@@ -19,7 +19,7 @@
     <description>An add-on created by Spring Roo's addon creator feature.</description>
     <url>http://www.some.company</url>
     <properties>
-        <roo.version>1.2.2.RELEASE</roo.version>
+        <roo.version>1.2.3.BUILD-SNAPSHOT</roo.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <google.code.project.name>${project.name}</google.code.project.name>
         <repo.folder>TO_BE_CHANGED_BY_ADDON</repo.folder>
@@ -214,10 +214,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>2.5.1</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
             <plugin>

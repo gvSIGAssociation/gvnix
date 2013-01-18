@@ -12,6 +12,8 @@ import static org.springframework.roo.model.JdkJavaType.ITERATOR;
 import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.JdkJavaType.RANDOM;
 import static org.springframework.roo.model.JdkJavaType.SECURE_RANDOM;
+import static org.springframework.roo.model.JdkJavaType.TIMESTAMP;
+import static org.springframework.roo.model.JpaJavaType.JOIN_COLUMN;
 import static org.springframework.roo.model.Jsr303JavaType.CONSTRAINT_VIOLATION;
 import static org.springframework.roo.model.Jsr303JavaType.CONSTRAINT_VIOLATION_EXCEPTION;
 import static org.springframework.roo.model.Jsr303JavaType.DECIMAL_MAX;
@@ -275,9 +277,8 @@ public class DataOnDemandMetadata extends
                 // Must make the field
                 final List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
                 annotations.add(new AnnotationMetadataBuilder(AUTOWIRED));
-                builder.addField(new FieldMetadataBuilder(getId(),
-                        Modifier.PRIVATE, annotations, fieldSymbolName,
-                        collaboratorType));
+                builder.addField(new FieldMetadataBuilder(getId(), 0,
+                        annotations, fieldSymbolName, collaboratorType));
                 fields.add(fieldSymbolName);
             }
         }
@@ -747,6 +748,11 @@ public class DataOnDemandMetadata extends
                 initializer = "Calendar.getInstance()";
             }
         }
+        else if (fieldType.equals(TIMESTAMP)) {
+            builder.getImportRegistrationResolver().addImports(CALENDAR,
+                    GREGORIAN_CALENDAR, TIMESTAMP);
+            initializer = "new Timestamp(new GregorianCalendar(Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH), Calendar.getInstance().get(Calendar.HOUR_OF_DAY), Calendar.getInstance().get(Calendar.MINUTE), Calendar.getInstance().get(Calendar.SECOND) + new Double(Math.random() * 1000).intValue()).getTime().getTime())";
+        }
         else if (fieldType.equals(STRING)) {
             if (fieldInitializer != null && fieldInitializer.contains("\"")) {
                 final int offset = fieldInitializer.indexOf("\"");
@@ -992,7 +998,8 @@ public class DataOnDemandMetadata extends
             final DataOnDemandMetadata collaboratingMetadata,
             final Set<?> fieldCustomDataKeys) {
         // To avoid circular references, we don't try to set nullable fields
-        final boolean nullableField = field.getAnnotation(NOT_NULL) == null;
+        final boolean nullableField = field.getAnnotation(NOT_NULL) == null
+                && isNullableJoinColumn(field);
         if (nullableField) {
             return null;
         }
@@ -1010,6 +1017,17 @@ public class DataOnDemandMetadata extends
                 + "."
                 + collaboratingMetadata.getRandomPersistentEntityMethod()
                         .getMethodName().getSymbolName() + "()";
+    }
+
+    private boolean isNullableJoinColumn(final FieldMetadata field) {
+        final AnnotationMetadata joinColumnAnnotation = field
+                .getAnnotation(JOIN_COLUMN);
+        if (joinColumnAnnotation == null) {
+            return true;
+        }
+        final AnnotationAttributeValue<?> nullableAttr = joinColumnAnnotation
+                .getAttribute(new JavaSymbolName("nullable"));
+        return nullableAttr == null || (Boolean) nullableAttr.getValue();
     }
 
     private List<MethodMetadataBuilder> getFieldMutatorMethods() {

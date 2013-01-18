@@ -44,6 +44,7 @@ import org.springframework.roo.classpath.TypeParsingService;
 import org.springframework.roo.classpath.customdata.CustomDataKeys;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.layers.LayerService;
@@ -228,8 +229,10 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
                         && !Modifier.isAbstract(entity.getModifier())) {
                     final String entitySimpleName = entity.getName()
                             .getSimpleTypeName();
-                    final ClassOrInterfaceTypeDetails request = gwtTypeService
-                            .lookupRequestFromProxy(proxy);
+                    ClassOrInterfaceTypeDetails request = gwtTypeService
+                            .lookupUnmanagedRequestFromProxy(proxy);
+                    if (request == null)
+                        request = gwtTypeService.lookupRequestFromProxy(proxy);
                     if (request != null) {
                         final String requestExpression = new StringBuilder("\t")
                                 .append(request.getName().getSimpleTypeName())
@@ -248,8 +251,7 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
                                 .getTopLevelPackage(moduleName)));
             }
 
-            if (projectOperations
-                    .isFeatureInstalledInFocusedModule(FeatureNames.GAE)) {
+            if (projectOperations.isFeatureInstalled(FeatureNames.GAE)) {
                 dataDictionary.showSection("gae");
             }
             break;
@@ -423,6 +425,58 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
         GwtProxyProperty dateProperty = null;
         final Set<String> importSet = new HashSet<String>();
 
+        List<String> omittedFields = new ArrayList<String>();
+
+        // Adds names of fields in edit view to ommittedFields list
+        if (type == GwtType.EDIT_VIEW) {
+            try {
+                String className = GwtPath.MANAGED_UI
+                        .packageName(topLevelPackage)
+                        + "."
+                        + simpleTypeName
+                        + GwtType.EDIT_VIEW.getTemplate();
+
+                ClassOrInterfaceTypeDetails details = typeLocationService
+                        .getTypeDetails(new JavaType(className));
+
+                if (details != null) {
+                    for (FieldMetadata field : details.getDeclaredFields()) {
+                        JavaSymbolName fieldName = field.getFieldName();
+                        String name = fieldName.toString();
+                        omittedFields.add(name);
+                    }
+                }
+            }
+            catch (Exception e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+
+        // Adds names of fields in mobile edit view to ommittedFields list
+        if (type == GwtType.MOBILE_EDIT_VIEW) {
+            try {
+                String className = GwtPath.MANAGED_UI
+                        .packageName(topLevelPackage)
+                        + "."
+                        + simpleTypeName
+                        + GwtType.MOBILE_EDIT_VIEW.getTemplate();
+
+                ClassOrInterfaceTypeDetails details = typeLocationService
+                        .getTypeDetails(new JavaType(className));
+
+                if (details != null) {
+                    for (FieldMetadata field : details.getDeclaredFields()) {
+                        JavaSymbolName fieldName = field.getFieldName();
+                        String name = fieldName.toString();
+                        omittedFields.add(name);
+                    }
+                }
+            }
+            catch (Exception e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+
         for (final GwtProxyProperty gwtProxyProperty : clientSideTypeMap
                 .values()) {
             // Determine if this is the primary property.
@@ -464,8 +518,10 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
             dataDictionary.addSection("fields").setVariable("field",
                     gwtProxyProperty.getName());
             if (!isReadOnly(gwtProxyProperty.getName(), mirroredType)) {
-                dataDictionary.addSection("editViewProps").setVariable("prop",
-                        gwtProxyProperty.forEditView());
+                // if the property is in the omittedFields list, do not add it
+                if (!omittedFields.contains(gwtProxyProperty.getName()))
+                    dataDictionary.addSection("editViewProps").setVariable(
+                            "prop", gwtProxyProperty.forEditView());
             }
 
             final TemplateDataDictionary propertiesSection = dataDictionary

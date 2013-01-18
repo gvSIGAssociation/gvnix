@@ -10,6 +10,7 @@ import static org.springframework.roo.classpath.PhysicalTypeCategory.INTERFACE;
 import static org.springframework.roo.model.RooJavaType.ROO_GWT_MIRRORED_FROM;
 import static org.springframework.roo.model.RooJavaType.ROO_GWT_PROXY;
 import static org.springframework.roo.model.RooJavaType.ROO_GWT_REQUEST;
+import static org.springframework.roo.model.RooJavaType.ROO_GWT_UNMANAGED_REQUEST;
 import static org.springframework.roo.model.RooJavaType.ROO_JPA_ACTIVE_RECORD;
 import static org.springframework.roo.model.RooJavaType.ROO_JPA_ENTITY;
 import static org.springframework.roo.project.Path.ROOT;
@@ -58,7 +59,6 @@ import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.FeatureNames;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Plugin;
-import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.project.maven.Pom;
@@ -207,10 +207,10 @@ public class GwtOperationsImpl implements GwtOperations {
     }
 
     /**
-     * Builds the given entity's RequestContext interface. Note that we don't
-     * generate the entire interface here, only the @RooGwtRequest annotation;
-     * we then invoke the metadata provider, which takes over and generates the
-     * remaining code, namely the method declarations and the @ServiceName
+     * Builds the given entity's managed RequestContext interface. Note that we
+     * don't generate the entire interface here, only the @RooGwtRequest
+     * annotation; we then invoke the metadata provider, which takes over and
+     * generates the remaining code, namely the method declarations and the @ServiceName
      * annotation. This is analogous to how ITD-based addons work, e.g. adding a
      * trigger annotation and letting the metadata provider do the rest. This
      * allows for the metadata provider to correctly respond to project changes.
@@ -225,7 +225,8 @@ public class GwtOperationsImpl implements GwtOperations {
             final JavaPackage destinationPackage) {
         final JavaType requestType = new JavaType(
                 destinationPackage.getFullyQualifiedPackageName() + "."
-                        + entity.getType().getSimpleTypeName() + "Request");
+                        + entity.getType().getSimpleTypeName()
+                        + "Request_Roo_Gwt");
         final LogicalPath focusedSrcMainJava = LogicalPath.getInstance(
                 SRC_MAIN_JAVA, projectOperations.getFocusedModuleName());
         final ClassOrInterfaceTypeDetailsBuilder requestBuilder = new ClassOrInterfaceTypeDetailsBuilder(
@@ -243,12 +244,55 @@ public class GwtOperationsImpl implements GwtOperations {
                 focusedSrcMainJava));
     }
 
+    /**
+     * Builds the given entity's unmanaged RequestContext interface used for
+     * adding custom methods. This interface extends the RequestContext
+     * interface managed by Roo.
+     * 
+     * @param entity the entity for which to create the GWT request interface
+     *            (required)
+     * @param destinationPackage the package in which to create the request
+     *            interface (required)
+     */
+    private void createUnmanagedRequestInterface(
+            final ClassOrInterfaceTypeDetails entity,
+            JavaPackage destinationPackage) {
+        final ClassOrInterfaceTypeDetails managedRequest = gwtTypeService
+                .lookupRequestFromEntity(entity);
+
+        if (managedRequest == null)
+            return;
+
+        final JavaType unmanagedRequestType = new JavaType(
+                destinationPackage.getFullyQualifiedPackageName() + "."
+                        + entity.getType().getSimpleTypeName() + "Request");
+
+        final LogicalPath focusedSrcMainJava = LogicalPath.getInstance(
+                SRC_MAIN_JAVA, projectOperations.getFocusedModuleName());
+        final ClassOrInterfaceTypeDetailsBuilder unmanagedRequestBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                PhysicalTypeIdentifier.createIdentifier(unmanagedRequestType,
+                        focusedSrcMainJava));
+        unmanagedRequestBuilder.setName(unmanagedRequestType);
+        unmanagedRequestBuilder.addExtendsTypes(managedRequest.getType());
+        unmanagedRequestBuilder.setPhysicalTypeCategory(INTERFACE);
+        unmanagedRequestBuilder.setModifier(PUBLIC);
+        unmanagedRequestBuilder
+                .addAnnotation(getRooGwtUnmanagedRequestAnnotation(entity));
+        unmanagedRequestBuilder.addAnnotation(managedRequest
+                .getAnnotation(GwtJavaType.SERVICE_NAME));
+        typeManagementService.createOrUpdateTypeOnDisk(unmanagedRequestBuilder
+                .build());
+
+    }
+
     private void createRequestInterfaceIfNecessary(
             final ClassOrInterfaceTypeDetails entity,
             final JavaPackage destinationPackage) {
         if (entity != null && !entity.isAbstract()
                 && gwtTypeService.lookupRequestFromEntity(entity) == null) {
             createRequestInterface(entity, destinationPackage);
+
+            createUnmanagedRequestInterface(entity, destinationPackage);
         }
     }
 
@@ -346,6 +390,16 @@ public class GwtOperationsImpl implements GwtOperations {
         final List<AnnotationAttributeValue<?>> gwtRequestAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
         gwtRequestAttributeValues.add(entityAttributeValue);
         return new AnnotationMetadataBuilder(ROO_GWT_REQUEST,
+                gwtRequestAttributeValues).build();
+    }
+
+    private AnnotationMetadata getRooGwtUnmanagedRequestAnnotation(
+            final ClassOrInterfaceTypeDetails entity) {
+        final StringAttributeValue entityAttributeValue = new StringAttributeValue(
+                VALUE, entity.getType().getFullyQualifiedTypeName());
+        final List<AnnotationAttributeValue<?>> gwtRequestAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
+        gwtRequestAttributeValues.add(entityAttributeValue);
+        return new AnnotationMetadataBuilder(ROO_GWT_UNMANAGED_REQUEST,
                 gwtRequestAttributeValues).build();
     }
 
@@ -606,24 +660,16 @@ public class GwtOperationsImpl implements GwtOperations {
 
     private void updateBuildPlugins(final boolean isGaeEnabled) {
         // Update the POM
+        final List<Plugin> plugins = new ArrayList<Plugin>();
         final String xPathExpression = "/configuration/"
                 + (isGaeEnabled ? "gae" : "gwt") + "/plugins/plugin";
         final List<Element> pluginElements = XmlUtils.findElements(
                 xPathExpression, XmlUtils.getConfiguration(getClass()));
         for (final Element pluginElement : pluginElements) {
-            final Plugin defaultPlugin = new Plugin(pluginElement);
-            for (final Plugin plugin : projectOperations.getFocusedModule()
-                    .getBuildPlugins()) {
-                if ("gwt-maven-plugin".equals(plugin.getArtifactId())) {
-                    projectOperations.removeBuildPluginImmediately(
-                            projectOperations.getFocusedModuleName(),
-                            defaultPlugin);
-                    break;
-                }
-            }
-            projectOperations.addBuildPlugin(
-                    projectOperations.getFocusedModuleName(), defaultPlugin);
+        	  plugins.add(new Plugin(pluginElement));
         }
+        projectOperations.addBuildPlugins(
+        		projectOperations.getFocusedModuleName(), plugins);
     }
 
     private void updateDependencies(final Element configuration) {
@@ -633,60 +679,61 @@ public class GwtOperationsImpl implements GwtOperations {
         for (final Element dependencyElement : gwtDependencies) {
             dependencies.add(new Dependency(dependencyElement));
         }
-        projectOperations.removeDependencies(
-                projectOperations.getFocusedModuleName(), dependencies);
-        metadataService
-                .evict(ProjectMetadata.getProjectIdentifier(projectOperations
-                        .getFocusedModuleName()));
         projectOperations.addDependencies(
-                projectOperations.getFocusedModuleName(), dependencies);
+            projectOperations.getFocusedModuleName(), dependencies);
     }
 
     /**
      * Updates the Eclipse plugin in the POM with the necessary GWT details
      */
     private void updateEclipsePlugin() {
-        // Load the POM
-        final String pom = getPomPath();
-        final Document document = XmlUtils.readXml(fileManager
-                .getInputStream(pom));
-        final Element root = document.getDocumentElement();
+  		// Load the POM
+  		final String pom = getPomPath();
+  		final Document document = XmlUtils.readXml(fileManager
+  				.getInputStream(pom));
+  		final Element root = document.getDocumentElement();
 
-        // Add the GWT "buildCommand"
-        final Element additionalBuildCommandsElement = XmlUtils
-                .findFirstElement(MAVEN_ECLIPSE_PLUGIN
-                        + "/configuration/additionalBuildcommands", root);
-        Validate.notNull(additionalBuildCommandsElement,
-                "additionalBuildcommands element of the maven-eclipse-plugin required");
-        Element gwtBuildCommandElement = XmlUtils.findFirstElement(
-                "buildCommand[name = '" + GWT_BUILD_COMMAND + "']",
-                additionalBuildCommandsElement);
-        if (gwtBuildCommandElement == null) {
-            gwtBuildCommandElement = DomUtils.createChildElement(
-                    "buildCommand", additionalBuildCommandsElement, document);
-            final Element nameElement = DomUtils.createChildElement("name",
-                    gwtBuildCommandElement, document);
-            nameElement.setTextContent(GWT_BUILD_COMMAND);
-        }
+  		// Add the GWT "buildCommand"
+  		final Element additionalBuildCommandsElement = XmlUtils
+  				.findFirstElement(MAVEN_ECLIPSE_PLUGIN
+  						+ "/configuration/additionalBuildcommands", root);
+  		Validate.notNull(additionalBuildCommandsElement,
+  				"additionalBuildcommands element of the maven-eclipse-plugin required");
+  		Element gwtBuildCommandElement = XmlUtils.findFirstElement(
+  				"buildCommand[name = '" + GWT_BUILD_COMMAND + "']",
+  				additionalBuildCommandsElement);
+  		if (gwtBuildCommandElement == null) {
+  			gwtBuildCommandElement = DomUtils.createChildElement(
+  					"buildCommand", additionalBuildCommandsElement, document);
+  			final Element nameElement = DomUtils.createChildElement("name",
+  					gwtBuildCommandElement, document);
+  			nameElement.setTextContent(GWT_BUILD_COMMAND);
+  		}
 
-        // Add the GWT "projectnature"
-        final Element additionalProjectNaturesElement = XmlUtils
-                .findFirstElement(MAVEN_ECLIPSE_PLUGIN
-                        + "/configuration/additionalProjectnatures", root);
-        Validate.notNull(additionalProjectNaturesElement,
-                "additionalProjectnatures element of the maven-eclipse-plugin required");
-        Element gwtProjectNatureElement = XmlUtils.findFirstElement(
-                "projectnature[name = '" + GWT_PROJECT_NATURE + "']",
-                additionalProjectNaturesElement);
-        if (gwtProjectNatureElement == null) {
-            gwtProjectNatureElement = new XmlElementBuilder("projectnature",
-                    document).setText(GWT_PROJECT_NATURE).build();
-            additionalProjectNaturesElement
-                    .appendChild(gwtProjectNatureElement);
-        }
+  		// Add the GWT "projectnature"
+  		final Element additionalProjectNaturesElement = XmlUtils
+  				.findFirstElement(MAVEN_ECLIPSE_PLUGIN
+  						+ "/configuration/additionalProjectnatures", root);
+  		Validate.notNull(additionalProjectNaturesElement,
+  				"additionalProjectnatures element of the maven-eclipse-plugin required");
+  		Element gwtProjectNatureElement = null;
+  		List<Element> gwtProjectNatureElements = XmlUtils.findElements("projectnature",
+  				additionalProjectNaturesElement);
+  		for (Element element: gwtProjectNatureElements) {
+  			if (GWT_PROJECT_NATURE.equals(element.getTextContent())) {
+  				gwtProjectNatureElement = element;
+  				break;
+  			}
+  		}
+  		if (gwtProjectNatureElement == null) {
+  			gwtProjectNatureElement = new XmlElementBuilder("projectnature",
+  					document).setText(GWT_PROJECT_NATURE).build();
+  			additionalProjectNaturesElement
+  					.appendChild(gwtProjectNatureElement);
+  		}
 
-        fileManager.createOrUpdateTextFileIfRequired(pom,
-                XmlUtils.nodeToString(document), false);
+  		fileManager.createOrUpdateTextFileIfRequired(pom,
+  				XmlUtils.nodeToString(document), false);
     }
 
     private void updateFile(final String sourceAntPath, String targetDirectory,

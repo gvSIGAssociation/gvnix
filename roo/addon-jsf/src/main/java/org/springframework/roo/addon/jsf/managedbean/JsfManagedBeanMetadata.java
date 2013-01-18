@@ -29,6 +29,7 @@ import static org.springframework.roo.addon.jsf.JsfJavaType.PRIMEFACES_FILE_UPLO
 import static org.springframework.roo.addon.jsf.JsfJavaType.PRIMEFACES_INPUT_TEXT;
 import static org.springframework.roo.addon.jsf.JsfJavaType.PRIMEFACES_INPUT_TEXTAREA;
 import static org.springframework.roo.addon.jsf.JsfJavaType.PRIMEFACES_MESSAGE;
+import static org.springframework.roo.addon.jsf.JsfJavaType.PRIMEFACES_OUTPUT_LABEL;
 import static org.springframework.roo.addon.jsf.JsfJavaType.PRIMEFACES_REQUEST_CONTEXT;
 import static org.springframework.roo.addon.jsf.JsfJavaType.PRIMEFACES_SELECT_BOOLEAN_CHECKBOX;
 import static org.springframework.roo.addon.jsf.JsfJavaType.PRIMEFACES_SELECT_MANY_MENU;
@@ -175,6 +176,7 @@ public class JsfManagedBeanMetadata extends
     private JavaSymbolName entityName;
     private Set<FieldMetadata> locatedFields;
     private String plural;
+    private JavaType messageFactory;
 
     public JsfManagedBeanMetadata(
             final String identifier,
@@ -217,6 +219,8 @@ public class JsfManagedBeanMetadata extends
         beanName = annotationValues.getBeanName();
         this.plural = plural;
         entityName = JavaSymbolName.getReservedWordSafeName(entity);
+        messageFactory = new JavaType(destination.getPackage()
+                .getFullyQualifiedPackageName() + ".util.MessageFactory");
 
         final JavaSymbolName allEntitiesFieldName = new JavaSymbolName("all"
                 + plural);
@@ -559,13 +563,14 @@ public class JsfManagedBeanMetadata extends
         }
 
         builder.getImportRegistrationResolver().addImports(FACES_MESSAGE,
-                FACES_CONTEXT);
+                FACES_CONTEXT, messageFactory);
 
         final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         bodyBuilder.appendFormalLine(removeMethod.getMethodCall() + ";");
         removeMethod.copyAdditionsTo(builder, governorTypeDetails);
         bodyBuilder
-                .appendFormalLine("FacesMessage facesMessage = new FacesMessage(\"Successfully deleted\");");
+                .appendFormalLine("FacesMessage facesMessage = MessageFactory.getMessage(\"message_successfully_deleted\", \""
+                        + entity.getSimpleTypeName() + "\");");
         bodyBuilder
                 .appendFormalLine("FacesContext.getCurrentInstance().addMessage(null, facesMessage);");
         bodyBuilder.appendFormalLine("reset();");
@@ -651,7 +656,7 @@ public class JsfManagedBeanMetadata extends
         }
 
         builder.getImportRegistrationResolver().addImports(FACES_CONTEXT,
-                FACES_MESSAGE, PRIMEFACES_FILE_UPLOAD_EVENT);
+                FACES_MESSAGE, PRIMEFACES_FILE_UPLOAD_EVENT, messageFactory);
 
         final List<JavaSymbolName> parameterNames = Arrays
                 .asList(new JavaSymbolName("event"));
@@ -661,7 +666,7 @@ public class JsfManagedBeanMetadata extends
                 + StringUtils.capitalize(fieldName)
                 + "(event.getFile().getContents());");
         bodyBuilder
-                .appendFormalLine("FacesMessage facesMessage = new FacesMessage(\"Successful\", event.getFile().getFileName() + \" is uploaded.\");");
+                .appendFormalLine("FacesMessage facesMessage = MessageFactory.getMessage(\"message_successfully_uploaded\", event.getFile().getFileName());");
         bodyBuilder
                 .appendFormalLine("FacesContext.getCurrentInstance().addMessage(null, facesMessage);");
 
@@ -917,7 +922,7 @@ public class JsfManagedBeanMetadata extends
         }
 
         builder.getImportRegistrationResolver().addImports(FACES_MESSAGE,
-                PRIMEFACES_REQUEST_CONTEXT);
+                PRIMEFACES_REQUEST_CONTEXT, FACES_CONTEXT, messageFactory);
 
         final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         bodyBuilder.appendFormalLine("String message = \"\";");
@@ -927,23 +932,27 @@ public class JsfManagedBeanMetadata extends
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine(mergeMethod.getMethodCall() + ";");
         mergeMethod.copyAdditionsTo(builder, governorTypeDetails);
-        bodyBuilder.appendFormalLine("message = \"Successfully updated\";");
+        bodyBuilder
+                .appendFormalLine("message = \"message_successfully_updated\";");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("} else {");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine(persistMethod.getMethodCall() + ";");
         persistMethod.copyAdditionsTo(builder, governorTypeDetails);
-        bodyBuilder.appendFormalLine("message = \"Successfully created\";");
+        bodyBuilder
+                .appendFormalLine("message = \"message_successfully_created\";");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
         bodyBuilder
                 .appendFormalLine("RequestContext context = RequestContext.getCurrentInstance();");
         bodyBuilder
-                .appendFormalLine("context.execute(\"createDialog.hide()\");");
-        bodyBuilder.appendFormalLine("context.execute(\"editDialog.hide()\");");
+                .appendFormalLine("context.execute(\"createDialogWidget.hide()\");");
+        bodyBuilder
+                .appendFormalLine("context.execute(\"editDialogWidget.hide()\");");
         bodyBuilder.appendFormalLine("");
         bodyBuilder
-                .appendFormalLine("FacesMessage facesMessage = new FacesMessage(message);");
+                .appendFormalLine("FacesMessage facesMessage = MessageFactory.getMessage(message, \""
+                        + entity.getSimpleTypeName() + "\");");
         bodyBuilder
                 .appendFormalLine("FacesContext.getCurrentInstance().addMessage(null, facesMessage);");
         bodyBuilder.appendFormalLine("reset();");
@@ -1005,7 +1014,7 @@ public class JsfManagedBeanMetadata extends
         }
 
         builder.getImportRegistrationResolver().addImports(EL_CONTEXT,
-                EXPRESSION_FACTORY, HTML_OUTPUT_TEXT);
+                EXPRESSION_FACTORY, HTML_OUTPUT_TEXT, PRIMEFACES_OUTPUT_LABEL);
 
         bodyBuilder
                 .appendFormalLine("ExpressionFactory expressionFactory = application.getExpressionFactory();");
@@ -1022,6 +1031,7 @@ public class JsfManagedBeanMetadata extends
             final String simpleTypeName = fieldType.getSimpleTypeName();
             final String fieldName = field.getFieldName().getSymbolName();
             final String fieldLabelId = fieldName + suffix1;
+            final String fieldValueId = fieldName + suffix2;
 
             final BigDecimal minValue = ObjectUtils.max(
                     getMinOrMaxValue(field, MIN),
@@ -1046,19 +1056,28 @@ public class JsfManagedBeanMetadata extends
                     && sizeMaxValue.intValue() > 30
                     || customData.keySet().contains(CustomDataKeys.LOB_FIELD);
 
+            final boolean isUIComponent = isUIComponent(field, fieldType,
+                    customData);
+
             // Field label
-            bodyBuilder.appendFormalLine("HtmlOutputText " + fieldLabelId
-                    + " = " + getComponentCreation("HtmlOutputText"));
+            if (action.equals(Action.VIEW) || !isUIComponent) {
+                bodyBuilder.appendFormalLine("HtmlOutputText " + fieldLabelId
+                        + " = " + getComponentCreation("HtmlOutputText"));
+            }
+            else {
+                bodyBuilder.appendFormalLine("OutputLabel " + fieldLabelId
+                        + " = " + getComponentCreation("OutputLabel"));
+                bodyBuilder.appendFormalLine(fieldLabelId + ".setFor(\""
+                        + fieldValueId + "\");");
+            }
             bodyBuilder.appendFormalLine(fieldLabelId + ".setId(\""
                     + fieldLabelId + "\");");
             bodyBuilder.appendFormalLine(fieldLabelId + ".setValue(\""
-                    + field.getFieldName().getReadableSymbolName() + ": "
-                    + (required ? "* " : "  ") + "\");");
+                    + field.getFieldName().getReadableSymbolName() + ":\");");
             bodyBuilder.appendFormalLine(getAddToPanelText(fieldLabelId));
             bodyBuilder.appendFormalLine("");
 
             // Field value
-            final String fieldValueId = fieldName + suffix2;
             final String converterName = fieldValueId + "Converter";
             final String htmlOutputTextStr = "HtmlOutputText " + fieldValueId
                     + " = " + getComponentCreation("HtmlOutputText");
@@ -1162,6 +1181,7 @@ public class JsfManagedBeanMetadata extends
                         bodyBuilder.appendFormalLine(fieldValueId
                                 + ".setAuto(true);");
                     }
+                    bodyBuilder.appendFormalLine(requiredStr);
                 }
             }
             else if (fieldType.equals(BOOLEAN_OBJECT)
@@ -1354,10 +1374,10 @@ public class JsfManagedBeanMetadata extends
                     if (sizeMinValue != null || sizeMaxValue != null) {
                         bodyBuilder.append(getLengthValdatorString(
                                 fieldValueId, sizeMinValue, sizeMaxValue));
-                        bodyBuilder.appendFormalLine(requiredStr);
                     }
                     setRegexPatternValidationString(field, fieldValueId,
                             bodyBuilder);
+                    bodyBuilder.appendFormalLine(requiredStr);
                 }
             }
             else if (customData.keySet().contains(PARAMETER_TYPE_KEY)) {
@@ -1769,6 +1789,47 @@ public class JsfManagedBeanMetadata extends
                     + "\");");
             bodyBuilder.appendFormalLine(fieldValueId + ".addValidator("
                     + fieldValueId + "RegexValidator);");
+        }
+    }
+
+    private boolean isUIComponent(FieldMetadata field, JavaType fieldType,
+            CustomData customData) {
+
+        if (field.getAnnotation(ROO_UPLOADED_FILE) != null
+                || fieldType.equals(BOOLEAN_OBJECT)
+                || fieldType.equals(BOOLEAN_PRIMITIVE)
+                || customData.keySet().contains(ENUMERATED_KEY)
+                || JdkJavaType.isDateField(fieldType)
+                || JdkJavaType.isIntegerType(fieldType)
+                || JdkJavaType.isDecimalType(fieldType)
+                || fieldType.equals(STRING)) {
+
+            return true;
+
+        }
+        else if (customData.keySet().contains(PARAMETER_TYPE_KEY)) {
+            if (StringUtils.isNotBlank((String) customData
+                    .get(PARAMETER_TYPE_MANAGED_BEAN_NAME_KEY))) {
+                if (customData.keySet().contains(ONE_TO_MANY_FIELD)
+                        || customData.keySet().contains(MANY_TO_MANY_FIELD)
+                        && isInverseSideOfRelationship(field, ONE_TO_MANY,
+                                MANY_TO_MANY)) {
+                    return false;
+                }
+            }
+
+            return true;
+
+        }
+        else if (customData.keySet().contains(APPLICATION_TYPE_KEY)) {
+            if (customData.keySet().contains(ONE_TO_ONE_FIELD)
+                    && isInverseSideOfRelationship(field, ONE_TO_ONE)) {
+                return false;
+            }
+            return true;
+        }
+        else {
+            return true;
         }
     }
 

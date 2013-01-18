@@ -1,5 +1,6 @@
 package org.springframework.roo.addon.dbre;
 
+import static org.springframework.roo.model.JdkJavaType.CALENDAR;
 import static org.springframework.roo.model.JdkJavaType.DATE;
 import static org.springframework.roo.model.JdkJavaType.SET;
 import static org.springframework.roo.model.JpaJavaType.CASCADE_TYPE;
@@ -653,9 +654,6 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
         AnnotationAttributeValue<?> value = toStringAnnotation
                 .getAttribute(new JavaSymbolName("excludeFields"));
         if (value == null) {
-            // XXX DiSiD: If no excludeFields attribute
-            // Create new empty one to add new fields
-            // http://projects.disid.com/issues/7455
             value = new ArrayAttributeValue<StringAttributeValue>(
                     new JavaSymbolName("excludeFields"),
                     new ArrayList<StringAttributeValue>());
@@ -755,7 +753,7 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
         }
 
         // Add JSR 220 @Temporal annotation to date fields
-        if (fieldType.equals(DATE)) {
+        if (fieldType.equals(DATE) || fieldType.equals(CALENDAR)) {
             final AnnotationMetadataBuilder temporalBuilder = new AnnotationMetadataBuilder(
                     TEMPORAL);
             temporalBuilder.addEnumAttribute(VALUE, new EnumDetails(
@@ -764,7 +762,12 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 
             final AnnotationMetadataBuilder dateTimeFormatBuilder = new AnnotationMetadataBuilder(
                     DATE_TIME_FORMAT);
-            dateTimeFormatBuilder.addStringAttribute("style", "M-");
+            if (fieldType.equals(DATE)) {
+                dateTimeFormatBuilder.addStringAttribute("style", "M-");
+            }
+            else {
+                dateTimeFormatBuilder.addStringAttribute("style", "MM");
+            }
 
             if (fieldName.getSymbolName().equals(CREATED)) {
                 columnBuilder.addBooleanAttribute("updatable", false);
@@ -780,7 +783,13 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
         final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
                 getId(), Modifier.PRIVATE, annotations, fieldName, fieldType);
         if (fieldName.getSymbolName().equals(CREATED)) {
-            fieldBuilder.setFieldInitializer("new java.util.Date()");
+            if (fieldType.equals(DATE)) {
+                fieldBuilder.setFieldInitializer("new java.util.Date()");
+            }
+            else {
+                fieldBuilder
+                        .setFieldInitializer("java.util.Calendar.getInstance()");
+            }
         }
         return fieldBuilder;
     }
@@ -800,8 +809,6 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
         return getJoinColumnAnnotation(reference, referencedColumn, null);
     }
 
-    // XXX DiSiD: Old method. Works as before with nullable=null
-    // http://projects.disid.com/issues/7454
     private AnnotationMetadataBuilder getJoinColumnAnnotation(
             final Reference reference, final boolean referencedColumn,
             final JavaType fieldType) {
@@ -809,9 +816,6 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
                 null);
     }
 
-    // XXX DiSiD: New method
-    // If null works as before, else set nullable with new parameter value
-    // http://projects.disid.com/issues/7454
     private AnnotationMetadataBuilder getJoinColumnAnnotation(
             final Reference reference, final boolean referencedColumn,
             final JavaType fieldType, final Boolean nullable) {
