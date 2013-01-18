@@ -281,6 +281,13 @@ public final class JavaParserUtils {
                     null, null);
         }
 
+        // Check if we are looking for the enclosingType itself
+        final NameExpr enclosingTypeName = getNameExpr(compilationUnitServices
+                .getEnclosingTypeName().getSimpleTypeName());
+        if (isEqual(enclosingTypeName, nameToFind)) {
+            return compilationUnitServices.getEnclosingTypeName();
+        }
+
         // We are searching for a non-qualified name expression (nameToFind), so
         // check if the compilation unit itself declares that type
         for (final TypeDeclaration internalType : compilationUnitServices

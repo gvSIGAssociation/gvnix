@@ -1,13 +1,14 @@
 package org.springframework.roo.classpath.javaparser;
 
 import static org.junit.Assert.assertTrue;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.springframework.roo.model.JdkJavaType.SET;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -26,7 +27,11 @@ import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.operations.Cardinality;
+import org.springframework.roo.classpath.operations.jsr303.ReferenceField;
+import org.springframework.roo.classpath.operations.jsr303.SetField;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
@@ -38,8 +43,6 @@ import org.springframework.roo.model.JavaType;
  * @since 1.2.1
  */
 @RunWith(PowerMockRunner.class)
-// @PrepareForTest({ JavaParserUtils.class, JavaParser.class,
-// CompilationUnit.class })
 public class UpdateCompilationUnitTest {
 
     private static final String SIMPLE_INTERFACE_FILE_PATH = "SimpleInterface.java.test";
@@ -47,6 +50,17 @@ public class UpdateCompilationUnitTest {
     private static final String SIMPLE_CLASS2_FILE_PATH = "SimpleClass2.java.test";
     private static final String SIMPLE_CLASS3_FILE_PATH = "SimpleClass3.java.test";
     private static final String ROO1505_CLASS_FILE_PATH = "Roo_1505.java.test";
+
+    private static final JavaType SIMPLE_INTERFACE_TYPE = new JavaType(
+            "org.myPackage.SimpleInterface");
+    private static final JavaType SIMPLE_CLASS_TYPE = new JavaType(
+            "org.myPackage.SimpleClass");
+    private static final JavaType SIMPLE_CLASS2_TYPE = new JavaType(
+            "org.myPackage.SimpleClass2");
+    private static final JavaType SIMPLE_CLASS3_TYPE = new JavaType(
+            "org.myPackage.SimpleClass3");
+    private static final JavaType ROO1505_CLASS_TYPE = new JavaType(
+            "com.pet.Roo_1505");
 
     private static final String SIMPLE_INTERFACE_DECLARED_BY_MID = "MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#bar?SimpleInterface";
     private static final String SIMPLE_CLASS_DECLARED_BY_MID = "MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?SimpleClass";
@@ -83,13 +97,10 @@ public class UpdateCompilationUnitTest {
         // Set up
         final File file = getResource(SIMPLE_INTERFACE_FILE_PATH);
         final String fileContents = getResourceContents(file);
-        final JavaType mockTargetType = mock(JavaType.class);
-        when(mockTargetType.getSimpleTypeName()).thenReturn(
-                SIMPLE_INTERFACE_NAME);
 
         final ClassOrInterfaceTypeDetails simpleInterfaceDetails = typeParsingService
                 .getTypeFromString(fileContents,
-                        SIMPLE_INTERFACE_DECLARED_BY_MID, mockTargetType);
+                        SIMPLE_INTERFACE_DECLARED_BY_MID, SIMPLE_INTERFACE_TYPE);
 
         // invoke
         final String result = typeParsingService
@@ -107,12 +118,10 @@ public class UpdateCompilationUnitTest {
         // Set up
         final File file = getResource(SIMPLE_CLASS_FILE_PATH);
         final String fileContents = getResourceContents(file);
-        final JavaType mockTargetType = mock(JavaType.class);
-        when(mockTargetType.getSimpleTypeName()).thenReturn(SIMPLE_CLASS_NAME);
 
         final ClassOrInterfaceTypeDetails simpleInterfaceDetails = typeParsingService
                 .getTypeFromString(fileContents, SIMPLE_CLASS_DECLARED_BY_MID,
-                        mockTargetType);
+                        SIMPLE_CLASS_TYPE);
 
         // invoke
         final String result = typeParsingService
@@ -130,12 +139,10 @@ public class UpdateCompilationUnitTest {
         // Set up
         final File file = getResource(SIMPLE_CLASS2_FILE_PATH);
         final String fileContents = getResourceContents(file);
-        final JavaType mockTargetType = mock(JavaType.class);
-        when(mockTargetType.getSimpleTypeName()).thenReturn(SIMPLE_CLASS2_NAME);
 
         final ClassOrInterfaceTypeDetails simpleInterfaceDetails = typeParsingService
                 .getTypeFromString(fileContents, SIMPLE_CLASS2_DECLARED_BY_MID,
-                        mockTargetType);
+                        SIMPLE_CLASS2_TYPE);
 
         // invoke
         final String result = typeParsingService
@@ -152,12 +159,10 @@ public class UpdateCompilationUnitTest {
         // Set up
         final File file = getResource(SIMPLE_CLASS3_FILE_PATH);
         final String fileContents = getResourceContents(file);
-        final JavaType mockTargetType = mock(JavaType.class);
-        when(mockTargetType.getSimpleTypeName()).thenReturn(SIMPLE_CLASS3_NAME);
 
         final ClassOrInterfaceTypeDetails simpleInterfaceDetails = typeParsingService
                 .getTypeFromString(fileContents, SIMPLE_CLASS3_DECLARED_BY_MID,
-                        mockTargetType);
+                        SIMPLE_CLASS3_TYPE);
 
         // invoke
         final String result = typeParsingService
@@ -169,17 +174,85 @@ public class UpdateCompilationUnitTest {
     }
 
     @Test
+    public void testSimpleClass3AddField() throws Exception {
+
+        // Set up
+        final File file = getResource(SIMPLE_CLASS3_FILE_PATH);
+        final String fileContents = getResourceContents(file);
+
+        final ClassOrInterfaceTypeDetails simpleInterfaceDetails = typeParsingService
+                .getTypeFromString(fileContents, SIMPLE_CLASS3_DECLARED_BY_MID,
+                        SIMPLE_CLASS3_TYPE);
+
+        final SetField fieldDetails = new SetField(
+                SIMPLE_CLASS3_DECLARED_BY_MID, new JavaType(
+                        SET.getFullyQualifiedTypeName(), 0, DataType.TYPE,
+                        null, Arrays.asList(SIMPLE_CLASS3_TYPE)),
+                new JavaSymbolName("children"), SIMPLE_CLASS3_TYPE,
+                Cardinality.ONE_TO_MANY);
+
+        final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                fieldDetails.getPhysicalTypeIdentifier(), Modifier.PRIVATE,
+                new ArrayList<AnnotationMetadataBuilder>(),
+                fieldDetails.getFieldName(), fieldDetails.getFieldType());
+        fieldBuilder.setFieldInitializer("new HashSet<SimpleClass3>()");
+
+        ClassOrInterfaceTypeDetails newClassDetails = addField(
+                simpleInterfaceDetails, fieldBuilder.build());
+
+        // invoke
+        final String result = typeParsingService
+                .getCompilationUnitContents(newClassDetails);
+
+        saveResult(file, result, "-addField");
+
+        checkSimple3Class(result);
+
+        assertTrue(result
+                .contains("private Set<SimpleClass3> children = new HashSet<SimpleClass3>();"));
+
+        // add another
+
+        final ClassOrInterfaceTypeDetails simpleInterfaceDetails2 = typeParsingService
+                .getTypeFromString(result, SIMPLE_CLASS3_DECLARED_BY_MID,
+                        SIMPLE_CLASS3_TYPE);
+
+        final ReferenceField fieldDetails2 = new ReferenceField(
+                SIMPLE_CLASS3_DECLARED_BY_MID, SIMPLE_CLASS2_TYPE,
+                new JavaSymbolName("referenceField"), Cardinality.MANY_TO_ONE);
+
+        final FieldMetadataBuilder fieldBuilder2 = new FieldMetadataBuilder(
+                fieldDetails2.getPhysicalTypeIdentifier(), Modifier.PRIVATE,
+                new ArrayList<AnnotationMetadataBuilder>(),
+                fieldDetails2.getFieldName(), fieldDetails2.getFieldType());
+
+        ClassOrInterfaceTypeDetails newClassDetails2 = addField(
+                simpleInterfaceDetails2, fieldBuilder2.build());
+
+        // invoke
+        final String result2 = typeParsingService
+                .getCompilationUnitContents(newClassDetails2);
+
+        saveResult(file, result2, "-addField2");
+
+        checkSimple3Class(result2);
+
+        assertTrue(result
+                .contains("private Set<SimpleClass3> children = new HashSet<SimpleClass3>();"));
+        assertTrue(result2.contains("private SimpleClass2 referenceField;"));
+
+    }
+
+    @Test
     public void testRegresion_ROO_1505() throws Exception {
 
         // Set up
         final File file = getResource(ROO1505_CLASS_FILE_PATH);
         final String fileContents = getResourceContents(file);
-        final JavaType mockTargetType = mock(JavaType.class);
-        when(mockTargetType.getSimpleTypeName()).thenReturn(ROO1505_CLASS_NAME);
 
         final ClassOrInterfaceTypeDetails simpleInterfaceDetails = typeParsingService
                 .getTypeFromString(fileContents, ROO1505_CLASS_DECLARED_BY_MID,
-                        mockTargetType);
+                        ROO1505_CLASS_TYPE);
 
         // invoke
         final String result = typeParsingService
@@ -196,12 +269,10 @@ public class UpdateCompilationUnitTest {
         // Set up
         final File file = getResource(SIMPLE_CLASS_FILE_PATH);
         final String fileContents = getResourceContents(file);
-        final JavaType mockTargetType = mock(JavaType.class);
-        when(mockTargetType.getSimpleTypeName()).thenReturn(SIMPLE_CLASS_NAME);
 
         final ClassOrInterfaceTypeDetails simpleInterfaceDetails = typeParsingService
                 .getTypeFromString(fileContents, SIMPLE_CLASS_DECLARED_BY_MID,
-                        mockTargetType);
+                        SIMPLE_CLASS_TYPE);
 
         final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
                 SIMPLE_CLASS_DECLARED_BY_MID, Modifier.PRIVATE,
@@ -228,12 +299,10 @@ public class UpdateCompilationUnitTest {
         // Set up
         final File file = getResource(SIMPLE_CLASS_FILE_PATH);
         final String fileContents = getResourceContents(file);
-        final JavaType mockTargetType = mock(JavaType.class);
-        when(mockTargetType.getSimpleTypeName()).thenReturn(SIMPLE_CLASS_NAME);
 
         final ClassOrInterfaceTypeDetails simpleInterfaceDetails = typeParsingService
                 .getTypeFromString(fileContents, SIMPLE_CLASS_DECLARED_BY_MID,
-                        mockTargetType);
+                        SIMPLE_CLASS_TYPE);
 
         final AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 new JavaType(
@@ -256,7 +325,7 @@ public class UpdateCompilationUnitTest {
         // invoke2
         final ClassOrInterfaceTypeDetails simpleInterfaceDetails2 = typeParsingService
                 .getTypeFromString(result, SIMPLE_CLASS_DECLARED_BY_MID,
-                        mockTargetType);
+                        SIMPLE_CLASS_TYPE);
 
         final String result2 = typeParsingService
                 .getCompilationUnitContents(simpleInterfaceDetails2);
