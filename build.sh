@@ -53,10 +53,10 @@ rm -rf ~/.m2/repository/org/gvnix
 
 ### gvNIX wrappings
 
-# Compile and install all wrappings although they may not be required
-cd wrapping
+# Compile and install javaparser fork wrapping since accepted by Roo
+cd wrapping/javaparser-fork
 mvn clean install
-cd ..
+cd ../..
 
 ### ROO PACKAGE
 
