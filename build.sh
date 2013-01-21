@@ -51,6 +51,13 @@ done
 rm -rf ~/.m2/repository/org/springframework/roo
 rm -rf ~/.m2/repository/org/gvnix
 
+### gvNIX wrappings
+
+# Compile and install all wrappings although they may not be required
+cd wrapping
+mvn clean install
+cd ..
+
 ### ROO PACKAGE
 
 # Change to Roo folder
