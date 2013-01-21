@@ -53,7 +53,9 @@
     <module>aspectj</module>
     <module>hibernate</module>
     <module>javassist</module>
+<!-- Oracle license don't allow distribution 
     <module>oracle</module>
+-->
     <module>postgresql</module>
     <module>postgis</module>
     <module>jts</module>
