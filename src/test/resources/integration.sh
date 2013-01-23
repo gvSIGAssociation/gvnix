@@ -193,7 +193,7 @@
 	mkdir base
 	cd base
 	gvnix.sh script --file $2/code/addon-web-menu/src/test/resources/base.roo
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 
 ##
@@ -274,7 +274,7 @@
 	mkdir gvnix-test
 	cd gvnix-test
 	gvnix.sh script --file $2/code/addon-web-report/src/test/resources/gvnix-test.roo
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 
 ##
@@ -334,7 +334,7 @@
 	mkdir gvnix-sample
 	cd gvnix-sample
 	gvnix.sh script --file $2/code/src/main/assembly/samples/gvnix-sample.roo
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	
 	## script
