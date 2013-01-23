@@ -1239,13 +1239,16 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
   	<para xml:lang="es">Servidor Hudson (antiguo): http://v-pre01.disid.com:8081</para>
   	<para xml:lang="es">Servidor Jenkins (nuevo): http://hq02.disid.com:8080/</para>
   	
-  	<para xml:lang="es">En el servidor será necesario tener instalado en el sistema y disponible desde la consola:
-  	Maven 3.0.X (mayor revisión), Java 1.6.X (mayor revisión) y Xvfb (simulador de interfaces gráficas)
-  	ya que los utiliza el script de shell que ejecuta todas las pruebas.</para>
+  	<para xml:lang="es">En el servidor será necesario tener instalado en el sistema y, por lo tanto, disponible desde la consola:
+  	startx (iniciador de interfaces gráficas para lanzarlos tests de integración de selenium) y zip (para empaquetar
+  	la distribución) ya que los utiliza el script de shell que ejecuta todas las pruebas.</para>
+  	
+  	<para xml:lang="es">Maven 3.0.X (mayor revisión), Java 1.6.X (mayor revisión), Ant 1.8.X (mayor revision).</para> 
   	
   	<para xml:lang="es">Se descarga el código de http://scmcit.gva.es/svn/gvnix/trunk/code
-  	haciendo siempre un revertido y actualización del código para ejecutar el test con la
-  	última versión de código disponible y sin posibles cambios locales.</para>
+  	haciendo una descarga limpia completa del código para ejecutar el test con la
+  	última versión de código disponible y sin posibles cambios locales. La fecha y hora del
+  	servidor debe ser correcta para asegurar que las descargas de código sean correctas.</para>
   	
   	<para xml:lang="es">La tarea de prueba se ejecuta todos los días cada 2 horas entre las 6 y las 20 horas.</para>
   	
@@ -1254,11 +1257,15 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
   	siendo ${clave} una clave válida según explica Roo en su documentación y se utiliza para firmar el código compilado.
   	</para>
   	
-  	<para xml:lang="es">Se ejecuta el siguiente script: code/src/test/resources/integration.sh mediante un comando de consola:
-  	${WORKSPACE}/code/src/test/resources/integration.sh ${BUILD_NUMBER} ${WORKSPACE}</para>
+  	<para xml:lang="es">Se ejecuta el script code/src/test/resources/integration.sh mediante un comando de consola,
+  	siendo antes necesario dar permisos de ejecución a dicho script:
+  	<command>chmod 744 ${WORKSPACE}/code/src/test/resources/integration.sh
+  	${WORKSPACE}/code/src/test/resources/integration.sh ${BUILD_NUMBER} ${WORKSPACE}</command></para>
   	
   	<para xml:lang="es">Se avisa por correo de ejecucions erróneas al responsable técnico del proyecto 
-  	y a las personas que hayan producido el error.</para>
+  	y a las personas que hayan producido el error. Para ello, debe estar configurado en el sistema
+  	de build continuo el servidor de correo saliente a mail.disid.com y el sufijo de email por defecto
+  	a @disid.com.</para>
   	
   	<para xml:lang="es">Actualmente, el test tarda aproximadamente 2 horas.</para>
   </section>  

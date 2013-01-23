@@ -67,6 +67,7 @@ However, Roo source code can be updated to a new tag with next commands:
 * Store our Roo modifications:	git stash
 * Change to new tag:			git checkout {version}
 * Apply our Roo modifications:	git stash pop
+* Merge changes:				git mergetool
 * Save in SVN:					svn commit
 
 Update gvNIX parent pom roo.version property to new value.
