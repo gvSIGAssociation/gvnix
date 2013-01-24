@@ -219,6 +219,13 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
             }
             isAlreadyAnnotated = true;
         }
+        
+        // If no changes will make (annotation exists and no name
+        // must be added)
+        if (isAlreadyAnnotated && name == null){
+        	// All done
+        	return;
+        }
 
         // Prepare annotation builder
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
