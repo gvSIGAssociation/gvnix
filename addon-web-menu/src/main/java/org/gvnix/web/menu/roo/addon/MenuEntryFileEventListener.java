@@ -70,7 +70,7 @@ public class MenuEntryFileEventListener implements FileEventListener {
 	    }
 
 		// If OSGI Roo menu component already disabled, nothing to do
-		if (MenuEntryOperationsImpl.isRooMenuDisabled) {
+		if (MenuEntryOperationsImpl.isRooMenuDisabled()) {
 			return;
 		}
 

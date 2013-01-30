@@ -19,16 +19,18 @@
 package org.gvnix.web.menu.roo.addon;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.roundtrip.XmlRoundTripFileManager;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,23 +46,40 @@ import org.w3c.dom.Element;
  * @author Enrique Ruiz (eruiz at disid dot com) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
  */
 
-//Immediate required to avoid invalid gvNIX menu activation
-@Component(immediate=true)
+@Component
 @Service
 public class MenuOperationsImpl implements MenuOperations { 
 
+  private static Logger logger = HandlerUtils
+            .getLogger(MenuOperationsImpl.class);
+  
+  /**
+   * Property to identify this service in {@link FilterMenuOperationsHook}
+   * and {@link MenuOperationsProxy}
+   */
+  @Property(boolValue=true)
+  public static final String GVNIX_COMPONENT = "gvNIXComponent";
+  
   /**
    * Use AddonOperations delegate to operations this add-on offers
    */
   @Reference private MenuEntryOperations operations;
-  @Reference private XmlRoundTripFileManager xmlRoundTripFileManager;
-
-  /** {@inheritDoc} */
-  protected void activate(ComponentContext context) {
-	  
-	  // Avoid invalid gvNIX menu activation: if Roo menu enabled, wait until this service is started
-	  if (!MenuEntryOperationsImpl.isRooMenuDisabled) {
-		  while (context.getBundleContext().getServiceReference(MenuOperations.class.getName()) == null);
+  @Reference private XmlRoundTripFileManager xmlFileManager;
+  
+  
+  /**
+   * Waits until all required references are available
+   */
+  private void waitToReferences(){
+	  if (operations != null && xmlFileManager != null){
+		  return;
+	  }
+	  while (!(operations != null && xmlFileManager != null)){
+		  try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			break;
+		}
 	  }
   }
 
@@ -68,6 +87,7 @@ public class MenuOperationsImpl implements MenuOperations {
   public void addMenuItem(JavaSymbolName menuCategoryName,
                           JavaSymbolName menuItemId, String globalMessageCode,
                           String link, String idPrefix, LogicalPath logicalPath) {
+	waitToReferences();
 	// TODO Added logicalPath param to method: related methods modification required ? 
     operations.addMenuItem(menuCategoryName, menuItemId, globalMessageCode, link,
         idPrefix);
@@ -77,13 +97,15 @@ public class MenuOperationsImpl implements MenuOperations {
   public void addMenuItem(JavaSymbolName menuCategoryName,
                           JavaSymbolName menuItemId, String menuItemLabel,
                           String globalMessageCode, String link, String idPrefix, LogicalPath logicalPath) {
+	waitToReferences();
 	// TODO Added logicalPath param to method: related methods modification required ? 
     operations.addMenuItem(menuCategoryName, menuItemId, menuItemLabel,
         globalMessageCode, link, idPrefix);
   }
 
   public void cleanUpFinderMenuItems(JavaSymbolName menuCategoryName, List<String> allowedFinderMenuIds, LogicalPath logicalPath) {
-	  
+	
+	waitToReferences();
 	// TODO Added logicalPath param to method: related methods modification required ? 
 	Validate.notNull(menuCategoryName, "Menu category identifier required");
 	Validate.notNull(allowedFinderMenuIds, "List of allowed menu items required");
@@ -108,7 +130,7 @@ public class MenuOperationsImpl implements MenuOperations {
         element.getParentNode().removeChild(element);
       }
     }
-    xmlRoundTripFileManager.writeToDiskIfNecessary(
+    xmlFileManager.writeToDiskIfNecessary(
     		operations.getMenuConfigFile(), document);
   }
 
@@ -120,6 +142,8 @@ public class MenuOperationsImpl implements MenuOperations {
    * @param idPrefix the prefix to be used for this menu item (optional, MenuOperations.DEFAULT_MENU_ITEM_PREFIX is default)
    */
   public void cleanUpMenuItem(JavaSymbolName menuCategoryName, JavaSymbolName menuItemName, String idPrefix, LogicalPath logicalPath) {
+	
+	waitToReferences();
 	// TODO Added logicalPath param to method: related methods modification required ? 
 	Validate.notNull(menuCategoryName, "Menu category identifier required");
 	Validate.notNull(menuItemName, "Menu item id required");
@@ -153,4 +177,14 @@ public class MenuOperationsImpl implements MenuOperations {
 
     operations.writeXMLConfigIfNeeded(document);
   }
+
+  /**
+   * Informs if gvNIX menu is activated
+   * 
+   * @return
+   */
+  public boolean isGvNixMenuAvailable() {
+	  waitToReferences();
+	  return operations.isGvNixMenuAvailable();
+  }  
 }
