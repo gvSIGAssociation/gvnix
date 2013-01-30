@@ -12,7 +12,7 @@
 
     <productname>Spring Roo</productname>
 
-    <releaseinfo>1.2.3.BUILD-SNAPSHOT</releaseinfo>
+    <releaseinfo>1.2.4.BUILD-SNAPSHOT</releaseinfo>
 
     <authorgroup>
       <author>
@@ -37,7 +37,7 @@
     </authorgroup>
 
     <legalnotice>
-      <para>Copyright 2009, 2010, 2011, 2012 VMware, Inc. All Rights
+      <para>Copyright 2009-2013 VMware, Inc. All Rights
       Reserved.</para>
 
       <para>Copies of this document may be made for your own use and for

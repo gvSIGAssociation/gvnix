@@ -142,7 +142,8 @@ public class JavaParserTypeParsingService implements TypeParsingService {
                     typeLocationService).build();
         }
         catch (final ParseException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Failed to parse " + typeName
+                    + " : " + e.getMessage());
         }
     }
 
@@ -181,10 +182,9 @@ public class JavaParserTypeParsingService implements TypeParsingService {
                                     .getFullyQualifiedTypeName()), importType
                             .getImportType().getSimpleTypeName());
                 }
-                // DiSiD: Fixed lose static modifier (Solved in ROO-3340)
                 compilationUnit.getImports().add(
                         new ImportDeclaration(typeToImportExpr, importType
-                                .isStatic(), false)); // DiSiD Fix static lose
+                                .isStatic(), false));
             }
             else {
                 compilationUnit.getImports().add(
@@ -446,69 +446,5 @@ public class JavaParserTypeParsingService implements TypeParsingService {
         });
 
         compilationUnit.setImports(imports);
-    }
-
-    /*
-     * XXX DiSiD: try to solve problems about lost of comments and javadoc in
-     * java files. http://projects.disid.com/issues/7728
-     * https://jira.springsource.org/browse/ROO-3335
-     */
-    @Override
-    public String updateAndGetCompilationUnitContents(String fileIdentifier,
-            ClassOrInterfaceTypeDetails cid) {
-
-        // Validate parameters
-        Validate.notBlank(fileIdentifier, "Oringinal unit path required");
-        Validate.notNull(cid, "Type details required");
-
-        // Load original compilation unit from file
-        final File file = new File(fileIdentifier);
-        String fileContents = "";
-        try {
-            fileContents = FileUtils.readFileToString(file);
-        }
-        catch (IOException ignored) {
-        }
-        if (StringUtils.isBlank(fileContents)) {
-            return getCompilationUnitContents(cid);
-        }
-        CompilationUnit compilationUnit;
-        try {
-            compilationUnit = JavaParser.parse(new ByteArrayInputStream(
-                    fileContents.getBytes()));
-
-        }
-        catch (final ParseException e) {
-            throw new IllegalStateException(e);
-        }
-
-        // Load new compilation unit from cid information
-        final String cidContents = getCompilationUnitContents(cid);
-        CompilationUnit cidCompilationUnit;
-        try {
-            cidCompilationUnit = JavaParser.parse(new ByteArrayInputStream(
-                    cidContents.getBytes()));
-
-        }
-        catch (final ParseException e) {
-            throw new IllegalStateException(e);
-        }
-
-        // Update package
-        if (!compilationUnit.getPackage().getName().getName()
-                .equals(cidCompilationUnit.getPackage().getName().getName())) {
-            compilationUnit.setPackage(cidCompilationUnit.getPackage());
-        }
-
-        // Update imports
-        UpdateCompilationUnitUtils.updateCompilationUnitImports(
-                compilationUnit, cidCompilationUnit);
-
-        // Update types
-        UpdateCompilationUnitUtils.updateCompilationUnitTypes(compilationUnit,
-                cidCompilationUnit);
-
-        // Return new contents
-        return compilationUnit.toString();
     }
 }

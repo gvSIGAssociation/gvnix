@@ -50,11 +50,9 @@ public class JavaParserFieldMetadataBuilder implements Builder<FieldMetadata> {
         JavaParserUtils.importTypeIfRequired(
                 compilationUnitServices.getEnclosingTypeName(),
                 compilationUnitServices.getImports(), field.getFieldType());
-        // DiSiD #7728 Fixed problem with arrays fields
         final Type initType = JavaParserUtils.getResolvedName(
                 compilationUnitServices.getEnclosingTypeName(),
                 field.getFieldType(), compilationUnitServices);
-        // DiSiD #7728 Fixed problem with arrays fields
         ClassOrInterfaceType finalType = JavaParserUtils
                 .getClassOrInterfaceType(initType);
 
@@ -65,7 +63,6 @@ public class JavaParserFieldMetadataBuilder implements Builder<FieldMetadata> {
         // Add parameterized types for the field type (not initializer)
         if (field.getFieldType().getParameters().size() > 0) {
             final List<Type> fieldTypeArgs = new ArrayList<Type>();
-            // DiSiD #7728 Fixed problem with arrays fields
             finalType.setTypeArgs(fieldTypeArgs);
             for (final JavaType parameter : field.getFieldType()
                     .getParameters()) {
@@ -140,16 +137,12 @@ public class JavaParserFieldMetadataBuilder implements Builder<FieldMetadata> {
 
                 if (typeToImport.getParameters().size() > 0) {
                     final List<Type> initTypeArgs = new ArrayList<Type>();
-                    // DiSiD #7728 Fixed problem with arrays fields
                     finalType.setTypeArgs(initTypeArgs);
                     for (final JavaType parameter : typeToImport
                             .getParameters()) {
-                        initTypeArgs.add(JavaParserUtils
-                                .importParametersForType(
-                                        compilationUnitServices
-                                                .getEnclosingTypeName(),
-                                        compilationUnitServices.getImports(),
-                                        parameter));
+                        initTypeArgs.add(JavaParserUtils.importParametersForType(
+                                compilationUnitServices.getEnclosingTypeName(),
+                                compilationUnitServices.getImports(), parameter));
                     }
                     classOrInterfaceType.setTypeArgs(initTypeArgs);
                 }
@@ -224,8 +217,8 @@ public class JavaParserFieldMetadataBuilder implements Builder<FieldMetadata> {
             }
         }
 
-        Validate.isTrue(toDelete > -1, "Could not locate field '" + fieldName
-                + "' to delete");
+        Validate.isTrue(toDelete > -1, "Could not locate field '%s' to delete",
+                fieldName);
 
         // Do removal outside iteration of body declaration members, to avoid
         // concurrent modification exceptions

@@ -19,9 +19,7 @@ public class Table {
     private final Set<ForeignKey> exportedKeys = new LinkedHashSet<ForeignKey>();
     private final Set<ForeignKey> importedKeys = new LinkedHashSet<ForeignKey>();
     private boolean includeNonPortableAttributes;
-    // XXX DiSiD Disable version fields
     private boolean disableVersionFields;
-    // XXX DiSiD Disable generated identifiers
     private boolean disableGeneratedIdentifiers;
     private final Set<Index> indices = new LinkedHashSet<Index>();
     private boolean joinTable;
@@ -29,7 +27,7 @@ public class Table {
     private final Schema schema;
 
     Table(final String name, final Schema schema) {
-        Validate.isTrue(StringUtils.isNotBlank(name), "Table name required");
+        Validate.notBlank(name, "Table name required");
         Validate.notNull(schema, "Table schema required");
         this.name = name;
         this.schema = schema;
@@ -147,8 +145,7 @@ public class Table {
 
     public ForeignKey getImportedKey(final String name) {
         for (final ForeignKey foreignKey : importedKeys) {
-            Validate.isTrue(StringUtils.isNotBlank(foreignKey.getName()),
-                    "Foreign key name required");
+            Validate.notBlank(foreignKey.getName(), "Foreign key name required");
             if (foreignKey.getName().equalsIgnoreCase(name)) {
                 return foreignKey;
             }

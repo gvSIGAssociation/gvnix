@@ -19,8 +19,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.roo.classpath.TypeLocationService;
-import org.springframework.roo.classpath.TypeManagementService;
-import org.springframework.roo.classpath.TypeManagementServiceImpl;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.FieldMetadata;
@@ -40,7 +38,7 @@ import org.springframework.roo.model.JavaType;
  * {@link JavaParserTypeParsingService#getCompilationUnitContents(org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails)}
  * 
  * @author DiSiD Technologies
- * @since 1.2.1
+ * @since 1.2.4
  */
 @RunWith(PowerMockRunner.class)
 public class UpdateCompilationUnitTest {
@@ -68,16 +66,8 @@ public class UpdateCompilationUnitTest {
     private static final String SIMPLE_CLASS3_DECLARED_BY_MID = "MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?SimpleClass3";
     private static final String ROO1505_CLASS_DECLARED_BY_MID = "MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?Roo_1505";
 
-    private static final String SIMPLE_INTERFACE_NAME = "SimpleInterface";
-    private static final String SIMPLE_CLASS_NAME = "SimpleClass";
-    private static final String SIMPLE_CLASS2_NAME = "SimpleClass2";
-    private static final String SIMPLE_CLASS3_NAME = "SimpleClass3";
-    private static final String ROO1505_CLASS_NAME = "Roo_1505";
-
     @Mock private MetadataService mockMetadataService;
     @Mock private TypeLocationService mockTypeLocationService;
-
-    private TypeManagementService typeManagementService;
 
     // Fixture
     private JavaParserTypeParsingService typeParsingService;
@@ -88,12 +78,10 @@ public class UpdateCompilationUnitTest {
         typeParsingService = new JavaParserTypeParsingService();
         typeParsingService.metadataService = mockMetadataService;
         typeParsingService.typeLocationService = mockTypeLocationService;
-        typeManagementService = new TypeManagementServiceImpl();
     }
 
     @Test
     public void testSimpleInterfaceNoChanges() throws Exception {
-
         // Set up
         final File file = getResource(SIMPLE_INTERFACE_FILE_PATH);
         final String fileContents = getResourceContents(file);
@@ -102,11 +90,11 @@ public class UpdateCompilationUnitTest {
                 .getTypeFromString(fileContents,
                         SIMPLE_INTERFACE_DECLARED_BY_MID, SIMPLE_INTERFACE_TYPE);
 
-        // invoke
+        // Invoke
         final String result = typeParsingService
                 .getCompilationUnitContents(simpleInterfaceDetails);
-        ;
 
+        // Save to file for debug
         saveResult(file, result);
 
         checkSimpleInterface(result);
@@ -114,7 +102,6 @@ public class UpdateCompilationUnitTest {
 
     @Test
     public void testSimpleClassNoChanges() throws Exception {
-
         // Set up
         final File file = getResource(SIMPLE_CLASS_FILE_PATH);
         final String fileContents = getResourceContents(file);
@@ -123,11 +110,11 @@ public class UpdateCompilationUnitTest {
                 .getTypeFromString(fileContents, SIMPLE_CLASS_DECLARED_BY_MID,
                         SIMPLE_CLASS_TYPE);
 
-        // invoke
+        // Invoke
         final String result = typeParsingService
                 .getCompilationUnitContents(simpleInterfaceDetails);
-        ;
 
+        // Save to file for debug
         saveResult(file, result);
 
         checkSimpleClass(result);
@@ -135,7 +122,6 @@ public class UpdateCompilationUnitTest {
 
     @Test
     public void testSimpleClass2NoChanges() throws Exception {
-
         // Set up
         final File file = getResource(SIMPLE_CLASS2_FILE_PATH);
         final String fileContents = getResourceContents(file);
@@ -144,10 +130,11 @@ public class UpdateCompilationUnitTest {
                 .getTypeFromString(fileContents, SIMPLE_CLASS2_DECLARED_BY_MID,
                         SIMPLE_CLASS2_TYPE);
 
-        // invoke
+        // Invoke
         final String result = typeParsingService
                 .getCompilationUnitContents(simpleInterfaceDetails);
 
+        // Save to file for debug
         saveResult(file, result);
 
         checkSimple2Class(result);
@@ -155,7 +142,6 @@ public class UpdateCompilationUnitTest {
 
     @Test
     public void testSimpleClass3NoChanges() throws Exception {
-
         // Set up
         final File file = getResource(SIMPLE_CLASS3_FILE_PATH);
         final String fileContents = getResourceContents(file);
@@ -164,10 +150,11 @@ public class UpdateCompilationUnitTest {
                 .getTypeFromString(fileContents, SIMPLE_CLASS3_DECLARED_BY_MID,
                         SIMPLE_CLASS3_TYPE);
 
-        // invoke
+        // Invoke
         final String result = typeParsingService
                 .getCompilationUnitContents(simpleInterfaceDetails);
 
+        // Save to file for debug
         saveResult(file, result);
 
         checkSimple3Class(result);
@@ -175,7 +162,6 @@ public class UpdateCompilationUnitTest {
 
     @Test
     public void testSimpleClass3AddField() throws Exception {
-
         // Set up
         final File file = getResource(SIMPLE_CLASS3_FILE_PATH);
         final String fileContents = getResourceContents(file);
@@ -200,7 +186,7 @@ public class UpdateCompilationUnitTest {
         ClassOrInterfaceTypeDetails newClassDetails = addField(
                 simpleInterfaceDetails, fieldBuilder.build());
 
-        // invoke
+        // Invoke
         final String result = typeParsingService
                 .getCompilationUnitContents(newClassDetails);
 
@@ -211,8 +197,7 @@ public class UpdateCompilationUnitTest {
         assertTrue(result
                 .contains("private Set<SimpleClass3> children = new HashSet<SimpleClass3>();"));
 
-        // add another
-
+        // Add another
         final ClassOrInterfaceTypeDetails simpleInterfaceDetails2 = typeParsingService
                 .getTypeFromString(result, SIMPLE_CLASS3_DECLARED_BY_MID,
                         SIMPLE_CLASS3_TYPE);
@@ -229,10 +214,11 @@ public class UpdateCompilationUnitTest {
         ClassOrInterfaceTypeDetails newClassDetails2 = addField(
                 simpleInterfaceDetails2, fieldBuilder2.build());
 
-        // invoke
+        // Invoke
         final String result2 = typeParsingService
                 .getCompilationUnitContents(newClassDetails2);
 
+        // Save to file for debug
         saveResult(file, result2, "-addField2");
 
         checkSimple3Class(result2);
@@ -245,7 +231,6 @@ public class UpdateCompilationUnitTest {
 
     @Test
     public void testRegresion_ROO_1505() throws Exception {
-
         // Set up
         final File file = getResource(ROO1505_CLASS_FILE_PATH);
         final String fileContents = getResourceContents(file);
@@ -254,10 +239,11 @@ public class UpdateCompilationUnitTest {
                 .getTypeFromString(fileContents, ROO1505_CLASS_DECLARED_BY_MID,
                         ROO1505_CLASS_TYPE);
 
-        // invoke
+        // Invoke
         final String result = typeParsingService
                 .getCompilationUnitContents(simpleInterfaceDetails);
 
+        // Save to file for debug
         saveResult(file, result);
 
         check_ROO_1505_Class(result);
@@ -265,7 +251,6 @@ public class UpdateCompilationUnitTest {
 
     @Test
     public void testSimpleClassAddField() throws Exception {
-
         // Set up
         final File file = getResource(SIMPLE_CLASS_FILE_PATH);
         final String fileContents = getResourceContents(file);
@@ -281,10 +266,11 @@ public class UpdateCompilationUnitTest {
         final ClassOrInterfaceTypeDetails newSimpleInterfaceDetails = addField(
                 simpleInterfaceDetails, fieldBuilder.build());
 
-        // invoke
+        // Invoke
         final String result = typeParsingService
                 .getCompilationUnitContents(newSimpleInterfaceDetails);
 
+        // Save to file for debug
         saveResult(file, result, "-addedField");
 
         checkSimpleClass(result);
@@ -295,7 +281,6 @@ public class UpdateCompilationUnitTest {
 
     @Test
     public void testSimpleClassAddAnnotation() throws Exception {
-
         // Set up
         final File file = getResource(SIMPLE_CLASS_FILE_PATH);
         final String fileContents = getResourceContents(file);
@@ -310,10 +295,11 @@ public class UpdateCompilationUnitTest {
         final ClassOrInterfaceTypeDetails newSimpleInterfaceDetails = addAnnotation(
                 simpleInterfaceDetails, annotationBuilder.build());
 
-        // invoke
+        // Invoke
         final String result = typeParsingService
                 .getCompilationUnitContents(newSimpleInterfaceDetails);
 
+        // Save to file for debug
         saveResult(file, result, "-addedAnnotation");
 
         checkSimpleClass(result);
@@ -322,7 +308,7 @@ public class UpdateCompilationUnitTest {
                 .contains("import org.springframework.roo.addon.tostring.RooToString;"));
         assertTrue(result.contains("@RooToString"));
 
-        // invoke2
+        // Invoke again
         final ClassOrInterfaceTypeDetails simpleInterfaceDetails2 = typeParsingService
                 .getTypeFromString(result, SIMPLE_CLASS_DECLARED_BY_MID,
                         SIMPLE_CLASS_TYPE);
@@ -330,6 +316,7 @@ public class UpdateCompilationUnitTest {
         final String result2 = typeParsingService
                 .getCompilationUnitContents(simpleInterfaceDetails2);
 
+        // Save to file for debug
         saveResult(file, result2, "-addedAnnotation2");
 
         checkSimpleClass(result2);

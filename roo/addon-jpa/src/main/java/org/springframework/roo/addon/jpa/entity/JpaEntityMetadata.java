@@ -1,7 +1,7 @@
 package org.springframework.roo.addon.jpa.entity;
 
-import static org.springframework.roo.model.GoogleJavaType.GAE_DATASTORE_KEY;
 import static org.springframework.roo.model.GoogleJavaType.DATANUCLEUS_JPA_EXTENSION;
+import static org.springframework.roo.model.GoogleJavaType.GAE_DATASTORE_KEY;
 import static org.springframework.roo.model.JavaType.LONG_OBJECT;
 import static org.springframework.roo.model.JdkJavaType.BIG_DECIMAL;
 import static org.springframework.roo.model.JdkJavaType.CALENDAR;
@@ -310,16 +310,12 @@ public class JpaEntityMetadata extends
 
         // Compute the column name, as required
         if (!hasIdClass) {
-
-            // XXX DiSiD: No auto generated identifier when empty sequence name
             if (!"".equals(annotationValues.getSequenceName())) {
-
                 String generationType = isGaeEnabled || isDatabaseDotComEnabled ? "IDENTITY"
                         : "AUTO";
 
                 // ROO-746: Use @GeneratedValue(strategy = GenerationType.TABLE)
-                // if
-                // the root of the governor declares @Inheritance(strategy =
+                // If the root of the governor declares @Inheritance(strategy =
                 // InheritanceType.TABLE_PER_CLASS)
                 if ("AUTO".equals(generationType)) {
                     AnnotationMetadata inheritance = governorTypeDetails
@@ -417,11 +413,10 @@ public class JpaEntityMetadata extends
     private FieldMetadata getIdentifierField(
             final List<FieldMetadata> identifierFields,
             final JavaType identifierType) {
-        Validate.isTrue(
-                identifierFields.size() == 1,
-                "More than one field was annotated with @"
-                        + identifierType.getSimpleTypeName() + " in '"
-                        + destination.getFullyQualifiedTypeName() + "'");
+        Validate.isTrue(identifierFields.size() == 1,
+                "More than one field was annotated with @%s in '%s'",
+                identifierType.getSimpleTypeName(),
+                destination.getFullyQualifiedTypeName());
         return new FieldMetadataBuilder(identifierFields.get(0)).build();
     }
 
@@ -690,8 +685,8 @@ public class JpaEntityMetadata extends
                 .getFieldsWithAnnotation(VERSION);
         if (!versionFields.isEmpty()) {
             Validate.isTrue(versionFields.size() == 1,
-                    "More than 1 field was annotated with @Version in '"
-                            + destination.getFullyQualifiedTypeName() + "'");
+                    "More than 1 field was annotated with @Version in '%s'",
+                    destination.getFullyQualifiedTypeName());
             return versionFields.get(0);
         }
 

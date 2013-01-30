@@ -62,14 +62,12 @@ public interface TypeParsingService {
      * Returns the compilation unit contents that represents the java file
      * updated with the passed class or interface details. The difference with
      * {@link #getCompilationUnitContents(ClassOrInterfaceTypeDetails)} is that
-     * this method doesn't creates a new compilation unit but try to update from
-     * original with received and return the final file contents.
+     * this method doesn't create a new compilation unit but tries to update the
+     * original return the final file contents.
      * 
      * @param fileIdentifier canonical path of file
      * @param cid a parsed representation of a class or interface (required)
-     * @return a valid Java compilation unit contents (never null or empty) XXX
-     *         DiSiD: try to solve problems about lost of comments and javadoc
-     *         in java files. http://projects.disid.com/issues/7728
+     * @return a valid Java compilation unit contents (never null or empty)
      */
     String updateAndGetCompilationUnitContents(String fileIdentifier,
             ClassOrInterfaceTypeDetails cid);

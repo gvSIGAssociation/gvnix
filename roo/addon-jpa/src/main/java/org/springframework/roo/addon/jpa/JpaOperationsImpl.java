@@ -317,7 +317,7 @@ public class JpaOperationsImpl implements JpaOperations {
         final List<Element> propertyElements = XmlUtils.findElements(
                 "/persistence/persistence-unit/properties/property", root);
         Validate.notEmpty(propertyElements,
-                "Failed to find property elements in " + persistenceXmlPath);
+                "Failed to find property elements in %s", persistenceXmlPath);
         final SortedSet<String> properties = new TreeSet<String>();
 
         for (final Element propertyElement : propertyElements) {
@@ -571,10 +571,9 @@ public class JpaOperationsImpl implements JpaOperations {
     }
 
     public void newEntity(final JavaType name, final boolean createAbstract,
-            final JavaType superclass,
+            final JavaType superclass, final JavaType implementsType,
             final List<AnnotationMetadataBuilder> annotations) {
         Validate.notNull(name, "Entity name required");
-
         Validate.isTrue(
                 !JdkJavaType.isPartOfJavaLang(name.getSimpleTypeName()),
                 "Entity name '%s' must not be part of java.lang",
@@ -603,6 +602,18 @@ public class JpaOperationsImpl implements JpaOperations {
         }
 
         cidBuilder.setExtendsTypes(Arrays.asList(superclass));
+
+        if (implementsType != null) {
+            final Set<JavaType> implementsTypes = new LinkedHashSet<JavaType>();
+            final ClassOrInterfaceTypeDetails typeDetails = typeLocationService
+                    .getTypeDetails(declaredByMetadataId);
+            if (typeDetails != null) {
+                implementsTypes.addAll(typeDetails.getImplementsTypes());
+            }
+            implementsTypes.add(implementsType);
+            cidBuilder.setImplementsTypes(implementsTypes);
+        }
+
         cidBuilder.setAnnotations(annotations);
 
         typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());

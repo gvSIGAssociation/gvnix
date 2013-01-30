@@ -47,16 +47,19 @@ public interface DbreOperations {
      *            engineering
      * @param includeNonPortableAttributes whether or not to include
      *            non-portable JPA @Column attributes such as 'columnDefinition'
-     * @param disableVersionFields whether or not to disable tables version
-     *            column such as concurrency control field
-     * @param disableGeneratedIdentifiers whether or not to disable identifiers
-     *            auto generation value
+     * @param disableVersionFields whether or not to disable a table's version
+     *            column
+     * @param disableGeneratedIdentifiers whether or not to disable the
+     *            identifier auto generation value
      * @param activeRecord whether to generate CRUD active record methods for
      *            each entity
+     * @param repository whether to generate a service layer for each entity
+     * @param service whether to generate a repository layer for each entity
      */
     void reverseEngineerDatabase(Set<Schema> schemas,
             JavaPackage destinationPackage, boolean testAutomatically,
             boolean view, Set<String> includeTables, Set<String> excludeTables,
             boolean includeNonPortableAttributes, boolean disableVersionFields,
-            boolean disableGeneratedIdentifiers, boolean activeRecord);
+            boolean disableGeneratedIdentifiers, boolean activeRecord,
+            boolean repository, boolean service);
 }

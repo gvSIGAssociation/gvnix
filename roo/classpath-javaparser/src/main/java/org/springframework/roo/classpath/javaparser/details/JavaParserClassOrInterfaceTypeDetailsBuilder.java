@@ -188,10 +188,8 @@ public class JavaParserClassOrInterfaceTypeDetailsBuilder implements
                 // We want to calculate these...
 
                 final JavaType type = new JavaType(fullName);
-                // DiSiD #7728: Fixed a problem with asterisk imports
-                // 'import java.util.*;' --> 'import java.*;'
-                final JavaPackage typePackage = importDeclaration.isAsterisk() ? new JavaPackage(
-                        fullName) : type.getPackage();
+                final JavaPackage typePackage = importDeclaration.isAsterisk() 
+                		? new JavaPackage(fullName) : type.getPackage();
                 final ImportMetadataBuilder newImport = new ImportMetadataBuilder(
                         declaredByMetadataId, 0, typePackage, type,
                         importDeclaration.isStatic(),

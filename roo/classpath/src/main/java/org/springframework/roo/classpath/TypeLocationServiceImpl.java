@@ -434,16 +434,17 @@ public class TypeLocationServiceImpl implements TypeLocationService {
             }
         }
         Validate.notBlank(relativePath,
-                "Could not determine compilation unit name for file '"
-                        + fileCanonicalPath + "'");
-        Validate.isTrue(relativePath.startsWith(File.separator),
-                "Relative path unexpectedly dropped the '" + File.separator
-                        + "' prefix (received '" + relativePath + "' from '"
-                        + fileCanonicalPath + "'");
+                "Could not determine compilation unit name for file '%s'",
+                fileCanonicalPath);
+        Validate.isTrue(
+                relativePath.startsWith(File.separator),
+                "Relative path unexpectedly dropped the '%s' prefix (received '%s' from '%s')",
+                File.separator, relativePath, fileCanonicalPath);
         relativePath = relativePath.substring(1);
-        Validate.isTrue(relativePath.endsWith(".java"),
-                "The relative path unexpectedly dropped the .java extension for file '"
-                        + fileCanonicalPath + "'");
+        Validate.isTrue(
+                relativePath.endsWith(".java"),
+                "The relative path unexpectedly dropped the .java extension for file '%s'",
+                fileCanonicalPath);
         relativePath = relativePath.substring(0,
                 relativePath.lastIndexOf(".java"));
         return relativePath.replace(File.separatorChar, '.');
@@ -465,6 +466,7 @@ public class TypeLocationServiceImpl implements TypeLocationService {
      * @param typePackages the set to which to add each type's package
      * @return a non-<code>null</code> map laid out as above
      */
+    @SuppressWarnings("unused")
     private Map<String, Collection<String>> getTypesByPackage(
             final Iterable<String> typesInModule, final Set<String> typePackages) {
         final Map<String, Collection<String>> typesByPackage = new HashMap<String, Collection<String>>();
@@ -486,16 +488,14 @@ public class TypeLocationServiceImpl implements TypeLocationService {
         return getTypeDetails(getPhysicalTypeIdentifier(type));
     }
 
-    // -------------------------- Private methods ------------------------------
-
     public ClassOrInterfaceTypeDetails getTypeDetails(
             final String physicalTypeId) {
         if (StringUtils.isBlank(physicalTypeId)) {
             return null;
         }
         Validate.isTrue(PhysicalTypeIdentifier.isValid(physicalTypeId),
-                "Metadata id '" + physicalTypeId
-                        + "' is not a valid physical type id");
+                "Metadata id '%s' is not a valid physical type id",
+                physicalTypeId);
         updateTypeCache();
         final ClassOrInterfaceTypeDetails cachedDetails = typeCache
                 .getTypeDetails(physicalTypeId);

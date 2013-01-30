@@ -1,9 +1,12 @@
 package org.springframework.roo.classpath.operations;
 
+import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.JdkJavaType.SET;
 import static org.springframework.roo.model.JpaJavaType.EMBEDDABLE;
 import static org.springframework.roo.model.JpaJavaType.ENTITY;
 import static org.springframework.roo.model.SpringJavaType.PERSISTENT;
+import static org.springframework.roo.shell.OptionContexts.PROJECT;
+import static org.springframework.roo.shell.OptionContexts.UPDATE_PROJECT;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -34,6 +37,7 @@ import org.springframework.roo.classpath.operations.jsr303.DateFieldPersistenceT
 import org.springframework.roo.classpath.operations.jsr303.EmbeddedField;
 import org.springframework.roo.classpath.operations.jsr303.EnumField;
 import org.springframework.roo.classpath.operations.jsr303.FieldDetails;
+import org.springframework.roo.classpath.operations.jsr303.ListField;
 import org.springframework.roo.classpath.operations.jsr303.NumericField;
 import org.springframework.roo.classpath.operations.jsr303.ReferenceField;
 import org.springframework.roo.classpath.operations.jsr303.SetField;
@@ -91,7 +95,7 @@ public class FieldCommands implements CommandMarker {
     @CliCommand(value = "field boolean", help = "Adds a private boolean field to an existing Java source file")
     public void addFieldBoolean(
             @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
-            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the class to receive this field") final JavaType typeName,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType typeName,
             @CliOption(key = "notNull", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value cannot be null") final boolean notNull,
             @CliOption(key = "nullRequired", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must be null") final boolean nullRequired,
             @CliOption(key = "assertFalse", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must assert false") final boolean assertFalse,
@@ -105,8 +109,8 @@ public class FieldCommands implements CommandMarker {
 
         final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
                 .getTypeDetails(typeName);
-        Validate.notNull(javaTypeDetails, "The type specified, '" + typeName
-                + "'doesn't exist");
+        Validate.notNull(javaTypeDetails,
+                "The type specified, '%s', doesn't exist", typeName);
 
         final String physicalTypeIdentifier = javaTypeDetails
                 .getDeclaredByMetadataId();
@@ -135,7 +139,7 @@ public class FieldCommands implements CommandMarker {
             @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
             @CliOption(key = "type", mandatory = true, optionContext = "java-date", help = "The Java type of the entity") final JavaType fieldType,
             @CliOption(key = "persistenceType", mandatory = false, help = "The type of persistent storage to be used") final DateFieldPersistenceType persistenceType,
-            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the class to receive this field") final JavaType typeName,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType typeName,
             @CliOption(key = "notNull", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value cannot be null") final boolean notNull,
             @CliOption(key = "nullRequired", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must be null") final boolean nullRequired,
             @CliOption(key = "future", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must be in the future") final boolean future,
@@ -151,8 +155,8 @@ public class FieldCommands implements CommandMarker {
 
         final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
                 .getTypeDetails(typeName);
-        Validate.notNull(javaTypeDetails, "The type specified, '" + typeName
-                + "'doesn't exist");
+        Validate.notNull(javaTypeDetails,
+                "The type specified, '%s', doesn't exist", typeName);
 
         final String physicalTypeIdentifier = javaTypeDetails
                 .getDeclaredByMetadataId();
@@ -192,8 +196,8 @@ public class FieldCommands implements CommandMarker {
     @CliCommand(value = "field embedded", help = "Adds a private @Embedded field to an existing Java source file ")
     public void addFieldEmbeddedJpa(
             @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
-            @CliOption(key = "type", mandatory = true, optionContext = "project", help = "The Java type of the @Embeddable class") final JavaType fieldType,
-            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the @Entity class to receive this field") final JavaType typeName,
+            @CliOption(key = "type", mandatory = true, optionContext = PROJECT, help = "The Java type of the @Embeddable class") final JavaType fieldType,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the @Entity class to receive this field") final JavaType typeName,
             @CliOption(key = "permitReservedWords", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates whether reserved words are ignored by Roo") final boolean permitReservedWords) {
 
         // Check if the field type is a JPA @Embeddable class
@@ -208,8 +212,8 @@ public class FieldCommands implements CommandMarker {
         // Check if the requested entity is a JPA @Entity
         final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
                 .getTypeDetails(typeName);
-        Validate.notNull(javaTypeDetails, "The type specified, '" + typeName
-                + "'doesn't exist");
+        Validate.notNull(javaTypeDetails,
+                "The type specified, '%s', doesn't exist", typeName);
 
         final String physicalTypeIdentifier = javaTypeDetails
                 .getDeclaredByMetadataId();
@@ -240,7 +244,7 @@ public class FieldCommands implements CommandMarker {
     public void addFieldEnum(
             @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
             @CliOption(key = "type", mandatory = true, help = "The enum type of this field") final JavaType fieldType,
-            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the class to receive this field") final JavaType typeName,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType typeName,
             @CliOption(key = "column", mandatory = false, help = "The JPA @Column name") final String column,
             @CliOption(key = "notNull", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value cannot be null") final boolean notNull,
             @CliOption(key = "nullRequired", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must be null") final boolean nullRequired,
@@ -251,8 +255,8 @@ public class FieldCommands implements CommandMarker {
 
         final ClassOrInterfaceTypeDetails cid = typeLocationService
                 .getTypeDetails(typeName);
-        Validate.notNull(cid, "The type specified, '" + typeName
-                + "'doesn't exist");
+        Validate.notNull(cid, "The type specified, '%s', doesn't exist",
+                typeName);
 
         final String physicalTypeIdentifier = cid.getDeclaredByMetadataId();
         final EnumField fieldDetails = new EnumField(physicalTypeIdentifier,
@@ -276,7 +280,7 @@ public class FieldCommands implements CommandMarker {
     public void addFieldNumber(
             @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
             @CliOption(key = "type", mandatory = true, optionContext = "java-number", help = "The Java type of the entity") JavaType fieldType,
-            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the class to receive this field") final JavaType typeName,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType typeName,
             @CliOption(key = "notNull", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value cannot be null") final boolean notNull,
             @CliOption(key = "nullRequired", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must be null") final boolean nullRequired,
             @CliOption(key = "decimalMin", mandatory = false, help = "The BigDecimal string-based representation of the minimum value") final String decimalMin,
@@ -295,8 +299,8 @@ public class FieldCommands implements CommandMarker {
 
         final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
                 .getTypeDetails(typeName);
-        Validate.notNull(javaTypeDetails, "The type specified, '" + typeName
-                + "'doesn't exist");
+        Validate.notNull(javaTypeDetails,
+                "The type specified, '%s', doesn't exist", typeName);
 
         final String physicalTypeIdentifier = javaTypeDetails
                 .getDeclaredByMetadataId();
@@ -351,8 +355,8 @@ public class FieldCommands implements CommandMarker {
     @CliCommand(value = "field reference", help = "Adds a private reference field to an existing Java source file (eg the 'many' side of a many-to-one)")
     public void addFieldReferenceJpa(
             @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
-            @CliOption(key = "type", mandatory = true, optionContext = "project", help = "The Java type of the entity to reference") final JavaType fieldType,
-            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the class to receive this field") final JavaType typeName,
+            @CliOption(key = "type", mandatory = true, optionContext = PROJECT, help = "The Java type of the entity to reference") final JavaType fieldType,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType typeName,
             @CliOption(key = "notNull", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value cannot be null") final boolean notNull,
             @CliOption(key = "nullRequired", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must be null") final boolean nullRequired,
             @CliOption(key = "joinColumnName", mandatory = false, help = "The JPA @JoinColumn name") final String joinColumnName,
@@ -386,8 +390,8 @@ public class FieldCommands implements CommandMarker {
 
         final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
                 .getTypeDetails(typeName);
-        Validate.notNull(javaTypeDetails, "The type specified, '" + typeName
-                + "'doesn't exist");
+        Validate.notNull(javaTypeDetails,
+                "The type specified, '%s', doesn't exist", typeName);
 
         final String physicalTypeIdentifier = javaTypeDetails
                 .getDeclaredByMetadataId();
@@ -417,7 +421,7 @@ public class FieldCommands implements CommandMarker {
     public void addFieldSetJpa(
             @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
             @CliOption(key = "type", mandatory = true, help = "The entity which will be contained within the Set") final JavaType fieldType,
-            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the class to receive this field") final JavaType typeName,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType typeName,
             @CliOption(key = "mappedBy", mandatory = false, help = "The field name on the referenced type which owns the relationship") final JavaSymbolName mappedBy,
             @CliOption(key = "notNull", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value cannot be null") final boolean notNull,
             @CliOption(key = "nullRequired", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must be null") final boolean nullRequired,
@@ -461,8 +465,8 @@ public class FieldCommands implements CommandMarker {
 
         final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
                 .getTypeDetails(typeName);
-        Validate.notNull(javaTypeDetails, "The type specified, '" + typeName
-                + "'doesn't exist");
+        Validate.notNull(javaTypeDetails,
+                "The type specified, '%s', doesn't exist", typeName);
 
         final String physicalTypeIdentifier = javaTypeDetails
                 .getDeclaredByMetadataId();
@@ -491,10 +495,88 @@ public class FieldCommands implements CommandMarker {
         insertField(fieldDetails, permitReservedWords, transientModifier);
     }
 
+    @CliCommand(value = "field list", help = "Adds a private List field to an existing Java source file (eg the 'one' side of a many-to-one)")
+    public void addFieldListJpa(
+            @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
+            @CliOption(key = "type", mandatory = true, help = "The entity which will be contained within the Set") final JavaType fieldType,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the class to receive this field") final JavaType typeName,
+            @CliOption(key = "mappedBy", mandatory = false, help = "The field name on the referenced type which owns the relationship") final JavaSymbolName mappedBy,
+            @CliOption(key = "notNull", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value cannot be null") final boolean notNull,
+            @CliOption(key = "nullRequired", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must be null") final boolean nullRequired,
+            @CliOption(key = "sizeMin", mandatory = false, help = "The minimum number of elements in the collection") final Integer sizeMin,
+            @CliOption(key = "sizeMax", mandatory = false, help = "The maximum number of elements in the collection") final Integer sizeMax,
+            @CliOption(key = "cardinality", mandatory = false, unspecifiedDefaultValue = "MANY_TO_MANY", specifiedDefaultValue = "MANY_TO_MANY", help = "The relationship cardinality at a JPA level") Cardinality cardinality,
+            @CliOption(key = "fetch", mandatory = false, help = "The fetch semantics at a JPA level") final Fetch fetch,
+            @CliOption(key = "comment", mandatory = false, help = "An optional comment for JavaDocs") final String comment,
+            @CliOption(key = "transient", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates to mark the field as transient") final boolean transientModifier,
+            @CliOption(key = "permitReservedWords", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates whether reserved words are ignored by Roo") final boolean permitReservedWords) {
+
+        final ClassOrInterfaceTypeDetails cid = typeLocationService
+                .getTypeDetails(fieldType);
+        Validate.notNull(
+                cid,
+                "The specified target '--type' does not exist or can not be found. Please create this type first.");
+
+        // Check if the requested entity is a JPA @Entity
+        final MemberDetails memberDetails = memberDetailsScanner
+                .getMemberDetails(this.getClass().getName(), cid);
+        final AnnotationMetadata entityAnnotation = memberDetails
+                .getAnnotation(ENTITY);
+        final AnnotationMetadata persistentAnnotation = memberDetails
+                .getAnnotation(PERSISTENT);
+
+        if (entityAnnotation != null) {
+            Validate.isTrue(cardinality == Cardinality.ONE_TO_MANY
+                    || cardinality == Cardinality.MANY_TO_MANY,
+                    "Cardinality must be ONE_TO_MANY or MANY_TO_MANY for the field list command");
+        }
+        else if (cid.getPhysicalTypeCategory() == PhysicalTypeCategory.ENUMERATION) {
+            cardinality = null;
+        }
+        else if (persistentAnnotation != null) {
+            // Yes, we can deal with that
+        }
+        else {
+            throw new IllegalStateException(
+                    "The field list command is only applicable to enum, JPA @Entity or Spring Data @Persistence elements");
+        }
+
+        final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
+                .getTypeDetails(typeName);
+        Validate.notNull(javaTypeDetails,
+                "The type specified, '%s' doesn't exist", typeName);
+
+        final String physicalTypeIdentifier = javaTypeDetails
+                .getDeclaredByMetadataId();
+        final ListField fieldDetails = new ListField(physicalTypeIdentifier,
+                new JavaType(LIST.getFullyQualifiedTypeName(), 0,
+                        DataType.TYPE, null, Arrays.asList(fieldType)),
+                fieldName, fieldType, cardinality);
+        fieldDetails.setNotNull(notNull);
+        fieldDetails.setNullRequired(nullRequired);
+        if (sizeMin != null) {
+            fieldDetails.setSizeMin(sizeMin);
+        }
+        if (sizeMax != null) {
+            fieldDetails.setSizeMax(sizeMax);
+        }
+        if (mappedBy != null) {
+            fieldDetails.setMappedBy(mappedBy);
+        }
+        if (fetch != null) {
+            fieldDetails.setFetch(fetch);
+        }
+        if (comment != null) {
+            fieldDetails.setComment(comment);
+        }
+
+        insertField(fieldDetails, permitReservedWords, transientModifier);
+    }
+
     @CliCommand(value = "field string", help = "Adds a private string field to an existing Java source file")
     public void addFieldString(
             @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
-            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the class to receive this field") final JavaType typeName,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType typeName,
             @CliOption(key = "notNull", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value cannot be null") final boolean notNull,
             @CliOption(key = "nullRequired", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must be null") final boolean nullRequired,
             @CliOption(key = "decimalMin", mandatory = false, help = "The BigDecimal string-based representation of the minimum value") final String decimalMin,
@@ -509,13 +591,12 @@ public class FieldCommands implements CommandMarker {
             @CliOption(key = "unique", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates whether to mark the field with a unique constraint") final boolean unique,
             @CliOption(key = "permitReservedWords", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates whether reserved words are ignored by Roo") final boolean permitReservedWords) {
 
-        final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
+        final ClassOrInterfaceTypeDetails cid = typeLocationService
                 .getTypeDetails(typeName);
-        Validate.notNull(javaTypeDetails, "The type specified, '" + typeName
-                + "'doesn't exist");
+        Validate.notNull(cid, "The type specified, '%s', doesn't exist",
+                typeName);
 
-        final String physicalTypeIdentifier = javaTypeDetails
-                .getDeclaredByMetadataId();
+        final String physicalTypeIdentifier = cid.getDeclaredByMetadataId();
         final StringField fieldDetails = new StringField(
                 physicalTypeIdentifier, fieldName);
         fieldDetails.setNotNull(notNull);
@@ -554,7 +635,7 @@ public class FieldCommands implements CommandMarker {
     @CliCommand(value = "field file", help = "Adds a byte array field for storing uploaded file contents (JSF-scaffolded UIs only)")
     public void addFileUploadField(
             @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the file upload field to add") final JavaSymbolName fieldName,
-            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the class to receive this field") final JavaType typeName,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType typeName,
             @CliOption(key = "contentType", mandatory = true, help = "The content type of the file") final UploadedFileContentType contentType,
             @CliOption(key = "autoUpload", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false", help = "Whether the file is uploaded automatically when selected") final boolean autoUpload,
             @CliOption(key = "column", mandatory = false, help = "The JPA @Column name") final String column,
@@ -563,8 +644,8 @@ public class FieldCommands implements CommandMarker {
 
         final ClassOrInterfaceTypeDetails cid = typeLocationService
                 .getTypeDetails(typeName);
-        Validate.notNull(cid, "The type specified, '" + typeName
-                + "'doesn't exist");
+        Validate.notNull(cid, "The type specified, '%s', doesn't exist",
+                typeName);
 
         final String physicalTypeIdentifier = cid.getDeclaredByMetadataId();
         final UploadedFileField fieldDetails = new UploadedFileField(
@@ -625,7 +706,7 @@ public class FieldCommands implements CommandMarker {
     public void insertField(
             @CliOption(key = "fieldName", mandatory = true, help = "The name of the field") final JavaSymbolName fieldName,
             @CliOption(key = "type", mandatory = true, help = "The Java type of this field") final JavaType fieldType,
-            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the class to receive this field") final JavaType typeName,
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType typeName,
             @CliOption(key = "notNull", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value cannot be null") final boolean notNull,
             @CliOption(key = "nullRequired", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether this value must be null") final boolean nullRequired,
             @CliOption(key = "comment", mandatory = false, help = "An optional comment for JavaDocs") final String comment,
@@ -634,13 +715,12 @@ public class FieldCommands implements CommandMarker {
             @CliOption(key = "transient", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates to mark the field as transient") final boolean transientModifier,
             @CliOption(key = "permitReservedWords", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates whether reserved words are ignored by Roo") final boolean permitReservedWords) {
 
-        final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
+        final ClassOrInterfaceTypeDetails cid = typeLocationService
                 .getTypeDetails(typeName);
-        Validate.notNull(javaTypeDetails, "The type specified, '" + typeName
-                + "'doesn't exist");
+        Validate.notNull(cid, "The type specified, '%s', doesn't exist",
+                typeName);
 
-        final String physicalTypeIdentifier = javaTypeDetails
-                .getDeclaredByMetadataId();
+        final String physicalTypeIdentifier = cid.getDeclaredByMetadataId();
         final FieldDetails fieldDetails = new FieldDetails(
                 physicalTypeIdentifier, fieldType, fieldName);
         fieldDetails.setNotNull(notNull);
@@ -662,7 +742,7 @@ public class FieldCommands implements CommandMarker {
         return projectOperations.isFocusedProjectAvailable();
     }
 
-    @CliAvailabilityIndicator({ "field reference", "field set" })
+    @CliAvailabilityIndicator({ "field reference", "field set", "field list" })
     public boolean isJpaFieldManagementAvailable() {
         // In a separate method in case we decide to check for JPA registration
         // in the future

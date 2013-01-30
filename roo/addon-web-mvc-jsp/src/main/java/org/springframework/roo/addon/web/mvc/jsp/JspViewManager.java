@@ -99,11 +99,10 @@ public class JspViewManager {
                 .getPersistenceDetails();
         Validate.notNull(formBackingTypePersistenceMetadata,
                 "Persistence metadata required for form backing type");
-
-        Validate.notNull(webScaffoldAnnotationValues.getPath(),
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        + webScaffoldAnnotationValues.getGovernorTypeDetails()
-                                .getName() + "'");
+        Validate.notNull(
+                webScaffoldAnnotationValues.getPath(),
+                "Path is not specified in the @RooWebScaffold annotation for '%s'",
+                webScaffoldAnnotationValues.getGovernorTypeDetails().getName());
 
         if (webScaffoldAnnotationValues.getPath().startsWith("/")) {
             controllerPath = webScaffoldAnnotationValues.getPath();
@@ -291,12 +290,11 @@ public class JspViewManager {
                     .contains(CustomDataKeys.ONE_TO_MANY_FIELD)) {
                 // OneToMany relationships are managed from the 'many' side of
                 // the relationship, therefore we provide a link to the relevant
-                // form
-                // the link URL is determined as a best effort attempt following
-                // Roo REST conventions, this link might be wrong if custom
-                // paths are used
-                // if custom paths are used the developer can adjust the path
-                // attribute in the field:reference tag accordingly
+                // form the link URL is determined as a best effort attempt
+                // following Roo REST conventions, this link might be wrong if
+                // custom paths are used if custom paths are used the developer
+                // can adjust the path attribute in the field:reference tag
+                // accordingly
                 if (typePersistenceMetadataHolder != null) {
                     fieldElement = new XmlElementBuilder("field:simple",
                             document)
@@ -397,7 +395,7 @@ public class JspViewManager {
                             + formBackingType.getFullyQualifiedTypeName() + "."
                             + field.getFieldName().getSymbolName()));
 
-            // XXX DiSiD: If identifier manual assignment, then required
+            // If identifier manually assigned, then add 'required=true'
             if (formBackingTypePersistenceMetadata.getIdentifierField()
                     .getFieldName().equals(field.getFieldName())
                     && field.getAnnotation(JpaJavaType.GENERATED_VALUE) == null) {
@@ -485,7 +483,7 @@ public class JspViewManager {
         }
         formFields.addAll(fieldCopy);
 
-        // XXX DiSiD: If identifier manual assignment, show it in creation
+        // If identifier manually assigned, show it in creation
         if (formBackingTypePersistenceMetadata.getIdentifierField()
                 .getAnnotation(JpaJavaType.GENERATED_VALUE) == null) {
 
@@ -568,8 +566,8 @@ public class JspViewManager {
             if (type.equals(new JavaType(Map.class.getName()))) {
                 continue;
             }
-            Validate.notNull(paramName, "Could not find field '" + paramName
-                    + "' in '" + type.getFullyQualifiedTypeName() + "'");
+            Validate.notNull(paramName, "Could not find field '%s' in '%s'",
+                    paramName, type.getFullyQualifiedTypeName());
             Element fieldElement = null;
 
             final JavaTypeMetadataDetails typeMetadataHolder = relatedDomainTypes
@@ -814,10 +812,9 @@ public class JspViewManager {
     private String getPathForType(final JavaType type) {
         final JavaTypeMetadataDetails javaTypeMetadataHolder = relatedDomainTypes
                 .get(type);
-        Validate.notNull(
-                javaTypeMetadataHolder,
-                "Unable to obtain metadata for type "
-                        + type.getFullyQualifiedTypeName());
+        Validate.notNull(javaTypeMetadataHolder,
+                "Unable to obtain metadata for type %s",
+                type.getFullyQualifiedTypeName());
         return javaTypeMetadataHolder.getControllerPath();
     }
 

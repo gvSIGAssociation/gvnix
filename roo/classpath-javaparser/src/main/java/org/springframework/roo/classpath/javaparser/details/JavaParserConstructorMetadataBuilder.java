@@ -100,7 +100,6 @@ public class JavaParserConstructorMetadataBuilder implements
                         .getJavaType());
             }
             else {
-                // DiSiD #7728 Fixed problem with arrays fields final NameExpr
                 final Type finalType = JavaParserUtils.getResolvedName(
                         constructorParameter.getJavaType(),
                         constructorParameter.getJavaType(),
@@ -124,8 +123,6 @@ public class JavaParserConstructorMetadataBuilder implements
                     }
 
                 }
-                // DiSiD #7728 Fixed problem with arrays fields
-                // parameterType = cit;
                 parameterType = finalType;
             }
 

@@ -132,10 +132,9 @@ public class JspMetadataListener implements MetadataProvider,
         final JavaTypeMetadataDetails formBackingTypeMetadataDetails = webMetadataService
                 .getJavaTypeMetadataDetails(formBackingType, memberDetails,
                         jspMetadataId);
-        Validate.notNull(
-                formBackingTypeMetadataDetails,
-                "Unable to obtain metadata for type "
-                        + formBackingType.getFullyQualifiedTypeName());
+        Validate.notNull(formBackingTypeMetadataDetails,
+                "Unable to obtain metadata for type %s",
+                formBackingType.getFullyQualifiedTypeName());
 
         formBackingObjectTypesToLocalMids.put(formBackingType, jspMetadataId);
 
@@ -205,8 +204,9 @@ public class JspMetadataListener implements MetadataProvider,
         }
         else {
             final File file = new File(destinationDirectory);
-            Validate.isTrue(file.isDirectory(), destinationDirectory
-                    + " is a file, when a directory was expected");
+            Validate.isTrue(file.isDirectory(),
+                    "%s is a file, when a directory was expected",
+                    destinationDirectory);
         }
 
         // By now we have a directory to put the JSPs inside
@@ -291,8 +291,8 @@ public class JspMetadataListener implements MetadataProvider,
         final JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = formBackingTypeMetadataDetails
                 .getPersistenceDetails();
         Validate.notNull(javaTypePersistenceMetadataDetails,
-                "Unable to determine persistence metadata for type "
-                        + formBackingType.getFullyQualifiedTypeName());
+                "Unable to determine persistence metadata for type %s",
+                formBackingType.getFullyQualifiedTypeName());
 
         if (!javaTypePersistenceMetadataDetails.getRooIdentifierFields()
                 .isEmpty()) {
@@ -311,10 +311,9 @@ public class JspMetadataListener implements MetadataProvider,
             }
         }
 
-        // XXX DiSiD: If no auto generated value for id, put name in i18n
+        // If no auto generated value for id, put name in i18n
         if (javaTypePersistenceMetadataDetails.getIdentifierField()
                 .getAnnotation(JpaJavaType.GENERATED_VALUE) == null) {
-
             properties.put(
                     XmlUtils.convertId(resourceId
                             + "."
@@ -442,8 +441,8 @@ public class JspMetadataListener implements MetadataProvider,
                         viewManager.getFinderDocument(finderDetails));
                 final JavaSymbolName finderLabel = new JavaSymbolName(
                         finderName.replace("find" + plural + "By", ""));
-                // Add 'Find by' menu item
 
+                // Add 'Find by' menu item
                 menuOperations.addMenuItem(categoryName, finderLabel,
                         "global_menu_find", "/" + controllerPath + "?find="
                                 + finderName.replace("find" + plural, "")

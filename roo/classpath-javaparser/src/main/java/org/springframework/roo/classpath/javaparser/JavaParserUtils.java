@@ -280,7 +280,7 @@ public final class JavaParserUtils {
             return new JavaType(nameToFind.getName(), 0, DataType.VARIABLE,
                     null, null);
         }
-
+        
         // Check if we are looking for the enclosingType itself
         final NameExpr enclosingTypeName = getNameExpr(compilationUnitServices
                 .getEnclosingTypeName().getSimpleTypeName());
@@ -703,12 +703,12 @@ public final class JavaParserUtils {
                         getResolvedName(target, param, compilationUnit));
             }
         }
-        // DiSiD #7728: Fixed a problem with arrays types
+        
         if (current.getArray() > 0) {
-            // Primitives includes array declaration in resolvedName
-            if (!current.isPrimitive()) {
-                return new ReferenceType(resolvedName, current.getArray());
-            }
+        	// Primitives includes array declaration in resolvedName
+        	if (!current.isPrimitive()){
+        		return new ReferenceType(resolvedName, current.getArray());
+        	}
         }
 
         return resolvedName;
@@ -840,20 +840,21 @@ public final class JavaParserUtils {
         Validate.notNull(imports, "Compilation unit imports required");
         Validate.notNull(typeToImport, "Java type to import is required");
 
-        // DiSiD #7728: Resolve parameters of types with parameters
         final ClassOrInterfaceType cit = getClassOrInterfaceType(importTypeIfRequired(
                 targetType, imports, typeToImport));
-
+        
         // Add any type arguments presented for the return type
         if (typeToImport.getParameters().size() > 0) {
             final List<Type> typeArgs = new ArrayList<Type>();
             cit.setTypeArgs(typeArgs);
-            for (final JavaType parameter : typeToImport.getParameters()) {
+            for (final JavaType parameter : typeToImport
+                    .getParameters()) {
                 typeArgs.add(JavaParserUtils.importParametersForType(
-                        targetType, imports, parameter));
+                        targetType,
+                        imports, parameter));
             }
         }
-        return new ReferenceType(cit);
+        return  new ReferenceType(cit);
     }
 
     /**
@@ -895,9 +896,8 @@ public final class JavaParserUtils {
             return new NameExpr(typeToImport.getSimpleTypeName());
         }
 
-        // DiSiD #7728: Fixed problems with arrays in primitive types
         final JavaPackage typeToImportPackage = typeToImport.getPackage();
-        if (typeToImportPackage.equals(compilationUnitPackage)) {
+        if (typeToImportPackage.equals(compilationUnitPackage)) {        	
             return new NameExpr(typeToImport.getSimpleTypeName());
         }
 
@@ -989,7 +989,7 @@ public final class JavaParserUtils {
                 .getFullyQualifiedPackageName()),
                 typeToImport.getSimpleTypeName());
     }
-
+    
     /**
      * Indicates whether two {@link NameExpr} expressions are equal.
      * <p>
@@ -1045,24 +1045,22 @@ public final class JavaParserUtils {
      */
     private JavaParserUtils() {
     }
-
-    // DiSiD
+    
     /**
      * Returns the final {@link ClassOrInterfaceType} from a {@link Type}
      * 
      * @param initType
-     * @return the final {@link ClassOrInterfaceType} or null if no
-     *         {@link ClassOrInterfaceType} found
+     * @return the final {@link ClassOrInterfaceType} or null if no {@link ClassOrInterfaceType} found
+     * 
      */
     public static ClassOrInterfaceType getClassOrInterfaceType(Type type) {
         Type tmp = type;
         while (tmp instanceof ReferenceType) {
-            tmp = ((ReferenceType) tmp).getType();
-        }
-        ;
-        if (tmp instanceof ClassOrInterfaceType) {
-            return (ClassOrInterfaceType) tmp;
+               tmp = ((ReferenceType) tmp).getType();
+        };
+        if (tmp instanceof ClassOrInterfaceType){
+        	return (ClassOrInterfaceType) tmp;
         }
         return null;
-    }
+    }    
 }
