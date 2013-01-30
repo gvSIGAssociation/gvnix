@@ -51,13 +51,6 @@ done
 rm -rf ~/.m2/repository/org/springframework/roo
 rm -rf ~/.m2/repository/org/gvnix
 
-### gvNIX wrappings
-
-# Compile and install javaparser fork wrapping since accepted by Roo
-cd wrapping/javaparser-fork
-mvn clean install
-cd ../..
-
 ### ROO PACKAGE
 
 # Change to Roo folder
