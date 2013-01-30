@@ -54,6 +54,7 @@
   	<para xml:lang="es">Se ejecuta el script code/src/test/resources/integration.sh que prueba la distribución:
   	<command>export M2_HOME=/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/apache-maven-3.0.4
 	export PATH=$M2_HOME/bin:$PATH
+	export MAVEN_OPTS="$MAVEN_OPTS -Xmx1024m -XX:MaxPermSize=512m"
 	chmod 744 ${WORKSPACE}/code/src/test/resources/integration.sh
 	${WORKSPACE}/code/src/test/resources/integration.sh /tmp/gvNIX-1.1.0-RELEASE/bin ${WORKSPACE}</command>
 	Observar que se establece la ruta en donde Jenkins tiene instalada la versión de Maven.</para>
