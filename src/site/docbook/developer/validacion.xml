@@ -21,4 +21,52 @@
 
     <para>TBC [FALTA Info del proceso]</para>
   </section>
+
+  <section>
+  	<title xml:lang="es">Build continuo</title>
+
+  	<para xml:lang="es">Servidor Jenkins: http://hq02.disid.com:8081/</para>
+  	
+  	<para xml:lang="es">En el servidor será necesario tener instalado y, por lo tanto, disponible desde la consola:
+  	startx (iniciador de interfaces gráficas para lanzar los tests de integración de selenium) y zip (para empaquetar
+  	la distribución) ya que los utiliza el script de shell que ejecuta todas las pruebas.</para>
+  	
+  	<para xml:lang="es">También será necesario disponer en Jenkins del siguiente software instalado:
+  	Maven 3.0.X (mayor revisión) y Java 1.6.X (mayor revisión).</para> 
+  	
+  	<para xml:lang="es">Se descarga el código de http://scmcit.gva.es/svn/gvnix/trunk/code
+  	haciendo una descarga limpia del código (delete and checkout) para ejecutar el test con la
+  	última versión de código disponible y sin posibles cambios locales. La fecha y hora del
+  	servidor debe ser correcta para asegurar que las descargas de código sean correctas.</para>
+  	
+  	<para xml:lang="es">La tarea de prueba se ejecuta todos los días cada 2 horas entre las 6 y las 20 horas.
+  	Actualmente, el test tarda algo mas de 1 hora.</para>
+  	
+  	<para xml:lang="es">Se ejecuta el script build.sh que construye la distribución de gvNIX a partir del código fuente:
+	<command>export M2_HOME=/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/apache-maven-3.0.4
+	export PATH=$M2_HOME/bin:$PATH
+	export MAVEN_OPTS="$MAVEN_OPTS -Dgpg.skip=true -Xmx1024m -XX:MaxPermSize=512m"
+	cd ${WORKSPACE}/code
+	./build.sh</command>
+  	Observar que se establece la ruta en donde Jenkins tiene instalada la versión de Maven.
+  	</para>
+  	
+  	<para xml:lang="es">Se ejecuta el script code/src/test/resources/integration.sh que prueba la distribución:
+  	<command>export M2_HOME=/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/apache-maven-3.0.4
+	export PATH=$M2_HOME/bin:$PATH
+	chmod 744 ${WORKSPACE}/code/src/test/resources/integration.sh
+	${WORKSPACE}/code/src/test/resources/integration.sh /tmp/gvNIX-1.1.0-RELEASE/bin ${WORKSPACE}</command>
+	Observar que se establece la ruta en donde Jenkins tiene instalada la versión de Maven.</para>
+	
+	<para xml:lang="es">Con el <emphasis>Text-finder Plugin</emphasis> se busca la cadena
+	<emphasis>BUILD FAILURE</emphasis> y en el caso de encontrarla se marca el build como inestable.</para>
+  	
+  	<para xml:lang="es">Se avisa por correo de ejecuciones erróneas al responsable técnico del proyecto 
+  	y a las personas que hayan producido el error. Para ello, debe estar configurado en el sistema
+  	de build continuo el servidor de correo saliente a mail.disid.com y el sufijo de email por defecto
+  	a @disid.com.</para>
+  	
+  	<para xml:lang="es">Es necesario tener instalados los plugins <emphasis>Run Condition Plugin</emphasis> y <emphasis>Text-finder Plugin</emphasis>.</para>
+  </section>  
+  
 </chapter>
