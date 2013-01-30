@@ -6,5 +6,6 @@ remote service export operation --class ~.service.Kk --method Kk
 remote service list operation --class ~.service.Kk
 remote service ws list
 remote service import ws --class ~.service.Kk2 --wsdl http://wsf.cdyne.com/WeatherWS/Weather.asmx?WSDL
-perform tests
-perform package
+// Error can't determine superclass of missing type org.springframework.transaction.interceptor.TransactionAspectSupport
+//perform tests
+//perform package
