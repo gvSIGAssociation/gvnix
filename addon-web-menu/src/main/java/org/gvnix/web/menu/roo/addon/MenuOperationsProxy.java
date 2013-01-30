@@ -206,10 +206,10 @@ public class MenuOperationsProxy implements MenuOperations {
 		waitToOperations();
 		
 		if (gvNIXOperations.isGvNixMenuAvailable()){
-			logger.info("Using gvNIX Menu ops");
+			logger.finest("Using gvNIX Menu ops");
 			return gvNIXOperations;
 		} else {
-			logger.info("Using Roo Menu ops");
+			logger.finest("Using Roo Menu ops");
 			return rooOperations;
 		}
 	}
