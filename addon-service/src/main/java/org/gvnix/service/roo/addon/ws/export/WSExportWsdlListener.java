@@ -18,15 +18,15 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
-import japa.parser.JavaParser;
-import japa.parser.ParseException;
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
-import japa.parser.ast.body.EnumDeclaration;
-import japa.parser.ast.body.TypeDeclaration;
-import japa.parser.ast.expr.AnnotationExpr;
-import japa.parser.ast.expr.MarkerAnnotationExpr;
-import japa.parser.ast.expr.NormalAnnotationExpr;
-import japa.parser.ast.expr.SingleMemberAnnotationExpr;
+import com.github.antlrjavaparser.JavaParser;
+import com.github.antlrjavaparser.ParseException;
+import com.github.antlrjavaparser.api.body.ClassOrInterfaceDeclaration;
+import com.github.antlrjavaparser.api.body.EnumDeclaration;
+import com.github.antlrjavaparser.api.body.TypeDeclaration;
+import com.github.antlrjavaparser.api.expr.AnnotationExpr;
+import com.github.antlrjavaparser.api.expr.MarkerAnnotationExpr;
+import com.github.antlrjavaparser.api.expr.NormalAnnotationExpr;
+import com.github.antlrjavaparser.api.expr.SingleMemberAnnotationExpr;
 
 import java.io.File;
 import java.io.IOException;

@@ -18,13 +18,13 @@
  */
 package org.gvnix.service.roo.addon.ws;
 
-import japa.parser.ast.ImportDeclaration;
-import japa.parser.ast.body.TypeDeclaration;
+import com.github.antlrjavaparser.api.ImportDeclaration;
+import com.github.antlrjavaparser.api.body.TypeDeclaration;
 
 import java.util.List;
 
 import org.springframework.roo.classpath.PhysicalTypeCategory;
-import org.springframework.roo.classpath.javaparser.CompilationUnitServices;
+import org.springframework.roo.classpath.antlrjavaparser.CompilationUnitServices;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 
@@ -67,7 +67,7 @@ public class WSCompilationUnit implements CompilationUnitServices {
      * (non-Javadoc)
      * 
      * @see
-     * org.springframework.roo.classpath.javaparser.CompilationUnitServices#
+     * org.springframework.roo.classpath.antlrjavaparser.CompilationUnitServices#
      * flush()
      */
     public void flush() {
@@ -78,7 +78,7 @@ public class WSCompilationUnit implements CompilationUnitServices {
      * (non-Javadoc)
      * 
      * @see
-     * org.springframework.roo.classpath.javaparser.CompilationUnitServices#
+     * org.springframework.roo.classpath.antlrjavaparser.CompilationUnitServices#
      * getCompilationUnitPackage()
      */
     public JavaPackage getCompilationUnitPackage() {
@@ -89,7 +89,7 @@ public class WSCompilationUnit implements CompilationUnitServices {
      * (non-Javadoc)
      * 
      * @see
-     * org.springframework.roo.classpath.javaparser.CompilationUnitServices#
+     * org.springframework.roo.classpath.antlrjavaparser.CompilationUnitServices#
      * getEnclosingTypeName()
      */
     public JavaType getEnclosingTypeName() {
@@ -100,7 +100,7 @@ public class WSCompilationUnit implements CompilationUnitServices {
      * (non-Javadoc)
      * 
      * @see
-     * org.springframework.roo.classpath.javaparser.CompilationUnitServices#
+     * org.springframework.roo.classpath.antlrjavaparser.CompilationUnitServices#
      * getImports()
      */
     public List<ImportDeclaration> getImports() {
@@ -111,7 +111,7 @@ public class WSCompilationUnit implements CompilationUnitServices {
      * (non-Javadoc)
      * 
      * @see
-     * org.springframework.roo.classpath.javaparser.CompilationUnitServices#
+     * org.springframework.roo.classpath.antlrjavaparser.CompilationUnitServices#
      * getInnerTypes()
      */
     public List<TypeDeclaration> getInnerTypes() {

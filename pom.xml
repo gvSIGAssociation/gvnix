@@ -312,6 +312,16 @@
           <artifactId>commons-codec</artifactId>
           <version>1.6</version>
       </dependency>
+      <dependency>
+          <groupId>com.github.antlrjavaparser</groupId>
+          <artifactId>antlr-java-parser</artifactId>
+          <version>1.0.7</version>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework.roo.wrapping</groupId>
+          <artifactId>org.springframework.roo.wrapping.antlr4-runtime</artifactId>
+          <version>4.0-rc-1.0001</version>
+      </dependency>
       <!-- Wrapped JARs -->
       <dependency>
         <groupId>org.springframework.roo.wrapping</groupId>
@@ -535,9 +545,9 @@
         <version>${roo.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.springframework.roo</groupId>
-        <artifactId>org.springframework.roo.classpath.javaparser</artifactId>
-        <version>${roo.version}</version>
+          <groupId>org.springframework.roo</groupId>
+          <artifactId>org.springframework.roo.classpath.antlrjavaparser</artifactId>
+          <version>${roo.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.roo</groupId>

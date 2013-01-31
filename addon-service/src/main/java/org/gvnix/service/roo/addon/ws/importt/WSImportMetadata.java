@@ -18,15 +18,15 @@
  */
 package org.gvnix.service.roo.addon.ws.importt;
 
-import japa.parser.JavaParser;
-import japa.parser.ParseException;
-import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.BodyDeclaration;
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
-import japa.parser.ast.body.MethodDeclaration;
-import japa.parser.ast.body.Parameter;
-import japa.parser.ast.body.TypeDeclaration;
-import japa.parser.ast.expr.NameExpr;
+import com.github.antlrjavaparser.JavaParser;
+import com.github.antlrjavaparser.ParseException;
+import com.github.antlrjavaparser.api.CompilationUnit;
+import com.github.antlrjavaparser.api.body.BodyDeclaration;
+import com.github.antlrjavaparser.api.body.ClassOrInterfaceDeclaration;
+import com.github.antlrjavaparser.api.body.MethodDeclaration;
+import com.github.antlrjavaparser.api.body.Parameter;
+import com.github.antlrjavaparser.api.body.TypeDeclaration;
+import com.github.antlrjavaparser.api.expr.NameExpr;
 
 import java.io.File;
 import java.io.IOException;

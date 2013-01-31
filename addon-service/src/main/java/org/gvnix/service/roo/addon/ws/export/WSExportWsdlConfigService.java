@@ -18,8 +18,8 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
-import japa.parser.ParseException;
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.antlrjavaparser.ParseException;
+import com.github.antlrjavaparser.api.body.ClassOrInterfaceDeclaration;
 
 import java.io.File;
 import java.io.IOException;
