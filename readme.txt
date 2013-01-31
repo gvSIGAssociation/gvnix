@@ -61,13 +61,16 @@ However, Roo source code can be updated to a new tag with next commands:
 
 * Ask which branch is current:	git status
 * Revert working copy changes:  git checkout .
+* Add a file/resolve conflict:  git add 
 * Revert index (adedd) changes: git reset
 * Update git info:				git pull
+* Update master git info:		git pull git@github.com:SpringSource/spring-roo.git master
 * List available tags:			git tag -l
 * Store our Roo modifications:	git stash
 * Change to new tag:			git checkout {version}
 * Apply our Roo modifications:	git stash pop
 * Merge changes:				git mergetool
+* Remove all stashed states:	git stash clear
 * Save in SVN:					svn commit
 
 Update gvNIX parent pom roo.version property to new value.
