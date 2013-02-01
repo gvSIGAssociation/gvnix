@@ -487,16 +487,16 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
         // setting targetPackage change default package
         String finalTargetPackage = null;
-        if (targetPackage != null) {
-            if (targetPackage.startsWith("~")) {
-                finalTargetPackage = targetPackage.replace("~", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName());
-            } else {
-                finalTargetPackage = targetPackage;
-            }
-            packagePath = finalTargetPackage.replace('.', '/');
+        if (targetPackage == null) {
+        	finalTargetPackage = getClass().getPackage().getName();
         } else {
-            finalTargetPackage = getClass().getPackage().getName();
+        	if (targetPackage.startsWith("~")) {
+        		finalTargetPackage = targetPackage.replace("~", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName());
+        	} else {
+        		finalTargetPackage = targetPackage;
+        	}
         }
+        packagePath = finalTargetPackage.replace('.', '/');
 
         String destinationFile = projectOperations.getPathResolver()
                 .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
