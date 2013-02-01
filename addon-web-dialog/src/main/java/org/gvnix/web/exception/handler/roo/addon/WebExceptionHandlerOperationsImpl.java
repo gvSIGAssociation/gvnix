@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +52,7 @@ import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -76,6 +78,9 @@ public class WebExceptionHandlerOperationsImpl implements
     private static final String LANGUAGE_FILENAMES = "WEB-INF/i18n/messages**.properties";
 	
     private static final String FOLDER_SEPARATOR = "/";
+    
+    private static Logger LOGGER = HandlerUtils
+            .getLogger(WebModalDialogOperationsImpl.class);
 
     @Reference
     private ProjectOperations projectOperations;
@@ -579,11 +584,12 @@ public class WebExceptionHandlerOperationsImpl implements
 
         MutableFile mutableFile = null;
         if (fileManager.exists(exceptionFilename)) {
-            File f = new File(exceptionFilename);
+            File newFile = new File(exceptionFilename);
             String existing = null;
             try {
-                existing = IOUtils.toString(new FileReader(f));
+                existing = IOUtils.toString(new FileReader(newFile));
             } catch (IOException ignoreAndJustOverwriteIt) {
+            	LOGGER.finest("Problems writting ".concat(newFile.getAbsolutePath()));
             }
 
             if (!template.equals(existing)) {

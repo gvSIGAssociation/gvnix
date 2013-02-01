@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.transform.Transformer;
 
@@ -72,6 +73,7 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Repository;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.osgi.OSGiUtils;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.FileUtils;
@@ -98,6 +100,9 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
     private static final JavaType MODAL_DIALOGS = new JavaType(
             GvNIXModalDialogs.class.getName());
+    
+    private static Logger LOGGER = HandlerUtils
+            .getLogger(WebModalDialogOperationsImpl.class);
 
     @Reference
     private ProjectOperations projectOperations;
@@ -545,8 +550,10 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
      */
     private void copyDirectoryContents(String sourceAntPath,
             String targetDirectory) {
-    	StringUtils.isNotBlank(sourceAntPath);
-    	StringUtils.isNotBlank(targetDirectory);
+    	Validate.notNull(sourceAntPath, "sourceAntPath required");
+    	Validate.notBlank(sourceAntPath, "sourceAntPath required");
+    	Validate.notNull(targetDirectory, "targetDirectory required");
+    	Validate.notBlank(targetDirectory, "targetDirectory required");
 
         if (!targetDirectory.endsWith("/")) {
             targetDirectory += "/";
@@ -579,7 +586,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 	                    IOUtils.closeQuietly(outputStream);
                     }
                 } catch (IOException e) {
-                    new IllegalStateException(
+                    throw new IllegalStateException(
                             "Encountered an error during copying of resources for MVC JSP addon.",
                             e);
                 }
@@ -659,11 +666,12 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         MutableFile mutableFile = null;
         if (fileManager.exists(filePath)) {
             // First verify if the file has even changed
-            File f = new File(filePath);
+            File newFile = new File(filePath);
             String existing = null;
             try {
-                existing = IOUtils.toString(new FileReader(f));
+                existing = IOUtils.toString(new FileReader(newFile));
             } catch (IOException ignoreAndJustOverwriteIt) {
+            	LOGGER.finest("Problems writting ".concat(newFile.getAbsolutePath()));
             }
 
             if (!viewContent.equals(existing)) {
