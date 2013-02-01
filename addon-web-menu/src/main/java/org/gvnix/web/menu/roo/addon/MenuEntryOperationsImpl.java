@@ -125,6 +125,13 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     public static boolean isRooMenuDisabled(){
     	return isRooMenuDisabled;
     }
+    
+    /**
+     * Set {@link #isRooMenuDisabled} to true
+     */
+    private static void setRooMenuDisabled(){
+    	isRooMenuDisabled = true;
+    }
 
     /**
      * {@inheritDoc}
@@ -390,7 +397,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 original = IOUtils.toString(new FileReader(
                         getMenuConfigFile()));
             } catch (Exception e) {
-                new IllegalStateException(
+                throw new IllegalStateException(
                         "Could not load file: ".concat(getMenuConfigFile()));
             }
 
@@ -1169,7 +1176,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      */
     public void disableRooMenuOperations() {
         logger.fine("Disable Roo MenuOperationsImpl");
-        isRooMenuDisabled = true;
+        setRooMenuDisabled();
     }
 
     /**
