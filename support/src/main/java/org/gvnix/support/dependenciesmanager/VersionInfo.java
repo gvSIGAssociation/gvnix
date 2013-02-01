@@ -18,6 +18,8 @@
  */
 package org.gvnix.support.dependenciesmanager;
 
+import org.apache.commons.lang3.Validate;
+
 /**
  * VersionInfo holder for comparisons between dependencies and properties
  * versions
@@ -37,9 +39,7 @@ public class VersionInfo {
     private Qualifiers qualifier = Qualifiers.EMPTY;
 
     public int compareTo(VersionInfo v) {
-        if (v == null) {
-            throw new NullPointerException();
-        }
+    	Validate.notNull(v);
         int result = major.compareTo(v.major);
         if (result != 0) {
             return result;
