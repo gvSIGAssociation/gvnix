@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
@@ -106,8 +107,8 @@ public abstract class PropertiesDynamicConfiguration extends
                     } else {
 
                         logger.log(Level.WARNING,
-                                "Property key " + dynProp.getKey()
-                                        + " to put value not exists on file");
+                                "Property key ".concat(dynProp.getKey())
+                                        .concat(" to put value not exists on file"));
                     }
                 }
                 outputStream = file.getOutputStream();
@@ -117,18 +118,14 @@ public abstract class PropertiesDynamicConfiguration extends
 
                 logger.log(
                         Level.WARNING,
-                        "File "
-                                + getFilePath()
-                                + " not exists and there are dynamic properties to set it");
+                        "File ".concat(getFilePath())
+                                .concat(" not exists and there are dynamic properties to set it")); 
             }
         } catch (IOException ioe) {
             throw new IllegalStateException(ioe);
         } finally {
             if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException ignored) {
-                }
+            	IOUtils.closeQuietly(outputStream);
             }
         }
     }
