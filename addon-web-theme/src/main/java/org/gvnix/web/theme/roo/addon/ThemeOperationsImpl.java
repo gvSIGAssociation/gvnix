@@ -26,8 +26,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -117,7 +117,17 @@ import org.w3c.dom.NodeList;
 public class ThemeOperationsImpl extends AbstractOperations implements
         ThemeOperations {
 
-    /** Logger */
+    private static final String WEB_INF_THEME_FILE = "WEB-INF/views/theme.xml";
+
+	private static final String HREF_ATTRIBUTE = "href";
+
+	private static final String TYPE_ATTRIBUTE = "type";
+
+	private static final String VAR_ATTRIBUTE = "var";
+
+	private static final String VALUE_ATTRIBUTE = "value";
+
+	/** Logger */
     private static final Logger logger = HandlerUtils
             .getLogger(ThemeOperationsImpl.class);
 
@@ -493,30 +503,30 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         if (testElement == null) {
             Element urlCitIECss = new XmlElementBuilder("spring:url",
                     loadScriptsXml)
-                    .addAttribute("value", "/resources/styles/cit-IE.css")
-                    .addAttribute("var", "roo_css-ie_url").build();
+                    .addAttribute(VALUE_ATTRIBUTE, "/resources/styles/cit-IE.css")
+                    .addAttribute(VAR_ATTRIBUTE, "roo_css-ie_url").build();
             Element urlApplicationCss = new XmlElementBuilder("spring:url",
                     loadScriptsXml)
-                    .addAttribute("value", "/resources/styles/application.css")
-                    .addAttribute("var", "application_css_url").build();
+                    .addAttribute(VALUE_ATTRIBUTE, "/resources/styles/application.css")
+                    .addAttribute(VAR_ATTRIBUTE, "application_css_url").build();
             Element urlYuiEventJs = new XmlElementBuilder("spring:url",
                     loadScriptsXml)
-                    .addAttribute("value",
+                    .addAttribute(VALUE_ATTRIBUTE,
                             "/resources/scripts/yui/yahoo-dom-event.js")
-                    .addAttribute("var", "yui_event").build();
+                    .addAttribute(VAR_ATTRIBUTE, "yui_event").build();
             Element urlYuiCoreJs = new XmlElementBuilder("spring:url",
                     loadScriptsXml)
-                    .addAttribute("value",
+                    .addAttribute(VALUE_ATTRIBUTE,
                             "/resources/scripts/yui/container_core-min.js")
-                    .addAttribute("var", "yui_core").build();
+                    .addAttribute(VAR_ATTRIBUTE, "yui_core").build();
             Element urlYoiMenuJs = new XmlElementBuilder("spring:url",
                     loadScriptsXml)
-                    .addAttribute("value", "/resources/scripts/yui/menu-min.js")
-                    .addAttribute("var", "yui_menu").build();
+                    .addAttribute(VALUE_ATTRIBUTE, "/resources/scripts/yui/menu-min.js")
+                    .addAttribute(VAR_ATTRIBUTE, "yui_menu").build();
             Element urlCitJs = new XmlElementBuilder("spring:url",
                     loadScriptsXml)
-                    .addAttribute("value", "/resources/scripts/utils.js")
-                    .addAttribute("var", "cit_js_url").build();
+                    .addAttribute(VALUE_ATTRIBUTE, "/resources/scripts/utils.js")
+                    .addAttribute(VAR_ATTRIBUTE, "cit_js_url").build();
             List<Element> springUrlElements = org.springframework.roo.support.util.XmlUtils
                     .findElements("/root/url", lsRoot);
             // Element lastSpringUrl = null;
@@ -559,8 +569,8 @@ public class ThemeOperationsImpl extends AbstractOperations implements
 
             Element linkCitIECss = new XmlElementBuilder("link", loadScriptsXml)
                     .addAttribute("rel", "stylesheet")
-                    .addAttribute("type", "text/css")
-                    .addAttribute("href", "${roo_css-ie_url}").build();
+                    .addAttribute(TYPE_ATTRIBUTE, "text/css")
+                    .addAttribute(HREF_ATTRIBUTE, "${roo_css-ie_url}").build();
             ifIE.appendChild(linkCitIECss);
             Node linkFaviconNode = org.springframework.roo.support.util.XmlUtils
                     .findFirstElement("/root/link[@href='${favicon}']", lsRoot);
@@ -595,9 +605,9 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         if (testElement == null) {
             Element linkApplicationCss = new XmlElementBuilder("link",
                     loadScriptsXml).addAttribute("rel", "stylesheet")
-                    .addAttribute("type", "text/css")
+                    .addAttribute(TYPE_ATTRIBUTE, "text/css")
                     .addAttribute("media", "screen")
-                    .addAttribute("href", "${application_css_url}").build();
+                    .addAttribute(HREF_ATTRIBUTE, "${application_css_url}").build();
             linkApplicationCss.appendChild(loadScriptsXml
                     .createComment(" required for FF3 and Opera "));
             Node linkFaviconNode = org.springframework.roo.support.util.XmlUtils
@@ -632,22 +642,22 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         if (testElement == null) {
             Element scriptYuiEventJs = new XmlElementBuilder("script",
                     loadScriptsXml).addAttribute("src", "${yui_event}")
-                    .addAttribute("type", "text/javascript").build();
+                    .addAttribute(TYPE_ATTRIBUTE, "text/javascript").build();
             scriptYuiEventJs.appendChild(loadScriptsXml
                     .createComment(" required for FF3 and Opera "));
             Element scriptYuiCoreJs = new XmlElementBuilder("script",
                     loadScriptsXml).addAttribute("src", "${yui_core}")
-                    .addAttribute("type", "text/javascript").build();
+                    .addAttribute(TYPE_ATTRIBUTE, "text/javascript").build();
             scriptYuiCoreJs.appendChild(loadScriptsXml
                     .createComment(" required for FF3 and Opera "));
             Element scriptYoiMenuJs = new XmlElementBuilder("script",
                     loadScriptsXml).addAttribute("src", "${yui_menu}")
-                    .addAttribute("type", "text/javascript").build();
+                    .addAttribute(TYPE_ATTRIBUTE, "text/javascript").build();
             scriptYoiMenuJs.appendChild(loadScriptsXml
                     .createComment(" required for FF3 and Opera "));
             Element scriptCitJs = new XmlElementBuilder("script",
                     loadScriptsXml).addAttribute("src", "${cit_js_url}")
-                    .addAttribute("type", "text/javascript").build();
+                    .addAttribute(TYPE_ATTRIBUTE, "text/javascript").build();
             scriptCitJs.appendChild(loadScriptsXml
                     .createComment(" required for FF3 and Opera "));
             List<Element> scrtiptElements = org.springframework.roo.support.util.XmlUtils
@@ -746,7 +756,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     public Theme getActiveTheme() {
 
         String activeThemePath = getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/views/theme.xml");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), WEB_INF_THEME_FILE);
         File descriptor = new File(activeThemePath);
         Theme active = null;
 
@@ -779,11 +789,11 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         List<Theme> themes = new ArrayList<Theme>();
 
         // find themes in bundles and local repository
-        Set<URL> urls = findThemeDescriptors();
+        Set<URI> uris = findThemeDescriptors();
 
-        for (URL url : urls) {
+        for (URI uri : uris) {
             // load the theme
-            Theme theme = XmlUtils.parseTheme(url);
+            Theme theme = XmlUtils.parseTheme(uri);
             theme.setAvailable(true);
             themes.add(theme);
         }
@@ -811,11 +821,11 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         Theme active = getActiveTheme();
 
         // 2nd iterate over project themes
-        Set<URL> urls = findFileThemeDescriptors(getThemesPath());
+        Set<URI> uris = findFileThemeDescriptors(getThemesPath());
 
-        for (URL url : urls) {
+        for (URI uri : uris) {
             // load the theme
-            Theme theme = XmlUtils.parseTheme(url);
+            Theme theme = XmlUtils.parseTheme(uri);
             theme.setInstalled(true);
 
             // if this installed theme is the active theme, just set it as
@@ -948,30 +958,40 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * the other in a bundle, the result Set will contain the theme descriptor
      * in the local repository.
      * 
-     * @return URLs to available theme descriptors "WEB-INF/views/theme.xml"
+     * @return UIRs to available theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Set<URL> findThemeDescriptors() {
+    private Set<URI> findThemeDescriptors() {
 
         // URLs to repository theme descriptors
-        Set<URL> urls = findFileThemeDescriptors(getThemesRepositoryPath());
+        Set<URI> uris = findFileThemeDescriptors(getThemesRepositoryPath());
 
         // URLs to theme descriptors in OSGi bundles
-        urls.addAll(findBundleThemeDescriptors());
+        uris.addAll(findBundleThemeDescriptors());
 
-        return urls;
+        return uris;
     }
 
     /**
      * Find theme descriptors in OSGi bundles.
      * 
-     * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
+     * @return URIs to theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Collection<URL> findBundleThemeDescriptors() {
+    private Collection<URI> findBundleThemeDescriptors() {
 
         // URLs to theme descriptors in OSGi bundles
         Collection<URL> urls = OSGiUtils.findEntriesByPattern(
                 context.getBundleContext(), "/**/WEB-INF/views/theme.xml");
-        return urls;
+        Set<URI> uris = new HashSet<URI>(urls.size());
+        
+        // Transform to uri so make easy to compare 
+        for (URL url : urls){
+        	try {
+				uris.add(url.toURI());
+			} catch (URISyntaxException e) {
+				throw new IllegalStateException(e);
+			}
+        }
+        return uris;
     }
 
     /**
@@ -981,38 +1001,32 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * 
      * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Set<URL> findFileThemeDescriptors(File path) {
-        Set<URL> urls = new HashSet<URL>();
+    private Set<URI> findFileThemeDescriptors(File path) {
+        Set<URI> uris = new HashSet<URI>();
 
         // find themes in the local theme repository (if it exists)
         if (path == null) {
             // there isn't a local theme repository, return theme descriptors in
             // bundles
-            return urls;
+            return uris;
         }
 
         // get the list of theme dirs in the repository
         File[] themeDirs = path.listFiles();
         if (themeDirs == null) {
             // if null there isn't any installed theme : return empty set
-            return urls;
+            return uris;
         }
 
         // iterate over the set of theme directories in the repository
         for (File themeDir : themeDirs) {
             File descriptor = new File(themeDir.getAbsolutePath(),
-                    "WEB-INF/views/theme.xml");
-            try {
-                if (themeDir.isDirectory() && descriptor.exists()) {
-                    urls.add(descriptor.toURI().toURL());
-                }
-            } catch (MalformedURLException ex) {
-                // this shouldn't occur because Files were created by JDK
-                logger.info("Cannot convert '".concat(descriptor.getPath())
-                        .concat("' to URL. [Nothing to add]"));
+                    WEB_INF_THEME_FILE);
+            if (themeDir.isDirectory() && descriptor.exists()) {
+                uris.add(descriptor.toURI());
             }
         }
-        return urls;
+        return uris;
     }
 
     /**
@@ -1182,7 +1196,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                     }
                 }
             } catch (IOException e) {
-                new IllegalStateException(
+                throw new IllegalStateException(
                         "Encountered an error during copying of resources for MVC Theme addon.",
                         e);
             }
@@ -1378,22 +1392,22 @@ public class ThemeOperationsImpl extends AbstractOperations implements
             Element span = org.springframework.roo.support.util.XmlUtils
                     .findRequiredElement("//span", root);
             span.appendChild(new XmlElementBuilder("c:out", tagxDocument)
-                    .addAttribute("value", " | ").build());
+                    .addAttribute(VALUE_ATTRIBUTE, " | ").build());
 
             // create gvNIX spring:url and add theme parameter
             Element gvnixUrlEl = new XmlElementBuilder("spring:url",
-                    tagxDocument).addAttribute("var", "url_theme_gvnix")
-                    .addAttribute("value", "").build();
+                    tagxDocument).addAttribute(VAR_ATTRIBUTE, "url_theme_gvnix")
+                    .addAttribute(VALUE_ATTRIBUTE, "").build();
             gvnixUrlEl.appendChild(new XmlElementBuilder("spring:param",
                     tagxDocument).addAttribute("name", "theme")
-                    .addAttribute("value", theme.getId()).build());
+                    .addAttribute(VALUE_ATTRIBUTE, theme.getId()).build());
 
             // create conditional page parameter to add to gvNIX spring:url
             Element ifPageEl = new XmlElementBuilder("c:if", tagxDocument)
                     .addAttribute("test", "${not empty param.page}").build();
             Element paramPageEl = new XmlElementBuilder("spring:param",
                     tagxDocument).addAttribute("name", "page")
-                    .addAttribute("value", "${param.page}").build();
+                    .addAttribute(VALUE_ATTRIBUTE, "${param.page}").build();
             ifPageEl.appendChild(paramPageEl);
 
             gvnixUrlEl.appendChild(ifPageEl);
@@ -1403,7 +1417,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                     .addAttribute("test", "${not empty param.size}").build();
             Element paramSizeEl = new XmlElementBuilder("spring:param",
                     tagxDocument).addAttribute("name", "size")
-                    .addAttribute("value", "${param.size}").build();
+                    .addAttribute(VALUE_ATTRIBUTE, "${param.size}").build();
             ifSizeEl.appendChild(paramSizeEl);
 
             gvnixUrlEl.appendChild(ifSizeEl);
@@ -1414,12 +1428,12 @@ public class ThemeOperationsImpl extends AbstractOperations implements
             // create the anchor to change to gvNIX Theme
             Element gvnixMsgEl = new XmlElementBuilder("spring:message",
                     tagxDocument).addAttribute("text", theme.getName())
-                    .addAttribute("var", "theme_gvnix")
+                    .addAttribute(VAR_ATTRIBUTE, "theme_gvnix")
                     .addAttribute("htmlEscape", "false").build();
             span.appendChild(gvnixMsgEl);
 
             Element anchorEl = new XmlElementBuilder("a", tagxDocument)
-                    .addAttribute("href", "${url_theme_gvnix}")
+                    .addAttribute(HREF_ATTRIBUTE, "${url_theme_gvnix}")
                     .addAttribute("title", "${fn:escapeXml(theme_gvnix)}")
                     .setText("${fn:escapeXml(theme_gvnix)}").build();
             span.appendChild(anchorEl);

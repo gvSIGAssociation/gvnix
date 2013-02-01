@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.project.Path;
@@ -85,6 +86,7 @@ public class Theme {
 
     this.id = themeEl.getAttribute("id");
     Validate.notNull(id, "Theme element must have id attribute");
+    Validate.notBlank(id, "Theme element must have id attribute");
 
     this.name = themeEl.getAttribute("name");
 
@@ -104,6 +106,8 @@ public class Theme {
   }
 
   public void setId(String id) {
+	Validate.notNull(id,"Invalid Theme id");
+	Validate.notBlank(id,"Invalid Theme id");
     this.id = id;
   }
 
@@ -246,14 +250,22 @@ public class Theme {
     if(this == obj) {
       return true;
     }
+    if (obj == null){
+    	return false;
+    }
     if(!(obj instanceof Theme)) {
       return false;
     }
-    Theme t = (Theme) obj;
+    Theme otherTheme = (Theme) obj;
 
-    if(getId() != null && getId().equals(t.getId())) {
+    if(ObjectUtils.equals(getId(), otherTheme.getId())) {
       return true;
     }
     return false;
+  }
+  
+  @Override
+  public int hashCode() {
+    return getId().hashCode();
   }
 }
