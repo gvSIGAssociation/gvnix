@@ -18,6 +18,8 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon.entity;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 /**
  * Dynamic configuration component entity.
  * 
@@ -89,26 +91,41 @@ public class DynComponent {
     public String toString() {
 
         // Show the component name
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(" * " + getName());
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(" * ");
+        buffer.append(getName());
 
         // Show properties
         for (DynProperty prop : properties) {
 
             // Show the property and value if exists with format
             buffer.append("\n");
-            buffer.append("   - " + prop.getKey());
+            buffer.append("   - ");
+            buffer.append(prop.getKey());
             if (prop.getValue() == null) {
 
                 buffer.append(" = (UNDEFINED)");
             } else {
 
-                buffer.append(" = \"" + prop.getValue() + "\"");
+                buffer.append(" = \"");
+                buffer.append(prop.getValue());
+                buffer.append('"');
             }
         }
 
         return buffer.toString();
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		for (DynProperty property : properties) {
+			result = prime * result
+					+ ((property == null) ? 0 : property.hashCode());
+		}
+		return result;
+	}
 
     /**
      * Two components are equal if their properties are equal.
@@ -117,12 +134,22 @@ public class DynComponent {
      *            Component to compare to
      * @return Component equals
      */
-    public boolean equals(DynComponent obj) {
-
+	@Override
+    public boolean equals(Object obj) {
+		if (ObjectUtils.equals(this, obj)){
+			return true;
+		}
+		if (obj == null){
+			return false;
+		}
+		if (!(obj instanceof DynComponent)){
+			return false;
+		}
+		DynComponent other = (DynComponent) obj;
         for (DynProperty component : properties) {
 
             boolean exist = false;
-            for (DynProperty component2 : obj.getProperties()) {
+            for (DynProperty component2 : other.getProperties()) {
                 if (component.equals(component2)) {
 
                     exist = true;

@@ -18,6 +18,8 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon.entity;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 /**
  * Dynamic configuration entity.
  * 
@@ -79,7 +81,7 @@ public class DynConfiguration {
     @Override
     public String toString() {
 
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         if (active) {
             buffer.append("      (Active)      ");
@@ -99,12 +101,22 @@ public class DynConfiguration {
      *            Configuration to compare to
      * @return Configuration equals
      */
-    public boolean equals(DynConfiguration obj) {
-
+    @Override
+    public boolean equals(Object obj) {
+    	if (ObjectUtils.equals(this, obj)){
+    		return true;
+    	}
+    	if (obj == null){
+    		return false;
+    	}
+    	if (!(obj instanceof DynConfiguration)){
+    		return false;
+    	}
+    	DynConfiguration other = (DynConfiguration) obj;
         for (DynComponent component : components) {
 
             boolean exist = false;
-            for (DynComponent component2 : obj.getComponents()) {
+            for (DynComponent component2 : other.getComponents()) {
                 if (component.equals(component2)) {
 
                     exist = true;
@@ -120,4 +132,14 @@ public class DynConfiguration {
         return true;
     }
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		for (DynComponent component : components) {
+			result = prime * result
+					+ ((component == null) ? 0 : component.hashCode());
+		}
+		return result;
+	}
 }
