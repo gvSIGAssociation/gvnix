@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -14,20 +15,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
-import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.shell.Shell;
 import org.springframework.roo.support.util.FileUtils;
@@ -46,10 +46,6 @@ import com.xsoftwarelabs.spring.roo.addon.typicalsecurity.utils.TokenReplacement
 @Component
 @Service
 public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations {
-	private static Logger logger = Logger
-			.getLogger(TypicalsecurityOperations.class.getName());
-	@Reference
-	private MetadataService metadataService;
 	@Reference
 	private FileManager fileManager;
 	@Reference
@@ -64,7 +60,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 	 *	private ClasspathOperations classpathOperations;
 	 */
 	
-	private static char separator = File.separatorChar;
+	private static char SEPARATOR = File.separatorChar;
 
 	public boolean isCommandAvailable() {
 		/*	Not available since Roo 1.1.2 (See ROO-2066)
@@ -104,8 +100,8 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		// -----------------------------------------------------------------------------------
 		// Create User entity
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("entity jpa --class " + entityPackage
-				+ ".User --testAutomatically --permitReservedWords");
+		shell.executeCommand("entity jpa --class ".concat(entityPackage)
+				.concat(".User --testAutomatically --permitReservedWords"));
 		shell.executeCommand("field string --fieldName firstName --sizeMin 1 --notNull");
 		shell.executeCommand("field string --fieldName lastName --sizeMin 1 --notNull");
 		shell.executeCommand("field string --fieldName emailAddress --sizeMin 1 --notNull --unique");
@@ -118,31 +114,31 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		// -----------------------------------------------------------------------------------
 		// Create Role entity
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("entity jpa --class " + entityPackage
-				+ ".Role --testAutomatically --permitReservedWords");
+		shell.executeCommand("entity jpa --class ".concat(entityPackage)
+				.concat(".Role --testAutomatically --permitReservedWords"));
 		shell.executeCommand("field string --fieldName roleName --sizeMin 1 --notNull --unique");
 		shell.executeCommand("field string --fieldName roleDescription --sizeMin --sizeMax 200 --notNull");
 
 		// -----------------------------------------------------------------------------------
 		// Create User Role Mapping
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("entity jpa --class " + entityPackage
-				+ ".UserRole --testAutomatically");
+		shell.executeCommand("entity jpa --class ".concat(entityPackage)
+				.concat(".UserRole --testAutomatically"));
 		shell.executeCommand("field reference --fieldName userEntry --type "
-				+ entityPackage + ".User --notNull");
+				.concat(entityPackage).concat(".User --notNull"));
 		shell.executeCommand("field reference --fieldName roleEntry --type "
-				+ entityPackage + ".Role --notNull");
+				.concat(entityPackage).concat(".Role --notNull"));
 
 		// -----------------------------------------------------------------------------------
 		// Create Finders for find user by email address and find user role by
 		// user
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("finder add findUsersByEmailAddress --class " + entityPackage
-				+ ".User");
-		shell.executeCommand("finder add findUsersByActivationKeyAndEmailAddress --class " + entityPackage
-				+ ".User");
-		shell.executeCommand("finder add findUserRolesByUserEntry --class " + entityPackage
-				+ ".UserRole");
+		shell.executeCommand("finder add findUsersByEmailAddress --class "
+				.concat(entityPackage).concat(".User"));
+		shell.executeCommand("finder add findUsersByActivationKeyAndEmailAddress --class "
+				.concat(entityPackage).concat(".User"));
+		shell.executeCommand("finder add findUserRolesByUserEntry --class " 
+				.concat(entityPackage).concat(".UserRole"));
 
 	}
 
@@ -158,24 +154,23 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		// -----------------------------------------------------------------------------------
 		// Controller for User
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("web mvc scaffold --class " + controllerPackage
-				+ ".UserController --backingType " + entityPackage
-				+ ".User");
+		shell.executeCommand(
+				String.format("web mvc scaffold --class %s.UserController --backingType %s.User", 
+						controllerPackage,entityPackage));
 
 		// -----------------------------------------------------------------------------------
 		// Controller for Role
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("web mvc scaffold --class " + controllerPackage
-				+ ".RoleController --backingType " + entityPackage
-				+ ".Role");
+		shell.executeCommand(
+				String.format("web mvc scaffold --class %s.RoleController --backingType %s.Role",
+						controllerPackage, entityPackage));
 
 		// -----------------------------------------------------------------------------------
 		// Controller for User Role
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("web mvc scaffold --class " + controllerPackage
-				+ ".UserRoleController --backingType " + entityPackage
-				+ ".UserRole");
-
+		shell.executeCommand(
+				String.format("web mvc scaffold --class %s.UserRoleController --backingType %s.UserRole",
+						controllerPackage, entityPackage));
 	}
 
 	/**
@@ -215,7 +210,6 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 	private void createMailSender() {
 		shell.executeCommand("email sender setup --hostServer smtp.gmail.com --port 587 --protocol SMTP --username rohitsghatoltest@gmail.com --password password4me");
 		shell.executeCommand("email template setup --from rohitsghatoltest@gmail.com --subject \"Password Recovery\"");
-
 	}
 
 	/**
@@ -238,7 +232,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 						mutableConfigXml.getInputStream());
 			} else {
 				throw new IllegalStateException("Could not acquire "
-						+ springSecurity);
+						.concat(springSecurity));
 			}
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
@@ -307,8 +301,13 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 //		newAuthProvider.appendChild(
 //				new XmlElementBuilder("password-encoder", webConfigDoc)
 //					.addAttribute("hash", "sha-256").build());
-
-		XmlUtils.writeXml(mutableConfigXml.getOutputStream(), webConfigDoc);
+		OutputStream out = null;
+		try {
+			out = mutableConfigXml.getOutputStream();
+			XmlUtils.writeXml(out, webConfigDoc);
+		} finally {
+			IOUtils.closeQuietly(out);
+		}
 
 	}
 
@@ -360,13 +359,13 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
 		JavaPackage topLevelPackage = projectOperations.getFocusedTopLevelPackage();
 
-		String packagePath = topLevelPackage.getFullyQualifiedPackageName()
-				.replace('.', separator);
+		final String packagePath = topLevelPackage.getFullyQualifiedPackageName()
+				.replace('.', SEPARATOR);
 
-		String finalEntityPackage = entityPackage.replace("~",
+		final String finalEntityPackage = entityPackage.replace("~",
 				topLevelPackage.getFullyQualifiedPackageName());
 
-		String finalControllerPackage = controllerPackage.replace("~",
+		final String finalControllerPackage = controllerPackage.replace("~",
 				topLevelPackage.getFullyQualifiedPackageName());
 
 		Properties properties = new Properties();
@@ -376,116 +375,124 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		properties.put("__CONTROLLER_PACKAGE__", finalControllerPackage);
 
 		Map<String, String> map = new HashMap<String, String>();
+		
 
+		final String controllerPath = finalControllerPackage.replace('.', SEPARATOR);
+		
 		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
-				finalControllerPackage.replace('.', separator) + separator
-						+ "ChangePasswordController.java"),
+				joinPath(controllerPath, "ChangePasswordController.java")),
 				"ChangePasswordController.java-template");
 
 		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
-				finalControllerPackage.replace('.', separator) + separator
-						+ "ChangePasswordForm.java"),
+				joinPath(controllerPath, "ChangePasswordForm.java")),
 				"ChangePasswordForm.java-template");
 
 		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
-				finalControllerPackage.replace('.', separator) + separator
-						+ "ChangePasswordValidator.java"),
+				joinPath(controllerPath, "ChangePasswordValidator.java")),
 				"ChangePasswordValidator.java-template");
 
 		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
-				finalControllerPackage.replace('.', separator) + separator
-						+ "SignUpController.java"),
+				joinPath(controllerPath, "SignUpController.java")),
 				"SignUpController.java-template");
 
 		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
-				finalControllerPackage.replace('.', separator) + separator
-						+ "UserRegistrationForm.java"),
+				joinPath(controllerPath, "UserRegistrationForm.java")),
 				"UserRegistrationForm.java-template");
 
 		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
-				finalControllerPackage.replace('.', separator) + separator
-						+ "SignUpValidator.java"),
+				joinPath(controllerPath, "SignUpValidator.java")),
 				"SignUpValidator.java-template");
 
 		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
-				finalControllerPackage.replace('.', separator) + separator
-						+ "ForgotPasswordController.java"),
+				joinPath(controllerPath, "ForgotPasswordController.java")),
 				"ForgotPasswordController.java-template");
 
 		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
-				finalControllerPackage.replace('.', separator) + separator
-						+ "ForgotPasswordForm.java"),
+				joinPath(controllerPath, "ForgotPasswordForm.java")),
 				"ForgotPasswordForm.java-template");
 
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA, packagePath
-				+ separator + "provider" + separator
-				+ "DatabaseAuthenticationProvider.java"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA, 
+				joinPath(packagePath, "provider", "DatabaseAuthenticationProvider.java")),
 				"DatabaseAuthenticationProvider.java-template");
 
 		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
-				finalControllerPackage.replace('.', separator) + separator
-						+ "UserController.java"),
+				joinPath(controllerPath, "UserController.java")),
 				"UserController.java-template");
 
-		String prefix = separator + "WEB-INF/views";
+		final String prefix = SEPARATOR + "WEB-INF/views";
 
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
-				+ separator + "signup" + separator + "index.jspx"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, 
+				joinPath(prefix, "signup", "index.jspx")),
 				"signup/index.jspx");
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
-				+ separator + "signup" + separator + "thanks.jspx"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, 
+				joinPath(prefix, "signup", "thanks.jspx")),
 				"signup/thanks.jspx");
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
-				+ separator + "signup" + separator + "error.jspx"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, 
+				joinPath(prefix, "signup", "error.jspx")),
 				"signup/error.jspx");
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
-				+ separator + "signup" + separator + "views.xml"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, 
+				joinPath(prefix, "signup", "views.xml")),
 				"signup/views.xml");
 
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
-				+ separator + "forgotpassword" + separator + "index.jspx"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, 
+				joinPath(prefix, "forgotpassword", "index.jspx")),
 				"forgotpassword/index.jspx");
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
-				+ separator + "forgotpassword" + separator + "thanks.jspx"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, 
+				joinPath(prefix, "forgotpassword", "thanks.jspx")),
 				"forgotpassword/thanks.jspx");
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
-				+ separator + "forgotpassword" + separator + "views.xml"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, 
+				joinPath(prefix, "forgotpassword", "views.xml")),
 				"forgotpassword/views.xml");
 
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
-				+ separator + "changepassword" + separator + "index.jspx"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, 
+				joinPath(prefix, "changepassword", "index.jspx")),
 				"changepassword/index.jspx");
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
-				+ separator + "changepassword" + separator + "thanks.jspx"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, 
+				joinPath(prefix, "changepassword", "thanks.jspx")),
 				"changepassword/thanks.jspx");
-		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
-				+ separator + "changepassword" + separator + "views.xml"),
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, 
+				joinPath(prefix, "changepassword", "views.xml")),
 				"changepassword/views.xml");
 
 		for (Entry<String, String> entry : map.entrySet()) {
 
 			MutableFile mutableFile = null;
 
-			String path = entry.getKey();
-			String file = entry.getValue();
+			final String path = entry.getKey();
+			final String file = entry.getValue();
+			InputStream ins = null;
+			OutputStream outs = null;
 			try {
-
-				if (fileManager.exists(path))
+				if (fileManager.exists(path)){
 					mutableFile = fileManager.updateFile(path);
-				else
+				} else {
 					mutableFile = fileManager.createFile(path);
+				}
 
+				ins = FileUtils.getInputStream(getClass(), file);
+				outs = mutableFile.getOutputStream();
 				TokenReplacementFileCopyUtils.replaceAndCopy(
-						FileUtils.getInputStream(getClass(), file),
-						mutableFile.getOutputStream(), properties);
+						ins, outs, properties);
 				
 				insertI18nMessages();
-
 			} catch (IOException ioe) {
 				throw new IllegalStateException(ioe);
+			} finally {
+				IOUtils.closeQuietly(ins);
+				IOUtils.closeQuietly(outs);
 			}
 		}
 
+	}
+	
+	/**
+	 * Join a list of element with {@link #SEPARATOR}
+	 * 
+	 * @param elements
+	 * @return
+	 */
+	private String joinPath(String...elements){
+		return StringUtils.join(elements, SEPARATOR);
 	}
 
 	private void addChangePasswordToFooter() {
@@ -501,6 +508,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
 		MutableFile mutableFooterJspx = null;
 		Document footerJspxDoc;
+		OutputStream out = null;
 		try {
 			if (fileManager.exists(footerJspx)) {
 				mutableFooterJspx = fileManager.updateFile(footerJspx);
@@ -509,9 +517,9 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 				Element logout = XmlUtils.findFirstElement(
 						"//a[@href=\"${logout}\"]",
 						footerJspxDoc.getDocumentElement());
-				assert logout != null :
+				Validate.notNull(logout,
 						"Could not find <a href=\"${logout}\"> in "
-								+ footerJspx;
+								.concat(footerJspx));
 
 				logout.getParentNode().appendChild(
 						new XmlElementBuilder("div", footerJspxDoc).addChild(
@@ -521,22 +529,23 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 						new XmlElementBuilder("a", footerJspxDoc)
 								.addAttribute(
 										"href",
-										"/" + contextPath
-												+ "/changepassword/index")
+										"/".concat(contextPath)
+												.concat("/changepassword/index"))
 								.addChild(
 										footerJspxDoc
 												.createTextNode("password"))
 								.build());
-				XmlUtils.writeXml(mutableFooterJspx.getOutputStream(),
-						footerJspxDoc);
+				out = mutableFooterJspx.getOutputStream();
+				XmlUtils.writeXml(out, footerJspxDoc);
 
 			} else {
 				throw new IllegalStateException("Could not acquire "
-						+ footerJspx);
+						.concat(footerJspx));
 			}
 		} catch (Exception e) {
-			System.out.println("---> " + e.getMessage());
 			throw new IllegalStateException(e);
+		} finally {
+			IOUtils.closeQuietly(out);
 		}
 
 	}
@@ -552,6 +561,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
 		MutableFile mutableLoginJspx = null;
 		Document loginJspxDoc;
+		OutputStream out = null;
 		try {
 			if (fileManager.exists(loginJspx)) {
 				mutableLoginJspx = fileManager.updateFile(loginJspx);
@@ -559,28 +569,29 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 						mutableLoginJspx.getInputStream());
 				Element form = XmlUtils.findFirstElementByName("form",
 						loginJspxDoc.getDocumentElement());
-				assert form != null : "Could not find form in " + loginJspx;
+				Validate.notNull(form,"Could not find form in ".concat(loginJspx));
 
 				String contextPath = projectOperations.getFocusedProjectName();
 				form.appendChild(new XmlElementBuilder("div", loginJspxDoc)
 						.addChild(
 								loginJspxDoc
 										.createTextNode("<br/><a href =\"/"
-												+ contextPath
-												+ "/forgotpassword/index\">Forgot Password</a> | Not a User Yet? <a href =\"/"
-												+ contextPath
-												+ "/signup?form\">Sign Up</a>"))
+												.concat(contextPath)
+												.concat("/forgotpassword/index\">Forgot Password</a> | Not a User Yet? <a href =\"/")
+												.concat(contextPath)
+												.concat("/signup?form\">Sign Up</a>")))
 						.build());
-				XmlUtils.writeXml(mutableLoginJspx.getOutputStream(),
-						loginJspxDoc);
+				out = mutableLoginJspx.getOutputStream();
+				XmlUtils.writeXml(out, loginJspxDoc);
 
 			} else {
 				throw new IllegalStateException("Could not acquire "
 						+ loginJspx);
 			}
 		} catch (Exception e) {
-			System.out.println("---> " + e.getMessage());
 			throw new IllegalStateException(e);
+		} finally {
+			IOUtils.closeQuietly(out);
 		}
 
 	}
@@ -591,14 +602,16 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
 		MutableFile mutableApplicationProperties = null;
 
+		BufferedWriter out = null;
+		InputStream ins = null;
 		try {
 			if (fileManager.exists(applicationProperties)) {
 				mutableApplicationProperties = fileManager
 						.updateFile(applicationProperties);
-				String originalData = convertStreamToString(mutableApplicationProperties
-						.getInputStream());
+				ins = mutableApplicationProperties.getInputStream();
+				String originalData = convertStreamToString(ins);
 
-				BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
+				out = new BufferedWriter(new OutputStreamWriter(
 						mutableApplicationProperties.getOutputStream()));
 
 				out.write(originalData);
@@ -619,15 +632,15 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 				out.write("label_com_training_spring_roo_model_user_emailaddress=Email Address\n");
 				out.write("label_com_training_spring_roo_model_user_activationdate=Activation Date\n");
 
-				out.close();
-
 			} else {
 				throw new IllegalStateException("Could not acquire "
-						+ applicationProperties);
+						.concat(applicationProperties));
 			}
 		} catch (Exception e) {
-			System.out.println("---> " + e.getMessage());
 			throw new IllegalStateException(e);
+		} finally{
+			IOUtils.closeQuietly(ins);
+			IOUtils.closeQuietly(out);
 		}
 
 	}
@@ -643,41 +656,15 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 			Writer writer = new StringWriter();
 
 			char[] buffer = new char[1024];
-			try {
-				Reader reader = new BufferedReader(new InputStreamReader(is,
-						"UTF-8"));
-				int n;
-				while ((n = reader.read(buffer)) != -1) {
-					writer.write(buffer, 0, n);
-				}
-			} finally {
-				is.close();
+			Reader reader = new BufferedReader(new InputStreamReader(is,
+					"UTF-8"));
+			int n;
+			while ((n = reader.read(buffer)) != -1) {
+				writer.write(buffer, 0, n);
 			}
 			return writer.toString();
 		} else {
 			return "";
 		}
 	}
-
-	/**
-	 * @return the path resolver or null if there is no user project
-	 */
-	private PathResolver getPathResolver() {
-		ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-				.get(ProjectMetadata.getProjectIdentifier(null));
-		if (projectMetadata == null) {
-			return null;
-		}
-		return projectOperations.getPathResolver();
-	}
-
-	/**
-	 * 
-	 * @return the project metadata
-	 */
-	private ProjectMetadata getProjectMetadata() {
-		return (ProjectMetadata) metadataService.get(ProjectMetadata
-				.getProjectIdentifier(projectOperations.getFocusedModuleName()));
-	}
-
 }

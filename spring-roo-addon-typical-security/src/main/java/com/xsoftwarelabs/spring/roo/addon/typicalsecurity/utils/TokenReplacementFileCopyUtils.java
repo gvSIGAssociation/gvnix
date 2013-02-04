@@ -9,6 +9,8 @@ import java.io.OutputStream;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.commons.io.IOUtils;
+
 /**
  * @author rohit 
  *
@@ -35,14 +37,8 @@ public class TokenReplacementFileCopyUtils {
                 out.flush();
                 return byteCount;
         } finally {
-                try {
-                        in.close();
-                } catch (IOException ex) {
-                }
-                try {
-                        out.close();
-                } catch (IOException ex) {
-                }
+                IOUtils.closeQuietly(in);
+                IOUtils.closeQuietly(out);
         }
 }
 }
