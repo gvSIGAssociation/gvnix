@@ -81,11 +81,11 @@ public class WSExportMetadata extends
         AnnotationMetadata annotationMetadata = governorTypeDetails
                 .getTypeAnnotation(new JavaType(GvNIXWebService.class.getName()));
 
-        // Check if Web Service has been exported from WSDL.
-        BooleanAttributeValue exported = (BooleanAttributeValue) annotationMetadata
-                .getAttribute(new JavaSymbolName("exported"));
-
         if (annotationMetadata != null) {
+        	
+        	// Check if Web Service has been exported from WSDL.
+        	BooleanAttributeValue exported = (BooleanAttributeValue) annotationMetadata
+        			.getAttribute(new JavaSymbolName("exported"));
 
             // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
             AnnotationMetadata webServiceAnnotationMetadata = getWebServiceAnnotation(annotationMetadata);

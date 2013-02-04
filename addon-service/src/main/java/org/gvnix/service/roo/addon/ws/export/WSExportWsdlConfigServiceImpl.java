@@ -657,14 +657,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         // GvNIXWebService annotation.
         AnnotationMetadata gvNIXWebServiceAnnotation;
 
-        String fileDirectory;
-        int lastPathSepratorIndex = 0;
         for (File webServiceFile : webServices) {
-
-            fileDirectory = webServiceFile.getAbsolutePath();
-            lastPathSepratorIndex = fileDirectory.lastIndexOf(File.separator);
-            fileDirectory = fileDirectory.substring(0,
-                    lastPathSepratorIndex + 1);
 
             // Parse Java file.
             CompilationUnit compilationUnit;
@@ -1459,12 +1452,14 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                     for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
 
-                        EnumAttributeValue enumparameterStyleAttributeValue = new EnumAttributeValue(
-                                new JavaSymbolName("parameterStyle"),
-                                new EnumDetails(
-                                        new JavaType(
-                                                "org.gvnix.service.roo.addon.annotations.GvNIXWebService.GvNIXWebServiceParameterStyle"),
-                                        new JavaSymbolName("WRAPPED")));
+                    	EnumAttributeValue enumparameterStyleAttributeValue;
+                    	// TODO this is dead code, to Remove it or it's a bug?? 
+//                      enumparameterStyleAttributeValue = new EnumAttributeValue(
+//                                new JavaSymbolName("parameterStyle"),
+//                                new EnumDetails(
+//                                        new JavaType(
+//                                                "org.gvnix.service.roo.addon.annotations.GvNIXWebService.GvNIXWebServiceParameterStyle"),
+//                                        new JavaSymbolName("WRAPPED")));
 
                         if (pair.getName().contentEquals("parameterStyle")) {
 

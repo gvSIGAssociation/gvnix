@@ -126,10 +126,6 @@ public class ServiceCommands implements CommandMarker {
             }
 
             paramTypes = paramTypesList.getJavaTypes();
-
-        } else {
-
-            paramTypes = new ArrayList<JavaType>();
         }
 
         // Exceptions.

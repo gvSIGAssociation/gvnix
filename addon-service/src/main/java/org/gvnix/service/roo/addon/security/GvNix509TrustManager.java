@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.LogicalPath;
@@ -108,9 +109,13 @@ public class GvNix509TrustManager implements X509TrustManager {
 
         if (keystore.canWrite()) {
 
-            OutputStream out = new FileOutputStream(keystore);
-            ks.store(out, pass);
-            out.close();
+        	OutputStream out = null;
+        	try {
+        		out = new FileOutputStream(keystore);
+        		ks.store(out, pass);
+        	} finally {
+        		IOUtils.closeQuietly(out);
+        	}
 
         } else {
 
@@ -153,9 +158,13 @@ public class GvNix509TrustManager implements X509TrustManager {
         if (!fileManager.exists(cerFilePath)) {
 
             File cerFile = new File(cerFilePath);
-            OutputStream os = new FileOutputStream(cerFile);
-            os.write(cert.getEncoded());
-            os.close();
+            OutputStream os = null;
+            try {
+	            os = new FileOutputStream(cerFile);
+	            os.write(cert.getEncoded());
+            } finally {
+            	IOUtils.closeQuietly(os);
+            }
             logger.info("Created ".concat(Path.SRC_MAIN_RESOURCES.name())
                     .concat("/").concat(aliasCerFileName));
         }

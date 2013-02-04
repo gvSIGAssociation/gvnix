@@ -319,7 +319,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                                 .getFullyQualifiedTypeName()
                         + "' has to be defined to export class as Web Service.");
 
-        Validate.isTrue(
+        Validate.isTrue(targetNamespace != null &&
                 wSExportValidationService.checkNamespaceFormat(targetNamespace
                         .getValue()),
                 "The namespace for Web Service has to start with 'http://'.\ni.e.: http://name.of.namespace/");
@@ -482,8 +482,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                                     .getFullyQualifiedTypeName()
                             + "' has to be defined to export as Web Service operation.");
 
-            Validate.isTrue(
-                    wSExportValidationService
+            Validate.isTrue( 
+            		resultNamespace != null 
+            		&& wSExportValidationService
                             .checkNamespaceFormat(resultNamespace.getValue()),
                     "Attribute 'resultNamespace' in annotation @GvNIXWebMethod defined in method '"
                             + methodMetadata.getMethodName()
@@ -521,7 +522,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                             + "' has to be defined to export as Web Service operation.");
 
             Validate.isTrue(
-                    wSExportValidationService
+            		responseWrapperNamespace != null 
+                    	&& wSExportValidationService
                             .checkNamespaceFormat(responseWrapperNamespace
                                     .getValue()),
                     "Attribute 'responseWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
@@ -682,7 +684,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
             // Check if is the same class type as parameter type.
             Validate.isTrue(
-                    inputParameter
+            		gvNIxWebParamTypeAttributeValue != null
+                    && inputParameter
                             .getJavaType()
                             .getFullyQualifiedTypeName()
                             .contentEquals(
@@ -750,7 +753,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                             + "' to be exported as web Service operation.");
 
             Validate.isTrue(
-                    webParamNameAttributeValue.getValue().contentEquals(
+                    webParamNameAttributeValue != null
+                    	&& gvNixWebParamNameAttributeValue != null 
+                    	&& webParamNameAttributeValue.getValue().contentEquals(
                             gvNixWebParamNameAttributeValue.getValue()),
                     "The 'name' attribute in @GvNIXWebParam and @WebParam annotation to: "
                             + inputParameter.getJavaType()

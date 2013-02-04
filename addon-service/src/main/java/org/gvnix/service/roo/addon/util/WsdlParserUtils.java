@@ -387,18 +387,21 @@ public class WsdlParserUtils {
 
         // Any namepace is a SOAP namespace with or whitout final slash ?
         int index;
+        boolean soap1_2 = false;
+        boolean soap1_1 = false;
         if ((index = namespaces.indexOf(SOAP_12_NAMESPACE)) != -1
                 || (index = namespaces.indexOf(SOAP_12_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
             // First preference: SOAP 1.2 protocol
+        	soap1_2 = true;
 
         } else if ((index = namespaces.indexOf(SOAP_11_NAMESPACE)) != -1
                 || (index = namespaces.indexOf(SOAP_11_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
             // Second preference: SOAP 1.1 protocol
-
-        } else {
-
+        	soap1_1 = true;
+        }
+        if (!(soap1_2 || soap1_1)) {
             // Other protocols not supported
             return null;
         }
