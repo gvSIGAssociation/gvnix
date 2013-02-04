@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
@@ -31,16 +32,13 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.OperationUtils;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.customdata.CustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
@@ -54,6 +52,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link RelatedPatternMetadata}. This type is called by Roo to
@@ -75,13 +74,17 @@ import org.springframework.roo.project.ProjectOperations;
 @Component(immediate = true)
 @Service
 public final class RelatedPatternMetadataProvider extends AbstractPatternMetadataProvider {
+	
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(RelatedPatternMetadataProvider.class);
 
-    @Reference WebScaffoldMetadataProvider webScaffoldMetadataProvider;
-    @Reference ProjectOperations projectOperations;
-    @Reference PropFileOperations propFileOperations;
-    @Reference WebMetadataService webMetadataService;
-    @Reference PatternService patternService;
-    @Reference TypeLocationService typeLocationService;
+    @Reference 
+    private ProjectOperations projectOperations;
+    @Reference 
+    private WebMetadataService webMetadataService;
+    @Reference 
+    private PatternService patternService;
+    
 
     private final Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
     private final Map<String, JavaType> webScaffoldMidToEntityMap = new LinkedHashMap<String, JavaType>();
@@ -255,7 +258,7 @@ public final class RelatedPatternMetadataProvider extends AbstractPatternMetadat
         	return tempMap.lastKey();
         	
         } catch (NoSuchElementException e) {
-        	
+        	LOGGER.fine(String.format("Related pattern without master entity (%s)",entity));
         	// This is a related pattern without master entity. Is this possible ?
 		}
 		

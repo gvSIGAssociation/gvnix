@@ -185,7 +185,7 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
     	StringUtils.isNotBlank(targetDirectory);
 
         if (!targetDirectory.endsWith("/")) {
-            targetDirectory += "/";
+            targetDirectory = targetDirectory.concat("/");
         }
 
         if (!fileManager.exists(targetDirectory)) {
@@ -200,7 +200,7 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
                         + "'");
         for (URL url : urls) {
             String fileName = url.getPath().substring(
-                    url.getPath().lastIndexOf("/") + 1);
+                    url.getPath().lastIndexOf('/') + 1);
             if (!fileManager.exists(targetDirectory + fileName)) {
                 try {
                     InputStream inputStream = null;
@@ -215,7 +215,7 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
                     	IOUtils.closeQuietly(outputStream);
                     }
                 } catch (IOException e) {
-                    new IllegalStateException(
+                    throw new IllegalStateException(
                             "Encountered an error during copying of resources for MVC JSP addon.",
                             e);
                 }

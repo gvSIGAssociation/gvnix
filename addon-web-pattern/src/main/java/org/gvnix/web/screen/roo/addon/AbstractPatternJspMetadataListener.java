@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,6 +75,7 @@ import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlRoundTripUtils;
@@ -95,7 +97,14 @@ import org.w3c.dom.NodeList;
 public abstract class AbstractPatternJspMetadataListener implements
         MetadataProvider, MetadataNotificationListener {
 
-    protected FileManager _fileManager;
+    private static final String ID_ATTRIBUTE = "id";
+	private static final String ID_RENDER_ATTRIBUTE = "idRender";
+	private static final String ID_DISABLED_ATTRIBUTE = "idDisabled";
+	
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(AbstractPatternJspMetadataListener.class);
+	
+	protected FileManager _fileManager;
     protected TilesOperations _tilesOperations;
     protected MenuOperations _menuOperations;
     protected ProjectOperations _projectOperations;
@@ -164,9 +173,10 @@ public abstract class AbstractPatternJspMetadataListener implements
         	
             installPatternTypeArtifact(WebPatternType.tabular_edit_register, destinationDirectory, controllerPath, patternNameType[0]);
             
-        } else {
+        } 
+        // else {
             // Pattern type not supported. Nothing to do
-        }
+        //}
 
         // Modify some Roo JSPx
         modifyRooJsp(RooJspx.create);
@@ -283,7 +293,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 
         Element pageShow = new XmlElementBuilder("page:show", document)
                 .addAttribute(
-                        "id",
+                        ID_ATTRIBUTE,
                         XmlUtils.convertId("ps:"
                                 + formbackingType.getFullyQualifiedTypeName()))
                 .addAttribute("object", "${" + entityName.toLowerCase() + "}")
@@ -299,7 +309,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         }
         
         String identifierFieldName = formbackingTypeMetadata.getPersistenceDetails().getIdentifierField().getFieldName().getSymbolName();
-        if (!"id".equals(identifierFieldName)) {
+        if (!ID_ATTRIBUTE.equals(identifierFieldName)) {
 	        pageShow.setAttribute("typeIdFieldName", 
 	        		formbackingTypeMetadata.getPersistenceDetails().getIdentifierField().getFieldName().getSymbolName());
         }
@@ -309,7 +319,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 
         Element divContentPane = new XmlElementBuilder("div", document)
                 .addAttribute(
-                        "id",
+                        ID_ATTRIBUTE,
                         XmlUtils.convertId("div:"
                                 + formbackingType.getFullyQualifiedTypeName()
                                 + "_contentPane"))
@@ -317,7 +327,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 
         Element divForm = new XmlElementBuilder("div", document)
                 .addAttribute(
-                        "id",
+                        ID_ATTRIBUTE,
                         XmlUtils.convertId("div:"
                                 + formbackingType.getFullyQualifiedTypeName()
                                 + "_formNoedit"))
@@ -339,7 +349,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             Element ul = new XmlElementBuilder("ul", document)
                     .addAttribute("class", "formInline")
                     .addAttribute(
-                            "id",
+                            ID_ATTRIBUTE,
                             XmlUtils.convertId("ul:"
                                     .concat(formbackingType
                                             .getFullyQualifiedTypeName())
@@ -347,7 +357,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             Element li = new XmlElementBuilder("li", document)
                     .addAttribute("class", "size120")
                     .addAttribute(
-                            "id",
+                            ID_ATTRIBUTE,
                             XmlUtils.convertId("li:"
                                     .concat(formbackingType
                                             .getFullyQualifiedTypeName())
@@ -357,7 +367,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             Element fieldDisplay = new XmlElementBuilder("field:display",
                     document)
                     .addAttribute(
-                            "id",
+                            ID_ATTRIBUTE,
                             XmlUtils.convertId("s:"
                                     + formbackingType
                                             .getFullyQualifiedTypeName() + "."
@@ -415,7 +425,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		Element patternRelations = new XmlElementBuilder(
 		        "pattern:relations", document)
 		        .addAttribute(
-		                "id",
+		                ID_ATTRIBUTE,
 		                XmlUtils.convertId("pr:"
 		                        + formbackingType
 		                                .getFullyQualifiedTypeName() + "."
@@ -439,7 +449,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		    Element patternRelation = new XmlElementBuilder(
 		            "pattern:relation", document)
 		            .addAttribute(
-		                    "id",
+		                    ID_ATTRIBUTE,
 		                    XmlUtils.convertId("pr:"
 		                            + formbackingType
 		                                    .getFullyQualifiedTypeName()
@@ -504,7 +514,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		Element patternRelations = new XmlElementBuilder(
 		        "pattern:relations", document)
 		        .addAttribute(
-		                "id",
+		                ID_ATTRIBUTE,
 		                XmlUtils.convertId("pr:"
 		                        + formbackingType
 		                                .getFullyQualifiedTypeName() + "."
@@ -528,7 +538,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		    Element patternRelation = new XmlElementBuilder(
 		            "pattern:relation", document)
 		            .addAttribute(
-		                    "id",
+		                    ID_ATTRIBUTE,
 		                    XmlUtils.convertId("pr:"
 		                            + formbackingType
 		                                    .getFullyQualifiedTypeName()
@@ -607,20 +617,18 @@ public abstract class AbstractPatternJspMetadataListener implements
 
                 ArrayAttributeValue<?> arrayVal = (ArrayAttributeValue<?>) thisAnnotationValue;
 
-                if (arrayVal != null) {
-                    @SuppressWarnings("unchecked")
-                    List<StringAttributeValue> values = (List<StringAttributeValue>) arrayVal
-                            .getValue();
-                    String regexPattern = "(".concat(patternName).concat(":)")
-                            .concat(".*").concat("( ").concat(symbolName)
-                            .concat("=\\s*\\w*)");
-                    Pattern pattern = Pattern.compile(regexPattern);
-                    Matcher matcher = null;
-                    for (StringAttributeValue value : values) {
-                        matcher = pattern.matcher(value.getValue());
-                        if (matcher.find() && matcher.groupCount() == 2) {
-                            return true;
-                        }
+                @SuppressWarnings("unchecked")
+                List<StringAttributeValue> values = (List<StringAttributeValue>) arrayVal
+                        .getValue();
+                String regexPattern = "(".concat(patternName).concat(":)")
+                        .concat(".*").concat("( ").concat(symbolName)
+                        .concat("=\\s*\\w*)");
+                Pattern pattern = Pattern.compile(regexPattern);
+                Matcher matcher = null;
+                for (StringAttributeValue value : values) {
+                    matcher = pattern.matcher(value.getValue());
+                    if (matcher.find() && matcher.groupCount() == 2) {
+                        return true;
                     }
                 }
             }
@@ -688,7 +696,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                 docRoot);
         if (null == divContentPane) {
             divContentPane = new XmlElementBuilder("div", docJspXml)
-                    .addAttribute("id", divContPaneId)
+                    .addAttribute(ID_ATTRIBUTE, divContPaneId)
                     .addAttribute("class", "patternContentPane").build();
         }
 
@@ -698,7 +706,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                 + "/div/div[@id='" + divFormId + "']", docRoot);
         if (null == divForm) {
             divForm = new XmlElementBuilder("div", docJspXml)
-                    .addAttribute("id", divFormId)
+                    .addAttribute(ID_ATTRIBUTE, divFormId)
                     .addAttribute("class", "formularios boxNoedit").build();
             divContentPane.appendChild(divForm);
         }
@@ -738,7 +746,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                             Element li = new XmlElementBuilder("li", docJspXml)
                                     .addAttribute("class", "size120")
                                     .addAttribute(
-                                            "id",
+                                            ID_ATTRIBUTE,
                                             XmlUtils.convertId("li:"
                                                     .concat(formbackingType
                                                             .getFullyQualifiedTypeName())
@@ -748,7 +756,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                             Element ul = new XmlElementBuilder("ul", docJspXml)
                                     .addAttribute("class", "formInline")
                                     .addAttribute(
-                                            "id",
+                                            ID_ATTRIBUTE,
                                             XmlUtils.convertId("ul:"
                                                     .concat(formbackingType
                                                             .getFullyQualifiedTypeName())
@@ -774,7 +782,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                 if (null == hiddenField) {
                     hiddenField = new XmlElementBuilder(
                             "pattern:hiddengvnixpattern", docJspXml)
-                            .addAttribute("id", hiddenFieldId)
+                            .addAttribute(ID_ATTRIBUTE, hiddenFieldId)
                             .addAttribute("value", "${param.gvnixpattern}")
                             .addAttribute("render",
                                     "${not empty param.gvnixpattern}").build();
@@ -790,7 +798,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                 if (null == cancelButton) {
                     cancelButton = new XmlElementBuilder(
                             "pattern:cancelbutton", docJspXml)
-                            .addAttribute("id", cancelId)
+                            .addAttribute(ID_ATTRIBUTE, cancelId)
                             .addAttribute("render",
                                     "${not empty param.gvnixpattern}").build();
                     divForm.appendChild(cancelButton);
@@ -1057,7 +1065,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         	
 	        // Add form update element
 	        formUpdate = new XmlElementBuilder("form:updateregister", document).addAttribute(
-	        		"id", XmlUtils.convertId("fu:" + formbackingType.getFullyQualifiedTypeName()))
+	        		ID_ATTRIBUTE, XmlUtils.convertId("fu:" + formbackingType.getFullyQualifiedTypeName()))
 	                /* Modified previous value entityName */
 	                .addAttribute("modelAttribute",formbackingTypeMetadata.getPlural().toLowerCase().concat("Tab")).build();
         }
@@ -1065,9 +1073,9 @@ public abstract class AbstractPatternJspMetadataListener implements
             // Add form update element
             formUpdate = new XmlElementBuilder("form:update", document)
                     .addAttribute(
-                            "id",
+                            ID_ATTRIBUTE,
                             XmlUtils.convertId("fu:"
-                                    + formbackingType.getFullyQualifiedTypeName()))
+                                    .concat(formbackingType.getFullyQualifiedTypeName())))
                     /* Modified previous value entityName */
                     .addAttribute(
                             "modelAttribute",
@@ -1079,33 +1087,33 @@ public abstract class AbstractPatternJspMetadataListener implements
                 formbackingType.getSimpleTypeName().toLowerCase())) {
             formUpdate.setAttribute("path", controllerPath);
         }
-        if (!"id".equals(formbackingTypePersistenceMetadata
+        if (!ID_ATTRIBUTE.equals(formbackingTypePersistenceMetadata
                 .getIdentifierField().getFieldName().getSymbolName())) {
             formUpdate.setAttribute("idField",
                     formbackingTypePersistenceMetadata.getIdentifierField()
                             .getFieldName().getSymbolName());
             formUpdate
                     .setAttribute(
-                            "idDisabled",
+                            ID_DISABLED_ATTRIBUTE,
                             String.valueOf(isIdFieldAutogenerated(formbackingTypePersistenceMetadata
                                     .getIdentifierField())));
             if (!patternType.equals(WebPatternType.tabular_edit_register)) {
 	            formUpdate
 	                    .setAttribute(
-	                            "idRender",
+	                            ID_RENDER_ATTRIBUTE,
 	                            String.valueOf(!isIdFieldAutogenerated(formbackingTypePersistenceMetadata
 	                                    .getIdentifierField())));
             }
         } else {
             formUpdate
                     .setAttribute(
-                            "idDisabled",
+                            ID_DISABLED_ATTRIBUTE,
                             String.valueOf(isIdFieldAutogenerated(formbackingTypePersistenceMetadata
                                     .getIdentifierField())));
             if (!patternType.equals(WebPatternType.tabular_edit_register)) {
 	            formUpdate
 	                    .setAttribute(
-	                            "idRender",
+	                            ID_RENDER_ATTRIBUTE,
 	                            String.valueOf(!isIdFieldAutogenerated(formbackingTypePersistenceMetadata
 	                                    .getIdentifierField())));
             }
@@ -1113,13 +1121,16 @@ public abstract class AbstractPatternJspMetadataListener implements
         if (null == formbackingTypePersistenceMetadata
                 .getVersionAccessorMethod()) {
             formUpdate.setAttribute("versionField", "none");
-        } else if (!"version"
-                .equals(BeanInfoUtils
-                        .getPropertyNameForJavaBeanMethod(formbackingTypePersistenceMetadata
-                                .getVersionAccessorMethod()))) {
-            String methodName = formbackingTypePersistenceMetadata
+        } else{
+        	JavaSymbolName propertyName = BeanInfoUtils
+                    .getPropertyNameForJavaBeanMethod(formbackingTypePersistenceMetadata
+                            .getVersionAccessorMethod());
+        	if (!"version"
+                .equals(propertyName.getSymbolName())) {
+              String methodName = formbackingTypePersistenceMetadata
                     .getVersionAccessorMethod().getMethodName().getSymbolName();
-            formUpdate.setAttribute("versionField", methodName.substring(3));
+              formUpdate.setAttribute("versionField", methodName.substring(3));
+        	}
         }
     	
 		// Handle Roo identifiers
@@ -1345,7 +1356,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             addCommonAttributes(field, fieldElement);
             fieldElement.setAttribute("field", fieldName);
             fieldElement.setAttribute(
-                    "id",
+                    ID_ATTRIBUTE,
                     XmlUtils.convertId("c:"
                             + formbackingType.getFullyQualifiedTypeName() + "."
                             + field.getFieldName().getSymbolName()));
@@ -1576,11 +1587,12 @@ public abstract class AbstractPatternJspMetadataListener implements
         MutableFile mutableFile = null;
         if (_fileManager.exists(filePath)) {
             // First verify if the file has even changed
-            File f = new File(filePath);
+            File newFile = new File(filePath);
             String existing = null;
             try {
-                existing = IOUtils.toString(new FileReader(f));
+                existing = IOUtils.toString(new FileReader(newFile));
             } catch (IOException ignoreAndJustOverwriteIt) {
+            	LOGGER.finest("Problems writing ".concat(newFile.getAbsolutePath()));
             }
 
             if (!viewContent.equals(existing)) {

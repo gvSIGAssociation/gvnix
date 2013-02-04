@@ -48,7 +48,6 @@ import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.operations.DateTime;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
@@ -84,7 +83,9 @@ import org.w3c.dom.Node;
 @Service
 public class SeleniumServicesImpl implements SeleniumServices {
 
-    /**
+    private static final Random RANDOM_GENERATOR = new Random(new Date().getTime());
+    
+	/**
      * MetadataService offers access to Roo's metadata model, use it to retrieve
      * any available metadata by its MID
      */
@@ -1192,7 +1193,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		
 		short index = 1;
 		if (random) {
-			index = new Integer(new Random(new Date().getTime()).nextInt()).shortValue();
+			index = new Integer(RANDOM_GENERATOR.nextInt()).shortValue();
 		}
 		
 		AnnotationMetadata min = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Min"));
