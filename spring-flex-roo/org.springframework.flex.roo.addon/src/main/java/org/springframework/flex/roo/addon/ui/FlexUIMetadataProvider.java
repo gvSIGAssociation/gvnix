@@ -469,12 +469,16 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         // file
         MutableFile mutableFile = null;
         if (this.fileManager.exists(mxmlFilename)) {
+        	InputStream inStream = null;
             try {
-                original = XmlUtils.getDocumentBuilder().parse(this.fileManager.getInputStream(mxmlFilename));
+            	inStream =this.fileManager.getInputStream(mxmlFilename);
+                original = XmlUtils.getDocumentBuilder().parse(inStream);
             } catch (Exception e) {
-                new IllegalStateException("Could not parse file: " + mxmlFilename);
+                throw new IllegalStateException("Could not parse file: ".concat(mxmlFilename));
+            } finally {
+            	IOUtils.closeQuietly(inStream);
             }
-            Validate.notNull(original, "Unable to parse " + mxmlFilename);
+            Validate.notNull(original, "Unable to parse ".concat(mxmlFilename));
             if (MxmlRoundTripUtils.compareDocuments(original, proposed)) { // TODO - need to actually implement the
                                                                            // comparison algorithm in a way that works
                                                                            // for MXML to allow non-destructive editing
@@ -483,7 +487,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         } else {
             original = proposed;
             mutableFile = this.fileManager.createFile(mxmlFilename);
-            Validate.notNull(mutableFile, "Could not create MXML file '" + mxmlFilename + "'");
+            Validate.notNull(mutableFile, "Could not create MXML file '".concat(mxmlFilename).concat("'"));
         }
 
         try {
@@ -510,7 +514,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
                 return true;
             }
         } catch (IOException ioe) {
-            throw new IllegalStateException("Could not output '" + mutableFile.getCanonicalPath() + "'", ioe);
+            throw new IllegalStateException("Could not output '".concat(mutableFile.getCanonicalPath()).concat("'"), ioe);
         }
 
         // A file existed, but it contained the same content, so we return false
@@ -519,7 +523,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
     
     private MemberDetails getMemberDetails(JavaType entityType) {
         PhysicalTypeMetadata entityPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(entityType, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
-        Validate.notNull(entityPhysicalTypeMetadata, "Unable to obtain physical type metdata for type " + entityType.getFullyQualifiedTypeName());
+        Validate.notNull(entityPhysicalTypeMetadata, "Unable to obtain physical type metdata for type ".concat(entityType.getFullyQualifiedTypeName()));
         ClassOrInterfaceTypeDetails entityClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) entityPhysicalTypeMetadata.getMemberHoldingTypeDetails();
         return scanForMemberDetails(entityClassOrInterfaceDetails);
     }

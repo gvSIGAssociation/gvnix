@@ -87,13 +87,13 @@ public class FlexProjectListener implements MetadataNotificationListener {
 
         if (upstreamDependency.equals(FlexProjectMetadata.getProjectIdentifier())) {
             // Acquire the Project Metadata, if available
-            FlexProjectMetadata md = (FlexProjectMetadata) this.metadataService.get(upstreamDependency);
-            if (md == null) {
+            FlexProjectMetadata pmd = (FlexProjectMetadata) this.metadataService.get(upstreamDependency);
+            if (pmd == null) {
                 return;
             }
 
-            PathResolver pathResolver = md.getPathResolver();
-            Validate.notNull(pathResolver, "Path resolver could not be acquired from changed metadata '" + md + "'");
+            PathResolver pathResolver = pmd.getPathResolver();
+            Validate.notNull(pathResolver, "Path resolver could not be acquired from changed metadata '" + pmd + "'");
 
             Set<FileOperation> notifyOn = new HashSet<FileOperation>();
             notifyOn.add(FileOperation.MONITORING_START);
@@ -103,10 +103,11 @@ public class FlexProjectListener implements MetadataNotificationListener {
             notifyOn.add(FileOperation.UPDATED);
             notifyOn.add(FileOperation.DELETED);
 
-            for (LogicalPath p : pathResolver.getPaths()) {
+            for (LogicalPath path : pathResolver.getPaths()) {
                 // Verify path exists and ensure it's monitored, except root (which we assume is already monitored via ProcessManager)
-                if (!Path.ROOT.equals(p)) {
-                    String fileIdentifier = pathResolver.getRoot(p);
+            	
+                if (!path.isProjectRoot()) {
+                    String fileIdentifier = pathResolver.getRoot(path);
                     File file = new File(fileIdentifier);
                     Validate.isTrue(!file.exists() || (file.exists() && file.isDirectory()), "Path '" + fileIdentifier + "' must either not exist or be a directory");
                     if (!file.exists()) {
@@ -114,12 +115,12 @@ public class FlexProjectListener implements MetadataNotificationListener {
                         new CreateDirectory(undoManager, filenameResolver, file);
                     }
                     MonitoringRequest request = new DirectoryMonitoringRequest(file, true, notifyOn);
-                    new UndoableMonitoringRequest(undoManager, fileMonitorService, request, md.isValid());
+                    new UndoableMonitoringRequest(undoManager, fileMonitorService, request, pmd.isValid());
                 }
             }
 
             // Avoid doing this operation again unless the validity changes
-            pathsRegistered = md.isValid();
+            pathsRegistered = pmd.isValid();
             
             // Explicitly perform a scan now that we've added all the directories we wish to monitor
             fileMonitorService.scanAll();

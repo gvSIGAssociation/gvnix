@@ -139,7 +139,7 @@ public class FlexOperationsImpl implements FlexOperations {
     }
 
     public void createScaffoldApp() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
+        this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
         String scaffoldAppFileId = this.pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/" + projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "_scaffold.mxml");
         String presentationPackage = projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()) + ".presentation";
         StringTemplate scaffoldTemplate = this.templateGroup.getInstanceOf(TEMPLATE_PATH + "/appname_scaffold");
@@ -161,7 +161,7 @@ public class FlexOperationsImpl implements FlexOperations {
     }
 
     public void createFlexCompilerConfig() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
+        this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
         String compilerConfigFileId = pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/" + projectOperations.getProjectName(projectOperations.getFocusedModuleName())
             + "_scaffold-config.xml");
         if (!this.fileManager.exists(compilerConfigFileId)) {
@@ -265,7 +265,7 @@ public class FlexOperationsImpl implements FlexOperations {
             outputStream = this.fileManager.createFile(getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), servicesConfigFilename)).getOutputStream();
             IOUtils.copy(inputStream, outputStream);
         } catch (IOException e) {
-            new IllegalStateException("Encountered an error during copying of resources for maven addon.", e);
+            throw new IllegalStateException("Encountered an error during copying of resources for maven addon.", e);
         }
         finally {
             IOUtils.closeQuietly(inputStream);
@@ -421,7 +421,7 @@ public class FlexOperationsImpl implements FlexOperations {
     }
 
     private void configureFlexBuild() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
+        this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
 
         Repository externalRepository = new Repository("spring-external", "Spring External Repository", "http://maven.springframework.org/external");
         if (!projectOperations.getFocusedModule().isRepositoryRegistered(externalRepository)) {

@@ -170,8 +170,9 @@ public abstract class ActionScriptMappingUtils {
                 return Modifier.PRIVATE;
             case DEFAULT:
             default:
-                return 0;
+            	break;
         }
+        return 0;
     }
 
     public static ASFieldMetadata toASFieldMetadata(String asEntityId, FieldMetadata javaField, boolean makePublic) {

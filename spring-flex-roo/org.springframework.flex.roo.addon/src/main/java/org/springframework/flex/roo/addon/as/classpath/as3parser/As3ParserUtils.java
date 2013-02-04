@@ -129,9 +129,9 @@ public class As3ParserUtils {
                 return Visibility.PUBLIC;
             case DEFAULT:
             default:
-                return Visibility.DEFAULT;
-
+            	break;
         }
+        return Visibility.DEFAULT;
     }
 
     public static MetaTagAttributeValue<?> getMetaTagAttributeValue(Param param) {
