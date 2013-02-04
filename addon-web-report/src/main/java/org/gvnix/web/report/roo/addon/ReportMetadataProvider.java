@@ -3,6 +3,8 @@ package org.gvnix.web.report.roo.addon;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.Validate;
@@ -46,22 +48,22 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
     private static final Logger logger = HandlerUtils.getLogger(ReportMetadataProvider.class);
 
     @Reference
-    TypeLocationService typeLocationService;
+    protected TypeLocationService typeLocationService;
 
     @Reference
-    WebScaffoldMetadataProvider webScaffoldMetadataProvider;
+    protected WebScaffoldMetadataProvider webScaffoldMetadataProvider;
 
     @Reference
-    ProjectOperations projectOperations;
+    protected ProjectOperations projectOperations;
 
     @Reference
-    PropFileOperations propFileOperations;
+    protected PropFileOperations propFileOperations;
 
     @Reference
-    WebMetadataService webMetadataService;
+    protected WebMetadataService webMetadataService;
 
     @Reference
-    ReportConfigService reportConfigService;
+    protected ReportConfigService reportConfigService;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -141,7 +143,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
                 }
 
                 ArrayAttributeValue<?> arrayVal = (ArrayAttributeValue<?>) val;
-                HashMap<String, String> validReportNameFormats = getValidReportNameFormats(arrayVal);
+                Map<String, String> validReportNameFormats = getValidReportNameFormats(arrayVal);
                 /*
                  * Dealing with reportNames defined several times in the GvNIX
                  * annotation. With the validReportNameFormats HashMap we can
@@ -150,13 +152,12 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
                  * report definition.
                  * TODO: would be a great improvement to advise user about duplicity of report definitions
                  */
-                for (String reportName : validReportNameFormats.keySet()) {
+                for (Entry<String,String> reportEntry : validReportNameFormats.entrySet()) {
+                	String reportName = reportEntry.getKey().toLowerCase();
                     StringAttributeValue newSV = new StringAttributeValue(
                             new JavaSymbolName("ignored"),
-                            reportName.toLowerCase()
-                                    + "|"
-                                    + validReportNameFormats.get(reportName
-                                            .toLowerCase()));
+                            reportName.concat("|")
+                            	.concat(validReportNameFormats.get(reportName)));
                     definedReports.add(newSV);
                 }
             }
@@ -193,17 +194,17 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
      * @param arrayVal
      * @return
      */
-    private HashMap<String, String> getValidReportNameFormats(
+    private Map<String, String> getValidReportNameFormats(
             ArrayAttributeValue<?> arrayVal) {
         HashMap<String, String> validReportNameFormats = new HashMap<String, String>();
-        StringAttributeValue sv = null;
-        String[] reportNameFormat = {};
+        StringAttributeValue sAttrValue = null;
+        String[] reportNameFormat;
         for (Object o : arrayVal.getValue()) {
             if (!(o instanceof StringAttributeValue)) {
                 return null;
             }
-            sv = (StringAttributeValue) o;
-            reportNameFormat = ReportMetadata.stripGvNixReportValue(sv
+            sAttrValue = (StringAttributeValue) o;
+            reportNameFormat = ReportMetadata.stripGvNixReportValue(sAttrValue
                     .getValue());
             if (ReportMetadata.isValidFormat(reportNameFormat[1])) {
                 if (validReportNameFormats.containsKey(reportNameFormat[0])) {
