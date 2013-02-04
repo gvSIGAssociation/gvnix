@@ -82,10 +82,10 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     // From AbstractItdTypeDetailsProvidingMetadataItem
     private ClassOrInterfaceTypeDetails governorTypeDetails;
-    private JavaType destination;
+    private final JavaType destination;
 
-    private JavaType aspectName;
-    private PhysicalTypeMetadata governorPhysicalTypeMetadata;
+    private final JavaType aspectName;
+    private final PhysicalTypeMetadata governorPhysicalTypeMetadata;
 
     private static final String PROVIDES_TYPE_STRING = OCCChecksumMetadata.class
             .getName();
@@ -107,7 +107,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     private JpaActiveRecordMetadata entityMetadata;
 
     // DiSiD: Used to get the type members
-    private MemberDetailsScanner memberDetailsScanner;
+    private final MemberDetailsScanner memberDetailsScanner;
 
     private String itdFileContents = null;
 
@@ -138,8 +138,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
 
-        if (physicalTypeDetails == null
-                || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+        if (!(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
             // There is a problem
             valid = false;
         } else {
@@ -393,6 +392,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         // Try to locate an existing field with @javax.persistence.Version
 
         try {
+        	// FIXME List type is not equal to object to check (it's a bug??)
             if (!mutableTypeDetails.getDeclaredFields().contains(field)) {
                 mutableTypeDetails.addField(new FieldMetadataBuilder(governorTypeDetails.getDeclaredByMetadataId(), field));
             }
@@ -473,18 +473,13 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         // Ensure there isn't already a field called like fieldName; if so,
         // compute a
         // unique name (it's not really a fatal situation at the end of the day)
-        int index = -1;
+        StringBuilder fieldNameBuilder = new StringBuilder();
         JavaSymbolName checksumField = null;
         while (true) {
             // Compute the required field name
-            index++;
-            String fieldName = "";
-            for (int i = 0; i < index; i++) {
-                fieldName = fieldName + "_";
-            }
-            fieldName = fieldName + this.fieldName;
+            fieldNameBuilder.append('_');
 
-            checksumField = new JavaSymbolName(fieldName);
+            checksumField = new JavaSymbolName(fieldNameBuilder.toString().concat(this.fieldName));
             if (MemberFindingUtils.getField(governorTypeDetails, checksumField) == null) {
                 // Found a usable field name
                 break;

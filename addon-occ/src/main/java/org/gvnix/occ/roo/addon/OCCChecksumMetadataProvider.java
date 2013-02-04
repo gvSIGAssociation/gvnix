@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
@@ -32,6 +33,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.finder.FinderOperationsImpl;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -53,6 +55,7 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * gvNIX OCCChecksum Metadata provider
@@ -66,6 +69,9 @@ import org.springframework.roo.project.Path;
 @Service
 public class OCCChecksumMetadataProvider implements
         ItdTriggerBasedMetadataProvider, MetadataNotificationListener {
+	
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(FinderOperationsImpl.class);
 
     // From AbstractItdMetadataProvider
     private boolean dependsOnGovernorTypeDetailAvailability = true;
@@ -180,7 +186,7 @@ public class OCCChecksumMetadataProvider implements
 
         if (versionField != null) {
             String declaredByType = entityMetadataKey
-                    .substring(entityMetadataKey.lastIndexOf("?") + 1);
+                    .substring(entityMetadataKey.lastIndexOf('?') + 1);
             if (!versionField.getDeclaredByMetadataId()
                     .endsWith(declaredByType)) {
                 throw new IllegalStateException(
@@ -404,11 +410,13 @@ public class OCCChecksumMetadataProvider implements
                     MutableFile mutableFile = null;
                     if (fileManager.exists(itdFilename)) {
                         // First verify if the file has even changed
-                        File f = new File(itdFilename);
+                        File newFile = new File(itdFilename);
                         String existing = null;
                         try {
-                            existing = IOUtils.toString(new FileReader(f));
+                            existing = IOUtils.toString(new FileReader(newFile));
                         } catch (IOException ignoreAndJustOverwriteIt) {
+                        	LOGGER.finest("Problem writting ".concat(newFile.getAbsolutePath()).concat(": ")
+                        			+ ignoreAndJustOverwriteIt);
                         }
 
                         if (!itd.equals(existing)) {
@@ -438,7 +446,7 @@ public class OCCChecksumMetadataProvider implements
                         }
                     } catch (IOException ioe) {
                         throw new IllegalStateException("Could not output '"
-                                + mutableFile.getCanonicalPath() + "'", ioe);
+                                .concat(mutableFile.getCanonicalPath()).concat("'"), ioe);
                     }
 
                     // Important to exit here, so we don't proceed onto the
@@ -450,11 +458,11 @@ public class OCCChecksumMetadataProvider implements
             }
 
             // Delete the ITD if we determine deletion is appropriate
-            if (metadata.isValid() && fileManager.exists(itdFilename)) {
-                // DiSiD: Removed because in shell restart some AJ files deleted
-                // and not recreated
+            // DiSiD: Removed because in shell restart some AJ files deleted
+            // and not recreated
+            // if (metadata.isValid() && fileManager.exists(itdFilename)) {
                 // fileManager.delete(itdFilename);
-            }
+            // }
 
             return metadata;
         }
