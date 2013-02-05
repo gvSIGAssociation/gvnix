@@ -211,6 +211,8 @@
     </partintro>
 
     <xi:include href="convenciones.xml"/>
+    
+    <xi:include href="calidad-codigo.xml"/>
 
     <xi:include href="repositorio.xml"/>
 

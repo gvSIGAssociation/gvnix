@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="calidad-codigo" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Calidad del código</title>
+
+  <section xml:id="calidad-codigo_nombres-comandos" xml:lang="es">
+    <title xml:lang="es">Recomendaciones a seguir en el código</title>
+
+    <para xml:lang="es">En esta sección se incluyen una serie de recomendaciones
+    para mantener la calidad del código del framework. Estas recomendaciones
+    están basadas en reglas de buenas prácticas medidas por ciertas herramientas
+    pensadas para este fin.</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><emphasis>No dejar bloque de código vacíos</emphasis></para>
+        
+        <para>Ya sean excepciones ignoradas o condiciones no utilizadas, es 
+        recomendable no dejar estos bloques sin realizar ninguna operación (los comentarios
+        no cuentan como operación). Ejemplos:</para>
+        
+	    <itemizedlist>
+	      <listitem>
+	        <para>En el caso de ignorar una excepción podemos lanzar una traza de depuración:</para>
+	        
+	        <programlisting> } catch (Exception toIgnore) {
+    LOGGER.finest("Problem do something");
+  }
+	        </programlisting>
+	      </listitem>
+	      <listitem>
+	        <para>Para condiciones de if que no se utilizan es recomendable eliminarlas</para>
+	      </listitem>
+	    </itemizedlist>		
+
+      </listitem>
+      <listitem>
+      	<para><emphasis>Lanzar las excepciones</emphasis></para>
+      	
+      	<para>Suele pasar a veces que en bloques <literal>catch</literal> 
+      	ser crean las excepciones <emphasis>pero se lanzan</emphasis> con
+      	la sentencia <literal>throw</literal></para>
+      
+      </listitem>
+      <listitem>
+      	<para><emphasis>Implementar el método</emphasis> <literal>hashCode</literal>  
+      		<emphasis>a la vez que el</emphasis> <literal>equals</literal></para>
+      	
+      	<para>Para el correcto funcionamiento del método <literal>equals</literal>
+      	en una clase con dicho método personalizado, en fundamental personalizar
+      	también el método <literal>hashCode</literal> utilizando los mismos
+      	campos en ambos.</para>
+      	
+      	<para>Eclipse, en la opción <literal>source</literal> ofrece una
+      	herramienta que permite generar ambos métodos de manera automática a
+      	partir de los campos de la clase que estimemos oportunos.</para>
+      
+      </listitem>
+      <listitem>
+      	<para><emphasis>Añadir JavaDoc en todos los métodos públicos.</emphasis></para>
+      </listitem>
+      <listitem>
+      	<para><emphasis>Añadir comentarios en los métodos para explicar
+      	bloques de código</emphasis></para>
+      </listitem>            
+      <listitem>
+      	<para><emphasis>Uso de </emphasis> <literal>try/finally</literal>  
+      		<emphasis>para el cierre de recursos</emphasis></para>
+      	
+      	<para>Siempre que se utilicen recursos, como <emphasis>Streams</emphasis>,
+      	<emphasis>objetos de BBDD (Conexiones, cursores, Statement)</emphasis>
+      	utilizaremos un bloque <literal>try/finally</literal> para asegurarnos
+      	que los recursos son liberados. Ejemplo:</para>
+      	
+      	<programlisting>			InputStream ins = null;
+			OutputStream outs = null;
+			try {
+				if (fileManager.exists(path)){
+					mutableFile = fileManager.updateFile(path);
+				} else {
+					mutableFile = fileManager.createFile(path);
+				}
+
+				ins = FileUtils.getInputStream(getClass(), file);
+				outs = mutableFile.getOutputStream();
+				TokenReplacementFileCopyUtils.replaceAndCopy(
+						ins, outs, properties);
+				
+				insertI18nMessages();
+			} catch (IOException ioe) {
+				throw new IllegalStateException(ioe);
+			} finally {
+				IOUtils.closeQuietly(ins);
+				IOUtils.closeQuietly(outs);
+			}
+</programlisting>
+
+      	<para>Para cerrar los objetos de tipo<literal>*Stream</literal>
+      	es recomendable usar el método <literal>IOUtils.closeQuietly</literal></para>
+      
+      </listitem>
+      <listitem>
+      	<para><emphasis>Evitar el uso de operador </emphasis> <literal>+</literal></para>
+      	
+      	<para>Es recomendable usar otras opciones como:</para>
+        <itemizedlist>
+      		<listitem>
+      			<para><literal>String.concat</literal></para>
+      		</listitem>
+      		<listitem>
+      			<para><literal>StringBuilder</literal>. Preferentemente antes que 
+      			<literal>StringBuffer</literal>, a no ser que se requiera que
+      			las instancia se <emphasis>Thread-safe</emphasis></para>
+      		</listitem>
+      		<listitem>
+      			<para><literal>String.format</literal>. Para cadenas complejas
+      			o con varios argumentos. Ejemplo: </para>
+      			<programlisting> String.format("Esta concatenación de '%s' es mas compleja ya que %s.%s usar varias cadenas.", 
+      			var1, var2, var3)</programlisting>
+      		</listitem>      		
+    	</itemizedlist>  	
+      </listitem>
+      <listitem>
+      	<para><emphasis>Evitar identificadores de variables o campos de menos de 3 caracteres.</emphasis></para>
+      </listitem>
+      <listitem>
+      	<para><emphasis>Nombres de constantes en mayúsculas.</emphasis></para>
+	<para>Incluye el <literal>LOGGER</literal>.</para>
+      </listitem>
+      <listitem>
+      	<para><emphasis>No modificar un campo estático desde un método no-estático</emphasis></para>
+      </listitem>
+      <listitem>
+      	<para><emphasis>Añadir el modificador </emphasis><literal>final</literal> en las
+        propiedades que se establecen en el constructor y no se van a ser modificadas</para>
+      </listitem>
+      <listitem>
+      	<para><emphasis>Eliminar código muerto.</emphasis></para>
+      	<para>El código muerto son métodos privados que nunca se invocan, campos de clase no usados,
+      	variables asignadas que nunca se utilizan en el método, etc...</para>
+      </listitem>	  
+      <listitem>
+      	<para><emphasis>Iterar sobre</emphasis> <literal>Map.entrySet</literal> 
+      		<emphasis>en vez de</emphasis> <literal>Map.keySet</literal></para>
+      	<para>El coste de iteración es el mismo y se obtiene la clave y el valor a la vez.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+</chapter>
