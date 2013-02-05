@@ -77,7 +77,7 @@ import org.springframework.roo.support.logging.HandlerUtils;
 public class OCCChecksumMetadata extends AbstractMetadataItem implements
         ItdTypeDetailsProvidingMetadataItem {
 
-    private final Logger logger = HandlerUtils
+    private final Logger LOGGER = HandlerUtils
             .getLogger(OCCChecksumMetadata.class);
 
     // From AbstractItdTypeDetailsProvidingMetadataItem
@@ -406,6 +406,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
         } catch (IllegalArgumentException e) {
             // TODO In some cases, one element is added more than one time
+        	LOGGER.finest("Problem adding version field: ".concat(e.toString()));
         }
 
     }
@@ -459,7 +460,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                     + "' must have @Transient annotation");
 
             if (!field.getFieldName().getSymbolName().equals(fieldName)) {
-                logger.warning(governorTypeDetails.getName()
+                LOGGER.warning(governorTypeDetails.getName()
                         .getFullyQualifiedTypeName()
                         + ": The @Version field name ("
                         + field.getFieldName().getSymbolName()

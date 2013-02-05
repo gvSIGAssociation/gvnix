@@ -584,6 +584,10 @@ public class WSConfigServiceImpl implements WSConfigService {
         StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) annotationMetadata
                 .getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
 
+        Validate.notNull(fullyQualifiedTypeName,
+                "Annotation attribute 'fullyQualifiedTypeName' in "
+                        + className.getFullyQualifiedTypeName()
+                        + "' must be defined.");
         Validate.isTrue(
                 fullyQualifiedTypeName != null
                         && StringUtils.isNotBlank(fullyQualifiedTypeName
@@ -600,6 +604,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         String cxfXmlPath = getCxfConfigAbsoluteFilePath();
 
+        
         boolean updateFullyQualifiedTypeName = false;
         // Check if class name and annotation class name are different.
         if (!className.getFullyQualifiedTypeName().contentEquals(

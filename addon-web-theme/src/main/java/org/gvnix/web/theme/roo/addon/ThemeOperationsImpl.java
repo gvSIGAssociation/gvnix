@@ -709,11 +709,12 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         MutableFile mutableFile = null;
         if (fileManager.exists(filePath)) {
             // First verify if the file has even changed
-            File f = new File(filePath);
+            File newFile = new File(filePath);
             String existing = null;
             try {
-                existing = IOUtils.toString(new FileReader(f));
+                existing = IOUtils.toString(new FileReader(newFile));
             } catch (IOException ignoreAndJustOverwriteIt) {
+            	LOGGER.finest("Problems reading file".concat(filePath));
             }
 
             if (!viewContent.equals(existing)) {
@@ -762,7 +763,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
 
         // check if there is an active theme
         if (descriptor.exists()) {
-            active = XmlUtils.parseTheme(descriptor.toURI());
+            active = Theme.parseTheme(descriptor.toURI());
             active.setActive(true);
         }
 
@@ -793,7 +794,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
 
         for (URI uri : uris) {
             // load the theme
-            Theme theme = XmlUtils.parseTheme(uri);
+            Theme theme = Theme.parseTheme(uri);
             theme.setAvailable(true);
             themes.add(theme);
         }
@@ -825,7 +826,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
 
         for (URI uri : uris) {
             // load the theme
-            Theme theme = XmlUtils.parseTheme(uri);
+            Theme theme = Theme.parseTheme(uri);
             theme.setInstalled(true);
 
             // if this installed theme is the active theme, just set it as

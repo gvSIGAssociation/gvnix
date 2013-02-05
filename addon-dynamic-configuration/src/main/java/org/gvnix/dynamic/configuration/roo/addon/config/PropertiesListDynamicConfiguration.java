@@ -53,7 +53,7 @@ import org.springframework.roo.support.logging.HandlerUtils;
 public abstract class PropertiesListDynamicConfiguration extends
         PropertiesDynamicConfiguration {
 
-    private static final Logger logger = HandlerUtils
+    private static final Logger LOGGER = HandlerUtils
             .getLogger(PropertiesListDynamicConfiguration.class);
 
     /**
@@ -134,7 +134,7 @@ public abstract class PropertiesListDynamicConfiguration extends
 
                         } else {
 
-                            logger.log(
+                            LOGGER.log(
                                     Level.WARNING,
                                     "Property key "
                                             .concat(dynProp.getKey())
@@ -205,6 +205,7 @@ public abstract class PropertiesListDynamicConfiguration extends
             }
         } catch (IllegalArgumentException iae) {
             // Path is a a file: nothing to do
+        	LOGGER.finest("Path element file");
         }
 
         return result;

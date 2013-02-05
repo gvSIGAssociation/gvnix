@@ -530,7 +530,7 @@ public class FlexOperationsImpl implements FlexOperations {
                     outputStream = this.fileManager.createFile(targetDirectory + fileName).getOutputStream();
                     IOUtils.copy(inputStream, outputStream);
                 } catch (IOException e) {
-                    new IllegalStateException("Encountered an error during copying of resources for Flex addon.", e);
+                    throw new IllegalStateException("Encountered an error during copying of resources for Flex addon.", e);
                 }
                 finally {
                     IOUtils.closeQuietly(inputStream);

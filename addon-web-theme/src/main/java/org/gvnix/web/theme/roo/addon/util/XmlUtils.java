@@ -18,16 +18,10 @@
  */
 package org.gvnix.web.theme.roo.addon.util;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.logging.Logger;
 
-import org.gvnix.web.theme.roo.addon.Theme;
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Utilities related to XML mangement.
@@ -36,9 +30,6 @@ import org.w3c.dom.Element;
  * @since 0.6
  */
 public abstract class XmlUtils {
-
-  private static Logger logger = Logger.getLogger(XmlUtils.class
-      .getName());
 
   /**
    * Parses and build Document from the given path to XML file
@@ -57,98 +48,9 @@ public abstract class XmlUtils {
       throw new IllegalStateException("Error parsing XML", e);
     }
     finally {
-      if (is != null) {
-        try {
-          is.close();
-        }
-        catch (IOException e) {
-          logger.severe(e.getMessage());
-        }
-      }
+      IOUtils.closeQuietly(is);
     }
     return doc;
-  }
-
-  /**
-   * Parses and build Document from the given theme descriptor URL to Theme 
-   * object.
-   * 
-   * @param url URL to theme descriptor to parse
-   * @return Theme object. Null if there is any problem parsing the stream or
-   *         the stream doesn't contain a valid XML.
-   */
-  public static Theme parseTheme(URL url) {
-    try {
-      Theme theme = parseTheme(url.openStream());
-      theme.setDescriptor(url.toURI());
-      return theme;
-    }
-    catch (IOException e) {
-      throw new IllegalStateException("I/O exception.", e);
-    }
-    catch (URISyntaxException e) {
-      throw new IllegalStateException("Error parsing URL to URI.", e);
-    }
-  }
-
-  /**
-   * Parses and build Document from the given theme descriptor URI to Theme 
-   * object.
-   * 
-   * @param uri URI to theme descriptor to parse
-   * @return Theme object. Null if there is any problem parsing the stream or
-   *         the stream doesn't contain a valid XML.
-   */
-  public static Theme parseTheme(URI uri) {
-    try {
-      Theme theme = parseTheme(uri.toURL().openStream());
-      theme.setDescriptor(uri);
-      return theme;
-    }
-    catch (IOException e) {
-      throw new IllegalStateException("I/O exception.", e);
-    }
-  }
-
-  /**
-   * Parses and build Document from the stream to Theme object.
-   * <p>
-   * This is an internal utility method, use {@link #parseTheme(URI)} and
-   * {@link #parseTheme(URL)} to parse Theme descriptors because the 
-   * URI to the theme descriptor is set in the new Theme objet.
-   * 
-   * @param is InputStream to parse
-   * @return Theme object. Null if there is any problem parsing the stream or
-   *         the stream doesn't contain a valid XML.
-   */
-  protected static Theme parseTheme(InputStream is) {
-    try {
-      
-      // load the theme
-      Document themeDoc = org.springframework.roo.support.util.XmlUtils.getDocumentBuilder().parse(is);
-      Element root = (Element) themeDoc.getDocumentElement();
-
-      // if root element isn't theme, we found invalid theme
-      if(!root.getNodeName().equals("gvnix-theme")) {
-        throw new IllegalStateException("XML doesn't contain valid Theme.");
-      }
-
-      Theme theme = new Theme(root);
-      return theme;
-    }
-    catch (Exception e) {
-      throw new IllegalStateException("Error parsing XML", e);
-    }
-    finally {
-      if (is != null) {
-        try {
-          is.close();
-        }
-        catch (IOException e) {
-          logger.severe(e.getMessage());
-        }
-      }
-    }
   }
 
 }

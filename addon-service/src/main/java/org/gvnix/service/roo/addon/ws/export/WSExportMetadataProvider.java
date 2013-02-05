@@ -580,7 +580,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                             + "' has to be defined to export as Web Service operation.");
 
             Validate.isTrue(
-                    wSExportValidationService
+            		requestWrapperName != null 
+                    && wSExportValidationService
                             .checkNamespaceFormat(requestWrapperNamespace
                                     .getValue()),
                     "Attribute 'requestWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"

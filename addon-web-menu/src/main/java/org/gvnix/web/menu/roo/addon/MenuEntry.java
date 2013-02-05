@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.menu.roo.addon.converters;
+package org.gvnix.web.menu.roo.addon;
 
 import org.gvnix.web.menu.roo.addon.util.StringUtils;
 import org.springframework.roo.model.JavaSymbolName;

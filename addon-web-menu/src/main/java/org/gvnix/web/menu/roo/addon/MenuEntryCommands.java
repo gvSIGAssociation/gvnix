@@ -25,7 +25,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.web.menu.roo.addon.converters.MenuEntry;
 import org.gvnix.web.menu.roo.addon.util.StringUtils;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.model.JavaSymbolName;
