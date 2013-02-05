@@ -430,7 +430,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         ClassOrInterfaceTypeDetails typeDetails = typeLocationService
                 .getTypeDetails(javaType);
         Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
-                typeDetails, "Can't modify " + typeDetails.getName());
+                typeDetails, "Can't modify ".concat(typeDetails.getName().toString()));
 
         // Get and validate gvNIX web service annotation
         AnnotationMetadata annotation = typeDetails.getTypeAnnotation(
@@ -438,25 +438,28 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         Validate.isTrue(
                 annotation != null,
                 "Launch command 'service define ws --class "
-                        + javaType.getFullyQualifiedTypeName()
-                        + "' to export class to Web Service.");
+                        .concat(javaType.getFullyQualifiedTypeName())
+                        .concat( "' to export class to Web Service."));
 
         // Get and validate gvNIX web service annotation target namespace attr
         StringAttributeValue targetNamespace = (StringAttributeValue) annotation
                 .getAttribute(new JavaSymbolName("targetNamespace"));
-        Validate.isTrue(
-                targetNamespace != null
-                        && StringUtils.isNotBlank(targetNamespace.getValue()),
+        
+        Validate.notNull(targetNamespace,
+        		"You must define 'targetNamespace' annotation attribute in @GvNIXWebService in class: '"
+                .concat(javaType.getFullyQualifiedTypeName()).concat("'."));
+
+        Validate.isTrue(StringUtils.isNotBlank(targetNamespace.getValue()),
                 "You must define 'targetNamespace' annotation attribute in @GvNIXWebService in class: '"
-                        + javaType.getFullyQualifiedTypeName() + "'.");
+                        .concat(javaType.getFullyQualifiedTypeName()).concat("'."));
 
         // Get and validate gvNIX web service annotation target namespace value
         String targetNamespaceValue = targetNamespace.getValue();
         Validate.isTrue(
                 checkNamespaceFormat(targetNamespaceValue),
                 "Attribute 'targetNamespace' in @GvNIXWebService for Web Service class '"
-                        + javaType.getFullyQualifiedTypeName()
-                        + "'has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+                        .concat(javaType.getFullyQualifiedTypeName())
+                        .concat("'has to start with 'http://'.\ni.e.: http://name.of.namespace/"));
 
         return targetNamespaceValue;
     }

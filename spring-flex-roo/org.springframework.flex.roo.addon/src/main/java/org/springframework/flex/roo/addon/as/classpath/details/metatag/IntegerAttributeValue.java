@@ -38,6 +38,6 @@ public class IntegerAttributeValue extends AbstractMetaTagAttributeValue<Integer
 
     @Override
     public String toString() {
-        return getName() + " -> " + new Integer(this.value).toString();
+        return getName() + " -> " + String.valueOf(this.value);
     }
 }

@@ -77,7 +77,13 @@ import org.springframework.roo.model.JavaType;
  */
 public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 
-    protected WebScaffoldMetadata webScaffoldMetadata;
+    private static final JavaSymbolName PAGE_PARAM_NAME = new JavaSymbolName("page");
+	private static final JavaSymbolName SIZE_PARAM_NAME = new JavaSymbolName("size");
+	private static final JavaSymbolName PARAMS_ATTRIBUTE_NAME = new JavaSymbolName("params");
+	private static final JavaSymbolName VALUE_ATTRIBUTE_NAME = new JavaSymbolName("value");
+	private static final JavaType REQUEST_MAPPING_ANNOTATION_TYPE = new JavaType(
+	        "org.springframework.web.bind.annotation.RequestMapping");
+	protected WebScaffoldMetadata webScaffoldMetadata;
     private SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities;
     protected JavaType entity;
     protected JavaTypeMetadataDetails entityTypeDetails;
@@ -214,8 +220,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
 
         List<AnnotationAttributeValue<?>> reqParamAttrPathVar = new ArrayList<AnnotationAttributeValue<?>>();
-        reqParamAttrPathVar.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), formBackingObjectIdField.getFieldName()
+        reqParamAttrPathVar.add(new StringAttributeValue(VALUE_ATTRIBUTE_NAME, formBackingObjectIdField.getFieldName()
                 .getSymbolName()));
         List<AnnotationMetadata> methodAttrPathVarAnnotations = new ArrayList<AnnotationMetadata>();
         AnnotationMetadataBuilder methodAttPathVarAnnotation = new AnnotationMetadataBuilder(
@@ -229,8 +234,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         methodParamTypes.add(getPatternRequestParam(false).getValue());
 
         List<AnnotationAttributeValue<?>> reqParamAttrPage = new ArrayList<AnnotationAttributeValue<?>>();
-        reqParamAttrPage.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "page"));
+        reqParamAttrPage.add(new StringAttributeValue(VALUE_ATTRIBUTE_NAME, "page"));
         reqParamAttrPage.add(new BooleanAttributeValue(new JavaSymbolName(
                 "required"), false));
         List<AnnotationMetadata> methodAttrPageAnnotations = new ArrayList<AnnotationMetadata>();
@@ -243,8 +247,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 methodAttrPageAnnotations));
 
         List<AnnotationAttributeValue<?>> reqParamAttrSize = new ArrayList<AnnotationAttributeValue<?>>();
-        reqParamAttrSize.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "size"));
+        reqParamAttrSize.add(new StringAttributeValue(VALUE_ATTRIBUTE_NAME, "size"));
         reqParamAttrSize.add(new BooleanAttributeValue(new JavaSymbolName(
                 "required"), false));
         List<AnnotationMetadata> methodAttrSizeAnnotations = new ArrayList<AnnotationMetadata>();
@@ -274,8 +277,8 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         methodParamNames.add(formBackingObjectIdField.getFieldName());
         Entry<JavaSymbolName, AnnotatedJavaType> patternRequestParam = getPatternRequestParam(false);
         methodParamNames.add(patternRequestParam.getKey());
-        methodParamNames.add(new JavaSymbolName("page"));
-        methodParamNames.add(new JavaSymbolName("size"));
+        methodParamNames.add(PAGE_PARAM_NAME);
+        methodParamNames.add(SIZE_PARAM_NAME);
         methodParamNames.add(modelRequestParam.getKey());
         methodParamNames.add(httpServletRequest.getKey());
 
@@ -299,19 +302,18 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         // Get Method RequestMapping annotation
         List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
         requestMappingAttributes.add(new StringAttributeValue(
-                new JavaSymbolName("value"), "/{"
+                VALUE_ATTRIBUTE_NAME, "/{"
                         + formBackingObjectIdField.getFieldName()
                                 .getSymbolName() + "}"));
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(getPatternParamRequestMapping(patternName));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
-                        new JavaSymbolName("params"), paramValues));
+                        PARAMS_ATTRIBUTE_NAME, paramValues));
         requestMappingAttributes.add(getMethodRequestMapping(RequestMethod.DELETE));
         requestMappingAttributes.add(getProducesParamRequestMapping());
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestMapping"),
+                REQUEST_MAPPING_ANNOTATION_TYPE,
                 requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
@@ -411,12 +413,11 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         paramValues.add(getPatternParamRequestMapping(patternName));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
-                        new JavaSymbolName("params"), paramValues));
+                        PARAMS_ATTRIBUTE_NAME, paramValues));
         requestMappingAttributes.add(getMethodRequestMapping(requestMethod));
         requestMappingAttributes.add(getProducesParamRequestMapping());
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestMapping"),
+                REQUEST_MAPPING_ANNOTATION_TYPE,
                 requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
@@ -647,15 +648,14 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(getPatternParamRequestMapping(patternName));
         paramValues.add(getFormParamRequestMapping(false));
-        paramValues.add(new StringAttributeValue(new JavaSymbolName("value"), "!find"));
+        paramValues.add(new StringAttributeValue(VALUE_ATTRIBUTE_NAME, "!find"));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
-                        new JavaSymbolName("params"), paramValues));
+                        PARAMS_ATTRIBUTE_NAME, paramValues));
         requestMappingAttributes.add(getMethodRequestMapping(RequestMethod.GET));
         requestMappingAttributes.add(getProducesParamRequestMapping());
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestMapping"),
+                REQUEST_MAPPING_ANNOTATION_TYPE,
                 requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
@@ -676,8 +676,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
 
         List<AnnotationAttributeValue<?>> reqParamAttrIndex = new ArrayList<AnnotationAttributeValue<?>>();
-        reqParamAttrIndex.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "index"));
+        reqParamAttrIndex.add(new StringAttributeValue(VALUE_ATTRIBUTE_NAME, "index"));
         reqParamAttrIndex.add(new BooleanAttributeValue(new JavaSymbolName(
                 "required"), true));
         List<AnnotationMetadata> methodAttrIndexAnnotations = new ArrayList<AnnotationMetadata>();
@@ -795,15 +794,14 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         paramValues.add(getPatternParamRequestMapping(patternName));
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
                 "gvnixform"));
-        paramValues.add(new StringAttributeValue(new JavaSymbolName("value"), "!find"));
+        paramValues.add(new StringAttributeValue(VALUE_ATTRIBUTE_NAME, "!find"));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
-                        new JavaSymbolName("params"), paramValues));
+                        PARAMS_ATTRIBUTE_NAME, paramValues));
         requestMappingAttributes.add(getMethodRequestMapping(RequestMethod.GET));
         requestMappingAttributes.add(getProducesParamRequestMapping());
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestMapping"),
+                REQUEST_MAPPING_ANNOTATION_TYPE,
                 requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
@@ -983,8 +981,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Get Method RequestMapping annotation
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestMapping"),
+                REQUEST_MAPPING_ANNOTATION_TYPE,
                 requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
@@ -1031,8 +1028,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Get Method RequestMapping annotation
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestMapping"),
+                REQUEST_MAPPING_ANNOTATION_TYPE,
                 requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
@@ -1079,8 +1075,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Get Method RequestMapping annotation
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestMapping"),
+                REQUEST_MAPPING_ANNOTATION_TYPE,
                 requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
@@ -1235,7 +1230,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         // Define method annotations
         List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
         requestMappingAttributes.add(new StringAttributeValue(
-                new JavaSymbolName("value"), "/list"));
+                VALUE_ATTRIBUTE_NAME, "/list"));
         requestMappingAttributes.add(getMethodRequestMapping(requestMethod));
         requestMappingAttributes.add(getProducesParamRequestMapping());
 
@@ -1341,7 +1336,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 		requestMappingAnnotation.add(getMethodRequestMapping(method));
 		requestMappingAnnotation.add(getProducesParamRequestMapping());
 		return new AnnotationMetadataBuilder(
-				new JavaType("org.springframework.web.bind.annotation.RequestMapping"), requestMappingAnnotation);
+				REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAnnotation);
 	}
 
 	protected List<AnnotationAttributeValue<?>> getParamsRequestMapping(String patternName) {
@@ -1352,7 +1347,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 		requestMapingAnnotationParams.add(getReferenceParamRequestMapping());
 		List<AnnotationAttributeValue<?>> requestMappingAnnotation = new ArrayList<AnnotationAttributeValue<?>>();
 		requestMappingAnnotation.add(new ArrayAttributeValue<StringAttributeValue>(
-				new JavaSymbolName("params"), requestMapingAnnotationParams));
+				PARAMS_ATTRIBUTE_NAME, requestMapingAnnotationParams));
 		
 		return requestMappingAnnotation;
 	}
@@ -1367,13 +1362,13 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 	protected StringAttributeValue getReferenceParamRequestMapping() {
 		
 		// TODO Refactor
-		return new StringAttributeValue(new JavaSymbolName("value"), "gvnixreference");
+		return new StringAttributeValue(VALUE_ATTRIBUTE_NAME, "gvnixreference");
 	}
 
 	protected StringAttributeValue getPatternParamRequestMapping(String patternName) {
 		
 		// TODO Refactor 
-		return new StringAttributeValue(new JavaSymbolName("value"), getPattern() + "=" + patternName);
+		return new StringAttributeValue(VALUE_ATTRIBUTE_NAME, getPattern() + "=" + patternName);
 	}
 	
 	protected StringAttributeValue getProducesParamRequestMapping() {
@@ -1392,10 +1387,10 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 		
 		// TODO Refactor 
 		if (exists) {
-			return new StringAttributeValue(new JavaSymbolName("value"), "form");
+			return new StringAttributeValue(VALUE_ATTRIBUTE_NAME, "form");
 		}
 		else {
-			return new StringAttributeValue(new JavaSymbolName("value"), "!form");
+			return new StringAttributeValue(VALUE_ATTRIBUTE_NAME, "!form");
 		}
 	}
 

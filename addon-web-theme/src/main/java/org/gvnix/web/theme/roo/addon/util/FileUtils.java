@@ -19,8 +19,7 @@
 package org.gvnix.web.theme.roo.addon.util;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,31 +38,25 @@ public abstract class FileUtils {
    * @param directory the directory to search in
    * @return the set of files found
    */
-  public static Set<URL> findFiles(File directory) {
+  public static Set<URI> findFiles(File directory) {
 
     // Set of File URLs
-    Set<URL> urls = new HashSet<URL>();
+    Set<URI> uris = new HashSet<URI>();
 
-    try {
-      File[] found = directory.listFiles();
-      if (found != null) {
-        for (int i = 0; i < found.length; i++) {
-          // recursive call if found is a directory
-          if (found[i].isDirectory()) {
-            Set<URL> children = findFiles(found[i]);
-            urls.addAll(children);
-          }
-          // if found is file add to Set
-          else {
-            urls.add(found[i].toURI().toURL());
-          }
+    File[] found = directory.listFiles();
+    if (found != null) {
+      for (int i = 0; i < found.length; i++) {
+        // recursive call if found is a directory
+        if (found[i].isDirectory()) {
+          Set<URI> children = findFiles(found[i]);
+          uris.addAll(children);
+        }
+        // if found is file add to Set
+        else {
+          uris.add(found[i].toURI());
         }
       }
     }
-    catch (MalformedURLException e) {
-      throw new IllegalArgumentException("Error recursive find files in '"
-          .concat(directory.getAbsolutePath()).concat("'"));
-    }
-    return urls;
+    return uris;
   }
 }

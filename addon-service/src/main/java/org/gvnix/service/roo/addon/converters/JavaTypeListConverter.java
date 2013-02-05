@@ -118,9 +118,9 @@ public class JavaTypeListConverter implements Converter<JavaTypeList> {
             completeProjectSpecificPaths(completions, existingData,
                     completeExistingDataList, tmpExistingData);
 
-        } else if (optionContext != null
-                && optionContext.contains("exceptions")) {
-
+//        } else if (optionContext != null
+//                && optionContext.contains("exceptions")) {
+//
             // TODO: Nothing to do.
         }
 

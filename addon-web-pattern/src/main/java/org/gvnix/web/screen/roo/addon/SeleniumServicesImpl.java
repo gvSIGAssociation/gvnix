@@ -83,7 +83,11 @@ import org.w3c.dom.Node;
 @Service
 public class SeleniumServicesImpl implements SeleniumServices {
 
-    private static final Random RANDOM_GENERATOR = new Random(new Date().getTime());
+    private static final String TBODY_XPATH = "/html/body/table/tbody";
+
+	private static final String CONTROLLER_NO_CREATION_WARN = "The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.";
+
+	private static final Random RANDOM_GENERATOR = new Random(new Date().getTime());
     
 	/**
      * MetadataService offers access to Roo's metadata model, use it to retrieve
@@ -118,7 +122,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// We abort the creation of a selenium test if the controller does not allow the creation of new instances for the form backing object
 		if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
 
-			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
+			logger.warning(CONTROLLER_NO_CREATION_WARN);
 			return;
 		}
 
@@ -131,7 +135,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		Element root = getHtmlElement(name, document);
 
 		// Get table body element to include test operations
-		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
+		Element tbody = XmlUtils.findRequiredElement(TBODY_XPATH, root);
 
 		// Add pattern URL to open for test
 		if (!serverURL.endsWith("/")) {
@@ -166,7 +170,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// We abort the creation of a selenium test if the controller does not allow the creation of new instances for the form backing object
 		if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
 
-			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
+			logger.warning(CONTROLLER_NO_CREATION_WARN);
 			return;
 		}
 
@@ -179,7 +183,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		Element root = getHtmlElement(name, document);
 
 		// Get table body element to include test operations
-		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
+		Element tbody = XmlUtils.findRequiredElement(TBODY_XPATH, root);
 
 		// Add pattern URL to open for test
 		if (!serverURL.endsWith("/")) {
@@ -217,7 +221,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// We abort the creation of a selenium test if the controller does not allow the creation of new instances for the form backing object
 		if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
 
-			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
+			logger.warning(CONTROLLER_NO_CREATION_WARN);
 			return;
 		}
 
@@ -230,7 +234,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		Element root = getHtmlElement(name, document);
 
 		// Get table body element to include test operations
-		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
+		Element tbody = XmlUtils.findRequiredElement(TBODY_XPATH, root);
 
 		// Add pattern URL to open for test
 		if (!serverURL.endsWith("/")) {
@@ -272,7 +276,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// We abort the creation of a selenium test if the controller does not allow the creation of new instances for the form backing object
 		if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
 
-			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
+			logger.warning(CONTROLLER_NO_CREATION_WARN);
 			return;
 		}
 		
@@ -285,7 +289,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		Element root = getHtmlElement(name, document);
 
 		// Get table body element to include test operations
-		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
+		Element tbody = XmlUtils.findRequiredElement(TBODY_XPATH, root);
 
 		// Add pattern URL to open for test
 		if (!serverURL.endsWith("/")) {
@@ -1193,14 +1197,14 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		
 		short index = 1;
 		if (random) {
-			index = new Integer(RANDOM_GENERATOR.nextInt()).shortValue();
+			index = (short) RANDOM_GENERATOR.nextInt();
 		}
 		
 		AnnotationMetadata min = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Min"));
 		if (min != null) {
 			AnnotationAttributeValue<?> value = min.getAttribute(new JavaSymbolName("value"));
 			if (value != null) {
-				index = new Short(value.getValue().toString());
+				index = Short.valueOf(value.getValue().toString());
 			}
 		}
 		if (field.getFieldName().getSymbolName().contains("email") || field.getFieldName().getSymbolName().contains("Email")) {
@@ -1239,19 +1243,19 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			}
 
 		} else if (field.getFieldType().equals(JavaType.BOOLEAN_OBJECT) || field.getFieldType().equals(JavaType.BOOLEAN_PRIMITIVE)) {
-			initializer = new Boolean(false).toString();
+			initializer = Boolean.FALSE.toString();
 		} else if (field.getFieldType().equals(JavaType.INT_OBJECT) || field.getFieldType().equals(JavaType.INT_PRIMITIVE)) {
-			initializer = new Integer(index).toString();
+			initializer = Integer.valueOf(index).toString();
 		} else if (field.getFieldType().equals(JavaType.DOUBLE_OBJECT) || field.getFieldType().equals(JavaType.DOUBLE_PRIMITIVE)) {
-			initializer = new Double(index).toString();
+			initializer = Double.valueOf(index).toString();
 		} else if (field.getFieldType().equals(JavaType.FLOAT_OBJECT) || field.getFieldType().equals(JavaType.FLOAT_PRIMITIVE)) {
-			initializer = new Float(index).toString();
+			initializer = Float.valueOf(index).toString();
 		} else if (field.getFieldType().equals(JavaType.LONG_OBJECT) || field.getFieldType().equals(JavaType.LONG_PRIMITIVE)) {
-			initializer = new Long(index).toString();
+			initializer = Long.valueOf(index).toString();
 		} else if (field.getFieldType().equals(JavaType.SHORT_OBJECT) || field.getFieldType().equals(JavaType.SHORT_PRIMITIVE)) {
-			initializer = new Short(index).toString();
+			initializer = Short.valueOf(index).toString();
 		} else if (field.getFieldType().equals(new JavaType("java.math.BigDecimal"))) {
-			initializer = new BigDecimal(index).toString();
+			initializer = BigDecimal.valueOf(index).toString();
 		}
 		return initializer;
 	}

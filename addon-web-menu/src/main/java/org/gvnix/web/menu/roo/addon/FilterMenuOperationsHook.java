@@ -108,17 +108,17 @@ public class FilterMenuOperationsHook implements FindHook {
         }
         
         // Remove all ServiceReferes except MenuOpertationProxy service  
-        for (Iterator i = references.iterator(); i.hasNext(); ) {
-            ServiceReference sr = (ServiceReference) i.next();
+        for (Iterator iter = references.iterator(); iter.hasNext(); ) {
+            ServiceReference sr = (ServiceReference) iter.next();
             if (isGvNIXOperations(sr)){
             	// logger.finest("   - gvNIX Menu op ( Removing)");
-        		i.remove();
-            } else if (isProxy(sr)){
-            	// logger.finest("   - gvNIX Menu proxy op");
+        		iter.remove();
+            } else if (isProxy(sr)){            	
             	// Don't remove proxy
+            	continue;
             } else {
             	// logger.finest("   - Roo Menu op ( Removing)");
-            	i.remove();
+            	iter.remove();
             }
         }
 	}

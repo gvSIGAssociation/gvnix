@@ -1113,12 +1113,12 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         }
 
         // Set of resource URLs to be copied to target dir
-        Set<URL> urls = new HashSet<URL>();
+        Set<URI> uris = new HashSet<URI>();
 
         // if source URI schema is file:// , source files are in a local
         // repository
         if ("file".equals(sourceDirectory.getScheme())) {
-            urls = FileUtils.findFiles(new File(sourceDirectory));
+            uris = FileUtils.findFiles(new File(sourceDirectory));
         }
 
         // if source URI schema is bundle:// , we can access to that bundle
@@ -1136,7 +1136,12 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                     .getBundle(bundleId)
                     .findEntries(sourceDirectory.getPath(), "*.*", true);
             while (entries.hasMoreElements()) {
-                urls.add(entries.nextElement());
+                try {
+					uris.add(entries.nextElement().toURI());
+				} catch (URISyntaxException e) {
+					throw new IllegalStateException(
+							"Encountered an error during copying of resources for MVC Theme addon.",e);
+				}
             }
         }
         // it shouldn't occur
@@ -1147,14 +1152,14 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         }
 
         Validate.notNull(
-                urls,
+                uris,
                 "No resources found to copy in '".concat(
                         sourceDirectory.toString()).concat("'"));
 
         // iterate over Theme resources and copy them with same dir layout
-        for (URL url : urls) {
+        for (URI uri : uris) {
         	// Remove source directory prefix from absolute url: relative file path
-            String filePath = url.toString().substring(
+            String filePath = uri.toString().substring(
                     sourceDirectory.toString().length());
             if (isVersionControlSystemFile(filePath)) {
                 // nothing to do if the URL is of a file from a Version Control
@@ -1172,7 +1177,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                     InputStream inputStream = null;
                     OutputStream outputStream = null;
                     try { 
-	                    inputStream = url.openStream();
+	                    inputStream = uri.toURL().openStream();
 	                    outputStream = fileManager.createFile(targetFile.getAbsolutePath()).getOutputStream();
 	                    IOUtils.copy(inputStream, outputStream);
                     }
@@ -1186,7 +1191,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                     InputStream inputStream = null;
                     OutputStream outputStream = null;
                     try { 
-	                    inputStream = url.openStream();
+	                    inputStream = uri.toURL().openStream();
 	                    outputStream = fileManager.updateFile(targetFile.getAbsolutePath()).getOutputStream();
 	                    IOUtils.copy(inputStream, outputStream);
                     }

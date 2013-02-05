@@ -97,7 +97,18 @@ import org.w3c.dom.NodeList;
 public abstract class AbstractPatternJspMetadataListener implements
         MetadataProvider, MetadataNotificationListener {
 
-    private static final String ID_ATTRIBUTE = "id";
+    private static final String TRUE_VALUE = "true";
+	private static final String FIELD_ATTRIBUTE = "field";
+	private static final String FIELD_TEXTAREA_ELEMENT = "field:textarea";
+	private static final String FIELD_INPUT_ELEMENT = "field:input";
+	private static final String MAX_ATTRIBUTE = "max";
+	private static final String RENDER_ATTRIBUTE = "render";
+	private static final String DIV_ID_PREFIX = "div:";
+	private static final String CLASS_ATTRIBUTE = "class";
+	private static final String PATH_ATTRIBUTE = "path";
+	private static final String OBJECT_ATTRIBUTE = "object";
+	private static final String DIV_ELEMENT = "div";
+	private static final String ID_ATTRIBUTE = "id";
 	private static final String ID_RENDER_ATTRIBUTE = "idRender";
 	private static final String ID_DISABLED_ATTRIBUTE = "idDisabled";
 	
@@ -273,7 +284,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 
         // Add document namespaces
         Element div = (Element) document.appendChild(new XmlElementBuilder(
-                "div", document)
+                DIV_ELEMENT, document)
                 .addAttribute("xmlns:field",
                         "urn:jsptagdir:/WEB-INF/tags/form/fields")
                 .addAttribute("xmlns:page",
@@ -296,8 +307,8 @@ public abstract class AbstractPatternJspMetadataListener implements
                         ID_ATTRIBUTE,
                         XmlUtils.convertId("ps:"
                                 + formbackingType.getFullyQualifiedTypeName()))
-                .addAttribute("object", "${" + entityName.toLowerCase() + "}")
-                .addAttribute("path", controllerPath).build();
+                .addAttribute(OBJECT_ATTRIBUTE, "${" + entityName.toLowerCase() + "}")
+                .addAttribute(PATH_ATTRIBUTE, controllerPath).build();
         if (!webScaffoldAnnotationValues.isCreate()) {
             pageShow.setAttribute("create", "false");
         }
@@ -317,21 +328,21 @@ public abstract class AbstractPatternJspMetadataListener implements
         pageShow.setAttribute("z",
                 XmlRoundTripUtils.calculateUniqueKeyFor(pageShow));
 
-        Element divContentPane = new XmlElementBuilder("div", document)
+        Element divContentPane = new XmlElementBuilder(DIV_ELEMENT, document)
                 .addAttribute(
                         ID_ATTRIBUTE,
-                        XmlUtils.convertId("div:"
+                        XmlUtils.convertId(DIV_ID_PREFIX
                                 + formbackingType.getFullyQualifiedTypeName()
                                 + "_contentPane"))
-                .addAttribute("class", "patternContentPane").build();
+                .addAttribute(CLASS_ATTRIBUTE, "patternContentPane").build();
 
-        Element divForm = new XmlElementBuilder("div", document)
+        Element divForm = new XmlElementBuilder(DIV_ELEMENT, document)
                 .addAttribute(
                         ID_ATTRIBUTE,
-                        XmlUtils.convertId("div:"
+                        XmlUtils.convertId(DIV_ID_PREFIX
                                 + formbackingType.getFullyQualifiedTypeName()
                                 + "_formNoedit"))
-                .addAttribute("class", "formularios boxNoedit").build();
+                .addAttribute(CLASS_ATTRIBUTE, "formularios boxNoedit").build();
 
         divContentPane.appendChild(divForm);
 
@@ -347,7 +358,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                     .getSymbolName());
 
             Element ul = new XmlElementBuilder("ul", document)
-                    .addAttribute("class", "formInline")
+                    .addAttribute(CLASS_ATTRIBUTE, "formInline")
                     .addAttribute(
                             ID_ATTRIBUTE,
                             XmlUtils.convertId("ul:"
@@ -355,7 +366,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                                             .getFullyQualifiedTypeName())
                                     .concat(".").concat(fieldName))).build();
             Element li = new XmlElementBuilder("li", document)
-                    .addAttribute("class", "size120")
+                    .addAttribute(CLASS_ATTRIBUTE, "size120")
                     .addAttribute(
                             ID_ATTRIBUTE,
                             XmlUtils.convertId("li:"
@@ -372,16 +383,16 @@ public abstract class AbstractPatternJspMetadataListener implements
                                     + formbackingType
                                             .getFullyQualifiedTypeName() + "."
                                     + field.getFieldName().getSymbolName()))
-                    .addAttribute("object",
+                    .addAttribute(OBJECT_ATTRIBUTE,
                             "${" + entityName.toLowerCase() + "}")
-                    .addAttribute("field", fieldName).build();
+                    .addAttribute(FIELD_ATTRIBUTE, fieldName).build();
             if (field.getFieldType().equals(new JavaType(Date.class.getName()))) {
-                fieldDisplay.setAttribute("date", "true");
+                fieldDisplay.setAttribute("date", TRUE_VALUE);
                 fieldDisplay.setAttribute("dateTimePattern", "${" + entityName
                         + "_" + fieldName.toLowerCase() + "_date_format}");
             } else if (field.getFieldType().equals(
                     new JavaType(Calendar.class.getName()))) {
-                fieldDisplay.setAttribute("calendar", "true");
+                fieldDisplay.setAttribute("calendar", TRUE_VALUE);
                 fieldDisplay.setAttribute("dateTimePattern", "${" + entityName
                         + "_" + fieldName.toLowerCase() + "_date_format}");
             } else if (field.getFieldType().isCommonCollectionType()
@@ -431,7 +442,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		                                .getFullyQualifiedTypeName() + "."
 		                        + patternName))
 		        .addAttribute(
-		                "render",
+		                RENDER_ATTRIBUTE,
 		                "${!empty ".concat(entityName.toLowerCase())
 		                        .concat("}")).build();
 		patternRelations.setAttribute("z",
@@ -454,9 +465,9 @@ public abstract class AbstractPatternJspMetadataListener implements
 		                            + formbackingType
 		                                    .getFullyQualifiedTypeName()
 		                            + "." + fieldName))
-		            .addAttribute("object",
+		            .addAttribute(OBJECT_ATTRIBUTE,
 		                    "${" + entityName.toLowerCase() + "}")
-		            .addAttribute("field", fieldName)
+		            .addAttribute(FIELD_ATTRIBUTE, fieldName)
 		            .addAttribute("folder", webScaffoldFolder)
 		            .addAttribute("patternName", patternName)
 		            .addAttribute("referenceName", referenceName)
@@ -466,7 +477,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		                            .getIdentifierField().getFieldName()
 		                            .getSymbolName())
 		            .addAttribute(
-		                    "render",
+		                    RENDER_ATTRIBUTE,
 		                    "${!empty ".concat(entityName.toLowerCase())
 		                            .concat("}")).build();
 		    patternRelation.setAttribute("z", XmlRoundTripUtils
@@ -520,8 +531,8 @@ public abstract class AbstractPatternJspMetadataListener implements
 		                                .getFullyQualifiedTypeName() + "."
 		                        + patternName))
 		        .addAttribute(
-		                "render",
-		                "${!empty ".concat("object")
+		                RENDER_ATTRIBUTE,
+		                "${!empty ".concat(OBJECT_ATTRIBUTE)
 		                        .concat("}")).build();
 		patternRelations.setAttribute("z",
 		        XmlRoundTripUtils.calculateUniqueKeyFor(patternRelations));
@@ -543,9 +554,9 @@ public abstract class AbstractPatternJspMetadataListener implements
 		                            + formbackingType
 		                                    .getFullyQualifiedTypeName()
 		                            + "." + fieldName))
-		            .addAttribute("object",
+		            .addAttribute(OBJECT_ATTRIBUTE,
 		                    "${object}")
-		            .addAttribute("field", fieldName)
+		            .addAttribute(FIELD_ATTRIBUTE, fieldName)
 		            .addAttribute("folder", webScaffoldFolder)
 		            .addAttribute("patternName", patternName)
 		            .addAttribute("referenceName", referenceName)
@@ -555,8 +566,8 @@ public abstract class AbstractPatternJspMetadataListener implements
 		                            .getIdentifierField().getFieldName()
 		                            .getSymbolName())
 		            .addAttribute(
-		                    "render",
-		                    "${!empty ".concat("object")
+		                    RENDER_ATTRIBUTE,
+		                    "${!empty ".concat(OBJECT_ATTRIBUTE)
 		                            .concat("}")).build();
 		    patternRelation.setAttribute("z", XmlRoundTripUtils
 		            .calculateUniqueKeyFor(patternRelation));
@@ -689,25 +700,25 @@ public abstract class AbstractPatternJspMetadataListener implements
                     "urn:jsptagdir:/WEB-INF/tags/pattern");
         }
 
-        String divContPaneId = XmlUtils.convertId("div:"
+        String divContPaneId = XmlUtils.convertId(DIV_ID_PREFIX
                 + formbackingType.getFullyQualifiedTypeName() + "_contentPane");
         Element divContentPane = XmlUtils.findFirstElement(
                 "/div/" + rooJspx.name() + "/div[@id='" + divContPaneId + "']",
                 docRoot);
         if (null == divContentPane) {
-            divContentPane = new XmlElementBuilder("div", docJspXml)
+            divContentPane = new XmlElementBuilder(DIV_ELEMENT, docJspXml)
                     .addAttribute(ID_ATTRIBUTE, divContPaneId)
-                    .addAttribute("class", "patternContentPane").build();
+                    .addAttribute(CLASS_ATTRIBUTE, "patternContentPane").build();
         }
 
-        String divFormId = XmlUtils.convertId("div:"
+        String divFormId = XmlUtils.convertId(DIV_ID_PREFIX
                 + formbackingType.getFullyQualifiedTypeName() + "_formNoedit");
         Element divForm = XmlUtils.findFirstElement("/div/" + rooJspx.name()
                 + "/div/div[@id='" + divFormId + "']", docRoot);
         if (null == divForm) {
-            divForm = new XmlElementBuilder("div", docJspXml)
+            divForm = new XmlElementBuilder(DIV_ELEMENT, docJspXml)
                     .addAttribute(ID_ATTRIBUTE, divFormId)
-                    .addAttribute("class", "formularios boxNoedit").build();
+                    .addAttribute(CLASS_ATTRIBUTE, "formularios boxNoedit").build();
             divContentPane.appendChild(divForm);
         }
 
@@ -742,9 +753,9 @@ public abstract class AbstractPatternJspMetadataListener implements
                          */) {
                             Node thisNodeCpy = thisField.cloneNode(true);
                             String fieldAttValue = thisNodeCpy.getAttributes()
-                                    .getNamedItem("field").getNodeValue();
+                                    .getNamedItem(FIELD_ATTRIBUTE).getNodeValue();
                             Element li = new XmlElementBuilder("li", docJspXml)
-                                    .addAttribute("class", "size120")
+                                    .addAttribute(CLASS_ATTRIBUTE, "size120")
                                     .addAttribute(
                                             ID_ATTRIBUTE,
                                             XmlUtils.convertId("li:"
@@ -754,7 +765,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                                                     .concat(fieldAttValue)))
                                     .addChild(thisNodeCpy).build();
                             Element ul = new XmlElementBuilder("ul", docJspXml)
-                                    .addAttribute("class", "formInline")
+                                    .addAttribute(CLASS_ATTRIBUTE, "formInline")
                                     .addAttribute(
                                             ID_ATTRIBUTE,
                                             XmlUtils.convertId("ul:"
@@ -784,7 +795,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                             "pattern:hiddengvnixpattern", docJspXml)
                             .addAttribute(ID_ATTRIBUTE, hiddenFieldId)
                             .addAttribute("value", "${param.gvnixpattern}")
-                            .addAttribute("render",
+                            .addAttribute(RENDER_ATTRIBUTE,
                                     "${not empty param.gvnixpattern}").build();
                     divForm.appendChild(hiddenField);
                 }
@@ -799,7 +810,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                     cancelButton = new XmlElementBuilder(
                             "pattern:cancelbutton", docJspXml)
                             .addAttribute(ID_ATTRIBUTE, cancelId)
-                            .addAttribute("render",
+                            .addAttribute(RENDER_ATTRIBUTE,
                                     "${not empty param.gvnixpattern}").build();
                     divForm.appendChild(cancelButton);
                 }
@@ -1042,7 +1053,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 
         // Add document namespaces
         Element div = (Element) document.appendChild(new XmlElementBuilder(
-                "div", document)
+                DIV_ELEMENT, document)
                 .addAttribute("xmlns:form",
                         "urn:jsptagdir:/WEB-INF/tags/pattern/form")
                 .addAttribute("xmlns:field",
@@ -1085,7 +1096,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 
         if (!controllerPath.toLowerCase().equals(
                 formbackingType.getSimpleTypeName().toLowerCase())) {
-            formUpdate.setAttribute("path", controllerPath);
+            formUpdate.setAttribute(PATH_ATTRIBUTE, controllerPath);
         }
         if (!ID_ATTRIBUTE.equals(formbackingTypePersistenceMetadata
                 .getIdentifierField().getFieldName().getSymbolName())) {
@@ -1162,7 +1173,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         }
 
         if (!fieldsOfRelations.isEmpty()) {
-            formUpdate.setAttribute("related", "true");
+            formUpdate.setAttribute("related", TRUE_VALUE);
             Element patternRelations = getTabularRelationsDocument(patternName,
 					document, fieldsOfRelations);
             div.appendChild(patternRelations);
@@ -1241,7 +1252,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                                 "${"
                                         + typeMetadataHolder.getPlural()
                                                 .toLowerCase() + "}")
-                        .addAttribute("path", getPathForType(fieldType))
+                        .addAttribute(PATH_ATTRIBUTE, getPathForType(fieldType))
                         .build();
             } else if (field.getCustomData().keySet()
                     .contains(CustomDataKeys.ONE_TO_MANY_FIELD)) {
@@ -1296,7 +1307,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                                             .getIdentifierField()
                                             .getFieldName().getSymbolName())
                             .addAttribute(
-                                    "path",
+                                    PATH_ATTRIBUTE,
                                     "/"
                                             + getPathForType(getJavaTypeForField(field)))
                             .build();
@@ -1306,7 +1317,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                             .keySet()
                             .contains(
                             		CustomDataKeys.MANY_TO_MANY_FIELD)) {
-                        fieldElement.setAttribute("multiple", "true");
+                        fieldElement.setAttribute("multiple", TRUE_VALUE);
                     }
                 }
             } else if (fieldType.getFullyQualifiedTypeName().equals(
@@ -1325,36 +1336,36 @@ public abstract class AbstractPatternJspMetadataListener implements
                 if (null != MemberFindingUtils.getAnnotationOfType(field
                         .getAnnotations(), new JavaType(
                         "javax.validation.constraints.Future"))) {
-                    fieldElement.setAttribute("future", "true");
+                    fieldElement.setAttribute("future", TRUE_VALUE);
                 } else if (null != MemberFindingUtils.getAnnotationOfType(field
                         .getAnnotations(), new JavaType(
                         "javax.validation.constraints.Past"))) {
-                    fieldElement.setAttribute("past", "true");
+                    fieldElement.setAttribute("past", TRUE_VALUE);
                 }
             } else if (field.getCustomData().keySet()
                     .contains(CustomDataKeys.LOB_FIELD)) {
-                fieldElement = new XmlElementBuilder("field:textarea", document)
+                fieldElement = new XmlElementBuilder(FIELD_TEXTAREA_ELEMENT, document)
                         .build();
             }
             if (null != (annotationMetadata = MemberFindingUtils
                     .getAnnotationOfType(field.getAnnotations(), new JavaType(
                             "javax.validation.constraints.Size")))) {
                 AnnotationAttributeValue<?> max = annotationMetadata
-                        .getAttribute(new JavaSymbolName("max"));
+                        .getAttribute(new JavaSymbolName(MAX_ATTRIBUTE));
                 if (max != null) {
                     int maxValue = (Integer) max.getValue();
                     if (fieldElement == null && maxValue > 30) {
-                        fieldElement = new XmlElementBuilder("field:textarea",
+                        fieldElement = new XmlElementBuilder(FIELD_TEXTAREA_ELEMENT,
                                 document).build();
                     }
                 }
             }
             // Use a default input field if no other criteria apply
             if (fieldElement == null) {
-                fieldElement = document.createElement("field:input");
+                fieldElement = document.createElement(FIELD_INPUT_ELEMENT);
             }
             addCommonAttributes(field, fieldElement);
-            fieldElement.setAttribute("field", fieldName);
+            fieldElement.setAttribute(FIELD_ATTRIBUTE, fieldName);
             fieldElement.setAttribute(
                     ID_ATTRIBUTE,
                     XmlUtils.convertId("c:"
@@ -1438,7 +1449,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             fieldElement.setAttribute("validationMessageCode",
                     "field_invalid_number");
         }
-        if ("field:input".equals(fieldElement.getTagName())
+        if (FIELD_INPUT_ELEMENT.equals(fieldElement.getTagName())
                 && null != (annotationMetadata = MemberFindingUtils
                         .getAnnotationOfType(
                                 field.getAnnotations(),
@@ -1449,25 +1460,25 @@ public abstract class AbstractPatternJspMetadataListener implements
                 fieldElement.setAttribute("min", min.getValue().toString());
             }
         }
-        if ("field:input".equals(fieldElement.getTagName())
+        if (FIELD_INPUT_ELEMENT.equals(fieldElement.getTagName())
                 && null != (annotationMetadata = MemberFindingUtils
                         .getAnnotationOfType(
                                 field.getAnnotations(),
                                 new JavaType("javax.validation.constraints.Max")))
-                && !"field:textarea".equals(fieldElement.getTagName())) {
+                && !FIELD_TEXTAREA_ELEMENT.equals(fieldElement.getTagName())) {
             AnnotationAttributeValue<?> maxA = annotationMetadata
                     .getAttribute(new JavaSymbolName("value"));
             if (maxA != null) {
-                fieldElement.setAttribute("max", maxA.getValue().toString());
+                fieldElement.setAttribute(MAX_ATTRIBUTE, maxA.getValue().toString());
             }
         }
-        if ("field:input".equals(fieldElement.getTagName())
+        if (FIELD_INPUT_ELEMENT.equals(fieldElement.getTagName())
                 && null != (annotationMetadata = MemberFindingUtils
                         .getAnnotationOfType(
                                 field.getAnnotations(),
                                 new JavaType(
                                         "javax.validation.constraints.DecimalMin")))
-                && !"field:textarea".equals(fieldElement.getTagName())) {
+                && !FIELD_TEXTAREA_ELEMENT.equals(fieldElement.getTagName())) {
             AnnotationAttributeValue<?> decimalMin = annotationMetadata
                     .getAttribute(new JavaSymbolName("value"));
             if (decimalMin != null) {
@@ -1475,7 +1486,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                         .toString());
             }
         }
-        if ("field:input".equals(fieldElement.getTagName())
+        if (FIELD_INPUT_ELEMENT.equals(fieldElement.getTagName())
                 && null != (annotationMetadata = MemberFindingUtils
                         .getAnnotationOfType(
                                 field.getAnnotations(),
@@ -1498,15 +1509,15 @@ public abstract class AbstractPatternJspMetadataListener implements
                         .toString());
             }
         }
-        if ("field:input".equals(fieldElement.getTagName())
+        if (FIELD_INPUT_ELEMENT.equals(fieldElement.getTagName())
                 && null != (annotationMetadata = MemberFindingUtils
                         .getAnnotationOfType(field.getAnnotations(),
                                 new JavaType(
                                         "javax.validation.constraints.Size")))) {
             AnnotationAttributeValue<?> max = annotationMetadata
-                    .getAttribute(new JavaSymbolName("max"));
+                    .getAttribute(new JavaSymbolName(MAX_ATTRIBUTE));
             if (max != null) {
-                fieldElement.setAttribute("max", max.getValue().toString());
+                fieldElement.setAttribute(MAX_ATTRIBUTE, max.getValue().toString());
             }
             AnnotationAttributeValue<?> min = annotationMetadata
                     .getAttribute(new JavaSymbolName("min"));
@@ -1523,7 +1534,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                     || tagName.endsWith("textarea")
                     || tagName.endsWith("select")
                     || tagName.endsWith("reference")) {
-                fieldElement.setAttribute("required", "true");
+                fieldElement.setAttribute("required", TRUE_VALUE);
             }
         }
         if (field.getCustomData().keySet()
@@ -1534,12 +1545,12 @@ public abstract class AbstractPatternJspMetadataListener implements
                     .get(CustomDataKeys.COLUMN_FIELD);
             if (values.keySet().contains("nullable")
                     && ((Boolean) values.get("nullable")) == false) {
-                fieldElement.setAttribute("required", "true");
+                fieldElement.setAttribute("required", TRUE_VALUE);
             }
         }
         // Disable form binding for nested fields (mainly PKs)
         if (field.getFieldName().getSymbolName().contains(".")) {
-            fieldElement.setAttribute("disableFormBinding", "true");
+            fieldElement.setAttribute("disableFormBinding", TRUE_VALUE);
         }
     }
 
