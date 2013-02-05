@@ -39,9 +39,7 @@ public class VersionInfo {
     private Qualifiers qualifier = Qualifiers.EMPTY;
 
     public int compareTo(VersionInfo v) {
-    	// This check is not needed: next instruction
-    	// throws a NPE if v is null.
-    	// Validate.notNull(v);
+    	Validate.notNull(v);
         int result = major.compareTo(v.major);
         if (result != 0) {
             return result;
@@ -117,4 +115,31 @@ public class VersionInfo {
         }
         return null;
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((major == null) ? 0 : major.hashCode());
+		result = prime * result + ((minor == null) ? 0 : minor.hashCode());
+		result = prime * result + ((patch == null) ? 0 : patch.hashCode());
+		result = prime * result
+				+ ((qualifier == null) ? 0 : qualifier.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj){
+			return true;
+		}
+		if (obj == null){
+			return false;
+		}
+		if (!(obj instanceof VersionInfo)){
+			return false;
+		}
+		VersionInfo other = (VersionInfo) obj;
+		return compareTo(other) == 0;
+	}
 }
