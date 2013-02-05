@@ -39,7 +39,9 @@ public class VersionInfo {
     private Qualifiers qualifier = Qualifiers.EMPTY;
 
     public int compareTo(VersionInfo v) {
-    	Validate.notNull(v);
+    	// This check is not needed: next instruction
+    	// throws a NPE if v is null.
+    	// Validate.notNull(v);
         int result = major.compareTo(v.major);
         if (result != 0) {
             return result;

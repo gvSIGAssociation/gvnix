@@ -607,7 +607,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         
         boolean updateFullyQualifiedTypeName = false;
         // Check if class name and annotation class name are different.
-        if (!className.getFullyQualifiedTypeName().contentEquals(
+        if (fullyQualifiedTypeName != null &&
+        		!className.getFullyQualifiedTypeName().contentEquals(
                 fullyQualifiedTypeName.getValue())) {
             updateFullyQualifiedTypeName = true;
         }
