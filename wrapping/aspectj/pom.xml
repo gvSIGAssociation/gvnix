@@ -56,7 +56,6 @@
     <pkgVendor>Eclipse</pkgVendor>
     <pkgDocUrl>http://www.eclipse.org/aspectj/docs.php</pkgDocUrl>
     <pkgLicense>http://www.eclipse.org/legal/epl-v10.html</pkgLicense>
-<!--    <pkgImport>org.aspectj.*;resolution:=optional,*;resolution:=optional</pkgImport> -->
     <pkgExport>*;version=${pkgVersion}</pkgExport>
     <pkgImport>!com.bea.jvm.*,*</pkgImport>
   <pkgPrivate>!*</pkgPrivate>

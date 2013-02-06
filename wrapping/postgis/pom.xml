@@ -56,7 +56,6 @@
     <pkgLicense>http://www.opensource.org/licenses/gpl-2.0.php</pkgLicense>
     <pkgExport>!org.postgresql.*,!examples.*,*;version=${pkgVersion}</pkgExport>
     <pkgImport>*</pkgImport>
-    <!-- <pkgImport>*;version="[8.3,9.1]"</pkgImport>--><!-- Requires PostgreSQL 8.3 or higher -->
     <pkgPrivate>!*</pkgPrivate>
   </properties>
 

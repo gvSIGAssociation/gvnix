@@ -46,94 +46,40 @@
   <url>http://www.gvnix.org</url>
 
   <dependencies>
-    <!-- OSGi -->
-    <!-- DiSiD: No OSGi dependencies, there are defined on parent pom
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>4.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <version>4.1.0</version>
-    </dependency>
-    -->
-
-    <!-- Apache Felix -->
-    <!-- DiSiD: No Felix dependency, there is defined on parent pom
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.scr.annotations</artifactId>
-      <version>1.2.0</version>
-    </dependency>
-    -->
 
     <!-- Spring Roo modules -->
     <!-- DiSiD: No version or type; there are defined on parent pom -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.metadata</artifactId>
-      <!--
-      <version>${roo.version}</version>
-      <type>bundle</type>
-      -->
     </dependency>
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.process.manager</artifactId>
-      <!--
-      <version>${roo.version}</version>
-      <type>bundle</type>
-      -->
     </dependency>
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.project</artifactId>
-      <!--
-      <version>${roo.version}</version>
-      <type>bundle</type>
-      -->
     </dependency>
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.support</artifactId>
-      <!--
-      <version>${roo.version}</version>
-      <type>bundle</type>
-      -->
     </dependency>
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.shell</artifactId>
-      <!--
-      <version>${roo.version}</version>
-      <type>bundle</type>
-      -->
     </dependency>
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.bootstrap</artifactId>
-      <!--
-      <version>${roo.version}</version>
-      <scope>provided</scope>
-      -->
     </dependency>
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.model</artifactId>
-      <!--
-      <version>${roo.version}</version>
-      <scope>provided</scope>
-      -->
     </dependency>
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.classpath</artifactId>
-      <!--
-      <version>${roo.version}</version>
-      <type>bundle</type>
-      -->
     </dependency>
 
     <!-- DiSiD: Additional Spring Roo modules required by this addon -->

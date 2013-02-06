@@ -52,12 +52,14 @@
 
 
   <dependencies>
+  
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.scr.annotations</artifactId>
       <version>1.2.0</version>
     </dependency>
+    
     <!-- Spring Roo modules -->
     <dependency>
       <groupId>org.springframework.roo</groupId>

@@ -3,13 +3,7 @@
         <!-- TOREMOVE This is a temporal wrapping until String roo
 		includes it -->
 	<modelVersion>4.0.0</modelVersion>
-  <!--
-  <parent>
-    <groupId>org.gvnix</groupId>
-    <artifactId>wrapping</artifactId>
-    <version>1.1.0</version>
-  </parent>
-  -->
+
     <groupId>org.springframework.roo.wrapping</groupId>
 	<artifactId>${project.groupId}.${pkgArtifactId}</artifactId>
     <version>${osgiVersion}</version>

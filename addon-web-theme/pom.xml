@@ -37,8 +37,6 @@
   <packaging>bundle</packaging>
   <name>gvNIX - Spring Roo - Addon - Web MVC Theme Management</name>
 
-  <!-- DiSiD: No group specified, there is defined on parent pom -->
-  <!-- DiSiD: No version specified, there is defined on parent pom -->
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
@@ -52,12 +50,14 @@
   </properties>
 
   <dependencies>
+  
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.shell</artifactId>
       <version>1.4.2</version>
     </dependency>
+    
     <!-- Spring Roo modules -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
@@ -107,6 +107,7 @@
       <version>${roo.version}</version>
       <type>bundle</type>
     </dependency>
+    
     <!-- Spring Roo add-ons -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
@@ -121,23 +122,7 @@
       <type>bundle</type>
     </dependency>
   </dependencies>
-  <!-- 
-  <scm>
-    <connection>scm:svn:https://${google.code.project.name}.googlecode.com/svn/trunk</connection>
-    <developerConnection>scm:svn:https://${google.code.project.name}.googlecode.com/svn/trunk</developerConnection>
-    <url>http://code.google.com/p/${google.code.project.name}/source/browse</url>
-  </scm>
-  <distributionManagement>
-    <repository>
-      <id>Google Code</id>
-      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
-    </repository>
-  </distributionManagement>
-  <properties>
-    <osgi.Activator>${project.artifactId}.osgi.Activator</osgi.Activator>
-  </properties>
-  -->
-
+  
   <!-- DiSiD: Add google code distribution management -->
   <distributionManagement>
     <repository>

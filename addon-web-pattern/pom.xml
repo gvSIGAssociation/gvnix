@@ -44,6 +44,7 @@
   <description>MVC screen patterns management for Spring MVC based web layer. An screen pattern is ... TBC http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns</description>
   <url>http://www.gvnix.org</url>
   <dependencies>
+  
     <!-- Spring Roo modules -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
@@ -77,6 +78,7 @@
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.classpath</artifactId>
     </dependency>
+    
     <!-- Spring Roo add-ons -->
     <dependency>
       <groupId>org.springframework.roo</groupId>

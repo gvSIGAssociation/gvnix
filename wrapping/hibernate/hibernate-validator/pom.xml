@@ -51,12 +51,10 @@
     <pkgGroupId>org.hibernate</pkgGroupId>
     <pkgArtifactId>hibernate-validator</pkgArtifactId>
     <pkgVersion>4.2.0.Final</pkgVersion>
-    <!-- <pkgValidationAPIVersion>1.0</pkgValidationAPIVersion> -->
     <pkgVendor>JBoss</pkgVendor>
     <pkgDocUrl>http://www.hibernate.org/docs</pkgDocUrl>
     <pkgLicense>http://www.hibernate.org/license</pkgLicense>
     <pkgExport>org.hibernate.validator.*;version=${pkgVersion}</pkgExport>
-    <!-- <pkgExport>org.hibernate.validator.*;version=${pkgVersion},javax.validation.*;version=${pkgValidationAPIVersion}</pkgExport> -->
     <pkgImport>*</pkgImport>
     <pkgPrivate>com.googlecode.jtype,!*</pkgPrivate>
     <pkgInclude>src/main/resources/</pkgInclude>
@@ -74,33 +72,6 @@
       <artifactId>jtype</artifactId>
       <version>0.1.2</version>
     </dependency>
-    <!-- 
-    In the OSGi world the validation api, will delegate that call to the calling bundle (in our case the database tier bundle) so we are going to make sure that it finds it. How we are going to do so? We are going to copy it from Hibernate Validator and add it in our bundle.
-    <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-      <version>1.0.0.GA</version>
-    </dependency>
-    -->
   </dependencies>
 
-<!--
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.4.3</version>
-        <configuration>
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
-    </plugins>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
-  </build>
--->
 </project>

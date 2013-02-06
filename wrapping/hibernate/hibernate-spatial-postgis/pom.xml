@@ -55,10 +55,6 @@
     <pkgDocUrl>http://www.hibernatespatial.org/tutorial</pkgDocUrl>
     <pkgLicense>http://www.hibernatespatial.org/license.html</pkgLicense>
     <pkgExport>!com.vividsolutions.*,!org.slf4j.*,org.hibernatespatial.*,org.hibernatespatial.postgis.*,*;version=${pkgVersion}</pkgExport>
-    <!-- <pkgImport>oracle.jdbc.*;resolution:=optional,oracle.sql;resolution:=optional,org.postgis;resolution:=optional,*</pkgImport> -->
-    <!-- <pkgImport>oracle.jdbc.*;resolution:=optional,oracle.sql;resolution:=optional,org.postgis;resolution:=optional,org.hibernate.loader.collection;version="[3.6,4.0)",org.hibernate.*;version="[3.6,4.0)",*</pkgImport> -->
-    <!-- <pkgImport>org.postgis,*</pkgImport> -->
-    <!-- <pkgImport>*</pkgImport> -->
     <pkgImport>!com.ibm.uvm.tools.*,!com.sun.jdmk.comm.*,!javax.jmdns.*,!sun.io.*,*</pkgImport>
     <pkgPrivate>!*</pkgPrivate>
   </properties>
@@ -73,13 +69,6 @@
   </repositories>
 
   <dependencies>
-  <!--
-        <dependency>
-            <groupId>org.apache.servicemix.specs</groupId>
-            <artifactId>org.apache.servicemix.specs.locator</artifactId>
-            <version>1.8.0</version>
-        </dependency>
-  -->
         <dependency>
             <groupId>com.vividsolutions</groupId>
             <artifactId>jts</artifactId>
@@ -106,32 +95,7 @@
         </exclusion>
       </exclusions>
         </dependency>
-<!--
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
-            <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>xercesImpl</artifactId>
-        </exclusion>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-      </exclusions>
-        </dependency>
--->
+
     <!-- Spatial dialect provider for PostGIS -->
     <dependency>
       <groupId>${pkgGroupId}</groupId>
