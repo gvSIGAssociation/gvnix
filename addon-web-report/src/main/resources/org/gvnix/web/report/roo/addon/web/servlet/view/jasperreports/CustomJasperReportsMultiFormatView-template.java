@@ -24,8 +24,8 @@ import org.springframework.web.servlet.view.jasperreports.JasperReportsMultiForm
  */
 public class CustomJasperReportsMultiFormatView extends
         JasperReportsMultiFormatView {
-    private static final String DEFAULT_FORMAT_KEY = "format";
-    private static final String DEFAULT_FILENAME_KEY = "title";
+    public static final String DEFAULT_FORMAT_KEY = "format";
+    public static final String DEFAULT_FILENAME_KEY = "title";
 
     private String formatKey = DEFAULT_FORMAT_KEY;
     private String fileNameKey = DEFAULT_FILENAME_KEY;
@@ -73,4 +73,40 @@ public class CustomJasperReportsMultiFormatView extends
 
         super.renderReport(populatedReport, model, response);
     }
+
+	/**
+	 * Gets format model key-name
+	 * 
+	 * @return the formatKey
+	 */
+	public String getFormatKey() {
+		return formatKey;
+	}
+
+	/**
+	 * Gets format model key-name
+	 * 
+	 * @param formatKey the formatKey to set
+	 */
+	public void setFormatKey(String formatKey) {
+		this.formatKey = formatKey;
+	}
+
+	/**
+	 * Gets file-name model key-name
+	 * 
+	 * @return the fileNameKey
+	 */
+	public String getFileNameKey() {
+		return fileNameKey;
+	}
+
+	/**
+	 * Gets file-name model key-name
+	 * 
+	 * @param fileNameKey the fileNameKey to set
+	 */
+	public void setFileNameKey(String fileNameKey) {
+		this.fileNameKey = fileNameKey;
+	}
 }
