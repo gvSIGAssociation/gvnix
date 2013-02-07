@@ -174,6 +174,12 @@
 			<groupId>uk.co.badgersinfoil.metaas</groupId>
 			<artifactId>metaas</artifactId>
 			<version>0.8</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.antlr</groupId>
+					<artifactId>stringtemplate</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
@@ -183,13 +189,11 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<version>1.8.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -210,6 +214,12 @@
 			<version>1.2.16</version>
 			<scope>test</scope>
 		</dependency>
+	    <dependency>
+	      	<groupId>commons-logging</groupId>
+	      	<artifactId>commons-logging</artifactId>
+	      	<version>1.1.1</version>
+	      	<scope>test</scope>
+	    </dependency>   
 	</dependencies>
 
 	<build>
@@ -281,7 +291,7 @@
 						<id>compile</id>
 						<phase>compile</phase>
 						<configuration>
-							<tasks>
+							<target>
 								<property name="line.separator" value="${line.separator}" />
 								<echo append="false" file="${basedir}/setup.bat">@set
 									ROO_ADDON_CLASSPATH_FILE="${project.build.directory}\roo_classpath.txt"</echo>
@@ -297,7 +307,7 @@
 								<echo append="false" file="${project.build.directory}/roo_classpath.txt">${the_cp}</echo>
 								<echo
 									message="Cached Roo add-on classpath file '${project.build.directory}/roo_classpath.txt'" />
-							</tasks>
+							</target>
 						</configuration>
 						<goals>
 							<goal>run</goal>
@@ -464,6 +474,13 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+          <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+          <artifactId>maven-java-formatter-plugin</artifactId>
+          <configuration>
+              <configFile>../../roo/deployment-support/eclipse-formatter-config.xml</configFile>
+          </configuration>
       </plugin>
 		</plugins>
 	</build>

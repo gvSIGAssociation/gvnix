@@ -37,6 +37,7 @@
 
 	<properties>
 		<roo.version>1.2.4.BUILD-SNAPSHOT</roo.version>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <google.code.project.name>gvnix</google.code.project.name>
         <repo.folder>org/springframework/flex/roo/annotations</repo.folder>
 	</properties>
