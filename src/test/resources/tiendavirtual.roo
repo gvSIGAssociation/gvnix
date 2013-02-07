@@ -1,9 +1,9 @@
-// Spring Roo 1.1.5.RELEASE [rev d3a68c3] log opened
+
 project --topLevelPackage org.gvnix.tiendavirtual --java 6
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 database properties list
 backup
-// script --file practica04.roo
+
 hint
 help entity jpa
 entity jpa --class ~.domain.Producto --testAutomatically
@@ -71,7 +71,7 @@ field number --fieldName cantidad --type int --notNull --min 1 --max 99 --value 
 field number --fieldName precio --type java.lang.Float --notNull
 field string --fieldName nombre
 backup
-// script --file practica05.roo
+
 hint
 hint controllers
 help controller
@@ -94,7 +94,7 @@ finder list --class ~.domain.Pedido --depth 2 --filter Estado
 finder list --class ~.domain.Pedido --depth 3 --filter findPedidoesByTotalGreaterThanEqualsAndEstado
 finder add --finderName findPedidoesByTotalGreaterThanEqualsAndEstadoAndMetodoPago --class ~.domain.Pedido
 backup
-// script --file practica06.roo
+
 perform tests
 selenium test --controller ~.web.CategoriaController
 selenium test --controller ~.web.ClienteController
@@ -102,25 +102,23 @@ selenium test --controller ~.web.LineaPedidoController
 selenium test --controller ~.web.PedidoController
 selenium test --controller ~.web.ProductoController
 backup
-// script --file practica07.roo
-//help theme
-//theme list
-//theme install --id gvnix
-//theme list
-//theme install --id cit
-//theme list
-//backup
-// script --file practica08.1.roo
-// La práctica anterior se comenta porque no se mantiene para las siguientes prácticas.
+
+help theme
+theme list
+theme install --id gvnix
+theme list
+theme install --id cit
+theme list
+theme set --id cit
+theme list
+
 web mvc pattern master --class ~.web.PedidoController --name pedido --type register
 web mvc pattern detail --class ~.web.PedidoController --name pedido --field lineasPedido --type tabular
-//quit
-// Se debe reiniciar la consola para aplicar los cambios introducidos por el patrón detalle.
 web mvc pattern master --class ~.web.ProductoController --name ficha --type register
 web mvc pattern master --class ~.web.ProductoController --name productos --type tabular
 web mvc pattern master --class ~.web.ClienteController --name clientes --type tabular
 backup
-// script --file practica08.2.roo
+
 help menu
 help menu setup
 menu setup
@@ -146,16 +144,14 @@ menu tree
 menu entry visibility --id c_view --hidden true
 menu entry info --id c_view
 backup
-// script --file practica09.roo
+
 help occ checksum
 help occ checksum set
 occ checksum set --entity ~.domain.Pedido
 help occ checksum all
 occ checksum all
-//quit
-// Salimos de la consola para corregir los errores de compilación de los ITDs y para que se apliquen algunos cambios en las vistas
 backup
-// script --file practica10.roo
+
 help web mvc dialog
 help web mvc dialog setup
 web mvc dialog setup
@@ -166,24 +162,21 @@ web mvc dialog exception set language --exception java.lang.Exception --title "E
 web mvc dialog exception set language --exception java.lang.Exception --title "Error" --description "S'ha produit un error desconegut." --language ca
 help web mvc dialog add
 web mvc dialog add --class ~.web.PedidoController --name orderinstructions
-//quit
-// Reiniciamos la consola para que se apliquen cambios en los controladores.
 backup
-// script --file practica11.roo
+
 help web mvc install language
 web mvc install language --code es
 web mvc install language --code ca
 web mvc install language --code de
 backup
-// script --file practica12.roo
+
 help web report
 help web report setup
 web report setup
 help web report add
 web report add --controller ~.web.PedidoController --reportName informepedidos --format pdf,xls,html,csv
 web report add --controller ~.web.PedidoController --reportName pedidoreport
-// Creamos el subreport con iReports y lo añadimos al report generado por el comando anterior
 menu entry visibility --id i_pedido_pedidoreport_report --hidden true
+
 perform eclipse
 backup
-// script --file practica13.roo
