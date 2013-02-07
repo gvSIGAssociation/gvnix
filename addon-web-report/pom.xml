@@ -43,74 +43,37 @@
   <description>JasperReport support for Spring MVC based projects. With JasperReport support you give to the project the feature of create reports in several output formats</description>
   <url>http://www.gvnix.org</url>
 
-  <!-- DiSiD: Add gvnix version from parent pom and google code project name and repo folder values -->
-  <properties>
-    <gvnix.version>${project.parent.version}</gvnix.version>
-    <google.code.project.name>gvnix</google.code.project.name>
-    <repo.folder>org/gvnix/web/report/roo/addon</repo.folder>
-  </properties>
-  
   <dependencies>
-  
+
+    <!-- OSGi -->
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.shell</artifactId>
-      <version>1.4.2</version>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
     </dependency>
-    
-    <!-- Spring Roo modules -->
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.metadata</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.process.manager</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.project</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.support</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.shell</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.bootstrap</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.classpath</artifactId>
-    </dependency>
-    
-    <!-- Spring Roo add-ons -->
+
+    <!-- Roo -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.addon.web.mvc.jsp</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.propfiles</artifactId>
-    </dependency>
 
-    <!-- DiSiD: gvNIX modules required by this addon -->
+    <!-- gvNIX -->
     <dependency>
       <groupId>org.gvnix</groupId>
       <artifactId>org.gvnix.support</artifactId>
       <version>${gvnix.version}</version>
-      <scope>provided</scope>
-      <type>bundle</type>
     </dependency>
+    
   </dependencies>
   
   <!-- DiSiD: Add google code distribution management -->
@@ -122,12 +85,13 @@
   </distributionManagement>
 
   <build>
+  
     <!-- DiSiD: Add webdav extension to google code  -->
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav-jackrabbit</artifactId>
-        <version>1.0-beta-6</version>
+        <version>2.3</version>
       </extension>
     </extensions>
 
@@ -136,7 +100,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.1</version>
+        <version>2.6</version>
         <executions>
           <execution>
             <id>unpack</id>
@@ -163,6 +127,7 @@
       </plugin>
     </plugins>
 
+	<!-- DiSiD: Add build resources filtering -->
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -181,4 +146,11 @@
     </resources>
   </build>
 
+  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
+  <properties>
+    <gvnix.version>${project.parent.version}</gvnix.version>
+    <google.code.project.name>gvnix</google.code.project.name>
+    <repo.folder>org/gvnix/web/report/roo/addon</repo.folder>
+  </properties>
+  
 </project>

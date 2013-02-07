@@ -34,7 +34,6 @@
     <version>1.1.0</version>
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
-
   <artifactId>org.gvnix.web.screen.roo.addon</artifactId>
   <packaging>bundle</packaging>
   <name>gvNIX - Spring Roo - Addon - Web MVC Screen Patterns</name>
@@ -43,91 +42,62 @@
   </organization>
   <description>MVC screen patterns management for Spring MVC based web layer. An screen pattern is ... TBC http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns</description>
   <url>http://www.gvnix.org</url>
-  <dependencies>
   
-    <!-- Spring Roo modules -->
+  <dependencies>
+
+    <!-- OSGi -->
     <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.metadata</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.process.manager</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.project</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.support</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.shell</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.bootstrap</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.classpath</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     
-    <!-- Spring Roo add-ons -->
+    <!-- Apache Felix -->
     <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.web.mvc.jsp</artifactId>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.propfiles</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.web.mvc.controller</artifactId>
-    </dependency>
+
+    <!-- Roo -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.addon.web.selenium</artifactId>
       <version>${roo.version}</version>
     </dependency>
 
-    <!-- gvNIX add-ons -->
+    <!-- gvNIX -->
     <dependency>
       <groupId>org.gvnix</groupId>
       <artifactId>org.gvnix.web.i18n.roo.addon</artifactId>
       <version>${gvnix.version}</version>
-      <scope>provided</scope>
     </dependency>
-
-    <!-- DiSiD: gvNIX modules required by this addon -->
     <dependency>
       <groupId>org.gvnix</groupId>
       <artifactId>org.gvnix.support</artifactId>
       <version>${gvnix.version}</version>
-      <scope>provided</scope>
-      <type>bundle</type>
     </dependency>
 
   </dependencies>
+  
+  <!-- DiSiD: Add google code distribution management -->
   <distributionManagement>
     <repository>
       <id>Google Code</id>
       <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
     </repository>
   </distributionManagement>
+  
   <build>
+  
+    <!-- DiSiD: Add webdav extension to google code  -->
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav-jackrabbit</artifactId>
-        <version>1.0-beta-6</version>
+        <version>2.3</version>
       </extension>
     </extensions>
 
@@ -136,7 +106,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.1</version>
+        <version>2.6</version>
         <executions>
           <execution>
             <id>unpack</id>
@@ -163,6 +133,7 @@
       </plugin>
     </plugins>
 
+	<!-- DiSiD: Add build resources filtering -->
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -181,10 +152,11 @@
     </resources>
   </build>
 
-  <!-- DiSiD: Add gvnix version from parent pom and google code project name and repo folder values -->
+  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/web/screen/roo/addon</repo.folder>
   </properties>
+  
 </project>

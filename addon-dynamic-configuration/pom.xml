@@ -34,10 +34,8 @@
     <version>1.1.0</version>
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
-
   <artifactId>org.gvnix.dynamic.configuration.roo.addon</artifactId>
   <packaging>bundle</packaging>
-
   <name>gvNIX - Spring Roo - Addon - Dynamic Configuration</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
@@ -47,52 +45,23 @@
 
   <dependencies>
 
-    <!-- Spring Roo modules -->
-    <!-- DiSiD: No version or type; there are defined on parent pom -->
+    <!-- OSGi -->
     <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.metadata</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.process.manager</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.project</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.support</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.shell</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.bootstrap</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.classpath</artifactId>
-    </dependency>
-
-    <!-- DiSiD: Additional Spring Roo modules required by this addon -->
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.web.mvc.controller</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     
-    <!-- DiSiD: gvNIX modules required by this addon -->
+    <!-- Apache Felix -->
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
+    </dependency>
+
+    <!-- gvNIX -->
     <dependency>
       <groupId>org.gvnix</groupId>
       <artifactId>org.gvnix.support</artifactId>
@@ -101,31 +70,6 @@
       <type>bundle</type>
     </dependency>
 
-    <!-- DiSiD: Unit Test dependencies -->
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <version>3.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <version>${spring.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>${spring.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1.1</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <!-- DiSiD: Add google code distribution management -->
@@ -136,7 +80,6 @@
     </repository>
   </distributionManagement>
 
-  <!-- DiSiD: Add build resources filtering -->
   <build>
 
     <!-- DiSiD: Add webdav extension to google code  -->
@@ -144,16 +87,16 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav-jackrabbit</artifactId>
-        <version>1.0-beta-6</version>
+        <version>2.3</version>
       </extension>
     </extensions>
     
     <plugins>
-      <!-- Copy gvNIX common support module classes to this module -->
+      <!-- DiSiD: Copy gvNIX common support module classes to this module -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.1</version>
+        <version>2.6</version>
         <executions>
           <execution>
             <id>unpack</id>
@@ -168,7 +111,7 @@
                   <artifactId>org.gvnix.support</artifactId>
                   <version>${gvnix.version}</version>
                   <overWrite>false</overWrite>
-                  <includes>**/*.class</includes>
+                  <includes>**/*.class,**/*.java-template</includes>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>${project.build.outputDirectory}</outputDirectory>
@@ -182,7 +125,7 @@
     
   </build>
 
-  <!-- DiSiD: Add gvnix version from parent pom and google code project name and repo folder values -->
+  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>

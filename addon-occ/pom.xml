@@ -23,24 +23,19 @@
       GNU General Public License for more details.
 
       You should have received a copy of the GNU General Public License
-      along with this program.  If not, see <http://www.gnu.org/licenses />.
+      along with this program. If not, see <http://www.gnu.org/licenses />.
       ]]>
       </comments>
     </license>
   </licenses>
-
-  <!-- DiSiD: Add parent pom reference -->
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
     <version>1.1.0</version>
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
-  
   <artifactId>org.gvnix.occ.roo.addon</artifactId>
   <packaging>bundle</packaging>
-  
-  <!-- DiSiD: Add organization name, license and url -->
   <name>gvNIX - Spring Roo - Addon - Optimistic Concurrency Control</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
@@ -48,64 +43,29 @@
   <description>JPA Optimistic Control for Spring Roo. For those applications that starts with an unmodifiable schema and the tables don't have the column 'version' for concurrency control.</description>
   <url>http://www.gvnix.org</url>
   
-  <!-- DiSiD: Add google code project name and repo folder values -->
-  <properties>
-    <gvnix.version>${project.parent.version}</gvnix.version>
-    <google.code.project.name>gvnix</google.code.project.name>
-    <repo.folder>org/gvnix/occ/roo/addon</repo.folder>
-  </properties>
-
-
   <dependencies>
 
-    <!-- Spring Roo modules -->
-    <!-- DiSiD: No version or type; there are defined on parent pom -->
+    <!-- OSGi -->
     <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.metadata</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.process.manager</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.project</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.support</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.shell</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.bootstrap</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.classpath</artifactId>
-    </dependency>
-
-    <!-- DiSiD: Additional Spring Roo modules required by this addon -->
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.jpa</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     
-    <!-- DiSiD: gvNIX modules required by this addon -->
+    <!-- Apache Felix -->
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
+    </dependency>
+
+    <!-- gvNIX -->
     <dependency>
       <groupId>org.gvnix</groupId>
       <artifactId>org.gvnix.support</artifactId>
       <version>${gvnix.version}</version>
-      <scope>provided</scope>
-      <type>bundle</type>
     </dependency>
 
   </dependencies>
@@ -125,16 +85,16 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav-jackrabbit</artifactId>
-        <version>1.0-beta-6</version>
+        <version>2.3</version>
       </extension>
     </extensions>
 
     <plugins>
-      <!-- Copy gvNIX common support module classes to this module -->
+      <!-- DiSiD: Copy gvNIX common support module classes to this module -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.1</version>
+        <version>2.6</version>
         <executions>
           <execution>
             <id>unpack</id>
@@ -161,6 +121,7 @@
       </plugin>
     </plugins>
 
+	<!-- DiSiD: Add build resources filtering -->
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -179,5 +140,12 @@
     </resources>
 
   </build>
+
+  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
+  <properties>
+    <gvnix.version>${project.parent.version}</gvnix.version>
+    <google.code.project.name>gvnix</google.code.project.name>
+    <repo.folder>org/gvnix/occ/roo/addon</repo.folder>
+  </properties>
 
 </project>

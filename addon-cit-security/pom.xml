@@ -43,94 +43,37 @@
   <description>Spring Security settings for applications developed at Conselleria d'Infraestructures i Transport only</description>
   <url>http://www.gvnix.org</url>
   
-  <properties>
-    <gvnix.version>${project.parent.version}</gvnix.version>
-    <google.code.project.name>gvnix</google.code.project.name>
-    <repo.folder>org/gvnix/cit/security/roo/addon</repo.folder>
-  </properties>
-  
   <dependencies>
+
+    <!-- OSGi -->
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.shell</artifactId>
-      <version>1.4.2</version>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
     </dependency>
-    <!-- Spring Roo modules -->
+
+    <!-- Roo -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.metadata</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
+      <artifactId>org.springframework.roo.addon.security</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.process.manager</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.project</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.support</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.shell</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.bootstrap</artifactId>
-      <version>${roo.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.model</artifactId>
-      <version>${roo.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.classpath</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-        <dependency>
-        <groupId>org.springframework.roo</groupId>
-        <artifactId>org.springframework.roo.addon.security</artifactId>
-        <version>${roo.version}</version>
-        <type>bundle</type>
-    </dependency>
-    <!-- Spring Roo add-ons -->
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.web.mvc.jsp</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.propfiles</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <!-- gvNIX Roo add-ons -->
+    
+    <!-- gvNIX -->
     <dependency>
       <groupId>org.gvnix</groupId>
       <artifactId>org.gvnix.dynamic.configuration.roo.addon</artifactId>
       <version>${gvnix.version}</version>
-      <type>bundle</type>
     </dependency>
+    
   </dependencies>
   
   <!-- DiSiD: Add google code distribution management -->
@@ -148,10 +91,17 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav-jackrabbit</artifactId>
-        <version>1.0-beta-6</version>
+        <version>2.3</version>
       </extension>
     </extensions>
     
   </build>
 
+  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
+  <properties>
+    <gvnix.version>${project.parent.version}</gvnix.version>
+    <google.code.project.name>gvnix</google.code.project.name>
+    <repo.folder>org/gvnix/cit/security/roo/addon</repo.folder>
+  </properties>
+  
 </project>

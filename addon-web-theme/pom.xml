@@ -5,6 +5,7 @@
     <license>
       <name>&gt;GNU General Public License (GPL), Version 3.0</name>
       <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <distribution>repo</distribution>
       <comments>
       <![CDATA[
       gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
@@ -36,91 +37,36 @@
   <artifactId>org.gvnix.web.theme.roo.addon</artifactId>
   <packaging>bundle</packaging>
   <name>gvNIX - Spring Roo - Addon - Web MVC Theme Management</name>
-
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
   <description>Theme management for Spring MVC based web layer. A Theme is a set of JSP, TAG, CSS, etc that give you the ability to chage application aspect without changing business logic.</description>
   <url>http://www.gvnix.org</url>
   
-  <properties>
-    <gvnix.version>${project.parent.version}</gvnix.version>
-    <google.code.project.name>gvnix</google.code.project.name>
-    <repo.folder>org/gvnix/web/theme/roo/addon</repo.folder>
-  </properties>
-
   <dependencies>
   
+    <!-- OSGi -->
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.shell</artifactId>
-      <version>1.4.2</version>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
     </dependency>
-    
-    <!-- Spring Roo modules -->
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.metadata</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.process.manager</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.project</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.support</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.shell</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.bootstrap</artifactId>
-      <version>${roo.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.model</artifactId>
-      <version>${roo.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.classpath</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
-    
-    <!-- Spring Roo add-ons -->
+
+    <!-- Roo -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.addon.web.mvc.jsp</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.propfiles</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
-    </dependency>
+    
   </dependencies>
   
   <!-- DiSiD: Add google code distribution management -->
@@ -138,10 +84,11 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav-jackrabbit</artifactId>
-        <version>1.0-beta-6</version>
+        <version>2.3</version>
       </extension>
     </extensions>
   
+	<!-- DiSiD: Add build resources filtering -->
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -159,4 +106,12 @@
       </resource>
     </resources>
   </build>
+
+  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
+  <properties>
+    <gvnix.version>${project.parent.version}</gvnix.version>
+    <google.code.project.name>gvnix</google.code.project.name>
+    <repo.folder>org/gvnix/web/theme/roo/addon</repo.folder>
+  </properties>
+
 </project>
