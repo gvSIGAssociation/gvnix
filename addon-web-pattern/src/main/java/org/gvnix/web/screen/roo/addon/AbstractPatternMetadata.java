@@ -546,8 +546,8 @@ public abstract class AbstractPatternMetadata extends
 
         if (fmb == null) {
             fmb = new FieldMetadataBuilder(getId(), Modifier.PRIVATE
-                    | Modifier.STATIC, fieldName, stringArray, "{ ".concat(
-                    definedPatternIds).concat(" }"));
+                    | Modifier.STATIC | Modifier.FINAL, fieldName, stringArray,
+                    "{ ".concat(definedPatternIds).concat(" }"));
         }
 
         field = fmb.build();
