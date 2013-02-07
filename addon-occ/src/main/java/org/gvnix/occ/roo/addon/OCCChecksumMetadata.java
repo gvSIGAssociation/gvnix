@@ -513,16 +513,16 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         // unique name (it's not really a fatal situation at the end of the day)
         StringBuilder fieldNameBuilder = new StringBuilder();
         JavaSymbolName checksumField = null;
+        // Compute the required field name
         while (true) {
-            // Compute the required field name
-            fieldNameBuilder.append('_');
-
             checksumField = new JavaSymbolName(fieldNameBuilder.toString()
                     .concat(this.fieldName));
             if (MemberFindingUtils.getField(governorTypeDetails, checksumField) == null) {
                 // Found a usable field name
                 break;
             }
+
+            fieldNameBuilder.append('_');
         }
 
         // We're creating one
