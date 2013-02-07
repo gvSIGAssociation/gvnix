@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
@@ -79,10 +79,8 @@ public class ServicesImpl implements Services {
     /**
      * Get named configuration components.
      * 
-     * @param <T>
-     *            Components type
-     * @param name
-     *            Components name
+     * @param <T> Components type
+     * @param name Components name
      * @return Components
      */
     @SuppressWarnings("unchecked")
@@ -127,17 +125,20 @@ public class ServicesImpl implements Services {
                 DynComponent dynComp = new DynComponent(c.getName(), name,
                         dynProps);
                 dynConf.addComponent(dynComp);
-            } catch (NoSuchMethodException nsme) {
+            }
+            catch (NoSuchMethodException nsme) {
 
                 logger.log(Level.SEVERE,
                         "No read method on dynamic configuration class", nsme);
-            } catch (InvocationTargetException ite) {
+            }
+            catch (InvocationTargetException ite) {
 
                 logger.log(
                         Level.SEVERE,
                         "Cannot invoke read method on dynamic configuration class",
                         ite);
-            } catch (IllegalAccessException iae) {
+            }
+            catch (IllegalAccessException iae) {
 
                 logger.log(
                         Level.SEVERE,
@@ -167,19 +168,22 @@ public class ServicesImpl implements Services {
                     Method m = c.getMethod("getFilePath", new Class[0]);
                     path = (String) m.invoke(o, new Object[0]);
 
-                } catch (NoSuchMethodException nsme) {
+                }
+                catch (NoSuchMethodException nsme) {
 
                     logger.log(
                             Level.SEVERE,
                             "No get file path method on dynamic configuration class",
                             nsme);
-                } catch (InvocationTargetException ite) {
+                }
+                catch (InvocationTargetException ite) {
 
                     logger.log(
                             Level.SEVERE,
                             "Cannot invoke get file path method on dynamic configuration class",
                             ite);
-                } catch (IllegalAccessException iae) {
+                }
+                catch (IllegalAccessException iae) {
 
                     logger.log(
                             Level.SEVERE,
@@ -263,17 +267,20 @@ public class ServicesImpl implements Services {
                         m.invoke(o, args);
                     }
                 }
-            } catch (NoSuchMethodException nsme) {
+            }
+            catch (NoSuchMethodException nsme) {
 
                 logger.log(Level.SEVERE,
                         "No write method on dynamic configuration class", nsme);
-            } catch (InvocationTargetException ite) {
+            }
+            catch (InvocationTargetException ite) {
 
                 logger.log(
                         Level.SEVERE,
                         "Cannot invoke write method on dynamic configuration class",
                         ite);
-            } catch (IllegalAccessException iae) {
+            }
+            catch (IllegalAccessException iae) {
 
                 logger.log(
                         Level.SEVERE,

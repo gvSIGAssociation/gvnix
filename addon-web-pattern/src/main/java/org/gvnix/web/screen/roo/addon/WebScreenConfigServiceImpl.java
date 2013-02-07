@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.screen.roo.addon;
 
@@ -58,12 +58,9 @@ import org.w3c.dom.Element;
 @Service
 public class WebScreenConfigServiceImpl implements WebScreenConfigService {
 
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private MetadataService metadataService;
+    @Reference private FileManager fileManager;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private MetadataService metadataService;
 
     private ComponentContext context;
 
@@ -75,7 +72,7 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
 
     /** {@inheritDoc} */
     public void setup() {
-    	Validate.isTrue(isSpringMvcProject(),
+        Validate.isTrue(isSpringMvcProject(),
                 "Project must be Spring MVC project");
         Element configuration = XmlUtils.getConfiguration(getClass());
 
@@ -105,7 +102,8 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
         // resolve path for spring-mvc.xml if it hasn't been resolved yet
         if (springMvcConfigFile == null) {
             springMvcConfigFile = projectOperations.getPathResolver()
-                    .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                    .getIdentifier(
+                            LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                             "WEB-INF/spring/webmvc-config.xml");
         }
         return springMvcConfigFile;
@@ -118,9 +116,10 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
 
     public String getPatternTagsFolder() {
         if (patternTagsFolder == null) {
-            patternTagsFolder = projectOperations
-                    .getPathResolver()
-                    .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/tags/pattern");
+            patternTagsFolder = projectOperations.getPathResolver()
+                    .getIdentifier(
+                            LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                            "WEB-INF/tags/pattern");
         }
         return patternTagsFolder;
     }
@@ -132,8 +131,7 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
     /**
      * Add addon repository and dependency to get annotations.
      * 
-     * @param configuration
-     *            Configuration element
+     * @param configuration Configuration element
      */
     private void addAnnotations(Element configuration) {
 
@@ -144,7 +142,8 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
 
-            projectOperations.addRepository(projectOperations.getFocusedModuleName(), new Repository(repo));
+            projectOperations.addRepository(projectOperations
+                    .getFocusedModuleName(), new Repository(repo));
         }
 
         List<Element> depens = XmlUtils.findElements(
@@ -165,7 +164,8 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
                 "/configuration/gvnix/jasperReports/plugins/plugin",
                 configuration);
         for (Element pluginElement : jasperReportsPlugins) {
-            projectOperations.addBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(pluginElement));
+            projectOperations.addBuildPlugin(projectOperations
+                    .getFocusedModuleName(), new Plugin(pluginElement));
         }
     }
 
@@ -173,16 +173,14 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
      * This method will copy the contents of a directory to another if the
      * resource does not already exist in the target directory
      * 
-     * @param sourceAntPath
-     *            the source path
-     * @param targetDirectory
-     *            the target directory
+     * @param sourceAntPath the source path
+     * @param targetDirectory the target directory
      */
     @SuppressWarnings("unused")
     private void copyDirectoryContents(String sourceAntPath,
             String targetDirectory) {
-    	StringUtils.isNotBlank(sourceAntPath);
-    	StringUtils.isNotBlank(targetDirectory);
+        StringUtils.isNotBlank(sourceAntPath);
+        StringUtils.isNotBlank(targetDirectory);
 
         if (!targetDirectory.endsWith("/")) {
             targetDirectory = targetDirectory.concat("/");
@@ -206,15 +204,17 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
                     InputStream inputStream = null;
                     OutputStream outputStream = null;
                     try {
-                    	inputStream = url.openStream();
-    	                outputStream = fileManager.createFile(targetDirectory + fileName).getOutputStream();
-    	                IOUtils.copy(inputStream, outputStream);
+                        inputStream = url.openStream();
+                        outputStream = fileManager.createFile(
+                                targetDirectory + fileName).getOutputStream();
+                        IOUtils.copy(inputStream, outputStream);
                     }
                     finally {
-                    	IOUtils.closeQuietly(inputStream);
-                    	IOUtils.closeQuietly(outputStream);
+                        IOUtils.closeQuietly(inputStream);
+                        IOUtils.closeQuietly(outputStream);
                     }
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     throw new IllegalStateException(
                             "Encountered an error during copying of resources for MVC JSP addon.",
                             e);

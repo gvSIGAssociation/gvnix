@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.exception.handler.roo.addon;
 
@@ -100,28 +100,19 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
     private static final JavaType MODAL_DIALOGS = new JavaType(
             GvNIXModalDialogs.class.getName());
-    
+
     private static Logger LOGGER = HandlerUtils
             .getLogger(WebModalDialogOperationsImpl.class);
 
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private TypeLocationService typeLocationService;
-    @Reference
-    private PathResolver pathResolver;
-    @Reference
-    private WebExceptionHandlerOperations exceptionOperations;
-    @Reference
-    private I18nSupport i18nSupport;
-    @Reference
-    private PropFileOperations propFileOperations;
-    @Reference
-    private TypeManagementService typeManagementService;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private FileManager fileManager;
+    @Reference private MetadataService metadataService;
+    @Reference private TypeLocationService typeLocationService;
+    @Reference private PathResolver pathResolver;
+    @Reference private WebExceptionHandlerOperations exceptionOperations;
+    @Reference private I18nSupport i18nSupport;
+    @Reference private PropFileOperations propFileOperations;
+    @Reference private TypeManagementService typeManagementService;
 
     private ComponentContext context;
 
@@ -136,7 +127,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
-        return OperationUtils.isProjectAvailable(metadataService, projectOperations)
+        return OperationUtils.isProjectAvailable(metadataService,
+                projectOperations)
                 && OperationUtils.isSpringMvcProject(metadataService,
                         fileManager, projectOperations);
     }
@@ -175,8 +167,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
      * value name if informed
      * 
      * @param controllerClass
-     * @param name
-     *            name of the modal dialog. May be null.
+     * @param name name of the modal dialog. May be null.
      */
     private void annotateWithModalDialog(JavaType controllerClass,
             JavaSymbolName name) {
@@ -184,12 +175,15 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
         // Get mutableTypeDetails from controllerClass. Also checks javaType is
         // a controller
-        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService.getTypeDetails(controllerClass);
+        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+                .getTypeDetails(controllerClass);
         // Test if has the @Controller
-        Validate.notNull(MemberFindingUtils.getAnnotationOfType(controllerDetails
-                .getAnnotations(), new JavaType(
-                "org.springframework.stereotype.Controller")), controllerClass
-                .getSimpleTypeName().concat(" has not @Controller annotation"));
+        Validate.notNull(
+                MemberFindingUtils.getAnnotationOfType(controllerDetails
+                        .getAnnotations(), new JavaType(
+                        "org.springframework.stereotype.Controller")),
+                controllerClass.getSimpleTypeName().concat(
+                        " has not @Controller annotation"));
 
         // Test if the annotation already exists on the target type
         AnnotationMetadata annotationMetadata = MemberFindingUtils
@@ -224,12 +218,12 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
             }
             isAlreadyAnnotated = true;
         }
-        
+
         // If no changes will make (annotation exists and no name
         // must be added)
-        if (isAlreadyAnnotated && name == null){
-        	// All done
-        	return;
+        if (isAlreadyAnnotated && name == null) {
+            // All done
+            return;
         }
 
         // Prepare annotation builder
@@ -249,14 +243,17 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
                             VALUE, modalDialogsList));
         }
 
-        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(controllerDetails);
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                controllerDetails);
         if (isAlreadyAnnotated) {
-        	mutableTypeDetailsBuilder.updateTypeAnnotation(annotationBuilder.build(),
-                    new HashSet<JavaSymbolName>());
-        } else {
-        	mutableTypeDetailsBuilder.addAnnotation(annotationBuilder.build());
+            mutableTypeDetailsBuilder.updateTypeAnnotation(
+                    annotationBuilder.build(), new HashSet<JavaSymbolName>());
         }
-        typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
+        else {
+            mutableTypeDetailsBuilder.addAnnotation(annotationBuilder.build());
+        }
+        typeManagementService
+                .createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
     }
 
     /*
@@ -300,7 +297,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         List<Element> repos = XmlUtils.findElements(
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
-            projectOperations.addRepository(projectOperations.getFocusedModuleName(), new Repository(repo));
+            projectOperations.addRepository(projectOperations
+                    .getFocusedModuleName(), new Repository(repo));
         }
 
         List<Element> depens = XmlUtils.findElements(
@@ -311,7 +309,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         depens = XmlUtils.findElements(
                 "/configuration/dependencies/dependency", configuration);
         for (Element depen : depens) {
-            projectOperations.addDependency(projectOperations.getFocusedModuleName(), new Dependency(depen));
+            projectOperations.addDependency(projectOperations
+                    .getFocusedModuleName(), new Dependency(depen));
         }
     }
 
@@ -327,7 +326,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
                 ".servlet.handler");
 
         String classPath = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                 classPackage.concat(".").concat(className)
                         .replace(".", File.separator).concat(".java"));
 
@@ -340,7 +339,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
             String javaTemplate;
             try {
-                javaTemplate = IOUtils.toString(new InputStreamReader(template));
+                javaTemplate = IOUtils
+                        .toString(new InputStreamReader(template));
 
                 // Replace package definition
                 javaTemplate = StringUtils.replace(javaTemplate, "${PACKAGE}",
@@ -353,23 +353,26 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
                 mutableClass = fileManager.createFile(classPath);
                 InputStream inputStream = null;
                 OutputStream outputStream = null;
-                try { 
-	                inputStream = IOUtils.toInputStream(javaTemplate);
-	                outputStream = mutableClass.getOutputStream();
-	                IOUtils.copy(inputStream, outputStream);
+                try {
+                    inputStream = IOUtils.toInputStream(javaTemplate);
+                    outputStream = mutableClass.getOutputStream();
+                    IOUtils.copy(inputStream, outputStream);
                 }
                 finally {
-	                IOUtils.closeQuietly(inputStream);
-	                IOUtils.closeQuietly(outputStream);
+                    IOUtils.closeQuietly(inputStream);
+                    IOUtils.closeQuietly(outputStream);
                 }
-            } catch (IOException ioe) {
+            }
+            catch (IOException ioe) {
                 throw new IllegalStateException("Unable load "
                         .concat(className).concat(".java-template template"),
                         ioe);
-            } finally {
+            }
+            finally {
                 try {
                     template.close();
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     throw new IllegalStateException("Error creating ".concat(
                             className).concat(".java in project"), e);
                 }
@@ -408,11 +411,11 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
      * class. The gvNIX resolver class supports redirect calls and messages in a
      * modal dialog.
      * 
-     * @param beanClassName
-     *            the name of the new ExceptionResolver Bean
+     * @param beanClassName the name of the new ExceptionResolver Bean
      */
     private void updateExceptionResolverBean(String beanClassName) {
-        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String webXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/spring/webmvc-config.xml");
 
         if (!fileManager.exists(webXmlPath)) {
@@ -426,7 +429,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
             webXmlMutableFile = fileManager.updateFile(webXmlPath);
             webXml = XmlUtils.getDocumentBuilder().parse(
                     webXmlMutableFile.getInputStream());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(e);
         }
         Element root = webXml.getDocumentElement();
@@ -468,7 +472,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
     public void installMvcArtifacts() {
         // copy util to tags/util
         copyDirectoryContents("tags/dialog/modal/*.tagx",
-                pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                pathResolver.getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/tags/dialog/modal"));
         addMessageBoxInLayout();
 
@@ -509,7 +514,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
     private void modifyChangesControlDialogNs() {
         String changesControlTagx = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/tags/util/changes-control.tagx");
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "WEB-INF/tags/util/changes-control.tagx");
 
         if (!fileManager.exists(changesControlTagx)) {
             // tags/util/changes-control.tagx doesn't exist, so nothing to do
@@ -523,7 +529,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         try {
             changesControlTagxXml = XmlUtils.getDocumentBuilder().parse(
                     changesControlTagxIs);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IllegalStateException("Could not open default.jspx file",
                     ex);
         }
@@ -543,17 +550,15 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
      * This method will copy the contents of a directory to another if the
      * resource does not already exist in the target directory
      * 
-     * @param sourceAntPath
-     *            the source path
-     * @param targetDirectory
-     *            the target directory
+     * @param sourceAntPath the source path
+     * @param targetDirectory the target directory
      */
     private void copyDirectoryContents(String sourceAntPath,
             String targetDirectory) {
-    	Validate.notNull(sourceAntPath, "sourceAntPath required");
-    	Validate.notBlank(sourceAntPath, "sourceAntPath required");
-    	Validate.notNull(targetDirectory, "targetDirectory required");
-    	Validate.notBlank(targetDirectory, "targetDirectory required");
+        Validate.notNull(sourceAntPath, "sourceAntPath required");
+        Validate.notBlank(sourceAntPath, "sourceAntPath required");
+        Validate.notNull(targetDirectory, "targetDirectory required");
+        Validate.notBlank(targetDirectory, "targetDirectory required");
 
         if (!targetDirectory.endsWith("/")) {
             targetDirectory += "/";
@@ -576,16 +581,18 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
                 try {
                     InputStream inputStream = null;
                     OutputStream outputStream = null;
-                    try { 
-	                    inputStream = url.openStream();
-	                    outputStream = fileManager.createFile(targetDirectory + fileName).getOutputStream();
-	                    IOUtils.copy(inputStream, outputStream);
+                    try {
+                        inputStream = url.openStream();
+                        outputStream = fileManager.createFile(
+                                targetDirectory + fileName).getOutputStream();
+                        IOUtils.copy(inputStream, outputStream);
                     }
                     finally {
-	                    IOUtils.closeQuietly(inputStream);
-	                    IOUtils.closeQuietly(outputStream);
+                        IOUtils.closeQuietly(inputStream);
+                        IOUtils.closeQuietly(outputStream);
                     }
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     throw new IllegalStateException(
                             "Encountered an error during copying of resources for MVC JSP addon.",
                             e);
@@ -600,7 +607,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
      */
     private void addMessageBoxInLayout() {
         PathResolver pathResolver = projectOperations.getPathResolver();
-        String defaultJspx = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String defaultJspx = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/layouts/default.jspx");
 
         // TODO: Check if it's necessary to add message-box in home-default.jspx
@@ -616,7 +624,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         Document defaultJspxXml;
         try {
             defaultJspxXml = XmlUtils.getDocumentBuilder().parse(defulatJspxIs);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IllegalStateException("Could not open default.jspx file",
                     ex);
         }
@@ -645,9 +654,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
     /**
      * Decides if write to disk is needed (ie updated or created)<br/>
-     * Used for TAGx files
-     * 
-     * TODO: candidato a ir al módulo Support
+     * Used for TAGx files TODO: candidato a ir al módulo Support
      * 
      * @param filePath
      * @param body
@@ -670,14 +677,17 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
             String existing = null;
             try {
                 existing = IOUtils.toString(new FileReader(newFile));
-            } catch (IOException ignoreAndJustOverwriteIt) {
-            	LOGGER.finest("Problems writting ".concat(newFile.getAbsolutePath()));
+            }
+            catch (IOException ignoreAndJustOverwriteIt) {
+                LOGGER.finest("Problems writting ".concat(newFile
+                        .getAbsolutePath()));
             }
 
             if (!viewContent.equals(existing)) {
                 mutableFile = fileManager.updateFile(filePath);
             }
-        } else {
+        }
+        else {
             mutableFile = fileManager.createFile(filePath);
             Validate.notNull(mutableFile, "Could not create '" + filePath + "'");
         }
@@ -688,18 +698,19 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
                 // existing file has different contents)
                 InputStream inputStream = null;
                 OutputStream outputStream = null;
-                try { 
-	                inputStream = IOUtils.toInputStream(viewContent);
-	                outputStream = mutableFile.getOutputStream();
-	                IOUtils.copy(inputStream, outputStream);
+                try {
+                    inputStream = IOUtils.toInputStream(viewContent);
+                    outputStream = mutableFile.getOutputStream();
+                    IOUtils.copy(inputStream, outputStream);
                 }
                 finally {
-	                IOUtils.closeQuietly(inputStream);
-	                IOUtils.closeQuietly(outputStream);
+                    IOUtils.closeQuietly(inputStream);
+                    IOUtils.closeQuietly(outputStream);
                 }
                 // Return and indicate we wrote out the file
                 return true;
-            } catch (IOException ioe) {
+            }
+            catch (IOException ioe) {
                 throw new IllegalStateException("Could not output '"
                         + mutableFile.getCanonicalPath() + "'", ioe);
             }
@@ -716,7 +727,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
      * isMessageBoxOfTypeModal()
      */
     public boolean isMessageBoxOfTypeModal() {
-        String defaultJspx = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String defaultJspx = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/layouts/default.jspx");
 
         // TODO: Check if it's necessary to add message-box in home-default.jspx
@@ -732,7 +744,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         Document defaultJspxXml;
         try {
             defaultJspxXml = XmlUtils.getDocumentBuilder().parse(defulatJspxIs);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IllegalStateException("Could not open default.jspx file",
                     ex);
         }

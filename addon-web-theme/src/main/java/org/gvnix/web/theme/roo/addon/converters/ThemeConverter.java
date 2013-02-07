@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.theme.roo.addon.converters;
 
@@ -50,14 +50,12 @@ public class ThemeConverter implements Converter<Theme> {
     /**
      * Use PageOperations to execute operations
      */
-    @Reference
-    private ThemeOperations operations;
+    @Reference private ThemeOperations operations;
 
     /**
      * Check if given type can be converted by this Converter
      * 
-     * @param requiredType
-     *            Can this type be converted?
+     * @param requiredType Can this type be converted?
      * @param optionContext
      */
     public boolean supports(Class<?> requiredType, String optionContext) {
@@ -67,12 +65,9 @@ public class ThemeConverter implements Converter<Theme> {
     /**
      * Convert given ID to {@link Theme}
      * 
-     * @param value
-     *            Theme ID
-     * @param requiredType
-     *            [Not used]
-     * @param optionContext
-     *            [Not used]
+     * @param value Theme ID
+     * @param requiredType [Not used]
+     * @param optionContext [Not used]
      */
     public Theme convertFromText(String value, Class<?> requiredType,
             String optionContext) {
@@ -83,7 +78,8 @@ public class ThemeConverter implements Converter<Theme> {
         // only the installed themes, so if it occurs don't add available themes
         if (!"INSTALLED".equals(optionContext)) {
             themes.addAll(operations.getAvailableThemes());
-        } else {
+        }
+        else {
             themes.addAll(operations.getInstalledThemes());
         }
 
@@ -106,8 +102,9 @@ public class ThemeConverter implements Converter<Theme> {
      * @param target
      * @return
      */
-    public boolean getAllPossibleValues(List<Completion> completions, Class<?> requiredType,
-            String existingData, String optionContext, MethodTarget target) {
+    public boolean getAllPossibleValues(List<Completion> completions,
+            Class<?> requiredType, String existingData, String optionContext,
+            MethodTarget target) {
         List<Theme> themes = new ArrayList<Theme>();
 
         // Get all themes for generic use or only installed themes
@@ -115,7 +112,8 @@ public class ThemeConverter implements Converter<Theme> {
         // only the installed themes, so if it occurs don't add available themes
         if (!"INSTALLED".equals(optionContext)) {
             themes.addAll(operations.getAvailableThemes());
-        } else {
+        }
+        else {
             themes.addAll(operations.getInstalledThemes());
         }
 

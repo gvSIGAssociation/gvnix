@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.importt;
 
@@ -59,14 +59,11 @@ import org.w3c.dom.Element;
 @Service
 public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
-    @Reference
-    private WSConfigService wSConfigService;
+    @Reference private WSConfigService wSConfigService;
 
-    @Reference
-    private SecurityService securityService;
-    
-    @Reference
-    private ProjectOperations projectOperations;
+    @Reference private SecurityService securityService;
+
+    @Reference private ProjectOperations projectOperations;
 
     protected void activate(ComponentContext context) {
 
@@ -103,7 +100,8 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
         JavaType javaType = WSImportMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = WSImportMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = WSImportMetadata
+                .getPath(metadataIdentificationString);
         String physicalTypeIdentifier = PhysicalTypeIdentifier
                 .createIdentifier(javaType, path);
 
@@ -127,7 +125,8 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
         WSImportMetadata metadata = null;
 
         // Import service if project has required prerequisites
-        if (OperationUtils.isProjectAvailable(metadataService, projectOperations)) {
+        if (OperationUtils.isProjectAvailable(metadataService,
+                projectOperations)) {
 
             // Check if Web Service definition is correct.
             PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
@@ -140,7 +139,8 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
                 // There is a problem
                 return null;
 
-            } else {
+            }
+            else {
 
                 // We have reliable physical type details
                 governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
@@ -148,7 +148,8 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
             // Get upstreamDepency Class to check.
             AnnotationMetadata annotation = governorTypeDetails
-                    .getTypeAnnotation(new JavaType(GvNIXWebServiceProxy.class.getName()));
+                    .getTypeAnnotation(new JavaType(GvNIXWebServiceProxy.class
+                            .getName()));
 
             // Wsdl location
             StringAttributeValue url = (StringAttributeValue) annotation
@@ -167,7 +168,8 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
                     generate = wSConfigService.importService(
                             governorTypeDetails.getName(), url.getValue(),
                             WsType.IMPORT_RPC_ENCODED);
-                } else {
+                }
+                else {
 
                     // Generate service infraestructure to import the service
                     generate = wSConfigService.importService(
@@ -187,7 +189,8 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
                         aspectName, governorPhysicalTypeMetadata,
                         securityService);
 
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
 
                 throw new IllegalStateException(
                         "Error generating web service sources");

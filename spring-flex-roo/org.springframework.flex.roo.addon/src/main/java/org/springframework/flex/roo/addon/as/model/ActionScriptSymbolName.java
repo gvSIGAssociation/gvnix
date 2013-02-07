@@ -1,17 +1,17 @@
 /*
  * Copyright 2002-2010 the original author or authors.
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.springframework.flex.roo.addon.as.model;
@@ -23,15 +23,16 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * An ActionScript symbol (i.e., a field).
- *
+ * 
  * @author Jeremy Grelle
  */
-public final class ActionScriptSymbolName implements Comparable<ActionScriptSymbolName> {
+public final class ActionScriptSymbolName implements
+        Comparable<ActionScriptSymbolName> {
 
     private final String symbolName;
 
     public ActionScriptSymbolName(String symbolName) {
-    	StringUtils.isNotBlank(symbolName);
+        StringUtils.isNotBlank(symbolName);
         assertActionScriptNameLegal(symbolName);
         this.symbolName = symbolName;
     }
@@ -44,14 +45,14 @@ public final class ActionScriptSymbolName implements Comparable<ActionScriptSymb
     }
 
     /**
-     * @return the symbol name, capitalising the first letter (never null or empty)
+     * @return the symbol name, capitalising the first letter (never null or
+     *         empty)
      */
     public String getSymbolNameCapitalisedFirstLetter() {
         return StringUtils.capitalize(this.symbolName);
     }
 
     /**
-     * 
      * @return the symbol name in human readable form
      */
     public String getReadableSymbolName() {
@@ -71,12 +72,17 @@ public final class ActionScriptSymbolName implements Comparable<ActionScriptSymb
 
     @Override
     public final boolean equals(Object obj) {
-        // NB: Not using the normal convention of delegating to compareTo (for efficiency reasons)
-        return obj != null && obj instanceof ActionScriptSymbolName && this.symbolName.equals(((ActionScriptSymbolName) obj).symbolName);
+        // NB: Not using the normal convention of delegating to compareTo (for
+        // efficiency reasons)
+        return obj != null
+                && obj instanceof ActionScriptSymbolName
+                && this.symbolName
+                        .equals(((ActionScriptSymbolName) obj).symbolName);
     }
 
     public final int compareTo(ActionScriptSymbolName o) {
-        // NB: If adding more fields to this class ensure the equals(Object) method is updated accordingly
+        // NB: If adding more fields to this class ensure the equals(Object)
+        // method is updated accordingly
         if (o == null) {
             return -1;
         }

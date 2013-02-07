@@ -1,17 +1,17 @@
 /*
  * Copyright 2002-2010 the original author or authors.
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.springframework.flex.roo.addon.as.classpath.details;
@@ -27,10 +27,11 @@ import org.springframework.flex.roo.addon.as.model.ActionScriptType;
 
 /**
  * Default detail representation of an ActionScript class or interface.
- *
+ * 
  * @author Jeremy Grelle
  */
-public class DefaultASClassOrInterfaceTypeDetails implements ASClassOrInterfaceTypeDetails {
+public class DefaultASClassOrInterfaceTypeDetails implements
+        ASClassOrInterfaceTypeDetails {
 
     private final ActionScriptType name;
 
@@ -52,11 +53,13 @@ public class DefaultASClassOrInterfaceTypeDetails implements ASClassOrInterfaceT
 
     private final String declaredByMetadataId;
 
-    public DefaultASClassOrInterfaceTypeDetails(String declaredByMetadataId, ActionScriptType name, ASPhysicalTypeCategory physicalTypeCategory,
-        List<ASMetaTagMetadata> typeMetaTags) {
-    	StringUtils.isNotBlank(declaredByMetadataId);
+    public DefaultASClassOrInterfaceTypeDetails(String declaredByMetadataId,
+            ActionScriptType name, ASPhysicalTypeCategory physicalTypeCategory,
+            List<ASMetaTagMetadata> typeMetaTags) {
+        StringUtils.isNotBlank(declaredByMetadataId);
         Validate.notNull(name, "Name required");
-        Validate.notNull(physicalTypeCategory, "Physical type category required");
+        Validate.notNull(physicalTypeCategory,
+                "Physical type category required");
 
         this.declaredByMetadataId = declaredByMetadataId;
         this.name = name;
@@ -67,13 +70,19 @@ public class DefaultASClassOrInterfaceTypeDetails implements ASClassOrInterfaceT
         }
     }
 
-    public DefaultASClassOrInterfaceTypeDetails(String declaredByMetadataId, ActionScriptType name, ASPhysicalTypeCategory physicalTypeCategory,
-        List<ASFieldMetadata> declaredFields, ASConstructorMetadata declaredConstructor, List<ASMethodMetadata> declaredMethods,
-        ASClassOrInterfaceTypeDetails superClass, List<ActionScriptType> extendsTypes, List<ActionScriptType> implementsTypes,
-        List<ASMetaTagMetadata> typeMetaTags) {
-    	StringUtils.isNotBlank(declaredByMetadataId);
+    public DefaultASClassOrInterfaceTypeDetails(String declaredByMetadataId,
+            ActionScriptType name, ASPhysicalTypeCategory physicalTypeCategory,
+            List<ASFieldMetadata> declaredFields,
+            ASConstructorMetadata declaredConstructor,
+            List<ASMethodMetadata> declaredMethods,
+            ASClassOrInterfaceTypeDetails superClass,
+            List<ActionScriptType> extendsTypes,
+            List<ActionScriptType> implementsTypes,
+            List<ASMetaTagMetadata> typeMetaTags) {
+        StringUtils.isNotBlank(declaredByMetadataId);
         Validate.notNull(name, "Name required");
-        Validate.notNull(physicalTypeCategory, "Physical type category required");
+        Validate.notNull(physicalTypeCategory,
+                "Physical type category required");
 
         this.declaredByMetadataId = declaredByMetadataId;
         this.name = name;

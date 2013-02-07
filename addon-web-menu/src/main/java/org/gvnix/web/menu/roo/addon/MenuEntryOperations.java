@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.menu.roo.addon;
 
@@ -62,7 +62,7 @@ public interface MenuEntryOperations {
      *         false.
      */
     boolean isGvNixMenuAvailable();
-    
+
     /**
      * Checks if Spring Security 3.0.5.RELEASE is installed.
      * 
@@ -79,9 +79,9 @@ public interface MenuEntryOperations {
     /**
      * Create or update menu web layer artefacts.
      * 
-     * @param classesPackage
-     *            Web layer artefacts contains references to Java classes in
-     *            this package (used to create import declarations in artefacts)
+     * @param classesPackage Web layer artefacts contains references to Java
+     *            classes in this package (used to create import declarations in
+     *            artefacts)
      */
     void createWebArtefacts(String classesPackage);
 
@@ -105,8 +105,7 @@ public interface MenuEntryOperations {
      * 
      * @param menuCategoryName
      * @param menuItemId
-     * @param globalMessageCode
-     *            Code to load message from I18N properties
+     * @param globalMessageCode Code to load message from I18N properties
      * @param link
      * @param idPrefix
      * @see org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations#addMenuItem(JavaSymbolName,
@@ -137,10 +136,8 @@ public interface MenuEntryOperations {
      * 
      * @param menuCategoryName
      * @param menuItemId
-     * @param menuItemLabel
-     *            Text to be used as argument of message
-     * @param globalMessageCode
-     *            Code to load message from I18N properties
+     * @param menuItemLabel Text to be used as argument of message
+     * @param globalMessageCode Code to load message from I18N properties
      * @param link
      * @param idPrefix
      * @see org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations#addMenuItem(JavaSymbolName,
@@ -173,10 +170,8 @@ public interface MenuEntryOperations {
      * 
      * @param menuCategoryName
      * @param menuItemId
-     * @param menuItemLabel
-     *            Text to be used as argument of message
-     * @param globalMessageCode
-     *            Code to load message from I18N properties
+     * @param menuItemLabel Text to be used as argument of message
+     * @param globalMessageCode Code to load message from I18N properties
      * @param link
      * @param idPrefix
      * @param roles
@@ -195,8 +190,7 @@ public interface MenuEntryOperations {
     /**
      * Update menu config file with given contents
      * 
-     * @param doc
-     *            new contents for menu.xml
+     * @param doc new contents for menu.xml
      */
     void writeXMLConfigIfNeeded(Document doc);
 
@@ -210,10 +204,8 @@ public interface MenuEntryOperations {
     /**
      * Return a formated string that shows complete menu tree info
      * 
-     * @param pageId
-     *            menu entry identifier
-     * @param lang
-     *            Create info in this language
+     * @param pageId menu entry identifier
+     * @param lang Create info in this language
      * @return
      */
     String getFormatedInfo(JavaSymbolName pageId, I18n lang);
@@ -233,17 +225,12 @@ public interface MenuEntryOperations {
      * <p>
      * By default shows all menu entry Ids plus target URLs.
      * 
-     * @param pageId
-     *            root node of subtree to be shown. If null, show complete menu
-     *            tree
-     * @param label
-     *            show label values
-     * @param message
-     *            show message values
-     * @param roles
-     *            show roles values
-     * @param lang
-     *            show messages in this language
+     * @param pageId root node of subtree to be shown. If null, show complete
+     *            menu tree
+     * @param label show label values
+     * @param message show message values
+     * @param roles show roles values
+     * @param lang show messages in this language
      * @return
      */
     String getFormatedInfo(JavaSymbolName pageId, boolean label,
@@ -251,7 +238,6 @@ public interface MenuEntryOperations {
 
     /**
      * Move the menu entry node and its children into another node.<br/>
-     * 
      * The element will be place at the end of <code>into</code> children.
      * 
      * @param page
@@ -275,20 +261,13 @@ public interface MenuEntryOperations {
     /**
      * Update values of a menu entry.
      * 
-     * @param pageId
-     *            Current menu entry ID
-     * @param nid
-     *            New menu entry ID
-     * @param label
-     *            New text label
-     * @param messageCode
-     *            New message code
-     * @param url
-     *            New url
-     * @param roles
-     *            New rol list
-     * @param hidden
-     *            Set/Unset hidden
+     * @param pageId Current menu entry ID
+     * @param nid New menu entry ID
+     * @param label New text label
+     * @param messageCode New message code
+     * @param url New url
+     * @param roles New rol list
+     * @param hidden Set/Unset hidden
      * @param writeProps
      * @return
      */
@@ -302,9 +281,10 @@ public interface MenuEntryOperations {
      * @return the absolute path to the file (never null)
      */
     String getMenuConfigFile();
-    
+
     /**
-     * Disable OSGI Roo menu component and then OSGI gvNIX menu component will be used automatically.</p>
+     * Disable OSGI Roo menu component and then OSGI gvNIX menu component will
+     * be used automatically.</p>
      */
     public void disableRooMenuOperations();
 }

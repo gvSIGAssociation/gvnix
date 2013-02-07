@@ -18,10 +18,8 @@ import org.springframework.roo.project.ProjectOperations;
 
 public class ReportOperationsImplTests {
     private static final String WEB_MVC_CONFIG = "/org/gvnix/web/report/roo/addon/src/test/resources/webmvc-config.xml";
-    @Mock
-    private FileManager fileManager;
-    @Mock
-    private ProjectOperations projectOperations;
+    @Mock private FileManager fileManager;
+    @Mock private ProjectOperations projectOperations;
 
     @Before
     public void setUp() {
@@ -35,7 +33,8 @@ public class ReportOperationsImplTests {
         String webMvcConfig = WEB_MVC_CONFIG;
         PathResolver pathResolver = projectOperations.getPathResolver();
         when(
-                pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                pathResolver.getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "WEB-INF/spring/webmvc-config.xml")).thenReturn(
                 webMvcConfig);
         StubMutableFile webMvcConfigFile = new StubMutableFile(new File(

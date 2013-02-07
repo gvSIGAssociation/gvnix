@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws;
 
@@ -76,18 +76,12 @@ import org.w3c.dom.Node;
 @Service
 public class WSConfigServiceImpl implements WSConfigService {
 
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private SecurityService securityService;
-    @Reference
-    private AnnotationsService annotationsService;
-    @Reference
-    private MavenOperations mavenOperations;
+    @Reference private MetadataService metadataService;
+    @Reference private FileManager fileManager;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private SecurityService securityService;
+    @Reference private AnnotationsService annotationsService;
+    @Reference private MavenOperations mavenOperations;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
 
@@ -119,12 +113,10 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Install CXF configuration file if web layer exists.
-     * 
      * <p>
      * In projects without web layer, configuration file no created because is
      * referenced from web.xml and not exists.
      * </p>
-     * 
      * <p>
      * One servlet will be installed in '/services' URL to view the published
      * web services summary.
@@ -145,7 +137,6 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Returns CXF absolute configuration file path on disk.
-     * 
      * <p>
      * Creates the cxf config file using project name.
      * </p>
@@ -157,13 +148,14 @@ public class WSConfigServiceImpl implements WSConfigService {
         String relativePath = getCxfConfigRelativeFilePath();
 
         // Checks for src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
-        return projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), relativePath);
+        return projectOperations.getPathResolver()
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        relativePath);
     }
 
     /**
      * Returns CXF relative configuration file path in the project.
-     * 
      * <p>
      * Creates the cxf config file using project name.
      * </p>
@@ -184,15 +176,16 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Project metadata from project identifier
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
+                .get(ProjectMetadata.getProjectIdentifier(projectOperations
+                        .getFocusedModuleName()));
         Validate.isTrue(projectMetadata != null, "Project metadata required");
 
-        return projectOperations.getProjectName(projectOperations.getFocusedModuleName());
+        return projectOperations.getProjectName(projectOperations
+                .getFocusedModuleName());
     }
 
     /**
      * Create CXF configuration file.
-     * 
      * <p>
      * Create file src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml from
      * cxf-template.xml if not exists already.
@@ -209,9 +202,11 @@ public class WSConfigServiceImpl implements WSConfigService {
         // Create the configuration file from a template
         InputStream inputStream = null;
         OutputStream outputStream = null;
-        try { 
-            inputStream = FileUtils.getInputStream(getClass(), "cxf-template.xml");
-            outputStream = fileManager.createFile(cxfFilePath).getOutputStream();
+        try {
+            inputStream = FileUtils.getInputStream(getClass(),
+                    "cxf-template.xml");
+            outputStream = fileManager.createFile(cxfFilePath)
+                    .getOutputStream();
             IOUtils.copy(inputStream, outputStream);
         }
         catch (Exception e) {
@@ -230,15 +225,15 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * Check if all dependencies are registered in project (pom.xml).
      * 
-     * @param type
-     *            Web service type
+     * @param type Web service type
      * @return true if all dependencies are registed already
      */
     protected boolean dependenciesRegistered(WsType type) {
 
         // Get project to check installed dependencies
         ProjectMetadata project = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
+                .get(ProjectMetadata.getProjectIdentifier(projectOperations
+                        .getFocusedModuleName()));
         if (project == null) {
             return false;
         }
@@ -247,7 +242,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         for (Element dependency : getDependencies(type)) {
 
             // Some dependency not registered: all dependencies not installed
-        	Pom pom = project.getPom();
+            Pom pom = project.getPom();
             if (!pom.isDependencyRegistered(new Dependency(dependency))) {
                 return false;
             }
@@ -259,24 +254,20 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Get the file with dependencies list for certain web service type.
-     * 
      * <p>
      * Different web service type has different dependencies:
      * </p>
-     * 
      * <ul>
      * <li>Export and export from wsdl</li>
      * <li>Import</li>
      * <li>Import RPC encoded</li>
      * </ul>
-     * 
      * <p>
      * Files are stored at src/main/resources in same package as this class
      * (required).
      * </p>
      * 
-     * @param type
-     *            Web service type
+     * @param type Web service type
      * @return Dependency definition file name
      */
     protected String getDependenciesFileName(WsType type) {
@@ -304,8 +295,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * Get the dependencies list for certain web service type.
      * 
-     * @param type
-     *            Web service type
+     * @param type Web service type
      * @return List of dependencies as xml elements
      */
     protected List<Element> getDependencies(WsType type) {
@@ -313,7 +303,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         // Get the file with dependencies list
         InputStream dependencies = FileUtils.getInputStream(getClass(),
                 getDependenciesFileName(type));
-        Validate.notNull(dependencies, "Can't adquire dependencies file " + type);
+        Validate.notNull(dependencies, "Can't adquire dependencies file "
+                + type);
 
         // Find dependencies element list into file
         return XmlUtils.findElements("/dependencies/dependency",
@@ -322,13 +313,11 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Add dependencies to project (pom.xml) if not already.
-     * 
      * <p>
      * If some dependencies are not installed, will be installed.
      * </p>
      * 
-     * @param type
-     *            Web service type
+     * @param type Web service type
      */
     private void addDependencies(WsType type) {
 
@@ -339,28 +328,25 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Get all dependencies and add them to project (pom.xml)
         for (Element dependency : getDependencies(type)) {
-            projectOperations.addDependency(projectOperations.getFocusedModuleName(), new Dependency(dependency));
+            projectOperations.addDependency(projectOperations
+                    .getFocusedModuleName(), new Dependency(dependency));
         }
     }
 
     /**
      * Add or update library version properties into project (pom.xml).
-     * 
      * <p>
      * If newer version property, version will be updated.
      * </p>
-     * 
      * <p>
      * Different web service type has different properties:
      * </p>
-     * 
      * <ul>
      * <li>Import, export and export from wsdl: CXF version property</li>
      * <li>Import RPC encoded: Axis version property</li>
      * </ul>
      * 
-     * @param type
-     *            Web service type
+     * @param type Web service type
      */
     protected boolean addProperties(WsType type) {
 
@@ -374,10 +360,9 @@ public class WSConfigServiceImpl implements WSConfigService {
         case EXPORT:
         case EXPORT_WSDL:
 
-            properties = XmlUtils
-                    .findElements("/configuration/gvnix/properties/*",
-                            XmlUtils.getRootElement(this.getClass(),
-                                    "properties.xml"));
+            properties = XmlUtils.findElements(
+                    "/configuration/gvnix/properties/*",
+                    XmlUtils.getRootElement(this.getClass(), "properties.xml"));
             break;
 
         // Import RPC encoded properties (Axis version)
@@ -397,13 +382,11 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Update web configuration file (web.xml) with CXF configuration.
-     * 
      * <ul>
      * <li>Add the CXF servlet declaration and mapping with '/services/*' URL to
      * access published web services. All added before forst servlet mapping</li>
      * <li>Configure Spring context to load cxf configuration file</li>
      * </ul>
-     * 
      * <p>
      * If already installed cxf declaration, nothing to do.
      * </p>
@@ -449,8 +432,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * Get CXF servlet definition element.
      * 
-     * @param web
-     *            Document representation of web.xml
+     * @param web Document representation of web.xml
      * @return Element representation of CXF servlet definition
      */
     private Element getServletDefinition(Document web) {
@@ -474,8 +456,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * Get CXF servlet mapping element.
      * 
-     * @param web
-     *            Document representation of web.xml
+     * @param web Document representation of web.xml
      * @return Element representation of CXF servlet mapping
      */
     private Element getServletMapping(Document web) {
@@ -498,13 +479,11 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Get the XML document representation of a input stream.
-     * 
      * <p>
      * IllegalStateException if error parsing input stream.
      * </p>
      * 
-     * @param input
-     *            Input stream to parse
+     * @param input Input stream to parse
      * @return XML document representation of input stream
      */
     protected Document getInputDocument(InputStream input) {
@@ -513,7 +492,8 @@ public class WSConfigServiceImpl implements WSConfigService {
 
             return XmlUtils.getDocumentBuilder().parse(input);
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
 
             throw new IllegalStateException(e);
         }
@@ -527,7 +507,8 @@ public class WSConfigServiceImpl implements WSConfigService {
     protected String getWebConfigFilePath() {
 
         return projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/web.xml");
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "WEB-INF/web.xml");
     }
 
     /**
@@ -552,10 +533,9 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * Updates web services configuration file.
      * 
-     * @param className
-     *            to export.
-     * @param annotationMetadata
-     *            values from web service class to set in configuration file.
+     * @param className to export.
+     * @param annotationMetadata values from web service class to set in
+     *            configuration file.
      * @return true if annotation from className has to be updated because of
      *         changes in package or class name.
      */
@@ -584,7 +564,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) annotationMetadata
                 .getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
 
-        Validate.notNull(fullyQualifiedTypeName,
+        Validate.notNull(
+                fullyQualifiedTypeName,
                 "Annotation attribute 'fullyQualifiedTypeName' in "
                         + className.getFullyQualifiedTypeName()
                         + "' must be defined.");
@@ -604,12 +585,11 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         String cxfXmlPath = getCxfConfigAbsoluteFilePath();
 
-        
         boolean updateFullyQualifiedTypeName = false;
         // Check if class name and annotation class name are different.
-        if (fullyQualifiedTypeName != null &&
-        		!className.getFullyQualifiedTypeName().contentEquals(
-                fullyQualifiedTypeName.getValue())) {
+        if (fullyQualifiedTypeName != null
+                && !className.getFullyQualifiedTypeName().contentEquals(
+                        fullyQualifiedTypeName.getValue())) {
             updateFullyQualifiedTypeName = true;
         }
 
@@ -672,7 +652,8 @@ public class WSConfigServiceImpl implements WSConfigService {
                                             + "' has updated 'id' attribute in cxf config file.");
                         }
 
-                    } else {
+                    }
+                    else {
 
                         // Check if exists with fullyQualifiedTypeName.
                         classService = XmlUtils.findFirstElement(
@@ -711,7 +692,8 @@ public class WSConfigServiceImpl implements WSConfigService {
                         }
 
                     }
-                } else {
+                }
+                else {
 
                     // Check if exists with class name.
                     classService = XmlUtils.findFirstElement(
@@ -910,8 +892,7 @@ public class WSConfigServiceImpl implements WSConfigService {
             return "";
         }
 
-        String[] delimitedString = StringUtils.split(
-                packageName, ".");
+        String[] delimitedString = StringUtils.split(packageName, ".");
         List<String> revertedList = new ArrayList<String>();
 
         String revertedString;
@@ -920,8 +901,7 @@ public class WSConfigServiceImpl implements WSConfigService {
             revertedList.add(delimitedString[i]);
         }
 
-        revertedString = collectionToDelimitedString(revertedList,
-                ".", "", "");
+        revertedString = collectionToDelimitedString(revertedList, ".", "", "");
 
         revertedString = "http://".concat(revertedString).concat("/");
 
@@ -1058,7 +1038,8 @@ public class WSConfigServiceImpl implements WSConfigService {
             newExecutions.appendChild(serviceExecution);
             oldExecutions.getParentNode().replaceChild(oldExecutions,
                     newExecutions);
-        } else {
+        }
+        else {
             newExecutions = pom.createElement("executions");
             newExecutions.appendChild(serviceExecution);
 
@@ -1071,14 +1052,10 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * Generates Element for service wsdl generation execution
      * 
-     * @param pom
-     *            Pom document
-     * @param serviceClass
-     *            to generate
-     * @param addressName
-     *            of the service
-     * @param executionID
-     *            execution identifier
+     * @param pom Pom document
+     * @param serviceClass to generate
+     * @param addressName of the service
+     * @param executionID execution identifier
      * @return
      */
     private Element createJava2wsExecutionElement(Document pom,
@@ -1142,9 +1119,10 @@ public class WSConfigServiceImpl implements WSConfigService {
     protected void addPlugin() {
 
         // Get the plugin from the template and write into de project (pom.xml)
-        projectOperations.updateBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(XmlUtils
-                .findFirstElement("/jaxws-plugin/plugin", XmlUtils
-                        .getRootElement(this.getClass(),
+        projectOperations.updateBuildPlugin(
+                projectOperations.getFocusedModuleName(),
+                new Plugin(XmlUtils.findFirstElement("/jaxws-plugin/plugin",
+                        XmlUtils.getRootElement(this.getClass(),
                                 "dependencies-export-jaxws-plugin.xml"))));
 
         // What is this for ?
@@ -1157,8 +1135,10 @@ public class WSConfigServiceImpl implements WSConfigService {
     public void installWsdl2javaPlugin() {
 
         // Add plugin and write this modifications to disk
-        projectOperations.updateBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(XmlUtils
-                .findFirstElement("/cxf-codegen/cxf-codegen-plugin/plugin",
+        projectOperations.updateBuildPlugin(
+                projectOperations.getFocusedModuleName(),
+                new Plugin(XmlUtils.findFirstElement(
+                        "/cxf-codegen/cxf-codegen-plugin/plugin",
                         XmlUtils.getRootElement(this.getClass(),
                                 "dependencies-export-wsdl2java-plugin.xml"))));
         fileManager.commit();
@@ -1175,7 +1155,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         // Identifies the type of library to use
         if (WsType.IMPORT_RPC_ENCODED.equals(type)) {
             return addImportLocationRpc(wsdlLocation);
-        } else {
+        }
+        else {
             return addImportLocationDocument(wsdlLocation);
         }
     }
@@ -1200,10 +1181,8 @@ public class WSConfigServiceImpl implements WSConfigService {
      * generation plugin configuration not exists, it will be created.
      * </p>
      * 
-     * @param wsdlLocation
-     *            WSDL file location.
-     * @param wsdlDocument
-     *            WSDL file.
+     * @param wsdlLocation WSDL file location.
+     * @param wsdlDocument WSDL file.
      */
     private void addExportWSDLLocationDocument(String wsdlLocation,
             Document wsdlDocument) {
@@ -1250,14 +1229,16 @@ public class WSConfigServiceImpl implements WSConfigService {
         if (oldGenerateSourcesCxfServer != null) {
             oldGenerateSourcesCxfServer.getParentNode().replaceChild(
                     newGenerateSourcesCxfServer, oldGenerateSourcesCxfServer);
-        } else {
+        }
+        else {
 
             if (oldExecutions == null) {
                 newExecutions = pom.createElement("executions");
                 newExecutions.appendChild(newGenerateSourcesCxfServer);
 
                 codegenWsPlugin.appendChild(newExecutions);
-            } else {
+            }
+            else {
                 newExecutions = oldExecutions;
                 newExecutions.appendChild(newGenerateSourcesCxfServer);
                 oldExecutions.getParentNode().replaceChild(newExecutions,
@@ -1274,10 +1255,8 @@ public class WSConfigServiceImpl implements WSConfigService {
      * Creates execution xml pom element for wsdl2java generation
      * 
      * @param pom
-     * @param wsdlDocument
-     *            to generate sources
-     * @param wsdlLocation
-     *            current wsdl location
+     * @param wsdlDocument to generate sources
+     * @param wsdlLocation current wsdl location
      * @return
      */
     private Element createWsdl2JavaExecutionElement(Document pom,
@@ -1402,7 +1381,8 @@ public class WSConfigServiceImpl implements WSConfigService {
             pomMutableFile = fileManager.updateFile(pomPath);
             pom = XmlUtils.getDocumentBuilder().parse(
                     pomMutableFile.getInputStream());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(e);
         }
 
@@ -1448,8 +1428,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * Remove the "file:" prefix from a location string.
      * 
-     * @param location
-     *            Location
+     * @param location Location
      * @return Location withou prefix
      */
     private String removeFilePrefix(String location) {
@@ -1470,8 +1449,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * generation plugin configuration not exists, it will be created.
      * </p>
      * 
-     * @param wsdlLocation
-     *            WSDL file location
+     * @param wsdlLocation WSDL file location
      * @return Location added to pom ?
      */
     private boolean addImportLocationDocument(String wsdlLocation) {
@@ -1483,7 +1461,8 @@ public class WSConfigServiceImpl implements WSConfigService {
                         "dependencies-import-codegen-plugin.xml"));
 
         // Add plugin
-        projectOperations.updateBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(pluginTemplate));
+        projectOperations.updateBuildPlugin(projectOperations
+                .getFocusedModuleName(), new Plugin(pluginTemplate));
         fileManager.commit();
 
         // Get pom.xml
@@ -1621,8 +1600,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * generation plugin configuration not exists, it will be created.
      * </p>
      * 
-     * @param wsdlLocation
-     *            WSDL file location
+     * @param wsdlLocation WSDL file location
      * @return Location added to pom ?
      */
     private boolean addImportLocationRpc(String wsdlLocation) {
@@ -1633,7 +1611,8 @@ public class WSConfigServiceImpl implements WSConfigService {
                         "dependencies-import-axistools-plugin.xml"));
 
         // Add plugin
-        projectOperations.updateBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(plugin));
+        projectOperations.updateBuildPlugin(
+                projectOperations.getFocusedModuleName(), new Plugin(plugin));
         fileManager.commit();
 
         // Get pom.xml
@@ -1751,20 +1730,20 @@ public class WSConfigServiceImpl implements WSConfigService {
      * {@inheritDoc}
      */
     public void mvn(String parameters, String message) throws IOException {
-    	
-    	logger.log(Level.INFO, message + " ...");
-    	try {
-    		
-    		mavenOperations.executeMvnCommand(parameters);
-    	}
-    	catch (IOException e) {
-    		logger.log(Level.WARNING, message + " error !");
-    		throw e;
-		}
-    	catch (RuntimeException e) {
-    		logger.log(Level.WARNING, message + " error !");
-    		throw e;
-		}
+
+        logger.log(Level.INFO, message + " ...");
+        try {
+
+            mavenOperations.executeMvnCommand(parameters);
+        }
+        catch (IOException e) {
+            logger.log(Level.WARNING, message + " error !");
+            throw e;
+        }
+        catch (RuntimeException e) {
+            logger.log(Level.WARNING, message + " error !");
+            throw e;
+        }
     }
 
     /**
@@ -1779,7 +1758,8 @@ public class WSConfigServiceImpl implements WSConfigService {
     private String getPomFilePath() {
 
         // Project ID
-        String prjId = ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName());
+        String prjId = ProjectMetadata.getProjectIdentifier(projectOperations
+                .getFocusedModuleName());
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
                 .get(prjId);
         Validate.isTrue(projectMetadata != null, "Project metadata required");
@@ -1788,41 +1768,44 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Checks for pom.xml
         String pomPath = projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.ROOT, ""), pomFileName);
+                LogicalPath.getInstance(Path.ROOT, ""), pomFileName);
 
         boolean pomInstalled = fileManager.exists(pomPath);
 
         if (pomInstalled) {
 
             return pomPath;
-        } else {
+        }
+        else {
 
             return null;
         }
     }
-    
-	/**
-	 * Convenience method to return a Collection as a delimited (e.g. CSV)
-	 * String. E.g. useful for <code>toString()</code> implementations.
-	 * @param coll the Collection to display
-	 * @param delim the delimiter to use (probably a ",")
-	 * @param prefix the String to start each element with
-	 * @param suffix the String to end each element with
-	 * @return the delimited String
-	 */
-	public static String collectionToDelimitedString(List coll, String delim, String prefix, String suffix) {
-		if (coll == null || coll.size() == 0) {
-			return "";
-		}
-		StringBuilder sb = new StringBuilder();
-		Iterator it = coll.iterator();
-		while (it.hasNext()) {
-			sb.append(prefix).append(it.next()).append(suffix);
-			if (it.hasNext()) {
-				sb.append(delim);
-			}
-		}
-		return sb.toString();
-	}
+
+    /**
+     * Convenience method to return a Collection as a delimited (e.g. CSV)
+     * String. E.g. useful for <code>toString()</code> implementations.
+     * 
+     * @param coll the Collection to display
+     * @param delim the delimiter to use (probably a ",")
+     * @param prefix the String to start each element with
+     * @param suffix the String to end each element with
+     * @return the delimited String
+     */
+    public static String collectionToDelimitedString(List coll, String delim,
+            String prefix, String suffix) {
+        if (coll == null || coll.size() == 0) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        Iterator it = coll.iterator();
+        while (it.hasNext()) {
+            sb.append(prefix).append(it.next()).append(suffix);
+            if (it.hasNext()) {
+                sb.append(delim);
+            }
+        }
+        return sb.toString();
+    }
 
 }

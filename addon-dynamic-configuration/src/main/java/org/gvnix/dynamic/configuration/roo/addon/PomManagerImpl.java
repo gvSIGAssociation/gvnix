@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
@@ -49,10 +49,8 @@ public class PomManagerImpl implements PomManager {
 
     private static final String RESOURCES_PATH = "src/main/resources";
 
-    @Reference
-    ProjectOperations projectOperations;
-    @Reference
-    FileManager fileManager;
+    @Reference ProjectOperations projectOperations;
+    @Reference FileManager fileManager;
 
     /**
      * {@inheritDoc}
@@ -61,7 +59,7 @@ public class PomManagerImpl implements PomManager {
 
         // Pom root element
         String pom = projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.ROOT, ""), "pom.xml");
+                LogicalPath.getInstance(Path.ROOT, ""), "pom.xml");
         Document doc = XmlUtils.readXml(fileManager.getInputStream(pom));
 
         // Iterate stored dynamic configurations for export to pom
@@ -94,8 +92,7 @@ public class PomManagerImpl implements PomManager {
     /**
      * Write a configurations into POM profile.
      * 
-     * @param doc
-     *            Pom document
+     * @param doc Pom document
      * @param dynConf
      * @return New configuration element
      */
@@ -157,10 +154,8 @@ public class PomManagerImpl implements PomManager {
     /**
      * Write a component into POM profile.
      * 
-     * @param doc
-     *            Pom document
-     * @param prof
-     *            Profile element
+     * @param doc Pom document
+     * @param prof Profile element
      * @return New component element
      */
     protected Element exportComponent(Document doc, Element prof) {
@@ -228,13 +223,12 @@ public class PomManagerImpl implements PomManager {
 
     /**
      * Write a property into POM profile.
-     *
-     * <p>No write property if null value.</p>
+     * <p>
+     * No write property if null value.
+     * </p>
      * 
-     * @param doc
-     *            Pom document
-     * @param props
-     *            Properties element
+     * @param doc Pom document
+     * @param props Properties element
      * @return New property element
      */
     protected void exportProperty(Document doc, Element props,

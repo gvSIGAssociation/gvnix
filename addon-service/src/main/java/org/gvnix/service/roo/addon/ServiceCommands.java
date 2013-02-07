@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon;
 
@@ -57,23 +57,19 @@ import org.apache.commons.lang3.StringUtils;
 @Service
 public class ServiceCommands implements CommandMarker {
 
-    @Reference
-    private ServiceOperations serviceOperations;
-    @Reference
-    private WSExportOperations wSExportOperations;
-    @Reference
-    private WSImportOperations wSImportOperations;
-    @Reference
-    private WSExportWsdlOperations wSExportWsdlOperations;
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private ProjectOperations projectOperations;
+    @Reference private ServiceOperations serviceOperations;
+    @Reference private WSExportOperations wSExportOperations;
+    @Reference private WSImportOperations wSImportOperations;
+    @Reference private WSExportWsdlOperations wSExportWsdlOperations;
+    @Reference private MetadataService metadataService;
+    @Reference private ProjectOperations projectOperations;
 
-    @CliAvailabilityIndicator({ "remote service class", "remote service operation" })
+    @CliAvailabilityIndicator({ "remote service class",
+            "remote service operation" })
     public boolean isCreateServiceClassAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
+        return OperationUtils.isProjectAvailable(metadataService,
+                projectOperations);
     }
 
     @CliCommand(value = "remote service class", help = "Creates a new Service class in SRC_MAIN_JAVA.")
@@ -101,10 +97,11 @@ public class ServiceCommands implements CommandMarker {
         boolean existsParamTypes = paramTypesList != null;
 
         if (existsParamTypes && paramTypesList.getJavaTypes().size() > 0) {
-        	Validate.isTrue(StringUtils.isNotBlank(paramNames),
+            Validate.isTrue(StringUtils.isNotBlank(paramNames),
                     "You must provide parameter names to create the method.");
 
-        } else if (StringUtils.isNotBlank(paramNames)) {
+        }
+        else if (StringUtils.isNotBlank(paramNames)) {
             Validate.isTrue(existsParamTypes
                     && paramTypesList.getJavaTypes().size() > 0,
                     "You must provide parameter Types to create the method.");
@@ -141,7 +138,8 @@ public class ServiceCommands implements CommandMarker {
     @CliAvailabilityIndicator("remote service define ws")
     public boolean isServiceExportAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
+        return OperationUtils.isProjectAvailable(metadataService,
+                projectOperations);
     }
 
     @CliCommand(value = "remote service define ws", help = "Defines a service endpoint interface (SEI) that will be mapped to a PortType in service contract. If target class doesn't exist the add-on will create it.")
@@ -165,42 +163,36 @@ public class ServiceCommands implements CommandMarker {
     @CliAvailabilityIndicator("remote service export operation")
     public boolean isServiceExportOperationAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
+        return OperationUtils.isProjectAvailable(metadataService,
+                projectOperations);
     }
 
     @CliAvailabilityIndicator("remote service list operation")
     public boolean isServiceListOperationAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
+        return OperationUtils.isProjectAvailable(metadataService,
+                projectOperations);
     }
 
     /**
      * Command to export a method as a web service operation.
-     * 
      * <p>
      * Parameters:
      * </p>
      * <ul>
-     * <li>
-     * ``--class`` (mandatory) Class to export a method.</li>
-     * <li>
-     * ``--method``(mandatory) Method to export.</li>
-     * <li>
-     * ``--operationName`` Name of the method to be showed as a Web Service
+     * <li>``--class`` (mandatory) Class to export a method.</li>
+     * <li>``--method``(mandatory) Method to export.</li>
+     * <li>``--operationName`` Name of the method to be showed as a Web Service
      * operation.</li>
-     * <li>
-     * ``--resultName`` Method result name.</li>
-     * <li>
-     * ``--resultNamespace`` Namespace of the result type.</li>
-     * <li>
-     * ``--responseWrapperName`` Name to define the Response Wrapper Object.</li>
-     * <li>
-     * ``--responseWrapperNamespace``: Namespace of the Response Wrapper Object.
+     * <li>``--resultName`` Method result name.</li>
+     * <li>``--resultNamespace`` Namespace of the result type.</li>
+     * <li>``--responseWrapperName`` Name to define the Response Wrapper Object.
      * </li>
-     * <li>
-     * ``--requestWrapperName``: Name to define the Request Wrapper Object.</li>
-     * <li>
-     * ``--requestWrapperNamespace``: Namespace of the Request Wrapper Object.</li>
+     * <li>``--responseWrapperNamespace``: Namespace of the Response Wrapper
+     * Object.</li>
+     * <li>``--requestWrapperName``: Name to define the Request Wrapper Object.</li>
+     * <li>``--requestWrapperNamespace``: Namespace of the Request Wrapper
+     * Object.</li>
      * </ul>
      */
     @CliCommand(value = "remote service export operation", help = "Publish a class method as web service operation in a PortType.")
@@ -252,7 +244,8 @@ public class ServiceCommands implements CommandMarker {
     @CliAvailabilityIndicator("remote service import ws")
     public boolean isServiceImportAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
+        return OperationUtils.isProjectAvailable(metadataService,
+                projectOperations);
     }
 
     @CliCommand(value = "remote service import ws", help = "Imports a Web Service to Service class. If the class doesn't exists the Addon will create it.")
@@ -273,25 +266,27 @@ public class ServiceCommands implements CommandMarker {
     @CliAvailabilityIndicator("remote service export ws")
     public boolean isServiceExportWsdl() {
 
-        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
+        return OperationUtils.isProjectAvailable(metadataService,
+                projectOperations);
     }
 
     @CliCommand(value = "remote service export ws", help = "Exports a Web Service from WSDL to java code with gvNIX annotations to generate this Web Service in project with dummy methods.")
     public String serviceExportWsdl(
             @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
 
-        List<JavaType> serviceClasses = wSExportWsdlOperations
-                .exportWsdl(url);
+        List<JavaType> serviceClasses = wSExportWsdlOperations.exportWsdl(url);
         StringBuilder sb = new StringBuilder();
         if (serviceClasses == null || serviceClasses.size() == 0) {
             return null;
-        } else if (serviceClasses.size() == 1) {
+        }
+        else if (serviceClasses.size() == 1) {
 
             sb.append(MessageFormat
                     .format("* New service has been created at {0}, edit it to add you business logic.",
                             new Object[] { serviceClasses.get(0)
                                     .getFullyQualifiedTypeName() }));
-        } else {
+        }
+        else {
             sb.append("* New service classes has been created, edit them to add you business logic:");
             for (JavaType serviceClass : serviceClasses) {
                 sb.append("    - ".concat(serviceClass
@@ -307,12 +302,14 @@ public class ServiceCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("remote service ws list")
     public boolean isServiceWsListAvalilable() {
-        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
+        return OperationUtils.isProjectAvailable(metadataService,
+                projectOperations);
     }
 
     @CliAvailabilityIndicator("remote service security ws")
     public boolean isServiceSecurityWs() {
-        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
+        return OperationUtils.isProjectAvailable(metadataService,
+                projectOperations);
     }
 
     @CliCommand(value = "remote service security ws", help = "Adds Signature to a imported Web Service request")
@@ -345,7 +342,6 @@ public class ServiceCommands implements CommandMarker {
      * <p>
      * Format web service list
      * </p>
-     * 
      * <p>
      * Pattern:<br/>
      * 
@@ -419,7 +415,8 @@ public class ServiceCommands implements CommandMarker {
                 printer.print(fitStringTo("", 3, ' '));
                 printer.print('X');
                 printer.print(fitStringTo("", 4, ' '));
-            } else {
+            }
+            else {
                 printer.print(fitStringTo("", 8, ' '));
             }
 
@@ -429,7 +426,8 @@ public class ServiceCommands implements CommandMarker {
                 printer.print(fitStringTo("", 3, ' '));
                 printer.print('X');
                 printer.print(fitStringTo("", 4, ' '));
-            } else {
+            }
+            else {
                 printer.print(fitStringTo("", 8, ' '));
             }
             printer.println();

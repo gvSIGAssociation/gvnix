@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.support;
 
@@ -37,7 +37,6 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 
 /**
- * 
  * Utils for work over Messages Bundles.
  * 
  * @author Óscar Rovira (orovira at disid dot com) at <a
@@ -61,7 +60,7 @@ public class MessageBundleUtils {
      */
     public static void installI18nMessages(I18n i18n,
             ProjectOperations projectOperations, FileManager fileManager) {
-    	Validate.notNull(i18n, "Language choice required");
+        Validate.notNull(i18n, "Language choice required");
 
         if (i18n.getLocale() == null) {
             logger.warning("could not parse language choice");
@@ -69,7 +68,8 @@ public class MessageBundleUtils {
         }
 
         String targetDirectory = projectOperations.getPathResolver()
-                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "");
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "");
 
         // Install message bundle
         String messageBundle = targetDirectory + "/WEB-INF/i18n/messages_"
@@ -80,21 +80,23 @@ public class MessageBundleUtils {
                     + "/WEB-INF/i18n/messages.properties";
         }
         if (!fileManager.exists(messageBundle)) {
-        	OutputStream outputStream = null;
+            OutputStream outputStream = null;
             try {
-            	
-                outputStream = fileManager.createFile(messageBundle).getOutputStream();
+
+                outputStream = fileManager.createFile(messageBundle)
+                        .getOutputStream();
                 IOUtils.copy(i18n.getMessageBundle(), outputStream);
-                
-            } catch (IOException e) {
-            	
+
+            }
+            catch (IOException e) {
+
                 throw new IllegalStateException(
                         "Encountered an error during copying of message bundle MVC JSP addon.",
                         e);
             }
             finally {
-            	
-            	IOUtils.closeQuietly(outputStream);
+
+                IOUtils.closeQuietly(outputStream);
             }
         }
         return;
@@ -110,11 +112,9 @@ public class MessageBundleUtils {
      * <strong>This method doesn't check if messages[_xx].properties file exist
      * in the add-on invoking it</strong>
      * 
-     * @param language
-     *            Language locale as string (en, es, ca, ...)
-     * @param invokingClass
-     *            Class of the Add-on invoking this method. It's needed in order
-     *            to load local resources
+     * @param language Language locale as string (en, es, ca, ...)
+     * @param invokingClass Class of the Add-on invoking this method. It's
+     *            needed in order to load local resources
      * @param propFileOperations
      * @param projectOperations
      * @param fileManager
@@ -129,7 +129,8 @@ public class MessageBundleUtils {
         // Take "en" as default language
         String messageBundleRelativeFilePath = "/WEB-INF/i18n/messages.properties";
         String messageBundle = projectOperations.getPathResolver()
-                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         messageBundleRelativeFilePath);
         try {
             if (language == "en") {
@@ -137,12 +138,14 @@ public class MessageBundleUtils {
                         .concat("/messages.properties");
                 properties.load(invokingClass
                         .getResourceAsStream(propertiesFolderPath));
-            } else {
+            }
+            else {
                 messageBundleRelativeFilePath = "/WEB-INF/i18n/messages_"
                         .concat(language).concat(".properties");
                 messageBundle = projectOperations.getPathResolver()
-                        .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                                messageBundleRelativeFilePath);
+                        .getIdentifier(
+                                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP,
+                                        ""), messageBundleRelativeFilePath);
 
                 propertiesFolderPath = propertiesFolderPath.concat("/messages_"
                         + language + ".properties");
@@ -151,15 +154,18 @@ public class MessageBundleUtils {
             }
 
             if (fileManager.exists(messageBundle)) {
-                propFileOperations.addProperties(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                propFileOperations.addProperties(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         messageBundleRelativeFilePath,
                         new HashMap<String, String>((Map) properties), true,
                         true);
-            } else {
+            }
+            else {
                 logger.warning(messageBundle
                         .concat(" file doesn't exist in project."));
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             logger.log(Level.SEVERE, "Message properties for language \""
                     .concat(language).concat("\" can't be loaded"));
         }

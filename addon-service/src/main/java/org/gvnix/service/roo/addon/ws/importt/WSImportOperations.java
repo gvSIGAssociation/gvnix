@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.importt;
 
@@ -37,10 +37,8 @@ public interface WSImportOperations {
     /**
      * Adds the gvNIX import annotation with some wsdl location in a class.
      * 
-     * @param className
-     *            class to add annotation.
-     * @param wsdlLocation
-     *            contract wsdl url to import.
+     * @param className class to add annotation.
+     * @param wsdlLocation contract wsdl url to import.
      */
     public void addImportAnnotation(JavaType className, String wsdlLocation);
 
@@ -56,7 +54,6 @@ public interface WSImportOperations {
      * Adds the gvNIX annotation for add signature to request to a import
      * service.
      * </p>
-     * 
      * <p>
      * <b>Note:</b> <code>certificate</code> certificate file will be copied
      * into resources project folder.<br/>
@@ -64,14 +61,11 @@ public interface WSImportOperations {
      * will be generated and used.
      * </p>
      * 
-     * @param importedServiceClassName
-     *            class with the imported service to apply signature
-     * @param certificate
-     *            <code>.p12</code> file to use to sign requests
-     * @param password
-     *            for <code>.p12</code> file
-     * @param alias
-     *            of the certificate from certificate file to use for sing
+     * @param importedServiceClassName class with the imported service to apply
+     *            signature
+     * @param certificate <code>.p12</code> file to use to sign requests
+     * @param password for <code>.p12</code> file
+     * @param alias of the certificate from certificate file to use for sing
      *            request
      */
     public void addSignatureAnnotation(JavaType importedServiceClassName,

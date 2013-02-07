@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.exception.handler.roo.addon;
 
@@ -42,7 +42,6 @@ import org.springframework.test.util.ReflectionTestUtils;
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
- * 
  */
 public class WebExceptionHandlerOperationsImplTest {
 
@@ -55,7 +54,7 @@ public class WebExceptionHandlerOperationsImplTest {
     // jspx Exceptions path
     static final String EXC_JSPX_PATH = "src/main/webapp/WEB-INF/views/";
 
-    //Class under test
+    // Class under test
     private WebExceptionHandlerOperationsImpl webExceptionHandlerOperationsImpl;
 
     // Mock objects to emulate Roo OSGi Services
@@ -68,7 +67,7 @@ public class WebExceptionHandlerOperationsImplTest {
     private MutableFile webXmlMutableFile;
 
     private static Logger logger = Logger
-	    .getLogger(WebExceptionHandlerOperationsImplTest.class.getName());
+            .getLogger(WebExceptionHandlerOperationsImplTest.class.getName());
 
     /**
      * Setup operations instance and Mock objects
@@ -78,25 +77,27 @@ public class WebExceptionHandlerOperationsImplTest {
     @Before
     public void setUp() throws Exception {
 
-	// Class under test
-	webExceptionHandlerOperationsImpl = new WebExceptionHandlerOperationsImpl();
+        // Class under test
+        webExceptionHandlerOperationsImpl = new WebExceptionHandlerOperationsImpl();
 
-	// Setup Mock service objects
-	fileManager = createMock(FileManager.class);
-	metadataService = createMock(MetadataService.class);
-	pathResolver = createMock(PathResolver.class);
-	propFileOperations = createMock(PropFileOperations.class);
+        // Setup Mock service objects
+        fileManager = createMock(FileManager.class);
+        metadataService = createMock(MetadataService.class);
+        pathResolver = createMock(PathResolver.class);
+        propFileOperations = createMock(PropFileOperations.class);
 
-	// Mock Objects
-	webXmlMutableFile = createMock(MutableFile.class);
+        // Mock Objects
+        webXmlMutableFile = createMock(MutableFile.class);
 
-	// Inject mock objects in instance. This emulate OSGi environment
-	ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "fileManager", fileManager);
-	ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "metadataService",
-		metadataService);
-	ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "pathResolver", pathResolver);
-	ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "propFileOperations",
-		propFileOperations);
+        // Inject mock objects in instance. This emulate OSGi environment
+        ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl,
+                "fileManager", fileManager);
+        ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl,
+                "metadataService", metadataService);
+        ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl,
+                "pathResolver", pathResolver);
+        ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl,
+                "propFileOperations", propFileOperations);
 
     }
 
@@ -109,67 +110,68 @@ public class WebExceptionHandlerOperationsImplTest {
     @Test
     public void testGetHandledExceptionList() throws Exception {
 
-	String result;
-	String expected;
+        String result;
+        String expected;
 
-	/*
-	 * Test 1 - Encuentra excepciones instanciadas en el archivo de
-	 * configuración EXC_WEB_XML
-	 */
-	expect(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), WEB_XML_PATH))
-		.andReturn(EXC_WEB_XML);
+        /*
+         * Test 1 - Encuentra excepciones instanciadas en el archivo de
+         * configuración EXC_WEB_XML
+         */
+        expect(
+                pathResolver.getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        WEB_XML_PATH)).andReturn(EXC_WEB_XML);
 
-	expect(fileManager.exists(EXC_WEB_XML)).andReturn(true);
+        expect(fileManager.exists(EXC_WEB_XML)).andReturn(true);
 
-	expect(fileManager.updateFile(EXC_WEB_XML))
-		.andReturn(webXmlMutableFile);
+        expect(fileManager.updateFile(EXC_WEB_XML))
+                .andReturn(webXmlMutableFile);
 
-	expect(webXmlMutableFile.getInputStream()).andReturn(
-		getClass().getResourceAsStream(EXC_WEB_XML));
+        expect(webXmlMutableFile.getInputStream()).andReturn(
+                getClass().getResourceAsStream(EXC_WEB_XML));
 
-	replay(pathResolver, fileManager, webXmlMutableFile);
-	
-	result = webExceptionHandlerOperationsImpl.getHandledExceptionList();
-	
-	assertTrue("Test 1 \nThere aren't exceptions defined in " + EXC_WEB_XML
-		+ " file",
-		result != null);
-	
-	logger.log(Level.INFO, "Test 1 \nExceptions defined in " + EXC_WEB_XML
-		+ " :\n"
-		+ result);
+        replay(pathResolver, fileManager, webXmlMutableFile);
 
-	reset(pathResolver, fileManager, webXmlMutableFile);
+        result = webExceptionHandlerOperationsImpl.getHandledExceptionList();
 
-	/*
-	 * Test 2 - No encuentra excepciones instanciadas en el archivo de
-	 * configuración NO_EXC_WEB_XML
-	 */
-	expect(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), WEB_XML_PATH))
-		.andReturn(NO_EXC_WEB_XML);
+        assertTrue("Test 1 \nThere aren't exceptions defined in " + EXC_WEB_XML
+                + " file", result != null);
 
-	expect(fileManager.exists(NO_EXC_WEB_XML)).andReturn(true);
+        logger.log(Level.INFO, "Test 1 \nExceptions defined in " + EXC_WEB_XML
+                + " :\n" + result);
 
-	expect(fileManager.updateFile(NO_EXC_WEB_XML))
-		.andReturn(webXmlMutableFile);
+        reset(pathResolver, fileManager, webXmlMutableFile);
 
-	expect(webXmlMutableFile.getInputStream()).andReturn(
-		getClass().getResourceAsStream(NO_EXC_WEB_XML));
+        /*
+         * Test 2 - No encuentra excepciones instanciadas en el archivo de
+         * configuración NO_EXC_WEB_XML
+         */
+        expect(
+                pathResolver.getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        WEB_XML_PATH)).andReturn(NO_EXC_WEB_XML);
 
-	replay(pathResolver, fileManager, webXmlMutableFile);
+        expect(fileManager.exists(NO_EXC_WEB_XML)).andReturn(true);
 
-	result = webExceptionHandlerOperationsImpl.getHandledExceptionList();
+        expect(fileManager.updateFile(NO_EXC_WEB_XML)).andReturn(
+                webXmlMutableFile);
 
-	expected = "Handled Exceptions:\n";
+        expect(webXmlMutableFile.getInputStream()).andReturn(
+                getClass().getResourceAsStream(NO_EXC_WEB_XML));
 
-	assertEquals("Test 2 \nThere are exceptions defined in "
-		+ NO_EXC_WEB_XML
-		+ " file", expected, result);
+        replay(pathResolver, fileManager, webXmlMutableFile);
 
-	logger.log(Level.INFO, "Test 2 \nThere aren't exceptions defined in "
-		+ NO_EXC_WEB_XML);
+        result = webExceptionHandlerOperationsImpl.getHandledExceptionList();
 
-	reset(pathResolver, fileManager, webXmlMutableFile);
+        expected = "Handled Exceptions:\n";
+
+        assertEquals("Test 2 \nThere are exceptions defined in "
+                + NO_EXC_WEB_XML + " file", expected, result);
+
+        logger.log(Level.INFO, "Test 2 \nThere aren't exceptions defined in "
+                + NO_EXC_WEB_XML);
+
+        reset(pathResolver, fileManager, webXmlMutableFile);
 
     }
 
@@ -182,60 +184,63 @@ public class WebExceptionHandlerOperationsImplTest {
     @Test
     public void testUpdateWebMvcConfig() throws Exception {
 
-	String result;
-	String expected;
+        String result;
+        String expected;
 
-	String exceptionName;
-	String exceptionJspxPath;
-	
-	/*
-	 * Test 1 - Añade una excepción al archivo de configuración WEB_XML_PATH
-	 * 
-	 * exceptionName - java.lang.Exception
-	 */
+        String exceptionName;
+        String exceptionJspxPath;
 
-	exceptionName = "java.lang.Exception";
-	expected = "Exception";
+        /*
+         * Test 1 - Añade una excepción al archivo de configuración WEB_XML_PATH
+         * 
+         * exceptionName - java.lang.Exception
+         */
 
-	exceptionJspxPath = EXC_JSPX_PATH.concat(
-		StringUtils.uncapitalize(expected)).concat(".jspx");
-	
-	expect(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), WEB_XML_PATH))
-		.andReturn(EXC_WEB_XML);
+        exceptionName = "java.lang.Exception";
+        expected = "Exception";
 
-	expect(fileManager.exists(EXC_WEB_XML)).andReturn(true);
+        exceptionJspxPath = EXC_JSPX_PATH.concat(
+                StringUtils.uncapitalize(expected)).concat(".jspx");
 
-	expect(fileManager.updateFile(EXC_WEB_XML))
-		.andReturn(webXmlMutableFile);
+        expect(
+                pathResolver.getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        WEB_XML_PATH)).andReturn(EXC_WEB_XML);
 
-	expect(webXmlMutableFile.getInputStream()).andReturn(
-		getClass().getResourceAsStream(EXC_WEB_XML));
+        expect(fileManager.exists(EXC_WEB_XML)).andReturn(true);
 
-	// Search for an existing Exception jspx mapping
-	expect(
-		pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-			"WEB-INF/views/" + StringUtils.uncapitalize(expected)
-				+ ".jspx")).andReturn(exceptionJspxPath);
+        expect(fileManager.updateFile(EXC_WEB_XML))
+                .andReturn(webXmlMutableFile);
 
-	expect(fileManager.exists(exceptionJspxPath)).andReturn(false);
+        expect(webXmlMutableFile.getInputStream()).andReturn(
+                getClass().getResourceAsStream(EXC_WEB_XML));
 
-	// Output Stream
-	expect(webXmlMutableFile.getOutputStream()).andReturn(
-		new FileOutputStream("/tmp/exceptions-webmvc-config.xml"));
+        // Search for an existing Exception jspx mapping
+        expect(
+                pathResolver.getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        "WEB-INF/views/" + StringUtils.uncapitalize(expected)
+                                + ".jspx")).andReturn(exceptionJspxPath);
 
-	replay(pathResolver, fileManager, webXmlMutableFile);
+        expect(fileManager.exists(exceptionJspxPath)).andReturn(false);
 
-	result = webExceptionHandlerOperationsImpl
-		.updateWebMvcConfig(exceptionName);
+        // Output Stream
+        expect(webXmlMutableFile.getOutputStream()).andReturn(
+                new FileOutputStream("/tmp/exceptions-webmvc-config.xml"));
 
-	assertEquals("Test 1 \nThere isn't new exception defined in "
-		+ EXC_WEB_XML + " file", StringUtils.uncapitalize(expected),
-		result);
+        replay(pathResolver, fileManager, webXmlMutableFile);
 
-	logger.log(Level.INFO, "Test 1 \nNew Exception view: '" + result
-		+ "' defined in: " + EXC_WEB_XML);
+        result = webExceptionHandlerOperationsImpl
+                .updateWebMvcConfig(exceptionName);
 
-	reset(pathResolver, fileManager, webXmlMutableFile);
+        assertEquals("Test 1 \nThere isn't new exception defined in "
+                + EXC_WEB_XML + " file", StringUtils.uncapitalize(expected),
+                result);
+
+        logger.log(Level.INFO, "Test 1 \nNew Exception view: '" + result
+                + "' defined in: " + EXC_WEB_XML);
+
+        reset(pathResolver, fileManager, webXmlMutableFile);
 
     }
 }

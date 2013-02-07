@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.exception.handler.roo.addon;
 
@@ -160,8 +160,7 @@ public class ModalDialogMetadata extends
     /**
      * Returns the list of method parameter types.
      * 
-     * @param addParamsParameter
-     *            if true will define
+     * @param addParamsParameter if true will define
      *            <code>HashMap&lt;String, Object&gt; params</code> parameter
      * @return
      */
@@ -194,8 +193,8 @@ public class ModalDialogMetadata extends
     /**
      * Returns the list of method parameter names.
      * 
-     * @param addParamsParameter
-     *            if true will define <code>params</code> parameter
+     * @param addParamsParameter if true will define <code>params</code>
+     *            parameter
      * @return
      */
     private List<JavaSymbolName> getMethodParamNames(boolean addParamsParameter) {
@@ -214,8 +213,7 @@ public class ModalDialogMetadata extends
      * Returns the InvocableMemeberBodyBuilder for Dialog create and set in
      * Session methods
      * 
-     * @param customModalDialogJspxName
-     *            if informed will use
+     * @param customModalDialogJspxName if informed will use
      *            <code>Dialog(DialogType dialogType, String page, String title, String description, HashMap&lt;String, Object&gt; params)</code>
      *            constructor
      * @return
@@ -237,7 +235,8 @@ public class ModalDialogMetadata extends
                             .concat(" modalDialog = new Dialog(dialogType, \"/WEB-INF/dialogs/"
                                     .concat(customModalDialogJspxName)
                                     .concat(".jspx\", title, description, params);")));
-        } else {
+        }
+        else {
             bodyBuilder
                     .appendFormalLine(modalDialogJavaType
                             .getNameIncludingTypeParameters(false,
@@ -266,8 +265,7 @@ public class ModalDialogMetadata extends
      * <p>
      * DialogType is special because is an enum type defined in Dialog class
      * 
-     * @param className
-     *            Right now it expects only "DialogType" or "Dialog"
+     * @param className Right now it expects only "DialogType" or "Dialog"
      * @return
      */
     private JavaType getJavaTypeForClassName(String className) {
@@ -281,8 +279,8 @@ public class ModalDialogMetadata extends
 
     private void installModalDialogSample(String modalDialog) {
         String destinationPath = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/dialogs/".concat(modalDialog)
-                        .concat(".jspx"));
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "WEB-INF/dialogs/".concat(modalDialog).concat(".jspx"));
         if (!fileManager.exists(destinationPath)) {
             String template;
             try {
@@ -294,7 +292,8 @@ public class ModalDialogMetadata extends
                         templateInputStream);
 
                 template = IOUtils.toString(readerFile);
-            } catch (IOException ioe) {
+            }
+            catch (IOException ioe) {
                 throw new IllegalStateException(
                         "Unable load ITD jspx template", ioe);
             }
@@ -305,10 +304,10 @@ public class ModalDialogMetadata extends
                     if (mutableJspx != null) {
                         InputStream inputStream = null;
                         OutputStream outputStream = null;
-                        try { 
-                        	inputStream = IOUtils.toInputStream(template);
-                        	outputStream = mutableJspx.getOutputStream();
-                        	IOUtils.copy(inputStream, outputStream);
+                        try {
+                            inputStream = IOUtils.toInputStream(template);
+                            outputStream = mutableJspx.getOutputStream();
+                            IOUtils.copy(inputStream, outputStream);
                         }
                         finally {
                             IOUtils.closeQuietly(inputStream);
@@ -316,7 +315,8 @@ public class ModalDialogMetadata extends
                         }
                     }
                 }
-            } catch (IOException ioe) {
+            }
+            catch (IOException ioe) {
                 throw new IllegalStateException("Could not create ".concat(
                         modalDialog).concat(".jspx file"), ioe);
             }
@@ -333,7 +333,8 @@ public class ModalDialogMetadata extends
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
+    public static final String createIdentifier(JavaType javaType,
+            LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }

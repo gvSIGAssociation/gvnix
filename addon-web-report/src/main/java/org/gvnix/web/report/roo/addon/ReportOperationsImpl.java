@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.report.roo.addon;
 
@@ -50,14 +50,16 @@ import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of operations this add-on offers.
- *
+ * 
  * @author Oscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  * @since 0.6
  */
-@Component // Use these Apache Felix annotations to register your commands class in the Roo container
+@Component
+// Use these Apache Felix annotations to register your commands class in the Roo
+// container
 @Service
 public class ReportOperationsImpl implements ReportOperations {
     private static final Logger logger = HandlerUtils
@@ -70,45 +72,40 @@ public class ReportOperationsImpl implements ReportOperations {
      * MetadataService offers access to Roo's metadata model, use it to retrieve
      * any available metadata by its MID
      */
-    @Reference
-    private MetadataService metadataService;
+    @Reference private MetadataService metadataService;
 
-    @Reference
-    private TypeLocationService typeLocationService;
+    @Reference private TypeLocationService typeLocationService;
 
     /**
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference
-    private ProjectOperations projectOperations;
+    @Reference private ProjectOperations projectOperations;
 
     /**
      * ReportConfigService offers some methods for configuration purposes
      */
-    @Reference
-    ReportConfigService reportConfigService;
-    
-    @Reference
-    TypeManagementService typeManagementService;
+    @Reference ReportConfigService reportConfigService;
 
+    @Reference TypeManagementService typeManagementService;
 
     /** {@inheritDoc} */
     public boolean isCommandAvailable() {
         // Check if a project has been created
-        return projectOperations.isProjectAvailable(projectOperations.getFocusedModuleName());
+        return projectOperations.isProjectAvailable(projectOperations
+                .getFocusedModuleName());
     }
 
     /** {@inheritDoc} */
     public boolean isProjectAvailable() {
         // Check if a project has been created
-        return projectOperations.isProjectAvailable(projectOperations.getFocusedModuleName());
+        return projectOperations.isProjectAvailable(projectOperations
+                .getFocusedModuleName());
     }
-
 
     /** {@inheritDoc} */
     public void annotateType(JavaType javaType, String reportName, String format) {
-    	Validate.isTrue(reportConfigService.isSpringMvcProject(),
+        Validate.isTrue(reportConfigService.isSpringMvcProject(),
                 "Project must be Spring MVC project");
         reportConfigService.addJasperReportsViewResolver();
         Validate.isTrue(reportConfigService.isJasperViewsProject(),
@@ -116,7 +113,8 @@ public class ReportOperationsImpl implements ReportOperations {
 
         // Use Roo's Validate type for null checks
         Validate.notNull(javaType, "Java type required");
-        Validate.isTrue(StringUtils.isNotBlank(reportName), "Report Name required");
+        Validate.isTrue(StringUtils.isNotBlank(reportName),
+                "Report Name required");
         Validate.isTrue(StringUtils.isNotBlank(format), "Report Name required");
         reportName = reportName.toLowerCase();
         format = format.replaceAll(" ", "").toLowerCase();
@@ -216,10 +214,12 @@ public class ReportOperationsImpl implements ReportOperations {
                 new JavaSymbolName("value"), desiredReports));
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 GVNIX_REPORTS, attributes);
-        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
-        mutableTypeDetailsBuilder.updateTypeAnnotation(annotationBuilder.build(),
-                new HashSet<JavaSymbolName>());
-        typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                mutableTypeDetails);
+        mutableTypeDetailsBuilder.updateTypeAnnotation(
+                annotationBuilder.build(), new HashSet<JavaSymbolName>());
+        typeManagementService
+                .createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
 
     }
 

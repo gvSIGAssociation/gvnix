@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.export;
 
@@ -71,20 +71,13 @@ import org.apache.commons.lang3.StringUtils;
 @Service
 public class WSExportValidationServiceImpl implements WSExportValidationService {
 
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private WSConfigService wSConfigService;
-    @Reference
-    private AnnotationsService annotationsService;
-    @Reference
-    private TypeLocationService typeLocationService;
-    @Reference
-    private JavaParserService javaParserService;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private FileManager fileManager;
+    @Reference private MetadataService metadataService;
+    @Reference private WSConfigService wSConfigService;
+    @Reference private AnnotationsService annotationsService;
+    @Reference private TypeLocationService typeLocationService;
+    @Reference private JavaParserService javaParserService;
 
     /**
      * {@inheritDoc}
@@ -93,7 +86,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
             String targetNamespace) {
 
         // Method is required
-    	Validate.isTrue(method != null, "The method doesn't exists in the class");
+        Validate.isTrue(method != null,
+                "The method doesn't exists in the class");
 
         // Get all throws types
         List<JavaType> types = method.getThrowsTypes();
@@ -106,10 +100,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * Add GvNIXWebFault to exception and extends java types in project.
      * 
-     * @param method
-     *            Add annotation to java type exception in project
-     * @param targetNamespace
-     *            Target namespace to add as annotation attribute
+     * @param method Add annotation to java type exception in project
+     * @param targetNamespace Target namespace to add as annotation attribute
      */
     protected void addGvNixWebFaultToException(String targetNamespace,
             JavaType type) {
@@ -129,17 +121,14 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * Add GvNIXWebFault with attributes to exception java type in project.
-     * 
      * <ul>
      * <li>name: from uncapitalized java type simple type name</li>
      * <li>targetNamespace: from input parameter</li>
      * <li>faultBean: from java type fully qualified type name</li>
      * </ul>
      * 
-     * @param targetNamespace
-     *            Target namespace to add as annotation attribute
-     * @param type
-     *            Type to add annotation
+     * @param targetNamespace Target namespace to add as annotation attribute
+     * @param type Type to add annotation
      */
     protected void addGvNixWebFaultAnnotation(String targetNamespace,
             JavaType type) {
@@ -163,7 +152,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      */
     public void addGvNixXmlElementToTypes(MethodMetadata method) {
 
-        Validate.isTrue(method != null, "The method doesn't exists in the class");
+        Validate.isTrue(method != null,
+                "The method doesn't exists in the class");
 
         List<JavaType> types = new ArrayList<JavaType>();
         getProjectTypes(method, types);
@@ -187,16 +177,13 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * Add to list a method return and params types.
-     * 
      * <p>
      * Return and param types and their params only added to list if exists in
      * project source.
      * </p>
      * 
-     * @param method
-     *            Method to check
-     * @param types
-     *            Types list to add types
+     * @param method Method to check
+     * @param types Types list to add types
      */
     protected void getProjectTypes(MethodMetadata method, List<JavaType> types) {
 
@@ -211,15 +198,12 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * Add to list a type and their params and extends types.
-     * 
      * <p>
      * Type and extend types only added to list if exists in project source.
      * </p>
      * 
-     * @param type
-     *            Type to check
-     * @param types
-     *            Types list to add types
+     * @param type Type to check
+     * @param types Types list to add types
      */
     protected void getProjectTypes(JavaType type, List<JavaType> types) {
 
@@ -249,14 +233,12 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * Add GvNIXXmlElement to java type in project.
-     * 
      * <p>
      * GvNIXXmlElement annotation is added to parent extend types in project and
      * type parameters in project too.
      * </p>
      * 
-     * @param javaType
-     *            Java type (can't be null)
+     * @param javaType Java type (can't be null)
      * @return Is it allowed ?
      */
     protected void addGvNixXmlElementToType(JavaType javaType) {
@@ -286,7 +268,6 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * Add @GvNIXXmlElement annotation with attributes to java type.
-     * 
      * <ul>
      * <li>name attribute value from java type simple name</li>
      * <li>namespace attribute value from java type package</li>
@@ -295,10 +276,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      * <li>xmlTypeName from java simple type, if not empty</li>
      * </ul>
      * 
-     * @param javaType
-     *            To get attributes for gvNIX annotation
-     * @param typeName
-     *            Type name to add annotation
+     * @param javaType To get attributes for gvNIX annotation
+     * @param typeName Type name to add annotation
      */
     protected void addGvNixXmlElementAnnotation(JavaType javaType,
             JavaType typeName) {
@@ -348,7 +327,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                     javaType.getSimpleTypeName());
             attrs.add(xmlTypeName);
 
-        } else {
+        }
+        else {
 
             StringAttributeValue xmlTypeName = new StringAttributeValue(
                     new JavaSymbolName("xmlTypeName"), "");
@@ -367,16 +347,14 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * Get mutable class or interface type details from java type.
      * 
-     * @param javaType
-     *            Java type
+     * @param javaType Java type
      * @return Mutable class or interface type
      */
-    protected ClassOrInterfaceTypeDetails getTypeDetails(
-            JavaType javaType) {
+    protected ClassOrInterfaceTypeDetails getTypeDetails(JavaType javaType) {
 
         // Get mutable class or interface type details from java type
         String id = PhysicalTypeIdentifier.createIdentifier(javaType,
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
         PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
                 .get(id);
         Validate.notNull(ptm, "Java source class doesn't exists.");
@@ -398,7 +376,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         if (StringUtils.isNotBlank(namespace)) {
             try {
                 new URI(namespace);
-            } catch (URISyntaxException e) {
+            }
+            catch (URISyntaxException e) {
                 return false;
             }
         }
@@ -409,14 +388,13 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * Get the path identifier for a java type in the project.
      * 
-     * @param javaType
-     *            Java type
+     * @param javaType Java type
      * @return Path identifier in project
      */
     protected String getJavaTypeIdentifier(JavaType javaType) {
 
         return projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                 javaType.getFullyQualifiedTypeName()
                         .replace('.', File.separatorChar).concat(".java"));
     }
@@ -429,29 +407,33 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         // Get and validate mutable type details
         ClassOrInterfaceTypeDetails typeDetails = typeLocationService
                 .getTypeDetails(javaType);
-        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
-                typeDetails, "Can't modify ".concat(typeDetails.getName().toString()));
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class, typeDetails,
+                "Can't modify ".concat(typeDetails.getName().toString()));
 
         // Get and validate gvNIX web service annotation
-        AnnotationMetadata annotation = typeDetails.getTypeAnnotation(
-                new JavaType(GvNIXWebService.class.getName()));
+        AnnotationMetadata annotation = typeDetails
+                .getTypeAnnotation(new JavaType(GvNIXWebService.class.getName()));
         Validate.isTrue(
                 annotation != null,
-                "Launch command 'service define ws --class "
-                        .concat(javaType.getFullyQualifiedTypeName())
-                        .concat( "' to export class to Web Service."));
+                "Launch command 'service define ws --class ".concat(
+                        javaType.getFullyQualifiedTypeName()).concat(
+                        "' to export class to Web Service."));
 
         // Get and validate gvNIX web service annotation target namespace attr
         StringAttributeValue targetNamespace = (StringAttributeValue) annotation
                 .getAttribute(new JavaSymbolName("targetNamespace"));
-        
-        Validate.notNull(targetNamespace,
-        		"You must define 'targetNamespace' annotation attribute in @GvNIXWebService in class: '"
-                .concat(javaType.getFullyQualifiedTypeName()).concat("'."));
 
-        Validate.isTrue(StringUtils.isNotBlank(targetNamespace.getValue()),
+        Validate.notNull(
+                targetNamespace,
                 "You must define 'targetNamespace' annotation attribute in @GvNIXWebService in class: '"
-                        .concat(javaType.getFullyQualifiedTypeName()).concat("'."));
+                        .concat(javaType.getFullyQualifiedTypeName()).concat(
+                                "'."));
+
+        Validate.isTrue(
+                StringUtils.isNotBlank(targetNamespace.getValue()),
+                "You must define 'targetNamespace' annotation attribute in @GvNIXWebService in class: '"
+                        .concat(javaType.getFullyQualifiedTypeName()).concat(
+                                "'."));
 
         // Get and validate gvNIX web service annotation target namespace value
         String targetNamespaceValue = targetNamespace.getValue();

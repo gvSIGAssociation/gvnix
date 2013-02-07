@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.importt;
 
@@ -60,7 +60,6 @@ import org.xml.sax.SAXException;
 
 /**
  * gvNix Web Service Java proxy generation.
- * 
  * <p>
  * Compatible address should be SOAP protocol version 1.1 and 1.2.
  * </p>
@@ -85,8 +84,7 @@ public class WSImportMetadata extends
     private final SecurityService securityService;
 
     // From annotation
-    @AutoPopulate
-    private String wsdlLocation;
+    @AutoPopulate private String wsdlLocation;
 
     public WSImportMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -105,7 +103,8 @@ public class WSImportMetadata extends
 
         // Create the metadata.
         AnnotationMetadata annotationMetadata = governorTypeDetails
-                .getTypeAnnotation(new JavaType(GvNIXWebServiceProxy.class.getName()));
+                .getTypeAnnotation(new JavaType(GvNIXWebServiceProxy.class
+                        .getName()));
 
         if (annotationMetadata != null) {
 
@@ -122,19 +121,21 @@ public class WSImportMetadata extends
                 // Create Aspect methods related to this wsdl location
                 if (WsdlParserUtils.isRpcEncoded(root)) {
 
-                    createAspectMethods(root,
-                            WsType.IMPORT_RPC_ENCODED);
-                } else {
+                    createAspectMethods(root, WsType.IMPORT_RPC_ENCODED);
+                }
+                else {
 
                     createAspectMethods(root, WsType.IMPORT);
                 }
 
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
 
                 throw new IllegalStateException(
                         "Error accessing generated web service sources");
 
-            } catch (ParseException e) {
+            }
+            catch (ParseException e) {
 
                 throw new IllegalStateException(
                         "Error parsing generated web service sources");
@@ -157,16 +158,11 @@ public class WSImportMetadata extends
     /**
      * Create methods on Aspect file related to this wsdl location.
      * 
-     * @param root
-     *            Root element of the wsdl document
-     * @param sense
-     *            Communication sense type
-     * @throws IOException
-     *             No connection to the wsdl location
-     * @throws SAXException
-     *             Invalid wsdl format
-     * @throws ParseException
-     *             Generated Java client parse error
+     * @param root Root element of the wsdl document
+     * @param sense Communication sense type
+     * @throws IOException No connection to the wsdl location
+     * @throws SAXException Invalid wsdl format
+     * @throws ParseException Generated Java client parse error
      */
     private void createAspectMethods(Element root, WsType sense)
             throws IOException, ParseException {
@@ -211,18 +207,12 @@ public class WSImportMetadata extends
     /**
      * Create method on Aspect file related to method object.
      * 
-     * @param root
-     *            Root element of the wsdl document
-     * @param servicePath
-     *            Path to the service type
-     * @param portTypePath
-     *            Path to the port type type
-     * @param portName
-     *            Name of port name
-     * @param method
-     *            Method to create on AspectJ
-     * @param type
-     *            Communication sense type
+     * @param root Root element of the wsdl document
+     * @param servicePath Path to the service type
+     * @param portTypePath Path to the port type type
+     * @param portName Name of port name
+     * @param method Method to create on AspectJ
+     * @param type Communication sense type
      */
     private void createAspectMethod(Element root, String servicePath,
             String portTypePath, String portName, MethodDeclaration method,
@@ -238,7 +228,8 @@ public class WSImportMetadata extends
             for (Parameter parameter : parameters) {
 
                 javaTypes.add(new AnnotatedJavaType(getJavaTypeByName(root,
-                        parameter.getType().toString()), new ArrayList<AnnotationMetadata>()));
+                        parameter.getType().toString()),
+                        new ArrayList<AnnotationMetadata>()));
                 javaNames.add(new JavaSymbolName(parameter.getId().toString()));
             }
         }
@@ -287,14 +278,10 @@ public class WSImportMetadata extends
     /**
      * Create method on Aspect file related to method object.
      * 
-     * @param servicePath
-     *            Path to the service type
-     * @param portTypePath
-     *            Path to the port type type
-     * @param portName
-     *            Name of port name
-     * @param method
-     *            Method to create on AspectJ
+     * @param servicePath Path to the service type
+     * @param portTypePath Path to the port type type
+     * @param portName Name of port name
+     * @param method Method to create on AspectJ
      */
     private InvocableMemberBodyBuilder createAspectMethodBody(
             String servicePath, String portTypePath, String portName,
@@ -342,10 +329,8 @@ public class WSImportMetadata extends
     /**
      * Get object type or primitive java type related to primitive type name.
      * 
-     * @param root
-     *            Root element of the wsdl document
-     * @param name
-     *            Type name
+     * @param root Root element of the wsdl document
+     * @param name Type name
      * @return Java type
      */
     private JavaType getJavaTypeByName(Element root, String name) {
@@ -359,12 +344,14 @@ public class WSImportMetadata extends
             type = new JavaType(getJavaClassPrimitiveByName(name), 0,
                     DataType.PRIMITIVE, null, null);
 
-        } else if ("void".equals(name)) {
+        }
+        else if ("void".equals(name)) {
 
             // Void type
             type = JavaType.VOID_PRIMITIVE;
 
-        } else if (name.trim().endsWith("[]")) {
+        }
+        else if (name.trim().endsWith("[]")) {
 
             // If array, analyze dimensions quantity
             int i = 0;
@@ -379,7 +366,8 @@ public class WSImportMetadata extends
 
                 // Array of object types
                 type = new JavaType(name, i, DataType.TYPE, null, null);
-            } else {
+            }
+            else {
 
                 // Array of primitive types
                 type = new JavaType(primitive, i, DataType.PRIMITIVE, null,
@@ -421,8 +409,7 @@ public class WSImportMetadata extends
     /**
      * Get the primitive object type name related to a primitive type name.
      * 
-     * @param name
-     *            Type name
+     * @param name Type name
      * @return Java object type or null
      */
     private String getJavaClassPrimitiveByName(String name) {
@@ -433,31 +420,38 @@ public class WSImportMetadata extends
 
             type = Boolean.class.getName();
 
-        } else if ("char".equals(name)) {
+        }
+        else if ("char".equals(name)) {
 
             type = Character.class.getName();
 
-        } else if ("byte".equals(name)) {
+        }
+        else if ("byte".equals(name)) {
 
             type = Byte.class.getName();
 
-        } else if ("short".equals(name)) {
+        }
+        else if ("short".equals(name)) {
 
             type = Short.class.getName();
 
-        } else if ("int".equals(name)) {
+        }
+        else if ("int".equals(name)) {
 
             type = Integer.class.getName();
 
-        } else if ("long".equals(name)) {
+        }
+        else if ("long".equals(name)) {
 
             type = Long.class.getName();
 
-        } else if ("float".equals(name)) {
+        }
+        else if ("float".equals(name)) {
 
             type = Float.class.getName();
 
-        } else if ("double".equals(name)) {
+        }
+        else if ("double".equals(name)) {
 
             type = Double.class.getName();
         }
@@ -484,7 +478,8 @@ public class WSImportMetadata extends
                 WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
+    public static final String createIdentifier(JavaType javaType,
+            LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 WEB_SERVICE_TYPE_STRING, javaType, path);
     }

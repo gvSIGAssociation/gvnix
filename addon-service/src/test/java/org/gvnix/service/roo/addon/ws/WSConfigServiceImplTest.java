@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws;
 
@@ -68,7 +68,7 @@ public class WSConfigServiceImplTest {
     private ProjectMetadata projectMetadata;
 
     private ProjectOperations projectOperations;
-    
+
     private static Logger logger = Logger
             .getLogger(WSConfigServiceImplTest.class.getName());
 
@@ -97,9 +97,9 @@ public class WSConfigServiceImplTest {
                 fileManager);
         ReflectionTestUtils.setField(wSConfigServiceImpl, "metadataService",
                 metadataService);
-		ReflectionTestUtils.setField(wSConfigServiceImpl, "projectOperations",
-				projectOperations);
-		
+        ReflectionTestUtils.setField(wSConfigServiceImpl, "projectOperations",
+                projectOperations);
+
         // ReflectionTestUtils.setField(projectOperations, "pathResolver",
         // pathResolver);
 
@@ -107,12 +107,12 @@ public class WSConfigServiceImplTest {
 
     /**
      * Checks method {@link WSConfigServiceImpl#isCxfDependenciesInstalled()}
-     * 
-     * TODO Test disabled because error after migrate to Roo 1.2.2 (¿ changed mock tests ?)
+     * TODO Test disabled because error after migrate to Roo 1.2.2 (¿ changed
+     * mock tests ?)
      * 
      * @throws Exception
      */
-//    @Test
+    // @Test
     public void testAreCxfDependenciesInstalled() throws Exception {
 
         boolean areCxfDependenciesInstalledResult;
@@ -121,8 +121,11 @@ public class WSConfigServiceImplTest {
          * Test 1 - Todas las dependencias de CXF han sido definidas en el
          * pom.xml.
          */
-        expect(metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName())))
-                .andReturn(projectMetadata);
+        expect(
+                metadataService.get(ProjectMetadata
+                        .getProjectIdentifier(projectOperations
+                                .getFocusedModuleName()))).andReturn(
+                projectMetadata);
 
         Dependency dependency;
 
@@ -155,15 +158,19 @@ public class WSConfigServiceImplTest {
          */
         String dependencyNotDefined = "jaxb-api";
 
-        expect(metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName())))
-                .andReturn(projectMetadata);
+        expect(
+                metadataService.get(ProjectMetadata
+                        .getProjectIdentifier(projectOperations
+                                .getFocusedModuleName()))).andReturn(
+                projectMetadata);
 
         for (Element element : dependencyList) {
 
             dependency = new Dependency(element);
             if (dependency.getArtifactId().compareTo(dependencyNotDefined) == 0) {
-                expect(projectMetadata.getPom().isDependencyRegistered(dependency))
-                        .andReturn(false);
+                expect(
+                        projectMetadata.getPom().isDependencyRegistered(
+                                dependency)).andReturn(false);
             }
             expect(projectMetadata.getPom().isDependencyRegistered(dependency))
                     .andReturn(true);
@@ -184,13 +191,13 @@ public class WSConfigServiceImplTest {
     }
 
     /**
-     * Checks method {@link WSConfigServiceImpl#isCxfConfigurated()}
-     * 
-     * TODO Test disabled because error after migrate to Roo 1.2.2 (¿ changed mock tests ?)
+     * Checks method {@link WSConfigServiceImpl#isCxfConfigurated()} TODO Test
+     * disabled because error after migrate to Roo 1.2.2 (¿ changed mock tests
+     * ?)
      * 
      * @throws Exception
      */
-//    @Test
+    // @Test
     public void testIsCxfConfigurated() throws Exception {
 
         String projectName;
@@ -210,10 +217,15 @@ public class WSConfigServiceImplTest {
 
         cxfConfigFileExpected = true;
 
-        expect(metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName())))
-                .andReturn(projectMetadata);
+        expect(
+                metadataService.get(ProjectMetadata
+                        .getProjectIdentifier(projectOperations
+                                .getFocusedModuleName()))).andReturn(
+                projectMetadata);
 
-        expect(projectOperations.getProjectName(projectOperations.getFocusedModuleName())).andReturn(projectName);
+        expect(
+                projectOperations.getProjectName(projectOperations
+                        .getFocusedModuleName())).andReturn(projectName);
 
         // expect(
         // projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP,

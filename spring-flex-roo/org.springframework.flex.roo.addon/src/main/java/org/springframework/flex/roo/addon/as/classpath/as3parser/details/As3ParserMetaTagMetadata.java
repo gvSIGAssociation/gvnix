@@ -1,17 +1,17 @@
 /*
  * Copyright 2002-2010 the original author or authors.
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.springframework.flex.roo.addon.as.classpath.as3parser.details;
@@ -36,7 +36,7 @@ import uk.co.badgersinfoil.metaas.dom.MetaTagable;
 
 /**
  * Parser-specific metadata representation of an ActionScript meta-tag.
- *
+ * 
  * @author Jeremy Grelle
  */
 public class As3ParserMetaTagMetadata implements ASMetaTagMetadata {
@@ -51,8 +51,10 @@ public class As3ParserMetaTagMetadata implements ASMetaTagMetadata {
         Validate.notNull(metaTag, "Meta Tag required");
 
         this.name = metaTag.getName();
-        for (ASMetaTag.Param param : (List<ASMetaTag.Param>) metaTag.getParams()) {
-            MetaTagAttributeValue<?> attr = As3ParserUtils.getMetaTagAttributeValue(param);
+        for (ASMetaTag.Param param : (List<ASMetaTag.Param>) metaTag
+                .getParams()) {
+            MetaTagAttributeValue<?> attr = As3ParserUtils
+                    .getMetaTagAttributeValue(param);
             this.attributes.put(attr.getName(), attr);
         }
     }
@@ -61,7 +63,8 @@ public class As3ParserMetaTagMetadata implements ASMetaTagMetadata {
         return this.name;
     }
 
-    public MetaTagAttributeValue<?> getAttribute(ActionScriptSymbolName attributeName) {
+    public MetaTagAttributeValue<?> getAttribute(
+            ActionScriptSymbolName attributeName) {
         Validate.notNull(attributeName, "Attribute name required");
         return this.attributes.get(attributeName);
     }
@@ -71,28 +74,39 @@ public class As3ParserMetaTagMetadata implements ASMetaTagMetadata {
     }
 
     @SuppressWarnings("unchecked")
-    public static void addMetaTagToElement(CompilationUnitServices compilationUnitServices, ASMetaTagMetadata metaTag, MetaTagable element,
-        boolean permitFlush) {
+    public static void addMetaTagToElement(
+            CompilationUnitServices compilationUnitServices,
+            ASMetaTagMetadata metaTag, MetaTagable element, boolean permitFlush) {
 
-        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(compilationUnitServices,
+                "Compilation unit services required");
         Validate.notNull(metaTag, "Metatag required");
         Validate.notNull(element, "Element required");
 
         for (ASMetaTag existingTag : (List<ASMetaTag>) element.getAllMetaTags()) {
-            Validate.isTrue(!metaTag.getName().equals(existingTag.getName()), "Found an existing meta tag of type '" + metaTag.getName() + "'");
+            Validate.isTrue(!metaTag.getName().equals(existingTag.getName()),
+                    "Found an existing meta tag of type '" + metaTag.getName()
+                            + "'");
         }
 
         ASMetaTag newMetaTag = element.newMetaTag(metaTag.getName());
         for (ActionScriptSymbolName attrName : metaTag.getAttributeNames()) {
             MetaTagAttributeValue<?> value = metaTag.getAttribute(attrName);
             if (value instanceof BooleanAttributeValue) {
-                newMetaTag.addParam(attrName.getSymbolName(), ((BooleanAttributeValue) value).getValue());
-            } else if (value instanceof IntegerAttributeValue) {
-                newMetaTag.addParam(attrName.getSymbolName(), ((IntegerAttributeValue) value).getValue());
-            } else if (value instanceof StringAttributeValue) {
-                newMetaTag.addParam(attrName.getSymbolName(), ((StringAttributeValue) value).getValue());
-            } else {
-                throw new IllegalArgumentException("Cannot add uknown meta tag attribute type.");
+                newMetaTag.addParam(attrName.getSymbolName(),
+                        ((BooleanAttributeValue) value).getValue());
+            }
+            else if (value instanceof IntegerAttributeValue) {
+                newMetaTag.addParam(attrName.getSymbolName(),
+                        ((IntegerAttributeValue) value).getValue());
+            }
+            else if (value instanceof StringAttributeValue) {
+                newMetaTag.addParam(attrName.getSymbolName(),
+                        ((StringAttributeValue) value).getValue());
+            }
+            else {
+                throw new IllegalArgumentException(
+                        "Cannot add uknown meta tag attribute type.");
             }
         }
 
@@ -101,19 +115,25 @@ public class As3ParserMetaTagMetadata implements ASMetaTagMetadata {
         }
     }
 
-    public static void removeMetatagFromElement(CompilationUnitServices compilationUnitServices, MetaTagable element, String name, boolean permitFlush) {
-        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+    public static void removeMetatagFromElement(
+            CompilationUnitServices compilationUnitServices,
+            MetaTagable element, String name, boolean permitFlush) {
+        Validate.notNull(compilationUnitServices,
+                "Compilation unit services required");
         Validate.notNull(name, "Name required");
         Validate.notNull(element, "Element required");
 
         ASMetaTag tag = element.getFirstMetatag(name);
 
-        Validate.notNull(tag, "Could not locate metatag '" + name + "' to delete");
+        Validate.notNull(tag, "Could not locate metatag '" + name
+                + "' to delete");
 
-        // TODO - this doesn't actually work as the getAllMetaTags list is an unmodifiable collections
+        // TODO - this doesn't actually work as the getAllMetaTags list is an
+        // unmodifiable collections
         element.getAllMetaTags().remove(tag);
 
-        // For this to work, we'll have to extend the existing parser and add in something like
+        // For this to work, we'll have to extend the existing parser and add in
+        // something like
         // MetaTagable#removeTag(String name)
 
         if (permitFlush) {

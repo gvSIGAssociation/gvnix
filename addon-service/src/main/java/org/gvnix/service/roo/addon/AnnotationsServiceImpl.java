@@ -36,16 +36,11 @@ import org.w3c.dom.Element;
 @Service
 public class AnnotationsServiceImpl implements AnnotationsService {
 
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private JavaParserService javaParserService;
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private TypeLocationService typeLocationService;
-    @Reference
-    private TypeManagementService typeManagementService;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private JavaParserService javaParserService;
+    @Reference private MetadataService metadataService;
+    @Reference private TypeLocationService typeLocationService;
+    @Reference private TypeManagementService typeManagementService;
 
     private static Logger logger = Logger.getLogger(AnnotationsService.class
             .getName());
@@ -61,7 +56,8 @@ public class AnnotationsServiceImpl implements AnnotationsService {
         // Find repository elements and add them to the project
         for (Element repo : XmlUtils.findElements(
                 "/configuration/gvnix/repositories/repository", conf)) {
-            projectOperations.addRepository(projectOperations.getFocusedModuleName(), new Repository(repo));
+            projectOperations.addRepository(projectOperations
+                    .getFocusedModuleName(), new Repository(repo));
         }
 
         // Find dependency elements and update them into the project
@@ -83,8 +79,8 @@ public class AnnotationsServiceImpl implements AnnotationsService {
                 .getTypeDetails(serviceClass);
 
         // Check and get mutable instance
-        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
-                typeDetails, "Can't modify " + typeDetails.getName());
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class, typeDetails,
+                "Can't modify " + typeDetails.getName());
         ClassOrInterfaceTypeDetails mutableTypeDetails = (ClassOrInterfaceTypeDetails) typeDetails;
 
         // Check annotation defined.
@@ -100,10 +96,15 @@ public class AnnotationsServiceImpl implements AnnotationsService {
                                 + serviceClass.getFullyQualifiedTypeName()
                                 + "' and will be updated.");
 
-                ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
-                mutableTypeDetailsBuilder.removeAnnotation(new JavaType(annotation));
-                typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
-            } else {
+                ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                        mutableTypeDetails);
+                mutableTypeDetailsBuilder.removeAnnotation(new JavaType(
+                        annotation));
+                typeManagementService
+                        .createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder
+                                .build());
+            }
+            else {
                 logger.log(
                         Level.FINE,
                         "The annotation " + annotation
@@ -128,9 +129,11 @@ public class AnnotationsServiceImpl implements AnnotationsService {
                 new JavaType(annotation), annotationAttributeValues).build();
 
         // Adds annotation to the entity
-        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                mutableTypeDetails);
         mutableTypeDetailsBuilder.addAnnotation(defaultAnnotationMetadata);
-        typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
+        typeManagementService
+                .createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
 
         // Delete from chache to update class values.
         metadataService.evict(typeDetails.getDeclaredByMetadataId());

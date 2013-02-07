@@ -1,17 +1,17 @@
 /*
  * Copyright 2002-2010 the original author or authors.
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.springframework.flex.roo.addon.as.classpath.as3parser.details;
@@ -35,7 +35,7 @@ import uk.co.badgersinfoil.metaas.dom.ASMetaTag;
 
 /**
  * Parser-specific metadata representation of an ActionScript field.
- *
+ * 
  * @author Jeremy Grelle
  */
 public class As3ParserFieldMetadata extends AbstractASFieldMetadata {
@@ -53,18 +53,24 @@ public class As3ParserFieldMetadata extends AbstractASFieldMetadata {
     private String declaredByMetadataId;
 
     @SuppressWarnings("unchecked")
-    public As3ParserFieldMetadata(String declaredByMetadataId, ASField field, CompilationUnitServices compilationUnitServices) {
-        Validate.notNull(declaredByMetadataId, "Declared by metadata ID required");
+    public As3ParserFieldMetadata(String declaredByMetadataId, ASField field,
+            CompilationUnitServices compilationUnitServices) {
+        Validate.notNull(declaredByMetadataId,
+                "Declared by metadata ID required");
         Validate.notNull(field, "ActionScript field is required");
-        Validate.notNull(compilationUnitServices, "Compilation unit services are required");
+        Validate.notNull(compilationUnitServices,
+                "Compilation unit services are required");
 
         this.setDeclaredByMetadataId(declaredByMetadataId);
 
-        this.fieldType = As3ParserUtils.getActionScriptType(compilationUnitServices.getCompilationUnitPackage(),
-            compilationUnitServices.getImports(), field.getType());
+        this.fieldType = As3ParserUtils.getActionScriptType(
+                compilationUnitServices.getCompilationUnitPackage(),
+                compilationUnitServices.getImports(), field.getType());
         this.setFieldName(new ActionScriptSymbolName(field.getName()));
-        this.visibility = As3ParserUtils.getASTypeVisibility(field.getVisibility());
-        this.fieldInitializer = field.getInitializer() != null ? field.getInitializer().toString() : null;
+        this.visibility = As3ParserUtils.getASTypeVisibility(field
+                .getVisibility());
+        this.fieldInitializer = field.getInitializer() != null ? field
+                .getInitializer().toString() : null;
 
         for (ASMetaTag metaTag : (List<ASMetaTag>) field.getAllMetaTags()) {
             this.metaTags.add(new As3ParserMetaTagMetadata(metaTag));
@@ -97,18 +103,23 @@ public class As3ParserFieldMetadata extends AbstractASFieldMetadata {
         return this.fieldInitializer;
     }
 
-    public static void addField(CompilationUnitServices compilationUnitServices, ASClassType clazz, ASFieldMetadata field, boolean permitFlush) {
+    public static void addField(
+            CompilationUnitServices compilationUnitServices, ASClassType clazz,
+            ASFieldMetadata field, boolean permitFlush) {
 
-        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(compilationUnitServices,
+                "Compilation unit services required");
         Validate.notNull(clazz, "Class required");
         Validate.notNull(field, "Field required");
 
         // Import the field type into the compilation unit
-        As3ParserUtils.importTypeIfRequired(compilationUnitServices, field.getFieldType());
+        As3ParserUtils.importTypeIfRequired(compilationUnitServices,
+                field.getFieldType());
 
         // Add the field
-        ASField newField = clazz.newField(field.getFieldName().getSymbolName(), As3ParserUtils.getAs3ParserVisiblity(field.getVisibility()),
-            field.getFieldType().getSimpleTypeName());
+        ASField newField = clazz.newField(field.getFieldName().getSymbolName(),
+                As3ParserUtils.getAs3ParserVisiblity(field.getVisibility()),
+                field.getFieldType().getSimpleTypeName());
 
         if (field.getFieldInitializer() != null) {
             newField.setInitializer(field.getFieldInitializer());
@@ -116,7 +127,8 @@ public class As3ParserFieldMetadata extends AbstractASFieldMetadata {
 
         // Add meta tags to the field
         for (ASMetaTagMetadata metaTag : field.getMetaTags()) {
-            As3ParserMetaTagMetadata.addMetaTagToElement(compilationUnitServices, metaTag, newField, false);
+            As3ParserMetaTagMetadata.addMetaTagToElement(
+                    compilationUnitServices, metaTag, newField, false);
         }
 
         if (permitFlush) {
@@ -124,18 +136,24 @@ public class As3ParserFieldMetadata extends AbstractASFieldMetadata {
         }
     }
 
-    public static void updateField(CompilationUnitServices compilationUnitServices, ASClassType clazz, ASFieldMetadata field, boolean permitFlush) {
+    public static void updateField(
+            CompilationUnitServices compilationUnitServices, ASClassType clazz,
+            ASFieldMetadata field, boolean permitFlush) {
 
-        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(compilationUnitServices,
+                "Compilation unit services required");
         Validate.notNull(clazz, "Class required");
         Validate.notNull(field, "Field required");
 
         // Import the field type into the compilation unit
-        As3ParserUtils.importTypeIfRequired(compilationUnitServices, field.getFieldType());
+        As3ParserUtils.importTypeIfRequired(compilationUnitServices,
+                field.getFieldType());
 
-        ASField existingField = clazz.getField(field.getFieldName().getSymbolName());
+        ASField existingField = clazz.getField(field.getFieldName()
+                .getSymbolName());
 
-        existingField.setVisibility(As3ParserUtils.getAs3ParserVisiblity(field.getVisibility()));
+        existingField.setVisibility(As3ParserUtils.getAs3ParserVisiblity(field
+                .getVisibility()));
 
         existingField.setType(field.getFieldType().getSimpleTypeName());
 
@@ -146,18 +164,22 @@ public class As3ParserFieldMetadata extends AbstractASFieldMetadata {
         // Add meta tags to the field
         for (ASMetaTagMetadata metaTag : field.getMetaTags()) {
             if (existingField.getFirstMetatag(metaTag.getName()) != null) {
-                As3ParserMetaTagMetadata.addMetaTagToElement(compilationUnitServices, metaTag, existingField, false);
+                As3ParserMetaTagMetadata.addMetaTagToElement(
+                        compilationUnitServices, metaTag, existingField, false);
             }
         }
     }
 
-    public static void removeField(CompilationUnitServices compilationUnitServices, ASClassType clazz, ActionScriptSymbolName fieldName,
-        boolean permitFlush) {
-        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+    public static void removeField(
+            CompilationUnitServices compilationUnitServices, ASClassType clazz,
+            ActionScriptSymbolName fieldName, boolean permitFlush) {
+        Validate.notNull(compilationUnitServices,
+                "Compilation unit services required");
         Validate.notNull(clazz, "Class required");
         Validate.notNull(fieldName, "Field name required");
 
-        Validate.notNull(clazz.getField(fieldName.getSymbolName()), "Could not locate field '" + fieldName + "' to delete");
+        Validate.notNull(clazz.getField(fieldName.getSymbolName()),
+                "Could not locate field '" + fieldName + "' to delete");
 
         clazz.removeField(fieldName.getSymbolName());
 

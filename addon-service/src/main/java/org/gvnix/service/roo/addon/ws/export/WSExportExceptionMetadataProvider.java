@@ -1,23 +1,22 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.export;
-
 
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
@@ -53,10 +52,8 @@ import org.apache.commons.lang3.StringUtils;
 public class WSExportExceptionMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
-    private WSConfigService wSConfigService;
-    @Reference
-    private WSExportValidationService wSExportValidationService;
+    @Reference private WSConfigService wSConfigService;
+    @Reference private WSExportValidationService wSExportValidationService;
 
     protected void activate(ComponentContext context) {
         // Ensure we're notified of all metadata related to physical Java types,
@@ -125,7 +122,8 @@ public class WSExportExceptionMetadataProvider extends
                 || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
             // There is a problem
             return null;
-        } else {
+        }
+        else {
             // We have reliable physical type details
             governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
         }
@@ -146,7 +144,7 @@ public class WSExportExceptionMetadataProvider extends
         exceptionMetadata = new WSExportExceptionMetadata(
                 metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata);
-        
+
         return exceptionMetadata;
     }
 

@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.occ.roo.addon;
 
@@ -69,29 +69,23 @@ import org.springframework.roo.support.logging.HandlerUtils;
 @Service
 public class OCCChecksumMetadataProvider implements
         ItdTriggerBasedMetadataProvider, MetadataNotificationListener {
-	
+
     private static final Logger LOGGER = HandlerUtils
             .getLogger(FinderOperationsImpl.class);
 
     // From AbstractItdMetadataProvider
     private boolean dependsOnGovernorTypeDetailAvailability = true;
     private boolean dependsOnGovernorBeingAClass = true;
-    @Reference
-    protected MetadataService metadataService;
-    @Reference
-    protected MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference
-    protected FileManager fileManager;
+    @Reference protected MetadataService metadataService;
+    @Reference protected MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference protected FileManager fileManager;
 
     // DiSiD: Used to get the type members
-    @Reference
-    protected MemberDetailsScanner memberDetailsScanner;
-    
-    @Reference
-    protected PersistenceMemberLocator persistenceMemberLocator;
-    
-    @Reference
-    protected TypeManagementService typeManagementService;
+    @Reference protected MemberDetailsScanner memberDetailsScanner;
+
+    @Reference protected PersistenceMemberLocator persistenceMemberLocator;
+
+    @Reference protected TypeManagementService typeManagementService;
 
     /**
      * The annotations which, if present on a class or interface, will cause
@@ -156,7 +150,8 @@ public class OCCChecksumMetadataProvider implements
             String metadataIdentificationString) {
         JavaType javaType = OCCChecksumMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = OCCChecksumMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = OCCChecksumMetadata
+                .getPath(metadataIdentificationString);
         String physicalTypeIdentifier = PhysicalTypeIdentifier
                 .createIdentifier(javaType, path);
         return physicalTypeIdentifier;
@@ -182,7 +177,9 @@ public class OCCChecksumMetadataProvider implements
             return null;
         }
 
-        FieldMetadata versionField = persistenceMemberLocator.getVersionField(governorPhysicalTypeMetadata.getMemberHoldingTypeDetails().getName());
+        FieldMetadata versionField = persistenceMemberLocator
+                .getVersionField(governorPhysicalTypeMetadata
+                        .getMemberHoldingTypeDetails().getName());
 
         if (versionField != null) {
             String declaredByType = entityMetadataKey
@@ -202,7 +199,8 @@ public class OCCChecksumMetadataProvider implements
         OCCChecksumMetadata metadata = new OCCChecksumMetadata(
                 metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, entityMetadata,
-                memberDetailsScanner, typeManagementService, persistenceMemberLocator);
+                memberDetailsScanner, typeManagementService,
+                persistenceMemberLocator);
 
         return metadata;
     }
@@ -212,7 +210,7 @@ public class OCCChecksumMetadataProvider implements
             String downstreamDependency) {
         if (MetadataIdentificationUtils
                 .isIdentifyingClass(downstreamDependency)) {
-        	Validate.isTrue(
+            Validate.isTrue(
                     MetadataIdentificationUtils.getMetadataClass(
                             upstreamDependency).equals(
                             MetadataIdentificationUtils
@@ -226,7 +224,8 @@ public class OCCChecksumMetadataProvider implements
             // been
             JavaType javaType = PhysicalTypeIdentifier
                     .getJavaType(upstreamDependency);
-            LogicalPath path = PhysicalTypeIdentifier.getPath(upstreamDependency);
+            LogicalPath path = PhysicalTypeIdentifier
+                    .getPath(upstreamDependency);
             downstreamDependency = createLocalIdentifier(javaType, path);
 
             // We only need to proceed if the downstream dependency relationship
@@ -261,12 +260,11 @@ public class OCCChecksumMetadataProvider implements
      * Registers an additional {@link JavaType} that will trigger metadata
      * registration.
      * 
-     * @param javaType
-     *            the type-level annotation to detect that will cause metadata
-     *            creation (required)
+     * @param javaType the type-level annotation to detect that will cause
+     *            metadata creation (required)
      */
     public void addMetadataTrigger(JavaType javaType) {
-    	Validate.notNull(javaType,
+        Validate.notNull(javaType,
                 "Java type required for metadata trigger registration");
         this.metadataTriggers.add(javaType);
     }
@@ -275,11 +273,10 @@ public class OCCChecksumMetadataProvider implements
      * Removes a {@link JavaType} metadata trigger registration. If the type was
      * never registered, the method returns without an error.
      * 
-     * @param javaType
-     *            to remove (required)
+     * @param javaType to remove (required)
      */
     public void removeMetadataTrigger(JavaType javaType) {
-    	Validate.notNull(javaType,
+        Validate.notNull(javaType,
                 "Java type required for metadata trigger deregistration");
         this.metadataTriggers.remove(javaType);
     }
@@ -302,7 +299,7 @@ public class OCCChecksumMetadataProvider implements
      * org.springframework.roo.metadata.MetadataProvider#get(java.lang.String)
      */
     public final MetadataItem get(String metadataIdentificationString) {
-    	Validate.isTrue(
+        Validate.isTrue(
                 MetadataIdentificationUtils.getMetadataClass(
                         metadataIdentificationString).equals(
                         MetadataIdentificationUtils
@@ -413,17 +410,21 @@ public class OCCChecksumMetadataProvider implements
                         File newFile = new File(itdFilename);
                         String existing = null;
                         try {
-                            existing = IOUtils.toString(new FileReader(newFile));
-                        } catch (IOException ignoreAndJustOverwriteIt) {
-                        	LOGGER.finest("Problem writting ".concat(newFile.getAbsolutePath()).concat(": ")
-                        			+ ignoreAndJustOverwriteIt);
+                            existing = IOUtils
+                                    .toString(new FileReader(newFile));
+                        }
+                        catch (IOException ignoreAndJustOverwriteIt) {
+                            LOGGER.finest("Problem writting ".concat(
+                                    newFile.getAbsolutePath()).concat(": ")
+                                    + ignoreAndJustOverwriteIt);
                         }
 
                         if (!itd.equals(existing)) {
                             mutableFile = fileManager.updateFile(itdFilename);
                         }
 
-                    } else {
+                    }
+                    else {
                         mutableFile = fileManager.createFile(itdFilename);
                         Validate.notNull(mutableFile,
                                 "Could not create ITD file '" + itdFilename
@@ -434,19 +435,21 @@ public class OCCChecksumMetadataProvider implements
                         if (mutableFile != null) {
                             InputStream inputStream = null;
                             OutputStream outputStream = null;
-                            try { 
-                            	inputStream = IOUtils.toInputStream(itd);
-                            	outputStream = mutableFile.getOutputStream();
-                            	IOUtils.copy(inputStream, outputStream);
+                            try {
+                                inputStream = IOUtils.toInputStream(itd);
+                                outputStream = mutableFile.getOutputStream();
+                                IOUtils.copy(inputStream, outputStream);
                             }
                             finally {
-                            	IOUtils.closeQuietly(inputStream);
-                            	IOUtils.closeQuietly(outputStream);
+                                IOUtils.closeQuietly(inputStream);
+                                IOUtils.closeQuietly(outputStream);
                             }
                         }
-                    } catch (IOException ioe) {
+                    }
+                    catch (IOException ioe) {
                         throw new IllegalStateException("Could not output '"
-                                .concat(mutableFile.getCanonicalPath()).concat("'"), ioe);
+                                .concat(mutableFile.getCanonicalPath()).concat(
+                                        "'"), ioe);
                     }
 
                     // Important to exit here, so we don't proceed onto the
@@ -461,7 +464,7 @@ public class OCCChecksumMetadataProvider implements
             // DiSiD: Removed because in shell restart some AJ files deleted
             // and not recreated
             // if (metadata.isValid() && fileManager.exists(itdFilename)) {
-                // fileManager.delete(itdFilename);
+            // fileManager.delete(itdFilename);
             // }
 
             return metadata;
@@ -472,7 +475,7 @@ public class OCCChecksumMetadataProvider implements
 
     public final String getIdForPhysicalJavaType(
             String physicalJavaTypeIdentifier) {
-    	Validate.isTrue(
+        Validate.isTrue(
                 MetadataIdentificationUtils.getMetadataClass(
                         physicalJavaTypeIdentifier).equals(
                         MetadataIdentificationUtils
@@ -482,7 +485,8 @@ public class OCCChecksumMetadataProvider implements
                         + physicalJavaTypeIdentifier + "')");
         JavaType javaType = PhysicalTypeIdentifier
                 .getJavaType(physicalJavaTypeIdentifier);
-        LogicalPath path = PhysicalTypeIdentifier.getPath(physicalJavaTypeIdentifier);
+        LogicalPath path = PhysicalTypeIdentifier
+                .getPath(physicalJavaTypeIdentifier);
         return createLocalIdentifier(javaType, path);
     }
 
@@ -490,8 +494,8 @@ public class OCCChecksumMetadataProvider implements
      * If set to true (default is true), ensures subclass not called unless the
      * governor type details are available.
      * 
-     * @param dependsOnGovernorTypeDetailAvailability
-     *            true means governor type details must be available
+     * @param dependsOnGovernorTypeDetailAvailability true means governor type
+     *            details must be available
      */
     public void setDependsOnGovernorTypeDetailAvailability(
             boolean dependsOnGovernorTypeDetailAvailability) {
@@ -504,8 +508,8 @@ public class OCCChecksumMetadataProvider implements
      * {@link #setDependsOnGovernorTypeDetailAvailability(boolean)} must also be
      * true to ensure this can be relied upon.
      * 
-     * @param dependsOnGovernorBeingAClass
-     *            true means governor type detail must represent a class
+     * @param dependsOnGovernorBeingAClass true means governor type detail must
+     *            represent a class
      */
     public void setDependsOnGovernorBeingAClass(
             boolean dependsOnGovernorBeingAClass) {

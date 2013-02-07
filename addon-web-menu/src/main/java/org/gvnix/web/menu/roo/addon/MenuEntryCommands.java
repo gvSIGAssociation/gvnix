@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.menu.roo.addon;
 
@@ -66,8 +66,7 @@ public class MenuEntryCommands implements CommandMarker { // all command types
     /**
      * Use MenuEntryOperations to execute operations
      */
-    @Reference
-    private MenuEntryOperations operations;
+    @Reference private MenuEntryOperations operations;
 
     /**
      * Automatic {@code menu setup} command hiding in situations when the
@@ -118,7 +117,8 @@ public class MenuEntryCommands implements CommandMarker { // all command types
         JavaSymbolName categoryName = null;
         if (parentEntryId == null) {
             categoryName = new JavaSymbolName("Page");
-        } else {
+        }
+        else {
             categoryName = parentEntryId.getJavaSymbolName();
         }
 
@@ -151,7 +151,7 @@ public class MenuEntryCommands implements CommandMarker { // all command types
             @CliOption(key = "id", mandatory = true, help = "Item to move") MenuEntry menuEntryId,
             @CliOption(key = "into", mandatory = false, optionContext = MenuEntryOperations.CATEGORY_MENU_ITEM_PREFIX, help = "Insert the menu entry into this.") MenuEntry intoEntryId,
             @CliOption(key = "before", mandatory = false, help = "   .") MenuEntry beforeEntryId) {
-    	Validate.notNull(menuEntryId, "A page is required");
+        Validate.notNull(menuEntryId, "A page is required");
         if (intoEntryId == null && beforeEntryId == null) {
             logger.log(Level.SEVERE, "'into' or 'before' parameter must be set");
             return;
@@ -175,7 +175,8 @@ public class MenuEntryCommands implements CommandMarker { // all command types
         if (intoEntryId != null) {
             operations.moveInto(menuEntryId.getJavaSymbolName(),
                     intoEntryId.getJavaSymbolName());
-        } else {
+        }
+        else {
             operations.moveBefore(menuEntryId.getJavaSymbolName(),
                     beforeEntryId.getJavaSymbolName());
         }

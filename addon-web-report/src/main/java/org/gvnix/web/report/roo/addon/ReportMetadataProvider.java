@@ -39,40 +39,34 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * metadata for this add-on. Use this type to reference external types and
  * services needed by the metadata type. Register metadata triggers and
  * dependencies here. Also define the unique add-on ITD identifier.
- *
+ * 
  * @since 1.1
  */
 @Component(immediate = true)
 @Service
 public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
-    private static final Logger logger = HandlerUtils.getLogger(ReportMetadataProvider.class);
+    private static final Logger logger = HandlerUtils
+            .getLogger(ReportMetadataProvider.class);
 
-    @Reference
-    protected TypeLocationService typeLocationService;
+    @Reference protected TypeLocationService typeLocationService;
 
-    @Reference
-    protected WebScaffoldMetadataProvider webScaffoldMetadataProvider;
+    @Reference protected WebScaffoldMetadataProvider webScaffoldMetadataProvider;
 
-    @Reference
-    protected ProjectOperations projectOperations;
+    @Reference protected ProjectOperations projectOperations;
 
-    @Reference
-    protected PropFileOperations propFileOperations;
+    @Reference protected PropFileOperations propFileOperations;
 
-    @Reference
-    protected WebMetadataService webMetadataService;
+    @Reference protected WebMetadataService webMetadataService;
 
-    @Reference
-    protected ReportConfigService reportConfigService;
+    @Reference protected ReportConfigService reportConfigService;
 
     /**
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
      * command)
-     *
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * 
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -87,10 +81,9 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
      * The deactivate method for this OSGi component, this will be called by the
      * OSGi container upon bundle deactivation (result of the 'addon uninstall'
      * command)
-     *
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * 
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
         metadataDependencyRegistry.deregisterDependency(
@@ -149,15 +142,16 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
                  * annotation. With the validReportNameFormats HashMap we can
                  * know if a report is defined more than once and handle it as
                  * just one definition aggregating the formats defined in each
-                 * report definition.
-                 * TODO: would be a great improvement to advise user about duplicity of report definitions
+                 * report definition. TODO: would be a great improvement to
+                 * advise user about duplicity of report definitions
                  */
-                for (Entry<String,String> reportEntry : validReportNameFormats.entrySet()) {
-                	String reportName = reportEntry.getKey().toLowerCase();
+                for (Entry<String, String> reportEntry : validReportNameFormats
+                        .entrySet()) {
+                    String reportName = reportEntry.getKey().toLowerCase();
                     StringAttributeValue newSV = new StringAttributeValue(
-                            new JavaSymbolName("ignored"),
-                            reportName.concat("|")
-                            	.concat(validReportNameFormats.get(reportName)));
+                            new JavaSymbolName("ignored"), reportName.concat(
+                                    "|").concat(
+                                    validReportNameFormats.get(reportName)));
                     definedReports.add(newSV);
                 }
             }
@@ -171,26 +165,25 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
         WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) webScaffoldMetadataProvider
                 .get(webScaffoldMetadataKey);
         if (webScaffoldMetadata == null) {
-            logger.warning("The report can not be created over a Controlloer without " +
-                            "@RooWebScaffold annotation and its 'fromBackingObject' attribute " +
-                            "set. Check " + javaType.getFullyQualifiedTypeName());
+            logger.warning("The report can not be created over a Controlloer without "
+                    + "@RooWebScaffold annotation and its 'fromBackingObject' attribute "
+                    + "set. Check " + javaType.getFullyQualifiedTypeName());
             return null;
         }
 
         // Pass dependencies required by the metadata in through its constructor
         return new ReportMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata,
-                controllerMemberDetails.getMethods(),
-                metadataService, memberDetailsScanner,
-                metadataDependencyRegistry, webScaffoldMetadata,
-                webMetadataService, fileManager,
+                controllerMemberDetails.getMethods(), metadataService,
+                memberDetailsScanner, metadataDependencyRegistry,
+                webScaffoldMetadata, webMetadataService, fileManager,
                 projectOperations, propFileOperations, definedReports);
     }
 
     /**
      * Returns a HashMap<String, String>. Key is reportName; Value is the csv of
      * formats.
-     *
+     * 
      * @param arrayVal
      * @return
      */
@@ -215,7 +208,8 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
                             ReportMetadata.updateFormat(validReportNameFormats
                                     .get(reportNameFormat[0]),
                                     reportNameFormat[1]));
-                } else {
+                }
+                else {
                     validReportNameFormats.put(reportNameFormat[0],
                             reportNameFormat[1]);
                 }

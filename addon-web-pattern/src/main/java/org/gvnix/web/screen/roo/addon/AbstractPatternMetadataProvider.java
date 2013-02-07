@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.screen.roo.addon;
 
@@ -61,10 +61,12 @@ import org.springframework.roo.project.Path;
  *         Transport</a>
  * @since 0.8
  */
-public abstract class AbstractPatternMetadataProvider extends AbstractMemberDiscoveringItdMetadataProvider {
+public abstract class AbstractPatternMetadataProvider extends
+        AbstractMemberDiscoveringItdMetadataProvider {
 
     /** {@link RooWebScaffold} java type */
-    protected static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(RooWebScaffold.class.getName());
+    protected static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(
+            RooWebScaffold.class.getName());
 
     protected PatternService _patternService;
 
@@ -73,9 +75,8 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
      * OSGi container upon bundle activation (result of the 'addon install'
      * command)
      * 
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected abstract void activate(ComponentContext context);
 
@@ -84,9 +85,8 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
      * OSGi container upon bundle deactivation (result of the 'addon uninstall'
      * command)
      * 
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected abstract void deactivate(ComponentContext context);
 
@@ -95,12 +95,16 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
      */
     @Override
     protected abstract ItdTypeDetailsProvidingMetadataItem getMetadata(
-            String mid, JavaType aspect, PhysicalTypeMetadata controller, String file);
+            String mid, JavaType aspect, PhysicalTypeMetadata controller,
+            String file);
 
     /**
-     * Read the values of GvNIXRelationsPattern and for each field defined as relation retrieve its java type details.
-     * 
-     * <p>It parses the value of the GvNIXRelationsPattern annotation. GvNIXRelationsPattern example:</p>
+     * Read the values of GvNIXRelationsPattern and for each field defined as
+     * relation retrieve its java type details.
+     * <p>
+     * It parses the value of the GvNIXRelationsPattern annotation.
+     * GvNIXRelationsPattern example:
+     * </p>
      * <code>{ "PatternName1: field1=tabular, field2=register", "PatternName2: field3=tabular_edit_register" }</code>
      * 
      * @param mid Metadata identification string
@@ -110,29 +114,30 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
      * @return Map with java types and java type details
      */
     protected SortedMap<JavaType, JavaTypeMetadataDetails> getRelationFieldsDetails(
-            String mid, PhysicalTypeMetadata controller, JavaType entity, WebMetadataService webMetadataService) {
+            String mid, PhysicalTypeMetadata controller, JavaType entity,
+            WebMetadataService webMetadataService) {
 
-        SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = 
-        		new TreeMap<JavaType, JavaTypeMetadataDetails>();
+        SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = new TreeMap<JavaType, JavaTypeMetadataDetails>();
 
         // For each eligible field: put all java types details in the same map
-    	List<JavaType> relations = getRelationFields(
-				mid, controller, entity, webMetadataService);
+        List<JavaType> relations = getRelationFields(mid, controller, entity,
+                webMetadataService);
         for (JavaType relation : relations) {
 
             SortedMap<JavaType, JavaTypeMetadataDetails> tmp = getFieldJavaTypesDetails(
-            		relation, mid, webMetadataService);
+                    relation, mid, webMetadataService);
             if (tmp != null) {
-            	
-            	relatedApplicationTypeMetadata.putAll(tmp);
+
+                relatedApplicationTypeMetadata.putAll(tmp);
             }
-		}
-        
+        }
+
         return relatedApplicationTypeMetadata;
     }
 
     /**
-     * Read the values of GvNIXRelationsPattern and for each field defined as relation retrieve its java type.
+     * Read the values of GvNIXRelationsPattern and for each field defined as
+     * relation retrieve its java type.
      * 
      * @param mid Metadata identification string
      * @param controller Controller physical type metadata
@@ -140,38 +145,46 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
      * @param webMetadataService Web metadata service
      * @return Map with java types and java type details
      */
-	private List<JavaType> getRelationFields(
-			String mid, PhysicalTypeMetadata controller, JavaType entity, WebMetadataService webMetadataService) {
-		
-		// Fields name defined into relations pattern annotation
-        List<String> relations = _patternService.getControllerRelationsPatternsFields(controller);
+    private List<JavaType> getRelationFields(String mid,
+            PhysicalTypeMetadata controller, JavaType entity,
+            WebMetadataService webMetadataService) {
+
+        // Fields name defined into relations pattern annotation
+        List<String> relations = _patternService
+                .getControllerRelationsPatternsFields(controller);
 
         // Get each relation java type from eligible scaffolding fields
-        List<FieldMetadata> scaffoldFields = getScaffoldEligibleFields(entity, mid, webMetadataService);
-        
-        // We're interested only in those types defined in GvNIXRelationsPattern values
+        List<FieldMetadata> scaffoldFields = getScaffoldEligibleFields(entity,
+                mid, webMetadataService);
+
+        // We're interested only in those types defined in GvNIXRelationsPattern
+        // values
         List<JavaType> validFields = new ArrayList<JavaType>();
         for (FieldMetadata scaffoldEligibleField : scaffoldFields) {
-        	
-        	// This scaffold eligible field is defined into relations pattern annotation: is a valid field
-            if (relations.contains(scaffoldEligibleField.getFieldName().getSymbolName())) {
-            	
-            	// Get valid field type (simple or collection)
-            	JavaType validField = scaffoldEligibleField.getFieldType();
-                if (validField.isCommonCollectionType() && !validField.getParameters().isEmpty()) {
-                
+
+            // This scaffold eligible field is defined into relations pattern
+            // annotation: is a valid field
+            if (relations.contains(scaffoldEligibleField.getFieldName()
+                    .getSymbolName())) {
+
+                // Get valid field type (simple or collection)
+                JavaType validField = scaffoldEligibleField.getFieldType();
+                if (validField.isCommonCollectionType()
+                        && !validField.getParameters().isEmpty()) {
+
                     validField = validField.getParameters().get(0);
                 }
-                
+
                 validFields.add(validField);
             }
         }
-        
-		return validFields;
-	}
+
+        return validFields;
+    }
 
     /**
-     * For the given type returns a Map with its related application types metadata.
+     * For the given type returns a Map with its related application types
+     * metadata.
      * 
      * @param type Field java type
      * @param mid Metadata identification string
@@ -180,21 +193,27 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
      */
     private SortedMap<JavaType, JavaTypeMetadataDetails> getFieldJavaTypesDetails(
             JavaType type, String mid, WebMetadataService webMetadataService) {
-    	
-    	// Get field metadata, field details and field persistent details
-        PhysicalTypeMetadata typeMetadata = (PhysicalTypeMetadata) metadataService.get(
-        		PhysicalTypeIdentifier.createIdentifier(type, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
-        Validate.notNull(typeMetadata,
-                "Unable to obtain physical type metadata for type " + type.getFullyQualifiedTypeName());
+
+        // Get field metadata, field details and field persistent details
+        PhysicalTypeMetadata typeMetadata = (PhysicalTypeMetadata) metadataService
+                .get(PhysicalTypeIdentifier.createIdentifier(type,
+                        LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
+        Validate.notNull(
+                typeMetadata,
+                "Unable to obtain physical type metadata for type "
+                        + type.getFullyQualifiedTypeName());
         MemberDetails typeDetails = getMemberDetails(typeMetadata);
-        MemberHoldingTypeDetails typePersistentDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(
-        		typeDetails, CustomDataKeys.PERSISTENT_TYPE);
-        
-        // Get field related application type metadata if field persistent details no null
-        SortedMap<JavaType, JavaTypeMetadataDetails> typeRelatedApplicationTypeMetadata = 
-        		webMetadataService.getRelatedApplicationTypeMetadata(type, typeDetails, mid);
-        if (typePersistentDetails == null || typeRelatedApplicationTypeMetadata == null) {
-        	
+        MemberHoldingTypeDetails typePersistentDetails = MemberFindingUtils
+                .getMostConcreteMemberHoldingTypeDetailsWithTag(typeDetails,
+                        CustomDataKeys.PERSISTENT_TYPE);
+
+        // Get field related application type metadata if field persistent
+        // details no null
+        SortedMap<JavaType, JavaTypeMetadataDetails> typeRelatedApplicationTypeMetadata = webMetadataService
+                .getRelatedApplicationTypeMetadata(type, typeDetails, mid);
+        if (typePersistentDetails == null
+                || typeRelatedApplicationTypeMetadata == null) {
+
             return null;
         }
 
@@ -202,17 +221,19 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
     }
 
     /**
-     * Get scaffold eligible fields metadata from entity with some mid through web metadata service.
+     * Get scaffold eligible fields metadata from entity with some mid through
+     * web metadata service.
      * 
      * @param entity Entity java type
      * @param mid Metadata identification string
      * @param webMetadataService Web metadata service
      * @return Entity scaffold eligible fields
      */
-    private List<FieldMetadata> getScaffoldEligibleFields(
-    		JavaType entity, String mid, WebMetadataService webMetadataService) {
-    	
-        return webMetadataService.getScaffoldEligibleFieldMetadata(entity, webMetadataService.getMemberDetails(entity), mid);
+    private List<FieldMetadata> getScaffoldEligibleFields(JavaType entity,
+            String mid, WebMetadataService webMetadataService) {
+
+        return webMetadataService.getScaffoldEligibleFieldMetadata(entity,
+                webMetadataService.getMemberDetails(entity), mid);
     }
 
     /**
@@ -229,18 +250,21 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
      * @return
      */
     protected Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> getRelationFieldsDateFormat(
-            String mid, PhysicalTypeMetadata controller, JavaType entity, WebMetadataService webMetadataService) {
+            String mid, PhysicalTypeMetadata controller, JavaType entity,
+            WebMetadataService webMetadataService) {
 
-        // We're interested only in those types defined in GvNIXRelationsPattern values
-        Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedTypesDatePatterns = 
-        		new LinkedHashMap<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>>();
-        
-        List<JavaType> validFields = getRelationFields(mid, controller, entity, webMetadataService);
+        // We're interested only in those types defined in GvNIXRelationsPattern
+        // values
+        Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedTypesDatePatterns = new LinkedHashMap<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>>();
+
+        List<JavaType> validFields = getRelationFields(mid, controller, entity,
+                webMetadataService);
         for (JavaType validField : validFields) {
-            relatedTypesDatePatterns.put(
-            		validField, webMetadataService.getDatePatterns(
-            				validField, webMetadataService.getMemberDetails(validField), mid));
-		}
+            relatedTypesDatePatterns.put(validField, webMetadataService
+                    .getDatePatterns(validField,
+                            webMetadataService.getMemberDetails(validField),
+                            mid));
+        }
 
         return relatedTypesDatePatterns;
     }
@@ -254,8 +278,9 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
     protected abstract String getGovernorPhysicalTypeIdentifier(String mid);
 
     @Override
-    protected abstract String createLocalIdentifier(JavaType javaType, LogicalPath path);
+    protected abstract String createLocalIdentifier(JavaType javaType,
+            LogicalPath path);
 
     public abstract String getProvidesType();
-    
+
 }

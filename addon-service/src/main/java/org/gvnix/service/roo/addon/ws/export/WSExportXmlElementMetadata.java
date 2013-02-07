@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.export;
 
@@ -82,8 +82,8 @@ public class WSExportXmlElementMetadata extends
         }
 
         // Get the gvNIX xml element annotation
-        AnnotationMetadata annotation = governorTypeDetails.getTypeAnnotation(
-                new JavaType(GvNIXXmlElement.class.getName()));
+        AnnotationMetadata annotation = governorTypeDetails
+                .getTypeAnnotation(new JavaType(GvNIXXmlElement.class.getName()));
         if (annotation != null) {
 
             // Add to class XmlRoot, XmlType and XmlEnum or XmlAccessorType
@@ -122,8 +122,7 @@ public class WSExportXmlElementMetadata extends
     /**
      * Add annotation and method to avoid cycles converting to XML.
      * 
-     * @param id
-     *            Declared by metadata id
+     * @param id Declared by metadata id
      */
     protected void addCycleDetection(String id) {
 
@@ -136,7 +135,8 @@ public class WSExportXmlElementMetadata extends
         JavaType returnType = new JavaType(Object.class.getName());
         List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>(1);
         paramTypes.add(new AnnotatedJavaType(new JavaType(
-                "com.sun.xml.bind.CycleRecoverable.Context"), new ArrayList<AnnotationMetadata>()));
+                "com.sun.xml.bind.CycleRecoverable.Context"),
+                new ArrayList<AnnotationMetadata>()));
         List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>(1);
         paramNames.add(new JavaSymbolName("context"));
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -149,15 +149,13 @@ public class WSExportXmlElementMetadata extends
 
     /**
      * Create XmlElement annotation for each field.
-     * 
      * <p>
      * Field XmlElement annotation has same attributes as GvNIXXmlElementField
      * or only name attribute with field name if GvNIXXmlElementField not
      * exists.
      * </p>
      * 
-     * @param fields
-     *            Fields to be exported
+     * @param fields Fields to be exported
      * @return All the annotated @XmlElement fields (may be empty)
      */
     public List<DeclaredFieldAnnotationDetails> getXmlElementAnnotations(
@@ -191,7 +189,8 @@ public class WSExportXmlElementMetadata extends
                         attrs.add(annotation.getAttribute(javaSymbolName));
                     }
 
-                } else {
+                }
+                else {
 
                     // Annotation not exists, create name attr with field name
                     attrs.add(new StringAttributeValue(new JavaSymbolName(
@@ -219,7 +218,6 @@ public class WSExportXmlElementMetadata extends
 
     /**
      * Class annotations: XmlRoot, XmlType and XmlEnum or XmlAccessorType.
-     * 
      * <ul>
      * <li>XmlRoot: with name and namespace if annotation has name</li>
      * <li>XmlType: with name, propOrder and namespace</li>
@@ -227,10 +225,8 @@ public class WSExportXmlElementMetadata extends
      * <li>XmlAccessorType: with always field access type.</li>
      * </ul>
      * 
-     * @param annotation
-     *            Original gvNIX xml element annotation
-     * @param fields
-     *            Declared fields to be exported
+     * @param annotation Original gvNIX xml element annotation
+     * @param fields Declared fields to be exported
      * @return {@link List} of {@link AnnotationMetadata} to build the ITD
      */
     protected List<AnnotationMetadata> getAnnotations(
@@ -260,7 +256,8 @@ public class WSExportXmlElementMetadata extends
                 result.add(xmlEnumAnnotation);
             }
 
-        } else {
+        }
+        else {
 
             // Is not an enumeration: add XmlAccessorType with field access type
             AnnotationMetadata xmlAccesorType = getXmlAccesorTypeAnnotation();
@@ -275,8 +272,7 @@ public class WSExportXmlElementMetadata extends
     /**
      * Indicates whether the annotation will be introduced via this ITD.
      * 
-     * @param annotation
-     *            to be check if exists
+     * @param annotation to be check if exists
      * @return true if it will be introduced, false otherwise
      */
     public boolean hasAnnotation(String annotation) {
@@ -289,10 +285,8 @@ public class WSExportXmlElementMetadata extends
     /**
      * Indicates whether the annotation introduced via this field.
      * 
-     * @para field
-     *            to be check annotations
-     * @param annotation
-     *            to be check if exists
+     * @para field to be check annotations
+     * @param annotation to be check if exists
      * @return true if annotation exists into field, false otherwise
      */
     public boolean hasAnnotation(FieldMetadata field, String annotation) {
@@ -310,8 +304,7 @@ public class WSExportXmlElementMetadata extends
     /**
      * Get XmlRootElement with name and namespace if annotation has name.
      * 
-     * @param annotation
-     *            Annotation to get name and namespace
+     * @param annotation Annotation to get name and namespace
      * @return XmlRootElement annotation
      */
     protected AnnotationMetadata getXmlRootAnnotation(
@@ -344,7 +337,6 @@ public class WSExportXmlElementMetadata extends
 
     /**
      * Get XmlType with name, propOrder and namespace.
-     * 
      * <ul>
      * <li>name from annotation if annotation has xmlTypeName, else blank</li>
      * <li>propOrder from fields names</li>
@@ -372,7 +364,8 @@ public class WSExportXmlElementMetadata extends
                     ((StringAttributeValue) annotation
                             .getAttribute(new JavaSymbolName("xmlTypeName")))
                             .getValue()));
-        } else {
+        }
+        else {
 
             // @XmlType without name if xml type name not exists
             xmlTypeAttrs.add(new StringAttributeValue(
@@ -470,7 +463,8 @@ public class WSExportXmlElementMetadata extends
                 metadataIdentificationString);
     }
 
-    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
+    public static final String createIdentifier(JavaType javaType,
+            LogicalPath path) {
 
         // Get gvNIX xml element physical type idenfifier for java type in path
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(

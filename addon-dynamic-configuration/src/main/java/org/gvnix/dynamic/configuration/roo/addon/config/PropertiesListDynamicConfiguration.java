@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon.config;
 
@@ -75,7 +75,7 @@ public abstract class PropertiesListDynamicConfiguration extends
 
             // Get the property files to read from resources
             String resources = pathResolver.getIdentifier(
-            		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "");
+                    LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "");
             List<FileDetails> files = getFiles(resources);
             for (FileDetails file : files) {
 
@@ -96,7 +96,8 @@ public abstract class PropertiesListDynamicConfiguration extends
 
             }
 
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
 
             throw new IllegalStateException(ioe);
         }
@@ -113,7 +114,8 @@ public abstract class PropertiesListDynamicConfiguration extends
         OutputStream outputStream = null;
 
         // Get the property files to write from resources
-        String resources = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "");
+        String resources = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "");
         List<FileDetails> files = getFiles(resources);
         for (FileDetails f : files) {
 
@@ -132,7 +134,8 @@ public abstract class PropertiesListDynamicConfiguration extends
 
                             props.put(key, dynProp.getValue());
 
-                        } else {
+                        }
+                        else {
 
                             LOGGER.log(
                                     Level.WARNING,
@@ -145,10 +148,12 @@ public abstract class PropertiesListDynamicConfiguration extends
                 outputStream = file.getOutputStream();
                 props.store(outputStream, null);
 
-            } catch (IOException ioe) {
+            }
+            catch (IOException ioe) {
                 throw new IllegalStateException(ioe);
-            } finally {
-            	IOUtils.closeQuietly(outputStream);
+            }
+            finally {
+                IOUtils.closeQuietly(outputStream);
             }
         }
     }
@@ -156,10 +161,8 @@ public abstract class PropertiesListDynamicConfiguration extends
     /**
      * Is a dynamic property related to the file ?
      * 
-     * @param dynProp
-     *            Dynamic property
-     * @param file
-     *            Mutable file
+     * @param dynProp Dynamic property
+     * @param file Mutable file
      * @return Is property related to file ?
      */
     protected boolean isPropertyRelatedToFile(DynProperty dynProp,
@@ -176,8 +179,7 @@ public abstract class PropertiesListDynamicConfiguration extends
     /**
      * Get included files on a path.
      * 
-     * @param source
-     *            Initial path to search files
+     * @param source Initial path to search files
      * @return Files list
      */
     protected List<FileDetails> getFiles(String source) {
@@ -197,15 +199,17 @@ public abstract class PropertiesListDynamicConfiguration extends
                     // File to include !
                     result.add(path);
 
-                } else {
+                }
+                else {
 
                     // Iterate child paths (only for folders)
                     result.addAll(getFiles(pathName));
                 }
             }
-        } catch (IllegalArgumentException iae) {
+        }
+        catch (IllegalArgumentException iae) {
             // Path is a a file: nothing to do
-        	LOGGER.finest("Path element file");
+            LOGGER.finest("Path element file");
         }
 
         return result;
@@ -214,8 +218,7 @@ public abstract class PropertiesListDynamicConfiguration extends
     /**
      * There is a file to include on dynamic configurations ?
      * 
-     * @param path
-     *            File path to check
+     * @param path File path to check
      * @return Include on dynamic configuration ?
      */
     protected boolean include(String path) {
@@ -227,10 +230,8 @@ public abstract class PropertiesListDynamicConfiguration extends
     /**
      * Set key value to set on a dynamic property considering file name.
      * 
-     * @param key
-     *            Original key value
-     * @param path
-     *            File path
+     * @param key Original key value
+     * @param path File path
      * @return New key value
      */
     protected String setKeyValue(String key, String path) {
@@ -244,8 +245,7 @@ public abstract class PropertiesListDynamicConfiguration extends
     /**
      * Get the file identifier from the property key
      * 
-     * @param path
-     *            File path
+     * @param path File path
      * @return File identifier
      */
     protected String getFileIndentifierFromKey(String key) {
@@ -258,8 +258,7 @@ public abstract class PropertiesListDynamicConfiguration extends
     /**
      * Get key value from a dynamic property.
      * 
-     * @param key
-     *            Original key value
+     * @param key Original key value
      * @return New key value
      */
     protected String getKeyValue(String key) {
@@ -272,8 +271,7 @@ public abstract class PropertiesListDynamicConfiguration extends
     /**
      * Get the file identifier from the file path.
      * 
-     * @param path
-     *            File path
+     * @param path File path
      * @return File identifier
      */
     protected String getFileIdentifierFromPath(String path) {
@@ -286,8 +284,7 @@ public abstract class PropertiesListDynamicConfiguration extends
     /**
      * Get the file name part from a path.
      * 
-     * @param path
-     *            File path
+     * @param path File path
      * @return File name part
      */
     protected String getFileName(String path) {

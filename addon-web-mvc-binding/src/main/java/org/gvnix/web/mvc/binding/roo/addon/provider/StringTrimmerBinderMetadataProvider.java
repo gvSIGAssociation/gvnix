@@ -35,22 +35,20 @@ public final class StringTrimmerBinderMetadataProvider extends
 
     private static final JavaType GVNIX_STRING_TRIMMER_BINDER = new JavaType(
             GvNIXStringTrimmerBinder.class.getName());
-    
+
     /**
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference
-    private ProjectOperations projectOperations;
+    @Reference private ProjectOperations projectOperations;
 
     /**
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
      * command)
      * 
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -64,9 +62,8 @@ public final class StringTrimmerBinderMetadataProvider extends
      * OSGi container upon bundle deactivation (result of the 'addon uninstall'
      * command)
      * 
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
         metadataDependencyRegistry.deregisterDependency(
@@ -119,7 +116,10 @@ public final class StringTrimmerBinderMetadataProvider extends
                 .getJavaType(metadataIdentificationString);
         LogicalPath path = StringTrimmerBinderMetadata
                 .getPath(metadataIdentificationString);
-        return PhysicalTypeIdentifier.createIdentifier(javaType, LogicalPath.getInstance(path.getPath(), projectOperations.getFocusedModuleName()));
+        return PhysicalTypeIdentifier.createIdentifier(
+                javaType,
+                LogicalPath.getInstance(path.getPath(),
+                        projectOperations.getFocusedModuleName()));
     }
 
     @Override

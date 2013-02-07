@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.screen.roo.addon;
 
@@ -60,30 +60,18 @@ import org.springframework.roo.project.ProjectOperations;
 public class PatternJspMetadataListener extends
         AbstractPatternJspMetadataListener {
 
-    @Reference
-    private MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private WebMetadataService webMetadataService;
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private TilesOperations tilesOperations;
-    @Reference
-    private MenuOperations menuOperations;
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private PropFileOperations propFileOperations;
-    @Reference
-    WebScreenOperations webScreenOperations;
-    @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
-    @Reference
-    private PathResolver pathResolver;
-    @Reference
-    private TypeLocationService typeLocationService;
+    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference private MetadataService metadataService;
+    @Reference private WebMetadataService webMetadataService;
+    @Reference private FileManager fileManager;
+    @Reference private TilesOperations tilesOperations;
+    @Reference private MenuOperations menuOperations;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private PropFileOperations propFileOperations;
+    @Reference WebScreenOperations webScreenOperations;
+    @Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    @Reference private PathResolver pathResolver;
+    @Reference private TypeLocationService typeLocationService;
     private final Map<JavaType, String> formBackingObjectTypesToLocalMids = new HashMap<JavaType, String>();
 
     protected void activate(ComponentContext context) {
@@ -105,7 +93,8 @@ public class PatternJspMetadataListener extends
     public MetadataItem get(String metadataIdentificationString) {
         JavaType javaType = PatternJspMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = PatternJspMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = PatternJspMetadata
+                .getPath(metadataIdentificationString);
         String patternMetadataKey = PatternMetadata.createIdentifier(javaType,
                 path);
         PatternMetadata patternMetadata = (PatternMetadata) metadataService
@@ -188,7 +177,8 @@ public class PatternJspMetadataListener extends
                     .contains(downstreamDependency)) {
                 return;
             }
-        } else {
+        }
+        else {
             // This is the generic fallback listener, ie from
             // MetadataDependencyRegistry.addListener(this) in the activate()
             // method

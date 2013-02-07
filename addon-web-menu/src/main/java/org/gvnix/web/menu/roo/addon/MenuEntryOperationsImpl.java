@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.menu.roo.addon;
 
@@ -88,20 +88,17 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference
-    private ProjectOperations projectOperations;
+    @Reference private ProjectOperations projectOperations;
 
     /**
      * Use FileManager to modify the underlying disk storage.
      */
-    @Reference
-    private FileManager fileManager;
+    @Reference private FileManager fileManager;
 
     /**
      * Use for property file configuration operations.
      */
-    @Reference
-    private PropFileOperations propFileOperations;
+    @Reference private PropFileOperations propFileOperations;
 
     /** menu.jspx file path */
     private String menuFile;
@@ -110,27 +107,27 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     private String menuConfigFile;
 
     /**
-     * Is OSGI Roo menu component already disabled ?
-     * In other words, is OSGI gvNIX menu component already activated ?
+     * Is OSGI Roo menu component already disabled ? In other words, is OSGI
+     * gvNIX menu component already activated ?
      */
     private static boolean isRooMenuDisabled = false;
-    
+
     // Public operations -----
-    
+
     /**
      * Inform if roo menu operations must be disabled
      * 
      * @return
      */
-    public static boolean isRooMenuDisabled(){
-    	return isRooMenuDisabled;
+    public static boolean isRooMenuDisabled() {
+        return isRooMenuDisabled;
     }
-    
+
     /**
      * Set {@link #isRooMenuDisabled} to true
      */
-    private static void setRooMenuDisabled(){
-    	isRooMenuDisabled = true;
+    private static void setRooMenuDisabled() {
+        isRooMenuDisabled = true;
     }
 
     /**
@@ -141,7 +138,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      */
     public boolean isProjectAvailable() {
         // Check if a project has been created
-        return projectOperations.isProjectAvailable(projectOperations.getFocusedModuleName());
+        return projectOperations.isProjectAvailable(projectOperations
+                .getFocusedModuleName());
     }
 
     /**
@@ -173,7 +171,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 "spring-security-core", "3.0.5.RELEASE");
 
         // locate Spring Security dependency
-        Set<Dependency> dependencies = projectOperations.getFocusedModule().getDependenciesExcludingVersion(dep);
+        Set<Dependency> dependencies = projectOperations.getFocusedModule()
+                .getDependenciesExcludingVersion(dep);
 
         // if didn't find, Spring Security is not installed
         if (dependencies.isEmpty()) {
@@ -230,8 +229,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             String globalMessageCode, String link, String idPrefix,
             String roles, boolean hide, boolean writeProps) {
 
-    	Validate.notNull(menuCategoryName, "Menu category name required");
-    	Validate.notNull(menuItemId, "Menu item name required");
+        Validate.notNull(menuCategoryName, "Menu category name required");
+        Validate.notNull(menuItemId, "Menu item name required");
 
         // Properties to be written
         Map<String, String> properties = new HashMap<String, String>();
@@ -265,7 +264,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             // create categoryId using the category name
             categoryId.append(MenuEntryOperations.CATEGORY_MENU_ITEM_PREFIX)
                     .append(categoryName.toLowerCase());
-        } else {
+        }
+        else {
             categoryId.append(categoryName.toLowerCase());
             // create category name using the category Id
             categoryName = StringUtils.capitalize(categoryName.substring(2));
@@ -301,7 +301,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         if (menuItemId.getSymbolName().toLowerCase().startsWith(idPrefix)) {
             itemId.append(menuItemId.getSymbolName().toLowerCase());
             itemId.delete(0, idPrefix.length());
-        } else {
+        }
+        else {
             itemId.append(categoryName.toLowerCase()).append("_")
                     .append(menuItemId.getSymbolName().toLowerCase());
         }
@@ -328,7 +329,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                             "messageCode",
                             StringUtils.isNotBlank(globalMessageCode) ? globalMessageCode
                                     : "")
-                    .addAttribute("url", StringUtils.isNotBlank(link) ? link : "")
+                    .addAttribute("url",
+                            StringUtils.isNotBlank(link) ? link : "")
                     .addAttribute("hidden", Boolean.toString(hide))
                     .addAttribute("roles",
                             StringUtils.isNotBlank(roles) ? roles : "").build();
@@ -342,7 +344,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         }
 
         if (writeProps) {
-            propFileOperations.addProperties(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+            propFileOperations.addProperties(
+                    LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                     "/WEB-INF/i18n/application.properties", properties, true,
                     false);
         }
@@ -394,20 +397,23 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
             try {
                 // Current content to rollback to if an exception occur
-                original = IOUtils.toString(new FileReader(
-                        getMenuConfigFile()));
-            } catch (Exception e) {
+                original = IOUtils
+                        .toString(new FileReader(getMenuConfigFile()));
+            }
+            catch (Exception e) {
                 throw new IllegalStateException(
                         "Could not load file: ".concat(getMenuConfigFile()));
             }
 
             if (!proposed.equals(original)) {
                 mutableFile = fileManager.updateFile(getMenuConfigFile());
-            } else {
+            }
+            else {
                 // contents are equal, nothing to do
                 return;
             }
-        } else {
+        }
+        else {
             mutableFile = fileManager.createFile(getMenuConfigFile());
             Validate.notNull(mutableFile,
                     "Could not create file '".concat(getMenuConfigFile())
@@ -419,16 +425,18 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 InputStream inputStream = null;
                 OutputStreamWriter outputStream = null;
                 try {
-                	inputStream = IOUtils.toInputStream(proposed);
-    	            outputStream = new OutputStreamWriter(mutableFile.getOutputStream());
-    	            IOUtils.copy(inputStream, outputStream);
+                    inputStream = IOUtils.toInputStream(proposed);
+                    outputStream = new OutputStreamWriter(
+                            mutableFile.getOutputStream());
+                    IOUtils.copy(inputStream, outputStream);
                 }
                 finally {
-                	IOUtils.closeQuietly(inputStream);
-                	IOUtils.closeQuietly(outputStream);
+                    IOUtils.closeQuietly(inputStream);
+                    IOUtils.closeQuietly(outputStream);
                 }
             }
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
             throw new IllegalStateException("Could not output '".concat(
                     mutableFile.getCanonicalPath()).concat("'"), ioe);
         }
@@ -486,7 +494,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         }
 
         if (writeProps) {
-            propFileOperations.addProperties(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+            propFileOperations.addProperties(
+                    LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                     "/WEB-INF/i18n/application.properties", properties, true,
                     true);
         }
@@ -512,7 +521,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
     /** {@inheritDoc} */
     public String getFormatedInfo(JavaSymbolName pageId, I18n lang) {
-    	Validate.notNull(pageId, "Menu entry ID required");
+        Validate.notNull(pageId, "Menu entry ID required");
         return getFormatedInfo(pageId, true, true, true, lang);
     }
 
@@ -603,7 +612,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         }
         if (Boolean.valueOf(hidden)) {
             idVisibility.append(", hidden");
-        } else {
+        }
+        else {
             idVisibility.append(", visible");
         }
         if (!StringUtils.isNotBlank(url)) {
@@ -619,7 +629,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             builder.append("\n")
                     .append(getCompactInfo(element.getChildNodes(),
                             tabSize + 10)).append("\n");
-        } else {
+        }
+        else {
             builder.append("\n"); // empty line
         }
         return builder.toString();
@@ -700,8 +711,10 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 rootElement);
 
         // exit if menu entry doesn't exist
-        Validate.notNull(beforeElement, "Page '".concat(beforeId.getSymbolName())
-                .concat("' not found. [No changes done]"));
+        Validate.notNull(
+                beforeElement,
+                "Page '".concat(beforeId.getSymbolName()).concat(
+                        "' not found. [No changes done]"));
 
         // page parent element where remove menu entry element
         Element pageParentEl = (Element) pageElement.getParentNode();
@@ -762,7 +775,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // resolve path for menu.xml if it hasn't been resolved yet
         if (menuConfigFile == null) {
             menuConfigFile = getPathResolver().getIdentifier(
-            		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/WEB-INF/views/menu.xml");
+                    LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                    "/WEB-INF/views/menu.xml");
         }
         return menuConfigFile;
     }
@@ -776,7 +790,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // resolve absolute path for menu.jspx if it hasn't been resolved yet
         if (menuFile == null) {
-            menuFile = getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+            menuFile = getPathResolver().getIdentifier(
+                    LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                     "/WEB-INF/views/menu.jspx");
         }
         return menuFile;
@@ -803,8 +818,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * Create Menu model that lets the project works with the underlying menu
      * structure representation, i.e, menu.xml
      * 
-     * @param targetPackage
-     *            Java entities will be created inside this package
+     * @param targetPackage Java entities will be created inside this package
      */
     protected void createEntityModel(String targetPackage) {
 
@@ -828,7 +842,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // Put variable values in parameters Map
         params.put("__TOP_LEVEL_PACKAGE__", projectOperations
-                .getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName());
+                .getTopLevelPackage(projectOperations.getFocusedModuleName())
+                .getFullyQualifiedPackageName());
         params.put("__MENU_MODEL_CLASS__", javaPackage.concat(".Menu"));
 
         // install tags
@@ -840,7 +855,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                     "gvnixitem-sec.tagx", null,
                     new String[] { "<menu:gvnixitem", " xmlns:spring=",
                             " xmlns:sec=" });
-        } else {
+        }
+        else {
             installResourceIfNeeded("/WEB-INF/tags/menu/gvnixitem.tagx",
                     "gvnixitem.tagx", null, new String[] { "<menu:gvnixitem" });
         }
@@ -856,11 +872,10 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * This method has been copied from Maven addon, maybe it could be
      * refactored to utility class.
      * 
-     * @param targetFilename
-     *            File to create. Note this method will create the file by
-     *            locating a file template with the same name as target file but
-     *            prefixing "-template" to file extension. For example, given
-     *            {@code Menu.java} will locate {@code Menu-template.java}
+     * @param targetFilename File to create. Note this method will create the
+     *            file by locating a file template with the same name as target
+     *            file but prefixing "-template" to file extension. For example,
+     *            given {@code Menu.java} will locate {@code Menu-template.java}
      */
     private void installIfNeeded(String targetFilename, String targetPackage) {
 
@@ -875,11 +890,15 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 InputStream templateInputStream = FileUtils.getInputStream(
                         getClass(), fileName.concat("-template").concat(".")
                                 .concat(fileExt));
-                String input = IOUtils.toString(new InputStreamReader(templateInputStream));
+                String input = IOUtils.toString(new InputStreamReader(
+                        templateInputStream));
 
                 // replace template variables
-                input = input.replace("__TOP_LEVEL_PACKAGE__", projectOperations
-                        .getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName());
+                input = input.replace(
+                        "__TOP_LEVEL_PACKAGE__",
+                        projectOperations.getTopLevelPackage(
+                                projectOperations.getFocusedModuleName())
+                                .getFullyQualifiedPackageName());
 
                 // Output the file for the user
                 // use MutableFile in combination with FileManager to take
@@ -892,15 +911,16 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 InputStream inputStream = null;
                 OutputStream outputStream = null;
                 try {
-                	inputStream = IOUtils.toInputStream(input);
-    	            outputStream = mutableFile.getOutputStream();
-    	            IOUtils.copy(inputStream, outputStream);
+                    inputStream = IOUtils.toInputStream(input);
+                    outputStream = mutableFile.getOutputStream();
+                    IOUtils.copy(inputStream, outputStream);
                 }
                 finally {
-                	IOUtils.closeQuietly(inputStream);
-                	IOUtils.closeQuietly(outputStream);
+                    IOUtils.closeQuietly(inputStream);
+                    IOUtils.closeQuietly(outputStream);
                 }
-            } catch (IOException ioe) {
+            }
+            catch (IOException ioe) {
                 throw new IllegalStateException("Unable to create '".concat(
                         targetFilename).concat("'"), ioe);
             }
@@ -911,11 +931,10 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * Creates or updates the contents for one resource represented by the given
      * target file path and relative source path.
      * 
-     * @param relativePath
-     *            path relative to {@link Path.SRC_MAIN_WEBAPP} of target file
-     * @param resourceName
-     *            path relative to classpath of file to be copied (cannot be
-     *            null)
+     * @param relativePath path relative to {@link Path.SRC_MAIN_WEBAPP} of
+     *            target file
+     * @param resourceName path relative to classpath of file to be copied
+     *            (cannot be null)
      * @param toReplace
      * @param containsStrings
      */
@@ -924,8 +943,10 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             String[] containsStrings) {
         PathResolver pathResolver = getPathResolver();
 
-        String targetPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                relativePath);
+        String targetPath = pathResolver
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        relativePath);
 
         InputStream resource = getClass().getResourceAsStream(resourceName);
 
@@ -934,8 +955,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // load resource to copy
         try {
-            sourceContents = IOUtils.toString(new InputStreamReader(
-                    resource));
+            sourceContents = IOUtils.toString(new InputStreamReader(resource));
             // Replace params
             if (toReplace != null) {
                 for (Entry<String, String> entry : toReplace.entrySet()) {
@@ -943,14 +963,17 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                             entry.getKey(), entry.getValue());
                 }
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new IllegalStateException(
                     "Unable to load file to be copied '".concat(resourceName)
                             .concat("'"), e);
-        } finally {
+        }
+        finally {
             try {
                 resource.close();
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -961,15 +984,18 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             try {
                 reader = new FileReader(targetPath);
                 targetContents = IOUtils.toString(reader);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw new IllegalStateException("Error reading '".concat(
                         targetPath).concat("'"), e);
-            } finally {
+            }
+            finally {
                 try {
                     if (reader != null) {
                         reader.close();
                     }
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -983,12 +1009,14 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         MutableFile target = null;
         if (targetContents == null) {
             target = fileManager.createFile(targetPath);
-        } else {
+        }
+        else {
             // decide if need to replace target
             if (containsStrings == null || containsStrings.length == 0) {
                 // No checks to do
                 target = fileManager.updateFile(targetPath);
-            } else {
+            }
+            else {
                 for (String contains : containsStrings) {
                     if (!targetContents.contains(contains)) {
                         target = fileManager.updateFile(targetPath);
@@ -1006,15 +1034,16 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             InputStream inputStream = null;
             OutputStreamWriter outputStream = null;
             try {
-            	inputStream = IOUtils.toInputStream(sourceContents);
-	            outputStream = new OutputStreamWriter(target.getOutputStream());
-	            IOUtils.copy(inputStream, outputStream);
+                inputStream = IOUtils.toInputStream(sourceContents);
+                outputStream = new OutputStreamWriter(target.getOutputStream());
+                IOUtils.copy(inputStream, outputStream);
             }
             finally {
-            	IOUtils.closeQuietly(inputStream);
-            	IOUtils.closeQuietly(outputStream);
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new IllegalStateException("Unable to create/update '".concat(
                     targetPath).concat("'"), e);
         }
@@ -1023,10 +1052,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     /**
      * Get the absolute path to a file name in given package name.
      * 
-     * @param packageName
-     *            fully qualified package name
-     * @param fileName
-     *            file to get its absolute path
+     * @param packageName fully qualified package name
+     * @param fileName file to get its absolute path
      * @return Path.SRC_MAIN_JAVA + packagePath + fileName
      */
     private String getAbsolutePath(String packageName, String fileName) {
@@ -1036,7 +1063,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         String packagePath = fullyQualifPackage.replace('.', '/');
 
         return projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""), packagePath.concat("/").concat(fileName));
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                packagePath.concat("/").concat(fileName));
     }
 
     /**
@@ -1058,8 +1086,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // resolve "~" as denoting the user's top-level package
         if (packageName.startsWith("~")) {
             String topLevelPath = "";
-            topLevelPath = projectOperations
-                    .getTopLevelPackage(projectOperations.getFocusedModuleName())
+            topLevelPath = projectOperations.getTopLevelPackage(
+                    projectOperations.getFocusedModuleName())
                     .getFullyQualifiedPackageName();
             // analyze char after ~, if it is . do nothing, else concat .
             // between
@@ -1099,11 +1127,13 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             Element root = rooMenuDoc.getDocumentElement();
             Element menu = XmlUtils.findFirstElement("/div/menu", root);
             if (menu == null) {
-            	// Roo menu exists but is still empty: there is no menu element into div element already
-            	// Avoid error when execute "web mvc setup" and next "menu setup"
-            	return;
+                // Roo menu exists but is still empty: there is no menu element
+                // into div element already
+                // Avoid error when execute "web mvc setup" and next
+                // "menu setup"
+                return;
             }
-            
+
             // root categories and items
             NodeList menuElements = menu.getChildNodes();
             for (int i = 0; i < menuElements.getLength(); i++) {
@@ -1160,13 +1190,15 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                                     .concat(menuItemId.getSymbolName())
                                     .concat("' in menu:menu tag. It must be in "
                                             .concat("menu:category tag [Ignored]")));
-                } else {
+                }
+                else {
                     logger.warning("Found unknow element in menu:menu tag: '"
                             .concat(nodeName).concat("' [Ignored]"));
                 }
 
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IllegalStateException(ex);
         }
     }
@@ -1259,7 +1291,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             // get label text from application.properties
             if (StringUtils.isNotBlank(labelCode)) {
                 labelValue = propFileOperations.getProperty(
-                		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/i18n/application.properties", labelCode);
             }
             builder.append(indent).append("Label Code   : ").append(labelCode)
@@ -1278,14 +1310,16 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                     String messageBundle = "/WEB-INF/i18n/messages_".concat(
                             lang.getLocale().toString()).concat(".properties");
                     messageValue = propFileOperations.getProperty(
-                    		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), messageBundle, messageCode);
+                            LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                            messageBundle, messageCode);
                 }
 
                 // if no value for given lang, try default lang
                 if (!StringUtils.isNotBlank(messageValue)) {
                     String messageBundle = "/WEB-INF/i18n/messages.properties";
                     messageValue = propFileOperations.getProperty(
-                    		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), messageBundle, messageCode);
+                            LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                            messageBundle, messageCode);
                 }
             }
             builder.append(indent).append("Message Code : ")
@@ -1314,7 +1348,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                                                           // of
                                                           // "Children     : "
                                                           // (length 15 chars)
-        } else {
+        }
+        else {
             builder.append("\n"); // empty line
         }
         return builder.toString();
@@ -1329,7 +1364,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         List<Element> addonProperties = XmlUtils.findElements(
                 "/configuration/gvnix/menu/properties/*", configuration);
         for (Element property : addonProperties) {
-            projectOperations.addProperty(projectOperations.getFocusedModuleName(), new Property(property));
+            projectOperations.addProperty(projectOperations
+                    .getFocusedModuleName(), new Property(property));
         }
     }
 
@@ -1346,7 +1382,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         for (Element dependencyElement : securityDependencies) {
             dependencies.add(new Dependency(dependencyElement));
         }
-        projectOperations.addDependencies(projectOperations.getFocusedModuleName(), dependencies);
+        projectOperations.addDependencies(
+                projectOperations.getFocusedModuleName(), dependencies);
     }
 
     /**
@@ -1361,7 +1398,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     private String getMenuItemPrefix(String itemId) {
         if (itemId.startsWith(MenuOperations.FINDER_MENU_ITEM_PREFIX)) {
             return MenuOperations.FINDER_MENU_ITEM_PREFIX;
-        } else if (itemId.startsWith("si_")) {
+        }
+        else if (itemId.startsWith("si_")) {
             return "si_";
         }
         return MenuOperations.DEFAULT_MENU_ITEM_PREFIX;
@@ -1375,7 +1413,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     private String getMvcConfigFile() {
 
         // resolve absolute path for menu.jspx if it hasn't been resolved yet
-        return getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        return getPathResolver().getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "/WEB-INF/spring/webmvc-config.xml");
     }
 
@@ -1389,7 +1428,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     private String getTilesLayoutsFile() {
 
         // resolve absolute path for menu.jspx if it hasn't been resolved yet
-        return getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        return getPathResolver().getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "/WEB-INF/layouts/layouts.xml");
     }
 }

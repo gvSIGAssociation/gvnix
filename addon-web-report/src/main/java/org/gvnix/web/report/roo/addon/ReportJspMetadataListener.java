@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.report.roo.addon;
 
@@ -61,7 +61,7 @@ import org.w3c.dom.Element;
 
 /**
  * Implementation of Metadata listener.
- *
+ * 
  * @author Oscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -75,20 +75,13 @@ public final class ReportJspMetadataListener implements MetadataProvider,
     // private static final Logger logger =
     // HandlerUtils.getLogger(ReportJspMetadataListener.class);
 
-    @Reference
-    private MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private TilesOperations tilesOperations;
-    @Reference
-    private MenuOperations menuOperations;
-    @Reference
-    private PathResolver pathResolver;
-    @Reference
-    private PropFileOperations propFileOperations;
+    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference private MetadataService metadataService;
+    @Reference private FileManager fileManager;
+    @Reference private TilesOperations tilesOperations;
+    @Reference private MenuOperations menuOperations;
+    @Reference private PathResolver pathResolver;
+    @Reference private PropFileOperations propFileOperations;
 
     private WebScaffoldMetadata webScaffoldMetadata;
     private JpaActiveRecordMetadata entityMetadata;
@@ -102,7 +95,8 @@ public final class ReportJspMetadataListener implements MetadataProvider,
 
     public MetadataItem get(String metadataIdentificationString) {
         javaType = ReportJspMetadata.getJavaType(metadataIdentificationString);
-        LogicalPath path = ReportJspMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = ReportJspMetadata
+                .getPath(metadataIdentificationString);
         String reportMetadataKey = ReportMetadata.createIdentifier(javaType,
                 path);
         ReportMetadata reportMetadata = (ReportMetadata) metadataService
@@ -117,8 +111,9 @@ public final class ReportJspMetadataListener implements MetadataProvider,
         formbackingObject = webScaffoldMetadata.getAnnotationValues()
                 .getFormBackingObject();
 
-        entityMetadata = (JpaActiveRecordMetadata) metadataService.get(JpaActiveRecordMetadata
-                .createIdentifier(formbackingObject, path));
+        entityMetadata = (JpaActiveRecordMetadata) metadataService
+                .get(JpaActiveRecordMetadata.createIdentifier(
+                        formbackingObject, path));
         Assert.notNull(entityMetadata,
                 "Could not determine entity metadata for type: "
                         + formbackingObject.getFullyQualifiedTypeName());
@@ -134,7 +129,7 @@ public final class ReportJspMetadataListener implements MetadataProvider,
     /**
      * Given a reportFormat it generates/updates the JSPX showing the form with
      * the generate report submit button.
-     *
+     * 
      * @param report
      */
     public void installMvcArtifacts(String report) {
@@ -145,10 +140,12 @@ public final class ReportJspMetadataListener implements MetadataProvider,
                 .getPath();
         // Make the holding directory for this controller
         String destinationDirectory = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/views/" + controllerPath);
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "WEB-INF/views/" + controllerPath);
         if (!fileManager.exists(destinationDirectory)) {
             fileManager.createDirectory(destinationDirectory);
-        } else {
+        }
+        else {
             File file = new File(destinationDirectory);
             Assert.isTrue(file.isDirectory(), destinationDirectory
                     + " is a file, when a directory was expected");
@@ -156,23 +153,26 @@ public final class ReportJspMetadataListener implements MetadataProvider,
 
         Document document = getReportFormJsp(reportNameFormat[0],
                 controllerPath);
-        writeToDiskIfNecessary(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        writeToDiskIfNecessary(pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/views/" + controllerPath + "/" + reportNameFormat[0]
                         + ".jspx"), document);
 
         Map<String, String> properties = new HashMap<String, String>();
 
-        tilesOperations.addViewDefinition(controllerPath, LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), controllerPath + "/"
-                + reportNameFormat[0], TilesOperationsImpl.DEFAULT_TEMPLATE,
-                "/WEB-INF/views/" + controllerPath + "/" + reportNameFormat[0]
-                        + ".jspx");
+        tilesOperations.addViewDefinition(controllerPath,
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                controllerPath + "/" + reportNameFormat[0],
+                TilesOperationsImpl.DEFAULT_TEMPLATE, "/WEB-INF/views/"
+                        + controllerPath + "/" + reportNameFormat[0] + ".jspx");
         menuOperations.addMenuItem(
                 new JavaSymbolName(formbackingObject.getSimpleTypeName()),
                 new JavaSymbolName(reportNameFormat[0] + "_report"), "menu_"
                         + formbackingObject.getSimpleTypeName().toLowerCase()
                         + "_" + reportNameFormat[0] + "_report", "/"
                         + controllerPath + "/reports/" + reportNameFormat[0]
-                        + "?form", MenuOperations.DEFAULT_MENU_ITEM_PREFIX, LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""));
+                        + "?form", MenuOperations.DEFAULT_MENU_ITEM_PREFIX,
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""));
         properties.put("menu_"
                 + formbackingObject.getSimpleTypeName().toLowerCase() + "_"
                 + reportNameFormat[0] + "_report", new JavaSymbolName(
@@ -186,7 +186,8 @@ public final class ReportJspMetadataListener implements MetadataProvider,
 
         // Add the message error to the application.properties
         propFileOperations
-                .addProperties(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                .addProperties(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/i18n/application.properties", properties,
                         true, false);
     }
@@ -194,7 +195,7 @@ public final class ReportJspMetadataListener implements MetadataProvider,
     /**
      * Generates a JSPX with a form requesting the report. The form has as many
      * radio buttons as formats has set the report.
-     *
+     * 
      * @param reportName
      * @param formats
      * @param controllerPath
@@ -296,7 +297,8 @@ public final class ReportJspMetadataListener implements MetadataProvider,
         div.appendChild(formForm);
 
         propFileOperations
-                .addProperties(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                .addProperties(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/i18n/application.properties", properties,
                         true, false);
 
@@ -367,7 +369,8 @@ public final class ReportJspMetadataListener implements MetadataProvider,
             try {
                 original = XmlUtils.getDocumentBuilder().parse(
                         fileManager.getInputStream(jspFilename));
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw new IllegalStateException("Could not parse file: "
                         + jspFilename);
             }
@@ -375,7 +378,8 @@ public final class ReportJspMetadataListener implements MetadataProvider,
             if (XmlRoundTripUtils.compareDocuments(original, proposed)) {
                 mutableFile = fileManager.updateFile(jspFilename);
             }
-        } else {
+        }
+        else {
             original = proposed;
             mutableFile = fileManager.createFile(jspFilename);
             Assert.notNull(mutableFile, "Could not create JSP file '"
@@ -394,18 +398,19 @@ public final class ReportJspMetadataListener implements MetadataProvider,
                 // existing file has different contents)
                 InputStream inputStream = null;
                 OutputStream outputStream = null;
-                try { 
-	                inputStream = IOUtils.toInputStream(jspContent);
-	                outputStream = mutableFile.getOutputStream();
-	                IOUtils.copy(inputStream, outputStream);
+                try {
+                    inputStream = IOUtils.toInputStream(jspContent);
+                    outputStream = mutableFile.getOutputStream();
+                    IOUtils.copy(inputStream, outputStream);
                 }
                 finally {
-	                IOUtils.closeQuietly(inputStream);
-	                IOUtils.closeQuietly(outputStream);
+                    IOUtils.closeQuietly(inputStream);
+                    IOUtils.closeQuietly(outputStream);
                 }
                 // Return and indicate we wrote out the file
                 return true;
-            } catch (IOException ioe) {
+            }
+            catch (IOException ioe) {
                 throw new IllegalStateException("Could not output '"
                         + mutableFile.getCanonicalPath() + "'", ioe);
             }

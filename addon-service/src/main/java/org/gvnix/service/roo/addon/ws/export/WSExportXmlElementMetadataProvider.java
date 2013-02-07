@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.export;
 
@@ -60,10 +60,8 @@ import org.springframework.roo.project.LogicalPath;
 public class WSExportXmlElementMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
-    private WSConfigService wSConfigService;
-    @Reference
-    private JavaParserService javaParserService;
+    @Reference private WSConfigService wSConfigService;
+    @Reference private JavaParserService javaParserService;
 
     protected void activate(ComponentContext context) {
 
@@ -148,8 +146,8 @@ public class WSExportXmlElementMetadataProvider extends
         // TODO What is this for ?
         metadataDependencyRegistry.registerDependency(physicalTypeId, id);
 
-        AnnotationMetadata annotation = typeDetails.getTypeAnnotation(
-                new JavaType(GvNIXXmlElement.class.getName()));
+        AnnotationMetadata annotation = typeDetails
+                .getTypeAnnotation(new JavaType(GvNIXXmlElement.class.getName()));
 
         // Create metaData with field list values.
         return new WSExportXmlElementMetadata(id, aspectName, physicalType,
@@ -158,16 +156,13 @@ public class WSExportXmlElementMetadataProvider extends
 
     /**
      * Get defined fields to be exported as elements in XSD schema.
-     * 
      * <ul>
      * <li>Fields defined in 'elementList' annotation attribute will exported</li>
      * <li>Only executed if typeDetails is a class</li>
      * </ul>
      * 
-     * @param typeDetails
-     *            class to get fields to check
-     * @param annotation
-     *            to check element values.
+     * @param typeDetails class to get fields to check
+     * @param annotation to check element values.
      * @return {@link List} of annotated {@link FieldMetadata}
      */
     protected List<FieldMetadata> getDeclaredFields(

@@ -1,8 +1,7 @@
 /*
  * Copyright 2011 DiSiD Technologies S.L.L. All rights reserved.
- *
- * Project  : DiSiD org.gvnix.web.report.roo.addon
- * SVN Id   : $Id$
+ * 
+ * Project : DiSiD org.gvnix.web.report.roo.addon SVN Id : $Id$
  */
 package org.gvnix.web.report.roo.addon;
 
@@ -20,8 +19,7 @@ import org.springframework.roo.project.Path;
  * {@link ReportJspMetadata} is the fully qualifier name of the controller, and
  * the source {@link Path} of the controller. This can be created using
  * {@link #createIdentifier(JavaType, Path)}.
- *
- *
+ * 
  * @author Oscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -59,7 +57,8 @@ public class ReportJspMetadata extends AbstractMetadataItem {
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
+    public static final String createIdentifier(JavaType javaType,
+            LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }

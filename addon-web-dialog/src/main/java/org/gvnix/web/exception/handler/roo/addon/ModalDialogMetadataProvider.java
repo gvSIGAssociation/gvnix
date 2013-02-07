@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.exception.handler.roo.addon;
 
@@ -49,7 +49,6 @@ import org.springframework.roo.project.PathResolver;
  * services needed by the metadata type. Register metadata triggers and
  * dependencies here. Also define the unique add-on ITD identifier.
  * 
- * 
  * @author Oscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -65,19 +64,16 @@ public final class ModalDialogMetadataProvider extends
     private static final JavaType MODAL_DIALOGS = new JavaType(
             GvNIXModalDialogs.class.getName());
 
-    @Reference
-    private PathResolver pathResolver;
-    @Reference
-    private WebModalDialogOperations webModalDialogOperations;
+    @Reference private PathResolver pathResolver;
+    @Reference private WebModalDialogOperations webModalDialogOperations;
 
     /**
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
      * command)
      * 
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -95,9 +91,8 @@ public final class ModalDialogMetadataProvider extends
      * OSGi container upon bundle deactivation (result of the 'addon uninstall'
      * command)
      * 
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
         metadataDependencyRegistry.deregisterDependency(
@@ -134,15 +129,18 @@ public final class ModalDialogMetadataProvider extends
     private List<String> getDefinedModalDialogsIfAny(JavaType aspectName) {
         // Get mutableTypeDetails from controllerClass. Also checks javaType is
         // a controller
-        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService.getTypeDetails(aspectName);
+        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+                .getTypeDetails(aspectName);
         if (controllerDetails == null) {
             return null;
         }
         // Test if has the @Controller
-        Validate.notNull(MemberFindingUtils.getAnnotationOfType(controllerDetails
-                .getAnnotations(), new JavaType(
-                "org.springframework.stereotype.Controller")), aspectName
-                .getSimpleTypeName().concat(" has not @Controller annotation"));
+        Validate.notNull(
+                MemberFindingUtils.getAnnotationOfType(controllerDetails
+                        .getAnnotations(), new JavaType(
+                        "org.springframework.stereotype.Controller")),
+                aspectName.getSimpleTypeName().concat(
+                        " has not @Controller annotation"));
 
         // Test if the annotation already exists on the target type
         AnnotationMetadata annotationMetadata = MemberFindingUtils
@@ -186,7 +184,7 @@ public final class ModalDialogMetadataProvider extends
         String aspectPackage = aspectName.getPackage()
                 .getFullyQualifiedPackageName();
         String modalDialogTypePath = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                 File.separator.concat(
                         aspectPackage.replace(".", File.separator)).concat(
                         "/dialog/Dialog.java"));
@@ -213,7 +211,8 @@ public final class ModalDialogMetadataProvider extends
             String metadataIdentificationString) {
         JavaType javaType = ModalDialogMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = ModalDialogMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = ModalDialogMetadata
+                .getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 

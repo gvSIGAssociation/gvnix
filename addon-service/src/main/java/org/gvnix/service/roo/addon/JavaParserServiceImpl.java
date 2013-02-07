@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon;
 
@@ -69,20 +69,13 @@ import org.springframework.roo.project.ProjectOperations;
 @Service
 public class JavaParserServiceImpl implements JavaParserService {
 
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private TypeManagementService typeManagementService;
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private TypeLocationService typeLocationService;
-    @Reference
-    protected MemberDetailsScanner memberDetailsScanner;
-    @Reference
-    protected TypeParsingService typeParsingService;
+    @Reference private MetadataService metadataService;
+    @Reference private TypeManagementService typeManagementService;
+    @Reference private FileManager fileManager;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private TypeLocationService typeLocationService;
+    @Reference protected MemberDetailsScanner memberDetailsScanner;
+    @Reference protected TypeParsingService typeParsingService;
 
     /**
      * {@inheritDoc}
@@ -126,7 +119,7 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // Metadata Id.
         String id = PhysicalTypeIdentifier.createIdentifier(type,
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
         // Determine the canonical filename
         String physicalPath = typeLocationService
@@ -179,12 +172,12 @@ public class JavaParserServiceImpl implements JavaParserService {
             List<AnnotatedJavaType> paramTypes,
             List<JavaSymbolName> paramNames, String body) {
 
-    	Validate.notNull(paramTypes, "Param type mustn't be null");
+        Validate.notNull(paramTypes, "Param type mustn't be null");
         Validate.notNull(paramNames, "Param name mustn't be null");
 
         // MetadataID
         String targetId = PhysicalTypeIdentifier.createIdentifier(targetType,
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
         // Obtain the physical type and itd mutable details
         PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
@@ -214,9 +207,11 @@ public class JavaParserServiceImpl implements JavaParserService {
             operationMetadata.addThrowsType(javaType);
         }
 
-        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                mutableTypeDetails);
         mutableTypeDetailsBuilder.addMethod(operationMetadata.build());
-        typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
+        typeManagementService
+                .createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
     }
 
     /**
@@ -232,7 +227,7 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // MetadataID
         String targetId = PhysicalTypeIdentifier.createIdentifier(className,
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
         // Obtain the physical type and itd mutable details
         PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
@@ -242,8 +237,8 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         Validate.notNull(ptd, "Java source code details unavailable for type "
                 + PhysicalTypeIdentifier.getFriendlyName(targetId));
-        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
-                ptd, "Java source code is immutable for type "
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class, ptd,
+                "Java source code is immutable for type "
                         + PhysicalTypeIdentifier.getFriendlyName(targetId));
 
         ClassOrInterfaceTypeDetails mutableTypeDetails = (ClassOrInterfaceTypeDetails) ptd;
@@ -335,12 +330,9 @@ public class JavaParserServiceImpl implements JavaParserService {
     /**
      * Search method in Java.
      * 
-     * @param methodName
-     *            Method name to search
-     * @param targetId
-     *            New method destination identifier
-     * @param mutableTypeDetails
-     *            Type to search methods in
+     * @param methodName Method name to search
+     * @param targetId New method destination identifier
+     * @param mutableTypeDetails Type to search methods in
      * @return Methods list
      */
     protected List<MethodMetadata> searchMethodsInJava(
@@ -379,21 +371,15 @@ public class JavaParserServiceImpl implements JavaParserService {
 
     /**
      * Search method in all (Java and AspectJ).
-     * 
      * <p>
      * Add into method and into method params required web service annotations.
      * </p>
      * 
-     * @param className
-     *            Class name to seach
-     * @param method
-     *            Method name to search
-     * @param annotationMetadataUpdateList
-     *            Method annotation list
-     * @param annotationWebParamMetadataList
-     *            Method params annotation list
-     * @param targetId
-     *            New method destination identifier
+     * @param className Class name to seach
+     * @param method Method name to search
+     * @param annotationMetadataUpdateList Method annotation list
+     * @param annotationWebParamMetadataList Method params annotation list
+     * @param targetId New method destination identifier
      * @return Methods list
      */
     protected List<MethodMetadata> searchMethodInAll(JavaType className,
@@ -485,7 +471,7 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // MetadataID
         String targetId = PhysicalTypeIdentifier.createIdentifier(className,
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
         // Obtain the physical type and itd mutable details
         PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
@@ -495,8 +481,8 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         Validate.notNull(ptd, "Java source code details unavailable for type "
                 + PhysicalTypeIdentifier.getFriendlyName(targetId));
-        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
-                ptd, "Java source code is immutable for type "
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class, ptd,
+                "Java source code is immutable for type "
                         + PhysicalTypeIdentifier.getFriendlyName(targetId));
 
         ClassOrInterfaceTypeDetails mutableTypeDetails = (ClassOrInterfaceTypeDetails) ptd;
@@ -507,7 +493,7 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // Create param type.
         AnnotatedJavaType annotatedJavaType = new AnnotatedJavaType(paramType,
-        		new ArrayList<AnnotationMetadata>());
+                new ArrayList<AnnotationMetadata>());
 
         // Create param name.
         JavaSymbolName parameterName = new JavaSymbolName(paramName);
@@ -563,7 +549,8 @@ public class JavaParserServiceImpl implements JavaParserService {
                 }
                 operationMetadata = methodMetadataBuilder.build();
 
-            } else {
+            }
+            else {
 
                 InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
                 bodyBuilder
@@ -688,7 +675,6 @@ public class JavaParserServiceImpl implements JavaParserService {
 
     /**
      * {@inheritDoc}
-     * 
      * <p>
      * Search the method by name in class and related AJs.
      * </p>
@@ -721,7 +707,6 @@ public class JavaParserServiceImpl implements JavaParserService {
 
     /**
      * {@inheritDoc}
-     * 
      * <p>
      * Search all methods in class and related AJs.
      * </p>
@@ -738,7 +723,6 @@ public class JavaParserServiceImpl implements JavaParserService {
 
     /**
      * {@inheritDoc}
-     * 
      * <p>
      * Search all fields in class and related AJs.
      * </p>
@@ -784,14 +768,13 @@ public class JavaParserServiceImpl implements JavaParserService {
     /**
      * Get the list of type details (Java and AJs) from a Java type.
      * 
-     * @param name
-     *            Java type to get details
+     * @param name Java type to get details
      * @return List of type details
      */
     protected List<MemberHoldingTypeDetails> getMemberDetails(JavaType name) {
 
         String identifier = PhysicalTypeIdentifier.createIdentifier(name,
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
         PhysicalTypeMetadata physicalType = (PhysicalTypeMetadata) metadataService
                 .get(identifier);
         String className = getClass().getName();
@@ -818,14 +801,18 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // TODO: 'ClassOrInterfaceDeclaration' mantiene el javaDoc.
 
-        String javaIdentifier = typeLocationService.getPhysicalTypeIdentifier(classOrInterfaceTypeDetails.getName());
+        String javaIdentifier = typeLocationService
+                .getPhysicalTypeIdentifier(classOrInterfaceTypeDetails
+                        .getName());
         javaIdentifier = javaIdentifier.substring(
                 javaIdentifier.indexOf("?") + 1).replaceAll("\\.", "/");
 
         fileManager.delete(projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""), javaIdentifier.concat(".java")));
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                javaIdentifier.concat(".java")));
 
-        typeManagementService.createOrUpdateTypeOnDisk(classOrInterfaceTypeDetails);
+        typeManagementService
+                .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetails);
 
     }
 

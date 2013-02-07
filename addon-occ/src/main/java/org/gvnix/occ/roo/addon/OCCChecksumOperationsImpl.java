@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.occ.roo.addon;
 
@@ -68,18 +68,12 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
     private static final Logger logger = HandlerUtils
             .getLogger(OCCChecksumOperationsImpl.class);
 
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private JpaOperations entityOperations;
-    @Reference
-    private TypeLocationService typeLocationService;
-    @Reference
-    private PersistenceMemberLocator persistenceMemberLocator;
-    @Reference
-    private TypeManagementService typeManagementService;
+    @Reference private MetadataService metadataService;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private JpaOperations entityOperations;
+    @Reference private TypeLocationService typeLocationService;
+    @Reference private PersistenceMemberLocator persistenceMemberLocator;
+    @Reference private TypeManagementService typeManagementService;
 
     protected void activate(ComponentContext context) {
 
@@ -129,10 +123,10 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
         // Check if given entity has a @Version field declared
         // Maybe the given entity extends of a class declaring the @Version
         // field, in this case we must to annotate parent class
-        String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(entity,
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
-        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService.get(
-                entityMetadataKey, true);
+        String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(
+                entity, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
+        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService
+                .get(entityMetadataKey, true);
         if (entityMetadata == null) {
             // entity JavaType is not a valid Entity. Nothing to do
             return;
@@ -142,7 +136,8 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
         // class or in a parent one. If @Version field is declared in a parent
         // class, this will be the target class for annotate with
         // @GvNIXEntityOCCChecksum
-        FieldMetadata versionField = persistenceMemberLocator.getVersionField(entity);
+        FieldMetadata versionField = persistenceMemberLocator
+                .getVersionField(entity);
         if (versionField != null) {
             String declaredByType = versionField.getDeclaredByMetadataId()
                     .substring(
@@ -160,7 +155,8 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
                                     .concat(entity.getFullyQualifiedTypeName()))));
                     // Exchange target class
                     entity = entityToAnnotate;
-                } else {
+                }
+                else {
                     // We could annotate parent class with declared @Version
                     // field, but invoker doesn't want this.
                     return;
@@ -173,12 +169,14 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
                 .getTypeDetails(entity);
 
         // Checks if it's mutable
-        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
-                tmpDetails, "Can't modify " + tmpDetails.getName());
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class, tmpDetails,
+                "Can't modify " + tmpDetails.getName());
 
-        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder =  new ClassOrInterfaceTypeDetailsBuilder((ClassOrInterfaceTypeDetails)tmpDetails);
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                (ClassOrInterfaceTypeDetails) tmpDetails);
 
-        List<? extends AnnotationMetadata> entityAnnotations = mutableTypeDetailsBuilder.build().getAnnotations();
+        List<? extends AnnotationMetadata> entityAnnotations = mutableTypeDetailsBuilder
+                .build().getAnnotations();
 
         // Looks for @GvNIXEntityOCCChecksumAnnotation and @RooJpaActiveRecord
         AnnotationMetadata occAnnotation = MemberFindingUtils
@@ -186,7 +184,7 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
                         GvNIXEntityOCCChecksum.class.getName()));
         AnnotationMetadata rooEntityAnnotation = MemberFindingUtils
                 .getAnnotationOfType(entityAnnotations, new JavaType(
-                		RooJpaActiveRecord.class.getName()));
+                        RooJpaActiveRecord.class.getName()));
 
         if (rooEntityAnnotation != null) {
             if (occAnnotation != null) {
@@ -219,8 +217,9 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
 
             // Adds GvNIXEntityOCCChecksum to the entity
             mutableTypeDetailsBuilder.addAnnotation(occAnnotation);
-            
-            typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
+
+            typeManagementService
+                    .createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
         }
     }
 
@@ -235,7 +234,8 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
         addGvNIXAnnotationsDependecy();
         // Look for classes annotated with @RooJpaActiveRecord
         for (JavaType type : typeLocationService
-                .findTypesWithAnnotation(new JavaType(RooJpaActiveRecord.class.getName()))) {
+                .findTypesWithAnnotation(new JavaType(RooJpaActiveRecord.class
+                        .getName()))) {
             doAddOccToEntity(type, fieldName, digestMethod, false);
 
         }
@@ -259,7 +259,8 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
                 "/configuration/gvnix/repositories/repository", conf);
         for (Element repo : repos) {
 
-            projectOperations.addRepository(projectOperations.getFocusedModuleName(), new Repository(repo));
+            projectOperations.addRepository(projectOperations
+                    .getFocusedModuleName(), new Repository(repo));
         }
 
         List<Element> depens = XmlUtils.findElements(

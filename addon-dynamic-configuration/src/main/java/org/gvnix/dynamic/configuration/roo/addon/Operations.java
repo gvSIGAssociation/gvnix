@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
@@ -38,8 +38,7 @@ public interface Operations {
      * If configuration already exists, previous configuration will be deleted.
      * </p>
      * 
-     * @param name
-     *            Name for the dynamic configuration
+     * @param name Name for the dynamic configuration
      * @return Dynamic configuration stored
      */
     public DynConfiguration saveActiveConfiguration(String name);
@@ -52,8 +51,7 @@ public interface Operations {
      * <li>If active property is false, there are pending local changes</li>
      * </ul>
      * 
-     * @param name
-     *            Dynamic configuration name to activate
+     * @param name Dynamic configuration name to activate
      * @return Dynamic configuration activated
      */
     public DynConfiguration setActiveConfiguration(String name);
@@ -71,8 +69,7 @@ public interface Operations {
      * If dynamic configuration with name not exists, null will be returned.
      * </p>
      * 
-     * @param name
-     *            Name of the dynamic configuration
+     * @param name Name of the dynamic configuration
      * @return Stored dynamic configuration.
      */
     public DynConfiguration getConfiguration(String name);
@@ -88,8 +85,7 @@ public interface Operations {
      * Get the base dynamic configuration if contains a property name, else
      * empty.
      * 
-     * @param name
-     *            Property name
+     * @param name Property name
      * @return Dynamic configuration or empty
      */
     public DynConfiguration getBaseProperty(String name);
@@ -97,10 +93,8 @@ public interface Operations {
     /**
      * Set a configuration property with no value.
      * 
-     * @param configuration
-     *            Configuration name to update
-     * @param property
-     *            Property name to update
+     * @param configuration Configuration name to update
+     * @param property Property name to update
      * @return Dynamic property updated or null if not exists
      */
     public DynProperty updateProperty(String configuration, String property);
@@ -108,12 +102,9 @@ public interface Operations {
     /**
      * Set a value on a configuration property.
      * 
-     * @param configuration
-     *            Configuration name to update
-     * @param property
-     *            Property name to update
-     * @param value
-     *            Value to set
+     * @param configuration Configuration name to update
+     * @param property Property name to update
+     * @param value Value to set
      * @return Dynamic property updated or null if not exists
      */
     public DynProperty updateProperty(String configuration, String property,
@@ -129,15 +120,13 @@ public interface Operations {
     /**
      * Add property with name and value on all configurations.
      * 
-     * @param name
-     *            Property name
+     * @param name Property name
      * @return false if already exists or null if not exists
      */
     public Boolean addProperty(String name);
 
     /**
      * Write all stored dynamic configurations into the build tool.
-     * 
      * <p>
      * If no dynamic configuration active returns null. If no dynamic
      * configurations returns empty List.

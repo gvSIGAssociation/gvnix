@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures     
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.menu.roo.addon;
 
@@ -47,14 +47,12 @@ import org.w3c.dom.Element;
 @Service
 public class MenuEntryConverter implements Converter<MenuEntry> {
 
-    @Reference
-    private MenuEntryOperations operations;
+    @Reference private MenuEntryOperations operations;
 
     /**
      * Check if given type can be converted by this Converter
      * 
-     * @param requiredType
-     *            Can this type be converted?
+     * @param requiredType Can this type be converted?
      * @param optionContext
      */
     public boolean supports(Class<?> requiredType, String optionContext) {
@@ -64,12 +62,9 @@ public class MenuEntryConverter implements Converter<MenuEntry> {
     /**
      * Convert given ID to {@link PageMenuEntry}
      * 
-     * @param value
-     *            Page ID
-     * @param requiredType
-     *            [Not used]
-     * @param optionContext
-     *            [Not used]
+     * @param value Page ID
+     * @param requiredType [Not used]
+     * @param optionContext [Not used]
      */
     public MenuEntry convertFromText(String value, Class<?> requiredType,
             String optionContext) {
@@ -85,8 +80,9 @@ public class MenuEntryConverter implements Converter<MenuEntry> {
      * @param optionContext
      * @param target
      */
-    public boolean getAllPossibleValues(List<Completion> completions, Class<?> requiredType,
-            String existingData, String optionContext, MethodTarget target) {
+    public boolean getAllPossibleValues(List<Completion> completions,
+            Class<?> requiredType, String existingData, String optionContext,
+            MethodTarget target) {
         Document document = operations.getMenuDocument();
 
         // make the root element of the menu the one with the menu identifier

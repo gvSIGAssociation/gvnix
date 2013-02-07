@@ -20,48 +20,57 @@ import org.springframework.roo.project.PathResolver;
 
 @Component(immediate = true)
 @Service
-public class FlexProjectMetadataProvider implements MetadataProvider, FileEventListener {
+public class FlexProjectMetadataProvider implements MetadataProvider,
+        FileEventListener {
 
-    private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(MetadataIdentificationUtils.getMetadataClass(FlexProjectMetadata.getProjectIdentifier()));
-    
-    //private static final String FLEX_GROUP = "org.springframework.flex";
-    
-    @Reference
-    private MetadataService metadataService;
-    
-    @Reference
-    private MetadataDependencyRegistry metadataDependencyRegistry;
-    
-    @Reference 
-    private FileManager fileManager;
-    
-    @Reference
-    private PathResolver pathResolver;
-    
+    private static final String PROVIDES_TYPE = MetadataIdentificationUtils
+            .create(MetadataIdentificationUtils
+                    .getMetadataClass(FlexProjectMetadata
+                            .getProjectIdentifier()));
+
+    // private static final String FLEX_GROUP = "org.springframework.flex";
+
+    @Reference private MetadataService metadataService;
+
+    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+
+    @Reference private FileManager fileManager;
+
+    @Reference private PathResolver pathResolver;
+
     protected void activate(ComponentContext context) {
     }
-    
+
     public MetadataItem get(String metadataIdentificationString) {
-        Validate.isTrue(FlexProjectMetadata.getProjectIdentifier().equals(metadataIdentificationString), "Unexpected metadata request '" + metadataIdentificationString + "' for this provider");
-        
-        if (!fileManager.exists(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/flex/services-config.xml"))) {
+        Validate.isTrue(
+                FlexProjectMetadata.getProjectIdentifier().equals(
+                        metadataIdentificationString),
+                "Unexpected metadata request '" + metadataIdentificationString
+                        + "' for this provider");
+
+        if (!fileManager.exists(pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "WEB-INF/flex/services-config.xml"))) {
             return null;
         }
-        
+
         return new FlexProjectMetadata(pathResolver);
     }
-    
-    /*public void notify(String upstreamDependency, String downstreamDependency) {
-        Validate.isTrue(MetadataIdentificationUtils.isValid(upstreamDependency), "Upstream dependency is an invalid metadata identification string ('"
-            + upstreamDependency + "')");
 
-        if (upstreamDependency.equals(ProjectMetadata.getProjectIdentifier())) {
-            //recalculate the FlexProjectMetadata and notify
-            metadataService.get(FlexProjectMetadata.getProjectIdentifier(), true);
-            metadataDependencyRegistry.notifyDownstream(FlexProjectMetadata.getProjectIdentifier());
-        }
-    }*/
-    
+    /*
+     * public void notify(String upstreamDependency, String
+     * downstreamDependency) {
+     * Validate.isTrue(MetadataIdentificationUtils.isValid(upstreamDependency),
+     * "Upstream dependency is an invalid metadata identification string ('" +
+     * upstreamDependency + "')");
+     * 
+     * if (upstreamDependency.equals(ProjectMetadata.getProjectIdentifier())) {
+     * //recalculate the FlexProjectMetadata and notify
+     * metadataService.get(FlexProjectMetadata.getProjectIdentifier(), true);
+     * metadataDependencyRegistry
+     * .notifyDownstream(FlexProjectMetadata.getProjectIdentifier()); } }
+     */
+
     public String getProvidesType() {
         return PROVIDES_TYPE;
     }
@@ -69,7 +78,12 @@ public class FlexProjectMetadataProvider implements MetadataProvider, FileEventL
     public void onFileEvent(FileEvent fileEvent) {
         Validate.notNull(fileEvent, "File event required");
 
-        if (fileEvent.getFileDetails().getCanonicalPath().equals(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/flex/services-config.xml"))) {
+        if (fileEvent
+                .getFileDetails()
+                .getCanonicalPath()
+                .equals(pathResolver.getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        "WEB-INF/flex/services-config.xml"))) {
             // Something happened to the services-config
 
             // Don't notify if we're shutting down
@@ -77,9 +91,12 @@ public class FlexProjectMetadataProvider implements MetadataProvider, FileEventL
                 return;
             }
 
-            // Otherwise let everyone know something has happened of interest, plus evict any cached entries from the MetadataService
-            metadataService.get(FlexProjectMetadata.getProjectIdentifier(), true);
-            metadataDependencyRegistry.notifyDownstream(FlexProjectMetadata.getProjectIdentifier());
-        }    
+            // Otherwise let everyone know something has happened of interest,
+            // plus evict any cached entries from the MetadataService
+            metadataService.get(FlexProjectMetadata.getProjectIdentifier(),
+                    true);
+            metadataDependencyRegistry.notifyDownstream(FlexProjectMetadata
+                    .getProjectIdentifier());
+        }
     }
 }

@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.security;
 
@@ -42,12 +42,10 @@ import org.springframework.roo.project.PathResolver;
  * against secure servers that uses certificates not included in the JVM
  * keystore (Usually in $JAVA_HOME/jre/lib/security/cacerts)
  * 
- * 
  * @author Óscar Rovira ( orovira at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
- * 
  */
 public class GvNix509TrustManager implements X509TrustManager {
 
@@ -109,15 +107,17 @@ public class GvNix509TrustManager implements X509TrustManager {
 
         if (keystore.canWrite()) {
 
-        	OutputStream out = null;
-        	try {
-        		out = new FileOutputStream(keystore);
-        		ks.store(out, pass);
-        	} finally {
-        		IOUtils.closeQuietly(out);
-        	}
+            OutputStream out = null;
+            try {
+                out = new FileOutputStream(keystore);
+                ks.store(out, pass);
+            }
+            finally {
+                IOUtils.closeQuietly(out);
+            }
 
-        } else {
+        }
+        else {
 
             throw new Exception(
                     keystore.getAbsolutePath()
@@ -153,17 +153,19 @@ public class GvNix509TrustManager implements X509TrustManager {
 
         String aliasCerFileName = alias.concat(".cer");
         String cerFilePath = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), aliasCerFileName);
+                LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                aliasCerFileName);
 
         if (!fileManager.exists(cerFilePath)) {
 
             File cerFile = new File(cerFilePath);
             OutputStream os = null;
             try {
-	            os = new FileOutputStream(cerFile);
-	            os.write(cert.getEncoded());
-            } finally {
-            	IOUtils.closeQuietly(os);
+                os = new FileOutputStream(cerFile);
+                os.write(cert.getEncoded());
+            }
+            finally {
+                IOUtils.closeQuietly(os);
             }
             logger.info("Created ".concat(Path.SRC_MAIN_RESOURCES.name())
                     .concat("/").concat(aliasCerFileName));
@@ -176,8 +178,8 @@ public class GvNix509TrustManager implements X509TrustManager {
      * @param keystore
      * @param pass
      * @return
-     * @throws Exception
-     *             will be a IOExecption if the given password is a wrong one
+     * @throws Exception will be a IOExecption if the given password is a wrong
+     *             one
      */
     public static KeyStore loadKeyStore(File keystore, char[] pass)
             throws Exception {

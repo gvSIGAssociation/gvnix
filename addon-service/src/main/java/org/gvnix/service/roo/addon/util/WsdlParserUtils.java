@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.util;
 
@@ -41,7 +41,6 @@ import org.xml.sax.SAXException;
 
 /**
  * gvNix Wsdl parser utilities.
- * 
  * <p>
  * Compatible address should be SOAP protocol version 1.1 and 1.2.
  * </p>
@@ -137,8 +136,7 @@ public class WsdlParserUtils {
     /**
      * Get the namespace attribute from root wsdl
      * 
-     * @param root
-     *            Root element of the wsdl
+     * @param root Root element of the wsdl
      * @return Wsdl namespace
      */
     public static String getTargetNamespace(Element root) {
@@ -152,19 +150,17 @@ public class WsdlParserUtils {
 
     /**
      * Constructs a valid java package path from target namespace of root wsdl.
-     * 
      * <p>
      * Package ends with the package separator. Related package is different
      * when web service is rpc encoded or not.
      * </p>
      * 
-     * @param root
-     *            Root element of the wsdl
+     * @param root Root element of the wsdl
      * @return Equivalent java package or empty
      */
     public static String getTargetNamespaceRelatedPackage(Element root) {
 
-    	Validate.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         // Get the namespace attribute from root wsdl
         String namespace = getTargetNamespace(root);
@@ -178,16 +174,13 @@ public class WsdlParserUtils {
 
     /**
      * Constructs a valid java package path from a namespace.
-     * 
      * <p>
      * Package ends with the package separator. If target namespace has not a
      * compatible prefix, empty string will be returned.
      * </p>
      * 
-     * @param namespace
-     *            Name space
-     * @param root
-     *            Root element of the wsdl
+     * @param namespace Name space
+     * @param root Root element of the wsdl
      * @return Equivalent java package or empty
      */
     private static String getTargetNamespaceRelatedPackage(String namespace,
@@ -231,7 +224,8 @@ public class WsdlParserUtils {
             hostname = u.getHost();
             path = u.getPath();
 
-        } catch (MalformedURLException e) {
+        }
+        catch (MalformedURLException e) {
 
             if (namespace.indexOf(":") > -1) {
 
@@ -240,7 +234,8 @@ public class WsdlParserUtils {
 
                     hostname = hostname.substring(0, hostname.indexOf("/"));
                 }
-            } else {
+            }
+            else {
 
                 hostname = namespace;
             }
@@ -286,18 +281,14 @@ public class WsdlParserUtils {
 
     /**
      * Massage word into a form suitable for use in a Java package name.
-     * 
      * <p>
      * Append it to the target string buffer with a <tt>.</tt> delimiter if
      * <tt>word</tt> is not the first word in the package name.
      * </p>
      * 
-     * @param sb
-     *            the buffer to append to
-     * @param word
-     *            the word to append
-     * @param firstWord
-     *            a flag indicating whether this is the first word
+     * @param sb the buffer to append to
+     * @param word the word to append
+     * @param firstWord a flag indicating whether this is the first word
      */
     private static void addWordToPackageBuffer(StringBuffer sb, String word,
             boolean firstWord) {
@@ -343,7 +334,6 @@ public class WsdlParserUtils {
 
     /**
      * Turn a java keyword string into a non-Java keyword string.
-     * 
      * <p>
      * Right now this simply means appending an underscore.
      * </p>
@@ -354,13 +344,11 @@ public class WsdlParserUtils {
 
     /**
      * Find the first compatible address element of the root.
-     * 
      * <p>
      * Compatible address should be SOAP protocol version 1.1 and 1.2.
      * </p>
      * 
-     * @param root
-     *            Root element of wsdl.
+     * @param root Root element of wsdl.
      * @return First compatible address element or null if no element.
      */
     public static Element findFirstCompatibleAddress(Element root) {
@@ -393,13 +381,14 @@ public class WsdlParserUtils {
                 || (index = namespaces.indexOf(SOAP_12_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
             // First preference: SOAP 1.2 protocol
-        	soap1_2 = true;
+            soap1_2 = true;
 
-        } else if ((index = namespaces.indexOf(SOAP_11_NAMESPACE)) != -1
+        }
+        else if ((index = namespaces.indexOf(SOAP_11_NAMESPACE)) != -1
                 || (index = namespaces.indexOf(SOAP_11_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
             // Second preference: SOAP 1.1 protocol
-        	soap1_1 = true;
+            soap1_1 = true;
         }
         if (!(soap1_2 || soap1_1)) {
             // Other protocols not supported
@@ -412,12 +401,9 @@ public class WsdlParserUtils {
     /**
      * Obtain from the list the element with the reference on the root wsdl.
      * 
-     * @param root
-     *            Root wsdl
-     * @param elements
-     *            Elements list to search in
-     * @param reference
-     *            Reference to be searched
+     * @param root Root wsdl
+     * @param elements Elements list to search in
+     * @param reference Reference to be searched
      * @return Element found or null if not
      */
     private static Element getReferencedElement(Element root,
@@ -450,14 +436,11 @@ public class WsdlParserUtils {
     /**
      * Get the path to the generated service class.
      * 
-     * @param root
-     *            Wsdl root element
-     * @param sense
-     *            Communication sense type
+     * @param root Wsdl root element
+     * @param sense Communication sense type
      * @return Path to the class
      */
-    public static String getServiceClassPath(Element root,
-            WsType sense) {
+    public static String getServiceClassPath(Element root, WsType sense) {
 
         Validate.notNull(root, "Wsdl root element required");
 
@@ -480,14 +463,11 @@ public class WsdlParserUtils {
     /**
      * Get the path to the generated port type class.
      * 
-     * @param root
-     *            Wsdl root element
-     * @param sense
-     *            Communication sense type
+     * @param root Wsdl root element
+     * @param sense Communication sense type
      * @return Path to the class
      */
-    public static String getPortTypeClassPath(Element root,
-            WsType sense) {
+    public static String getPortTypeClassPath(Element root, WsType sense) {
 
         Validate.notNull(root, "Wsdl root element required");
 
@@ -499,8 +479,7 @@ public class WsdlParserUtils {
         String port = findFirstCompatiblePortClassName(root, sense);
 
         // RPC Encoded web services adds sufix to port type when equals to port
-        if (WsType.IMPORT_RPC_ENCODED.equals(sense)
-                && portType.equals(port)) {
+        if (WsType.IMPORT_RPC_ENCODED.equals(sense) && portType.equals(port)) {
 
             portType = portType.concat("_PortType");
         }
@@ -512,14 +491,11 @@ public class WsdlParserUtils {
     /**
      * Get the port type Java file
      * 
-     * @param root
-     *            Wsdl root element
-     * @param sense
-     *            Communication sense type
+     * @param root Wsdl root element
+     * @param sense Communication sense type
      * @return Java file
      */
-    public static File getPortTypeJavaFile(Element root,
-            WsType sense) {
+    public static File getPortTypeJavaFile(Element root, WsType sense) {
 
         return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(
                 root, sense)));
@@ -528,8 +504,7 @@ public class WsdlParserUtils {
     /**
      * Convert the path to a type to the java file path.
      * 
-     * @param classPath
-     *            Path to the class
+     * @param classPath Path to the class
      * @return Path to the java file
      */
     private static String convertTypePathToJavaPath(String classPath) {
@@ -543,8 +518,7 @@ public class WsdlParserUtils {
     /**
      * Get the file on path in generated sources folder.
      * 
-     * @param path
-     *            Searched path
+     * @param path Searched path
      * @return File to path
      */
     private static File getGeneratedJavaFile(String path) {
@@ -556,15 +530,12 @@ public class WsdlParserUtils {
 
     /**
      * Find the first compatible service related class name of the root.
-     * 
      * <p>
      * Compatible service should be SOAP protocol version 1.1 and 1.2.
      * </p>
      * 
-     * @param root
-     *            Root element of wsdl
-     * @param sense
-     *            Communication sense type
+     * @param root Root element of wsdl
+     * @param sense Communication sense type
      * @return First compatible service class name
      */
     private static String findFirstCompatibleServiceClassName(Element root,
@@ -577,15 +548,12 @@ public class WsdlParserUtils {
 
     /**
      * Find the first compatible service related element name of the root.
-     * 
      * <p>
      * Compatible service should be SOAP protocol version 1.1 and 1.2.
      * </p>
      * 
-     * @param root
-     *            Root element of wsdl
-     * @param sense
-     *            Communication sense type
+     * @param root Root element of wsdl
+     * @param sense Communication sense type
      * @return First compatible service class name
      */
     public static String findFirstCompatibleServiceElementName(Element root) {
@@ -604,13 +572,11 @@ public class WsdlParserUtils {
 
     /**
      * Find the first compatible port element of the root.
-     * 
      * <p>
      * Compatible port should be SOAP protocol version 1.1 and 1.2.
      * </p>
      * 
-     * @param root
-     *            Root element of wsdl
+     * @param root Root element of wsdl
      * @return First compatible port element
      */
     public static Element findFirstCompatiblePort(Element root) {
@@ -629,14 +595,12 @@ public class WsdlParserUtils {
 
     /**
      * Check port if Supported port element of the root.
-     * 
      * <p>
      * Should exists only one compatible port using SOAP protocol version 1.1 or
      * 1.2.
      * </p>
      * 
-     * @param root
-     *            Root element of wsdl
+     * @param root Root element of wsdl
      * @return Compatible port element
      */
     public static Element checkCompatiblePort(Element root) {
@@ -655,14 +619,12 @@ public class WsdlParserUtils {
 
     /**
      * Check compatible address element of the root.
-     * 
      * <p>
      * Should exists only one compatible address using SOAP protocol version 1.1
      * or 1.2.
      * </p>
      * 
-     * @param root
-     *            Root element of wsdl.
+     * @param root Root element of wsdl.
      * @return First compatible address element or null if no element.
      */
     public static Element checkCompatibleAddress(Element root) {
@@ -719,9 +681,11 @@ public class WsdlParserUtils {
 
         if (isSoap12Compatible && !isSoap11Compatible) {
             index = indexSoap12;
-        } else if (isSoap11Compatible && !isSoap12Compatible) {
+        }
+        else if (isSoap11Compatible && !isSoap12Compatible) {
             index = indexSoap11;
-        } else {
+        }
+        else {
             // Other protocols not supported
             return null;
         }
@@ -731,15 +695,12 @@ public class WsdlParserUtils {
 
     /**
      * Find the first compatible port related class name of the root.
-     * 
      * <p>
      * Compatible port should be SOAP protocol version 1.1 and 1.2.
      * </p>
      * 
-     * @param root
-     *            Root element of wsdl
-     * @param sense
-     *            Communication sense type
+     * @param root Root element of wsdl
+     * @param sense Communication sense type
      * @return First compatible port element class name
      */
     public static String findFirstCompatiblePortClassName(Element root,
@@ -754,15 +715,12 @@ public class WsdlParserUtils {
 
     /**
      * Find the first compatible port type class name of the root.
-     * 
      * <p>
      * Compatible port type should be SOAP protocol version 1.1 and 1.2.
      * </p>
      * 
-     * @param root
-     *            Root element of wsdl
-     * @param sense
-     *            Communication sense type
+     * @param root Root element of wsdl
+     * @param sense Communication sense type
      * @return First compatible port type class name
      */
     private static String findFirstCompatiblePortTypeClassName(Element root,
@@ -787,13 +745,11 @@ public class WsdlParserUtils {
 
     /**
      * Find the first compatible binding name of the root.
-     * 
      * <p>
      * Compatible binding should be SOAP protocol version 1.1 and 1.2.
      * </p>
      * 
-     * @param root
-     *            Root element of wsdl
+     * @param root Root element of wsdl
      * @return First compatible binding element
      */
     private static Element findFirstCompatibleBinding(Element root) {
@@ -815,17 +771,14 @@ public class WsdlParserUtils {
 
     /**
      * URI of a wsdl namespace, or target namespace if not exists or null.
-     * 
      * <p>
      * URI is defined by the value of the root attributes that starts with
      * 'xmlns' namespace. For example, for element
      * 'xmlns:tns="http://tempuri.org/"' the uri is 'http://tempuri.org/'.
      * </p>
      * 
-     * @param root
-     *            Wsdl root element
-     * @param namespace
-     *            Namespace to search it URI
+     * @param root Wsdl root element
+     * @param namespace Namespace to search it URI
      * @return Namespace URI related to the namespace
      */
     private static String getNamespaceURI(Element root, String namespace) {
@@ -850,14 +803,12 @@ public class WsdlParserUtils {
 
     /**
      * Get the prefix of a name, or empty if not.
-     * 
      * <p>
      * Prefix is the text before first namespace separator character. For
      * example, for name '<soap12:address>' the prefix is 'soap12'.
      * </p>
      * 
-     * @param elementName
-     *            An element name
+     * @param elementName An element name
      * @return Prefix of the name or empty if not
      */
     protected static String getNamespace(String elementName) {
@@ -879,14 +830,12 @@ public class WsdlParserUtils {
 
     /**
      * Get the local name of an element.
-     * 
      * <p>
      * Local name is the text after first namespace separator character. For
      * example, for element name soap12:address the local name is 'address'.
      * </p>
      * 
-     * @param elementName
-     *            An element name
+     * @param elementName An element name
      * @return Sufix of the name or name if not
      */
     protected static String getLocalName(String elementName) {
@@ -899,19 +848,15 @@ public class WsdlParserUtils {
 
     /**
      * Converts a wsdl name to a valid Java format.
-     * 
      * <p>
      * The conversion is different if RPC/Encoded communication sense.
      * </p>
      * 
-     * @param name
-     *            A wsdl name
-     * @param sense
-     *            Communication sense type
+     * @param name A wsdl name
+     * @param sense Communication sense type
      * @return Valid java name
      */
-    private static String convertNameToJavaFormat(String name,
-            WsType sense) {
+    private static String convertNameToJavaFormat(String name, WsType sense) {
 
         if (WsType.IMPORT_RPC_ENCODED.equals(sense)) {
 
@@ -923,15 +868,13 @@ public class WsdlParserUtils {
 
     /**
      * Converts a wsdl name to a valid Java format in Document.
-     * 
      * <p>
      * Valid chars are letters, numbers and $. '-', '_', ':' and '.' chars are
      * replaced with none. Other chars are replaced by unicode value with format
      * "_002f". New words in name always will be start by uppercase.
      * </p>
      * 
-     * @param name
-     *            A wsdl name
+     * @param name A wsdl name
      * @return Valid java name
      */
     private static String convertDocumentNameToJavaFormat(String name) {
@@ -954,7 +897,8 @@ public class WsdlParserUtils {
 
                     ostr.append(Character.toUpperCase(ch));
 
-                } else {
+                }
+                else {
 
                     ostr.append(ch);
                 }
@@ -964,11 +908,13 @@ public class WsdlParserUtils {
                     // Next character to number or $ will be uppercase
                     upper = true;
 
-                } else {
+                }
+                else {
 
                     upper = false;
                 }
-            } else {
+            }
+            else {
 
                 // Next characters will be replace by none, others to Unicode
                 if (ch != '-' && ch != '_' && ch != ':' && ch != '.') {
@@ -999,8 +945,7 @@ public class WsdlParserUtils {
     /**
      * Converts a wsdl name to a valid Java format in RPC.
      * 
-     * @param name
-     *            A wsdl name
+     * @param name A wsdl name
      * @return Valid java name
      */
     private static String convertRpcNameToJavaFormat(String name) {
@@ -1017,8 +962,7 @@ public class WsdlParserUtils {
     /**
      * Returns true if the name is a valid java identifier.
      * 
-     * @param id
-     *            to check
+     * @param id to check
      * @return boolean true/false
      **/
     public static boolean isJavaId(String id) {
@@ -1072,8 +1016,7 @@ public class WsdlParserUtils {
      * Map an XML name to a Java identifier per the mapping rules of JSR 101 (in
      * version 1.0 this is "Chapter 20: Appendix: Mapping of XML Names"
      * 
-     * @param name
-     *            is the xml name
+     * @param name is the xml name
      * @return the java name per JSR 101 specification
      */
     public static String xmlNameToJava(String name) {
@@ -1102,12 +1045,14 @@ public class WsdlParserUtils {
             // wordStart = !Character.isLetter(nameArray[i]);
             wordStart = !Character.isLetter(nameArray[i])
                     && nameArray[i] != "_".charAt(0);
-        } else {
+        }
+        else {
             // The identifier cannot be mapped strictly according to
             // JSR 101
             if (Character.isJavaIdentifierPart(nameArray[0])) {
                 result.append("_" + nameArray[0]);
-            } else {
+            }
+            else {
                 // The XML identifier does not contain any characters
                 // we can map to Java. Using the length of the string
                 // will make it somewhat unique.
@@ -1131,7 +1076,8 @@ public class WsdlParserUtils {
             }
             if (wordStart && Character.isLowerCase(c)) {
                 result.append(Character.toUpperCase(c));
-            } else {
+            }
+            else {
                 result.append(c);
             }
             // If c is not a character, but is a legal Java
@@ -1168,8 +1114,7 @@ public class WsdlParserUtils {
     /**
      * Is wsdl document root element rpc encoded ?
      * 
-     * @param root
-     *            Wsdl document root element
+     * @param root Wsdl document root element
      * @return is rpc endoded
      */
     public static boolean isRpcEncoded(Element root) {
@@ -1222,12 +1167,9 @@ public class WsdlParserUtils {
      * If you need SSL support acceding to WSLD you should use
      * {@link SecurityService#getWsdl(String)}
      * 
-     * @param url
-     *            URL to check
+     * @param url URL to check
      * @return Wsdl document root element
-     * @exception IllegalStateException
-     *                wsdl no connection or invalid
-     * 
+     * @exception IllegalStateException wsdl no connection or invalid
      */
     public static Element validateWsdlUrl(String url) {
 
@@ -1240,11 +1182,13 @@ public class WsdlParserUtils {
 
             return root;
 
-        } catch (SAXException e) {
+        }
+        catch (SAXException e) {
 
             throw new IllegalStateException("The format of the wsdl has errors");
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
 
             throw new IllegalStateException("There is no access to the wsdl");
         }

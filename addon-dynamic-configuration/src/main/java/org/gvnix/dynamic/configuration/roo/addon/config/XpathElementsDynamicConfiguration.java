@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon.config;
 
@@ -117,7 +117,8 @@ public abstract class XpathElementsDynamicConfiguration extends
 
                     logger.log(Level.WARNING, "Element " + xpath
                             + " to set value not exists on file");
-                } else {
+                }
+                else {
 
                     // If target element exists, set new value
                     Element value = XmlUtils.findFirstElement(getValue(), elem);
@@ -125,7 +126,8 @@ public abstract class XpathElementsDynamicConfiguration extends
 
                         logger.log(Level.WARNING, "Element  " + xpath
                                 + " to set value not exists on file");
-                    } else {
+                    }
+                    else {
 
                         value.setTextContent(dynProp.getValue());
                     }
@@ -135,7 +137,8 @@ public abstract class XpathElementsDynamicConfiguration extends
             // Update the XML file
             XmlUtils.writeXml(file.getOutputStream(), doc);
 
-        } else if (!dynProps.isEmpty()) {
+        }
+        else if (!dynProps.isEmpty()) {
 
             logger.log(Level.WARNING, "File " + getFilePath()
                     + " not exists and there are dynamic properties to set it");

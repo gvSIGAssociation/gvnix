@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon.entity;
 
@@ -74,9 +74,7 @@ public class DynConfiguration {
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * Name and active message if configuration active.
+     * {@inheritDoc} Name and active message if configuration active.
      */
     @Override
     public String toString() {
@@ -85,7 +83,8 @@ public class DynConfiguration {
 
         if (active) {
             buffer.append("      (Active)      ");
-        } else {
+        }
+        else {
             buffer.append("                    ");
         }
         buffer.append(getName());
@@ -97,22 +96,21 @@ public class DynConfiguration {
     /**
      * Two configurations are equal if their components are equal.
      * 
-     * @param obj
-     *            Configuration to compare to
+     * @param obj Configuration to compare to
      * @return Configuration equals
      */
     @Override
     public boolean equals(Object obj) {
-    	if (ObjectUtils.equals(this, obj)){
-    		return true;
-    	}
-    	if (obj == null){
-    		return false;
-    	}
-    	if (!(obj instanceof DynConfiguration)){
-    		return false;
-    	}
-    	DynConfiguration other = (DynConfiguration) obj;
+        if (ObjectUtils.equals(this, obj)) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof DynConfiguration)) {
+            return false;
+        }
+        DynConfiguration other = (DynConfiguration) obj;
         for (DynComponent component : components) {
 
             boolean exist = false;
@@ -132,14 +130,14 @@ public class DynConfiguration {
         return true;
     }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		for (DynComponent component : components) {
-			result = prime * result
-					+ ((component == null) ? 0 : component.hashCode());
-		}
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        for (DynComponent component : components) {
+            result = prime * result
+                    + ((component == null) ? 0 : component.hashCode());
+        }
+        return result;
+    }
 }

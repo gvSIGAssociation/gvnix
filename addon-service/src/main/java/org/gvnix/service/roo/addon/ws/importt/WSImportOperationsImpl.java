@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.importt;
 
@@ -69,19 +69,13 @@ public class WSImportOperationsImpl implements WSImportOperations {
     private static Logger logger = Logger.getLogger(WSImportOperations.class
             .getName());
 
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private JavaParserService javaParserService;
-    @Reference
-    private AnnotationsService annotationsService;
-    @Reference
-    private TypeLocationService typeLocationService;
+    @Reference private FileManager fileManager;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private JavaParserService javaParserService;
+    @Reference private AnnotationsService annotationsService;
+    @Reference private TypeLocationService typeLocationService;
 
-    @Reference
-    private SecurityService securityService;
+    @Reference private SecurityService securityService;
 
     /**
      * {@inheritDoc}
@@ -98,7 +92,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
         // Service class path
         String fileLocation = projectOperations.getPathResolver()
                 .getIdentifier(
-                		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                        LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                         serviceClass.getFullyQualifiedTypeName()
                                 .replace('.', '/').concat(".java"));
 
@@ -120,7 +114,8 @@ public class WSImportOperationsImpl implements WSImportOperations {
 
             logger.log(Level.WARNING,
                     "Provided class is already importing a service");
-        } else {
+        }
+        else {
 
             // Add the import definition annotation and attributes to the class
             List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
@@ -175,7 +170,8 @@ public class WSImportOperationsImpl implements WSImportOperations {
         Document wsdl = getWSDLFromClass(importedServiceClass);
         Validate.notNull(wsdl, importedServiceDetails.getName().toString()
                 .concat(" is not a imported service"));
-        Validate.isTrue(WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
+        Validate.isTrue(
+                WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
                 "Only RPC-Encoded services is supported");
 
         // Check if certificate file exist
@@ -219,7 +215,6 @@ public class WSImportOperationsImpl implements WSImportOperations {
      * <p>
      * Copy a certificate file into project resources
      * </p>
-     * 
      * <p>
      * If a file with the same name already exists, file will be copied using a
      * new name adding an suffix to original base name (see
@@ -244,9 +239,10 @@ public class WSImportOperationsImpl implements WSImportOperations {
 
         InputStream inputStream = null;
         OutputStream outputStream = null;
-        try { 
+        try {
             inputStream = new FileInputStream(certificate);
-            outputStream = fileManager.createFile(targetCertificated.getAbsolutePath()).getOutputStream();
+            outputStream = fileManager.createFile(
+                    targetCertificated.getAbsolutePath()).getOutputStream();
             IOUtils.copy(inputStream, outputStream);
         }
         catch (Exception e) {
@@ -265,7 +261,6 @@ public class WSImportOperationsImpl implements WSImportOperations {
      * Generates file names for certificate file to copy into project resource
      * folder until it find a unused one.
      * </p>
-     * 
      * <p>
      * The first try is <code>{target-folder}/{certificate_fileName}</code>
      * </p>
@@ -291,7 +286,8 @@ public class WSImportOperationsImpl implements WSImportOperations {
         String baseNamePath = targetPath.replace(certificate.getName(), "");
 
         targetPath = projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), targetPath);
+                LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                targetPath);
 
         int index = 1;
 
@@ -299,7 +295,8 @@ public class WSImportOperationsImpl implements WSImportOperations {
             targetPath = baseNamePath.concat(certificateName)
                     .concat("_" + index).concat(extension);
             targetPath = projectOperations.getPathResolver().getIdentifier(
-            		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), targetPath);
+                    LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                    targetPath);
             index++;
         }
         return new File(targetPath);

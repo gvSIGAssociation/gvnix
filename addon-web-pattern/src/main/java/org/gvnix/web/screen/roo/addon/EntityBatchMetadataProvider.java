@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.screen.roo.addon;
 
@@ -51,24 +51,20 @@ public final class EntityBatchMetadataProvider extends
     private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(
             GvNIXEntityBatch.class.getName());
 
-    @Reference
-    ProjectOperations projectOperations;
+    @Reference ProjectOperations projectOperations;
 
-    @Reference
-    PropFileOperations propFileOperations;
+    @Reference PropFileOperations propFileOperations;
 
     /* For project setup */
-    @Reference
-    WebScreenConfigService config;
+    @Reference WebScreenConfigService config;
 
     /**
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
      * command)
      * 
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -82,9 +78,8 @@ public final class EntityBatchMetadataProvider extends
      * OSGi container upon bundle deactivation (result of the 'addon uninstall'
      * command)
      * 
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
         metadataDependencyRegistry.deregisterDependency(
@@ -112,9 +107,10 @@ public final class EntityBatchMetadataProvider extends
                 "Governor failed to provide class type details, in violation of superclass contract");
 
         // We need to know the metadata of the Entity through
-        LogicalPath path = EntityBatchMetadata.getPath(metadataIdentificationString);
-        String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(entityType,
-        		path);
+        LogicalPath path = EntityBatchMetadata
+                .getPath(metadataIdentificationString);
+        String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(
+                entityType, path);
         JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService
                 .get(entityMetadataKey);
         if (entityMetadata == null) {
@@ -143,7 +139,8 @@ public final class EntityBatchMetadataProvider extends
             String metadataIdentificationString) {
         JavaType javaType = EntityBatchMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = EntityBatchMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = EntityBatchMetadata
+                .getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 

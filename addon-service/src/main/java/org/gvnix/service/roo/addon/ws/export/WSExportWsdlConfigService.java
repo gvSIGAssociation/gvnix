@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.export;
 
@@ -74,14 +74,12 @@ public interface WSExportWsdlConfigService {
 
     /**
      * Generate java source code related to a WSDL with maven plugin.
-     * 
      * <p>
      * Check correct WSDL format, configure plugin to generate sources and
      * generate java sources.
      * </p>
      * 
-     * @param wsdlLocation
-     *            contract wsdl url to export
+     * @param wsdlLocation contract wsdl url to export
      */
     public void generateJavaFromWsdl(String wsdlLocation);
 
@@ -95,14 +93,13 @@ public interface WSExportWsdlConfigService {
      * creation events from wsdl2java maven plugin
      * </p>
      * 
-     * @param directoryToMonitoring
-     *            directory to look up for CXF Web Service generated java files.
+     * @param directoryToMonitoring directory to look up for CXF Web Service
+     *            generated java files.
      */
     public void monitorFolder(String directoryToMonitoring);
 
     /**
      * Create gvNIX web service from wsdl2java plugin generation monitoring.
-     * 
      * <p>
      * Creates java files in 'src/main/java' from result of wsdl2java plugin
      * generation monitoring and creating required gvNIX annotation to identify
@@ -130,7 +127,6 @@ public interface WSExportWsdlConfigService {
      * <p>
      * This files will be registered by {@link WSExportWsdlListener}
      * </p>
-     * 
      * TODO to be removed from interface. This method need a sequence of
      * operations to be useful.
      */
@@ -144,7 +140,6 @@ public interface WSExportWsdlConfigService {
      * <p>
      * This files will be registered by {@link WSExportWsdlListener}
      * </p>
-     * 
      * TODO to be removed from interface. This method need a sequence of
      * operations to be useful.
      * 
@@ -153,12 +148,10 @@ public interface WSExportWsdlConfigService {
     public List<JavaType> createGvNixWebServiceClasses();
 
     /**
-     * Retrieve Web Service implemented interface from interface list.
+     * Retrieve Web Service implemented interface from interface list. TODO to
+     * be removed?. This method could be useless outside this service.
      * 
-     * TODO to be removed?. This method could be useless outside this service.
-     * 
-     * @param classOrInterfaceDeclaration
-     *            to retrieve its implemented interface.
+     * @param classOrInterfaceDeclaration to retrieve its implemented interface.
      * @return {@link ClassOrInterfaceDeclaration} interface that implements
      *         classOrInterfaceDeclaratio, null if not exists.
      * @throws IOException
@@ -177,7 +170,6 @@ public interface WSExportWsdlConfigService {
      * Creates {@link FieldMetadata} with @GvNIXXmlElementField annotation even
      * if not exists @XmlElement.
      * </p>
-     * 
      * TODO to be removed from interface?. This method could be useless outside
      * this service.
      * 
@@ -189,16 +181,14 @@ public interface WSExportWsdlConfigService {
 
     /**
      * Convert annotation @WebFault values from
-     * {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebFault}.
+     * {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebFault}. TODO to be
+     * removed from interface?. This method could be useless outside this
+     * service.
      * 
-     * TODO to be removed from interface?. This method could be useless outside
-     * this service.
-     * 
-     * @param classOrInterfaceDeclaration
-     *            to retrieve values from @WebFault annotations and convert to
-     *            {@link GvNIXWebFault} values.
-     * @param exceptionType
-     *            to retrieve faultBean attribute value {@link GvNIXWebFault}.
+     * @param classOrInterfaceDeclaration to retrieve values from @WebFault
+     *            annotations and convert to {@link GvNIXWebFault} values.
+     * @param exceptionType to retrieve faultBean attribute value
+     *            {@link GvNIXWebFault}.
      * @return {@link GvNIXWebFault} to define in class.
      */
     public AnnotationMetadata getGvNIXWebFaultAnnotation(
@@ -207,18 +197,15 @@ public interface WSExportWsdlConfigService {
 
     /**
      * Convert annotation @WebService values from
-     * {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebService}.
+     * {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebService}. TODO to
+     * be removed from interface?. This method could be useless outside this
+     * service.
      * 
-     * TODO to be removed from interface?. This method could be useless outside
-     * this service.
-     * 
-     * @param classOrInterfaceDeclaration
-     *            to retrieve values from @WebService annotations and convert to
-     *            {@link GvNIXWebService} values.
-     * @param implementedInterface
-     *            Web Service interface.
-     * @param javaType
-     *            to retrieve mandatory Annotation attributed with its values.
+     * @param classOrInterfaceDeclaration to retrieve values from @WebService
+     *            annotations and convert to {@link GvNIXWebService} values.
+     * @param implementedInterface Web Service interface.
+     * @param javaType to retrieve mandatory Annotation attributed with its
+     *            values.
      * @return {@link GvNIXWebService} to define in class.
      */
     public AnnotationMetadata getGvNIXWebServiceAnnotation(
@@ -227,14 +214,12 @@ public interface WSExportWsdlConfigService {
 
     /**
      * Creates MethodMetadata with GvNIX Annotation values to export as Web
-     * Service Operation.
-     * 
-     * TODO to be removed from interface?. This method could be useless outside
-     * this service.
+     * Service Operation. TODO to be removed from interface?. This method could
+     * be useless outside this service.
      * 
      * @param methodMetadata
-     * @param defaultNamespace
-     *            from Web Service to set where is not defined in annotations.
+     * @param defaultNamespace from Web Service to set where is not defined in
+     *            annotations.
      * @return {@link MethodMetadata} with GvNIX Annotations.
      */
     public MethodMetadata getGvNIXWebMethodMetadata(
@@ -242,15 +227,12 @@ public interface WSExportWsdlConfigService {
 
     /**
      * Define @GvNIXWebMethod annotation using Web Services annotation attribute
-     * values.
+     * values. TODO to be removed from interface?. This method could be useless
+     * outside this service.
      * 
-     * TODO to be removed from interface?. This method could be useless outside
-     * this service.
-     * 
-     * @param methodMetadata
-     *            to check Web Services annotations.
-     * @param defaultNamespace
-     *            from Web Service to set where is not defined in annotations.
+     * @param methodMetadata to check Web Services annotations.
+     * @param defaultNamespace from Web Service to set where is not defined in
+     *            annotations.
      * @return {@link GvNIXWebMethod} with Attributes.
      */
     public AnnotationMetadata getGvNIXWebMethodAnnotation(
@@ -259,10 +241,9 @@ public interface WSExportWsdlConfigService {
     /**
      * Define @GVNIXWebParam for each input method parameter.
      * 
-     * @param methodMetadata
-     *            to check for Web Services annotations.
-     * @param defaultNamespace
-     *            from Web Service to set where is not defined in annotations.
+     * @param methodMetadata to check for Web Services annotations.
+     * @param defaultNamespace from Web Service to set where is not defined in
+     *            annotations.
      * @return {@link List} of {@link AnnotatedJavaType} for each input method
      *         parameter.
      */
@@ -271,31 +252,25 @@ public interface WSExportWsdlConfigService {
 
     /**
      * Updates list of files generated to update with '@GvNIX' annotations.
-     * 
      * <b>For {@link WSExportWsdlListener} uses only</b>
      * 
-     * @param file
-     *            scanned to add to list.
-     * @param gvNIXAnnotationType
-     *            to select the list where add the file.
+     * @param file scanned to add to list.
+     * @param gvNIXAnnotationType to select the list where add the file.
      */
     public void addFileToUpdateAnnotation(File file,
             GvNIXAnnotationType gvNIXAnnotationType);
 
     /**
-     * Reset Web Service generated file lists.
-     * 
-     * <b>For {@link WSExportWsdlListener} uses only</b>
+     * Reset Web Service generated file lists. <b>For
+     * {@link WSExportWsdlListener} uses only</b>
      */
     public void resetGeneratedFilesList();
 
     /**
-     * Updates package info file location.
+     * Updates package info file location. <b>For {@link WSExportWsdlListener}
+     * uses only</b>
      * 
-     * <b>For {@link WSExportWsdlListener} uses only</b>
-     * 
-     * @param schemaPackageInfoFile
-     *            File absolute path.
+     * @param schemaPackageInfoFile File absolute path.
      */
     public void setSchemaPackageInfoFile(File schemaPackageInfoFile);
 

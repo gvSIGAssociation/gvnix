@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.cit.security.roo.addon;
 
@@ -64,7 +64,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
     public static final String AUTHENTICATION_SUBPACKAGE = ".security.authentication.wscit";
 
-	static final Integer DEFAUL_SESSION_TIMEOUT = 45;
+    static final Integer DEFAUL_SESSION_TIMEOUT = 45;
 
     private static final String PROVIDER_CLASS_FILENAME = "WscitAuthenticationProvider.java";
 
@@ -88,20 +88,15 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private static Logger logger = Logger
             .getLogger(CitSecurityOperationsImpl.class.getName());
 
-    @Reference
-    private FileManager fileManager;
+    @Reference private FileManager fileManager;
 
-    @Reference
-    private PathResolver pathResolver;
+    @Reference private PathResolver pathResolver;
 
-    @Reference
-    private MetadataService metadataService;
+    @Reference private MetadataService metadataService;
 
-    @Reference
-    private ProjectOperations projectOperations;
+    @Reference private ProjectOperations projectOperations;
 
-    @Reference
-    private SecurityOperations securityOperations;
+    @Reference private SecurityOperations securityOperations;
 
     /**
      * Get java package of cit security classes into destination project.
@@ -109,9 +104,11 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      * @return Cit security classes java package
      */
     protected String getClassesPackage() {
-    	return projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE);
+        return projectOperations.getFocusedTopLevelPackage()
+                .getFullyQualifiedPackageName()
+                .concat(AUTHENTICATION_SUBPACKAGE);
     }
-    
+
     /**
      * Get folder path of cit security files into destination project.
      * 
@@ -121,7 +118,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
         return getClassesPackage().replace(".", File.separator);
     }
-    
+
     /**
      * Get file path of cit security provider file into destination project.
      * 
@@ -142,7 +139,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         // configurada
         // no estara disponible el comando
         String appSecurityXMLPath = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""), "applicationContext-security.xml");
+                LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""),
+                "applicationContext-security.xml");
         if (!fileManager.exists(appSecurityXMLPath)) {
             return false;
         }
@@ -156,7 +154,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     public boolean checkIsAlredyInstalled() {
         // Si no existe la ruta de nuestas clases no estan instaladas: estamos
         // disponibles
-        String folderPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+        String folderPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                 getClassesPath());
         if (!fileManager.exists(folderPath)) {
             return false;
@@ -164,7 +163,9 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
         // si no existe la clase provider no estamos instalados: estamos
         // disonible
-        String filePath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""), getProviderTargetClassFileName());
+        String filePath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                getProviderTargetClassFileName());
         return fileManager.exists(filePath);
     }
 
@@ -187,7 +188,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private String getSpringMvcConfigFile() {
         // resolve path for webmvc-config.xml if it hasn't been resolved yet
         return projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/spring/webmvc-config.xml");
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "WEB-INF/spring/webmvc-config.xml");
     }
 
     /**
@@ -200,7 +202,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private String getTilesLayoutsFile() {
         // resolve absolute path for layouts.xml if it hasn't been resolved yet
         return projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/WEB-INF/layouts/layouts.xml");
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "/WEB-INF/layouts/layouts.xml");
     }
 
     public void setup(String url, String login, String password, String appName) {
@@ -238,25 +241,29 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
     private void addDependencies() {
 
-        Set<Dependency> dependencies = projectOperations.getFocusedModule().getDependenciesExcludingVersion(AXIS_DEPENDENCY);
+        Set<Dependency> dependencies = projectOperations.getFocusedModule()
+                .getDependenciesExcludingVersion(AXIS_DEPENDENCY);
 
         if (!dependencies.isEmpty()) {
-        	Validate.isTrue(dependencies.size() == 1,
+            Validate.isTrue(dependencies.size() == 1,
                     "Duplicate AXIS library dependecy");
             Dependency current = dependencies.iterator().next();
             String[] currentVersion = current.getVersion().split("[.]");
             if (currentVersion.length > 1) {
-                String[] requiredVersion = AXIS_DEPENDENCY.getVersion()
-                        .split("[.]");
+                String[] requiredVersion = AXIS_DEPENDENCY.getVersion().split(
+                        "[.]");
                 int cur, req;
                 for (int i = 0; i < currentVersion.length
                         && i < requiredVersion.length; i++) {
                     try {
                         cur = Integer.parseInt(currentVersion[i]);
                         req = Integer.parseInt(requiredVersion[i]);
-                    } catch (NumberFormatException e) {
+                    }
+                    catch (NumberFormatException e) {
                         // Actualizamos la dependencia por si acaso.
-                        projectOperations.addDependency(projectOperations.getFocusedModuleName(), AXIS_DEPENDENCY);
+                        projectOperations.addDependency(
+                                projectOperations.getFocusedModuleName(),
+                                AXIS_DEPENDENCY);
                         return;
                     }
                     if (cur > req) {
@@ -266,13 +273,15 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                     }
                 }
 
-            } else {
+            }
+            else {
                 // no sabemos la versión asumimos que es buena
                 return;
             }
 
         }
-        projectOperations.addDependency(projectOperations.getFocusedModuleName(), AXIS_DEPENDENCY);
+        projectOperations.addDependency(
+                projectOperations.getFocusedModuleName(), AXIS_DEPENDENCY);
 
     }
 
@@ -287,7 +296,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private void copyConfigFiles(String url, String login, String password,
             String appName) {
 
-        String properties = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""),
+        String properties = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""),
                 WSAUTH_PROPERTIES_NAME);
         if (fileManager.exists(properties)) {
             return;
@@ -305,24 +315,28 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
             InputStream inputStream = null;
             OutputStreamWriter outputStream = null;
-            try { 
-            	inputStream = IOUtils.toInputStream(template);
-            	outputStream = new OutputStreamWriter(fileManager.createFile(properties).getOutputStream());
-	            IOUtils.copy(inputStream, outputStream);
+            try {
+                inputStream = IOUtils.toInputStream(template);
+                outputStream = new OutputStreamWriter(fileManager.createFile(
+                        properties).getOutputStream());
+                IOUtils.copy(inputStream, outputStream);
             }
             finally {
-            	IOUtils.closeQuietly(inputStream);
-            	IOUtils.closeQuietly(outputStream);
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
             }
-            
-        } catch (IOException e) {
+
+        }
+        catch (IOException e) {
             throw new IllegalStateException("Unable to create '"
                     + WSAUTH_PROPERTIES_NAME + "'", e);
-        } finally {
+        }
+        finally {
             if (templateInputStream != null) {
                 try {
                     templateInputStream.close();
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     logger.throwing(getClass().getName(), "copyConfigFiles", e);
                 }
             }
@@ -333,7 +347,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private void updateSecurityConfig() {
 
         String secTemplate = "config/applicationContext-security-template.xml";
-        String secXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""),
+        String secXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""),
                 "applicationContext-security.xml");
 
         Document secXmlDoc;
@@ -341,7 +356,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         if (fileManager.exists(secXmlPath)) {
             // File exists, update file
             mutableFile = fileManager.updateFile(secXmlPath);
-        } else {
+        }
+        else {
             // Create file
             mutableFile = fileManager.createFile(secXmlPath);
         }
@@ -365,7 +381,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             bean.setAttribute("class",
                     clazz.replace("__TARGET_PACKAGE__", getClassesPackage()));
 
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IllegalStateException(ex);
         }
 
@@ -383,9 +400,10 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      * @param sessionTimeout
      */
     private void updateSessionTimeout(Integer sessionTimeout) {
-    	Validate.notNull(sessionTimeout, "Session timeout must not be null");
+        Validate.notNull(sessionTimeout, "Session timeout must not be null");
 
-        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String webXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/web.xml");
 
         Document webXmlDoc;
@@ -396,7 +414,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                 mutableFile = fileManager.updateFile(webXmlPath);
                 webXmlDoc = XmlUtils.getDocumentBuilder().parse(
                         mutableFile.getInputStream());
-            } else {
+            }
+            else {
                 throw new IllegalStateException(
                         "Could not acquire ".concat(webXmlPath));
             }
@@ -405,7 +424,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                     "/web-app/session-config/session-timeout", root);
             sessionTimeoutElement
                     .setTextContent(String.valueOf(sessionTimeout));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(e);
         }
 
@@ -416,27 +436,28 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
     private void copyJavaFiles() {
 
-        String prjId = ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName());
+        String prjId = ProjectMetadata.getProjectIdentifier(projectOperations
+                .getFocusedModuleName());
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
                 .get(prjId);
 
         // Copiamos los ficheros del cliente del servicio WSAuth
         for (String className : JAVA_WS_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, getClassesPackage(),
-                    projectMetadata, null, false);
+            installTemplate("java-src-templates", className,
+                    getClassesPackage(), projectMetadata, null, false);
         }
 
         // Copiamos los ficheros del Provider, usuarios y el cliente del
         // servicio WSAuth
         for (String className : JAVA_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, getClassesPackage(),
-                    projectMetadata, null, false);
+            installTemplate("java-src-templates", className,
+                    getClassesPackage(), projectMetadata, null, false);
         }
 
         // Copiamos los ficheros de los xsd del servicio WSAuth
         for (String className : JAVA_XSD_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, getClassesPackage(),
-                    projectMetadata, null, false);
+            installTemplate("java-src-templates", className,
+                    getClassesPackage(), projectMetadata, null, false);
         }
     }
 
@@ -462,39 +483,40 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      * <i>clave</i><code>__</code> --> <i>valor<i></li>
      * </ul>
      * 
-     * @param sourceFolder
-     *            path relativo a esta clase para buscar el template, si es null
-     *            usa la la ruta de la clase actual
-     * @param targetFilename
-     *            nombre del fichero final
-     * @param targetPackage
-     *            paquete donde se generará el fichero (admite '~' como comodín
-     *            del paquete base)
-     * @param projectMetadata
-     *            metadatos del proyecto
-     * @param parameters
-     *            valores adicionales a reemplazar (puede ser <code>null</code>
-     *            si no se necesita)
-     * @param override
-     *            especifica si sobreescribir el archivo si ya existe
+     * @param sourceFolder path relativo a esta clase para buscar el template,
+     *            si es null usa la la ruta de la clase actual
+     * @param targetFilename nombre del fichero final
+     * @param targetPackage paquete donde se generará el fichero (admite '~'
+     *            como comodín del paquete base)
+     * @param projectMetadata metadatos del proyecto
+     * @param parameters valores adicionales a reemplazar (puede ser
+     *            <code>null</code> si no se necesita)
+     * @param override especifica si sobreescribir el archivo si ya existe
      */
     private void installTemplate(String sourceFolder, String targetFilename,
             String targetPackage, ProjectMetadata projectMetadata,
             Map<String, String> parameters, boolean override) {
         // default package
-        String packagePath = projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName())
+        String packagePath = projectOperations
+                .getTopLevelPackage(projectOperations.getFocusedModuleName())
                 .getFullyQualifiedPackageName().replace('.', '/');
 
         // setting targetPackage change default package
         String finalTargetPackage = null;
         if (targetPackage == null) {
-        	finalTargetPackage = getClass().getPackage().getName();
-        } else {
-        	if (targetPackage.startsWith("~")) {
-        		finalTargetPackage = targetPackage.replace("~", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName());
-        	} else {
-        		finalTargetPackage = targetPackage;
-        	}
+            finalTargetPackage = getClass().getPackage().getName();
+        }
+        else {
+            if (targetPackage.startsWith("~")) {
+                finalTargetPackage = targetPackage.replace(
+                        "~",
+                        projectOperations.getTopLevelPackage(
+                                projectOperations.getFocusedModuleName())
+                                .getFullyQualifiedPackageName());
+            }
+            else {
+                finalTargetPackage = targetPackage;
+            }
         }
         packagePath = finalTargetPackage.replace('.', '/');
 
@@ -507,16 +529,32 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             if (sourceFolder == null) {
                 templateInputStream = FileUtils.getInputStream(getClass(),
                         targetFilename + "-template");
-            } else {
+            }
+            else {
                 templateInputStream = FileUtils.getInputStream(getClass(),
                         sourceFolder + "/" + targetFilename + "-template");
             }
             try {
                 // Read template and insert the user's package
-                String input = IOUtils.toString(new InputStreamReader(templateInputStream));
-                input = input.replace("__TOP_LEVEL_PACKAGE__", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE));
+                String input = IOUtils.toString(new InputStreamReader(
+                        templateInputStream));
+                input = input.replace(
+                        "__TOP_LEVEL_PACKAGE__",
+                        projectOperations
+                                .getTopLevelPackage(
+                                        projectOperations
+                                                .getFocusedModuleName())
+                                .getFullyQualifiedPackageName()
+                                .concat(AUTHENTICATION_SUBPACKAGE));
 
-                input = input.replace("__TARGET_PACKAGE__", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE));
+                input = input.replace(
+                        "__TARGET_PACKAGE__",
+                        projectOperations
+                                .getTopLevelPackage(
+                                        projectOperations
+                                                .getFocusedModuleName())
+                                .getFullyQualifiedPackageName()
+                                .concat(AUTHENTICATION_SUBPACKAGE));
 
                 if (parameters != null) {
                     for (Entry<String, String> entry : parameters.entrySet()) {
@@ -528,20 +566,21 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                 // Output the file for the user
                 MutableFile mutableFile = fileManager
                         .createFile(destinationFile);
-                
+
                 InputStream inputStream = null;
                 OutputStream outputStream = null;
-                try { 
-                	inputStream = IOUtils.toInputStream(input);
-                	outputStream = mutableFile.getOutputStream();
-    	            IOUtils.copy(inputStream, outputStream);
+                try {
+                    inputStream = IOUtils.toInputStream(input);
+                    outputStream = mutableFile.getOutputStream();
+                    IOUtils.copy(inputStream, outputStream);
                 }
                 finally {
-                	IOUtils.closeQuietly(inputStream);
-                	IOUtils.closeQuietly(outputStream);
+                    IOUtils.closeQuietly(inputStream);
+                    IOUtils.closeQuietly(outputStream);
                 }
-                
-            } catch (IOException ioe) {
+
+            }
+            catch (IOException ioe) {
                 throw new IllegalStateException("Unable to create '"
                         + targetFilename + "'", ioe);
             }

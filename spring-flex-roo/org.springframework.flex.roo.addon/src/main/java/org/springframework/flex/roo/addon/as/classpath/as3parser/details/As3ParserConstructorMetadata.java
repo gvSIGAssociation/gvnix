@@ -1,17 +1,17 @@
 /*
  * Copyright 2002-2010 the original author or authors.
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.springframework.flex.roo.addon.as.classpath.as3parser.details;
@@ -37,8 +37,9 @@ import uk.co.badgersinfoil.metaas.dom.ASType;
 import uk.co.badgersinfoil.metaas.dom.Statement;
 
 /**
- * Parser-specific metadata representation of an ActionScript constructor method.
- *
+ * Parser-specific metadata representation of an ActionScript constructor
+ * method.
+ * 
  * @author Jeremy Grelle
  */
 public class As3ParserConstructorMetadata implements ASConstructorMetadata {
@@ -54,10 +55,13 @@ public class As3ParserConstructorMetadata implements ASConstructorMetadata {
     private final ASTypeVisibility visibility;
 
     @SuppressWarnings("unchecked")
-    public As3ParserConstructorMetadata(String declaredByMetadataId, ASMethod method, CompilationUnitServices compilationUnitServices) {
-        Validate.notNull(declaredByMetadataId, "Declared by metadata ID required");
+    public As3ParserConstructorMetadata(String declaredByMetadataId,
+            ASMethod method, CompilationUnitServices compilationUnitServices) {
+        Validate.notNull(declaredByMetadataId,
+                "Declared by metadata ID required");
         Validate.notNull(method, "Method declaration required");
-        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(compilationUnitServices,
+                "Compilation unit services required");
 
         this.declaredByMetadataId = declaredByMetadataId;
 
@@ -70,19 +74,23 @@ public class As3ParserConstructorMetadata implements ASConstructorMetadata {
         List<ASMetaTag> metaTagList = method.getAllMetaTags();
         if (metaTagList != null) {
             for (ASMetaTag metaTag : metaTagList) {
-                As3ParserMetaTagMetadata md = new As3ParserMetaTagMetadata(metaTag);
+                As3ParserMetaTagMetadata md = new As3ParserMetaTagMetadata(
+                        metaTag);
                 this.metaTags.add(md);
             }
         }
 
         List<ASArg> args = method.getArgs();
         for (ASArg arg : args) {
-            ActionScriptType paramType = As3ParserUtils.getActionScriptType(compilationUnitServices.getCompilationUnitPackage(),
-                compilationUnitServices.getImports(), arg.getType());
-            this.params.put(new ActionScriptSymbolName(arg.getName()), paramType);
+            ActionScriptType paramType = As3ParserUtils.getActionScriptType(
+                    compilationUnitServices.getCompilationUnitPackage(),
+                    compilationUnitServices.getImports(), arg.getType());
+            this.params.put(new ActionScriptSymbolName(arg.getName()),
+                    paramType);
         }
 
-        this.visibility = As3ParserUtils.getASTypeVisibility(method.getVisibility());
+        this.visibility = As3ParserUtils.getASTypeVisibility(method
+                .getVisibility());
     }
 
     public String getBody() {
@@ -109,27 +117,37 @@ public class As3ParserConstructorMetadata implements ASConstructorMetadata {
         return this.visibility;
     }
 
-    public static void addConstructor(CompilationUnitServices compilationUnitServices, ASType type, ASConstructorMetadata declaredConstructor,
-        boolean permitFlush) {
+    public static void addConstructor(
+            CompilationUnitServices compilationUnitServices, ASType type,
+            ASConstructorMetadata declaredConstructor, boolean permitFlush) {
 
-        Validate.isTrue(type.getMethod(type.getName()) == null, "ActionScript classes may only have one constructor method.");
+        Validate.isTrue(type.getMethod(type.getName()) == null,
+                "ActionScript classes may only have one constructor method.");
 
-        ASMethod constructor = type.newMethod(type.getName(), As3ParserUtils.getAs3ParserVisiblity(declaredConstructor.getVisibility()), null);
+        ASMethod constructor = type.newMethod(type.getName(), As3ParserUtils
+                .getAs3ParserVisiblity(declaredConstructor.getVisibility()),
+                null);
 
-        // TODO - The parser doesn't allow any control over re-ordering methods. It would be good if we could ensure the
+        // TODO - The parser doesn't allow any control over re-ordering methods.
+        // It would be good if we could ensure the
         // constructor is the first method in the class.
 
         // Add MetaTags
         for (ASMetaTagMetadata metaTag : declaredConstructor.getMetaTags()) {
-            As3ParserMetaTagMetadata.addMetaTagToElement(compilationUnitServices, metaTag, constructor, false);
+            As3ParserMetaTagMetadata.addMetaTagToElement(
+                    compilationUnitServices, metaTag, constructor, false);
         }
 
         // Add Arguments
         for (int x = 0; x < declaredConstructor.getParameterNames().size(); x++) {
-            ActionScriptSymbolName argName = declaredConstructor.getParameterNames().get(x);
-            ActionScriptType argType = declaredConstructor.getParameterTypes().get(x);
-            As3ParserUtils.importTypeIfRequired(compilationUnitServices, argType);
-            constructor.addParam(argName.getSymbolName(), argType.getSimpleTypeName());
+            ActionScriptSymbolName argName = declaredConstructor
+                    .getParameterNames().get(x);
+            ActionScriptType argType = declaredConstructor.getParameterTypes()
+                    .get(x);
+            As3ParserUtils.importTypeIfRequired(compilationUnitServices,
+                    argType);
+            constructor.addParam(argName.getSymbolName(),
+                    argType.getSimpleTypeName());
         }
 
         if (permitFlush) {

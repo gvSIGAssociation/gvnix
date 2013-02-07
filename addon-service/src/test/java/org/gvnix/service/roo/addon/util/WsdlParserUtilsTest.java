@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.util;
 
@@ -39,8 +39,10 @@ import org.w3c.dom.Element;
 public class WsdlParserUtilsTest {
 
     public static final String TEMP_CONVERT_WSDL = "http://www.w3schools.com/webservices/tempconvert.asmx?WSDL";
-//    public static final String EMAIL_VALIDATION_V2_WSDL = "http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl";
-//    public static final String EMAIL_VALIDATION_V1_WSDL = "http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl";
+    // public static final String EMAIL_VALIDATION_V2_WSDL =
+    // "http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl";
+    // public static final String EMAIL_VALIDATION_V1_WSDL =
+    // "http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl";
     public static final String TEMP_CONVERT_MODIFIED_LOCAL_WSDL = "tempconvert.wsdl";
     public static final String KK_WEB_SERVICE_ENG_WSDL = "http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl";
     public static final String ELASTIC_MAP_REDUCE_WSDL = "http://elasticmapreduce.amazonaws.com/doc/2009-03-31/ElasticMapReduce.wsdl";
@@ -109,22 +111,21 @@ public class WsdlParserUtilsTest {
         Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
         Element root = wsdl.getDocumentElement();
         assertEquals("org.tempuri.TempConvert",
-                WsdlParserUtils.getServiceClassPath(root,
-                        WsType.IMPORT));
+                WsdlParserUtils.getServiceClassPath(root, WsType.IMPORT));
 
-//        wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V1_WSDL);
-//        root = wsdl.getDocumentElement();
-//        assertEquals(
-//                "com.xwebservices.ws.xwebemailvalidation.XWebEmailValidation",
-//                WsdlParserUtils.getServiceClassPath(root,
-//                        WsType.IMPORT));
+        // wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V1_WSDL);
+        // root = wsdl.getDocumentElement();
+        // assertEquals(
+        // "com.xwebservices.ws.xwebemailvalidation.XWebEmailValidation",
+        // WsdlParserUtils.getServiceClassPath(root,
+        // WsType.IMPORT));
 
-//        wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
-//        root = wsdl.getDocumentElement();
-//        assertEquals(
-//                "v2.emailvalidation.xwebemailvalidation.wsuxwebservicesucom.XWebEmailValidation",
-//                WsdlParserUtils.getServiceClassPath(root,
-//                        WsType.IMPORT));
+        // wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
+        // root = wsdl.getDocumentElement();
+        // assertEquals(
+        // "v2.emailvalidation.xwebemailvalidation.wsuxwebservicesucom.XWebEmailValidation",
+        // WsdlParserUtils.getServiceClassPath(root,
+        // WsType.IMPORT));
 
         File file = new File(SRC_TEST_RESOURCES_PATH,
                 TEMP_CONVERT_MODIFIED_LOCAL_WSDL);
@@ -132,8 +133,7 @@ public class WsdlParserUtilsTest {
         root = wsdl.getDocumentElement();
         assertEquals(
                 "org.te3mupuuri.www.kk.idu1ur.TEMP_002fC_0023ONe_0040R_002bT$GE_003dR_002aG_0027E_00282_00293_002c4_002f2_0025Rmm12Mm",
-                WsdlParserUtils.getServiceClassPath(root,
-                        WsType.IMPORT));
+                WsdlParserUtils.getServiceClassPath(root, WsType.IMPORT));
     }
 
     /**
@@ -147,28 +147,26 @@ public class WsdlParserUtilsTest {
         Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
         Element root = wsdl.getDocumentElement();
         assertEquals("org.tempuri.TempConvertSoap",
-                WsdlParserUtils.getPortTypeClassPath(root,
-                        WsType.IMPORT));
+                WsdlParserUtils.getPortTypeClassPath(root, WsType.IMPORT));
 
-//        wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V1_WSDL);
-//        root = wsdl.getDocumentElement();
-//        assertEquals(
-//                "com.xwebservices.ws.xwebemailvalidation.XWebEmailValidationSoap",
-//                WsdlParserUtils.getPortTypeClassPath(root,
-//                        WsType.IMPORT));
+        // wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V1_WSDL);
+        // root = wsdl.getDocumentElement();
+        // assertEquals(
+        // "com.xwebservices.ws.xwebemailvalidation.XWebEmailValidationSoap",
+        // WsdlParserUtils.getPortTypeClassPath(root,
+        // WsType.IMPORT));
 
-//        wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
-//        root = wsdl.getDocumentElement();
-//        assertEquals(
-//                "v2.emailvalidation.xwebemailvalidation.wsuxwebservicesucom.XWebEmailValidationInterface",
-//                WsdlParserUtils.getPortTypeClassPath(root,
-//                        WsType.IMPORT));
+        // wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
+        // root = wsdl.getDocumentElement();
+        // assertEquals(
+        // "v2.emailvalidation.xwebemailvalidation.wsuxwebservicesucom.XWebEmailValidationInterface",
+        // WsdlParserUtils.getPortTypeClassPath(root,
+        // WsType.IMPORT));
 
         wsdl = XmlUtils.getDocumentBuilder().parse(KK_WEB_SERVICE_ENG_WSDL);
         root = wsdl.getDocumentElement();
         assertEquals("com.konakart.ws.KKWSEngIf",
-                WsdlParserUtils.getPortTypeClassPath(root,
-                        WsType.IMPORT));
+                WsdlParserUtils.getPortTypeClassPath(root, WsType.IMPORT));
     }
 
 }

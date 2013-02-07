@@ -1,17 +1,17 @@
 /*
  * Copyright 2002-2010 the original author or authors.
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  * 
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.springframework.flex.roo.addon.as.classpath.details.metatag;
@@ -26,7 +26,7 @@ import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
 
 /**
  * Default metadata representation of an ActionScript meta-tag.
- *
+ * 
  * @author Jeremy Grelle
  */
 public class DefaultASMetaTagMetadata implements ASMetaTagMetadata {
@@ -35,7 +35,8 @@ public class DefaultASMetaTagMetadata implements ASMetaTagMetadata {
 
     private final Map<ActionScriptSymbolName, MetaTagAttributeValue<?>> attributes = new LinkedHashMap<ActionScriptSymbolName, MetaTagAttributeValue<?>>();
 
-    public DefaultASMetaTagMetadata(String name, List<MetaTagAttributeValue<?>> attributes) {
+    public DefaultASMetaTagMetadata(String name,
+            List<MetaTagAttributeValue<?>> attributes) {
         this.name = name;
         if (attributes != null) {
             for (MetaTagAttributeValue<?> attr : attributes) {
@@ -48,7 +49,8 @@ public class DefaultASMetaTagMetadata implements ASMetaTagMetadata {
         return this.name;
     }
 
-    public MetaTagAttributeValue<?> getAttribute(ActionScriptSymbolName attributeName) {
+    public MetaTagAttributeValue<?> getAttribute(
+            ActionScriptSymbolName attributeName) {
         Validate.notNull(attributeName, "Attribute name required");
         return this.attributes.get(attributeName);
     }

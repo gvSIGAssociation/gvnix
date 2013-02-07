@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
@@ -48,8 +48,7 @@ public class Commands implements CommandMarker {
 
     private static Logger logger = Logger.getLogger(Commands.class.getName());
 
-    @Reference
-    private Operations operations;
+    @Reference private Operations operations;
 
     @CliAvailabilityIndicator("configuration create")
     public boolean isCreate() {
@@ -101,7 +100,8 @@ public class Commands implements CommandMarker {
 
             logger.log(Level.WARNING, "Property not exists");
 
-        } else if (added == true) {
+        }
+        else if (added == true) {
 
             logger.log(Level.INFO, "Property available for all configurations");
             logger.log(Level.INFO,
@@ -109,7 +109,8 @@ public class Commands implements CommandMarker {
             logger.log(Level.INFO,
                     "(use 'configuration property undefined' to set property with no values)");
 
-        } else {
+        }
+        else {
 
             logger.log(Level.WARNING,
                     "Property already available for configurations");
@@ -228,8 +229,7 @@ public class Commands implements CommandMarker {
     /**
      * Show the configurations of a dynamic configuration list on the console.
      * 
-     * @param dynConfs
-     *            Dynamic configuration to show
+     * @param dynConfs Dynamic configuration to show
      */
     private void showDynConfigurations(DynConfigurationList dynConfs) {
 
@@ -243,8 +243,7 @@ public class Commands implements CommandMarker {
     /**
      * Show the components of a dynamic configuration on the console.
      * 
-     * @param dynConf
-     *            Dynamic configuration to show
+     * @param dynConf Dynamic configuration to show
      */
     private void showDynComponents(DynConfiguration dynConf) {
 

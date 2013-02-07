@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
@@ -77,10 +77,8 @@ public class ConfigurationsImpl implements Configurations {
     private static final String BASE_CONFIGURATION_XPATH = "/"
             + DYNAMIC_CONFIGURATION_ELEMENT_NAME + "/" + BASE_ELEMENT_NAME;
 
-    @Reference
-    private PathResolver pathResolver;
-    @Reference
-    private FileManager fileManager;
+    @Reference private PathResolver pathResolver;
+    @Reference private FileManager fileManager;
 
     /**
      * {@inheritDoc}
@@ -175,7 +173,8 @@ public class ConfigurationsImpl implements Configurations {
         if (name == null) {
 
             props = XmlUtils.findElements("*", comp);
-        } else {
+        }
+        else {
             props = XmlUtils.findElements(PROPERTY_ELEMENT_NAME + "/"
                     + KEY_ELEMENT_NAME + "[text()='" + name + "']/..", comp);
         }
@@ -348,7 +347,8 @@ public class ConfigurationsImpl implements Configurations {
                 prop.removeChild(valueElem);
             }
 
-        } else {
+        }
+        else {
 
             if (valueElem == null) {
 
@@ -370,16 +370,11 @@ public class ConfigurationsImpl implements Configurations {
     /**
      * Add a component property with some name and value on a configuration.
      * 
-     * @param name
-     *            Property name
-     * @param value
-     *            Property value
-     * @param compId
-     *            Component id
-     * @param compId
-     *            Component name
-     * @param conf
-     *            Configuration element
+     * @param name Property name
+     * @param value Property value
+     * @param compId Component id
+     * @param compId Component name
+     * @param conf Configuration element
      */
     private void addProperty(String name, String value, String compId,
             String compName, Element conf) {
@@ -399,10 +394,8 @@ public class ConfigurationsImpl implements Configurations {
     /**
      * Get a component element with some name from a configuration element.
      * 
-     * @param id
-     *            Component identificador
-     * @param conf
-     *            Configuration element
+     * @param id Component identificador
+     * @param conf Configuration element
      * @return Component element
      */
     private Element getComponent(String id, Element conf) {
@@ -415,12 +408,9 @@ public class ConfigurationsImpl implements Configurations {
     /**
      * Add new property element containing key and value elements on component.
      * 
-     * @param comp
-     *            Component where add property
-     * @param key
-     *            Property key
-     * @param value
-     *            Property value
+     * @param comp Component where add property
+     * @param key Property key
+     * @param value Property value
      */
     private void addProperty(Element comp, String key, String value) {
 
@@ -446,12 +436,9 @@ public class ConfigurationsImpl implements Configurations {
      * Add new component element containing id and name elements on
      * configuration.
      * 
-     * @param conf
-     *            Configuration where add component
-     * @param id
-     *            Component identificator
-     * @param name
-     *            Component name
+     * @param conf Configuration where add component
+     * @param id Component identificator
+     * @param name Component name
      */
     private Element addComponent(Element conf, String id, String name) {
 
@@ -467,8 +454,7 @@ public class ConfigurationsImpl implements Configurations {
     /**
      * Check if a configuration is the active.
      * 
-     * @param conf
-     *            Configuration element
+     * @param conf Configuration element
      * @return Active element or null if is not the active
      */
     private Element isActiveConfiguration(Element conf) {
@@ -502,11 +488,13 @@ public class ConfigurationsImpl implements Configurations {
             String path = getConfigurationFilePath();
             DocumentBuilder build = XmlUtils.getDocumentBuilder();
             doc = build.parse(fileManager.getInputStream(path));
-        } catch (SAXException se) {
+        }
+        catch (SAXException se) {
 
             throw new IllegalStateException(
                     "Cant parse the configuration file", se);
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
 
             throw new IllegalStateException("Cant read the configuration file",
                     ioe);
@@ -526,23 +514,25 @@ public class ConfigurationsImpl implements Configurations {
     private String getConfigurationFilePath() {
 
         String path = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
                 DYNAMIC_CONFIGURATION_FILE_NAME);
         if (!fileManager.exists(path)) {
-        	
-        	OutputStream outputStream = null;
+
+            OutputStream outputStream = null;
             try {
 
-        		outputStream = fileManager.createFile(path).getOutputStream();
-        		IOUtils.copy(FileUtils.getInputStream(getClass(), DYNAMIC_CONFIGURATION_TEMPLATE_NAME), outputStream);
-        		
-            } catch (IOException ioe) {
+                outputStream = fileManager.createFile(path).getOutputStream();
+                IOUtils.copy(FileUtils.getInputStream(getClass(),
+                        DYNAMIC_CONFIGURATION_TEMPLATE_NAME), outputStream);
+
+            }
+            catch (IOException ioe) {
 
                 throw new IllegalStateException(ioe);
             }
             finally {
-     	 	 	IOUtils.closeQuietly(outputStream);
-     	 	}
+                IOUtils.closeQuietly(outputStream);
+            }
         }
 
         return path;

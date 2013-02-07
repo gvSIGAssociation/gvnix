@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.security;
 
@@ -88,16 +88,12 @@ public class SecurityServiceImpl implements SecurityService {
     private static final String DEPENDENCIES_FILE = "dependencies-wssl4.xml";
     private static final String AXIS_CLIENT_CONFIG_TEMPLATE_FILE = "client-config-axis-template.xml";
 
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private AnnotationsService annotationsService;
+    @Reference private FileManager fileManager;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private AnnotationsService annotationsService;
 
     /**
      * {@inheritDoc}
-     * 
      * <p>
      * This performs this operations:
      * </p>
@@ -105,7 +101,6 @@ public class SecurityServiceImpl implements SecurityService {
      * <li>Install Apache WSSJ4 depenency in pom</li>
      * <li>Creates axis <code>client-config.wsdd</code> file</li>
      * </ul>
-     * 
      **/
     public void setupWSSJ4() {
         addDependencies();
@@ -117,7 +112,8 @@ public class SecurityServiceImpl implements SecurityService {
      */
     private String getAxisClientConfigPath() {
         return projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "client-config.wsdd");
+                LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                "client-config.wsdd");
     }
 
     /**
@@ -132,9 +128,11 @@ public class SecurityServiceImpl implements SecurityService {
 
         InputStream inputStream = null;
         OutputStream outputStream = null;
-        try { 
-            inputStream = FileUtils.getInputStream(getClass(), AXIS_CLIENT_CONFIG_TEMPLATE_FILE);
-            outputStream = fileManager.createFile(axisClientConfigPath).getOutputStream();
+        try {
+            inputStream = FileUtils.getInputStream(getClass(),
+                    AXIS_CLIENT_CONFIG_TEMPLATE_FILE);
+            outputStream = fileManager.createFile(axisClientConfigPath)
+                    .getOutputStream();
             IOUtils.copy(inputStream, outputStream);
         }
         catch (Exception e) {
@@ -165,7 +163,8 @@ public class SecurityServiceImpl implements SecurityService {
 
             dependencyDoc = XmlUtils.getDocumentBuilder().parse(
                     templateInputStream);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
 
             throw new IllegalStateException(e);
         }
@@ -179,12 +178,12 @@ public class SecurityServiceImpl implements SecurityService {
         for (Element element : dependecyElementList) {
             dependencyList.add(new Dependency(element));
         }
-        projectOperations.addDependencies(projectOperations.getFocusedModuleName(), dependencyList);
+        projectOperations.addDependencies(
+                projectOperations.getFocusedModuleName(), dependencyList);
     }
 
     /**
      * Parse a WSDL location and if it's needed it manage keystore certs.
-     * 
      * <p>
      * First it tries to parse WSDL from the given URL. If
      * <code>SSLHandshakeException</code> is catch because our JVM installation
@@ -194,10 +193,8 @@ public class SecurityServiceImpl implements SecurityService {
      * to parse WSDL from URL.
      * </p>
      * 
-     * @param loc
-     *            Location
-     * @param pass
-     *            Password
+     * @param loc Location
+     * @param pass Password
      * @return WSDL document
      * @throws Exception
      */
@@ -211,16 +208,19 @@ public class SecurityServiceImpl implements SecurityService {
 
             return wsdl;
 
-        } catch (SSLHandshakeException e) {
+        }
+        catch (SSLHandshakeException e) {
 
             // JVM is not confident with WSDL host server certificate
             return installCertificates(loc, pass);
 
-        } catch (SAXException e) {
+        }
+        catch (SAXException e) {
 
             throw new IllegalStateException("The format of the wsdl has errors");
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
 
             throw new IllegalStateException("There is not access to the wsdl.");
         }
@@ -228,7 +228,6 @@ public class SecurityServiceImpl implements SecurityService {
 
     /**
      * Get certificates in the chain of the host server and import them.
-     * 
      * <p>
      * Tries to get the certificates in the certificates chain of the host
      * server and import them to:
@@ -241,10 +240,8 @@ public class SecurityServiceImpl implements SecurityService {
      * the error.</li>
      * </ol>
      * </p>
-     * 
      * <p>
      * With that operation we can try again to get the WSDL.<br/>
-     * 
      * Also it exports the chain certificates to <code>.cer</code> files in
      * <code>SRC_MAIN_RESOURCES</code>, so the developer can distribute them for
      * its installation in other environments or just in case we reach the
@@ -293,13 +290,15 @@ public class SecurityServiceImpl implements SecurityService {
 
             socket.close();
 
-        } catch (SSLException ssle) {
+        }
+        catch (SSLException ssle) {
 
             // Get needed certificates for this host
             getCerts(host, keystore, passArray);
             doc = getWsdl(loc, pass);
 
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
 
             invalidHostCert(passArray, keystore, host);
         }
@@ -311,10 +310,8 @@ public class SecurityServiceImpl implements SecurityService {
     /**
      * Get SSL socket factory with gvNIX trust manager.
      * 
-     * @param pass
-     *            Password
-     * @param keystore
-     *            Keystore
+     * @param pass Password
+     * @param keystore Keystore
      * @return SSL socket factory with gvNIX trust manager
      * @throws NoSuchAlgorithmException
      * @throws KeyStoreException
@@ -336,10 +333,8 @@ public class SecurityServiceImpl implements SecurityService {
     /**
      * Get gvNIX trust manager.
      * 
-     * @param pass
-     *            Password
-     * @param keystore
-     *            Keystore
+     * @param pass Password
+     * @param keystore Keystore
      * @return gvNIX trust manager
      * @throws NoSuchAlgorithmException
      * @throws KeyStoreException
@@ -360,12 +355,9 @@ public class SecurityServiceImpl implements SecurityService {
     /**
      * Throw an illegal state exception with a invalid host cert message.
      * 
-     * @param pass
-     *            Password
-     * @param keystore
-     *            Keystore
-     * @param host
-     *            Host destination
+     * @param pass Password
+     * @param keystore Keystore
+     * @param host Host destination
      */
     protected void invalidHostCert(char[] pass, File keystore, String host) {
 
@@ -383,7 +375,8 @@ public class SecurityServiceImpl implements SecurityService {
                 String cn = getCn(dn);
                 if (cn != null) {
                     msg.append(" * Possible hostname: ".concat(cn).concat("\n"));
-                } else
+                }
+                else
                     msg.append(" * Possible hostname (check Cert. Distinguished name): "
                             .concat(dn).concat("\n"));
             }
@@ -394,13 +387,11 @@ public class SecurityServiceImpl implements SecurityService {
 
     /**
      * Given a X.500 Subject Distinguished name it returns the Common Name.
-     * 
      * <p>
      * If CN exists, null otherwise
      * </p>
      * 
-     * @param dn
-     *            Distinguished name
+     * @param dn Distinguished name
      * @return Common name if exists, null otherwise
      */
     private String getCn(String dn) {
@@ -450,7 +441,8 @@ public class SecurityServiceImpl implements SecurityService {
                 // Import needed certificates to JVM cacerts keystore
                 tm.addCerts(host, getJvmKeystore(), pass);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(
                     "Error loading or saving X509 certificates in keystore");
         }
@@ -468,7 +460,8 @@ public class SecurityServiceImpl implements SecurityService {
             // Read WSDL with the support of the Security System
             return getWsdl(url, null);
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(
                     "Error parsing WSDL from ".concat(url), e);
         }
@@ -476,7 +469,6 @@ public class SecurityServiceImpl implements SecurityService {
 
     /**
      * Copy, if exists, the JVM keystore file in the project resources folder.
-     * 
      * <p>
      * Destination resources file name is gvnix-cacerts.
      * </p>
@@ -487,7 +479,8 @@ public class SecurityServiceImpl implements SecurityService {
 
         // Get path to file at resources
         String path = projectOperations.getPathResolver().getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "gvnix-cacerts");
+                LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                "gvnix-cacerts");
 
         // Get JVM keystore file and validate it
         File keystore = getJvmKeystore();
@@ -499,7 +492,7 @@ public class SecurityServiceImpl implements SecurityService {
             // Write JVM keystore into resources file path
             InputStream inputStream = null;
             OutputStream outputStream = null;
-            try { 
+            try {
                 inputStream = new FileInputStream(keystore);
                 outputStream = fileManager.createFile(path).getOutputStream();
                 IOUtils.copy(inputStream, outputStream);
@@ -522,7 +515,6 @@ public class SecurityServiceImpl implements SecurityService {
 
     /**
      * Get JVM keytore file.
-     * 
      * <p>
      * "java.home" system property is required.
      * </p>
@@ -558,7 +550,8 @@ public class SecurityServiceImpl implements SecurityService {
 
         if (previousServices.isEmpty()) {
             deployment.appendChild(serviceElementDescriptor);
-        } else {
+        }
+        else {
             deployment.replaceChild(serviceElementDescriptor,
                     previousServices.get(0));
         }
@@ -578,7 +571,6 @@ public class SecurityServiceImpl implements SecurityService {
      * <p>
      * Create a xml element for a axis security service cliente configuration
      * </p>
-     * 
      * <p>
      * Result element will be like this:
      * </p>
@@ -595,8 +587,7 @@ public class SecurityServiceImpl implements SecurityService {
      * &lt;/service&gt;
      * </pre>
      * 
-     * @param doc
-     *            client-config.wsdd document
+     * @param doc client-config.wsdd document
      * @param serviceName
      * @param parameters
      * @return

@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures     
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.menu.roo.addon.util;
 
@@ -29,53 +29,57 @@ import org.w3c.dom.NodeList;
 /**
  * Utilities related to XML management.
  * 
- * @author Enrique Ruiz( eruiz at disid dot com ) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Enrique Ruiz( eruiz at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  * @since 0.6
  */
 public abstract class XmlUtils {
 
-  private static Logger logger = Logger.getLogger(XmlUtils.class
-      .getName());
+    private static Logger logger = Logger.getLogger(XmlUtils.class.getName());
 
-  /**
-   * Parses and build Document from the given path to XML file
-   * 
-   * @param is InputStream to parse
-   * @return XML Document. Null if file doesn't exist or there is any problem
-   * parsing file
-   */
-  public static Document parseFile(InputStream is) {
-    Document doc = null;
+    /**
+     * Parses and build Document from the given path to XML file
+     * 
+     * @param is InputStream to parse
+     * @return XML Document. Null if file doesn't exist or there is any problem
+     *         parsing file
+     */
+    public static Document parseFile(InputStream is) {
+        Document doc = null;
 
-    try {
-      doc = org.springframework.roo.support.util.XmlUtils.getDocumentBuilder().parse(is);
-    }
-    catch (Exception e) {
-      throw new IllegalStateException("Error parsing XML", e);
-    }
-    finally {
-      if (is != null) {
         try {
-          is.close();
+            doc = org.springframework.roo.support.util.XmlUtils
+                    .getDocumentBuilder().parse(is);
         }
-        catch (IOException e) {
-          logger.severe(e.getMessage());
+        catch (Exception e) {
+            throw new IllegalStateException("Error parsing XML", e);
         }
-      }
+        finally {
+            if (is != null) {
+                try {
+                    is.close();
+                }
+                catch (IOException e) {
+                    logger.severe(e.getMessage());
+                }
+            }
+        }
+        return doc;
     }
-    return doc;
-  }
 
-  /**
-   * Check if the given Element contains child nodes that match with the given
-   * child name.
-   * 
-   * @param element
-   * @param name The name of the child tag to match on. The special value "*" matches all tags.
-   * @return
-   */
-  public static boolean hasChildNodes(Element element, String name) {
-    NodeList elements = element.getElementsByTagName(name);
-    return elements.getLength() > 0;
-  }
+    /**
+     * Check if the given Element contains child nodes that match with the given
+     * child name.
+     * 
+     * @param element
+     * @param name The name of the child tag to match on. The special value "*"
+     *            matches all tags.
+     * @return
+     */
+    public static boolean hasChildNodes(Element element, String name) {
+        NodeList elements = element.getElementsByTagName(name);
+        return elements.getLength() > 0;
+    }
 }

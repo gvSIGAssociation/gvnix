@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.screen.roo.addon;
 
@@ -124,8 +124,8 @@ public class EntityBatchMetadata extends
     public ClassOrInterfaceTypeDetails getListInnerClass() {
         // Generate inner class name
         JavaType listInnerClassJavaType = new JavaType(destination
-                .getSimpleTypeName().concat("List"), 0, DataType.TYPE,
-                null, null);
+                .getSimpleTypeName().concat("List"), 0, DataType.TYPE, null,
+                null);
 
         // Create class builder
         ClassOrInterfaceTypeDetailsBuilder classBuilder = new ClassOrInterfaceTypeDetailsBuilder(
@@ -155,8 +155,7 @@ public class EntityBatchMetadata extends
     /**
      * Generate a getter for <code>field</code>
      * 
-     * @param field
-     *            field metadata
+     * @param field field metadata
      * @return
      */
     private MethodMetadataBuilder getListInner_getter(FieldMetadata field) {
@@ -180,8 +179,7 @@ public class EntityBatchMetadata extends
     /**
      * Generate a setter for <code>field</code>
      * 
-     * @param field
-     *            field metadata
+     * @param field field metadata
      * @return
      */
     private MethodMetadataBuilder getListInner_setter(FieldMetadata field) {
@@ -212,11 +210,8 @@ public class EntityBatchMetadata extends
      * Generates field (list) metadata for ListInner class using
      * <code>name</code> as field name
      * 
-     * @param name
-     *            to use to
-     * @param listType
-     *            list item type
-     * 
+     * @param name to use to
+     * @param listType list item type
      * @return
      */
     private FieldMetadataBuilder getListInner_field(String name,
@@ -272,10 +267,8 @@ public class EntityBatchMetadata extends
     private List<AnnotationMetadataBuilder> getAnnotationsForMethods() {
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
                 1);
-        annotations
-                .add(new AnnotationMetadataBuilder(
-                        new JavaType(
-                                "org.springframework.transaction.annotation.Transactional")));
+        annotations.add(new AnnotationMetadataBuilder(new JavaType(
+                "org.springframework.transaction.annotation.Transactional")));
         return Collections.unmodifiableList(annotations);
     }
 
@@ -300,8 +293,8 @@ public class EntityBatchMetadata extends
 
         // Check if a method with the same signature already exists in the
         // target type
-        MethodMetadata method = methodExists(methodName,
-        		parameterTypes.get(0).getJavaType());
+        MethodMetadata method = methodExists(methodName, parameterTypes.get(0)
+                .getJavaType());
         if (method != null) {
             // If it already exists, just return null and omit its
             // generation via the ITD
@@ -334,8 +327,9 @@ public class EntityBatchMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(),  Modifier.PUBLIC | Modifier.STATIC, methodName, JavaType.VOID_PRIMITIVE,
-                parameterTypes, parameterNames, bodyBuilder);
+                getId(), Modifier.PUBLIC | Modifier.STATIC, methodName,
+                JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
 
@@ -349,7 +343,8 @@ public class EntityBatchMetadata extends
      * @return
      */
     public MethodMetadata getMergeListMethod() {
-    	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
+        JpaCrudAnnotationValues annotation = new JpaCrudAnnotationValues(
+                entityMetadata);
         return getMethodFor(mergeListMethodName, annotation.getMergeMethod());
     }
 
@@ -359,8 +354,10 @@ public class EntityBatchMetadata extends
      * @return
      */
     public MethodMetadata getPersistListMethod() {
-    	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
-        return getMethodFor(persistListMethodName, annotation.getPersistMethod());
+        JpaCrudAnnotationValues annotation = new JpaCrudAnnotationValues(
+                entityMetadata);
+        return getMethodFor(persistListMethodName,
+                annotation.getPersistMethod());
     }
 
     /**
@@ -369,7 +366,8 @@ public class EntityBatchMetadata extends
      * @return
      */
     public MethodMetadata getRemoveListMethod() {
-    	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
+        JpaCrudAnnotationValues annotation = new JpaCrudAnnotationValues(
+                entityMetadata);
         return getMethodFor(removeListMethodName, annotation.getRemoveMethod());
     }
 
@@ -388,9 +386,10 @@ public class EntityBatchMetadata extends
         // we'll only scan the current class
         for (MethodMetadata method : governorTypeDetails.getDeclaredMethods()) {
             if (method.getMethodName().equals(methodName)
-            		&& method.getParameterTypes().size() > 0
-                    && method.getParameterTypes().get(0).getJavaType().getSimpleTypeName().equals(
-                    		paramType.getSimpleTypeName())) {
+                    && method.getParameterTypes().size() > 0
+                    && method.getParameterTypes().get(0).getJavaType()
+                            .getSimpleTypeName()
+                            .equals(paramType.getSimpleTypeName())) {
                 // Found a method of the expected name; we won't check method
                 // parameters though
                 return method;
@@ -417,7 +416,8 @@ public class EntityBatchMetadata extends
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
+    public static final String createIdentifier(JavaType javaType,
+            LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }

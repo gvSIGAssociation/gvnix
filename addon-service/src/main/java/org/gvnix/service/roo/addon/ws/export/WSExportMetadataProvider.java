@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.export;
 
@@ -71,14 +71,10 @@ import org.apache.commons.lang3.StringUtils;
 @Service
 public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
-    @Reference
-    private WSExportValidationService wSExportValidationService;
-    @Reference
-    private WSConfigService wSConfigService;
-    @Reference
-    private AnnotationsService annotationsService;
-    @Reference
-    private JavaParserService javaParserService;
+    @Reference private WSExportValidationService wSExportValidationService;
+    @Reference private WSConfigService wSConfigService;
+    @Reference private AnnotationsService annotationsService;
+    @Reference private JavaParserService javaParserService;
 
     private static Logger logger = Logger
             .getLogger(WSExportMetadataProvider.class.getName());
@@ -115,7 +111,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
             String metadataIdentificationString) {
         JavaType javaType = WSExportMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = WSExportMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = WSExportMetadata
+                .getPath(metadataIdentificationString);
         String physicalTypeIdentifier = PhysicalTypeIdentifier
                 .createIdentifier(javaType, path);
         return physicalTypeIdentifier;
@@ -149,7 +146,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                 || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
             // There is a problem
             return null;
-        } else {
+        }
+        else {
             // We have reliable physical type details
             governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
         }
@@ -194,8 +192,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                 fullyQualifiedTypeName.getValue());
 
         // Get methods to check.
-        List<MethodMetadata> methodMetadataList = getMemberDetails(physicalTypeDetails.getName())
-                .getMethods();
+        List<MethodMetadata> methodMetadataList = getMemberDetails(
+                physicalTypeDetails.getName()).getMethods();
 
         BooleanAttributeValue exported = (BooleanAttributeValue) gvNIXWebServiceAnnotation
                 .getAttribute(new JavaSymbolName("exported"));
@@ -221,7 +219,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                         governorTypeDetails.getName(),
                         methodMetadata.getMethodName());
 
-                // Add gvNIX xml element annotation to method return and parameters project types
+                // Add gvNIX xml element annotation to method return and
+                // parameters project types
                 wSExportValidationService.addGvNixXmlElementToTypes(method);
 
                 // Add gvNIX web fault annotation to method exceptions
@@ -288,10 +287,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
     /**
      * Check correct values in @GvNIXWebService annotation.
      * 
-     * @param gvNIXWebServiceAnnotation
-     *            to check.
-     * @param governorTypeDetails
-     *            class where is defined @GvNIXWebService.
+     * @param gvNIXWebServiceAnnotation to check.
+     * @param governorTypeDetails class where is defined @GvNIXWebService.
      */
     public void checkGvNIXWebServiceAnnotationAttributes(
             AnnotationMetadata gvNIXWebServiceAnnotation,
@@ -301,7 +298,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
         StringAttributeValue name = (StringAttributeValue) gvNIXWebServiceAnnotation
                 .getAttribute(new JavaSymbolName("name"));
 
-        Validate.isTrue(name != null && StringUtils.isNotBlank(name.getValue()),
+        Validate.isTrue(
+                name != null && StringUtils.isNotBlank(name.getValue()),
                 "Attribute 'name' in annotation @GvNIXWebService defined in class '"
                         + governorTypeDetails.getName()
                                 .getFullyQualifiedTypeName()
@@ -319,9 +317,11 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                                 .getFullyQualifiedTypeName()
                         + "' has to be defined to export class as Web Service.");
 
-        Validate.isTrue(targetNamespace != null &&
-                wSExportValidationService.checkNamespaceFormat(targetNamespace
-                        .getValue()),
+        Validate.isTrue(
+                targetNamespace != null
+                        && wSExportValidationService
+                                .checkNamespaceFormat(targetNamespace
+                                        .getValue()),
                 "The namespace for Web Service has to start with 'http://'.\ni.e.: http://name.of.namespace/");
 
         // serviceName
@@ -364,36 +364,24 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
     /**
      * Check correct values in @GvNIXWebMethod annotation.
-     * 
      * <p>
      * Annotation attributes to check:
      * </p>
      * <ul>
      * <li>operationName</li>
-     * <li>
-     * webResultType</li>
-     * <li>
-     * resultName</li>
-     * <li>
-     * resultNamespace</li>
-     * <li>
-     * requestWrapperName</li>
-     * <li>
-     * requestWrapperNamespace</li>
-     * <li>
-     * requestWrapperClassName</li>
-     * <li>
-     * responseWrapperName</li>
-     * <li>
-     * responseWrapperNamespace</li>
-     * <li>
-     * responseWrapperClassName</li>
+     * <li>webResultType</li>
+     * <li>resultName</li>
+     * <li>resultNamespace</li>
+     * <li>requestWrapperName</li>
+     * <li>requestWrapperNamespace</li>
+     * <li>requestWrapperClassName</li>
+     * <li>responseWrapperName</li>
+     * <li>responseWrapperNamespace</li>
+     * <li>responseWrapperClassName</li>
      * </ul>
      * 
-     * @param gvNixWebMethodAnnotation
-     *            to check.
-     * @param governorTypeDetails
-     *            class where is defined @GvNIXWebMethod.
+     * @param gvNixWebMethodAnnotation to check.
+     * @param governorTypeDetails class where is defined @GvNIXWebMethod.
      */
     public void checkGvNIXWebMethodAnnotationAttributes(
             AnnotationMetadata gvNixWebMethodAnnotation,
@@ -474,7 +462,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
             Validate.isTrue(
                     resultNamespace != null
-                            && StringUtils.isNotBlank(resultNamespace.getValue()),
+                            && StringUtils.isNotBlank(resultNamespace
+                                    .getValue()),
                     "Attribute 'resultNamespace' in annotation @GvNIXWebMethod defined in method '"
                             + methodMetadata.getMethodName()
                             + "' in class '"
@@ -482,10 +471,11 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                                     .getFullyQualifiedTypeName()
                             + "' has to be defined to export as Web Service operation.");
 
-            Validate.isTrue( 
-            		resultNamespace != null 
-            		&& wSExportValidationService
-                            .checkNamespaceFormat(resultNamespace.getValue()),
+            Validate.isTrue(
+                    resultNamespace != null
+                            && wSExportValidationService
+                                    .checkNamespaceFormat(resultNamespace
+                                            .getValue()),
                     "Attribute 'resultNamespace' in annotation @GvNIXWebMethod defined in method '"
                             + methodMetadata.getMethodName()
                             + "' in class '"
@@ -522,10 +512,10 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                             + "' has to be defined to export as Web Service operation.");
 
             Validate.isTrue(
-            		responseWrapperNamespace != null 
-                    	&& wSExportValidationService
-                            .checkNamespaceFormat(responseWrapperNamespace
-                                    .getValue()),
+                    responseWrapperNamespace != null
+                            && wSExportValidationService
+                                    .checkNamespaceFormat(responseWrapperNamespace
+                                            .getValue()),
                     "Attribute 'responseWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
                             + methodMetadata.getMethodName()
                             + "' in class '"
@@ -580,10 +570,10 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                             + "' has to be defined to export as Web Service operation.");
 
             Validate.isTrue(
-            		requestWrapperName != null 
-                    && wSExportValidationService
-                            .checkNamespaceFormat(requestWrapperNamespace
-                                    .getValue()),
+                    requestWrapperName != null
+                            && wSExportValidationService
+                                    .checkNamespaceFormat(requestWrapperNamespace
+                                            .getValue()),
                     "Attribute 'requestWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
                             + methodMetadata.getMethodName()
                             + "' in class '"
@@ -611,10 +601,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
      * Checks @GvNIXWebParam annotation attribute values in input method
      * parameters to avoid changes in service contract.
      * 
-     * @param governorTypeDetails
-     *            Service Class.
-     * @param methodMetadata
-     *            Method to check parameters.
+     * @param governorTypeDetails Service Class.
+     * @param methodMetadata Method to check parameters.
      */
     public void checkGvNIXWebParamsAnnotationAttributes(
             ClassOrInterfaceTypeDetails governorTypeDetails,
@@ -685,13 +673,14 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
             // Check if is the same class type as parameter type.
             Validate.isTrue(
-            		gvNIxWebParamTypeAttributeValue != null
-                    && inputParameter
-                            .getJavaType()
-                            .getFullyQualifiedTypeName()
-                            .contentEquals(
-                                    gvNIxWebParamTypeAttributeValue.getValue()
-                                            .getFullyQualifiedTypeName()),
+                    gvNIxWebParamTypeAttributeValue != null
+                            && inputParameter
+                                    .getJavaType()
+                                    .getFullyQualifiedTypeName()
+                                    .contentEquals(
+                                            gvNIxWebParamTypeAttributeValue
+                                                    .getValue()
+                                                    .getFullyQualifiedTypeName()),
                     "The 'type' attribute in @GvNIXWebParam annotation to: "
                             + inputParameter.getJavaType()
                                     .getFullyQualifiedTypeName()
@@ -741,8 +730,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
             Validate.isTrue(
                     webParamNameAttributeValue != null
-                            && StringUtils.isNotBlank(webParamNameAttributeValue
-                                    .getValue()),
+                            && StringUtils
+                                    .isNotBlank(webParamNameAttributeValue
+                                            .getValue()),
                     "Must be set 'name' attribute in @WebParam annotation to: "
                             + inputParameter.getJavaType()
                                     .getFullyQualifiedTypeName()
@@ -755,9 +745,11 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
             Validate.isTrue(
                     webParamNameAttributeValue != null
-                    	&& gvNixWebParamNameAttributeValue != null 
-                    	&& webParamNameAttributeValue.getValue().contentEquals(
-                            gvNixWebParamNameAttributeValue.getValue()),
+                            && gvNixWebParamNameAttributeValue != null
+                            && webParamNameAttributeValue.getValue()
+                                    .contentEquals(
+                                            gvNixWebParamNameAttributeValue
+                                                    .getValue()),
                     "The 'name' attribute in @GvNIXWebParam and @WebParam annotation to: "
                             + inputParameter.getJavaType()
                                     .getFullyQualifiedTypeName()
@@ -806,13 +798,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
      * Retrieve all related ITDs to {@link ClassOrInterfaceTypeDetails} with all
      * information.
      * 
-     * @param governorTypeDetails
-     *            Class to retrieve all related ITD information.
-     * @param governorPhysicalTypeMetadata
-     *            Physical Metadata.
-     * @param metadataIdentificationString
-     *            Identify this Metadata.
-     * 
+     * @param governorTypeDetails Class to retrieve all related ITD information.
+     * @param governorPhysicalTypeMetadata Physical Metadata.
+     * @param metadataIdentificationString Identify this Metadata.
      * @return List of {@link MemberHoldingTypeDetails} information.
      */
     public List<MemberHoldingTypeDetails> getMemberHoldingDetails(

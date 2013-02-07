@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.occ.roo.addon;
 
@@ -92,7 +92,8 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    // Template portions to create *_Roo_GvNIXRelatedPattern.aj when replacing vars with values and concatenated in order
+    // Template portions to create *_Roo_GvNIXRelatedPattern.aj when replacing
+    // vars with values and concatenated in order
     private static final String ITD_TEMPLATE_CLASS_START = "Entity_gvnix_persistence_occ.aj_template1";
     private static final String ITD_TEMPLATE_METHODGET_MESSAGE_DIGEST = "Entity_gvnix_persistence_occ.aj_template2";
     private static final String ITD_TEMPLATE_METHOD_REMOVE = "Entity_gvnix_persistence_occ.aj_template3";
@@ -112,15 +113,14 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     private String itdFileContents = null;
 
     // From annotation
-    @AutoPopulate
-    private final String fieldName = "occChekcsum";
-    @AutoPopulate
-    private final String digestMethod = "md5";
+    @AutoPopulate private final String fieldName = "occChekcsum";
+    @AutoPopulate private final String digestMethod = "md5";
 
     public OCCChecksumMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             JpaActiveRecordMetadata entityMetadata,
-            MemberDetailsScanner memberDetailsScanner, TypeManagementService typeManagementService,
+            MemberDetailsScanner memberDetailsScanner,
+            TypeManagementService typeManagementService,
             PersistenceMemberLocator persistenceMemberLocator) {
 
         // From AbstractItdTypeDetailsProvidingMetadataItem
@@ -141,7 +141,8 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         if (!(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
             // There is a problem
             valid = false;
-        } else {
+        }
+        else {
             // We have reliable physical type details
             governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
         }
@@ -171,66 +172,94 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
             FieldMetadata field = getChecksumField();
             MethodMetadata getter = getChecksumAccessor();
             MethodMetadata setter = getChecksumMutator();
-            addChecksumFieldToEntity(field, getter, setter, typeManagementService);
+            addChecksumFieldToEntity(field, getter, setter,
+                    typeManagementService);
 
             // Generates ITD
-            itdFileContents = generateITDContents(field, persistenceMemberLocator);
+            itdFileContents = generateITDContents(field,
+                    persistenceMemberLocator);
         }
     }
-    
+
     /**
-     * Replace some vars with values in all AspectJ template portions and concat results in order into one string. 
-     * 
-     * <p>Vars has next format: ${entity_package}.
-     * Template portions will be placed at same package in src/main/resources.
-     * If some method placed in a portion already defined (push-in), don't add it to result string.</p>
+     * Replace some vars with values in all AspectJ template portions and concat
+     * results in order into one string.
+     * <p>
+     * Vars has next format: ${entity_package}. Template portions will be placed
+     * at same package in src/main/resources. If some method placed in a portion
+     * already defined (push-in), don't add it to result string.
+     * </p>
      * 
      * @param checksumField Checksum field to get field name (one var value).
      * @param persistenceMemberLocator To get identifier field (one var value).
-     * @return All template portions replacing vars with values and concatenated in order.
+     * @return All template portions replacing vars with values and concatenated
+     *         in order.
      */
-    private String generateITDContents(FieldMetadata checksumField, PersistenceMemberLocator persistenceMemberLocator) {
+    private String generateITDContents(FieldMetadata checksumField,
+            PersistenceMemberLocator persistenceMemberLocator) {
 
-    	StringBuilder contents = new StringBuilder();
-    	
-    	contents.append(generateITDContent(ITD_TEMPLATE_CLASS_START, checksumField, persistenceMemberLocator));
-    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("getMessageDigest"), null) == null) {
-    		contents.append(generateITDContent(ITD_TEMPLATE_METHODGET_MESSAGE_DIGEST, checksumField, persistenceMemberLocator));
-    	}
-    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("remove"), null) == null) {
-    		contents.append(generateITDContent(ITD_TEMPLATE_METHOD_REMOVE, checksumField, persistenceMemberLocator));
-    	}
-    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("merge"), null) == null) {
-    		contents.append(generateITDContent(ITD_TEMPLATE_METHOD_MERGE, checksumField, persistenceMemberLocator));
-    	}
-    	List<JavaType> parameters = new ArrayList<JavaType>();
-    	parameters.add(new JavaType(governorTypeDetails.getName().getSimpleTypeName()));
-    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("checkConcurrency")) == null) {
-    		contents.append(generateITDContent(ITD_TEMPLATE_METHOD_CHECK_CONCURRENCY, checksumField, persistenceMemberLocator));
-    	}
-    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("loadChecksum"), null) == null) {
-    		contents.append(generateITDContent(ITD_TEMPLATE_METHOD_LOAD_CHECKSUM, checksumField, persistenceMemberLocator));
-    	}
-    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("checksumDigest"), null) == null) {
-    		contents.append(generateITDContent(ITD_TEMPLATE_METHOD_CHECKSUM_DIGEST, checksumField, persistenceMemberLocator));
-    	}
-    	contents.append(generateITDContent(ITD_TEMPLATE_CLASS_END, checksumField, persistenceMemberLocator));
-        
+        StringBuilder contents = new StringBuilder();
+
+        contents.append(generateITDContent(ITD_TEMPLATE_CLASS_START,
+                checksumField, persistenceMemberLocator));
+        if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
+                new JavaSymbolName("getMessageDigest"), null) == null) {
+            contents.append(generateITDContent(
+                    ITD_TEMPLATE_METHODGET_MESSAGE_DIGEST, checksumField,
+                    persistenceMemberLocator));
+        }
+        if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
+                new JavaSymbolName("remove"), null) == null) {
+            contents.append(generateITDContent(ITD_TEMPLATE_METHOD_REMOVE,
+                    checksumField, persistenceMemberLocator));
+        }
+        if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
+                new JavaSymbolName("merge"), null) == null) {
+            contents.append(generateITDContent(ITD_TEMPLATE_METHOD_MERGE,
+                    checksumField, persistenceMemberLocator));
+        }
+        List<JavaType> parameters = new ArrayList<JavaType>();
+        parameters.add(new JavaType(governorTypeDetails.getName()
+                .getSimpleTypeName()));
+        if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
+                new JavaSymbolName("checkConcurrency")) == null) {
+            contents.append(generateITDContent(
+                    ITD_TEMPLATE_METHOD_CHECK_CONCURRENCY, checksumField,
+                    persistenceMemberLocator));
+        }
+        if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
+                new JavaSymbolName("loadChecksum"), null) == null) {
+            contents.append(generateITDContent(
+                    ITD_TEMPLATE_METHOD_LOAD_CHECKSUM, checksumField,
+                    persistenceMemberLocator));
+        }
+        if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
+                new JavaSymbolName("checksumDigest"), null) == null) {
+            contents.append(generateITDContent(
+                    ITD_TEMPLATE_METHOD_CHECKSUM_DIGEST, checksumField,
+                    persistenceMemberLocator));
+        }
+        contents.append(generateITDContent(ITD_TEMPLATE_CLASS_END,
+                checksumField, persistenceMemberLocator));
+
         return contents.toString();
     }
 
     /**
-     * Replace some vars with values in a template file name. 
-     * 
-     * <p>Vars has next format: ${entity_package}.
-     * Template will be placed at same package in src/main/resources.</p>
+     * Replace some vars with values in a template file name.
+     * <p>
+     * Vars has next format: ${entity_package}. Template will be placed at same
+     * package in src/main/resources.
+     * </p>
      * 
      * @param templateName File name with a template.
      * @param checksumField Checksum field to get field name (one var value).
      * @param persistenceMemberLocator To get identifier field (one var value).
      * @return String replacing vars with values.
      */
-    private String generateITDContent(String templateName, FieldMetadata checksumField, PersistenceMemberLocator persistenceMemberLocator) {
+    private String generateITDContent(String templateName,
+            FieldMetadata checksumField,
+            PersistenceMemberLocator persistenceMemberLocator) {
 
         // We use a template for generate ITD because the class
         // org.springframework.roo.classpath.details.DefaultItdTypeDetailsBuilder
@@ -238,11 +267,11 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
         String template;
         try {
-            template = IOUtils.toString(new InputStreamReader(this
-                    .getClass().getResourceAsStream(templateName)));
-        } catch (IOException ioe) {
-            throw new IllegalStateException(
-                    "Unable load " + templateName, ioe);
+            template = IOUtils.toString(new InputStreamReader(this.getClass()
+                    .getResourceAsStream(templateName)));
+        }
+        catch (IOException ioe) {
+            throw new IllegalStateException("Unable load " + templateName, ioe);
         }
 
         Map<String, String> params = new HashMap<String, String>(10);
@@ -264,9 +293,14 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
         // Adds id field name ('id_field')
         // TODO Now get identifier is a collection, temporaly getted first
-        params.put("id_field", persistenceMemberLocator.getIdentifierFields(governorPhysicalTypeMetadata.getMemberHoldingTypeDetails()
-                .getName()).get(0)
-                .getFieldName().getSymbolName());
+        params.put(
+                "id_field",
+                persistenceMemberLocator
+                        .getIdentifierFields(
+                                governorPhysicalTypeMetadata
+                                        .getMemberHoldingTypeDetails()
+                                        .getName()).get(0).getFieldName()
+                        .getSymbolName());
 
         // Adds checksum field name ('checksum_field')
         params.put("checksum_field", checksumField.getFieldName()
@@ -282,7 +316,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     /**
      * Gets java code to generate the string that represents the object state.
-     * 
      * Currently it uses all the entity's properties that fulfill this
      * conditions:
      * <ol>
@@ -293,7 +326,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
      * <li>no transient</li>
      * <li></li>
      * </ol>
-     * 
      * TODO Include support for relationship and embeddedId
      * 
      * @return
@@ -348,7 +380,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                                 "javax.persistence.ManyToOne")) != null) {
                             continue;
                         }
-                        
+
                         if (MemberFindingUtils.getAnnotationOfType(field
                                 .getAnnotations(), new JavaType(
                                 "javax.persistence.EmbeddedId")) != null) {
@@ -374,7 +406,8 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     }
 
     private void addChecksumFieldToEntity(FieldMetadata field,
-            MethodMetadata getter, MethodMetadata setter, TypeManagementService typeManagementService) {
+            MethodMetadata getter, MethodMetadata setter,
+            TypeManagementService typeManagementService) {
 
         PhysicalTypeDetails ptd = governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
@@ -386,15 +419,17 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                         + PhysicalTypeIdentifier
                                 .getFriendlyName(governorPhysicalTypeMetadata
                                         .getId()));
-        
-        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetails = new ClassOrInterfaceTypeDetailsBuilder((ClassOrInterfaceTypeDetails)ptd);
+
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetails = new ClassOrInterfaceTypeDetailsBuilder(
+                (ClassOrInterfaceTypeDetails) ptd);
 
         // Try to locate an existing field with @javax.persistence.Version
 
         try {
-        	// FIXME List type is not equal to object to check (it's a bug??)
+            // FIXME List type is not equal to object to check (it's a bug??)
             if (!mutableTypeDetails.getDeclaredFields().contains(field)) {
-                mutableTypeDetails.addField(new FieldMetadataBuilder(governorTypeDetails.getDeclaredByMetadataId(), field));
+                mutableTypeDetails.addField(new FieldMetadataBuilder(
+                        governorTypeDetails.getDeclaredByMetadataId(), field));
             }
             if (!mutableTypeDetails.getDeclaredMethods().contains(getter)) {
                 mutableTypeDetails.addMethod(getter);
@@ -402,18 +437,20 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
             if (!mutableTypeDetails.getDeclaredMethods().contains(setter)) {
                 mutableTypeDetails.addMethod(setter);
             }
-            typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetails.build());
+            typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetails
+                    .build());
 
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             // TODO In some cases, one element is added more than one time
-        	LOGGER.finest("Problem adding version field: ".concat(e.toString()));
+            LOGGER.finest("Problem adding version field: ".concat(e.toString()));
         }
 
     }
 
     @Override
     public String toString() {
-    	ToStringBuilder tsc = new ToStringBuilder(this);
+        ToStringBuilder tsc = new ToStringBuilder(this);
         tsc.append("identifier", getId());
         tsc.append("valid", valid);
         tsc.append("aspectName", aspectName);
@@ -442,7 +479,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         List<FieldMetadata> found = MemberFindingUtils.getFieldsWithAnnotation(
                 governorTypeDetails, new JavaType("javax.persistence.Version"));
         if (found.size() > 0) {
-        	Validate.isTrue(found.size() == 1,
+            Validate.isTrue(found.size() == 1,
                     "More than 1 field was annotated with @javax.persistence.Version in '"
                             + governorTypeDetails.getName()
                                     .getFullyQualifiedTypeName() + "'");
@@ -480,7 +517,8 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
             // Compute the required field name
             fieldNameBuilder.append('_');
 
-            checksumField = new JavaSymbolName(fieldNameBuilder.toString().concat(this.fieldName));
+            checksumField = new JavaSymbolName(fieldNameBuilder.toString()
+                    .concat(this.fieldName));
             if (MemberFindingUtils.getField(governorTypeDetails, checksumField) == null) {
                 // Found a usable field name
                 break;
@@ -500,8 +538,8 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         annotations.add(idAnnotation);
 
         FieldMetadata field = new FieldMetadataBuilder(getId(),
-                Modifier.PRIVATE, annotations, checksumField,
-                JavaType.STRING).build();
+                Modifier.PRIVATE, annotations, checksumField, JavaType.STRING)
+                .build();
 
         return field;
     }
@@ -585,7 +623,8 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                 bodyBuilder).build();
     }
 
-    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
+    public static final String createIdentifier(JavaType javaType,
+            LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }

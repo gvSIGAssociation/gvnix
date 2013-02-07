@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
@@ -51,10 +51,8 @@ public class DynPropertyConverter implements Converter<DynProperty> {
     private static final Logger logger = HandlerUtils
             .getLogger(DynPropertyConverter.class);
 
-    @Reference
-    private Services services;
-    @Reference
-    private Configurations configurations;
+    @Reference private Services services;
+    @Reference private Configurations configurations;
 
     /**
      * {@inheritDoc}
@@ -69,8 +67,9 @@ public class DynPropertyConverter implements Converter<DynProperty> {
     /**
      * {@inheritDoc}
      */
-    public boolean getAllPossibleValues(List<Completion> completions, Class<?> requiredType,
-            String existingData, String optionContext, MethodTarget target) {
+    public boolean getAllPossibleValues(List<Completion> completions,
+            Class<?> requiredType, String existingData, String optionContext,
+            MethodTarget target) {
 
         // Option context mark property completions origin
         if (CONFIGURATION_FILE.equals(optionContext)) {
@@ -79,12 +78,14 @@ public class DynPropertyConverter implements Converter<DynProperty> {
             DynConfiguration dynConf = configurations.parseConfiguration(
                     configurations.getBaseConfiguration(), null);
             return addPropertyCompletions(completions, dynConf);
-        } else if (SOURCE_FILES.equals(optionContext)) {
+        }
+        else if (SOURCE_FILES.equals(optionContext)) {
 
             // Find all properties key from files on disk
             DynConfiguration dynConf = services.getCurrentConfiguration();
             return addPropertyCompletions(completions, dynConf);
-        } else {
+        }
+        else {
 
             // No valid state
             logger.log(Level.SEVERE, "Invalid property possible values context");
@@ -95,10 +96,8 @@ public class DynPropertyConverter implements Converter<DynProperty> {
     /**
      * Add a dynamic configuration properties to completions list.
      * 
-     * @param completions
-     *            Completions list
-     * @param dynConf
-     *            Dynamic configuration
+     * @param completions Completions list
+     * @param dynConf Dynamic configuration
      * @return Completions list exists
      */
     private boolean addPropertyCompletions(List<Completion> completions,

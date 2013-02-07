@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.ws.export;
 
@@ -82,10 +82,10 @@ public class WSExportMetadata extends
                 .getTypeAnnotation(new JavaType(GvNIXWebService.class.getName()));
 
         if (annotationMetadata != null) {
-        	
-        	// Check if Web Service has been exported from WSDL.
-        	BooleanAttributeValue exported = (BooleanAttributeValue) annotationMetadata
-        			.getAttribute(new JavaSymbolName("exported"));
+
+            // Check if Web Service has been exported from WSDL.
+            BooleanAttributeValue exported = (BooleanAttributeValue) annotationMetadata
+                    .getAttribute(new JavaSymbolName("exported"));
 
             // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
             AnnotationMetadata webServiceAnnotationMetadata = getWebServiceAnnotation(annotationMetadata);
@@ -109,12 +109,14 @@ public class WSExportMetadata extends
                         // declarations.
                         updateMethodWithGvNIXAnnotation(methodMetadata,
                                 methodAnnotation);
-                    } else {
+                    }
+                    else {
                         // Update method without checking attributes.
                         updateMethodWithGvNIXAnnotationFromWsdl(methodMetadata,
                                 methodAnnotation);
                     }
-                } else {
+                }
+                else {
                     // Exclude from Web Service.
                     methodMetadataListToExclude.add(methodMetadata);
                 }
@@ -136,11 +138,10 @@ public class WSExportMetadata extends
      * Adds @javax.jws.WebService annotation to the type, unless it already
      * exists.
      * 
-     * @param annotationMetadata
-     *            to retrieve selected values to @javax.jws.WebService
-     * 
-     * @return the annotation is already exists or will be created, or null if
-     *         it will not be created (required)
+     * @param annotationMetadata to retrieve selected values to
+     *            @javax.jws.WebService
+     * @return the annotation is already exists or will be created, or null if it
+     *         will not be created (required)
      */
     public AnnotationMetadata getWebServiceAnnotation(
             AnnotationMetadata annotationMetadata) {
@@ -183,11 +184,10 @@ public class WSExportMetadata extends
      * Adds @javax.jws.soap.SOAPBinding annotation to the type, unless it
      * already exists.
      * 
-     * @param annotationMetadata
-     *            to check if exists SOAPBinding parameter type value defined.
-     * 
-     * @return the annotation is already exists or will be created, or null if
-     *         it will not be created (required)
+     * @param annotationMetadata to check if exists SOAPBinding parameter type
+     *            value defined.
+     * @return the annotation is already exists or will be created, or null if it
+     *         will not be created (required)
      */
     public AnnotationMetadata getSoapBindingAnnotation(
             AnnotationMetadata annotationMetadata) {
@@ -223,7 +223,8 @@ public class WSExportMetadata extends
                                 enumparameterStyleAttributeValue.getValue()
                                         .getField()));
 
-            } else {
+            }
+            else {
                 enumparameterStyleAttributeValue = new EnumAttributeValue(
                         new JavaSymbolName("parameterStyle"),
                         new EnumDetails(new JavaType(
@@ -243,9 +244,7 @@ public class WSExportMetadata extends
     /**
      * Indicates whether the annotation will be introduced via this ITD.
      * 
-     * @param annotation
-     *            to be check if exists.
-     * 
+     * @param annotation to be check if exists.
      * @return true if it will be introduced, false otherwise
      */
     public boolean isAnnotationIntroduced(String annotation) {
@@ -258,10 +257,8 @@ public class WSExportMetadata extends
     /**
      * Update methods with @GvNIXWebMethod annotation to ITD.
      * 
-     * @param methodMetadata
-     *            method to assign ITD declarations.
-     * @param methodAnnotation
-     *            Annotations to generate ITD declaration.
+     * @param methodMetadata method to assign ITD declarations.
+     * @param methodAnnotation Annotations to generate ITD declaration.
      */
     public void updateMethodWithGvNIXAnnotation(MethodMetadata methodMetadata,
             AnnotationMetadata methodAnnotation) {
@@ -383,7 +380,8 @@ public class WSExportMetadata extends
             builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
                     methodMetadata, responseWrapper));
 
-        } else {
+        }
+        else {
             // @Oneway - not require a response from the service.
             AnnotationMetadata oneway = new AnnotationMetadataBuilder(
                     new JavaType("javax.jws.Oneway"),
@@ -400,10 +398,8 @@ public class WSExportMetadata extends
      * Update methods with @GvNIXWebMethod annotation when Web Service has been
      * exported from WSDL file.
      * 
-     * @param methodMetadata
-     *            method to assign ITD declarations.
-     * @param methodAnnotation
-     *            Annotations to generate ITD declaration.
+     * @param methodMetadata method to assign ITD declarations.
+     * @param methodAnnotation Annotations to generate ITD declaration.
      */
     public void updateMethodWithGvNIXAnnotationFromWsdl(
             MethodMetadata methodMetadata, AnnotationMetadata methodAnnotation) {
@@ -571,7 +567,8 @@ public class WSExportMetadata extends
                         methodMetadata, responseWrapper));
             }
 
-        } else {
+        }
+        else {
 
             // @Oneway - not require a response from the service.
             AnnotationMetadata oneway = new AnnotationMetadataBuilder(
@@ -588,8 +585,7 @@ public class WSExportMetadata extends
     /**
      * Create a @javax.jws.soap.WebMethod annotation from a method annotation.
      * 
-     * @param methodAnnotation
-     *            Method annotation
+     * @param methodAnnotation Method annotation
      * @return @javax.jws.soap.WebMethod annotation
      */
     protected AnnotationMetadata getWebMethodAnnotation(
@@ -616,7 +612,8 @@ public class WSExportMetadata extends
                     "action"),
                     ((StringAttributeValue) tmpAnnotationAttributeValue)
                             .getValue());
-        } else {
+        }
+        else {
             actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
                     "action"), "");
         }
@@ -637,8 +634,7 @@ public class WSExportMetadata extends
     /**
      * Create @javax.jws.soap.WebResult from a method annotation and attributes.
      * 
-     * @param methodAnnotation
-     *            Method annotation
+     * @param methodAnnotation Method annotation
      * @return @javax.jws.soap.WebResult annotation
      */
     protected AnnotationMetadata getWebResultAnnotation(
@@ -653,7 +649,8 @@ public class WSExportMetadata extends
         if (headerAttributeValue == null) {
             headerAttributeValue = new BooleanAttributeValue(
                     new JavaSymbolName("header"), false);
-        } else {
+        }
+        else {
             headerAttributeValue = new BooleanAttributeValue(
                     new JavaSymbolName("header"),
                     headerAttributeValue.getValue());
@@ -667,7 +664,8 @@ public class WSExportMetadata extends
         if (partNameAttributeValue == null) {
             partNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("partName"), "parameters");
-        } else {
+        }
+        else {
             partNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("partName"),
                     partNameAttributeValue.getValue());
@@ -684,10 +682,8 @@ public class WSExportMetadata extends
      * Update methods without @GvNIXWebMethod annotation with @WebMethod(exclude
      * = true).
      * 
-     * @param methodMetadataListToExclude
-     *            methods to exclude from Web Service.
-     * @param id
-     *            Destination type identifier
+     * @param methodMetadataListToExclude methods to exclude from Web Service.
+     * @param id Destination type identifier
      */
     public void updateMethodWithoutGvNIXAnnotation(
             List<MethodMetadata> methodMetadataListToExclude, String id,
@@ -736,7 +732,8 @@ public class WSExportMetadata extends
                 WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
+    public static final String createIdentifier(JavaType javaType,
+            LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 WEB_SERVICE_TYPE_STRING, javaType, path);
     }

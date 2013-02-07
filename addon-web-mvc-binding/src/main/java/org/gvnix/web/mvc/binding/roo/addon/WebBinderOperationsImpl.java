@@ -49,32 +49,28 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
      * MetadataService offers access to Roo's metadata model, use it to retrieve
      * any available metadata by its MID
      */
-    @Reference
-    private MetadataService metadataService;
+    @Reference private MetadataService metadataService;
 
     /**
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference
-    private ProjectOperations projectOperations;
+    @Reference private ProjectOperations projectOperations;
 
     /**
      * Use TypeLocationService to find types which are annotated with a given
      * annotation in the project
      */
-    @Reference
-    private TypeLocationService typeLocationService;
+    @Reference private TypeLocationService typeLocationService;
 
-    @Reference
-    private FileManager fileManager;
-    
-    @Reference
-    private TypeManagementService typeManagementService;
+    @Reference private FileManager fileManager;
+
+    @Reference private TypeManagementService typeManagementService;
 
     /** {@inheritDoc} */
     public boolean isStringTrimmerAvailable() {
-        return projectOperations.isProjectAvailable(projectOperations.getFocusedModuleName())
+        return projectOperations.isProjectAvailable(projectOperations
+                .getFocusedModuleName())
                 && OperationUtils.isSpringMvcProject(metadataService,
                         fileManager, projectOperations);
     }
@@ -107,7 +103,8 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
         Validate.notNull(controller, "Java type required");
 
         // Retrieve the Java source type the annotation is being added to
-        ClassOrInterfaceTypeDetails mutableTypeDetails = typeLocationService.getTypeDetails(controller);
+        ClassOrInterfaceTypeDetails mutableTypeDetails = typeLocationService
+                .getTypeDetails(controller);
 
         // Check if provided JavaType is a @Controller class
         AnnotationMetadata controllerAnnotation = MemberFindingUtils
@@ -140,9 +137,13 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
                     stringTrimmerBinder, attributes);
 
             // Add annotation to target type and save changes to disk
-            ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
-            classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder.build());
-            typeManagementService.createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder.build());
+            ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                    mutableTypeDetails);
+            classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder
+                    .build());
+            typeManagementService
+                    .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
+                            .build());
         }
     }
 
@@ -157,8 +158,7 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
     /**
      * Add addon repository and dependency to get annotations.
      * 
-     * @param configuration
-     *            Configuration element
+     * @param configuration Configuration element
      */
     private void addAnnotations(Element configuration) {
 
@@ -169,7 +169,8 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
 
-            projectOperations.addRepository(projectOperations.getFocusedModuleName(), new Repository(repo));
+            projectOperations.addRepository(projectOperations
+                    .getFocusedModuleName(), new Repository(repo));
         }
 
         List<Element> depens = XmlUtils.findElements(

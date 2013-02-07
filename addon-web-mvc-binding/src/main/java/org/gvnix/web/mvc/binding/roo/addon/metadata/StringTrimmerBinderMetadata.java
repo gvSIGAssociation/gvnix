@@ -58,9 +58,8 @@ public class StringTrimmerBinderMetadata extends
      * Builds the method initStringTrimmerBinder annotated with @InitBinder.
      * This method registers the StringTrimmerEditor
      * 
-     * @param emptyAsNull
-     *            if true the editor registered will convert empty Strings to
-     *            <code>null</code>
+     * @param emptyAsNull if true the editor registered will convert empty
+     *            Strings to <code>null</code>
      */
     private MethodMetadata getInitStringTrimmerBinderMethod(boolean emptyAsNull) {
         // Specify the desired method name
@@ -70,7 +69,8 @@ public class StringTrimmerBinderMetadata extends
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
         parameterTypes.add(new AnnotatedJavaType(new JavaType(
-                "org.springframework.web.bind.WebDataBinder"), new ArrayList<AnnotationMetadata>()));
+                "org.springframework.web.bind.WebDataBinder"),
+                new ArrayList<AnnotationMetadata>()));
 
         // Check if a method with the same name already exists in the
         // target type
@@ -141,7 +141,8 @@ public class StringTrimmerBinderMetadata extends
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
+    public static final String createIdentifier(JavaType javaType,
+            LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }

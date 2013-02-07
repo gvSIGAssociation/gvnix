@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon.config;
 
@@ -106,7 +106,8 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
             // Update the XML file
             XmlUtils.writeXml(file.getOutputStream(), doc);
 
-        } else if (!dynProps.isEmpty()) {
+        }
+        else if (!dynProps.isEmpty()) {
 
             logger.log(Level.WARNING, "File " + getFilePath()
                     + " not exists and there are dynamic properties to set it");
@@ -116,8 +117,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
     /**
      * Get a document from a file.
      * 
-     * @param file
-     *            Mutable file
+     * @param file Mutable file
      * @return File document
      */
     protected Document getXmlDocument(MutableFile file) {
@@ -129,10 +129,12 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
             DocumentBuilder build = XmlUtils.getDocumentBuilder();
             doc = build.parse(fileManager.getInputStream(file
                     .getCanonicalPath()));
-        } catch (SAXException se) {
+        }
+        catch (SAXException se) {
 
             throw new IllegalStateException("Cant parse the XML file", se);
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
 
             throw new IllegalStateException("Cant read the XML file", ioe);
         }
@@ -147,10 +149,8 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
      * ATTRIBUTE_NODE nodes references neither are considered.
      * </p>
      * 
-     * @param baseName
-     *            Parent node name of node list
-     * @param nodes
-     *            XML node list to convert
+     * @param baseName Parent node name of node list
+     * @param nodes XML node list to convert
      * @return Dynamic property list
      */
     protected DynPropertyList getProperties(String baseName, NodeList nodes) {
@@ -193,8 +193,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
      * TEXT_NODE, TEXT_NODE and ATTRIBUTE_NODE nodes are valid.
      * </p>
      * 
-     * @param node
-     *            Node to check
+     * @param node Node to check
      * @return Has valid format
      */
     protected boolean isValidNode(Node node) {
@@ -212,10 +211,8 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
     /**
      * Create the dynamic properties related to this node attributes.
      * 
-     * @param node
-     *            Node to add to list
-     * @param xpath
-     *            Xpath expression of this node
+     * @param node Node to add to list
+     * @param xpath Xpath expression of this node
      * @return Dynamic property list
      */
     protected DynPropertyList getPropertyAttributes(Node node, String xpath) {
@@ -249,12 +246,9 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
      * The xpath expression could be an array or not.
      * </p>
      * 
-     * @param baseName
-     *            Base name of current node
-     * @param nodes
-     *            List of brother nodes
-     * @param i
-     *            Index of current node
+     * @param baseName Base name of current node
+     * @param nodes List of brother nodes
+     * @param i Index of current node
      * @return Xpath expression
      */
     protected String getPropertyXpath(String baseName, NodeList nodes, int i) {
@@ -276,7 +270,8 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
 
                     index = temp;
                     break;
-                } else {
+                }
+                else {
                     temp++;
                 }
             }
@@ -291,7 +286,8 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
 
             // Xpath expression of an element
             return baseName + XPATH_ELEMENT_SEPARATOR + name;
-        } else {
+        }
+        else {
 
             // Xpath expression of an element array
             return baseName + XPATH_ELEMENT_SEPARATOR + name
@@ -302,8 +298,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
     /**
      * Remove possible namespaces from a xpath expression.
      * 
-     * @param xpath
-     *            Xpath expressión with optional namespaces
+     * @param xpath Xpath expressión with optional namespaces
      * @return Xpath expresion without namespaces, if exists
      */
     protected String removeNamespaces(String xpath) {
@@ -320,7 +315,8 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
 
                 // Remove namespace substring from xpath
                 xpath = xpath.replace(xpath.substring(ini + 1, end + 1), "");
-            } else {
+            }
+            else {
 
                 // If attribute prefix before, is an attribute not a namespace
                 break;
@@ -333,10 +329,8 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
     /**
      * Update the root element property values with dynamic properties.
      * 
-     * @param root
-     *            Parent element
-     * @param dynProps
-     *            Dynamic property list
+     * @param root Parent element
+     * @param dynProps Dynamic property list
      */
     protected void setProperties(Element root, DynPropertyList dynProps) {
 
@@ -358,7 +352,8 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
 
                     logger.log(Level.WARNING, "Element " + xpath
                             + " to set attribute value not exists on file");
-                } else {
+                }
+                else {
 
                     String name = xpath
                             .substring(index + 2, xpath.length() - 1);
@@ -367,12 +362,14 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
 
                         logger.log(Level.WARNING, "Element attribute " + xpath
                                 + " to set value not exists on file");
-                    } else {
+                    }
+                    else {
 
                         attr.setValue(dynProp.getValue());
                     }
                 }
-            } else {
+            }
+            else {
 
                 // Set the new element content
                 Element elem = XmlUtils.findFirstElement(xpath, root);
@@ -381,7 +378,8 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
 
                     logger.log(Level.WARNING, "Element " + xpath
                             + " to set text content not exists on file");
-                } else {
+                }
+                else {
 
                     elem.setTextContent(dynProp.getValue());
                 }

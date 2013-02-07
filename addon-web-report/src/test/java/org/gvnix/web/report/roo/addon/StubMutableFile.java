@@ -14,7 +14,7 @@ import org.springframework.roo.process.manager.MutableFile;
  * Provides an easy way to create a {@link MutableFile} without actually
  * creating a file on the file system. Records all write operations in an
  * OutputStream and makes it available via {@link #getOutputAsString()}.
- *
+ * 
  * @author Rossen Stoyanchev
  * @since 1.1.1
  */
@@ -36,7 +36,8 @@ public class StubMutableFile implements MutableFile {
     public String getCanonicalPath() {
         try {
             return file.getCanonicalPath();
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
             throw new IllegalStateException(
                     "Cannot determine canoncial path for '" + file + "'", ioe);
         }
@@ -45,7 +46,8 @@ public class StubMutableFile implements MutableFile {
     public InputStream getInputStream() {
         try {
             return new FileInputStream(file);
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
             throw new IllegalStateException(
                     "Unable to acquire input stream for file '"
                             + getCanonicalPath() + "'", ioe);

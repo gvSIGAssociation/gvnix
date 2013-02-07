@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.security;
 
@@ -51,11 +51,9 @@ import org.w3c.dom.Element;
  * <p>
  * Web Service Security Metadata provider
  * </p>
- * 
  * <p>
  * Manage {@link GvNIXWebServiceSecurity} annotation
  * </p>
- * 
  * <p>
  * In {@link #getMetadata(String, JavaType, PhysicalTypeMetadata, String)}:
  * <ul>
@@ -67,7 +65,6 @@ import org.w3c.dom.Element;
  * {@link SecurityService}</li>
  * <li>checks if {certificate} file exist in
  * <code>scr/main/resorces/{governor_Package}</code></li>
- * 
  * </ul>
  * </p>
  * 
@@ -81,20 +78,17 @@ import org.w3c.dom.Element;
 public final class WSServiceSecurityMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
-    private SecurityService securityService;
+    @Reference private SecurityService securityService;
 
-    @Reference
-    private ProjectOperations projectOperations;
+    @Reference private ProjectOperations projectOperations;
 
     /**
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
      * command)
      * 
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -108,9 +102,8 @@ public final class WSServiceSecurityMetadataProvider extends
      * OSGi container upon bundle deactivation (result of the 'addon uninstall'
      * command)
      * 
-     * @param context
-     *            the component context can be used to get access to the OSGi
-     *            container (ie find out if certain bundles are active)
+     * @param context the component context can be used to get access to the
+     *            OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
         metadataDependencyRegistry.deregisterDependency(
@@ -135,7 +128,6 @@ public final class WSServiceSecurityMetadataProvider extends
      * <code>scr/main/resorces/{governor_Package}</code></li>
      * </ul>
      * </p>
-     * 
      */
     @Override
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
@@ -162,14 +154,16 @@ public final class WSServiceSecurityMetadataProvider extends
             // write properties file
             createSecurityPropertiesFile(aspectName, metadata);
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(
                     "Error generating security configuration", e);
         }
 
         // Checks for certificated file
         String certificatePath = projectOperations.getPathResolver()
-                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
                         metadata.getCertificatePath());
 
         Validate.isTrue(
@@ -196,7 +190,8 @@ public final class WSServiceSecurityMetadataProvider extends
 
         // Resolve absolute path
         String propertiesPath = projectOperations.getPathResolver()
-                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
                         metadata.getPropertiesPath());
 
         OutputStream os;
@@ -214,7 +209,8 @@ public final class WSServiceSecurityMetadataProvider extends
             try {
                 is = mutableFile.getInputStream();
                 storedProperties.load(is);
-            } finally {
+            }
+            finally {
                 if (is != null) {
                     is.close();
                 }
@@ -224,7 +220,8 @@ public final class WSServiceSecurityMetadataProvider extends
                 // File Content is up to date --> exit
                 return;
             }
-        } else {
+        }
+        else {
             // Unable to find the file, so let's create it
             mutableFile = fileManager.createFile(propertiesPath);
         }
@@ -234,7 +231,8 @@ public final class WSServiceSecurityMetadataProvider extends
         try {
             os = mutableFile.getOutputStream();
             storeProperties(aspectName, metadata, os, properties);
-        } finally {
+        }
+        finally {
             if (os != null) {
                 os.close();
             }
@@ -260,7 +258,8 @@ public final class WSServiceSecurityMetadataProvider extends
                 if (entry.getValue() != null) {
                     return false;
                 }
-            } else if (!otherValue.equals(entry.getValue())) {
+            }
+            else if (!otherValue.equals(entry.getValue())) {
                 return false;
             }
         }
@@ -317,7 +316,8 @@ public final class WSServiceSecurityMetadataProvider extends
 
         Validate.notNull(wsdl, "Can't get WSDl from ".concat(wsdlLocation));
 
-        Validate.isTrue(WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
+        Validate.isTrue(
+                WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
                 "Only RPC-Encoded services is supported");
 
         // Gets first port

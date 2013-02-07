@@ -1,8 +1,7 @@
 /*
  * Copyright 2011 DiSiD Technologies S.L.L. All rights reserved.
- *
- * Project  : DiSiD org.gvnix.web.mvc.binding.roo.addon
- * SVN Id   : $Id$
+ * 
+ * Project : DiSiD org.gvnix.web.mvc.binding.roo.addon SVN Id : $Id$
  */
 package org.gvnix.web.mvc.binding.roo.addon.annotation;
 

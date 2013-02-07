@@ -39,8 +39,7 @@ public interface DefaultDynamicConfiguration {
     /**
      * Update a configuration file with the values of the properties list.
      * 
-     * @param file
-     *            Info to be stored on the original file.
+     * @param file Info to be stored on the original file.
      */
     void write(DynPropertyList dynProperties);
 

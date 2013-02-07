@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.service.roo.addon.security;
 
@@ -53,17 +53,14 @@ import org.springframework.roo.project.LogicalPath;
  * <p>
  * Web Service Security Metadata
  * </p>
- * 
  * <p>
  * Manage {@link GvNIXWebServiceSecurity} annotation
  * </p>
- * 
  * <p>
  * Prepares Metadata for configure Web service Proxy configuration. Currently
  * only can generate WS client configuration and only for <code>Signature</code>
  * action and <code>pck12</code> certificated.
  * </p>
- * 
  * <p>
  * This generates:
  * <ul>
@@ -74,7 +71,6 @@ import org.springframework.roo.project.LogicalPath;
  * file ( {@link #getServiceWsddConfigurationParameters()})
  * </ul>
  * </p>
- * 
  * <p>
  * TODO extend it to support more wssl4 security actions
  * </p>
@@ -92,14 +88,11 @@ public class WSServiceSecurityMetadata extends
             .create(PROVIDES_TYPE_STRING);
 
     // From annotation
-    @AutoPopulate
-    private String password;
+    @AutoPopulate private String password;
 
-    @AutoPopulate
-    private String alias;
+    @AutoPopulate private String alias;
 
-    @AutoPopulate
-    private String certificate;
+    @AutoPopulate private String certificate;
 
     /**
      * Path (relative to classpath ) to Certificate
@@ -122,7 +115,8 @@ public class WSServiceSecurityMetadata extends
 
         // Process values from the annotation, if present (XXX ???)
         AnnotationMetadata annotation = governorTypeDetails
-                .getAnnotation(new JavaType(GvNIXWebServiceSecurity.class.getName()));
+                .getAnnotation(new JavaType(GvNIXWebServiceSecurity.class
+                        .getName()));
 
         // XXX annotation null? (???)
         if (annotation != null) {
@@ -149,7 +143,7 @@ public class WSServiceSecurityMetadata extends
         // Adding CallBackHandler method
         MethodMetadata callBackHandler = getCallBackHandlerMethod();
         if (callBackHandler != null) {
-        	builder.addMethod(callBackHandler);
+            builder.addMethod(callBackHandler);
         }
 
         // Create output ITD
@@ -204,7 +198,8 @@ public class WSServiceSecurityMetadata extends
 
         // Check if a method with the same signature already exists in the
         // target type
-        if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, methodName, parameterTypes) != null) {
+        if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
+                methodName, parameterTypes) != null) {
             // If it already exists, just return the method and omit its
             // generation via the ITD
             return null;
@@ -302,11 +297,9 @@ public class WSServiceSecurityMetadata extends
      * <p>
      * Return security action string
      * </p>
-     * 
      * <p>
      * currently a constant (<code>Signature</code>)
      * </p>
-     * 
      * <p>
      * TODO parameterize it
      * </p>
@@ -321,11 +314,9 @@ public class WSServiceSecurityMetadata extends
      * <p>
      * Returns keystore type string identifier
      * </p>
-     * 
      * <p>
      * currently constant (<code>pkcs12</code>)
      * </p>
-     * 
      * <p>
      * TODO identify it from values
      * </p>
@@ -424,7 +415,8 @@ public class WSServiceSecurityMetadata extends
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
+    public static final String createIdentifier(JavaType javaType,
+            LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }

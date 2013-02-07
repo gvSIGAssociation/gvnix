@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.dynamic.configuration.roo.addon.config;
 
@@ -77,7 +77,8 @@ public abstract class PropertiesDynamicConfiguration extends
                             .getValue().toString()));
                 }
             }
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
 
             throw new IllegalStateException(ioe);
         }
@@ -104,28 +105,34 @@ public abstract class PropertiesDynamicConfiguration extends
                     if (props.containsKey(dynProp.getKey())) {
 
                         props.put(dynProp.getKey(), dynProp.getValue());
-                    } else {
+                    }
+                    else {
 
-                        logger.log(Level.WARNING,
-                                "Property key ".concat(dynProp.getKey())
+                        logger.log(
+                                Level.WARNING,
+                                "Property key "
+                                        .concat(dynProp.getKey())
                                         .concat(" to put value not exists on file"));
                     }
                 }
                 outputStream = file.getOutputStream();
                 props.store(outputStream, null);
 
-            } else if (!dynProps.isEmpty()) {
+            }
+            else if (!dynProps.isEmpty()) {
 
                 logger.log(
                         Level.WARNING,
                         "File ".concat(getFilePath())
-                                .concat(" not exists and there are dynamic properties to set it")); 
+                                .concat(" not exists and there are dynamic properties to set it"));
             }
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
             throw new IllegalStateException(ioe);
-        } finally {
+        }
+        finally {
             if (outputStream != null) {
-            	IOUtils.closeQuietly(outputStream);
+                IOUtils.closeQuietly(outputStream);
             }
         }
     }

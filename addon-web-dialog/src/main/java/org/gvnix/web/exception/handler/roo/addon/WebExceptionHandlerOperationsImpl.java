@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.exception.handler.roo.addon;
 
@@ -76,26 +76,19 @@ public class WebExceptionHandlerOperationsImpl implements
     private static final String ENGLISH_LANGUAGE_FILENAME = "/WEB-INF/i18n/messages.properties";
 
     private static final String LANGUAGE_FILENAMES = "WEB-INF/i18n/messages**.properties";
-	
+
     private static final String FOLDER_SEPARATOR = "/";
-    
+
     private static Logger LOGGER = HandlerUtils
             .getLogger(WebModalDialogOperationsImpl.class);
 
-    @Reference
-    private ProjectOperations projectOperations;
-    @Reference
-    private TilesOperations tilesOperations;
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private PathResolver pathResolver;
-    @Reference
-    private PropFileOperations propFileOperations;
-    @Reference
-    private I18nSupport i18nSupport;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private TilesOperations tilesOperations;
+    @Reference private FileManager fileManager;
+    @Reference private MetadataService metadataService;
+    @Reference private PathResolver pathResolver;
+    @Reference private PropFileOperations propFileOperations;
+    @Reference private I18nSupport i18nSupport;
 
     /*
      * (non-Javadoc)
@@ -106,7 +99,8 @@ public class WebExceptionHandlerOperationsImpl implements
      */
     public String getHandledExceptionList() {
 
-        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String webXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/spring/webmvc-config.xml");
         Validate.isTrue(fileManager.exists(webXmlPath),
                 "webmvc-config.xml not found");
@@ -118,7 +112,8 @@ public class WebExceptionHandlerOperationsImpl implements
             webXmlMutableFile = fileManager.updateFile(webXmlPath);
             webXml = XmlUtils.getDocumentBuilder().parse(
                     webXmlMutableFile.getInputStream());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(e);
         }
         Element root = webXml.getDocumentElement();
@@ -154,9 +149,10 @@ public class WebExceptionHandlerOperationsImpl implements
             String exceptionTitle, String exceptionDescription,
             String exceptionLanguage) {
 
-    	Validate.notNull(exceptionName, "You have to provide a Exception Name.");
-    	Validate.notNull(exceptionTitle, "You have to provide a Exception Title.");
-    	Validate.notNull(exceptionDescription,
+        Validate.notNull(exceptionName, "You have to provide a Exception Name.");
+        Validate.notNull(exceptionTitle,
+                "You have to provide a Exception Title.");
+        Validate.notNull(exceptionDescription,
                 "You have to provide a Exception Description.");
 
         // Update webmvcconfig.xml and retrieve the exception view name.
@@ -185,7 +181,7 @@ public class WebExceptionHandlerOperationsImpl implements
      */
     public void removeExceptionHandled(String exceptionName) {
 
-    	Validate.notNull(exceptionName, "You have to provide a Exception Name.");
+        Validate.notNull(exceptionName, "You have to provide a Exception Name.");
 
         // Remove Exception mapping
         String exceptionViewName = removeWebMvcConfig(exceptionName);
@@ -243,13 +239,16 @@ public class WebExceptionHandlerOperationsImpl implements
 
         if (exceptionLanguage.compareTo("en") == 0) {
             languagePath = ENGLISH_LANGUAGE_FILENAME;
-        } else {
+        }
+        else {
             languagePath = "WEB-INF/i18n/messages_" + exceptionLanguage
                     + ".properties";
         }
 
-        String messagesPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                languagePath);
+        String messagesPath = pathResolver
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        languagePath);
 
         Validate.isTrue(
                 fileManager.exists(messagesPath),
@@ -262,11 +261,11 @@ public class WebExceptionHandlerOperationsImpl implements
      * Checks if the Exception is mapped in the SimpleMappingExceptionResolver
      * Controller
      * 
-     * @param exceptionName
-     *            Exception Name to Handle.
+     * @param exceptionName Exception Name to Handle.
      */
     private void existException(String exceptionName) {
-        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String webXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/spring/webmvc-config.xml");
         Validate.isTrue(fileManager.exists(webXmlPath),
                 "webmvc-config.xml not found");
@@ -278,7 +277,8 @@ public class WebExceptionHandlerOperationsImpl implements
             webXmlMutableFile = fileManager.updateFile(webXmlPath);
             webXml = XmlUtils.getDocumentBuilder().parse(
                     webXmlMutableFile.getInputStream());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(e);
         }
         Element root = webXml.getDocumentElement();
@@ -297,13 +297,13 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Update the webmvc-config.xml with the new Exception.
      * 
-     * @param exceptionName
-     *            Exception Name to Handle.
+     * @param exceptionName Exception Name to Handle.
      * @return {@link String} The exceptionViewName to create the .jspx view.
      */
     protected String updateWebMvcConfig(String exceptionName) {
 
-        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String webXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/spring/webmvc-config.xml");
         Validate.isTrue(fileManager.exists(webXmlPath),
                 "webmvc-config.xml not found");
@@ -315,7 +315,8 @@ public class WebExceptionHandlerOperationsImpl implements
             webXmlMutableFile = fileManager.updateFile(webXmlPath);
             webXml = XmlUtils.getDocumentBuilder().parse(
                     webXmlMutableFile.getInputStream());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(e);
         }
         Element root = webXml.getDocumentElement();
@@ -341,7 +342,8 @@ public class WebExceptionHandlerOperationsImpl implements
         if (simpleMappingExceptionResolverProp != null) {
             exceptionViewName = simpleMappingExceptionResolverProp
                     .getTextContent();
-        } else {
+        }
+        else {
             updateMappings = true;
             exceptionViewName = getExceptionViewName(exceptionName);
         }
@@ -393,10 +395,8 @@ public class WebExceptionHandlerOperationsImpl implements
      * Returns the exception view name checking if exists in the file
      * webmvc-config.xml file.
      * 
-     * @param exceptionName
-     *            to create the view.
-     * @param root
-     *            {@link Element} with the values off webmvc-config.xml
+     * @param exceptionName to create the view.
+     * @param root {@link Element} with the values off webmvc-config.xml
      * @return
      */
     private String getExceptionViewName(String exceptionName) {
@@ -419,8 +419,9 @@ public class WebExceptionHandlerOperationsImpl implements
         while (exceptionNameExists) {
 
             exceptionNameExists = fileManager.exists(pathResolver
-                    .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/views/"
-                            + tmpExceptionViewName + ".jspx"));
+                    .getIdentifier(
+                            LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                            "WEB-INF/views/" + tmpExceptionViewName + ".jspx"));
 
             if (exceptionNameExists) {
                 tmpExceptionViewName = exceptionViewName.concat(Integer
@@ -435,12 +436,12 @@ public class WebExceptionHandlerOperationsImpl implements
      * Removes the definition of the selected Exception in the webmvc-config.xml
      * file.
      * 
-     * @param exceptionName
-     *            Exception Name to remove.
+     * @param exceptionName Exception Name to remove.
      */
     private String removeWebMvcConfig(String exceptionName) {
 
-        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String webXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/spring/webmvc-config.xml");
         Validate.isTrue(fileManager.exists(webXmlPath),
                 "webmvc-config.xml not found");
@@ -452,7 +453,8 @@ public class WebExceptionHandlerOperationsImpl implements
             webXmlMutableFile = fileManager.updateFile(webXmlPath);
             webXml = XmlUtils.getDocumentBuilder().parse(
                     webXmlMutableFile.getInputStream());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(e);
         }
         Element root = webXml.getDocumentElement();
@@ -494,52 +496,51 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Update layout.xml to map the new Exception associated View.
      * 
-     * @param exceptionViewName
-     *            to create the view and the definition in the xml
+     * @param exceptionViewName to create the view and the definition in the xml
      */
     private void updateViewsLayout(String exceptionViewName) {
 
         // Exception view - create a view to show the exception message.
 
-        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String webXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/views/views.xml");
         Validate.isTrue(fileManager.exists(webXmlPath), "views.xml not found");
 
         String jspxPath = "/WEB-INF/views/" + exceptionViewName + ".jspx";
 
-        tilesOperations.addViewDefinition("", LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), exceptionViewName,
-                TilesOperationsImpl.PUBLIC_TEMPLATE, jspxPath);
+        tilesOperations.addViewDefinition("",
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                exceptionViewName, TilesOperationsImpl.PUBLIC_TEMPLATE,
+                jspxPath);
 
     }
 
     /**
      * Removes the definition of the Exception view in layout.xml.
      * 
-     * @param exceptionViewName
-     *            Exception Name to remove.
+     * @param exceptionViewName Exception Name to remove.
      */
     private void removeViewsLayout(String exceptionViewName) {
 
         // Exception view - create a view to show the exception message.
 
-        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String webXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/views/views.xml");
         Validate.isTrue(fileManager.exists(webXmlPath), "views.xml not found");
 
-        tilesOperations.removeViewDefinition(exceptionViewName, "", LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""));
+        tilesOperations.removeViewDefinition(exceptionViewName, "",
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""));
     }
 
     /**
      * Creates a view for the new Handled Exception.
      * 
-     * @param exceptionName
-     *            Name of the Exception to handle.
-     * @param exceptionTitle
-     *            Title of the exception view.
-     * @param exceptionDescription
-     *            Description to show in the view.
-     * @param exceptionViewName
-     *            Name of the .jspx view.
+     * @param exceptionName Name of the Exception to handle.
+     * @param exceptionTitle Title of the exception view.
+     * @param exceptionDescription Description to show in the view.
+     * @param exceptionViewName Name of the .jspx view.
      */
     private void createNewExceptionView(String exceptionName,
             String exceptionTitle, String exceptionDescription,
@@ -556,8 +557,8 @@ public class WebExceptionHandlerOperationsImpl implements
                 + exceptionNameUncapitalize + ".problemdescription");
 
         String exceptionFilename = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/views/" + exceptionViewName
-                        + ".jspx");
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "WEB-INF/views/" + exceptionViewName + ".jspx");
         String template;
         try {
 
@@ -569,7 +570,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
             template = IOUtils.toString(readerFile);
 
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
             throw new IllegalStateException("Unable load ITD jspx template",
                     ioe);
         }
@@ -588,15 +590,18 @@ public class WebExceptionHandlerOperationsImpl implements
             String existing = null;
             try {
                 existing = IOUtils.toString(new FileReader(newFile));
-            } catch (IOException ignoreAndJustOverwriteIt) {
-            	LOGGER.finest("Problems writting ".concat(newFile.getAbsolutePath()));
+            }
+            catch (IOException ignoreAndJustOverwriteIt) {
+                LOGGER.finest("Problems writting ".concat(newFile
+                        .getAbsolutePath()));
             }
 
             if (!template.equals(existing)) {
                 mutableFile = fileManager.updateFile(exceptionFilename);
             }
 
-        } else {
+        }
+        else {
             mutableFile = fileManager.createFile(exceptionFilename);
             Validate.notNull(mutableFile, "Could not create ITD file '"
                     + exceptionFilename + "'");
@@ -606,17 +611,18 @@ public class WebExceptionHandlerOperationsImpl implements
             if (mutableFile != null) {
                 InputStream inputStream = null;
                 OutputStream outputStream = null;
-                try { 
-                  inputStream = IOUtils.toInputStream(template);
-                  outputStream = mutableFile.getOutputStream();
-                  IOUtils.copy(inputStream, outputStream);
+                try {
+                    inputStream = IOUtils.toInputStream(template);
+                    outputStream = mutableFile.getOutputStream();
+                    IOUtils.copy(inputStream, outputStream);
                 }
                 finally {
-                  IOUtils.closeQuietly(inputStream);
-                  IOUtils.closeQuietly(outputStream);
+                    IOUtils.closeQuietly(inputStream);
+                    IOUtils.closeQuietly(outputStream);
                 }
             }
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
             throw new IllegalStateException("Could not output '"
                     + mutableFile.getCanonicalPath() + "'", ioe);
         }
@@ -625,14 +631,13 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Removes Exception view .jspx.
      * 
-     * @param exceptionViewName
-     *            Exception Name to remove.
+     * @param exceptionViewName Exception Name to remove.
      */
     private void removeExceptionView(String exceptionViewName) {
 
         String exceptionFilename = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/views/" + exceptionViewName
-                        + ".jspx");
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "WEB-INF/views/" + exceptionViewName + ".jspx");
 
         fileManager.delete(exceptionFilename);
 
@@ -641,11 +646,8 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Method to replace the parameters set in the Map into the template.
      * 
-     * @param template
-     *            Template to create a new jspx.
-     * @param params
-     *            {@link Map} with the specified parameters.
-     * 
+     * @param template Template to create a new jspx.
+     * @param params {@link Map} with the specified parameters.
      * @return {@link String} with the updated parameters values.
      */
     private String replaceParams(String template, Map<String, String> params) {
@@ -660,12 +662,9 @@ public class WebExceptionHandlerOperationsImpl implements
      * Updates the selected language file with the title and the description of
      * the new Exception.
      * 
-     * @param exceptionName
-     *            Name of the Exception.
-     * @param exceptionTitle
-     *            Title of the Exception.
-     * @param exceptionDescription
-     *            Description of the Exception.
+     * @param exceptionName Name of the Exception.
+     * @param exceptionTitle Title of the Exception.
+     * @param exceptionDescription Description of the Exception.
      */
     private void createMultiLanguageMessages(String exceptionName,
             String exceptionTitle, String exceptionDescription,
@@ -700,23 +699,30 @@ public class WebExceptionHandlerOperationsImpl implements
                 if (propertyFileName.compareTo(fileName.substring(1)) == 0) {
 
                     tmpProperty = propFileOperations.getProperty(
-                    		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), fileName, entry.getKey());
+                            LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                            fileName, entry.getKey());
                     if (tmpProperty == null) {
 
-                        propFileOperations.changeProperty(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                                propertyFileName, entry.getKey(),
-                                entry.getValue());
-                    } else if (tmpProperty.compareTo(entry.getValue()) != 0) {
-                        propFileOperations.changeProperty(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                                propertyFileName, entry.getKey(),
-                                entry.getValue());
+                        propFileOperations.changeProperty(LogicalPath
+                                .getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                                propertyFileName, entry.getKey(), entry
+                                        .getValue());
                     }
-                } else {
+                    else if (tmpProperty.compareTo(entry.getValue()) != 0) {
+                        propFileOperations.changeProperty(LogicalPath
+                                .getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                                propertyFileName, entry.getKey(), entry
+                                        .getValue());
+                    }
+                }
+                else {
 
                     // Updates the file if the property doesn't exists.
-                    if (propFileOperations.getProperty(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                    if (propFileOperations.getProperty(
+                            LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                             fileName, entry.getKey()) == null) {
-                        propFileOperations.changeProperty(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        propFileOperations.changeProperty(LogicalPath
+                                .getInstance(Path.SRC_MAIN_WEBAPP, ""),
                                 fileName, entry.getKey(), entry.getKey());
                     }
                 }
@@ -730,12 +736,9 @@ public class WebExceptionHandlerOperationsImpl implements
      * Updates the selected language file with the title and the description of
      * the new Exception.
      * 
-     * @param exceptionName
-     *            Name of the Exception.
-     * @param exceptionTitle
-     *            Title of the Exception.
-     * @param exceptionDescription
-     *            Description of the Exception.
+     * @param exceptionName Name of the Exception.
+     * @param exceptionTitle Title of the Exception.
+     * @param exceptionDescription Description of the Exception.
      */
     private void updateMultiLanguageMessages(String exceptionName,
             String exceptionTitle, String exceptionDescription,
@@ -755,13 +758,17 @@ public class WebExceptionHandlerOperationsImpl implements
         for (Entry<String, String> entry : params.entrySet()) {
 
             String tmpProperty = propFileOperations.getProperty(
-            		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), propertyFileName, entry.getKey());
+                    LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                    propertyFileName, entry.getKey());
             if (tmpProperty == null) {
 
-                propFileOperations.changeProperty(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                propFileOperations.changeProperty(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         propertyFileName, entry.getKey(), entry.getValue());
-            } else if (tmpProperty.compareTo(entry.getValue()) != 0) {
-                propFileOperations.changeProperty(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+            }
+            else if (tmpProperty.compareTo(entry.getValue()) != 0) {
+                propFileOperations.changeProperty(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         propertyFileName, entry.getKey(), entry.getValue());
             }
 
@@ -772,8 +779,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Removes the Language messages properties of the Exception.
      * 
-     * @param exceptionName
-     *            Exception Name to remove.
+     * @param exceptionName Exception Name to remove.
      */
     private void removeMultiLanguageMessages(String exceptionName) {
 
@@ -801,7 +807,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
                 fileName = propertyFilePath.concat(getFilename(canonicalPath));
 
-                propFileOperations.removeProperty(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                propFileOperations.removeProperty(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         fileName, entry.getKey());
             }
 
@@ -976,7 +983,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
         SortedSet<FileDetails> propertiesFiles = fileManager
                 .findMatchingAntPath(pathResolver.getIdentifier(
-                		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), LANGUAGE_FILENAMES));
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        LANGUAGE_FILENAMES));
 
         return propertiesFiles;
     }
@@ -990,7 +998,8 @@ public class WebExceptionHandlerOperationsImpl implements
      */
     public boolean isExceptionMappingAvailable() {
 
-        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String webXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/spring/webmvc-config.xml");
 
         if (!fileManager.exists(webXmlPath)) {
@@ -1004,7 +1013,8 @@ public class WebExceptionHandlerOperationsImpl implements
             webXmlMutableFile = fileManager.updateFile(webXmlPath);
             webXml = XmlUtils.getDocumentBuilder().parse(
                     webXmlMutableFile.getInputStream());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(e);
         }
         Element root = webXml.getDocumentElement();
@@ -1030,7 +1040,8 @@ public class WebExceptionHandlerOperationsImpl implements
      */
     public boolean isMessageMappingAvailable() {
 
-        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+        String webXmlPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/spring/webmvc-config.xml");
 
         if (!fileManager.exists(webXmlPath)) {
@@ -1044,7 +1055,8 @@ public class WebExceptionHandlerOperationsImpl implements
             webXmlMutableFile = fileManager.updateFile(webXmlPath);
             webXml = XmlUtils.getDocumentBuilder().parse(
                     webXmlMutableFile.getInputStream());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new IllegalStateException(e);
         }
         Element root = webXml.getDocumentElement();
@@ -1068,23 +1080,26 @@ public class WebExceptionHandlerOperationsImpl implements
      * #isProjectAvailable()
      */
     public boolean isProjectAvailable() {
-        return OperationUtils.isProjectAvailable(metadataService, projectOperations)
+        return OperationUtils.isProjectAvailable(metadataService,
+                projectOperations)
                 && OperationUtils.isSpringMvcProject(metadataService,
                         fileManager, projectOperations);
     }
 
-	/**
-	 * Extract the filename from the given path,
-	 * e.g. "mypath/myfile.txt" -> "myfile.txt".
-	 * @param path the file path (may be <code>null</code>)
-	 * @return the extracted filename, or <code>null</code> if none
-	 */
-	public static String getFilename(String path) {
-		if (path == null) {
-			return null;
-		}
-		int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR);
-		return (separatorIndex != -1 ? path.substring(separatorIndex + 1) : path);
-	}
+    /**
+     * Extract the filename from the given path, e.g. "mypath/myfile.txt" ->
+     * "myfile.txt".
+     * 
+     * @param path the file path (may be <code>null</code>)
+     * @return the extracted filename, or <code>null</code> if none
+     */
+    public static String getFilename(String path) {
+        if (path == null) {
+            return null;
+        }
+        int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR);
+        return (separatorIndex != -1 ? path.substring(separatorIndex + 1)
+                : path);
+    }
 
 }

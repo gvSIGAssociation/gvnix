@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.report.roo.addon;
 
@@ -87,7 +87,7 @@ import org.w3c.dom.Node;
  * {@link ItdTypeDetailsBuilder} provided by
  * {@link AbstractItdTypeDetailsProvidingMetadataItem} to register a field in
  * the ITD and a new method.
- *
+ * 
  * @author Oscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -96,26 +96,28 @@ import org.w3c.dom.Node;
  */
 public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
     private static final JavaSymbolName METHOD_SYMBOL_NAME = new JavaSymbolName(
-	        "method");
+            "method");
 
-	private static final JavaSymbolName PARAMS_SYMBOL_NAME = new JavaSymbolName("params");
+    private static final JavaSymbolName PARAMS_SYMBOL_NAME = new JavaSymbolName(
+            "params");
 
-	private static final JavaSymbolName VALUE_SYMBOL_NAME = new JavaSymbolName("value");
+    private static final JavaSymbolName VALUE_SYMBOL_NAME = new JavaSymbolName(
+            "value");
 
-	private static final JavaType REQUEST_PARAM_TYPE = new JavaType(
-	        "org.springframework.web.bind.annotation.RequestParam");
+    private static final JavaType REQUEST_PARAM_TYPE = new JavaType(
+            "org.springframework.web.bind.annotation.RequestParam");
 
-	private static final JavaType MODEL_TYPE = new JavaType(
-	        "org.springframework.ui.Model");
+    private static final JavaType MODEL_TYPE = new JavaType(
+            "org.springframework.ui.Model");
 
-	private static final JavaType REQUEST_METHOD_TYPE = new JavaType(
-	"org.springframework.web.bind.annotation.RequestMethod");
-	// private static final Logger logger =
+    private static final JavaType REQUEST_METHOD_TYPE = new JavaType(
+            "org.springframework.web.bind.annotation.RequestMethod");
+    // private static final Logger logger =
     // HandlerUtils.getLogger(ReportMetadata.class);
 
     private static final JavaType REQUEST_MAPPING_TYPE = new JavaType(
-	        "org.springframework.web.bind.annotation.RequestMapping");
-	private static final String PROVIDES_TYPE_STRING = ReportMetadata.class
+            "org.springframework.web.bind.annotation.RequestMapping");
+    private static final String PROVIDES_TYPE_STRING = ReportMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
@@ -143,7 +145,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
             PropFileOperations propFileOperations,
             List<StringAttributeValue> definedReports) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
-        Validate.notNull(controllerMethods, "List of controller methods required");
+        Validate.notNull(controllerMethods,
+                "List of controller methods required");
 
         this.fileManager = fileManager;
         this.projectOperations = projectOperations;
@@ -176,11 +179,11 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                     reportNameFormat[1]);
 
             // Add methodForm and method in the webScaffold
-            MethodMetadata reportFormMethod = addGenerateReportFormMethod(fromBackingObject, reportNameFormat[0],
-                    reportNameFormat[1]);
+            MethodMetadata reportFormMethod = addGenerateReportFormMethod(
+                    fromBackingObject, reportNameFormat[0], reportNameFormat[1]);
             reportMethods.add(reportFormMethod);
-            MethodMetadata reportMethod = addGenerateReportMethod(fromBackingObject, reportNameFormat[0],
-                    reportNameFormat[1]);
+            MethodMetadata reportMethod = addGenerateReportMethod(
+                    fromBackingObject, reportNameFormat[0], reportNameFormat[1]);
             reportMethods.add(reportMethod);
             installedReports.add(definedReport.getValue());
         }
@@ -195,7 +198,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
     /**
      * Add to the aspect the MethodMetadata of the generateReportForm method. It
      * uses AbstractMetadataItem.builder for add the new method.
-     *
+     * 
      * @param reportName
      * @param entity
      * @param reportMethods2
@@ -209,7 +212,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
-        parameterTypes.add(new AnnotatedJavaType(MODEL_TYPE, new ArrayList<AnnotationMetadata>()));
+        parameterTypes.add(new AnnotatedJavaType(MODEL_TYPE,
+                new ArrayList<AnnotationMetadata>()));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -230,12 +234,12 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                 VALUE_SYMBOL_NAME, "/reports/".concat(reportName)));
         requestMappingAttributes.add(new StringAttributeValue(
                 PARAMS_SYMBOL_NAME, "form"));
-        requestMappingAttributes.add(new EnumAttributeValue(METHOD_SYMBOL_NAME, 
-        		new EnumDetails(REQUEST_METHOD_TYPE,
-                new JavaSymbolName("GET"))));
+        requestMappingAttributes
+                .add(new EnumAttributeValue(METHOD_SYMBOL_NAME,
+                        new EnumDetails(REQUEST_METHOD_TYPE,
+                                new JavaSymbolName("GET"))));
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                REQUEST_MAPPING_TYPE,
-                requestMappingAttributes);
+                REQUEST_MAPPING_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
 
@@ -244,16 +248,17 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
         // Populate report_formats list for select
         String reportFormatsAsArray = getReportFormatsAsArray(reportFormats);
-        bodyBuilder.appendFormalLine("String[] reportFormats =  "
-                .concat(reportFormatsAsArray).concat(";"));
+        bodyBuilder.appendFormalLine("String[] reportFormats =  ".concat(
+                reportFormatsAsArray).concat(";"));
         bodyBuilder
                 .appendFormalLine("Collection<String> reportFormatsList = Arrays.asList(reportFormats);");
         bodyBuilder
                 .appendFormalLine("uiModel.addAttribute(\"report_formats\", reportFormatsList);");
 
         // return the View
-        bodyBuilder.appendFormalLine("return \"".concat(annotationValues.getPath())
-                .concat("/").concat(reportName).concat("\";"));
+        bodyBuilder.appendFormalLine("return \""
+                .concat(annotationValues.getPath()).concat("/")
+                .concat(reportName).concat("\";"));
 
         // ImportRegistrationResolver gives access to imports in the
         // Java/AspectJ source
@@ -278,34 +283,35 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
      * Returns a new MethodMetadata based on given parameters. It uses
      * AbstractMetadataItem.builder for add the new method and add needed
      * imports
-     *
+     * 
      * @param reportName
      * @param entity
      * @param reportNameFormat
      * @return
      */
-    private MethodMetadata addGenerateReportMethod(JavaType entity, String reportName,
-            String reportFormats) {
+    private MethodMetadata addGenerateReportMethod(JavaType entity,
+            String reportName, String reportFormats) {
         // Specify the desired method name
         Map<String, String> properties = new HashMap<String, String>();
         JavaSymbolName methodName = new JavaSymbolName(generateMethodName(
                 reportName, false));
 
         List<AnnotationAttributeValue<?>> reportAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-        reportAttributes.add(new StringAttributeValue(VALUE_SYMBOL_NAME, "format"));
+        reportAttributes.add(new StringAttributeValue(VALUE_SYMBOL_NAME,
+                "format"));
         reportAttributes.add(new BooleanAttributeValue(new JavaSymbolName(
                 "required"), true));
         List<AnnotationMetadata> reportAttributesAnnotations = new ArrayList<AnnotationMetadata>();
         AnnotationMetadataBuilder reportAttributesAnnotation = new AnnotationMetadataBuilder(
-                REQUEST_PARAM_TYPE,
-                reportAttributes);
+                REQUEST_PARAM_TYPE, reportAttributes);
         reportAttributesAnnotations.add(reportAttributesAnnotation.build());
 
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
         parameterTypes.add(new AnnotatedJavaType(new JavaType(String.class
                 .getName()), reportAttributesAnnotations));
-        parameterTypes.add(new AnnotatedJavaType(MODEL_TYPE, new ArrayList<AnnotationMetadata>()));
+        parameterTypes.add(new AnnotatedJavaType(MODEL_TYPE,
+                new ArrayList<AnnotationMetadata>()));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -325,11 +331,12 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
         requestMappingAttributes.add(new StringAttributeValue(
                 VALUE_SYMBOL_NAME, "/reports/".concat(reportName)));
-        requestMappingAttributes.add(new EnumAttributeValue(METHOD_SYMBOL_NAME, new EnumDetails(REQUEST_METHOD_TYPE,
-                new JavaSymbolName("GET"))));
+        requestMappingAttributes
+                .add(new EnumAttributeValue(METHOD_SYMBOL_NAME,
+                        new EnumDetails(REQUEST_METHOD_TYPE,
+                                new JavaSymbolName("GET"))));
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                REQUEST_MAPPING_TYPE,
-                requestMappingAttributes);
+                REQUEST_MAPPING_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
 
@@ -344,8 +351,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                 .appendFormalLine(
                         "uiModel.addAttribute(\"error\", \"message_format_required\");");
         bodyBuilder.appendIndent().appendFormalLine(
-                "return \"".concat(annotationValues.getPath()).concat("/").concat(reportName)
-                        .concat("\";"));
+                "return \"".concat(annotationValues.getPath()).concat("/")
+                        .concat(reportName).concat("\";"));
         bodyBuilder.appendFormalLine("}");
         // Add the message error to the application.properties
         properties.put("message_format_required",
@@ -357,8 +364,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
          * performing changes in JSPXs
          */
         // test if requested format is supported for this report
-        bodyBuilder.appendFormalLine("final String REGEX = \"("
-                .concat(reportFormats.replace(",", "|")).concat(")\";"));
+        bodyBuilder.appendFormalLine("final String REGEX = \"(".concat(
+                reportFormats.replace(",", "|")).concat(")\";"));
         bodyBuilder
                 .appendFormalLine("Pattern pattern = Pattern.compile(REGEX, Pattern.CASE_INSENSITIVE);");
         bodyBuilder
@@ -367,8 +374,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         bodyBuilder.appendIndent().appendFormalLine(
                 "uiModel.addAttribute(\"error\", \"message_format_invalid\");");
         bodyBuilder.appendIndent().appendFormalLine(
-                "return \"".concat(annotationValues.getPath())
-                .concat("/").concat(reportName).concat("\";"));
+                "return \"".concat(annotationValues.getPath()).concat("/")
+                        .concat(reportName).concat("\";"));
         bodyBuilder.appendFormalLine("}");
         // Add the message error to the application.properties
         properties.put("message_format_invalid",
@@ -384,13 +391,10 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         irr.addImport(new JavaType("java.util.regex.Pattern"));
 
         // Code populating the JasperReport DataSource
-        bodyBuilder.appendFormalLine("Collection<" 
-                .concat(entity.getSimpleTypeName())
-                .concat("> dataSource = ")
-                .concat(entity.getSimpleTypeName()) 
-                .concat(".find")
-                .concat(entity.getSimpleTypeName())
-                .concat("Entries(0, 10);"));
+        bodyBuilder.appendFormalLine("Collection<"
+                .concat(entity.getSimpleTypeName()).concat("> dataSource = ")
+                .concat(entity.getSimpleTypeName()).concat(".find")
+                .concat(entity.getSimpleTypeName()).concat("Entries(0, 10);"));
         // test if DataSource is empty and return to the report form if so
         bodyBuilder.appendFormalLine("if (dataSource.isEmpty()) {");
         bodyBuilder
@@ -398,9 +402,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                 .appendFormalLine(
                         "uiModel.addAttribute(\"error\", \"message_emptyresults_noreportgeneration\");");
         bodyBuilder.appendIndent().appendFormalLine(
-                "return \"".concat(annotationValues.getPath())
-                .concat("/").concat(reportName)
-                 .concat("\";"));
+                "return \"".concat(annotationValues.getPath()).concat("/")
+                        .concat(reportName).concat("\";"));
         bodyBuilder.appendFormalLine("}");
         // Add the message error to the application.properties
         properties.put("message_emptyresults_noreportgeneration",
@@ -415,14 +418,12 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                 .appendFormalLine("uiModel.addAttribute(\"format\", format);");
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"title\", \""
                 .concat(reportName.toUpperCase()).concat("\");"));
-        bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-                .concat(reportName)
-                .concat("List\", dataSource);"));
+        bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
+                reportName).concat("List\", dataSource);"));
 
         // return the JasperReport View
         bodyBuilder.appendFormalLine("return \""
-                .concat(entity.getSimpleTypeName().toLowerCase())
-                .concat("_")
+                .concat(entity.getSimpleTypeName().toLowerCase()).concat("_")
                 .concat(reportName.toLowerCase()).concat("\";"));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
@@ -436,7 +437,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         controllerMethods.add(reportMethod);
 
         propFileOperations
-                .addProperties(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                .addProperties(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/i18n/application.properties", properties,
                         true, false);
         return reportMethod;
@@ -444,7 +446,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
     /**
      * Checks if Method exists in the ReportMetadata.
-     *
+     * 
      * @param methodName
      * @param paramTypes
      * @return
@@ -452,7 +454,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
     private MethodMetadata reportMethodExists(JavaSymbolName methodName) {
         for (MethodMetadata methodMetadata : controllerMethods) {
             if (methodMetadata.getMethodName().equals(methodName)) {
-                return methodMetadata; // The method already exists. Just return it
+                return methodMetadata; // The method already exists. Just return
+                                       // it
             }
         }
         return null;
@@ -461,9 +464,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
     /**
      * Add a new <bean/> to jasper-views.xml file with the name of the new
      * report
-     *
-     * @param reportName
-     *            the name of the report
+     * 
+     * @param reportName the name of the report
      * @return jasperReportBeanId
      */
     private void addNewJasperReportBean(JavaType entity, String reportName,
@@ -471,17 +473,19 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         PathResolver pathResolver = projectOperations.getPathResolver();
 
         // Install CustomJasperReportsMultiFormatView into
-        // top.level.package.<web controllers sub-package>.servlet.view.jasperreports
+        // top.level.package.<web controllers
+        // sub-package>.servlet.view.jasperreports
         // if it is not already installed
         String classMultiFormatView = installCustomJasperReportMultiFormatView();
 
         // The bean id will be entity_reportName
-        String reportBeanId = entity.getSimpleTypeName().toLowerCase().concat("_")
-                .concat(reportName.toLowerCase());
+        String reportBeanId = entity.getSimpleTypeName().toLowerCase()
+                .concat("_").concat(reportName.toLowerCase());
 
         // Add config to jasper-views.xml
         String jasperReportsConfig = pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/spring/jasper-views.xml");
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "WEB-INF/spring/jasper-views.xml");
         MutableFile mutableJasperViewsConfigFile = fileManager
                 .updateFile(jasperReportsConfig);
         Document jasperViewsConfigDocument;
@@ -489,60 +493,67 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         try {
             jasperViewsConfigDocument = XmlUtils.getDocumentBuilder().parse(
                     mutableJasperViewsConfigFile.getInputStream());
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IllegalStateException(
-                    "Could not open jasper-views.xml config file '"
-                            .concat(jasperReportsConfig).concat("'"), ex);
+                    "Could not open jasper-views.xml config file '".concat(
+                            jasperReportsConfig).concat("'"), ex);
         }
 
         Element beans = jasperViewsConfigDocument.getDocumentElement();
 
-        if (null != XmlUtils.findFirstElement("/beans/bean[@id='"
-                .concat(reportBeanId).concat("']"), beans)) {
-            // logger.warning("A report with the name " + reportBeanId + " is already defined");
+        if (null != XmlUtils.findFirstElement(
+                "/beans/bean[@id='".concat(reportBeanId).concat("']"), beans)) {
+            // logger.warning("A report with the name " + reportBeanId +
+            // " is already defined");
             return; // There is a bean with the reportName already
-                                 // defined, nothing to do
+                    // defined, nothing to do
         }
 
         // Create a DOM element defining the new bean for the JasperReport view
         InputStream templateInputStream = null;
         OutputStream jasperViewsConfigOutStream = null;
         try {
-	        templateInputStream = FileUtils.getInputStream(getClass(),
-	                "jasperreports-bean-config-template.xml");
-	        Document reportBeanConfigDocument;
-	        try {
-	            reportBeanConfigDocument = XmlUtils.getDocumentBuilder().parse(
-	                    templateInputStream);
-	        } catch (Exception ex) {
-	            throw new IllegalStateException(
-	                    "Could not open jasperreports-bean-config-template.xml file",
-	                    ex);
-	        }
-	
-	        Element configElement = (Element) reportBeanConfigDocument
-	                .getDocumentElement();
-	        Element bean = XmlUtils.findFirstElement("/config/bean", configElement);
-	
-	        // Set the right attributes dynamically
-	        bean.setAttribute("id", reportBeanId);
-	        bean.setAttribute("class", classMultiFormatView);
-	        bean.setAttribute("p:url", "/WEB-INF/reports/".concat(reportBeanId)
-	                .concat(".jrxml"));
-	        bean.setAttribute("p:reportDataKey", reportName.concat("List"));
-	
-	        // Add the new bean handling the new report view
-	        Element rootElement = (Element) jasperViewsConfigDocument
-	                .getFirstChild();
-	        Node importedBean = jasperViewsConfigDocument.importNode(bean, true);
-	        rootElement.appendChild(importedBean);
-	        jasperViewsConfigOutStream = mutableJasperViewsConfigFile.getOutputStream();
-	        XmlUtils.writeXml(jasperViewsConfigOutStream,
-	                jasperViewsConfigDocument);
+            templateInputStream = FileUtils.getInputStream(getClass(),
+                    "jasperreports-bean-config-template.xml");
+            Document reportBeanConfigDocument;
+            try {
+                reportBeanConfigDocument = XmlUtils.getDocumentBuilder().parse(
+                        templateInputStream);
+            }
+            catch (Exception ex) {
+                throw new IllegalStateException(
+                        "Could not open jasperreports-bean-config-template.xml file",
+                        ex);
+            }
 
-        } finally {
-        	IOUtils.closeQuietly(templateInputStream);
-        	IOUtils.closeQuietly(jasperViewsConfigOutStream);
+            Element configElement = (Element) reportBeanConfigDocument
+                    .getDocumentElement();
+            Element bean = XmlUtils.findFirstElement("/config/bean",
+                    configElement);
+
+            // Set the right attributes dynamically
+            bean.setAttribute("id", reportBeanId);
+            bean.setAttribute("class", classMultiFormatView);
+            bean.setAttribute("p:url", "/WEB-INF/reports/".concat(reportBeanId)
+                    .concat(".jrxml"));
+            bean.setAttribute("p:reportDataKey", reportName.concat("List"));
+
+            // Add the new bean handling the new report view
+            Element rootElement = (Element) jasperViewsConfigDocument
+                    .getFirstChild();
+            Node importedBean = jasperViewsConfigDocument
+                    .importNode(bean, true);
+            rootElement.appendChild(importedBean);
+            jasperViewsConfigOutStream = mutableJasperViewsConfigFile
+                    .getOutputStream();
+            XmlUtils.writeXml(jasperViewsConfigOutStream,
+                    jasperViewsConfigDocument);
+
+        }
+        finally {
+            IOUtils.closeQuietly(templateInputStream);
+            IOUtils.closeQuietly(jasperViewsConfigOutStream);
         }
 
         fileManager.scan();
@@ -559,7 +570,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
      * </ul>
      * The jrxml is copied to the WEB-INF/reports foder with the name
      * entity_report_name.jrxml
-     *
+     * 
      * @param installedReport
      * @param fromBackingObject
      */
@@ -567,10 +578,14 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
             JavaType fromBackingObject) {
         // Check if a jrxml file exists
         PathResolver pathResolver = projectOperations.getPathResolver();
-        String reportJrXml = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/reports/"
-                        .concat(fromBackingObject.getSimpleTypeName().toLowerCase())
-                        .concat("_").concat(installedReport.toLowerCase()).concat(".jrxml"));
+        String reportJrXml = pathResolver
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        "WEB-INF/reports/"
+                                .concat(fromBackingObject.getSimpleTypeName()
+                                        .toLowerCase()).concat("_")
+                                .concat(installedReport.toLowerCase())
+                                .concat(".jrxml"));
 
         if (fileManager.exists(reportJrXml)) {
             // We can't modify the existing jrxml file just in case the user has
@@ -580,7 +595,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
         // Get member details of fromBackingObject type
         MemberDetails memberDetails = getMemberDetails(fromBackingObject);
-        List<FieldMetadata> elegibleFields = webMetadataService.getScaffoldEligibleFieldMetadata(fromBackingObject,
+        List<FieldMetadata> elegibleFields = webMetadataService
+                .getScaffoldEligibleFieldMetadata(fromBackingObject,
                         memberDetails, governorPhysicalTypeMetadata.getId());
         /*
          * We only use 3 fields in the sample report. By now we only use field
@@ -603,7 +619,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         Document jrxml;
         try {
             jrxml = XmlUtils.getDocumentBuilder().parse(templateInputStream);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IllegalStateException(
                     "Could not open JasperReport-template.jrxml file", ex);
         }
@@ -668,10 +685,10 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                             fieldMetadata.getFieldType()
                                     .getFullyQualifiedTypeName())
                     .addChild(
-                            jrxml.createCDATASection("$F{"
-                                    .concat(fieldMetadata.getFieldName()
-                                            .getSymbolName())
-                                    .concat("}"))).build());
+                            jrxml.createCDATASection("$F{".concat(
+                                    fieldMetadata.getFieldName()
+                                            .getSymbolName()).concat("}")))
+                    .build());
             detailBand.appendChild(textField);
             // Increment xPos for the next text box
             xPos += (Integer.parseInt(fTextW) + 1);
@@ -680,8 +697,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         // We are sure that reportJrXml file doesn't exist so we can write it
         // with the jrxml document content
         MutableFile mutableFile = fileManager.createFile(reportJrXml);
-        Validate.notNull(mutableFile, "Could not create jrxml file '"
-                .concat(reportJrXml).concat("'"));
+        Validate.notNull(mutableFile,
+                "Could not create jrxml file '".concat(reportJrXml).concat("'"));
 
         try {
             // Build a string representation of the jrxml
@@ -694,18 +711,19 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
             // file has different contents)
             InputStream inputStream = null;
             OutputStream outputStream = null;
-            try { 
-	            inputStream = IOUtils.toInputStream(jrxmlContent);
-	            outputStream = mutableFile.getOutputStream();
-	            IOUtils.copy(inputStream, outputStream);
+            try {
+                inputStream = IOUtils.toInputStream(jrxmlContent);
+                outputStream = mutableFile.getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
             }
             finally {
-	            IOUtils.closeQuietly(inputStream);
-	            IOUtils.closeQuietly(outputStream);
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
             }
-        } catch (IOException ioe) {
-            throw new IllegalStateException("Could not output '"
-                    .concat(mutableFile.getCanonicalPath()).concat("'"), ioe);
+        }
+        catch (IOException ioe) {
+            throw new IllegalStateException("Could not output '".concat(
+                    mutableFile.getCanonicalPath()).concat("'"), ioe);
         }
 
     }
@@ -714,7 +732,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
      * Install the Java file CustomJasperReportsMultiFormatView.java as part of
      * the web package. The sub-package will be
      * <b>controller_package.servlet.view.jasperreports</b>
-     *
+     * 
      * @return Qualified name of the installed Java file without extension
      */
     private String installCustomJasperReportMultiFormatView() {
@@ -724,7 +742,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                 .concat(".servlet.view.jasperreports");
         String customMultiFormatViewPath = projectOperations.getPathResolver()
                 .getIdentifier(
-                		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                        LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                         customMultiFormatViewPackage.replace(".",
                                 File.separator).concat(
                                 "/CustomJasperReportsMultiFormatView.java"));
@@ -733,12 +751,14 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         if (!fileManager.exists(customMultiFormatViewPath)) {
             mutableCustomMultiFormatViewClass = fileManager
                     .createFile(customMultiFormatViewPath);
-            InputStream template = FileUtils.getInputStream(
+            InputStream template = FileUtils
+                    .getInputStream(
                             getClass(),
                             "web/servlet/view/jasperreports/CustomJasperReportsMultiFormatView-template.java");
             String javaTemplate;
             try {
-                javaTemplate = IOUtils.toString(new InputStreamReader(template));
+                javaTemplate = IOUtils
+                        .toString(new InputStreamReader(template));
 
                 // Replace package definition
                 javaTemplate = StringUtils.replace(javaTemplate, "${PACKAGE}",
@@ -747,21 +767,24 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                 // Write final java file
                 InputStream inputStream = null;
                 OutputStream outputStream = null;
-                try { 
-	                inputStream = IOUtils.toInputStream(javaTemplate);
-	                outputStream = mutableCustomMultiFormatViewClass.getOutputStream();
-	                IOUtils.copy(inputStream, outputStream);
+                try {
+                    inputStream = IOUtils.toInputStream(javaTemplate);
+                    outputStream = mutableCustomMultiFormatViewClass
+                            .getOutputStream();
+                    IOUtils.copy(inputStream, outputStream);
                 }
                 finally {
-	                IOUtils.closeQuietly(inputStream);
-	                IOUtils.closeQuietly(outputStream);
+                    IOUtils.closeQuietly(inputStream);
+                    IOUtils.closeQuietly(outputStream);
                 }
-            } catch (IOException ioe) {
+            }
+            catch (IOException ioe) {
                 throw new IllegalStateException(
                         "Unable load CustomJasperReportsMultiFormatView-template.java template",
                         ioe);
-            } finally {
-            	IOUtils.closeQuietly(template);
+            }
+            finally {
+                IOUtils.closeQuietly(template);
             }
         }
 
@@ -771,14 +794,14 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
     /**
      * Return the member details of the given Type
-     *
+     * 
      * @param type
      * @return
      */
     private MemberDetails getMemberDetails(JavaType type) {
         PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
                 .get(PhysicalTypeIdentifier.createIdentifier(type,
-                		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
+                        LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
         Validate.notNull(
                 formBackingObjectPhysicalTypeMetadata,
                 "Unable to obtain physical type metdata for type "
@@ -793,7 +816,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
     /**
      * Return an string with the following content: <b>{"format1","format2"}</b>
      * as many fromatX as reportFromats values.
-     *
+     * 
      * @param reportFormats
      * @return
      */
@@ -811,14 +834,14 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
      * Given a reportName returns the name for the controller method
      * "generate<reportName>". If isForm = true, it will add "Form" to the
      * returned method name.
-     *
+     * 
      * @param reportName
      * @param isForm
      */
     public static String generateMethodName(String reportName, boolean isForm) {
         String methodName = "generate" + StringUtils.capitalize(reportName);
 
-        if (isForm){
+        if (isForm) {
             methodName = methodName.concat("Form");
         }
         return methodName;
@@ -826,7 +849,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
     /**
      * Strip a report|format string in 2 parts
-     *
+     * 
      * @param definedReport
      * @return string[0]=reportname, string[1]=format
      */
@@ -839,7 +862,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
     /**
      * Check if formats are a comma separated value matching supported report
      * formats.
-     *
+     * 
      * @param formats
      * @return
      */
@@ -862,7 +885,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
     /**
      * Update the format part in the value of a report definition in the
      * {@link GvNIXReports}
-     *
+     * 
      * @param oldFormats
      * @param formats
      * @return
@@ -912,7 +935,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
+    public static final String createIdentifier(JavaType javaType,
+            LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }

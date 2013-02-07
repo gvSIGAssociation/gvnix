@@ -1,20 +1,20 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
+ * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
+ * Valenciana
+ * 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.screen.roo.addon;
 
@@ -57,55 +57,73 @@ import org.springframework.roo.project.LogicalPath;
  */
 public class PatternMetadata extends AbstractPatternMetadata {
 
-    private static final String PROVIDES_TYPE_STRING = PatternMetadata.class.getName();
-    private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
+    private static final String PROVIDES_TYPE_STRING = PatternMetadata.class
+            .getName();
+    private static final String PROVIDES_TYPE = MetadataIdentificationUtils
+            .create(PROVIDES_TYPE_STRING);
 
-    public PatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, MemberDetails controllerDetails,
-    		WebScaffoldMetadata webScaffoldMetadata, List<StringAttributeValue> patterns, PhysicalTypeMetadata entityMetadata, 
-    		SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities, SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields,
-    		Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates, Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes) {
-    	
-        super(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patterns,
-        		entityMetadata, relatedEntities, relatedFields, relatedDates, entityDateTypes);
+    public PatternMetadata(
+            String mid,
+            JavaType aspect,
+            PhysicalTypeMetadata controllerMetadata,
+            MemberDetails controllerDetails,
+            WebScaffoldMetadata webScaffoldMetadata,
+            List<StringAttributeValue> patterns,
+            PhysicalTypeMetadata entityMetadata,
+            SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities,
+            SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields,
+            Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates,
+            Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes) {
+
+        super(mid, aspect, controllerMetadata, controllerDetails,
+                webScaffoldMetadata, patterns, entityMetadata, relatedEntities,
+                relatedFields, relatedDates, entityDateTypes);
 
         if (!isValid()) {
-        
-        	// This metadata instance not be already produced at the time of instantiation (will retry)
+
+            // This metadata instance not be already produced at the time of
+            // instantiation (will retry)
             return;
         }
-        
-        List<String> registerPatterns = getPatternTypeDefined(WebPatternType.register, this.patterns);
+
+        List<String> registerPatterns = getPatternTypeDefined(
+                WebPatternType.register, this.patterns);
         if (!registerPatterns.isEmpty()) {
-        	
-        	// TODO findEntries method required on this pattern ?
-            if (entityTypeDetails.getPersistenceDetails().getFindEntriesMethod() == null) {
-            	
-            	// TODO: If no find entries method, all other patterns are not generated ?
+
+            // TODO findEntries method required on this pattern ?
+            if (entityTypeDetails.getPersistenceDetails()
+                    .getFindEntriesMethod() == null) {
+
+                // TODO: If no find entries method, all other patterns are not
+                // generated ?
                 return;
             }
-            
+
             for (String registerPattern : registerPatterns) {
-            	
-	            builder.addMethod(getCreateMethod(registerPattern));
-	            builder.addMethod(getUpdateMethod(registerPattern));
+
+                builder.addMethod(getCreateMethod(registerPattern));
+                builder.addMethod(getUpdateMethod(registerPattern));
             }
         }
-        
-        List<String> tabularEditPatterns = getPatternTypeDefined(WebPatternType.tabular_edit_register, this.patterns);
+
+        List<String> tabularEditPatterns = getPatternTypeDefined(
+                WebPatternType.tabular_edit_register, this.patterns);
         if (!tabularEditPatterns.isEmpty()) {
 
-        	// TODO findAll method required on this pattern ?
+            // TODO findAll method required on this pattern ?
             if (entityTypeDetails.getPersistenceDetails().getFindAllMethod() == null) {
-            	
-            	// TODO: If no find all method, all other patterns are not generated ?
+
+                // TODO: If no find all method, all other patterns are not
+                // generated ?
                 return;
             }
-            
+
             for (String tabularEditPattern : tabularEditPatterns) {
-            	
-            	// Method only exists when this is a detail pattern (has master entity)
-	            builder.addMethod(getCreateMethod(tabularEditPattern));
-	            builder.addMethod(getUpdateMethod(tabularEditPattern));
+
+                // Method only exists when this is a detail pattern (has master
+                // entity)
+                builder.addMethod(getCreateMethod(tabularEditPattern));
+                builder.addMethod(getUpdateMethod(tabularEditPattern));
             }
         }
 
@@ -115,17 +133,18 @@ public class PatternMetadata extends AbstractPatternMetadata {
     }
 
     protected MethodMetadata getCreateMethod(String patternName) {
-    	
-    	// TODO Some code duplicated with same method in RelatedPatternMetadata
-    	
+
+        // TODO Some code duplicated with same method in RelatedPatternMetadata
+
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("createPattern" + patternName);
+        JavaSymbolName methodName = new JavaSymbolName("createPattern"
+                + patternName);
 
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
-        
+
         getRequestParam(methodParamNames, methodParamTypes);
-        
+
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
             // If it already exists, just return null and omit its
@@ -151,18 +170,16 @@ public class PatternMetadata extends AbstractPatternMetadata {
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        bodyBuilder
-        .appendFormalLine("return \""
-                .concat("redirect:/")
+        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
                 .concat(entityNamePlural.toLowerCase())
                 .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
-        
+
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
-        methodBuilder
-                .setAnnotations(getRequestMappingAnnotationCreateUpdate(RequestMethod.POST, patternName));
+        methodBuilder.setAnnotations(getRequestMappingAnnotationCreateUpdate(
+                RequestMethod.POST, patternName));
 
         method = methodBuilder.build();
         controllerMethods.add(method);
@@ -170,21 +187,23 @@ public class PatternMetadata extends AbstractPatternMetadata {
     }
 
     protected MethodMetadata getUpdateMethod(String patternName) {
-    	
-    	// TODO Some code duplicated with same method in RelatedPatternMetadata
+
+        // TODO Some code duplicated with same method in RelatedPatternMetadata
 
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("updatePattern" + patternName);
+        JavaSymbolName methodName = new JavaSymbolName("updatePattern"
+                + patternName);
 
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
-        
+
         getRequestParam(methodParamNames, methodParamTypes);
-        
+
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-        	
-            // If it already exists, just return null and omit its generation via the ITD
+
+            // If it already exists, just return null and omit its generation
+            // via the ITD
             return null;
         }
 
@@ -214,8 +233,8 @@ public class PatternMetadata extends AbstractPatternMetadata {
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
-        methodBuilder
-                .setAnnotations(getRequestMappingAnnotationCreateUpdate(RequestMethod.PUT, patternName));
+        methodBuilder.setAnnotations(getRequestMappingAnnotationCreateUpdate(
+                RequestMethod.PUT, patternName));
 
         method = methodBuilder.build();
         controllerMethods.add(method);
@@ -225,28 +244,33 @@ public class PatternMetadata extends AbstractPatternMetadata {
     // Typically, no changes are required beyond this point
 
     public static final String getMetadataIdentiferType() {
-    	
+
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType controller, LogicalPath path) {
-    	
-        return PhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, controller, path);
+    public static final String createIdentifier(JavaType controller,
+            LogicalPath path) {
+
+        return PhysicalTypeIdentifierNamingUtils.createIdentifier(
+                PROVIDES_TYPE_STRING, controller, path);
     }
 
     public static final JavaType getJavaType(String mid) {
-    	
-        return PhysicalTypeIdentifierNamingUtils.getJavaType(PROVIDES_TYPE_STRING, mid);
+
+        return PhysicalTypeIdentifierNamingUtils.getJavaType(
+                PROVIDES_TYPE_STRING, mid);
     }
 
     public static final LogicalPath getPath(String mid) {
-    	
-        return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, mid);
+
+        return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
+                mid);
     }
 
     public static boolean isValid(String mid) {
-    	
-        return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING, mid);
+
+        return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING,
+                mid);
     }
-    
+
 }
