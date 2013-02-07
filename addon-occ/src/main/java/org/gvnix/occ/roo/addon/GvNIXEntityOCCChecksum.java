@@ -54,8 +54,8 @@ public @interface GvNIXEntityOCCChecksum {
      * <code>occChecksum</code> is the default value.
      * </p>
      * 
-     * @return the name of the identifier field to use (defaults to "id"; must be
-     *         provided)
+     * @return the name of the identifier field to use (defaults to "id"; must
+     *         be provided)
      */
     String fieldName() default "occChecksum";
 

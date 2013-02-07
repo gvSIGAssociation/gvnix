@@ -139,9 +139,9 @@ public class WSExportMetadata extends
      * exists.
      * 
      * @param annotationMetadata to retrieve selected values to
-     *            @javax.jws.WebService
-     * @return the annotation is already exists or will be created, or null if it
-     *         will not be created (required)
+     * @javax.jws.WebService
+     * @return the annotation is already exists or will be created, or null if
+     *         it will not be created (required)
      */
     public AnnotationMetadata getWebServiceAnnotation(
             AnnotationMetadata annotationMetadata) {
@@ -186,8 +186,8 @@ public class WSExportMetadata extends
      * 
      * @param annotationMetadata to check if exists SOAPBinding parameter type
      *            value defined.
-     * @return the annotation is already exists or will be created, or null if it
-     *         will not be created (required)
+     * @return the annotation is already exists or will be created, or null if
+     *         it will not be created (required)
      */
     public AnnotationMetadata getSoapBindingAnnotation(
             AnnotationMetadata annotationMetadata) {
