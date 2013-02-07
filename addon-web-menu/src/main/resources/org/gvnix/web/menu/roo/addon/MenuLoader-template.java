@@ -30,8 +30,8 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -58,7 +58,7 @@ public class MenuLoader extends WebApplicationObjectSupport {
   /** Key to store Menu in application context */
   public static final String MENU_SERVLET_CONTEXT_KEY = "gvnixMenu";
 
-  public static final String MENU_MENU_ITEM_XML_ELEMENT_NAME = "menu-item";
+  public static final String MENU_ITEM_ELEMENT = "menu-item";
 
   /**
    * Calls to {@link #loadMenu()} and set the menu to the {@link ServletContext}
@@ -142,7 +142,7 @@ public class MenuLoader extends WebApplicationObjectSupport {
     for(int i = 0; i < nodes.getLength(); i++) {
       Node node = nodes.item(i);
       if (node.getNodeType() != Node.ELEMENT_NODE
-          || !MENU_MENU_ITEM_XML_ELEMENT_NAME.equals(node.getNodeName())) {
+          || !MENU_ITEM_ELEMENT.equals(node.getNodeName())) {
         continue;
       }
 

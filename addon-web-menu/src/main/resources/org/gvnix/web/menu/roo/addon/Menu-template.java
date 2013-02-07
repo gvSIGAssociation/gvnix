@@ -37,12 +37,20 @@ public class Menu {
   private List<MenuItem> children = new ArrayList<MenuItem>();
 
   protected Menu(String id) {
-    if (id != null) {
-      this.id = id;
+    if (id == null) {
+    	this.id = "_menu";
     }
     else {
-      this.id = "_menu";
+    	this.id = id;
     }
+  }
+  
+  /**
+   * Gets menu id
+   * @return
+   */
+  public String getId(){
+	  return this.id;
   }
 
   /**

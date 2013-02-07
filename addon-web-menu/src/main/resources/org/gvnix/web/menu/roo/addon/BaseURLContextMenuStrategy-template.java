@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -43,7 +44,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public abstract class BaseURLContextMenuStrategy implements ContextMenuStrategy {
 
-  protected static Pattern ELPattern = Pattern.compile(".*[$][{].*[}]");
+  private static final Pattern EL_PATTERN = Pattern.compile(".*[$][{].*[}]");
 
   /**
    * Get current {@link MenuItem} based on the <code>request</code> URL
@@ -147,15 +148,15 @@ public abstract class BaseURLContextMenuStrategy implements ContextMenuStrategy 
    */
   protected boolean isSameDestination(HttpServletRequest request,
                                       ServletContext jspContext, String path1,
-                                      TreeSet<String> paramNames,
+                                      Set<String> paramNames,
                                       Map<String, String> paramValues,
                                       String destination2) {
 
-    if (destination2 == null || destination2.length() == 0) {
+    if (destination2 == null || destination2.isEmpty()) {
       return false;
     }
 
-    int questionCharIndes2 = destination2.indexOf("?");
+    int questionCharIndes2 = destination2.indexOf('?');
 
     // Url's files have the same size.
     String path2;
@@ -186,16 +187,19 @@ public abstract class BaseURLContextMenuStrategy implements ContextMenuStrategy 
       return false;
     }
 
-    String[] paramTokens2 = query2.split("[&]");
+    String[] paramTokens2 = new String[] {};
+    if (query2 != null) {
+    	paramTokens2 = query2.split("[&]");
+    }
 
-    TreeSet<String> paramNames2 = new TreeSet<String>();
+    Set<String> paramNames2 = new TreeSet<String>();
     Map<String, String> paramValues2 = new HashMap<String, String>();
 
     String paramName;
     String paramValue;
     int equalCharIndex;
     for (String paramToken : paramTokens2) {
-      equalCharIndex = paramToken.indexOf("=");
+      equalCharIndex = paramToken.indexOf('=');
       if (equalCharIndex < 0) {
         paramName = paramToken;
         paramValue = null;
@@ -228,7 +232,7 @@ public abstract class BaseURLContextMenuStrategy implements ContextMenuStrategy 
       }
       paramValue = paramValues.get(paramName);
       paramValue2 = paramValues2.get(paramName2);
-      if (paramValue2 != null && ELPattern.matcher(paramValue2).matches()) {
+      if (paramValue2 != null && EL_PATTERN.matcher(paramValue2).matches()) {
         continue;
       }
       if (!hasText(paramValue)) {
@@ -248,6 +252,6 @@ public abstract class BaseURLContextMenuStrategy implements ContextMenuStrategy 
     if (var == null) {
       return false;
     }
-    return var.trim().length() > 0;
+    return var.trim().isEmpty();
   }
 }

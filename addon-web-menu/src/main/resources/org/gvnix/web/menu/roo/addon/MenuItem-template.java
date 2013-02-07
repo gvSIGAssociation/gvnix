@@ -34,11 +34,11 @@ public class MenuItem {
 
   private MenuItem parent;
 
-  private String url;
-  private String id;
-  private String messageCode;
-  private String roles;
-  private boolean hidden = false;
+  private final String url;
+  private final String id;
+  private final String messageCode;
+  private final String roles;
+  private final boolean hidden;
   private List<MenuItem> children = null;
 
   /** If label is null, menu will use labelCode to load the label from I18N properties */
@@ -58,6 +58,8 @@ public class MenuItem {
     this.roles = element.getAttribute("roles");
     if (element.hasAttribute("hidden")) {
       this.hidden = Boolean.parseBoolean(element.getAttribute("hidden"));
+    } else {
+      this.hidden = false; 
     }
   }
 
@@ -190,6 +192,9 @@ public class MenuItem {
     return path.toString();
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -206,40 +211,78 @@ public class MenuItem {
     return result;
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj) {
+    	return true;
+    }
+    if (obj == null){
+    	return false;
+    }
+    if (getClass() != obj.getClass()) {
+    	return false;
+    }
     MenuItem other = (MenuItem) obj;
     if (url == null) {
-      if (other.url != null) return false;
+      if (other.url != null) {
+    	  return false;
+      }
     }
-    else if (!url.equals(other.url)) return false;
-    if (hidden != other.hidden) return false;
+    else if (!url.equals(other.url)) {
+    	return false;
+    }
+    if (hidden != other.hidden) {
+    	return false;
+    }
     if (parent == null) {
-      if (other.parent != null) return false;
+      if (other.parent != null) {
+    	  return false;
+      }
     }
-    else if (!parent.equals(other.parent)) return false;
+    else if (!parent.equals(other.parent)) {
+    	return false;
+    }
     if (roles == null) {
-      if (other.roles != null) return false;
+      if (other.roles != null) {
+    	  return false;
+      }
     }
-    else if (!roles.equals(other.roles)) return false;
+    else if (!roles.equals(other.roles)) {
+    	return false;
+    }
     if (id == null) {
-      if (other.id != null) return false;
+      if (other.id != null) {
+    	  return false;
+      }
     }
-    else if (!id.equals(other.id)) return false;
+    else if (!id.equals(other.id)) {
+    	return false;
+    }
     if (labelCode == null) {
-      if (other.labelCode != null) return false;
+      if (other.labelCode != null) {
+    	  return false;
+      }
     }
-    else if (!labelCode.equals(other.labelCode)) return false;
+    else if (!labelCode.equals(other.labelCode)) {
+    	return false;
+    }
     if (messageCode == null) {
-      if (other.messageCode != null) return false;
+      if (other.messageCode != null) {
+    	  return false;
+      }
     }
-    else if (!messageCode.equals(other.messageCode)) return false;
+    else if (!messageCode.equals(other.messageCode)) {
+    	return false;
+    }
     return true;
   }
 
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
     return "MenuItem [".concat("ID=").concat(id).concat(", link=")

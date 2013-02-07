@@ -14,7 +14,7 @@ import ${PACKAGE_DIALOG}.Dialog;
 public class MessageMappingExceptionResolver extends
     SimpleMappingExceptionResolver {
 
-   private static final String DEFAULT_DIALOGMESSAGE_ATTRIBUTE = "dialogMessage";
+   private static final String DIALOGMESSAGE_ATTRIBUTE = "dialogMessage";
 
   /**
    * Actually resolve the given exception that got thrown during on handler
@@ -35,10 +35,11 @@ public class MessageMappingExceptionResolver extends
   protected ModelAndView doResolveException(HttpServletRequest request,
                                             HttpServletResponse response,
                                             Object handler, Exception ex) {
-
+	  
+    Exception theEx = ex;
     Throwable rootCauseException = ExceptionUtils.getRootCause(ex);
     if (rootCauseException != null) {
-      ex = (Exception) rootCauseException;
+      theEx = (Exception) rootCauseException;
     }
 
     String referer = request.getHeader("Referer");
@@ -58,7 +59,7 @@ public class MessageMappingExceptionResolver extends
       applyStatusCodeIfPossible(request, response, statusCode);
     }
 
-    modalDialog(request, ex);
+    modalDialog(request, theEx);
 
     // We don't need to add anything to the ViewModel since we use
     // attribute session because we have redirect
@@ -87,6 +88,6 @@ public class MessageMappingExceptionResolver extends
       page = "/WEB-INF/views/".concat(page).concat(".jspx");
     }
     Dialog modalDialog = new Dialog(page, ex);
-    session.setAttribute(DEFAULT_DIALOGMESSAGE_ATTRIBUTE, modalDialog);
+    session.setAttribute(DIALOGMESSAGE_ATTRIBUTE, modalDialog);
   }
 }
