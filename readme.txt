@@ -257,15 +257,27 @@ For more information generate and read the *gvNIX Developer Guide* (Spanish).
 # This will create the guide in the "target/site/developer" directory (in several formats)::
 
     target
+    |-- docbkx
+    |	`-- pdf
+    |		`-- index.pdf (reference guide)
     `-- site
-        `-- developer
+    	|-- index.html
+        |-- developer
+        |   |-- html
+        |   |   |-- index.html
+        |   |   `-- ...
+        |   `-- html-single
+        |       `-- index.html
+        `-- reference
             |-- html
             |   |-- index.html
             |   `-- ...
-            |-- html-single
-            |   `-- index.html
-            `-- pdf
-                `-- gvNIX-referencia.pdf
+            `-- html-single
+                `-- index.html
+
+The *gvNIX Reference Guide* (Spanish) is the documentation for developing projects with the framework.
+
+# And will create a site with the project summary (index.html).
 
 Write doc
 ---------
