@@ -277,7 +277,7 @@ For more information generate and read the *gvNIX Developer Guide* (Spanish).
 
 The *gvNIX Reference Guide* (Spanish) is the documentation for developing projects with the framework.
 
-# And will create a site with the project summary (index.html).
+# And will create a site with the project summary (target/site/index.html).
 
 Write doc
 ---------
