@@ -34,17 +34,17 @@
     <version>1.1.0</version>
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
-  <artifactId>org.gvnix.web.i18n.roo.addon</artifactId>
+  <artifactId>org.gvnix.web.typicalsecurity.roo.addon</artifactId>
   <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Co-official languages of Spain</name>
+  <name>gvNIX - Spring Roo - Addon - Typical Security</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
-  <description>Spain co-official languages support for Spring Roo Web MVC JSP Scaffolding; #mvc,#localization,locale:ca</description>
+  <description>This is an Addon which helps developer quick setup Typical Security setup for their project.</description>
   <url>http://www.gvnix.org</url>
-  
-  <dependencies>
 
+  <dependencies>
+  
     <!-- OSGi -->
     <dependency>
       <groupId>org.osgi</groupId>
@@ -60,15 +60,15 @@
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.scr.annotations</artifactId>
     </dependency>
-
+    
     <!-- Roo -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.web.mvc.jsp</artifactId>
+      <artifactId>org.springframework.roo.project</artifactId>
     </dependency>
-    
+
   </dependencies>
-  
+
   <!-- DiSiD: Add google code distribution management -->
   <distributionManagement>
     <repository>
@@ -76,7 +76,7 @@
       <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
     </repository>
   </distributionManagement>
-
+  
   <build>
   
     <!-- DiSiD: Add webdav extension to google code  -->
@@ -87,14 +87,14 @@
         <version>2.3</version>
       </extension>
     </extensions>
-    
+
   </build>
 
   <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
-    <repo.folder>org/gvnix/web/i18n/roo/addon</repo.folder>
+    <repo.folder>org/gvnix/web/typicalsecurity/roo/addon</repo.folder>
   </properties>
   
 </project>

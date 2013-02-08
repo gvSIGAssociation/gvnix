@@ -85,7 +85,6 @@ fi
 
 # Copy gvNIX build modules together Roo build modules 
 cp target/all/org.gvnix.* roo/target/all
-cp target/all/com.xsoftwarelabs.spring.roo.addon.typicalsecurity* roo/target/all
 cp target/all/org.springframework.flex.roo.addon* roo/target/all
 
 # Change to Roo deployment folder 
