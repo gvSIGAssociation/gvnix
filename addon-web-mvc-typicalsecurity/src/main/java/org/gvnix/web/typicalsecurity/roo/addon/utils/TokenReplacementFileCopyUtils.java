@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.xsoftwarelabs.spring.roo.addon.typicalsecurity.utils;
+package org.gvnix.web.typicalsecurity.roo.addon.utils;
 
 import java.io.IOException;
 import java.io.InputStream;

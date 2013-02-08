@@ -186,7 +186,7 @@ project ...
       <term>binding.roo</term>
 
       <listitem>
-        <para>Mismo ejemplo que clinic.roo configurando el guardadi de nulo en
+        <para>Mismo ejemplo que clinic.roo configurando el guardado de nulo en
         lugar de cadenas vacías en base de datos.</para>
       </listitem>
     </varlistentry>
@@ -198,6 +198,16 @@ project ...
         <para>Ejemplo de una aplicación aplicando distintos patrones de
         visualización de la información en pantalla de entidades y sus
         relaciones.</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>typicalsecurity.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo configurando la seguridad
+        de acceso a la aplicación mediante usuarios almacenados en base
+        de datos.</para>
       </listitem>
     </varlistentry>
   </variablelist>

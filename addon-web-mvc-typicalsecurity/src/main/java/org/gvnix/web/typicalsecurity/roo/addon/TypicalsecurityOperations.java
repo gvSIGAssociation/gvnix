@@ -1,4 +1,4 @@
-package com.xsoftwarelabs.spring.roo.addon.typicalsecurity;
+package org.gvnix.web.typicalsecurity.roo.addon;
 
 /**
  * Interface of commands that are available via the Roo shell.

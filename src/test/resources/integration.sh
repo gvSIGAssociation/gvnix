@@ -322,6 +322,18 @@
 	cd ..
 
 ##
+## gvNIX typicalsecurity add-on
+##
+	
+	## typicalsecurity
+	echo typicalsecurity
+	mkdir typicalsecurity
+	cd typicalsecurity
+	$1/gvnix.sh script --file $2/code/addon-web-mvc-typicalsecurity/src/main/resources/typicalsecurity.roo --lineNumbers true
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	cd ..
+
+##
 ## gvNIX theme add-on
 ##
 	

@@ -1,4 +1,4 @@
-package com.xsoftwarelabs.spring.roo.addon.typicalsecurity;
+package org.gvnix.web.typicalsecurity.roo.addon;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
