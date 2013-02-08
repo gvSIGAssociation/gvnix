@@ -1,0 +1,164 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package __TARGET_PACKAGE__;
+
+import static org.junit.Assert.*;
+
+import java.net.URL;
+
+import javax.xml.namespace.QName;
+
+import static org.mockito.Mockito.*;
+
+import org.apache.axis.client.Call;
+import org.apache.axis.client.Service;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * Test for {@link ServerWSAuthBindingStub} class
+ * 
+ * @author jmvivo <a href="mailto:jmvivo@disid.com">Jose manuel
+ *         Vivó Arnal</a>
+ *
+ */
+public class ServerWSAuthBindingStubTest {
+
+	private static final String ENDPOINT_URL = "http://localhost:8888";
+	private static final String VALIDA_OP_NAME = "valida";
+	private static final String VALIDA_LDAP_OP_NAME = "valida_ldap";
+	private static final String VALIDA_ACTION_URI = "urn:WSAuth#WSAuth#"
+			.concat(VALIDA_OP_NAME);
+	private static final String VALIDA_LDAP_ACTION_URI = "urn:WSAuth#WSAuth#"
+			.concat(VALIDA_LDAP_OP_NAME);
+	private static final String USER_PASSWORD = "password";
+	private static final String USER_NAME = "user";
+	private static final String CIT_LOGIN = "myApp";
+	private static final String CIT_LOGIN_PWD = "myApp";
+	private static final String APP_NAME = "myApp";
+
+	private Service service;
+	private ServerWSAuthBindingStub stub;
+	private Call call;
+	private CredencialCIT credencial;
+
+	/**
+	 * Initialize class and mocks method
+	 * 
+	 * @throws Exception
+	 */
+	@Before
+	public void init() throws Exception {
+		credencial = new CredencialCIT(CIT_LOGIN, CIT_LOGIN_PWD);
+		service = mock(org.apache.axis.client.Service.class);
+		stub = new ServerWSAuthBindingStub(new URL(ENDPOINT_URL),service);
+		call = mock(Call.class);
+		when(service.createCall()).thenReturn(call);
+	}
+
+	/**
+	 * Test {@link ServerWSAuthBindingStub#valida(CredencialCIT, String, String, String)}
+	 * method
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testValida() throws Exception {
+		ValidaStruct expected = createSampleValidaStruct();
+		when(call.invoke(new Object[] { credencial, USER_NAME, USER_PASSWORD,
+				APP_NAME })).thenReturn(expected);
+		ValidaStruct result = stub.valida(credencial, USER_NAME, USER_PASSWORD,
+				APP_NAME);
+		assertEquals(expected, result);
+
+		verifyCallObjectCalls(VALIDA_ACTION_URI, VALIDA_OP_NAME);
+	}
+
+	/**
+	 * Test {@link ServerWSAuthBindingStub#valida_ldap(CredencialCIT, String, String, String)
+	 * method
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testValidaLDAP() throws Exception {
+		ValidaStruct expected = createSampleValidaStruct();
+		when(
+				call.invoke(new Object[] { credencial, USER_NAME,
+						USER_PASSWORD, APP_NAME })).thenReturn(expected);
+		ValidaStruct result = stub.valida_ldap(credencial, USER_NAME,
+				USER_PASSWORD, APP_NAME);
+		assertEquals(expected, result);
+
+		verifyCallObjectCalls(VALIDA_LDAP_ACTION_URI, VALIDA_LDAP_OP_NAME);
+	}
+
+	/**
+	 * Verify than expected calls of {@link #call} mock object
+	 * has been performed
+	 * 
+	 * @param actionURI
+	 * @param operationName
+	 */
+	private void verifyCallObjectCalls(String actionURI, String operationName) {
+		verify(call).setSOAPActionURI(actionURI);
+		verify(call).setOperationName(new QName("urn:WSAuth", operationName));
+		verify(call,atLeastOnce()).setSOAPVersion(
+				org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+		verify(call,atLeastOnce()).setUseSOAPAction(true);
+
+	}
+
+	/**
+	 * Creates a Sample {@link ValidaStruct}
+	 * <br>
+	 * The contents of result object is not important 
+	 * 
+	 * @return
+	 */
+	private ValidaStruct createSampleValidaStruct() {
+		ValidaStruct newValidaStruct = new ValidaStruct();
+		newValidaStruct.setBd("DB");
+		newValidaStruct.setCodper(5);
+		newValidaStruct.setCorreo("aa@aa.es");
+		newValidaStruct.setCpro("A");
+		newValidaStruct.setCserv("B");
+		newValidaStruct.setDaplicacion("C");
+		newValidaStruct.setDgral("D");
+		newValidaStruct.setModulos(new ModuloStruct[] {
+				new ModuloStruct("M1", "V1", "Dec1", "Tipo1"),
+				new ModuloStruct("M2", "V2", "Dec2", "Tipo2"),
+		});
+		newValidaStruct.setNombre("E");
+		newValidaStruct.setNrp("F");
+		newValidaStruct.setParam1("G");
+		newValidaStruct.setParam2("H");
+		newValidaStruct.setParam3("I");
+		newValidaStruct.setRolusuar("J");
+		newValidaStruct.setTelefono("K");
+		newValidaStruct.setTipo("L");
+		newValidaStruct.setTipousu("M");
+		newValidaStruct.setUltentra("N");
+		newValidaStruct.setUltentra_s("Ñ");
+		newValidaStruct.setUsuario("O");
+		newValidaStruct.setVersion("P");
+		return newValidaStruct;
+	}
+
+}

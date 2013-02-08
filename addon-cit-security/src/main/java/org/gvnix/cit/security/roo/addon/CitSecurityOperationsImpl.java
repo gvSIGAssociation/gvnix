@@ -18,12 +18,7 @@
  */
 package org.gvnix.cit.security.roo.addon;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -39,12 +34,7 @@ import org.springframework.roo.addon.security.SecurityOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.Dependency;
-import org.springframework.roo.project.LogicalPath;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
-import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.*;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -62,28 +52,55 @@ import org.w3c.dom.Element;
 @Service
 public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
+    /**
+     * Installed classes package
+     */
     public static final String AUTHENTICATION_SUBPACKAGE = ".security.authentication.wscit";
 
     static final Integer DEFAUL_SESSION_TIMEOUT = 45;
 
+    /**
+     * Spring Security authentication provider to use
+     */
     private static final String PROVIDER_CLASS_FILENAME = "WscitAuthenticationProvider.java";
 
+    /**
+     * Classes with Spring Security integration
+     */
     private static final String[] JAVA_CLASS_FILENAMES = new String[] {
             PROVIDER_CLASS_FILENAME, "WscitAuthenticationProvider.java",
             "WscitUserAuthority.java", "WscitUser.java", };
 
+    /**
+     * Classes with Web-service client
+     */
     private static final String[] JAVA_WS_CLASS_FILENAMES = new String[] {
             "ServerWSAuthBindingStub.java", "ServerWSAuthPort.java",
             "ServerWSAuthPortProxy.java", "ServerWSAuthService.java",
             "ServerWSAuthServiceLocator.java" };
 
+    /**
+     * Classes with service data structures
+     */
     private static final String[] JAVA_XSD_CLASS_FILENAMES = new String[] {
-            "CredencialCIT.java", "ModuloStruct.java", "ValidaStruct.java" };
+            "CredencialCIT.java", "ModuloStruct.java", "ValidaStruct.java",
+            "StructUtil.java" };
+
+    /**
+     * Test classes
+     */
+    private static final String[] JAVA_TEST_CLASS_FILENAMES = new String[] {
+            "ServerWSAuthBindingStubTest.java",
+            "WscitAuthenticationProviderTest.java" };
 
     private static final String WSAUTH_PROPERTIES_NAME = "CITWSAuth.properties";
 
     private static final Dependency AXIS_DEPENDENCY = new Dependency("axis",
             "axis", "1.4");
+
+    private static final Dependency MOCK_DEPENDENCY = new Dependency(
+            "org.mockito", "mockito-all", "1.8.5", DependencyType.JAR,
+            DependencyScope.TEST);
 
     private static Logger logger = Logger
             .getLogger(CitSecurityOperationsImpl.class.getName());
@@ -128,6 +145,12 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         return getClassesPath() + File.separator + PROVIDER_CLASS_FILENAME;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.cit.security.roo.addon.CitSecurityOperations#isSetupAvailable()
+     */
     public boolean isSetupAvailable() {
         // Si no esta configurada la seguriad pero se puede configurar
         // ya lo haremos nosotros
@@ -151,6 +174,11 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         return !checkIsAlredyInstalled();
     }
 
+    /**
+     * Check if services is already installed on target project
+     * 
+     * @return
+     */
     public boolean checkIsAlredyInstalled() {
         // Si no existe la ruta de nuestas clases no estan instaladas: estamos
         // disponibles
@@ -206,6 +234,13 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                 "/WEB-INF/layouts/layouts.xml");
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.cit.security.roo.addon.CitSecurityOperations#setup(java.lang
+     * .String, java.lang.String, java.lang.String, java.lang.String)
+     */
     public void setup(String url, String login, String password, String appName) {
         // Si no esta configurada la seguriad pero se puede configurar
         // ya lo haremos nosotros
@@ -239,49 +274,63 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
     }
 
+    /**
+     * Add all dependencies needed on target project (if they aren't installed
+     * yet)
+     */
     private void addDependencies() {
-
-        Set<Dependency> dependencies = projectOperations.getFocusedModule()
-                .getDependenciesExcludingVersion(AXIS_DEPENDENCY);
-
-        if (!dependencies.isEmpty()) {
-            Validate.isTrue(dependencies.size() == 1,
-                    "Duplicate AXIS library dependecy");
-            Dependency current = dependencies.iterator().next();
-            String[] currentVersion = current.getVersion().split("[.]");
-            if (currentVersion.length > 1) {
-                String[] requiredVersion = AXIS_DEPENDENCY.getVersion().split(
-                        "[.]");
-                int cur, req;
-                for (int i = 0; i < currentVersion.length
-                        && i < requiredVersion.length; i++) {
-                    try {
-                        cur = Integer.parseInt(currentVersion[i]);
-                        req = Integer.parseInt(requiredVersion[i]);
-                    }
-                    catch (NumberFormatException e) {
-                        // Actualizamos la dependencia por si acaso.
-                        projectOperations.addDependency(
-                                projectOperations.getFocusedModuleName(),
-                                AXIS_DEPENDENCY);
-                        return;
-                    }
-                    if (cur > req) {
-                        // La dependencia actual una versión más nueva:
-                        // no cambiamos
-                        return;
-                    }
-                }
-
-            }
-            else {
-                // no sabemos la versión asumimos que es buena
-                return;
-            }
-
+        if (!isInstalled(AXIS_DEPENDENCY)) {
+            projectOperations.addDependency(
+                    projectOperations.getFocusedModuleName(), AXIS_DEPENDENCY);
         }
-        projectOperations.addDependency(
-                projectOperations.getFocusedModuleName(), AXIS_DEPENDENCY);
+        if (!isInstalled(MOCK_DEPENDENCY)) {
+            projectOperations.addDependency(
+                    projectOperations.getFocusedModuleName(), MOCK_DEPENDENCY);
+        }
+    }
+
+    /**
+     * Check if a dependency is already installed on tarject project
+     * 
+     * @param dependency
+     * @return
+     */
+    private boolean isInstalled(Dependency dependency) {
+        Set<Dependency> dependencies = projectOperations.getFocusedModule()
+                .getDependenciesExcludingVersion(dependency);
+
+        if (dependencies.isEmpty()) {
+            return false;
+        }
+        Validate.isTrue(dependencies.size() == 1,
+                "Library dependecy: ".concat(dependency.toString()));
+        Dependency current = dependencies.iterator().next();
+        String[] currentVersion = current.getVersion().split("[.]");
+        if (currentVersion.length > 1) {
+            String[] requiredVersion = dependency.getVersion().split("[.]");
+            int cur, req;
+            for (int i = 0; i < currentVersion.length
+                    && i < requiredVersion.length; i++) {
+                try {
+                    cur = Integer.parseInt(currentVersion[i]);
+                    req = Integer.parseInt(requiredVersion[i]);
+                }
+                catch (NumberFormatException e) {
+                    return false;
+                }
+                if (cur > req) {
+                    // La dependencia actual una versión más nueva:
+                    // no cambiamos
+                    return true;
+                }
+            }
+            // la version es inferior instalamos
+            return false;
+        }
+        else {
+            // no sabemos la versión asumimos que es buena
+            return true;
+        }
 
     }
 
@@ -444,20 +493,26 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         // Copiamos los ficheros del cliente del servicio WSAuth
         for (String className : JAVA_WS_CLASS_FILENAMES) {
             installTemplate("java-src-templates", className,
-                    getClassesPackage(), projectMetadata, null, false);
+                    getClassesPackage(), projectMetadata, null, false, false);
         }
 
         // Copiamos los ficheros del Provider, usuarios y el cliente del
         // servicio WSAuth
         for (String className : JAVA_CLASS_FILENAMES) {
             installTemplate("java-src-templates", className,
-                    getClassesPackage(), projectMetadata, null, false);
+                    getClassesPackage(), projectMetadata, null, false, false);
         }
 
         // Copiamos los ficheros de los xsd del servicio WSAuth
         for (String className : JAVA_XSD_CLASS_FILENAMES) {
             installTemplate("java-src-templates", className,
-                    getClassesPackage(), projectMetadata, null, false);
+                    getClassesPackage(), projectMetadata, null, false, false);
+        }
+
+        // Copiamos los ficheros de los test
+        for (String className : JAVA_TEST_CLASS_FILENAMES) {
+            installTemplate("java-src-templates", className,
+                    getClassesPackage(), projectMetadata, null, false, true);
         }
     }
 
@@ -492,10 +547,11 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      * @param parameters valores adicionales a reemplazar (puede ser
      *            <code>null</code> si no se necesita)
      * @param override especifica si sobreescribir el archivo si ya existe
+     * @param isTest especifica si la clase es de test o del fuente
      */
     private void installTemplate(String sourceFolder, String targetFilename,
             String targetPackage, ProjectMetadata projectMetadata,
-            Map<String, String> parameters, boolean override) {
+            Map<String, String> parameters, boolean override, boolean isTest) {
         // default package
         String packagePath = projectOperations
                 .getTopLevelPackage(projectOperations.getFocusedModuleName())
@@ -520,8 +576,13 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         }
         packagePath = finalTargetPackage.replace('.', '/');
 
+        Path basePath = Path.SRC_MAIN_JAVA;
+        if (isTest) {
+            basePath = Path.SRC_TEST_JAVA;
+        }
+
         String destinationFile = projectOperations.getPathResolver()
-                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                .getIdentifier(LogicalPath.getInstance(basePath, ""),
                         packagePath + "/" + targetFilename);
 
         if ((!fileManager.exists(destinationFile)) || override) {

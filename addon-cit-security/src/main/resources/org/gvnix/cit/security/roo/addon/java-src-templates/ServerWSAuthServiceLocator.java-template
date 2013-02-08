@@ -27,40 +27,77 @@ package __TARGET_PACKAGE__;
 public class ServerWSAuthServiceLocator extends org.apache.axis.client.Service
 	implements ServerWSAuthService {
 
+    private static final String DEFAULT_PORT_NAME = "ServerWSAuthPort";
+	/**
+	 * Serial version id
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+     * Default constructor
+     */
     public ServerWSAuthServiceLocator() {
+    	// Default constructor
     }
 
 
+    /**
+     * Constructor with config data
+     * 
+     * @param config
+     */
     public ServerWSAuthServiceLocator(org.apache.axis.EngineConfiguration config) {
         super(config);
     }
 
+    /**
+     * Constructor with wsdl and name
+     * 
+     * @param wsdlLoc
+     * @param sName
+     * @throws javax.xml.rpc.ServiceException
+     */
     public ServerWSAuthServiceLocator(java.lang.String wsdlLoc, javax.xml.namespace.QName sName) throws javax.xml.rpc.ServiceException {
         super(wsdlLoc, sName);
     }
 
     // Use to get a proxy class for ServerWSAuthPort
-    private java.lang.String ServerWSAuthPort_address = "";
+    private java.lang.String serverWSAuthPort_address = "";
 
+    /* (non-Javadoc)
+     * @see es.gva.cit.aplusu.security.authentication.wscit.ServerWSAuthService#getServerWSAuthPortAddress()
+     */
     public java.lang.String getServerWSAuthPortAddress() {
-        return ServerWSAuthPort_address;
+        return serverWSAuthPort_address;
     }
 
     // The WSDD service name defaults to the port name.
-    private java.lang.String ServerWSAuthPortWSDDServiceName = "ServerWSAuthPort";
+    private java.lang.String serverWSAuthPortWSDDServiceName = DEFAULT_PORT_NAME;
 
+    /**
+     * Gets WSSD service Name
+     *  
+     * @return
+     */
     public java.lang.String getServerWSAuthPortWSDDServiceName() {
-        return ServerWSAuthPortWSDDServiceName;
+        return serverWSAuthPortWSDDServiceName;
     }
 
+    /**
+     * Sets WSSD service name
+     * @param name
+     */
     public void setServerWSAuthPortWSDDServiceName(java.lang.String name) {
-        ServerWSAuthPortWSDDServiceName = name;
+        serverWSAuthPortWSDDServiceName = name;
     }
 
+    /* (non-Javadoc)
+     * @see es.gva.cit.aplusu.security.authentication.wscit.ServerWSAuthService#getServerWSAuthPort()
+     */
     public ServerWSAuthPort getServerWSAuthPort() throws javax.xml.rpc.ServiceException {
        java.net.URL endpoint;
         try {
-            endpoint = new java.net.URL(ServerWSAuthPort_address);
+            endpoint = new java.net.URL(serverWSAuthPort_address);
         }
         catch (java.net.MalformedURLException e) {
             throw new javax.xml.rpc.ServiceException(e);
@@ -68,19 +105,27 @@ public class ServerWSAuthServiceLocator extends org.apache.axis.client.Service
         return getServerWSAuthPort(endpoint);
     }
 
+    /* (non-Javadoc)
+     * @see es.gva.cit.aplusu.security.authentication.wscit.ServerWSAuthService#getServerWSAuthPort(java.net.URL)
+     */
     public ServerWSAuthPort getServerWSAuthPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
-            ServerWSAuthBindingStub _stub = new ServerWSAuthBindingStub(portAddress, this);
-            _stub.setPortName(getServerWSAuthPortWSDDServiceName());
-            return _stub;
+            ServerWSAuthBindingStub stub = new ServerWSAuthBindingStub(portAddress, this);
+            stub.setPortName(getServerWSAuthPortWSDDServiceName());
+            return stub;
         }
         catch (org.apache.axis.AxisFault e) {
             return null;
         }
     }
 
+    /**
+     * Sets End-point address
+     * 
+     * @param address
+     */
     public void setServerWSAuthPortEndpointAddress(java.lang.String address) {
-        ServerWSAuthPort_address = address;
+        serverWSAuthPort_address = address;
     }
 
     /**
@@ -91,9 +136,9 @@ public class ServerWSAuthServiceLocator extends org.apache.axis.client.Service
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
             if (ServerWSAuthPort.class.isAssignableFrom(serviceEndpointInterface)) {
-        	ServerWSAuthBindingStub _stub = new ServerWSAuthBindingStub(new java.net.URL(ServerWSAuthPort_address), this);
-                _stub.setPortName(getServerWSAuthPortWSDDServiceName());
-                return _stub;
+        	ServerWSAuthBindingStub stub = new ServerWSAuthBindingStub(new java.net.URL(serverWSAuthPort_address), this);
+                stub.setPortName(getServerWSAuthPortWSDDServiceName());
+                return stub;
             }
         }
         catch (java.lang.Throwable t) {
@@ -112,7 +157,7 @@ public class ServerWSAuthServiceLocator extends org.apache.axis.client.Service
             return getPort(serviceEndpointInterface);
         }
         java.lang.String inputPortName = portName.getLocalPart();
-        if ("ServerWSAuthPort".equals(inputPortName)) {
+        if (DEFAULT_PORT_NAME.equals(inputPortName)) {
             return getServerWSAuthPort();
         }
         else  {
@@ -122,16 +167,22 @@ public class ServerWSAuthServiceLocator extends org.apache.axis.client.Service
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.apache.axis.client.Service#getServiceName()
+     */
     public javax.xml.namespace.QName getServiceName() {
         return new javax.xml.namespace.QName("urn:ServerWSAuth", "ServerWSAuthService");
     }
 
-    private java.util.HashSet ports = null;
+    private java.util.Set ports = null;
 
+    /* (non-Javadoc)
+     * @see org.apache.axis.client.Service#getPorts()
+     */
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("urn:ServerWSAuth", "ServerWSAuthPort"));
+            ports.add(new javax.xml.namespace.QName("urn:ServerWSAuth", DEFAULT_PORT_NAME));
         }
         return ports.iterator();
     }
@@ -141,11 +192,11 @@ public class ServerWSAuthServiceLocator extends org.apache.axis.client.Service
     */
     public void setEndpointAddress(java.lang.String portName, java.lang.String address) throws javax.xml.rpc.ServiceException {
 
-if ("ServerWSAuthPort".equals(portName)) {
+        if (DEFAULT_PORT_NAME.equals(portName)) {
             setServerWSAuthPortEndpointAddress(address);
         }
         else
-{ // Unknown Port Name
+        { // Unknown Port Name
             throw new javax.xml.rpc.ServiceException(" Cannot set Endpoint Address for Unknown Port" + portName);
         }
     }

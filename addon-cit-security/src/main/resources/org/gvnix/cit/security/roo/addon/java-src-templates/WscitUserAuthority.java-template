@@ -52,53 +52,72 @@ public class WscitUserAuthority implements GrantedAuthority, Serializable {
 
 	// ************** <CIT data> ****************
 
+    /* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
 				+ ((authority == null) ? 0 : authority.hashCode());
-		result = prime * result + ((descrip == null) ? 0 : descrip.hashCode());
 		result = prime * result + ((modulo == null) ? 0 : modulo.hashCode());
-		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
+		result = prime * result + ((descrip == null) ? 0 : descrip.hashCode());
 		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
+		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		WscitUserAuthority other = (WscitUserAuthority) obj;
 		if (authority == null) {
-			if (other.authority != null)
+			if (other.authority != null) {
 				return false;
-		} else if (!authority.equals(other.authority))
+			}
+		} else if (!authority.equals(other.authority)) {
 			return false;
-		if (descrip == null) {
-			if (other.descrip != null)
-				return false;
-		} else if (!descrip.equals(other.descrip))
-			return false;
+		}
 		if (modulo == null) {
-			if (other.modulo != null)
+			if (other.modulo != null) {
 				return false;
-		} else if (!modulo.equals(other.modulo))
+			}
+		} else if (!modulo.equals(other.modulo)) {
 			return false;
-		if (tipo == null) {
-			if (other.tipo != null)
+		}
+		if (descrip == null) {
+			if (other.descrip != null) {
 				return false;
-		} else if (!tipo.equals(other.tipo))
+			}
+		} else if (!descrip.equals(other.descrip)) {
 			return false;
+		}
 		if (valor == null) {
-			if (other.valor != null)
+			if (other.valor != null) {
 				return false;
-		} else if (!valor.equals(other.valor))
+			}
+		} else if (!valor.equals(other.valor)) {
 			return false;
+		}		
+		if (tipo == null) {
+			if (other.tipo != null) {
+				return false;
+			}
+		} else if (!tipo.equals(other.tipo)) {
+			return false;
+		}
 		return true;
 	}
 

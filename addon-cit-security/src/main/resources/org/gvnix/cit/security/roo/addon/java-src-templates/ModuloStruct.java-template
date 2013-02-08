@@ -1,28 +1,25 @@
-/**
- *  GV-CIT terceros: Gestión de datos personales, domicilios, cuentas, versiones y relaciones.
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
  *
- *  Copyright (C) 2009 - CONSELLERIA D'INFRAESTRUCTURES I TRANSPORT
- *                       GENERALITAT VALENCIANA
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- *  You may obtain a copy of the License at http://www.gnu.org/licenses/gpl-2.0.html
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package __TARGET_PACKAGE__;
 
+import javax.xml.namespace.QName;
 /**
  *
  * @author rgarcia <a href="mailto:rgarcia@disid.com">Ricardo Garcia
@@ -30,22 +27,39 @@ package __TARGET_PACKAGE__;
  *
  */
 public class ModuloStruct implements java.io.Serializable {
-    private java.lang.String modulo;
+	
+	private static final String WS_AUTH_CIT_XSD = "http://WSAuth.cit.gva.es/xsd";
 
-    private java.lang.String valor;
+	private static final long serialVersionUID = 1L;
+	
+    private String modulo;
 
-    private java.lang.String descrip;
+    private String valor;
 
-    private java.lang.String tipo;
+    private String descrip;
 
+    private String tipo;
+
+    /**
+     * Default constructor
+     */
     public ModuloStruct() {
+    	// Default constructor
     }
 
+    /**
+     * Constructor with data
+     * 
+     * @param modulo
+     * @param valor
+     * @param descrip
+     * @param tipo
+     */
     public ModuloStruct(
-           java.lang.String modulo,
-           java.lang.String valor,
-           java.lang.String descrip,
-           java.lang.String tipo) {
+           String modulo,
+           String valor,
+           String descrip,
+           String tipo) {
            this.modulo = modulo;
            this.valor = valor;
            this.descrip = descrip;
@@ -58,7 +72,7 @@ public class ModuloStruct implements java.io.Serializable {
      *
      * @return modulo
      */
-    public java.lang.String getModulo() {
+    public String getModulo() {
         return modulo;
     }
 
@@ -68,7 +82,7 @@ public class ModuloStruct implements java.io.Serializable {
      *
      * @param modulo
      */
-    public void setModulo(java.lang.String modulo) {
+    public void setModulo(String modulo) {
         this.modulo = modulo;
     }
 
@@ -78,7 +92,7 @@ public class ModuloStruct implements java.io.Serializable {
      *
      * @return valor
      */
-    public java.lang.String getValor() {
+    public String getValor() {
         return valor;
     }
 
@@ -88,7 +102,7 @@ public class ModuloStruct implements java.io.Serializable {
      *
      * @param valor
      */
-    public void setValor(java.lang.String valor) {
+    public void setValor(String valor) {
         this.valor = valor;
     }
 
@@ -98,7 +112,7 @@ public class ModuloStruct implements java.io.Serializable {
      *
      * @return descrip
      */
-    public java.lang.String getDescrip() {
+    public String getDescrip() {
         return descrip;
     }
 
@@ -108,7 +122,7 @@ public class ModuloStruct implements java.io.Serializable {
      *
      * @param descrip
      */
-    public void setDescrip(java.lang.String descrip) {
+    public void setDescrip(String descrip) {
         this.descrip = descrip;
     }
 
@@ -118,7 +132,7 @@ public class ModuloStruct implements java.io.Serializable {
      *
      * @return tipo
      */
-    public java.lang.String getTipo() {
+    public String getTipo() {
         return tipo;
     }
 
@@ -128,91 +142,77 @@ public class ModuloStruct implements java.io.Serializable {
      *
      * @param tipo
      */
-    public void setTipo(java.lang.String tipo) {
+    public void setTipo(String tipo) {
         this.tipo = tipo;
     }
 
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof ModuloStruct)) return false;
-        ModuloStruct other = (ModuloStruct) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true &&
-            ((this.modulo==null && other.getModulo()==null) ||
-             (this.modulo!=null &&
-              this.modulo.equals(other.getModulo()))) &&
-            ((this.valor==null && other.getValor()==null) ||
-             (this.valor!=null &&
-              this.valor.equals(other.getValor()))) &&
-            ((this.descrip==null && other.getDescrip()==null) ||
-             (this.descrip!=null &&
-              this.descrip.equals(other.getDescrip()))) &&
-            ((this.tipo==null && other.getTipo()==null) ||
-             (this.tipo!=null &&
-              this.tipo.equals(other.getTipo())));
-        __equalsCalc = null;
-        return _equals;
-    }
+    /* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((descrip == null) ? 0 : descrip.hashCode());
+		result = prime * result + ((modulo == null) ? 0 : modulo.hashCode());
+		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
+		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
+		return result;
+	}
 
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        if (getModulo() != null) {
-            _hashCode += getModulo().hashCode();
-        }
-        if (getValor() != null) {
-            _hashCode += getValor().hashCode();
-        }
-        if (getDescrip() != null) {
-            _hashCode += getDescrip().hashCode();
-        }
-        if (getTipo() != null) {
-            _hashCode += getTipo().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof ModuloStruct)) {
+			return false;
+		}
+		ModuloStruct other = (ModuloStruct) obj;
+		if (descrip == null) {
+			if (other.descrip != null) {
+				return false;
+			}
+		} else if (!descrip.equals(other.descrip)) {
+			return false;
+		}
+		if (modulo == null) {
+			if (other.modulo != null) {
+				return false;
+			}
+		} else if (!modulo.equals(other.modulo)) {
+			return false;
+		}
+		if (tipo == null) {
+			if (other.tipo != null) {
+				return false;
+			}
+		} else if (!tipo.equals(other.tipo)) {
+			return false;
+		}
+		if (valor == null) {
+			if (other.valor != null) {
+				return false;
+			}
+		} else if (!valor.equals(other.valor)) {
+			return false;
+		}
+		return true;
+	}
 
-    // Type metadata
+	// Type metadata
     private static org.apache.axis.description.TypeDesc typeDesc =
         new org.apache.axis.description.TypeDesc(ModuloStruct.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://WSAuth.cit.gva.es/xsd", "ModuloStruct"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("modulo");
-        elemField.setXmlName(new javax.xml.namespace.QName("", "modulo"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("valor");
-        elemField.setXmlName(new javax.xml.namespace.QName("", "valor"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("descrip");
-        elemField.setXmlName(new javax.xml.namespace.QName("", "descrip"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("tipo");
-        elemField.setXmlName(new javax.xml.namespace.QName("", "tipo"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
+        typeDesc.setXmlType(new QName(WS_AUTH_CIT_XSD, "ModuloStruct"));
+        StructUtil.addStringField(typeDesc, "modulo");
+        StructUtil.addStringField(typeDesc, "valor");
+        StructUtil.addStringField(typeDesc, "descrip");
+        StructUtil.addStringField(typeDesc, "tipo");
     }
 
     /**
@@ -226,24 +226,24 @@ public class ModuloStruct implements java.io.Serializable {
      * Get Custom Serializer
      */
     public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType,
-           java.lang.Class _javaType,
-           javax.xml.namespace.QName _xmlType) {
+           String mechType,
+           Class javaType,
+           QName xmlType) {
         return
           new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
+            javaType, xmlType, typeDesc);
     }
 
     /**
      * Get Custom Deserializer
      */
     public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType,
-           java.lang.Class _javaType,
-           javax.xml.namespace.QName _xmlType) {
+           String mechType,
+           Class javaType,
+           QName xmlType) {
         return
           new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+            javaType, xmlType, typeDesc);
     }
 
 }

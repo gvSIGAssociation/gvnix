@@ -46,7 +46,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class WscitAuthenticationProvider extends
 		AbstractUserDetailsAuthenticationProvider {
 
-	private static Logger logger = Logger
+	private static Logger LOGGER = Logger
 			.getLogger(WscitAuthenticationProvider.class.getName());
 
 	// Credencial structure for WSAth call
@@ -235,8 +235,8 @@ public class WscitAuthenticationProvider extends
 			String password) {
 		try {
 
-			if (logger.isLoggable(Level.FINE)) {
-				logger.log(Level.INFO, "Invocando validacion servicio web ...");
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.log(Level.INFO, "Invocando validacion servicio web ...");
 			}
 
 			// Datos de entrada para el servicio web
@@ -248,14 +248,14 @@ public class WscitAuthenticationProvider extends
 			ValidaStruct validaReturn = getServerWSAuthPortProxy()
 					.valida(credentialCit, userName, password, this.applicationName);
 
-			if (logger.isLoggable(Level.FINE)) {
-				logger.log(Level.FINE, "Validation return=" + validaReturn);
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.log(Level.FINE, "Validation return=" + validaReturn);
 			}
 
 			if (validaReturn == null
 					|| !userName.equalsIgnoreCase(validaReturn.getUsuario())) {
 
-				logger.log(Level.WARNING, "Usuario= " + userName
+				LOGGER.log(Level.WARNING, "Usuario= " + userName
 						+ " no validado por servicio web: Respuesta="
 						+ validaReturn);
 				return null;
@@ -264,7 +264,7 @@ public class WscitAuthenticationProvider extends
 
 		} catch (RemoteException e) {
 
-			logger.log(Level.WARNING, "Solicitud de login denegada (usuario='"
+			LOGGER.log(Level.WARNING, "Solicitud de login denegada (usuario='"
 					+ userName + "'): " + e.getLocalizedMessage());
 			throw new AuthenticationServiceException(
 					"Error en servicio web de login al validar al usuario", e);
