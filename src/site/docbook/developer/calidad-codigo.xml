@@ -8,7 +8,7 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Calidad del código</title>
 
-  <section xml:id="calidad-codigo_nombres-comandos" xml:lang="es">
+  <section xml:id="calidad-codigo_recomendaciones" xml:lang="es">
     <title xml:lang="es">Recomendaciones a seguir en el código</title>
 
     <para xml:lang="es">En esta sección se incluyen una serie de recomendaciones
@@ -150,5 +150,114 @@
       	<para>El coste de iteración es el mismo y se obtiene la clave y el valor a la vez.</para>
       </listitem>
     </itemizedlist>
+  </section>
+  
+  <section xml:id="calidad-codigo_lanzar-proceso-comprobacion" xml:lang="es">
+    <title xml:lang="es">Lanzar proceso de comprobación</title>
+
+    <para xml:lang="es">Para el proyecto gvNIX se ha utilizado la herramienta
+    <link xlink:href="http://www.sonarsource.org/">Sonar</link> (
+    <link xlink:href="http://www.sonarsource.org/">http://www.sonarsource.org/</link>). Esta
+    herramienta se compone de un lanzador de proceso (en gvNIX se utiliza el plugin de maven)
+    que analiza el código y una aplicación servidor que permite visualizar y gestionar los resultados.
+    </para>
+    
+    <para>En este apartado se describe como preparar el entrono para lanzar el proceso de análisis
+    y como ejecutarlo sobre un proyecto generado por gvNIX o sobre el propio framework. No se
+    describen la instalación del servido y su gestión.</para>
+    
+    <section xml:lang="es">
+       <title xml:lang="es">Configuración del entorno para lanzar el análisis de Sonar</title>
+
+       <para>Para que el plugin de maven sea capaz de conectarse al servidor de Sonar es necesario
+       configura especificar los parámetros de conexión a la base de datos de Sonar. Para ello
+       hay que añadir un <emphasis>profile</emphasis> en el fichero <emphasis>${HOME}/.m2/settings.xml</emphasis>
+       . Este es un ejemplo de la declaración</para>
+
+       <programlisting><![CDATA[....
+<settings>
+  ....
+  ....
+  ....
+  <profiles>
+    ....
+    ....
+    ....
+    <profile>
+        <id>sonar</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <properties>
+         <sonar.jdbc.url>
+            jdbc:postgresql://localhost/sonar
+          </sonar.jdbc.url>
+          <sonar.jdbc.driverClassName>org.postgresql.Driver</sonar.jdbc.driverClassName>
+          <sonar.jdbc.username>sonar</sonar.jdbc.username>
+          <sonar.jdbc.password>sonar</sonar.jdbc.password>
+            <!-- optional URL to server. -->
+            <sonar.host.url>
+              http://localhost:9000
+            </sonar.host.url>
+        </properties>
+    </profile>
+  </profiles>
+</settings>
+]]></programlisting>
+
+        <para>En el ejemplo se pueden ver los siguientes parámetros:</para>
+
+        <itemizedlist>
+      	    <listitem>
+                <para><literal>sonar.jdbc.url</literal>:Url JDBC para conexión con el servidor de BBDD.</para>
+            </listitem>
+      	    <listitem>
+                <para><literal>sonar.jdbc.driverClassName</literal>:Nombre de la clase 
+                <emphasis>Driver</emphasis> JDBC a usar.</para>
+            </listitem>
+      	    <listitem>
+                <para><literal>sonar.jdbc.username</literal> y <literal>sonar.jdbc.username</literal>: 
+                Datos de usuario para conectar al servidor de BBDD</para>
+            </listitem>
+      	    <listitem>
+                <para><literal>sonar.host.url</literal>:Url de conexión al servido (aplicación) Sonar.</para>
+            </listitem>
+        </itemizedlist>
+
+        <para>También es posible especificar estos parámetros desde la línea de comandos en la ejecución
+        usando el formato <literal>-Dsonar.jdbc.username=sonar</literal></para>
+
+        <para>Para más información sobre la configuración del plugin de maven ver la
+          <link xlink:href="http://docs.codehaus.org/display/SONAR/Installing+and+Configuring+Maven">
+          documentación de sonar</link> al respecto</para>
+    </section>
+    
+    <section xml:lang="es">
+       <title xml:lang="es">Lanzar el análisis de Sonar</title>
+
+       <para>Para lanzar el análisis de sonar sobre un proyecto maven hay que usar el comando:</para>
+       <programlisting>mvn clean install sonar:sonar -Dmaven.test.failure.ignore=true</programlisting>
+       <para>Si ya se ha lanzado el install puede usarse el siguiente comando para no volver
+       a lanzarlo:</para>
+       <programlisting>mvn dependency:resolve sonar:sonar</programlisting>
+
+       <para>Una vez terminado el proceso de análisis es posible consultar el resultado desde
+       la aplicación servidor sonar.</para>
+
+       <para>Para más información sobre la configuración del plugin de maven ver la
+          <link xlink:href="http://docs.codehaus.org/display/SONAR/Analyzing+with+Maven">
+          documentación de sonar</link> al respecto</para>
+    </section>
+
+    <section xml:lang="es">
+      <title xml:lang="es">Visualizar evidencias de Sonar en proyectos de eclipse</title>
+      
+      <para>Existe un plugin para eclipse que permite visualizar las evidencias detectadas
+      por un análisis de sonar desde el proyecto de un workspace de eclipse. La información
+      para instalar, configurar y usar este plugin se encuentra en 
+      <link xlink:href="http://docs.codehaus.org/display/SONAR/Using+Sonar+in+Eclipse">
+          documentación de sonar</link> al respecto</para>
+    </section>
+
   </section>
 </chapter>
