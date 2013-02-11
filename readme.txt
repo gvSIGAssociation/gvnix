@@ -130,11 +130,7 @@ Package gvNIX
 
 * Update Roo version reference into gvNIX parent pom.xml (roo.version) and into gvNIX childs pom.xml (parent.version)
 
-* Update Roo version reference into flex pom.xml(s)
-
 * Update Roo version reference into gvNIX wrapping parent and childs pom.xml
-
-* Update if necessary the Flex addon source code version (tag or head) into 'spring-flex-roo' folder with git.
 
 * Modify and commit the appropriate Roo and gvNIX versions (GVNIX_VERSION and ROO_VERSION) at build.sh file.
 

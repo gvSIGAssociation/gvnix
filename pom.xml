@@ -60,7 +60,7 @@
     <module>addon-web-mvc-binding</module>
     <module>addon-web-dialog</module>
     <module>addon-web-mvc-typicalsecurity</module>
-    <module>spring-flex-roo</module>
+    <module>addon-flex</module>
   </modules>
 
   <!-- Note when doing releases: tagBase is set in release plugin configuration 

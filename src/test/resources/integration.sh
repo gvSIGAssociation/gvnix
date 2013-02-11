@@ -142,7 +142,7 @@
 	echo basic-flex-scaffold-test
 	mkdir basic-flex-scaffold-test
 	cd basic-flex-scaffold-test
-	$1/gvnix.sh script --file $2/code/spring-flex-roo/src/test/resources/basic-flex-scaffold-test.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/addon-flex/src/test/resources/basic-flex-scaffold-test.roo --lineNumbers true
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	
@@ -150,7 +150,7 @@
 	echo remoting-scaffold-all-test
 	mkdir remoting-scaffold-all-test
 	cd remoting-scaffold-all-test
-	$1/gvnix.sh script --file $2/code/spring-flex-roo/src/test/resources/remoting-scaffold-all-test.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/addon-flex/src/test/resources/remoting-scaffold-all-test.roo --lineNumbers true
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	
@@ -158,7 +158,7 @@
 	echo flex
 	mkdir flex
 	cd flex
-	$1/gvnix.sh script --file $2/code/spring-flex-roo/src/main/resources/flex.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/addon-flex/src/main/resources/flex.roo --lineNumbers true
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	
@@ -166,7 +166,7 @@
 	echo rootunes
 	mkdir rootunes
 	cd rootunes
-	$1/gvnix.sh script --file $2/code/spring-flex-roo/src/main/resources/rootunes.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/addon-flex/src/main/resources/rootunes.roo --lineNumbers true
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 
