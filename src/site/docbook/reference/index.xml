@@ -203,6 +203,8 @@
     <xi:include href="addon-dynamic-config.xml"/>
 
     <xi:include href="addon-web-mvc-binding.xml"/>
+    
+    <xi:include href="addon-flex.xml"/>
   </part>
 
   <part>
