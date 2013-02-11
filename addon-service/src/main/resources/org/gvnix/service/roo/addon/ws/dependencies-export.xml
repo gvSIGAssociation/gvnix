@@ -15,6 +15,6 @@
 		<exclusion org="org.springframework" name="spring-web" />
 	</exclusions>
 	</dependency>
-	<dependency org="javax.xml.bind" name="jaxb-api" rev="2.1" />
-	<dependency org="javax.xml.ws" name="jaxws-api" rev="2.1" />
+	<dependency org="javax.xml.bind" name="jaxb-api" rev="2.2.7" />
+	<dependency org="javax.xml.ws" name="jaxws-api" rev="2.2.8" />
 </dependencies>

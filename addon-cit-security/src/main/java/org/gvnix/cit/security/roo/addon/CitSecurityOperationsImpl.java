@@ -99,7 +99,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             "axis", "1.4");
 
     private static final Dependency MOCK_DEPENDENCY = new Dependency(
-            "org.mockito", "mockito-all", "1.8.5", DependencyType.JAR,
+            "org.mockito", "mockito-all", "1.9.5", DependencyType.JAR,
             DependencyScope.TEST);
 
     private static Logger logger = Logger

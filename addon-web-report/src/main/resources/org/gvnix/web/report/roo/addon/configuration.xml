@@ -3,9 +3,9 @@
   <gvnix>
     <web-report>
        <properties>
-         <jasperreports.version>4.0.1</jasperreports.version>
+         <jasperreports.version>5.0.1</jasperreports.version>
          <jasperreportsfonts.version>4.0.0</jasperreportsfonts.version>
-         <apachepoi.version>3.7</apachepoi.version>
+         <apachepoi.version>3.9</apachepoi.version>
      </properties>
     </web-report>
     <jasperReports>
