@@ -32,7 +32,7 @@ project ...
       <term>clinic.roo</term>
 
       <listitem>
-        <para>Ejemplo de una aplicación de clinica veterinaria usando
+        <para>Ejemplo de una aplicación de clínica veterinaria usando
         Hibernate, Registro Activo y Spring MVC</para>
       </listitem>
     </varlistentry>
@@ -152,6 +152,15 @@ project ...
         <para>Mismo ejemplo que clinic.roo incluyendo servicios web.</para>
       </listitem>
     </varlistentry>
+    
+    <varlistentry>
+      <term>bing.roo</term>
+
+      <listitem>
+        <para>Ejemplo de aplicación que utiliza el servicio web de
+        búsqueda bing.</para>
+      </listitem>
+    </varlistentry>
 
     <varlistentry>
       <term>configuration.roo</term>
@@ -179,6 +188,17 @@ project ...
         usando Hibernate, Registro Activo y Flex. El acceso a la aplicación
         se debe realizar a través de la siguiente dirección:
         http://localhost:8080/flexrocks/flexrocks_scaffold.html</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
+      <term>rootunes.roo</term>
+
+      <listitem>
+        <para>Ejemplo de una aplicación de catálogo de canciones
+        usando Hibernate, Registro Activo y Flex. El acceso a la aplicación
+        se debe realizar a través de la siguiente dirección:
+        http://localhost:8080/rootunes/rootunes_scaffold.html</para>
       </listitem>
     </varlistentry>
 

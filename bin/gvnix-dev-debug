@@ -35,12 +35,8 @@ mkdir -p "$ROO_HOME"/bootstrap/target/osgi/bundle
 mkdir -p "$ROO_HOME"/bootstrap/target/osgi/conf
 
 # gvNIX: copy add-ons
-# cp -f `find "$GVNIX_HOME" -name org.gvnix.*.roo.addon-*.jar | grep ".*/target/org.gvnix..*.roo.addon-.*.jar" | grep -v ".*sources[.]jar"` "$ROO_HOME"/bootstrap/target/osgi/bundle
-#cp -f "$GVNIX_HOME"/target/all/org.gvnix.* "$ROO_HOME"/target/all
+rm -rf "$GVNIX_HOME"/target/all/org.gvnix.support.*
 cp -f "$GVNIX_HOME"/target/all/org.gvnix.* "$ROO_HOME"/bootstrap/target/osgi/bundle
-
-# gvNIX: copy add-ons dependencies
-# cp `find "$GVNIX_HOME" -name *.jar | grep '.*/code/[^r][^o][^o][^/].*/target/dependency/.*.jar'` "$ROO_HOME"/bootstrap/target/osgi/bundle 2> /dev/null
 
 cp "$ROO_HOME"/bootstrap/src/main/bin/* "$ROO_HOME"/bootstrap/target/osgi/bin
 chmod +x "$ROO_HOME"/bootstrap/target/osgi/bin/*.sh
@@ -90,17 +86,19 @@ if [ "$cygwin" = "true" ]; then
 fi
 
 # make sure to disable the flash message feature for the default OSX terminal, we recommend to use a ANSI compliant terminal such as iTerm if flash message support is desired
-FLASH_DISABLED=false;
+APPLE_TERMINAL=false;
 if [ "$TERM_PROGRAM" = "Apple_Terminal" ]; then
-	FLASH_DISABLED=true
+	APPLE_TERMINAL=true
 fi
 
 # Hop, hop, hop...
+#DEBUG=
 DEBUG="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
 PAUSE=
 #PAUSE="-Droo.pause=true"
 METADATA_TRACE=
 #METADATA_TRACE="-Droo.metadata.trace=true"
-java $PAUSE $DEBUG $METADATA_TRACE -Dflash.message.disabled=$FLASH_DISABLED $ROO_OPTS -Dorg.osgi.framework.bootdelegation=org.netbeans.lib.profiler,org.netbeans.lib.profiler.\* -Droo.args="$*" -DdevelopmentMode=true -Dorg.osgi.framework.storage="$ROO_OSGI_FRAMEWORK_STORAGE" -Dfelix.auto.deploy.dir="$ROO_AUTO_DEPLOY_DIRECTORY" -Dfelix.config.properties="file:$ROO_CONFIG_FILE_PROPERTIES" -cp "$ROO_CP" org.springframework.roo.bootstrap.Main
+ANSI="-Droo.console.ansi=true"
+java $PAUSE $DEBUG $METADATA_TRACE $ANSI -Dis.apple.terminal=$APPLE_TERMINAL $ROO_OPTS -Dorg.osgi.framework.bootdelegation=org.netbeans.lib.profiler,org.netbeans.lib.profiler.\* -Droo.args="$*" -DdevelopmentMode=true -Dorg.osgi.framework.storage="$ROO_OSGI_FRAMEWORK_STORAGE" -Dfelix.auto.deploy.dir="$ROO_AUTO_DEPLOY_DIRECTORY" -Dfelix.config.properties="file:$ROO_CONFIG_FILE_PROPERTIES" -cp "$ROO_CP" org.springframework.roo.bootstrap.Main
 EXITED=$?
 echo Roo exited with code $EXITED

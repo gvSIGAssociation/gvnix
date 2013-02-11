@@ -227,38 +227,38 @@
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	
-	## test-script-pkc-roo
-	echo test-script-pkc-roo
-	mkdir test-script-pkc-roo
-	cd test-script-pkc-roo
-	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc-roo --lineNumbers true
+	## test-script-pkc
+	echo test-script-pkc
+	mkdir test-script-pkc
+	cd test-script-pkc
+	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc.roo --lineNumbers true
 	$1/gvnix.sh hint
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	
-	## test-script-pkc2-roo
-	echo test-script-pkc2-roo
-	mkdir test-script-pkc2-roo
-	cd test-script-pkc2-roo
-	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc2-roo --lineNumbers true
+	## test-script-pkc2
+	echo test-script-pkc2
+	mkdir test-script-pkc2
+	cd test-script-pkc2
+	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc2.roo --lineNumbers true
 	$1/gvnix.sh hint
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	
-	## test-script-pkc3-roo
-	echo test-script-pkc3-roo
-	mkdir test-script-pkc3-roo
-	cd test-script-pkc3-roo
-	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc3-roo --lineNumbers true
+	## test-script-pkc3
+	echo test-script-pkc3
+	mkdir test-script-pkc3
+	cd test-script-pkc3
+	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc3.roo --lineNumbers true
 	$1/gvnix.sh hint
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	
-	## test-script-manytomany-roo
-	echo test-script-manytomany-roo
-	mkdir test-script-manytomany-roo
-	cd test-script-manytomany-roo
-	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-manytomany-roo --lineNumbers true
+	## test-script-manytomany
+	echo test-script-manytomany
+	mkdir test-script-manytomany
+	cd test-script-manytomany
+	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-manytomany.roo --lineNumbers true
 	$1/gvnix.sh hint
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
@@ -353,7 +353,7 @@
 	echo gvnix-sample
 	mkdir gvnix-sample
 	cd gvnix-sample
-	$1/gvnix.sh script --file $2/code/src/main/assembly/samples/gvnix-sample.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/samples/gvnix-sample.roo --lineNumbers true
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	
@@ -361,7 +361,7 @@
 	echo script
 	mkdir script
 	cd script
-	$1/gvnix.sh script --file $2/code/src/test/resources/script.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/samples/script.roo --lineNumbers true
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	
@@ -369,7 +369,7 @@
 	echo tiendavirtual
 	mkdir tiendavirtual
 	cd tiendavirtual
-	$1/gvnix.sh script --file $2/code/src/test/resources/tiendavirtual.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/samples/tiendavirtual.roo --lineNumbers true
 ##  The operator > is undefined for the argument type(s) java.lang.String
 ##  Inter-type declaration conflicts with existing member
 ##	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 

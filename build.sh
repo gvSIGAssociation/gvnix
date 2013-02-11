@@ -83,9 +83,9 @@ else
 	mvn clean install site package
 fi
 
-# Copy gvNIX build modules together Roo build modules 
+# Copy gvNIX build modules (except support, already included on each add-on) together with Roo build modules
+rm -rf target/all/org.gvnix.support.*
 cp target/all/org.gvnix.* roo/target/all
-cp target/all/org.springframework.flex.roo.addon* roo/target/all
 
 # Change to Roo deployment folder 
 cd roo/deployment-support
@@ -104,10 +104,24 @@ cd ../..
 # Remove old release
 rm -rf /tmp/gvNIX*
 
-# Unzip new release, add gvNIX start scripts
+# Unzip new release
 unzip roo/target/roo-deploy/dist/spring-roo-$ROO_VERSION.zip -d /tmp
-cp /tmp/spring-roo-$ROO_VERSION/bin/roo.sh /tmp/spring-roo-$ROO_VERSION/bin/gvnix.sh
-cp /tmp/spring-roo-$ROO_VERSION/bin/roo.bat /tmp/spring-roo-$ROO_VERSION/bin/gvnix.bat
+WORK_DIR="/tmp/spring-roo-$ROO_VERSION"
+
+# Add gvNIX start scripts copying roo scripts
+cp $WORK_DIR/bin/roo.sh $WORK_DIR/bin/gvnix.sh
+cp $WORK_DIR/bin/roo.bat $WORK_DIR/bin/gvnix.bat
+
+# Copy static gvNIX resources (readme, license and doc) into Roo
+cp src/main/assembly/readme.txt $WORK_DIR/readme_gvNIX.txt
+cp LICENSE.TXT $WORK_DIR/LICENSE_gvNIX.TXT
+cp src/main/resources/*.roo $WORK_DIR/samples
+mkdir $WORK_DIR/docs/gvNIX
+cp target/docbkx/pdf/index.pdf $WORK_DIR/docs/gvNIX
+cp target/site/reference/html-single/* $WORK_DIR/docs/gvNIX
+
+# Create dir to include new themes for related add-on
+mkdir $WORK_DIR/themes
 
 # Rename release to gvNIX, pack it and add installed release to path
 mv /tmp/spring-roo-$ROO_VERSION /tmp/gvNIX-$GVNIX_VERSION
@@ -125,4 +139,3 @@ echo ""
 echo "gvNIX release created: ./target/gvnix-dist/gvNIX-$GVNIX_VERSION.zip"
 echo "gvNIX installed on /tmp and setted on PATH for test purpouses."
 echo "Type gvnix.sh to start"
-
