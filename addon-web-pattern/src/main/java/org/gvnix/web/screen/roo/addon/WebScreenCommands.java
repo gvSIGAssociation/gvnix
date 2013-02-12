@@ -74,7 +74,7 @@ public class WebScreenCommands implements CommandMarker {
      */
     @CliCommand(value = "web mvc pattern master", help = "Add a screen pattern to a controller")
     public void webScreenAdd(
-            @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
+            @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to (only active record entities supported)") JavaType controllerClass,
             @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name,
             @CliOption(key = "type", mandatory = true, help = "The pattern to apply") WebPatternType type,
             @CliOption(key = "testAutomatically", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false", help = "Create automatic Selenium test for this controller") boolean testAutomatically,
@@ -135,7 +135,7 @@ public class WebScreenCommands implements CommandMarker {
      */
     @CliCommand(value = "web mvc pattern detail", help = "Add a detail screen pattern to a defined master pattern in a controller")
     public void webRelationPattern(
-            @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
+            @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to (only active record entities supported)") JavaType controllerClass,
             @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name,
             @CliOption(key = "field", mandatory = true, help = "The one-to-many field to apply the pattern to") JavaSymbolName field,
             @CliOption(key = "type", mandatory = true, help = "The pattern to apply") WebPatternType type,

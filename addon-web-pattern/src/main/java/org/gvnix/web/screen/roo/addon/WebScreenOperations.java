@@ -112,4 +112,13 @@ public interface WebScreenOperations {
      * @param forceUpdate if true forces the update of the existing resources
      */
     void installPatternArtifacts(boolean forceUpdate);
+
+    /**
+     * Informs if entity class of <code>controller</code> is a active-record
+     * entity.
+     * 
+     * @param controller
+     * @return
+     */
+    boolean isControllerEntityActiveRecord(JavaType controller);
 }

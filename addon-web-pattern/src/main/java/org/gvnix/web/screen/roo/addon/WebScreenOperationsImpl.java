@@ -163,6 +163,11 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         ClassOrInterfaceTypeDetails controllerDetails = patternService
                 .getControllerTypeDetails(controllerClass);
 
+        // Check if controller entity is a active-record entity (supported)
+        Validate.isTrue(
+                isControllerEntityActiveRecord(controllerDetails),
+                "This operation only supports controllers of entities with @RooJpaActiveRecord annotation");
+
         // Check if there are pattern names used more than once in project
         Validate.isTrue(
                 !patternService.existsMasterPatternDuplicated()
@@ -245,6 +250,11 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         // a controller
         ClassOrInterfaceTypeDetails mutableTypeDetails = patternService
                 .getControllerTypeDetails(controllerClass);
+
+        // Check if controller entity is a active-record entity (supported)
+        Validate.isTrue(
+                isControllerEntityActiveRecord(mutableTypeDetails),
+                "This operation only supports controllers of entities with @RooJpaActiveRecord annotation");
 
         // Check if pattern name is already used as value of @GvNIXPattern
         Validate.isTrue(
@@ -804,5 +814,32 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         // Add properties to default messageBundle
         MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
                 propFileOperations, projectOperations, fileManager);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.gvnix.web.screen.roo.addon.WebScreenOperations#
+     * isControllerEntityActiveRecord(org.springframework.roo.model.JavaType)
+     */
+    @Override
+    public boolean isControllerEntityActiveRecord(JavaType controller) {
+        ClassOrInterfaceTypeDetails mutableTypeDetails = patternService
+                .getControllerTypeDetails(controller);
+        return isControllerEntityActiveRecord(mutableTypeDetails);
+    }
+
+    private boolean isControllerEntityActiveRecord(
+            ClassOrInterfaceTypeDetails controller) {
+        JavaType entityType = getFormBakingObject(controller);
+
+        // Retrieve metadata for the Java source type the annotation is being
+        // added to
+        String entityTypeId = JpaActiveRecordMetadata.createIdentifier(
+                entityType, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
+        JpaActiveRecordMetadata activeRecordMetadata = (JpaActiveRecordMetadata) metadataService
+                .get(entityTypeId);
+
+        return activeRecordMetadata != null;
     }
 }
