@@ -84,7 +84,7 @@ else
 fi
 
 # Copy gvNIX build modules (except support, already included on each add-on) together with Roo build modules
-rm -rf target/all/org.gvnix.support.*
+rm -rf target/all/org.gvnix.support*
 cp target/all/org.gvnix.* roo/target/all
 
 # Change to Roo deployment folder 
@@ -118,7 +118,7 @@ cp LICENSE.TXT $WORK_DIR/LICENSE_gvNIX.TXT
 cp src/main/resources/*.roo $WORK_DIR/samples
 mkdir $WORK_DIR/docs/gvNIX
 cp target/docbkx/pdf/index.pdf $WORK_DIR/docs/gvNIX
-cp target/site/reference/html-single/* $WORK_DIR/docs/gvNIX
+cp -r target/site/reference/html-single/* $WORK_DIR/docs/gvNIX
 
 # Create dir to include new themes for related add-on
 mkdir $WORK_DIR/themes

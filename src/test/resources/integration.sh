@@ -353,7 +353,7 @@
 	echo gvnix-sample
 	mkdir gvnix-sample
 	cd gvnix-sample
-	$1/gvnix.sh script --file $2/code/samples/gvnix-sample.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/src/main/resources/gvnix-sample.roo --lineNumbers true
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	
@@ -361,7 +361,7 @@
 	echo script
 	mkdir script
 	cd script
-	$1/gvnix.sh script --file $2/code/samples/script.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/src/main/resources/script.roo --lineNumbers true
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	
@@ -369,7 +369,7 @@
 	echo tiendavirtual
 	mkdir tiendavirtual
 	cd tiendavirtual
-	$1/gvnix.sh script --file $2/code/samples/tiendavirtual.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/src/main/resources/tiendavirtual.roo --lineNumbers true
 ##  The operator > is undefined for the argument type(s) java.lang.String
 ##  Inter-type declaration conflicts with existing member
 ##	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
