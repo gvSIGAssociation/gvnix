@@ -100,7 +100,7 @@
         	<spring:param name="gvnixreference" value="${referenceValue}"/>
         </c:if>
         <c:forEach var="p" items="${param}">
-          <c:if test="${p.key ne 'gvnixform'}">
+          <c:if test="${p.key ne 'gvnixform' and p.key ne 'find'}">
             <spring:param name="${p.key}" value="${p.value}" />
           </c:if>
         </c:forEach>
