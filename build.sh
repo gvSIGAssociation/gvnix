@@ -112,7 +112,7 @@ WORK_DIR="/tmp/spring-roo-$ROO_VERSION"
 cp $WORK_DIR/bin/roo.sh $WORK_DIR/bin/gvnix.sh
 cp $WORK_DIR/bin/roo.bat $WORK_DIR/bin/gvnix.bat
 
-# Copy static gvNIX resources (readme, license and doc) into Roo
+# Copy static gvNIX resources (readme, license, samples and doc) into Roo
 cp src/main/assembly/readme.txt $WORK_DIR/readme_gvNIX.txt
 cp LICENSE.TXT $WORK_DIR/LICENSE_gvNIX.TXT
 cp src/main/resources/*.roo $WORK_DIR/samples
