@@ -13,8 +13,16 @@
 
   <c:if test="${empty render or render}">
 
+    <script type="text/javascript"><![CDATA[
+      dojo.require('dijit.layout.ContentPane');
+      dojo.addOnLoad(function() {
+          new dijit.layout.ContentPane({}, "${id}_content");
+      });
+    ]]></script>
+    
     <spring:message code="label_${fn:substringAfter(fn:toLowerCase(id), 'pr_')}" var="tab_label"/>
-    <div id="${id}_content" class="tab_content_${field}" title="${tab_label}">
+    
+    <div id="${id}_content" class="main_tab_content tab_content_${field}" title="${tab_label}">
       <c:set scope="request" value="${object[fn:escapeXml(field)]}" var="data"/>
       <c:set scope="request" value="${referenceName}" var="referenceName"/>
       <c:set scope="request" value="${referenceField}" var="referenceField"/>

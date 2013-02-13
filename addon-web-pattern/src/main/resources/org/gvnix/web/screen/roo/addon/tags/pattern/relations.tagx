@@ -11,20 +11,10 @@
 
     <script type="text/javascript"><![CDATA[
       dojo.require('dijit.layout.TabContainer');
-      dojo.require('dijit.layout.ContentPane');
       dojo.addOnLoad(function() {
-          dojo.query(".tab_content").forEach(function(n) {
-              new dijit.layout.ContentPane({
-                  // just pass a title: attribute, this, we're stealing from the node
-                  title: dojo.attr(n, "title"),
-                  style: "height:620px;"
-              },
-              n);
-          });
           // Persist keep the same tab between different loaded pages:
           // Useful to remain in same tab in detail patterns when master pattern changes
           var tc = new dijit.layout.TabContainer({
-              style: dojo.attr("tab_container_relations_${patternName}", "style") + "height:620px;",
               tabPosition: 'top',
               persist:"true"
           },
@@ -32,10 +22,10 @@
           tc.startup();
       });
     ]]></script>
-    <div id="tab_container_relations_${patternName}" style="height: auto;">
+    
+    <div id="tab_container_relations_${patternName}" class="main_tab_container_relations">
       <jsp:doBody />
     </div>
-    <style>body .dijitAlignClient {position: relative;}</style>
-
+    
   </c:if>
 </jsp:root>

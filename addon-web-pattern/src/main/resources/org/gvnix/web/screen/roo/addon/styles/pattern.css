@@ -352,7 +352,7 @@ ul.formInline li {float: left;}
   border: none;
 }
 
-/* pattern table Sentencias */
+/* pattern table */
 
 .patternContentPane table tr td .submit input {
     float: right;
@@ -366,27 +366,26 @@ padding: 2px 5px;
 
 .patternContentPane table tr td input {
     float: left;
-    width: 100%;
-    max-width: 500px;/*show tribunales*/
+    max-width: 500px;
 }
 
-/* tribunales Terceros y sentencias td inputs */
+/* Relations and relation tags styles (make changes careful for FF, IE and CR navigators compatibility) */
 
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_gvnix_checkbox {}
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_nif { min-width: 70px;}
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_nombre { min-width: 175px;}
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_numero {}
+/* Required to view detail pattern in FF and CR */
+body .dijitAlignClient {
+	position: relative;
+}
 
-/* date format */
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_principalFdoc,
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_principalFpago,
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_interesesFdoc,
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_interesesFpago,
-td.fu_es_gva_cit_sentencias_domain_Sentencias_col_fauto { min-width: 65px;}
+/* Detail pattern container style */
+.main_tab_container_relations {
+	display: inherit;
+}
 
-/* show tribunales */
-td.fu_es_gva_cit_sentencias_domain_Tribunales_col_gvnix_checkbox { width: 20px;}
-
+/* Detail pattern pane for each tab*/
+.main_tab_content {
+	/* To view max tabular pattern rows (25) plus 5 additional rows when adding on all web navigators */
+	height: 1050px;
+}
 
 /* MESSAGES */
 
