@@ -15,12 +15,12 @@ BR {
 .panel-tabs {
     left: -3px;
     top: 25px;
-    width: 20px;
+    width: 0;
 }
 
 .panel-tabs a {
     float: left;
-    border-left: 1px solid #ccc;
+    border-left: 1px solid #fff;
 }
 .panel-tabs a.active-tab {
     border-left: 1px solid #fff;
@@ -30,7 +30,6 @@ BR {
 
 div.quicklinks {
     padding-left: 500px;
-    position: absolute;
     top: 0px;
     right: 0px;
     /*
@@ -40,8 +39,14 @@ div.quicklinks {
     the one with .dijitTitlePane class, so absolute:0,0 is relative to
     .dijitTitlePane.
     */
+    position: absolute;
     width: auto;
     text-align: right;
+    display: none;
+}
+
+.dijitTitlePane div.quicklinks {
+  display: inline;
 }
 
 .quicklinks form {
@@ -187,7 +192,7 @@ a:visited {
 }
 
 ul {
-  list-style: disc url(../images/bullet-arrow.png);
+  list-style-type: disc;
 }
 
 li {
@@ -196,7 +201,7 @@ li {
 }
 
 li ul {
-  list-style: square url(../images/sub-bullet.gif);
+  list-style-type: square;
 }
 
 li ul li ul {
@@ -822,7 +827,7 @@ div#exit_menu span {
 /* STYLES dijit.css*/
 
 .dijitTitlePane {
-  margin-bottom: 20px;
+  padding-bottom: 20px;
   position: relative;
 }
 
@@ -836,12 +841,13 @@ padding-left: 17px;
 
 .tundra .dijitTitlePaneContentInner {
   padding: 5px 0 0;
-  border: 1px solid #BFBFBF;
+  border: 2px solid #DFDFDF;
 	height: auto;/*!important*/
   }
 
 .tundra .dijitTitlePaneTitle {
-    border: 1px solid #BFBFBF;
+    border: solid #DFDFDF;
+    border-width: 1px 2px 0px 2px;
     padding: 3px 4px;
     background: #8f8f8f;
     width: 100%;
@@ -850,14 +856,14 @@ padding-left: 17px;
 /* styles dijitTab */
 
 .dijitLayoutContainer {
-  border-bottom: 1px solid #BFBFBF;
+  border: 2px solid #DFDFDF;
   height: auto;
   /*overflow: visible;*/
 }
 
 .tundra .dijitTabContainerTop-tabs, .tundra .dijitTabContainerBottom-tabs {
   background: #8F8F8F;
-  border: 1px solid #BFBFBF;
+  border: 2px solid #DFDFDF;
   padding: 1px;
   margin-bottom: -1px;
 }
@@ -867,12 +873,12 @@ padding-left: 17px;
   font-size: 11px;
   font-weight: bold;
   padding-left: 7px;
-  background: #d3d3d3 url(../images/pestanya.jpg) no-repeat 100% 0;
+  background: #d3d3d3 no-repeat 100% 0;
   padding-right: 20px;
 }
 
 .tundra .dijitTabChecked {
-  background: #f5f5f5 url(../images/pestanya-activa.jpg) no-repeat 100% 0;
+  background: #f5f5f5 no-repeat 100% 0;
 }
 
 .tundra .dijitTabChecked .tabLabel { color:#2D6893;}
@@ -880,10 +886,10 @@ padding-left: 17px;
 .tundra .dijitTabContainer .dijitTabCheckedHover {
     border: none;
     color:#2D6893;
-    background: #f5f5f5 url(../images/pestanya-activa.jpg) no-repeat 100% 0;
+    background: #f5f5f5 no-repeat 100% 0;
 }
 
-.tundra .dijitTabHover {background: #f5f5f5 url(../images/pestanya-activa.jpg) no-repeat 100% 0;}
+.tundra .dijitTabHover {background: #f5f5f5 no-repeat 100% 0;}
 
 
 /* STYLES DOJO */
@@ -1017,8 +1023,7 @@ text-align: right;
 
 div.submit {
   background-color: #DFDFDF;
-    border: 1px solid #BFBFBF;
-    border-top: none;
+    border: 1px solid #DFDFDF;
     float: right;
     height: 24px;
     padding: 1px;
@@ -1050,12 +1055,15 @@ div.submit input {
 }
 
 .patternContentPane table tr.footer td div.submit {
-  width: 50%;
+  width: 70%;
   border: none;
+  background-color: #DFDFDF;
+  display:table;
+
 }
 
 .patternContentPane table tr.footer td div.submit span.warning {
-    text-align: left;
+    text-align: center;
 }
 
 
@@ -1072,6 +1080,20 @@ div.submit input {
   background:  #ED7936 url(../images/cit/theme/41-white.gif) no-repeat;
   color: #fff;
   background-position: 4px 3px;
+}
+
+.submit #button_generic,
+.patternContentPane .submit .button_generic {
+  background: #fff;
+  width: auto;
+  background-position: 4px 3px;
+}
+.submit #button_generic:hover,
+.patternContentPane .submit .button_generic:hover {
+  background:  #ED7936;
+  width: auto;
+  background-position: 4px 3px;
+  color: #fff;
 }
 
 .submit #button_cancel,
@@ -1310,7 +1332,7 @@ li.size500 .boxDisabled { width: 500px;}
 }
 
 label {
-  width:150px;
+  width:120px;
   margin-left: 0px;
   margin-top: 3px;
   font-family: Verdana, Arial, Helvetica, sans-serif;
@@ -1342,7 +1364,8 @@ ul.tresCols .dijitTextBox, ul.dosCols .dijitTextBox {
   text-align: left;
 }
 
-ul.formInline li {float: left;}
+ul.formInline li {float: left;
+  line-height: 10px;}
 
 
 
@@ -1392,19 +1415,10 @@ padding: 2px 5px;
     max-width: 500px;/*show tribunales*/
 }
 
-/* tribunales Terceros y sentencias td inputs */
-
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_gvnix_checkbox {}
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_nif { min-width: 70px;}
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_nombre { min-width: 175px;}
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_numero {}
-
-/* date format */
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_principalFdoc,
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_principalFpago,
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_interesesFdoc,
-td.fu_es_gva_cit_sentencias_domain_Terceros_col_interesesFpago,
-td.fu_es_gva_cit_sentencias_domain_Sentencias_col_fauto { min-width: 65px;}
-
-/* show tribunales */
-td.fu_es_gva_cit_sentencias_domain_Tribunales_col_gvnix_checkbox { width: 20px;}
+/* mejora para mostrar los selects antes de que Dojo los transforme en inputs */
+select[size], select[multiple], select[size][multiple] {
+  height: 18px;
+  font-size: 11px;
+  padding-left: 1px;
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+}
