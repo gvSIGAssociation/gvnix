@@ -180,6 +180,11 @@
     controlador y una relación, se está definiendo un patrón detalle 
     para la entidad relacionada.</para>
 
+    <para xml:lang="es"><emphasis>Advertencia:</emphasis> Actualmente, este 
+    add-on solo soporta controladores cuya entidad sea un 
+    <emphasis>Active record</emphasis> (que son aquellas que tengan declarada
+    la notación <literal>@RooJpaActiveRecord</literal>).</para>
+
     <para xml:lang="es">Suponiendo el siguiente escenario codificado en Java
     :</para>
 

@@ -67,7 +67,7 @@
     <para xml:lang="es">Crea o actualiza en el proyecto los ficheros que
     utilizarán los patrones de visualización. El comando no tiene ningún
     parámetro obligatorio ni opcional.</para>
-    
+        
     <para xml:lang="es">Para una descripción detallada de los ficheros
     que instala este comando en el proyecto consultar la sección de
     <link linkend="addon-web-screen-patterns">instalación</link>
@@ -81,6 +81,11 @@
     <para xml:lang="es">Crea un patrón de visualización maestro en el
     controlador que gestiona una entidad del proyecto. El patrón maestro
     mostrará los registros de la entidad gestionada por este controlador.</para>
+    
+    <para xml:lang="es"><emphasis>Advertencia:</emphasis> Actualmente, este 
+    comando solo soporta controladores cuya entidad sea un 
+    <emphasis>Active record</emphasis> (que son aquellas que tengan declarada
+    la notación <literal>@RooJpaActiveRecord</literal>).</para>
 
     <para xml:lang="es">Sus parámetros son:<variablelist>
         <varlistentry>
@@ -163,6 +168,11 @@
     de la entidad relacionada que estén asociados con los registros
     de la entidad maestra. La entidad maestra en la entidad gestionada
     por este controlador.</para>
+    
+    <para xml:lang="es"><emphasis>Advertencia:</emphasis> Actualmente, este 
+    comando solo soporta controladores cuya entidad sea un 
+    <emphasis>Active record</emphasis> (que son aquellas que tengan declarada
+    la notación <literal>@RooJpaActiveRecord</literal>).</para>
     
     <para xml:lang="es">Para aplicar un patrón detalle sobre un
     controlador, es necesario definir previamente un patrón
