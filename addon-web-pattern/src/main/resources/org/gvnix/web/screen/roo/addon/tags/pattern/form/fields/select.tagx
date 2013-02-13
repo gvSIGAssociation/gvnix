@@ -127,7 +127,18 @@
         
             <!-- Item is not empty: Create a column element with value for update -->
             <c:otherwise>
-              <spring:eval expression="item[field]" scope="request" var="fieldValue" />
+            
+              <!-- When field is part of a identifier, get value from auxiliar field -->
+              <c:choose>
+              	<c:when test='${fn:contains(sec_field, ".")}'>
+              	  <c:set value='${fn:substringBefore(sec_field, ".")}' var="auxiliarField" />
+              	  <spring:eval expression="item[auxiliarField]" scope="request" var="fieldValue" />
+          		</c:when>
+          		<c:otherwise>
+              	  <spring:eval expression="item[field]" scope="request" var="fieldValue" />
+       			</c:otherwise>
+              </c:choose>
+              
               <select id="${fieldId}" disabled="disabled">
                 <c:choose>
                   <c:when test="${empty itemValue}">
