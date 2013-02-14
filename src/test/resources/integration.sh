@@ -292,8 +292,7 @@
 	mkdir bing
 	cd bing
 	$1/gvnix.sh script --file $2/code/addon-service/src/main/resources/bing.roo --lineNumbers true
-##  Error can't determine superclass of missing type org.springframework.transaction.interceptor.TransactionAspectSupport
-##	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	
 	## service
@@ -309,8 +308,7 @@
 	mkdir gvnix-test-no-web
 	cd gvnix-test-no-web
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-no-web.roo --lineNumbers true
-##  Error can't determine superclass of missing type org.springframework.transaction.interceptor.TransactionAspectSupport
-##	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	
 	## gvnix-test

@@ -7,10 +7,9 @@ web mvc setup
 
 controller class --class ~.controller.SearchController
 
-// Error can't determine superclass of missing type org.springframework.transaction.interceptor.TransactionAspectSupport
-//perform tests
-//perform eclipse
-//perform package
+perform tests
+perform eclipse
+perform package
 
 // next steps by hand:
 //
