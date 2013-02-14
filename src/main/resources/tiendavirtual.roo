@@ -2,7 +2,6 @@
 project --topLevelPackage org.gvnix.tiendavirtual --java 6
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 database properties list
-backup
 
 hint
 help entity jpa
@@ -70,7 +69,6 @@ field reference --fieldName producto --type ~.domain.Producto --notNull
 field number --fieldName cantidad --type int --notNull --min 1 --max 99 --value 1
 field number --fieldName precio --type java.lang.Float --notNull
 field string --fieldName nombre
-backup
 
 hint
 hint controllers
@@ -93,7 +91,6 @@ finder list --class ~.domain.Pedido
 finder list --class ~.domain.Pedido --depth 2 --filter Estado
 finder list --class ~.domain.Pedido --depth 3 --filter findPedidoesByTotalGreaterThanEqualsAndEstado
 finder add --finderName findPedidoesByTotalGreaterThanEqualsAndEstadoAndMetodoPago --class ~.domain.Pedido
-backup
 
 perform tests
 selenium test --controller ~.web.CategoriaController
@@ -101,6 +98,7 @@ selenium test --controller ~.web.ClienteController
 selenium test --controller ~.web.LineaPedidoController
 selenium test --controller ~.web.PedidoController
 selenium test --controller ~.web.ProductoController
+
 backup
 
 help theme
@@ -117,7 +115,6 @@ web mvc pattern detail --class ~.web.PedidoController --name pedido --field line
 web mvc pattern master --class ~.web.ProductoController --name ficha --type register
 web mvc pattern master --class ~.web.ProductoController --name productos --type tabular
 web mvc pattern master --class ~.web.ClienteController --name clientes --type tabular
-backup
 
 help menu
 help menu setup
@@ -143,14 +140,12 @@ menu entry info --id c_seleniumtests
 menu tree
 menu entry visibility --id c_view --hidden true
 menu entry info --id c_view
-backup
 
 help occ checksum
 help occ checksum set
 occ checksum set --entity ~.domain.Pedido
 help occ checksum all
 occ checksum all
-backup
 
 help web mvc dialog
 help web mvc dialog setup
@@ -162,13 +157,11 @@ web mvc dialog exception set language --exception java.lang.Exception --title "E
 web mvc dialog exception set language --exception java.lang.Exception --title "Error" --description "S'ha produit un error desconegut." --language ca
 help web mvc dialog add
 web mvc dialog add --class ~.web.PedidoController --name orderinstructions
-backup
 
 help web mvc install language
 web mvc install language --code es
 web mvc install language --code ca
 web mvc install language --code de
-backup
 
 help web report
 help web report setup
@@ -177,6 +170,3 @@ help web report add
 web report add --controller ~.web.PedidoController --reportName informepedidos --format pdf,xls,html,csv
 web report add --controller ~.web.PedidoController --reportName pedidoreport
 menu entry visibility --id i_pedido_pedidoreport_report --hidden true
-
-perform eclipse
-backup

@@ -376,7 +376,7 @@
 	mkdir tiendavirtual
 	cd tiendavirtual
 	$1/gvnix.sh script --file $2/code/src/main/resources/tiendavirtual.roo --lineNumbers true
-##  The operator > is undefined for the argument type(s) java.lang.String
-##  Inter-type declaration conflicts with existing member
-##	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+##  Inter-type declaration conflicts with existing member, avoid it temporally
+    mvn test-compile > /dev/null
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
