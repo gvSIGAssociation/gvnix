@@ -292,7 +292,7 @@
 	mkdir bing
 	cd bing
 	$1/gvnix.sh script --file $2/code/addon-service/src/main/resources/bing.roo --lineNumbers true
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	
 	## service
@@ -303,12 +303,20 @@
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	
-	## gvnix-test-no-web
-	echo gvnix-test-no-web
-	mkdir gvnix-test-no-web
-	cd gvnix-test-no-web
-	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-no-web.roo --lineNumbers true
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	## gvnix-test-no-jpa-no-web
+	echo gvnix-test-no-jpa-no-web
+	mkdir gvnix-test-no-jpa-no-web
+	cd gvnix-test-no-jpa-no-web
+	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-no-jpa-no-web.roo --lineNumbers true
+	mvn test package -Dmaven.tomcat.fork=true 
+	cd ..
+
+	## gvnix-test-no-jpa
+	echo gvnix-test-no-jpa
+	mkdir gvnix-test-no-jpa
+	cd gvnix-test-no-jpa
+	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-no-jpa.roo --lineNumbers true
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	
 	## gvnix-test

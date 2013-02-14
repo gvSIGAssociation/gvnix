@@ -1,10 +1,11 @@
-project --topLevelPackage es.kk
+
+project --topLevelPackage org.gvnix.test
+
+web mvc setup
+
 remote service class --class ~.service.Kk
 remote service operation --name Kk --service ~.service.Kk
 remote service define ws --class ~.service.Kk
 remote service export operation --class ~.service.Kk --method Kk
 remote service list operation --class ~.service.Kk
 remote service ws list
-remote service import ws --class ~.service.Kk2 --wsdl http://wsf.cdyne.com/WeatherWS/Weather.asmx?WSDL
-perform tests
-perform package
