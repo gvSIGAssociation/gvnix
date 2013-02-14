@@ -1,0 +1,6 @@
+
+project --topLevelPackage org.gvnix.test
+
+jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+
+remote service import ws --class ~.service.Kk2 --wsdl http://wsf.cdyne.com/WeatherWS/Weather.asmx?WSDL

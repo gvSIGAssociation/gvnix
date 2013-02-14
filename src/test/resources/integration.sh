@@ -319,6 +319,14 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	
+	## gvnix-test-no-web
+	echo gvnix-test-no-web
+	mkdir gvnix-test-no-web
+	cd gvnix-test-no-web
+	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-no-web.roo --lineNumbers true
+	mvn test package -Dmaven.tomcat.fork=true 
+	cd ..
+	
 	## gvnix-test
 	echo gvnix-test
 	mkdir gvnix-test
