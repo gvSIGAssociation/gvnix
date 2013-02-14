@@ -275,11 +275,11 @@
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	
-	## gvnix-test
-	echo gvnix-test
-	mkdir gvnix-test
-	cd gvnix-test
-	$1/gvnix.sh script --file $2/code/addon-web-report/src/test/resources/gvnix-test.roo --lineNumbers true
+	## gvnix-test-report
+	echo gvnix-test-report
+	mkdir gvnix-test-report
+	cd gvnix-test-report
+	$1/gvnix.sh script --file $2/code/addon-web-report/src/test/resources/gvnix-test-report.roo --lineNumbers true
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 
