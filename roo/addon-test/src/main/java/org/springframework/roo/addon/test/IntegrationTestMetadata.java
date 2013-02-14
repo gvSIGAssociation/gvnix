@@ -631,6 +631,16 @@ public class IntegrationTestMetadata extends
                                     .getSymbolName()
                             + "().after(currentVersion)) || !modified);");
         }
+        else if (JavaType.STRING.equals(versionType)) { // DISID. #5642 Fix
+                                                        // problems when version
+                                                        // field is a String
+            bodyBuilder
+                    .appendFormalLine("Assert.assertTrue(\"Version for '"
+                            + entityName
+                            + "' failed to increment on flush directive\", (currentVersion != null && !currentVersion.equals(obj."
+                            + versionAccessorMethod.getMethodName()
+                                    .getSymbolName() + "())) || !modified);");
+        }
         else {
             bodyBuilder
                     .appendFormalLine("Assert.assertTrue(\"Version for '"
@@ -738,6 +748,16 @@ public class IntegrationTestMetadata extends
                             + versionAccessorMethod.getMethodName()
                                     .getSymbolName()
                             + "().after(currentVersion)) || !modified);");
+        }
+        else if (JavaType.STRING.equals(versionType)) { // DISID. #5642 Fix
+                                                        // problems when version
+                                                        // field is a String
+            bodyBuilder
+                    .appendFormalLine("Assert.assertTrue(\"Version for '"
+                            + entityName
+                            + "' failed to increment on merge and flush directive\", (currentVersion != null && !currentVersion.equals(obj."
+                            + versionAccessorMethod.getMethodName()
+                                    .getSymbolName() + "())) || !modified);");
         }
         else {
             bodyBuilder
