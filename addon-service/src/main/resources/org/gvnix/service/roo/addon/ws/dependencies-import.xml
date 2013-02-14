@@ -8,4 +8,6 @@
 	</dependency>
 	<!-- Generated CXF classes uses javax.persistence.Entity -->
 	<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" />
+	<!-- Avoid ROO-3163 -->
+	<dependency org="org.springframework" name="spring-tx" rev="${spring.version}" />
 </dependencies>
