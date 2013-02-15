@@ -267,7 +267,7 @@ public class OperationUtils {
 
                     OutputStream outputStream = null;
                     try {
-                        outputStream = fileManager.createFile(
+                        outputStream = fileManager.updateFile(
                                 targetDirectory + fileName).getOutputStream();
                         IOUtils.copy(url.openStream(), outputStream);
                     }
