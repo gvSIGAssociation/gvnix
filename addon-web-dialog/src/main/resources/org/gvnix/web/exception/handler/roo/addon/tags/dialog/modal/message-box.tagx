@@ -125,9 +125,9 @@
         dojo.addOnLoad(function() {
           // create the dialog:
            messageDlg${id} = new dijit.Dialog(
-           { class: "MessageBoxDialog ${MsgDlgClass}",
-             title: "${applicationName}",
-             style: "width: 350px" }, dlgContent${id});
+           { 'class': "MessageBoxDialog ${MsgDlgClass}",
+             'title': "${applicationName}",
+             'style': "width: 350px" }, dlgContent${id});
 
           if(${show}) {
             messageDlg${id}.show();
