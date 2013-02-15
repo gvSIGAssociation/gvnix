@@ -93,8 +93,7 @@
 	mkdir wedding
 	cd wedding
 	$1/gvnix.sh script --file wedding.roo --lineNumbers true
-##  Error pending on selenium tests
-##	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	mvn test tomcat:run -Dmaven.tomcat.fork=true
 	cd ..
 
