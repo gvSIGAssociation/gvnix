@@ -95,9 +95,9 @@ finder add --finderName findPedidoesByTotalGreaterThanEqualsAndEstadoAndMetodoPa
 perform tests
 selenium test --controller ~.web.CategoriaController
 selenium test --controller ~.web.ClienteController
-selenium test --controller ~.web.LineaPedidoController
 selenium test --controller ~.web.PedidoController
 selenium test --controller ~.web.ProductoController
+selenium test --controller ~.web.LineaPedidoController
 
 backup
 
