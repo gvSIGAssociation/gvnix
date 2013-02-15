@@ -19,4 +19,6 @@
 	<dependency org="javax.xml.ws" name="jaxws-api" rev="2.2.8" />
 	<!-- Avoid ROO-3163 -->
 	<dependency org="org.springframework" name="spring-tx" rev="${spring.version}" />
+	<!-- Avoid ROO-770 -->
+	<dependency org="javax.persistence" name="persistence-api" rev="1.0.2" scope="provided" />
 </dependencies>

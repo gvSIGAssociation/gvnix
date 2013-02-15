@@ -10,4 +10,6 @@
 	<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" />
 	<!-- Avoid ROO-3163 -->
 	<dependency org="org.springframework" name="spring-tx" rev="${spring.version}" />
+	<!-- Avoid ROO-770 -->
+	<dependency org="javax.persistence" name="persistence-api" rev="1.0.2" scope="provided" />
 </dependencies>
