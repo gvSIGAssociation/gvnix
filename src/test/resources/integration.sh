@@ -334,6 +334,14 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 
+	## gvnix-test-security
+	echo gvnix-test-security
+	mkdir gvnix-test-security
+	cd gvnix-test-security
+	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-security.roo --lineNumbers true
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	cd ..
+
 ##
 ## gvNIX typicalsecurity add-on
 ##

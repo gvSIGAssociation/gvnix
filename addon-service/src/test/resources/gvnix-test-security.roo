@@ -1,0 +1,9 @@
+project --topLevelPackage org.gvnix.test
+jpa setup --provider HIBERNATE --database HYPERSONIC_PERSISTENT
+entity jpa --class ~.domain.ValidaDniRequest
+field boolean --fieldName isSpaniard --class es.gva.cit.webexplorer.domain.ValidaDniRequest --notNull
+web mvc setup
+web mvc all --package ~.web
+remote service import ws --class ~.services.ServiciosMapProxy1 --wsdl https://sleipnir2.accv.es:8448/accv_map_gateway/services/ServiciosMap?wsdl
+# Get random file (.bashrc by example) as certificate only to check command resources valid generation
+remote service security ws --class ~.services.ServiciosMapProxy1 --certificate ~/.bashrc --password myPass --alias profile_name
