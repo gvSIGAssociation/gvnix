@@ -97,7 +97,9 @@ public class WSConfigServiceImpl implements WSConfigService {
         annotationsService.addAddonDependency();
 
         // Installs jax2ws plugin in project
-        addPlugin();
+        if (type != WsType.IMPORT_RPC_ENCODED) {
+            addPlugin();
+        }
 
         // Add library dependencies, if not exists already
         addDependencies(type);
