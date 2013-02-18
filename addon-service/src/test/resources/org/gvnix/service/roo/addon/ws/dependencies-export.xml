@@ -17,4 +17,6 @@
 	</dependency>
 	<dependency org="javax.xml.bind" name="jaxb-api" rev="2.2.7" />
 	<dependency org="javax.xml.ws" name="jaxws-api" rev="2.2.8" />
+	<!-- Avoid ROO-3163 -->
+	<dependency org="org.springframework" name="spring-tx" rev="${spring.version}" />
 </dependencies>

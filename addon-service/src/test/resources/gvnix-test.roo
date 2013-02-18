@@ -48,9 +48,6 @@ remote service export operation --class org.gvnix.test.service.layer.project.ser
 // [CORRECT] Transport: HTTP,  Operations: 2, Bindings: SOAP, SOAP12, HTTP POST, Use: Literal
 remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
 
-// [CORRECT] Transport: HTTP,  Operations: 1, Bindings: SOAP, Use: Literal, Implementation: MS .NET, Authentication/Authorization: WS-Security, Complex Types,
-#remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy02 --wsdl http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl
-
 // [CORRECT] Transport: HTTP,  Operations: 3, Bindings: SOAP, SOAP12, HTTP GET, HTTP POST, Use: Literal
 remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy03 --wsdl http://wsf.cdyne.com/WeatherWS/Weather.asmx?WSDL
 
