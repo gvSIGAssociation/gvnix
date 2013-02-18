@@ -18,6 +18,53 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.logging.Logger;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
+import org.gvnix.service.roo.addon.JavaParserService;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
+import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
+import org.gvnix.service.roo.addon.security.SecurityService;
+import org.gvnix.service.roo.addon.util.WsdlParserUtils;
+import org.gvnix.service.roo.addon.ws.WSCompilationUnit;
+import org.gvnix.service.roo.addon.ws.WSConfigService;
+import org.springframework.roo.classpath.PhysicalTypeCategory;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.details.ConstructorMetadata;
+import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
+import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
+import org.springframework.roo.file.monitor.NotifiableFileMonitorService;
+import org.springframework.roo.file.monitor.event.FileDetails;
+import org.springframework.roo.model.EnumDetails;
+import org.springframework.roo.model.JavaPackage;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
+import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.ProjectOperations;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import com.github.antlrjavaparser.JavaParser;
 import com.github.antlrjavaparser.ParseException;
 import com.github.antlrjavaparser.api.CompilationUnit;
@@ -30,84 +77,14 @@ import com.github.antlrjavaparser.api.body.EnumDeclaration;
 import com.github.antlrjavaparser.api.body.FieldDeclaration;
 import com.github.antlrjavaparser.api.body.MethodDeclaration;
 import com.github.antlrjavaparser.api.body.TypeDeclaration;
-import com.github.antlrjavaparser.api.body.VariableDeclarator;
 import com.github.antlrjavaparser.api.expr.AnnotationExpr;
-import com.github.antlrjavaparser.api.expr.ArrayInitializerExpr;
-import com.github.antlrjavaparser.api.expr.Expression;
 import com.github.antlrjavaparser.api.expr.FieldAccessExpr;
+import com.github.antlrjavaparser.api.expr.MarkerAnnotationExpr;
 import com.github.antlrjavaparser.api.expr.MemberValuePair;
 import com.github.antlrjavaparser.api.expr.NormalAnnotationExpr;
+import com.github.antlrjavaparser.api.expr.SingleMemberAnnotationExpr;
 import com.github.antlrjavaparser.api.expr.StringLiteralExpr;
 import com.github.antlrjavaparser.api.type.ClassOrInterfaceType;
-import com.github.antlrjavaparser.api.type.ReferenceType;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
-import org.gvnix.service.roo.addon.JavaParserService;
-import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
-import org.gvnix.service.roo.addon.annotations.GvNIXWebMethod;
-import org.gvnix.service.roo.addon.annotations.GvNIXWebParam;
-import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
-import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
-import org.gvnix.service.roo.addon.annotations.GvNIXXmlElementField;
-import org.gvnix.service.roo.addon.security.SecurityService;
-import org.gvnix.service.roo.addon.util.WsdlParserUtils;
-import org.gvnix.service.roo.addon.ws.WSCompilationUnit;
-import org.gvnix.service.roo.addon.ws.WSConfigService;
-import org.springframework.roo.classpath.PhysicalTypeCategory;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.details.ConstructorMetadata;
-import org.springframework.roo.classpath.details.ConstructorMetadataBuilder;
-import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.FieldMetadataBuilder;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MethodMetadata;
-import org.springframework.roo.classpath.details.MethodMetadataBuilder;
-import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
-import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
-import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
-import org.springframework.roo.classpath.details.annotations.ClassAttributeValue;
-import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
-import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
-import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
-import org.springframework.roo.classpath.antlrjavaparser.details.JavaParserConstructorMetadataBuilder;
-import org.springframework.roo.classpath.antlrjavaparser.details.JavaParserFieldMetadataBuilder;
-import org.springframework.roo.classpath.antlrjavaparser.details.JavaParserMethodMetadataBuilder;
-import org.springframework.roo.file.monitor.DirectoryMonitoringRequest;
-import org.springframework.roo.file.monitor.NotifiableFileMonitorService;
-import org.springframework.roo.file.monitor.event.FileOperation;
-import org.springframework.roo.model.EnumDetails;
-import org.springframework.roo.model.JavaPackage;
-import org.springframework.roo.model.JavaSymbolName;
-import org.springframework.roo.model.JavaType;
-import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.LogicalPath;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.ProjectOperations;
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
@@ -119,17 +96,6 @@ import org.w3c.dom.Element;
 @Service
 public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService {
 
-    @Reference private WSConfigService wSConfigService;
-    @Reference private FileManager fileManager;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private NotifiableFileMonitorService fileMonitorService;
-    @Reference private JavaParserService javaParserService;
-    @Reference private SecurityService securityService;
-
-    private File schemaPackage = new File("");
-
-    private static final String FOLDER_SEPARATOR = "/";
-
     /*
      * Variables to store web files of web service generated by maven wsdl2java
      * plugin. TODO THIS IS NO THREAD-SAFE. EXTRACT IT to a process class and
@@ -139,6 +105,27 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     private List<File> webFaults = new ArrayList<File>();
     private List<File> webServices = new ArrayList<File>();
     private List<File> webServiceInterfaces = new ArrayList<File>();
+
+    private File schemaPackage = new File("");
+
+    static final String PACKAGE_INFO_FILE = "package-info.java";
+
+    static final String webService = "javax.jws.WebService";
+    static final String webServiceInterface = "WebService";
+    static final String soapBinding = "SOAPBinding";
+    static final String xmlRootElement = "XmlRootElement";
+    static final String xmlAccessorType = "XmlAccessorType";
+    static final String xmlType = "XmlType";
+    static final String xmlEnum = "XmlEnum";
+    static final String webFault = "WebFault";
+
+    @Reference private WSConfigService wSConfigService;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private NotifiableFileMonitorService fileMonitorService;
+    @Reference private SecurityService securityService;
+    @Reference private WsExportWsdl wsExportWsdl;
+    @Reference private FileManager fileManager;
+    @Reference private JavaParserService javaParserService;
 
     protected static Logger logger = Logger
             .getLogger(WSExportWsdlConfigService.class.getName());
@@ -175,6 +162,42 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     }
 
     /**
+     * Get XML document representation from WSDL if valid.
+     * <p>
+     * Check WSDL is not RPC Encoded and has only one compatible port.
+     * </p>
+     * 
+     * @param url from WSDL file to export
+     * @return XML document representation of WSDL
+     */
+    protected Document checkWSDLFile(String url) {
+
+        // Check URL connection and WSDL format
+        Element root = securityService.getWsdl(url).getDocumentElement();
+
+        Validate.isTrue(!WsdlParserUtils.isRpcEncoded(root), "This Wsdl '"
+                + url + "' is RPC Encoded and is not supported by the Add-on.");
+
+        // Check if is compatible port defined with SOAP12 or SOAP11.
+        WsdlParserUtils.checkCompatiblePort(root);
+
+        return root.getOwnerDocument();
+    }
+
+    /**
+     * Reset files values.
+     */
+    protected void resetGeneratedFilesList() {
+
+        // Reset File List
+        xmlElements = new ArrayList<File>();
+        webFaults = new ArrayList<File>();
+        webServices = new ArrayList<File>();
+        webServiceInterfaces = new ArrayList<File>();
+        schemaPackage = new File("");
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Monitoring file creation only.
@@ -186,16 +209,224 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         String path = projectOperations.getPathResolver().getIdentifier(
                 LogicalPath.getInstance(Path.ROOT, ""), folder);
 
-        // Monitoring only created files
-        Set<FileOperation> notify = new HashSet<FileOperation>();
-        notify.add(FileOperation.CREATED);
-        DirectoryMonitoringRequest dirMonitor = new DirectoryMonitoringRequest(
-                new File(path), true, notify);
+        resetGeneratedFilesList();
 
-        // Add monitor, scan and remove it
-        fileMonitorService.add(dirMonitor);
-        fileMonitorService.scanAll();
-        fileMonitorService.remove(dirMonitor);
+        SortedSet<FileDetails> files = fileMonitorService
+                .findMatchingAntPath(path + "/**");
+        for (FileDetails file : files) {
+            parseFile(file.getFile());
+        }
+    }
+
+    /**
+     * Parse target file for src generation when is valid.
+     * <p>
+     * Consider only when:
+     * </p>
+     * <ul>
+     * <li>File is not a directory and included on generated sources dir</li>
+     * </ul>
+     * <p>
+     * Include file for generation when is a package info file (special
+     * generated java file). Or check file first java type first valid
+     * annotation type and name if type is a class, interface or enumeration:
+     * </p>
+     * <p>
+     * Only files with valid annotations will be included
+     * {@link WSExportWsdlImpl#includeFileValidAnnot(File, AnnotationExpr, TypeDeclaration)}
+     * </p>
+     * 
+     * @param file File
+     **/
+    protected void parseFile(File file) {
+
+        // Is not a directory and is included on generated sources dir
+        if (file.getAbsolutePath().contains(wsExportWsdl.getGenSourcesDir())
+                && !file.isDirectory()) {
+
+            // When is a package info file (special generated java file)
+            if (file.getName().contentEquals(PACKAGE_INFO_FILE)) {
+
+                setSchemaPackageInfoFile(file);
+                return;
+            }
+
+            try {
+
+                // Get java types from java file
+                List<TypeDeclaration> types = JavaParser.parse(file).getTypes();
+                if (types != null) {
+
+                    // Get fist java type
+                    TypeDeclaration type = types.get(0);
+
+                    // If java type is a class, interface or enumeration
+                    if ((type instanceof ClassOrInterfaceDeclaration)
+                            || (type instanceof EnumDeclaration)) {
+
+                        logger.fine(file.getAbsolutePath());
+
+                        // First valid annot type and name include generate
+                        for (AnnotationExpr annot : type.getAnnotations()) {
+                            if (includeFileValidAnnot(file, annot, type)) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (ParseException e) {
+                throw new IllegalStateException(
+                        "Generated web service java file has errors:\n"
+                                + e.getMessage());
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+                throw new IllegalStateException(
+                        "Generated web service java file has errors:\n"
+                                + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Updates package info file location. <b>For {@link WSExportWsdlImpl} uses
+     * only</b>
+     * 
+     * @param schemaPackageInfoFile File absolute path.
+     */
+    private void setSchemaPackageInfoFile(File schemaPackageInfoFile) {
+
+        this.schemaPackage = schemaPackageInfoFile;
+    }
+
+    /**
+     * When annotation has a valid class and name, include file for generation.
+     * <ul>
+     * <li>Xml root element or xml accessor type: include file for xml element
+     * generation</li>
+     * <li>Web fault: include file for web fault generation</li>
+     * <li>Web service: include file for web service generation
+     * <li>Web service interface: include file for web service interface
+     * generation</li>
+     * <li>Xml enum: include file for xml element generation</li>
+     * </ul>
+     * <p>
+     * Only files with valid annotations names will be included
+     * {@link WSExportWsdlImpl#includeFileValidAnnotName(File, TypeDeclaration, String)}
+     * </p>
+     * 
+     * @param file Generated file
+     * @param annot File type annotation
+     * @param type File type
+     * @return Is valid annotation class and name included for generation ?
+     */
+    private boolean includeFileValidAnnot(File file, AnnotationExpr annot,
+            TypeDeclaration type) {
+
+        if (annot instanceof NormalAnnotationExpr) {
+
+            return includeFileValidAnnotName(file, type,
+                    ((NormalAnnotationExpr) annot).getName().getName());
+
+        }
+        else if (annot instanceof MarkerAnnotationExpr) {
+
+            return includeFileValidAnnotName(file, type,
+                    ((MarkerAnnotationExpr) annot).getName().getName());
+
+        }
+        else if (annot instanceof SingleMemberAnnotationExpr) {
+
+            return includeFileValidAnnotName(file, type,
+                    ((SingleMemberAnnotationExpr) annot).getName().getName());
+        }
+
+        return false;
+    }
+
+    /**
+     * When annotation has a valid name, include file for generation.
+     * <ul>
+     * <li>Xml root element or xml accessor type: include file for xml element
+     * generation</li>
+     * <li>Web fault: include file for web fault generation</li>
+     * <li>Web service: include file for web service generation</li>
+     * <li>Web service interface: include file for web service interface
+     * generation</li>
+     * <li>Xml enum: include file for xml element generation</li>
+     * </ul>
+     * 
+     * @param file Generated file
+     * @param annot File type annotation
+     * @param name Annotation name
+     * @return Is valid annotation name included for generation ?
+     */
+    private boolean includeFileValidAnnotName(File file, TypeDeclaration type,
+            String name) {
+
+        if (name.equals(xmlRootElement) || name.equals(xmlAccessorType)) {
+
+            addFileToUpdateAnnotation(file, GvNIXAnnotationType.XML_ELEMENT);
+            return true;
+
+        }
+        else if (name.equals(webFault)) {
+
+            addFileToUpdateAnnotation(file, GvNIXAnnotationType.WEB_FAULT);
+            return true;
+
+        }
+        else if (name.equals(webService)) {
+
+            addFileToUpdateAnnotation(file, GvNIXAnnotationType.WEB_SERVICE);
+            return true;
+
+        }
+        else if (name.equals(webServiceInterface)) {
+
+            addFileToUpdateAnnotation(file,
+                    GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
+            return true;
+
+        }
+        else if (name.equals(xmlEnum)) {
+
+            addFileToUpdateAnnotation(file, GvNIXAnnotationType.XML_ELEMENT);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Updates list of files generated to update with '@GvNIX' annotations.
+     * <b>For {@link WSExportWsdlImpl} uses only</b>
+     * 
+     * @param file scanned to add to list.
+     * @param gvNIXAnnotationType to select the list where add the file.
+     */
+    private void addFileToUpdateAnnotation(File file,
+            GvNIXAnnotationType gvNIXAnnotationType) {
+
+        switch (gvNIXAnnotationType) {
+
+        case XML_ELEMENT:
+            xmlElements.add(file);
+            break;
+
+        case WEB_FAULT:
+            webFaults.add(file);
+            break;
+
+        case WEB_SERVICE:
+            webServices.add(file);
+            break;
+
+        case WEB_SERVICE_INTERFACE:
+            webServiceInterfaces.add(file);
+            break;
+        }
     }
 
     /**
@@ -216,7 +447,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     /**
      * Create in 'src/main/java' gvNIX xml elements from wsdl2java classes list.
      * <p>
-     * The wsdl2java classes list are registered by {@link WSExportWsdlListener}
+     * The wsdl2java classes list are registered by {@link WSExportWsdlImpl}
      * </p>
      */
     protected void createGvNixXmlElementsClasses() {
@@ -258,182 +489,17 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     }
 
     /**
-     * Copy package info file from generated folder to sources folder.
+     * <p>
+     * Creates web service fail java files in 'src/main/java' from result of
+     * wsdl2java plugin. In addition, adds @GvNIXWebService annotation.
+     * </p>
+     * <p>
+     * This files will be registered by {@link WSExportWsdlImpl}
+     * </p>
+     * TODO to be removed from interface. This method need a sequence of
+     * operations to be useful.
      */
-    protected void createPackageInfoClass() {
-
-        // If schema package file exists
-        if (schemaPackage.exists()) {
-            try {
-
-                // Schema package file absolute path
-                String path = schemaPackage.getAbsolutePath();
-
-                // Remove sources dir folder prefix
-                path = StringUtils
-                        .remove(path,
-                                projectOperations
-                                        .getPathResolver()
-                                        .getIdentifier(
-                                                LogicalPath.getInstance(
-                                                        Path.ROOT, ""),
-                                                WSExportWsdlListener.GENERATED_CXF_SOURCES_DIR));
-
-                // Create file into sources folder at same location
-                fileManager.createOrUpdateTextFileIfRequired(
-                        projectOperations.getPathResolver()
-                                .getIdentifier(
-                                        LogicalPath.getInstance(
-                                                Path.SRC_MAIN_JAVA, ""), path),
-                        IOUtils.toString(new InputStreamReader(
-                                new FileInputStream(schemaPackage))), true);
-
-            }
-            catch (FileNotFoundException e) {
-                throw new IllegalStateException(
-                        "Generated 'package-info.java' file '"
-                                + schemaPackage.getAbsolutePath()
-                                + "' doesn't exist:\n" + e.getMessage());
-            }
-            catch (IOException e) {
-                throw new IllegalStateException(
-                        "Generated 'package-info.java' file '"
-                                + schemaPackage.getAbsolutePath()
-                                + "' has errors:\n" + e.getMessage());
-            }
-        }
-    }
-
-    /**
-     * Generate declared java type classes and its inner types from declaration.
-     * 
-     * @param typeDecl class to convert to JavaType
-     * @param compUnit Values from class to check
-     * @param fileDir to check 'package-info.java' annotation values
-     */
-    protected void createGvNixXmlElementClass(TypeDeclaration typeDecl,
-            CompilationUnit compUnit, String fileDir) {
-
-        // Compilation unit package
-        String pkg = compUnit.getPackage().getName().toString();
-
-        // Java type to generate from
-        JavaType type = new JavaType(pkg.concat(".").concat(typeDecl.getName()));
-
-        // Initial values for gvNIX xml element annotation creation
-        PhysicalTypeCategory physicalTypeCategory = PhysicalTypeCategory.CLASS;
-        List<JavaSymbolName> enumConstants = new ArrayList<JavaSymbolName>();
-        boolean isEnum = typeDecl instanceof EnumDeclaration;
-        List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
-
-        if (isEnum) {
-
-            // Type is an enumeration
-
-            // Define physical type as enumeration
-            physicalTypeCategory = PhysicalTypeCategory.ENUMERATION;
-
-            // Add all enumeration constant entries names to a list
-            for (EnumConstantDeclaration enumDecl : ((EnumDeclaration) typeDecl)
-                    .getEntries()) {
-
-                enumConstants.add(new JavaSymbolName(enumDecl.getName()));
-            }
-        }
-        else if (typeDecl instanceof ClassOrInterfaceDeclaration) {
-
-            // Type is a class or interface
-
-            // For each type member
-            for (BodyDeclaration body : typeDecl.getMembers()) {
-
-                if (body instanceof FieldDeclaration) {
-
-                    // Member is a field: add gvNIX xml element field annotation
-                    loadFieldFromType(PhysicalTypeIdentifier.createIdentifier(
-                            type,
-                            LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")),
-                            new WSCompilationUnit(new JavaPackage(pkg), type,
-                                    compUnit.getImports(),
-                                    new ArrayList<TypeDeclaration>(),
-                                    PhysicalTypeCategory.CLASS), fields, body);
-
-                }
-                else if (body instanceof ClassOrInterfaceDeclaration) {
-
-                    // Member is class or interface: add gvNIX xml element annot
-                    createGvNixXmlElementClass((TypeDeclaration) body,
-                            compUnit, fileDir);
-                }
-            }
-        }
-
-        List<AnnotationMetadata> annots = new ArrayList<AnnotationMetadata>();
-
-        // ROO annotation to generate get and set methods if is not an enum
-        if (!isEnum) {
-
-            annots.add(new AnnotationMetadataBuilder(new JavaType(
-                    "org.springframework.roo.addon.javabean.RooJavaBean"),
-                    new ArrayList<AnnotationAttributeValue<?>>()).build());
-        }
-
-        // Create gvNIX xml element annotation and add it to list
-        annots.add(getGvNixXmlElementAnnot(typeDecl));
-
-        // Create gvNIX web service type with annots, fields, type and enums
-        javaParserService.createGvNixWebServiceClass(type, annots,
-                GvNIXAnnotationType.XML_ELEMENT, fields,
-                new ArrayList<MethodMetadata>(),
-                new ArrayList<ConstructorMetadata>(),
-                new ArrayList<JavaType>(), physicalTypeCategory, enumConstants);
-    }
-
-    /**
-     * Load field declaration from a type
-     * 
-     * @param id
-     * @param compUnit
-     * @param fields
-     * @param body
-     */
-    private void loadFieldFromType(String id, WSCompilationUnit compUnit,
-            List<FieldMetadata> fields, BodyDeclaration body) {
-
-        // Fields from Inner Class type defined.
-        FieldDeclaration field = (FieldDeclaration) body;
-        if (field.getType() instanceof ReferenceType) {
-
-            ReferenceType refType = (ReferenceType) field.getType();
-            if (refType.getType() instanceof ClassOrInterfaceType) {
-
-                ClassOrInterfaceType type = (ClassOrInterfaceType) refType
-                        .getType();
-                type.setScope(null);
-                field.setType(type);
-            }
-        }
-
-        FieldDeclaration fieldDecl = new FieldDeclaration(field.getJavaDoc(),
-                field.getModifiers(), field.getAnnotations(), field.getType(),
-                field.getVariables());
-
-        for (VariableDeclarator var : fieldDecl.getVariables()) {
-
-            // Set var initilize to null beacuse if implements an
-            // interface the class is not well generated.
-            var.setInit(null);
-
-            fields.add(getGvNIXXmlElementFieldAnnotation(JavaParserFieldMetadataBuilder
-                    .getInstance(id, fieldDecl, var, compUnit,
-                            new HashSet<JavaSymbolName>()).build()));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void createGvNixWebFaultClasses() {
+    protected void createGvNixWebFaultClasses() {
 
         List<AnnotationMetadata> gvNixAnnotationList;
 
@@ -503,14 +569,15 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                             if (bodyDeclaration instanceof FieldDeclaration) {
 
-                                loadFaultFieldDeclaration(declaredByMetadataId,
+                                wsExportWsdl.loadFaultFieldDeclaration(
+                                        declaredByMetadataId,
                                         compilationUnitServices,
                                         fieldMetadataList, bodyDeclaration);
 
                             }
                             else if (bodyDeclaration instanceof ConstructorDeclaration) {
 
-                                loadFaultConstructorDeclaration(
+                                wsExportWsdl.loadFaultConstructorDeclaration(
                                         declaredByMetadataId,
                                         compilationUnitServices,
                                         constructorMetadataList,
@@ -519,7 +586,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                             }
                             else if (bodyDeclaration instanceof MethodDeclaration) {
 
-                                loadFaultMethodDeclaration(
+                                wsExportWsdl.loadFaultMethodDeclaration(
                                         declaredByMetadataId,
                                         compilationUnitServices,
                                         methodMetadataList,
@@ -528,8 +595,9 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                         }
 
                         // GvNIXWebFault Annotation.Get all annotations.
-                        gvNIXWebFaultAnnotation = getGvNIXWebFaultAnnotation(
-                                classOrInterfaceDeclaration, javaType);
+                        gvNIXWebFaultAnnotation = wsExportWsdl
+                                .getGvNIXWebFaultAnnotation(
+                                        classOrInterfaceDeclaration, javaType);
 
                         gvNixAnnotationList.add(gvNIXWebFaultAnnotation);
 
@@ -561,104 +629,19 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     }
 
     /**
-     * Loads fault method declaration into method list to generate fault web
-     * service class
+     * <p>
+     * Creates web service java files in 'src/main/java' from result of
+     * wsdl2java plugin. In addition, adds @GvNIXWebService annotation.
+     * </p>
+     * <p>
+     * This files will be registered by {@link WSExportWsdlImpl}
+     * </p>
+     * TODO to be removed from interface. This method need a sequence of
+     * operations to be useful.
      * 
-     * @param declaredByMetadataId
-     * @param compilationUnitServices
-     * @param methodMetadataList
-     * @param bodyDeclaration
+     * @return implementation class list
      */
-    private void loadFaultMethodDeclaration(String declaredByMetadataId,
-            WSCompilationUnit compilationUnitServices,
-            List<MethodMetadata> methodMetadataList,
-            MethodDeclaration methodDeclaration) {
-        MethodMetadata tmpMethodMetadata;
-
-        tmpMethodMetadata = JavaParserMethodMetadataBuilder.getInstance(
-                declaredByMetadataId, methodDeclaration,
-                compilationUnitServices, new HashSet<JavaSymbolName>()).build();
-
-        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine(tmpMethodMetadata.getBody());
-        MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
-                declaredByMetadataId, tmpMethodMetadata.getModifier(),
-                tmpMethodMetadata.getMethodName(),
-                tmpMethodMetadata.getReturnType(),
-                tmpMethodMetadata.getParameterTypes(),
-                tmpMethodMetadata.getParameterNames(), bodyBuilder);
-        for (AnnotationMetadata annotationMetadata : tmpMethodMetadata
-                .getAnnotations()) {
-            methodMetadataBuilder.addAnnotation(annotationMetadata);
-        }
-        for (JavaType myJavaType : tmpMethodMetadata.getThrowsTypes()) {
-            methodMetadataBuilder.addThrowsType(myJavaType);
-        }
-
-        methodMetadataList.add(methodMetadataBuilder.build());
-    }
-
-    /**
-     * Loads fault constructor declaration into contructor list to generate
-     * fault web service class
-     * 
-     * @param declaredByMetadataId
-     * @param compilationUnitServices
-     * @param constructorMetadataList
-     * @param bodyDeclaration
-     */
-    private void loadFaultConstructorDeclaration(String declaredByMetadataId,
-            WSCompilationUnit compilationUnitServices,
-            List<ConstructorMetadata> constructorMetadataList,
-            BodyDeclaration bodyDeclaration) {
-        ConstructorMetadata constructorMetadata;
-        ConstructorDeclaration constructorDeclaration;
-        constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
-
-        // TODO ??? what is this for? !!!
-        JavaParserConstructorMetadataBuilder.getInstance(declaredByMetadataId,
-                constructorDeclaration, compilationUnitServices,
-                new HashSet<JavaSymbolName>());
-
-        ConstructorMetadataBuilder constructorMetadataBuilder = new ConstructorMetadataBuilder(
-                declaredByMetadataId);
-        constructorMetadata = constructorMetadataBuilder.build();
-
-        constructorMetadataList.add(constructorMetadata);
-    }
-
-    /**
-     * Loads fault field declaration into field list to generate fault web
-     * service class
-     * 
-     * @param declaredByMetadataId
-     * @param compilationUnitServices
-     * @param fieldMetadataList
-     * @param bodyDeclaration
-     */
-    private void loadFaultFieldDeclaration(String declaredByMetadataId,
-            WSCompilationUnit compilationUnitServices,
-            List<FieldMetadata> fieldMetadataList,
-            BodyDeclaration bodyDeclaration) {
-        FieldMetadata fieldMetadata;
-        FieldDeclaration fieldDeclaration;
-        fieldDeclaration = (FieldDeclaration) bodyDeclaration;
-
-        for (VariableDeclarator var : fieldDeclaration.getVariables()) {
-
-            fieldMetadata = JavaParserFieldMetadataBuilder.getInstance(
-                    declaredByMetadataId, fieldDeclaration, var,
-                    compilationUnitServices, new HashSet<JavaSymbolName>())
-                    .build();
-
-            fieldMetadataList.add(fieldMetadata);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<JavaType> createGvNixWebServiceClasses() {
+    protected List<JavaType> createGvNixWebServiceClasses() {
 
         List<AnnotationMetadata> gvNixAnnotationList;
 
@@ -745,7 +728,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                         if (bodyDeclaration instanceof FieldDeclaration) {
 
-                            loadWebServiceFieldDeclaration(
+                            wsExportWsdl.loadWebServiceFieldDeclaration(
                                     declaredByMetadataId,
                                     compilationUnitServices, fieldMetadataList,
                                     bodyDeclaration);
@@ -753,7 +736,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                         }
                         else if (bodyDeclaration instanceof MethodDeclaration) {
 
-                            loadWebServiceMethodDeclaration(
+                            wsExportWsdl.loadWebServiceMethodDeclaration(
                                     declaredByMetadataId,
                                     compilationUnitServices,
                                     implementedInterface, methodMetadataList,
@@ -794,121 +777,145 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     }
 
     /**
-     * Load WebService method declaration and complete with GvNIX annotations
+     * Generate declared java type classes and its inner types from declaration.
      * 
-     * @param declaredByMetadataId
-     * @param compilationUnitServices
-     * @param implementedInterface
-     * @param methodMetadataList
-     * @param defaultNamespace
-     * @param bodyDeclaration
+     * @param typeDecl class to convert to JavaType
+     * @param compUnit Values from class to check
+     * @param fileDir to check 'package-info.java' annotation values
      */
-    private void loadWebServiceMethodDeclaration(String declaredByMetadataId,
-            WSCompilationUnit compilationUnitServices,
-            ClassOrInterfaceDeclaration implementedInterface,
-            List<MethodMetadata> methodMetadataList, String defaultNamespace,
-            BodyDeclaration bodyDeclaration) {
-        MethodMetadata methodMetadata;
-        MethodMetadata tmpMethodMetadata;
-        MethodDeclaration methodDeclaration;
-        methodDeclaration = (MethodDeclaration) bodyDeclaration;
+    private void createGvNixXmlElementClass(TypeDeclaration typeDecl,
+            CompilationUnit compUnit, String fileDir) {
 
-        tmpMethodMetadata = JavaParserMethodMetadataBuilder.getInstance(
-                declaredByMetadataId, methodDeclaration,
-                compilationUnitServices, new HashSet<JavaSymbolName>()).build();
+        // Compilation unit package
+        String pkg = compUnit.getPackage().getName().toString();
 
-        // Check method from interface because Web
-        // Service
-        // Annotations are defined there
-        for (BodyDeclaration interfacebodyDeclaration : implementedInterface
-                .getMembers()) {
+        // Java type to generate from
+        JavaType type = new JavaType(pkg.concat(".").concat(typeDecl.getName()));
 
-            MethodDeclaration interfaceMethodDeclaration;
+        // Initial values for gvNIX xml element annotation creation
+        PhysicalTypeCategory physicalTypeCategory = PhysicalTypeCategory.CLASS;
+        List<JavaSymbolName> enumConstants = new ArrayList<JavaSymbolName>();
+        boolean isEnum = typeDecl instanceof EnumDeclaration;
+        List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
 
-            if (interfacebodyDeclaration instanceof MethodDeclaration) {
+        if (isEnum) {
 
-                interfaceMethodDeclaration = (MethodDeclaration) interfacebodyDeclaration;
+            // Type is an enumeration
 
-                if (interfaceMethodDeclaration.getName().contentEquals(
-                        methodDeclaration.getName())) {
+            // Define physical type as enumeration
+            physicalTypeCategory = PhysicalTypeCategory.ENUMERATION;
 
-                    MethodMetadata interfaceTmpMethodMetadata = JavaParserMethodMetadataBuilder
-                            .getInstance(declaredByMetadataId,
-                                    interfaceMethodDeclaration,
-                                    compilationUnitServices,
-                                    new HashSet<JavaSymbolName>()).build();
+            // Add all enumeration constant entries names to a list
+            for (EnumConstantDeclaration enumDecl : ((EnumDeclaration) typeDecl)
+                    .getEntries()) {
 
-                    MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
-                            declaredByMetadataId,
-                            interfaceTmpMethodMetadata.getModifier(),
-                            interfaceTmpMethodMetadata.getMethodName(),
-                            interfaceTmpMethodMetadata.getReturnType(),
-                            interfaceTmpMethodMetadata.getParameterTypes(),
-                            interfaceTmpMethodMetadata.getParameterNames(),
-                            new InvocableMemberBodyBuilder()
-                                    .appendFormalLine(tmpMethodMetadata
-                                            .getBody()));
-                    for (AnnotationMetadata annotationMetadata : interfaceTmpMethodMetadata
-                            .getAnnotations()) {
-                        methodMetadataBuilder.addAnnotation(annotationMetadata);
-                    }
-                    for (JavaType myJavaType : interfaceTmpMethodMetadata
-                            .getThrowsTypes()) {
-                        methodMetadataBuilder.addThrowsType(myJavaType);
-                    }
-                    interfaceTmpMethodMetadata = methodMetadataBuilder.build();
+                enumConstants.add(new JavaSymbolName(enumDecl.getName()));
+            }
+        }
+        else if (typeDecl instanceof ClassOrInterfaceDeclaration) {
 
-                    // Web Service method Operation.
-                    methodMetadata = getGvNIXWebMethodMetadata(
-                            interfaceTmpMethodMetadata, defaultNamespace);
+            // Type is a class or interface
 
-                    methodMetadataList.add(methodMetadata);
+            // For each type member
+            for (BodyDeclaration body : typeDecl.getMembers()) {
+
+                if (body instanceof FieldDeclaration) {
+
+                    // Member is a field: add gvNIX xml element field annotation
+                    wsExportWsdl.loadFieldFromType(PhysicalTypeIdentifier
+                            .createIdentifier(type, LogicalPath.getInstance(
+                                    Path.SRC_MAIN_JAVA, "")),
+                            new WSCompilationUnit(new JavaPackage(pkg), type,
+                                    compUnit.getImports(),
+                                    new ArrayList<TypeDeclaration>(),
+                                    PhysicalTypeCategory.CLASS), fields, body);
 
                 }
+                else if (body instanceof ClassOrInterfaceDeclaration) {
+
+                    // Member is class or interface: add gvNIX xml element annot
+                    createGvNixXmlElementClass((TypeDeclaration) body,
+                            compUnit, fileDir);
+                }
+            }
+        }
+
+        List<AnnotationMetadata> annots = new ArrayList<AnnotationMetadata>();
+
+        // ROO annotation to generate get and set methods if is not an enum
+        if (!isEnum) {
+
+            annots.add(new AnnotationMetadataBuilder(new JavaType(
+                    "org.springframework.roo.addon.javabean.RooJavaBean"),
+                    new ArrayList<AnnotationAttributeValue<?>>()).build());
+        }
+
+        // Create gvNIX xml element annotation and add it to list
+        annots.add(getGvNixXmlElementAnnot(typeDecl));
+
+        // Create gvNIX web service type with annots, fields, type and enums
+        javaParserService.createGvNixWebServiceClass(type, annots,
+                GvNIXAnnotationType.XML_ELEMENT, fields,
+                new ArrayList<MethodMetadata>(),
+                new ArrayList<ConstructorMetadata>(),
+                new ArrayList<JavaType>(), physicalTypeCategory, enumConstants);
+    }
+
+    /**
+     * Copy package info file from generated folder to sources folder.
+     */
+    private void createPackageInfoClass() {
+
+        // If schema package file exists
+        if (schemaPackage.exists()) {
+            try {
+
+                // Schema package file absolute path
+                String path = schemaPackage.getAbsolutePath();
+
+                // Remove sources dir folder prefix
+                path = StringUtils.remove(
+                        path,
+                        projectOperations.getPathResolver().getIdentifier(
+                                LogicalPath.getInstance(Path.ROOT, ""),
+                                WsExportWsdl.GENERATED_CXF_SOURCES_DIR));
+
+                // Create file into sources folder at same location
+                fileManager.createOrUpdateTextFileIfRequired(
+                        projectOperations.getPathResolver()
+                                .getIdentifier(
+                                        LogicalPath.getInstance(
+                                                Path.SRC_MAIN_JAVA, ""), path),
+                        IOUtils.toString(new InputStreamReader(
+                                new FileInputStream(schemaPackage))), true);
+
+            }
+            catch (FileNotFoundException e) {
+                throw new IllegalStateException(
+                        "Generated 'package-info.java' file '"
+                                + schemaPackage.getAbsolutePath()
+                                + "' doesn't exist:\n" + e.getMessage());
+            }
+            catch (IOException e) {
+                throw new IllegalStateException(
+                        "Generated 'package-info.java' file '"
+                                + schemaPackage.getAbsolutePath()
+                                + "' has errors:\n" + e.getMessage());
             }
         }
     }
 
     /**
-     * Load WebService Field declaration and complete with GvNIX annotations
+     * Retrieve Web Service implemented interface from interface list. TODO to
+     * be removed?. This method could be useless outside this service.
      * 
-     * @param declaredByMetadataId
-     * @param compilationUnitServices
-     * @param fieldMetadataList
-     * @param bodyDeclaration
-     */
-    private void loadWebServiceFieldDeclaration(String declaredByMetadataId,
-            WSCompilationUnit compilationUnitServices,
-            List<FieldMetadata> fieldMetadataList,
-            BodyDeclaration bodyDeclaration) {
-        FieldMetadata fieldMetadata;
-        FieldDeclaration tmpFieldDeclaration;
-        FieldDeclaration fieldDeclaration;
-        tmpFieldDeclaration = (FieldDeclaration) bodyDeclaration;
-        fieldDeclaration = new FieldDeclaration(
-                tmpFieldDeclaration.getJavaDoc(),
-                tmpFieldDeclaration.getModifiers(),
-                new ArrayList<AnnotationExpr>(), tmpFieldDeclaration.getType(),
-                tmpFieldDeclaration.getVariables());
-
-        for (VariableDeclarator var : fieldDeclaration.getVariables()) {
-
-            fieldMetadata = JavaParserFieldMetadataBuilder.getInstance(
-                    declaredByMetadataId, fieldDeclaration, var,
-                    compilationUnitServices, new HashSet<JavaSymbolName>())
-                    .build();
-
-            fieldMetadataList.add(fieldMetadata);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
+     * @param classOrInterfaceDeclaration to retrieve its implemented interface.
+     * @return {@link ClassOrInterfaceDeclaration} interface that implements
+     *         classOrInterfaceDeclaratio, null if not exists.
      * @throws IOException
      * @throws ParseException
      */
-    public ClassOrInterfaceDeclaration getWebServiceInterface(
+    private ClassOrInterfaceDeclaration getWebServiceInterface(
             ClassOrInterfaceDeclaration classOrInterfaceDeclaration)
             throws ParseException, IOException {
 
@@ -929,7 +936,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
             interfaceName = interfaceName.concat(".java");
 
             for (File interfaceFile : webServiceInterfaces) {
-                fileInterfaceName = getFilename(interfaceFile.getAbsolutePath());
+                fileInterfaceName = wsExportWsdl.getFilename(interfaceFile
+                        .getAbsolutePath());
 
                 if (!fileInterfaceName.contentEquals(interfaceName)) {
                     continue;
@@ -956,435 +964,19 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     }
 
     /**
-     * Convert annotation @XmlElement values to GvNIXXmlElement.
-     * <p>
-     * Searches for Jaxb annotations in {@link ClassOrInterfaceDeclaration} to
-     * convert values to {@link GvNIXXmlElement}.
-     * </p>
+     * Convert annotation @WebService values from
+     * {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebService}. TODO to
+     * be removed from interface?. This method could be useless outside this
+     * service.
      * 
-     * @param typeDecl To retrieve values from @XmlElement annotations
-     * @return {@link GvNIXXmlElement} to define in class
+     * @param classOrInterfaceDeclaration to retrieve values from @WebService
+     *            annotations and convert to {@link GvNIXWebService} values.
+     * @param implementedInterface Web Service interface.
+     * @param javaType to retrieve mandatory Annotation attributed with its
+     *            values.
+     * @return {@link GvNIXWebService} to define in class.
      */
-    protected AnnotationMetadata getGvNixXmlElementAnnot(
-            TypeDeclaration typeDecl) {
-
-        // Attribute value list.
-        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
-
-        boolean isNamespace = false;
-        boolean isPropOrder = false;
-
-        for (AnnotationExpr typeAnnot : typeDecl.getAnnotations()) {
-
-            if (typeAnnot instanceof NormalAnnotationExpr) {
-
-                NormalAnnotationExpr normalAnnot = (NormalAnnotationExpr) typeAnnot;
-                String name = normalAnnot.getName().getName();
-                List<MemberValuePair> pairs = normalAnnot.getPairs();
-                if (name.contains(WSExportWsdlListener.xmlRootElement)) {
-
-                    // It's @XmlRootElement
-                    addNameAttr(attrs, pairs);
-
-                }
-                else if (name.contains(WSExportWsdlListener.xmlType)) {
-
-                    // It's @XmlType
-
-                    for (MemberValuePair pair : pairs) {
-
-                        if (pair.getName().contentEquals("name")) {
-
-                            // @XmlType.name
-                            addXmlTypeNameAttr(attrs, pair);
-
-                        }
-                        else if (pair.getName().contentEquals("propOrder")) {
-
-                            // @XmlType.propOrder
-                            addElementListAttr(attrs, pair);
-                            isPropOrder = true;
-
-                        }
-                        else if (pair.getName().contentEquals("namespace")) {
-
-                            // @XmlType.namespace
-                            addNamespaceAttr(attrs, pair);
-                            isNamespace = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Check correct values for @GvNIXXmlElement.
-        if (!isPropOrder) {
-
-            addElementListAttr(attrs);
-        }
-
-        if (!isNamespace) {
-
-            addNamespaceAttr(attrs);
-        }
-
-        addExportedAttr(attrs);
-
-        addEnumElementAttr(typeDecl, attrs);
-
-        // Create annotation
-        return new AnnotationMetadataBuilder(new JavaType(
-                GvNIXXmlElement.class.getName()), attrs).build();
-    }
-
-    /**
-     * Search name attributes on pairs and add it as name attrs.
-     * 
-     * @param attrs Annotation attributes to add names
-     * @param pairs Pairs to search in name attributes
-     */
-    protected void addNameAttr(List<AnnotationAttributeValue<?>> attrs,
-            List<MemberValuePair> pairs) {
-
-        // Search name attribute in pairs
-        for (MemberValuePair pair : pairs) {
-            if (pair.getName().contentEquals("name")) {
-
-                // Add name to attributes list
-                attrs.add(new StringAttributeValue(new JavaSymbolName("name"),
-                        ((StringLiteralExpr) pair.getValue()).getValue()));
-                return;
-            }
-        }
-    }
-
-    /**
-     * If pair has text, add it as xml type name attr.
-     * 
-     * @param attrs Annotation attributes to add xml type name
-     * @param pair Pair to test has text
-     */
-    protected void addXmlTypeNameAttr(List<AnnotationAttributeValue<?>> attrs,
-            MemberValuePair pair) {
-
-        if (StringUtils.isNotBlank(pair.getValue().toString())) {
-
-            attrs.add(new StringAttributeValue(
-                    new JavaSymbolName("xmlTypeName"),
-                    ((StringLiteralExpr) pair.getValue()).getValue()));
-        }
-    }
-
-    /**
-     * Get all pair values and add it as ignored attrs.
-     * 
-     * @param annotAttrs Annotation attributes to add ignored attrs
-     * @param pairs Pair to get values
-     */
-    protected void addElementListAttr(
-            List<AnnotationAttributeValue<?>> annotAttrs, MemberValuePair pair) {
-
-        List<StringAttributeValue> attrs = new ArrayList<StringAttributeValue>();
-        for (Expression value : ((ArrayInitializerExpr) pair.getValue())
-                .getValues()) {
-
-            attrs.add(new StringAttributeValue(new JavaSymbolName("ignored"),
-                    ((StringLiteralExpr) value).getValue()));
-        }
-
-        annotAttrs.add(new ArrayAttributeValue<StringAttributeValue>(
-                new JavaSymbolName("elementList"), attrs));
-    }
-
-    /**
-     * Add pair value with namespace name into attributes list.
-     * 
-     * @param attrs Attributes list
-     * @param pair Pair
-     */
-    protected void addNamespaceAttr(List<AnnotationAttributeValue<?>> attrs,
-            MemberValuePair pair) {
-
-        attrs.add(new StringAttributeValue(new JavaSymbolName("namespace"),
-                ((StringLiteralExpr) pair.getValue()).getValue()));
-    }
-
-    /**
-     * Add empty ignored attribute to list.
-     * 
-     * @param annotAttrs Attributes list
-     * @param pair Pair
-     */
-    protected void addElementListAttr(
-            List<AnnotationAttributeValue<?>> annotAttrs) {
-
-        List<StringAttributeValue> attrs = new ArrayList<StringAttributeValue>();
-        attrs.add(new StringAttributeValue(new JavaSymbolName("ignored"), ""));
-        annotAttrs.add(new ArrayAttributeValue<StringAttributeValue>(
-                new JavaSymbolName("elementList"), attrs));
-    }
-
-    protected void addNamespaceAttr(List<AnnotationAttributeValue<?>> annotAttrs) {
-
-        try {
-
-            String ns = "";
-
-            boolean exists = false;
-            List<AnnotationExpr> annots = JavaParser.parse(schemaPackage)
-                    .getPackage().getAnnotations();
-            for (AnnotationExpr annot : annots) {
-                if (annot instanceof NormalAnnotationExpr) {
-
-                    NormalAnnotationExpr normalAnnot = (NormalAnnotationExpr) annot;
-                    if (normalAnnot.getName().toString()
-                            .contains("javax.xml.bind.annotation.XmlSchema")) {
-
-                        // @XmlSchema
-
-                        for (MemberValuePair pair : normalAnnot.getPairs()) {
-                            if (pair.getName().contentEquals("namespace")) {
-
-                                ns = ((StringLiteralExpr) pair.getValue())
-                                        .getValue();
-                                exists = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (exists) {
-                    break;
-                }
-            }
-
-            // look for @XmlSchema
-            annotAttrs.add(new StringAttributeValue(new JavaSymbolName(
-                    "namespace"), ns));
-
-        }
-        catch (ParseException e) {
-            throw new IllegalStateException(
-                    "Generated Xml Element service java file has errors:\n"
-                            + e.getMessage());
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new IllegalStateException(
-                    "Generated Xml Element service java file has errors:\n"
-                            + e.getMessage());
-        }
-    }
-
-    /**
-     * Add true exported attribute to list.
-     * 
-     * @param annotAttrs Attributes list
-     * @param pair Pair
-     */
-    protected void addExportedAttr(List<AnnotationAttributeValue<?>> attrs) {
-
-        // Exported attr: always true to know when export from WSDL
-        attrs.add(new BooleanAttributeValue(new JavaSymbolName("exported"),
-                true));
-    }
-
-    /**
-     * Add true/false enum element attribute to list when if is/isnot enum.
-     * 
-     * @param typeDecl Type declaration
-     * @param annotAttrs Attributes list
-     */
-    protected void addEnumElementAttr(TypeDeclaration typeDecl,
-            List<AnnotationAttributeValue<?>> annotAttrs) {
-
-        // Check if is an Enum class
-        if (typeDecl instanceof EnumDeclaration) {
-            annotAttrs.add(new BooleanAttributeValue(new JavaSymbolName(
-                    "enumElement"), true));
-        }
-        else {
-            annotAttrs.add(new BooleanAttributeValue(new JavaSymbolName(
-                    "enumElement"), false));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public FieldMetadata getGvNIXXmlElementFieldAnnotation(FieldMetadata field) {
-
-        AnnotationMetadata gvNixXmlElementAnnot;
-
-        AnnotationMetadata xmlElementAnnot = MemberFindingUtils
-                .getAnnotationOfType(field.getAnnotations(), new JavaType(
-                        XmlElement.class.getName()));
-        if (xmlElementAnnot != null) {
-
-            // Field has XmlElement annotation: create GvNIXXmlElement from it
-            gvNixXmlElementAnnot = getXmlElementFieldAnnotation(xmlElementAnnot);
-
-        }
-        else {
-
-            AnnotationMetadata xmlElementRefAnnot = MemberFindingUtils
-                    .getAnnotationOfType(field.getAnnotations(), new JavaType(
-                            XmlElementRef.class.getName()));
-            if (xmlElementRefAnnot != null) {
-
-                // Field has XmlElementRef: create GvNIXXmlElement from it
-                gvNixXmlElementAnnot = getXmlElementRefFieldAnnotation(field);
-
-            }
-            else {
-
-                // Field no XmlElement, XmlElementRef: create empty
-                // GvNIXXmlElement
-                gvNixXmlElementAnnot = new AnnotationMetadataBuilder(
-                        new JavaType(GvNIXXmlElementField.class.getName()),
-                        new ArrayList<AnnotationAttributeValue<?>>()).build();
-            }
-        }
-
-        List<AnnotationMetadata> annots = new ArrayList<AnnotationMetadata>();
-        annots.add(gvNixXmlElementAnnot);
-
-        // Create new Field with GvNIXAnnotation.
-        FieldMetadataBuilder fieldMetadataBuilder = new FieldMetadataBuilder(
-                field.getDeclaredByMetadataId(), field.getModifier(),
-                field.getFieldName(), field.getFieldType(),
-                field.getFieldInitializer());
-        for (AnnotationMetadata annotationMetadata : annots) {
-            fieldMetadataBuilder.addAnnotation(annotationMetadata);
-        }
-
-        return fieldMetadataBuilder.build();
-    }
-
-    /**
-     * Get GvNIXXmlElement annotation related with XmlElement annotation.
-     * <p>
-     * Creates the GvNIXXmlElement with all attributes defined in XmlElement
-     * annotation.
-     * </p>
-     * 
-     * @param annot XmlElement annotation
-     * @return GvNIXXmlElement annotation
-     */
-    protected AnnotationMetadata getXmlElementFieldAnnotation(
-            AnnotationMetadata annot) {
-
-        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
-        for (JavaSymbolName attrName : annot.getAttributeNames()) {
-            attrs.add(annot.getAttribute(attrName));
-        }
-
-        return new AnnotationMetadataBuilder(new JavaType(
-                GvNIXXmlElementField.class.getName()), attrs).build();
-    }
-
-    /**
-     * Get GvNIXXmlElement annotation related with XmlElementRef annotation.
-     * <p>
-     * Only when field is of JAXBElement type, creates the GvNIXXmlElement with
-     * a "type" attribute with the first parameter type value.
-     * </p>
-     * 
-     * @param xmlElementAnnotation XmlElementRef annotation
-     * @return GvNIXXmlElement annotation
-     */
-    protected AnnotationMetadata getXmlElementRefFieldAnnotation(
-            FieldMetadata field) {
-
-        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
-
-        JavaType type = field.getFieldType();
-        List<JavaType> params = type.getParameters();
-        if (type.getFullyQualifiedTypeName()
-                .equals(JAXBElement.class.getName()) && !params.isEmpty()) {
-
-            attrs.add(new ClassAttributeValue(new JavaSymbolName("type"),
-                    params.get(0)));
-        }
-
-        return new AnnotationMetadataBuilder(new JavaType(
-                GvNIXXmlElementField.class.getName()), attrs).build();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public AnnotationMetadata getGvNIXWebFaultAnnotation(
-            ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
-            JavaType exceptionType) {
-
-        AnnotationMetadata gvNIXWebFaultAnnotationMetadata;
-        List<AnnotationAttributeValue<?>> gvNIXWebFaultAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-
-        // @WebFault(name = "faultDetail", targetNamespace =
-        // "http://apache.org/hello_world_soap_http/types")
-        List<AnnotationExpr> annotationExprList = classOrInterfaceDeclaration
-                .getAnnotations();
-
-        String faultBeanWebFault = exceptionType.getFullyQualifiedTypeName();
-
-        for (AnnotationExpr annotationExpr : annotationExprList) {
-
-            if (annotationExpr instanceof NormalAnnotationExpr) {
-
-                NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
-
-                StringAttributeValue nameStringAttributeValue;
-
-                StringAttributeValue targetNamespaceStringAttributeValue;
-
-                // Retrieve values.
-                for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
-
-                    if (pair.getName().contentEquals("name")) {
-
-                        // name
-                        nameStringAttributeValue = new StringAttributeValue(
-                                new JavaSymbolName("name"),
-                                ((StringLiteralExpr) pair.getValue())
-                                        .getValue());
-
-                        gvNIXWebFaultAnnotationAttributes
-                                .add(nameStringAttributeValue);
-                    }
-                    else if (pair.getName().contentEquals("targetNamespace")) {
-
-                        // targetNamespace
-                        targetNamespaceStringAttributeValue = new StringAttributeValue(
-                                new JavaSymbolName("targetNamespace"),
-                                ((StringLiteralExpr) pair.getValue())
-                                        .getValue());
-
-                        gvNIXWebFaultAnnotationAttributes
-                                .add(targetNamespaceStringAttributeValue);
-                    }
-
-                }
-            }
-        }
-
-        // faultBean
-        gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-                new JavaSymbolName("faultBean"), faultBeanWebFault));
-
-        // Create GvNIXWebFault annotation.
-        gvNIXWebFaultAnnotationMetadata = new AnnotationMetadataBuilder(
-                new JavaType(GvNIXWebFault.class.getName()),
-                gvNIXWebFaultAnnotationAttributes).build();
-
-        return gvNIXWebFaultAnnotationMetadata;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public AnnotationMetadata getGvNIXWebServiceAnnotation(
+    private AnnotationMetadata getGvNIXWebServiceAnnotation(
             ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
             ClassOrInterfaceDeclaration implementedInterface, JavaType javaType) {
 
@@ -1433,7 +1025,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                 StringAttributeValue addressStringAttributeValue;
 
                 if (normalAnnotationExpr.getName().getName()
-                        .contains(WSExportWsdlListener.webServiceInterface)) {
+                        .contains(webServiceInterface)) {
 
                     // Retrieve values.
                     for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
@@ -1453,7 +1045,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                     }
                 }
                 else if (normalAnnotationExpr.getName().getName()
-                        .contains(WSExportWsdlListener.soapBinding)) {
+                        .contains(soapBinding)) {
 
                     for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
 
@@ -1571,472 +1163,137 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     }
 
     /**
-     * {@inheritDoc}
+     * Convert annotation @XmlElement values to GvNIXXmlElement.
      * <p>
-     * Set Web Method and Parameters annotations.
-     * </p>
-     */
-    public MethodMetadata getGvNIXWebMethodMetadata(
-            MethodMetadata methodMetadata, String defaultNamespace) {
-
-        MethodMetadata gvNIXMethodMetadata;
-
-        // Method annotations.
-        List<AnnotationMetadata> gvNIXWebMethodAnnotationMetadataList = new ArrayList<AnnotationMetadata>();
-
-        AnnotationMetadata gvNIXWEbMethodAnnotationMetadata = getGvNIXWebMethodAnnotation(
-                methodMetadata, defaultNamespace);
-
-        Validate.isTrue(
-                gvNIXWEbMethodAnnotationMetadata != null,
-                "Generated Web Service method: '"
-                        + methodMetadata.getMethodName()
-                        + "' is not correctly generated with Web Service annotation values.\nRelaunch the command.");
-
-        gvNIXWebMethodAnnotationMetadataList
-                .add(gvNIXWEbMethodAnnotationMetadata);
-
-        // Input Parameters annotations.
-        List<AnnotatedJavaType> annotatedGvNIXWebParameterList = getGvNIXWebParamsAnnotations(
-                methodMetadata, defaultNamespace);
-
-        Validate.isTrue(
-                gvNIXWEbMethodAnnotationMetadata != null,
-                "Generated Web Service method: '"
-                        + methodMetadata.getMethodName()
-                        + "' is not correctly generated with Web Service annotation values for its parameters.\nRelaunch the command.");
-
-        // Rebuild method with retrieved parameters.
-        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine(methodMetadata.getBody());
-        MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
-                methodMetadata.getDeclaredByMetadataId(),
-                methodMetadata.getModifier(), methodMetadata.getMethodName(),
-                methodMetadata.getReturnType(), annotatedGvNIXWebParameterList,
-                methodMetadata.getParameterNames(), bodyBuilder);
-        for (AnnotationMetadata annotationMetadata : gvNIXWebMethodAnnotationMetadataList) {
-            methodMetadataBuilder.addAnnotation(annotationMetadata);
-        }
-        for (JavaType javaType : methodMetadata.getThrowsTypes()) {
-            methodMetadataBuilder.addThrowsType(javaType);
-        }
-
-        gvNIXMethodMetadata = methodMetadataBuilder.build();
-
-        return gvNIXMethodMetadata;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Returns 'null' if @WebMethod annotation is not defined.
-     * </p>
-     */
-    public AnnotationMetadata getGvNIXWebMethodAnnotation(
-            MethodMetadata methodMetadata, String defaultNamespace) {
-
-        AnnotationMetadata gvNIXWEbMethodAnnotationMetadata = null;
-        AnnotationAttributeValue<?> tmpAttributeValue;
-
-        List<AnnotationAttributeValue<?>> gvNIXWEbMethodAnnotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
-
-        List<AnnotationMetadata> methodAnnotations = methodMetadata
-                .getAnnotations();
-
-        AnnotationMetadata webMethodAnnotation = MemberFindingUtils
-                .getAnnotationOfType(methodAnnotations, new JavaType(
-                        "javax.jws.WebMethod"));
-
-        if (webMethodAnnotation == null) {
-            return gvNIXWEbMethodAnnotationMetadata;
-        }
-
-        // String operationName();
-        StringAttributeValue operationNameStringAttributeValue;
-        tmpAttributeValue = webMethodAnnotation
-                .getAttribute(new JavaSymbolName("operationName"));
-        if (tmpAttributeValue == null) {
-            operationNameStringAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("operationName"), methodMetadata
-                            .getMethodName().getSymbolName());
-        }
-        else {
-            operationNameStringAttributeValue = (StringAttributeValue) tmpAttributeValue;
-        }
-
-        gvNIXWEbMethodAnnotationAttributeValues
-                .add(operationNameStringAttributeValue);
-
-        // Check if exists action attribute value.
-        tmpAttributeValue = webMethodAnnotation
-                .getAttribute(new JavaSymbolName("action"));
-
-        StringAttributeValue actionAttributeValue;
-        if (tmpAttributeValue != null) {
-            actionAttributeValue = new StringAttributeValue(new JavaSymbolName(
-                    "action"),
-                    ((StringAttributeValue) tmpAttributeValue).getValue());
-        }
-        else {
-            actionAttributeValue = new StringAttributeValue(new JavaSymbolName(
-                    "action"), "");
-        }
-
-        gvNIXWEbMethodAnnotationAttributeValues.add(actionAttributeValue);
-
-        // @javax.jws.WebResult
-        AnnotationMetadata webResultAnnotation = MemberFindingUtils
-                .getAnnotationOfType(methodAnnotations, new JavaType(
-                        "javax.jws.WebResult"));
-
-        ClassAttributeValue resultTypeAttributeValue;
-        StringAttributeValue resultNameAttributeValue;
-        StringAttributeValue resultNamespaceAttributeValue = null;
-        BooleanAttributeValue headerAttributeValue = null;
-        StringAttributeValue partNameAttributeValue = null;
-
-        if (webResultAnnotation == null) {
-
-            resultTypeAttributeValue = new ClassAttributeValue(
-                    new JavaSymbolName("webResultType"),
-                    JavaType.VOID_PRIMITIVE);
-
-            resultNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("resultName"), "void");
-
-        }
-        else {
-            resultTypeAttributeValue = new ClassAttributeValue(
-                    new JavaSymbolName("webResultType"),
-                    methodMetadata.getReturnType());
-
-            AnnotationAttributeValue<?> nameAttributeValue = webResultAnnotation
-                    .getAttribute(new JavaSymbolName("name"));
-
-            if (nameAttributeValue != null) {
-                resultNameAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("resultName"),
-                        ((StringAttributeValue) nameAttributeValue).getValue());
-            }
-            else {
-                resultNameAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("resultName"), "return");
-            }
-
-            AnnotationAttributeValue<?> namespaceAttributeValue = webResultAnnotation
-                    .getAttribute(new JavaSymbolName("targetNamespace"));
-
-            if (namespaceAttributeValue != null) {
-                resultNamespaceAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("resultNamespace"),
-                        ((StringAttributeValue) namespaceAttributeValue)
-                                .getValue());
-            }
-            else {
-                resultNamespaceAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("resultNamespace"), defaultNamespace);
-            }
-
-            // Parameter webResultHeader.
-            headerAttributeValue = (BooleanAttributeValue) webResultAnnotation
-                    .getAttribute(new JavaSymbolName("header"));
-
-            if (headerAttributeValue == null) {
-                headerAttributeValue = new BooleanAttributeValue(
-                        new JavaSymbolName("webResultHeader"), false);
-            }
-            else {
-                headerAttributeValue = new BooleanAttributeValue(
-                        new JavaSymbolName("webResultHeader"),
-                        headerAttributeValue.getValue());
-            }
-
-            // Parameter webResultPartName.
-            partNameAttributeValue = (StringAttributeValue) webResultAnnotation
-                    .getAttribute(new JavaSymbolName("partName"));
-
-            if (partNameAttributeValue == null) {
-                partNameAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("webResultPartName"), "parameters");
-            }
-            else {
-                partNameAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("webResultPartName"),
-                        partNameAttributeValue.getValue());
-            }
-
-        }
-
-        gvNIXWEbMethodAnnotationAttributeValues.add(resultTypeAttributeValue);
-        gvNIXWEbMethodAnnotationAttributeValues.add(resultNameAttributeValue);
-
-        if (resultNamespaceAttributeValue != null) {
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(resultNamespaceAttributeValue);
-        }
-
-        if (headerAttributeValue != null) {
-            gvNIXWEbMethodAnnotationAttributeValues.add(headerAttributeValue);
-        }
-        if (partNameAttributeValue != null) {
-            gvNIXWEbMethodAnnotationAttributeValues.add(partNameAttributeValue);
-        }
-
-        // @javax.xml.ws.RequestWrapper
-        AnnotationMetadata requestWrapperAnnotation = MemberFindingUtils
-                .getAnnotationOfType(methodAnnotations, new JavaType(
-                        "javax.xml.ws.RequestWrapper"));
-
-        if (requestWrapperAnnotation != null) {
-
-            StringAttributeValue localNameAttributeValue = (StringAttributeValue) requestWrapperAnnotation
-                    .getAttribute(new JavaSymbolName("localName"));
-
-            StringAttributeValue requestWrapperNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("requestWrapperName"),
-                    localNameAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(requestWrapperNameAttributeValue);
-
-            StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) requestWrapperAnnotation
-                    .getAttribute(new JavaSymbolName("targetNamespace"));
-
-            StringAttributeValue requestTargetNamespaceAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("requestWrapperNamespace"),
-                    targetNamespaceAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(requestTargetNamespaceAttributeValue);
-
-            StringAttributeValue classNameAttributeValue = (StringAttributeValue) requestWrapperAnnotation
-                    .getAttribute(new JavaSymbolName("className"));
-
-            StringAttributeValue requestClassNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("requestWrapperClassName"),
-                    classNameAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(requestClassNameAttributeValue);
-
-        }
-
-        // @javax.xml.ws.ResponseWrapper
-        AnnotationMetadata responseWrapperAnnotation = MemberFindingUtils
-                .getAnnotationOfType(methodAnnotations, new JavaType(
-                        "javax.xml.ws.ResponseWrapper"));
-
-        if (responseWrapperAnnotation != null) {
-
-            StringAttributeValue localNameAttributeValue = (StringAttributeValue) responseWrapperAnnotation
-                    .getAttribute(new JavaSymbolName("localName"));
-
-            StringAttributeValue responseWrapperNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("responseWrapperName"),
-                    localNameAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(responseWrapperNameAttributeValue);
-
-            StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) responseWrapperAnnotation
-                    .getAttribute(new JavaSymbolName("targetNamespace"));
-
-            StringAttributeValue responseTargetNamespaceAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("responseWrapperNamespace"),
-                    targetNamespaceAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(responseTargetNamespaceAttributeValue);
-
-            StringAttributeValue classNameAttributeValue = (StringAttributeValue) responseWrapperAnnotation
-                    .getAttribute(new JavaSymbolName("className"));
-
-            StringAttributeValue responseClassNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("responseWrapperClassName"),
-                    classNameAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(responseClassNameAttributeValue);
-
-        }
-
-        // @javax.jws.soap.SOAPBinding
-        AnnotationMetadata sOAPBindingAnnotation = MemberFindingUtils
-                .getAnnotationOfType(methodAnnotations, new JavaType(
-                        "javax.jws.soap.SOAPBinding"));
-
-        if (sOAPBindingAnnotation != null) {
-
-            EnumAttributeValue sOAPBindingAttributeValue = (EnumAttributeValue) sOAPBindingAnnotation
-                    .getAttribute(new JavaSymbolName("parameterStyle"));
-
-            if (sOAPBindingAttributeValue != null) {
-
-                gvNIXWEbMethodAnnotationAttributeValues
-                        .add(new EnumAttributeValue(
-                                new JavaSymbolName("parameterStyle"),
-                                new EnumDetails(
-                                        new JavaType(
-                                                "org.gvnix.service.roo.addon.annotations.GvNIXWebMethod.GvNIXWebMethodParameterStyle"),
-                                        sOAPBindingAttributeValue.getValue()
-                                                .getField())));
-            }
-        }
-
-        gvNIXWEbMethodAnnotationMetadata = new AnnotationMetadataBuilder(
-                new JavaType(GvNIXWebMethod.class.getName()),
-                gvNIXWEbMethodAnnotationAttributeValues).build();
-
-        return gvNIXWEbMethodAnnotationMetadata;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * If there isn't WebParam annotation defined returns null.
-     * </p>
-     */
-    public List<AnnotatedJavaType> getGvNIXWebParamsAnnotations(
-            MethodMetadata methodMetadata, String defaultNamespace) {
-
-        List<AnnotatedJavaType> annotatedGvNIXWebParameterList = new ArrayList<AnnotatedJavaType>();
-
-        List<AnnotatedJavaType> parameterTypesList = methodMetadata
-                .getParameterTypes();
-
-        List<JavaSymbolName> parameterNamesList = methodMetadata
-                .getParameterNames();
-
-        if (parameterTypesList.isEmpty() && parameterNamesList.isEmpty()) {
-            return annotatedGvNIXWebParameterList;
-        }
-
-        AnnotatedJavaType parameterWithAnnotations;
-        List<AnnotationMetadata> parameterAnnotationList;
-
-        for (AnnotatedJavaType parameterType : parameterTypesList) {
-
-            parameterAnnotationList = new ArrayList<AnnotationMetadata>();
-
-            AnnotationMetadata webParamAnnotationMetadata = MemberFindingUtils
-                    .getAnnotationOfType(parameterType.getAnnotations(),
-                            new JavaType("javax.jws.WebParam"));
-
-            if (webParamAnnotationMetadata == null) {
-                // If there is not WebParam annotation defined returns null.
-                return null;
-            }
-
-            List<AnnotationAttributeValue<?>> gvNIXWebParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-            StringAttributeValue nameWebParamAttributeValue = (StringAttributeValue) webParamAnnotationMetadata
-                    .getAttribute(new JavaSymbolName("name"));
-
-            gvNIXWebParamAttributeValueList.add(nameWebParamAttributeValue);
-
-            ClassAttributeValue typeClassAttributeValue = new ClassAttributeValue(
-                    new JavaSymbolName("type"), parameterType.getJavaType());
-
-            gvNIXWebParamAttributeValueList.add(typeClassAttributeValue);
-
-            // @GvNIXWebParam
-            AnnotationMetadata gvNixWebParamAnnotationMetadata = new AnnotationMetadataBuilder(
-                    new JavaType(GvNIXWebParam.class.getName()),
-                    gvNIXWebParamAttributeValueList).build();
-
-            parameterAnnotationList.add(gvNixWebParamAnnotationMetadata);
-
-            // @WebParam
-            parameterAnnotationList.add(webParamAnnotationMetadata);
-
-            // Add annotation list to parameter.
-            parameterWithAnnotations = new AnnotatedJavaType(
-                    parameterType.getJavaType(), parameterAnnotationList);
-
-            annotatedGvNIXWebParameterList.add(parameterWithAnnotations);
-        }
-
-        return annotatedGvNIXWebParameterList;
-    }
-
-    /**
-     * Get XML document representation from WSDL if valid.
-     * <p>
-     * Check WSDL is not RPC Encoded and has only one compatible port.
+     * Searches for Jaxb annotations in {@link ClassOrInterfaceDeclaration} to
+     * convert values to {@link GvNIXXmlElement}.
      * </p>
      * 
-     * @param url from WSDL file to export
-     * @return XML document representation of WSDL
+     * @param typeDecl To retrieve values from @XmlElement annotations
+     * @return {@link GvNIXXmlElement} to define in class
      */
-    protected Document checkWSDLFile(String url) {
+    private AnnotationMetadata getGvNixXmlElementAnnot(TypeDeclaration typeDecl) {
 
-        // Check URL connection and WSDL format
-        Element root = securityService.getWsdl(url).getDocumentElement();
+        // Attribute value list.
+        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
 
-        Validate.isTrue(!WsdlParserUtils.isRpcEncoded(root), "This Wsdl '"
-                + url + "' is RPC Encoded and is not supported by the Add-on.");
+        boolean isNamespace = false;
+        boolean isPropOrder = false;
 
-        // Check if is compatible port defined with SOAP12 or SOAP11.
-        WsdlParserUtils.checkCompatiblePort(root);
+        for (AnnotationExpr typeAnnot : typeDecl.getAnnotations()) {
 
-        return root.getOwnerDocument();
-    }
+            if (typeAnnot instanceof NormalAnnotationExpr) {
 
-    /**
-     * {@inheritDoc}
-     */
-    public void addFileToUpdateAnnotation(File file,
-            GvNIXAnnotationType gvNIXAnnotationType) {
+                NormalAnnotationExpr normalAnnot = (NormalAnnotationExpr) typeAnnot;
+                String name = normalAnnot.getName().getName();
+                List<MemberValuePair> pairs = normalAnnot.getPairs();
+                if (name.contains(xmlRootElement)) {
 
-        switch (gvNIXAnnotationType) {
+                    // It's @XmlRootElement
+                    wsExportWsdl.addNameAttr(attrs, pairs);
 
-        case XML_ELEMENT:
-            xmlElements.add(file);
-            break;
+                }
+                else if (name.contains(xmlType)) {
 
-        case WEB_FAULT:
-            webFaults.add(file);
-            break;
+                    // It's @XmlType
 
-        case WEB_SERVICE:
-            webServices.add(file);
-            break;
+                    for (MemberValuePair pair : pairs) {
 
-        case WEB_SERVICE_INTERFACE:
-            webServiceInterfaces.add(file);
-            break;
+                        if (pair.getName().contentEquals("name")) {
+
+                            // @XmlType.name
+                            wsExportWsdl.addXmlTypeNameAttr(attrs, pair);
+
+                        }
+                        else if (pair.getName().contentEquals("propOrder")) {
+
+                            // @XmlType.propOrder
+                            wsExportWsdl.addElementListAttr(attrs, pair);
+                            isPropOrder = true;
+
+                        }
+                        else if (pair.getName().contentEquals("namespace")) {
+
+                            // @XmlType.namespace
+                            wsExportWsdl.addNamespaceAttr(attrs, pair);
+                            isNamespace = true;
+                        }
+                    }
+                }
+            }
         }
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void resetGeneratedFilesList() {
+        // Check correct values for @GvNIXXmlElement.
+        if (!isPropOrder) {
 
-        // Reset File List
-        xmlElements = new ArrayList<File>();
-        webFaults = new ArrayList<File>();
-        webServices = new ArrayList<File>();
-        webServiceInterfaces = new ArrayList<File>();
-        schemaPackage = new File("");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setSchemaPackageInfoFile(File schemaPackageInfoFile) {
-
-        this.schemaPackage = schemaPackageInfoFile;
-    }
-
-    /**
-     * Extract the filename from the given path, e.g. "mypath/myfile.txt" ->
-     * "myfile.txt".
-     * 
-     * @param path the file path (may be <code>null</code>)
-     * @return the extracted filename, or <code>null</code> if none
-     */
-    public static String getFilename(String path) {
-        if (path == null) {
-            return null;
+            wsExportWsdl.addElementListAttr(attrs);
         }
-        int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR);
-        return (separatorIndex != -1 ? path.substring(separatorIndex + 1)
-                : path);
+
+        if (!isNamespace) {
+
+            addNamespaceAttr(attrs);
+        }
+
+        wsExportWsdl.addExportedAttr(attrs);
+
+        wsExportWsdl.addEnumElementAttr(typeDecl, attrs);
+
+        // Create annotation
+        return new AnnotationMetadataBuilder(new JavaType(
+                GvNIXXmlElement.class.getName()), attrs).build();
+    }
+
+    private void addNamespaceAttr(List<AnnotationAttributeValue<?>> annotAttrs) {
+
+        try {
+
+            String ns = "";
+
+            boolean exists = false;
+            List<AnnotationExpr> annots = JavaParser.parse(schemaPackage)
+                    .getPackage().getAnnotations();
+            for (AnnotationExpr annot : annots) {
+                if (annot instanceof NormalAnnotationExpr) {
+
+                    NormalAnnotationExpr normalAnnot = (NormalAnnotationExpr) annot;
+                    if (normalAnnot.getName().toString()
+                            .contains("javax.xml.bind.annotation.XmlSchema")) {
+
+                        // @XmlSchema
+
+                        for (MemberValuePair pair : normalAnnot.getPairs()) {
+                            if (pair.getName().contentEquals("namespace")) {
+
+                                ns = ((StringLiteralExpr) pair.getValue())
+                                        .getValue();
+                                exists = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (exists) {
+                    break;
+                }
+            }
+
+            // look for @XmlSchema
+            annotAttrs.add(new StringAttributeValue(new JavaSymbolName(
+                    "namespace"), ns));
+
+        }
+        catch (ParseException e) {
+            throw new IllegalStateException(
+                    "Generated Xml Element service java file has errors:\n"
+                            + e.getMessage());
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            throw new IllegalStateException(
+                    "Generated Xml Element service java file has errors:\n"
+                            + e.getMessage());
+        }
     }
 
 }

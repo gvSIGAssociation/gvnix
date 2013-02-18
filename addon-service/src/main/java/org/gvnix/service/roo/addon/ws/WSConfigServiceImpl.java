@@ -1792,13 +1792,13 @@ public class WSConfigServiceImpl implements WSConfigService {
      * @param suffix the String to end each element with
      * @return the delimited String
      */
-    public static String collectionToDelimitedString(List coll, String delim,
-            String prefix, String suffix) {
+    public static String collectionToDelimitedString(List<String> coll,
+            String delim, String prefix, String suffix) {
         if (coll == null || coll.size() == 0) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        Iterator it = coll.iterator();
+        Iterator<String> it = coll.iterator();
         while (it.hasNext()) {
             sb.append(prefix).append(it.next()).append(suffix);
             if (it.hasNext()) {

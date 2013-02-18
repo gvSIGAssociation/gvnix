@@ -28,7 +28,7 @@ import org.springframework.roo.model.JavaType;
  * @author Ricardo García at <a href="http://www.disid.com">DiSiD Technologies
  *         S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria
  *         d'Infraestructures i Transport</a>
- * @See {@link WSExportWsdlListener}
+ * @See {@link WSExportWsdlImpl}
  * @see {@link WSExportWsdlConfigService}
  */
 public interface WSExportWsdlOperations {
