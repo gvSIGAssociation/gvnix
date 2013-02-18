@@ -33,6 +33,9 @@ field set --fieldName cars --type ~.domain.Car --cardinality ONE_TO_MANY --mappe
 web mvc setup
 web mvc all --package ~.web
 
+# Patterns setup
+web mvc pattern setup
+
 # Master register
 web mvc pattern master --class ~.web.PersonController --name personreg --type register --testAutomatically
 web mvc pattern master --class ~.web.CarController --name carreg --type register --testAutomatically
@@ -77,3 +80,6 @@ web mvc pattern detail --class ~.web.PersonController --name persontabeditregtab
 web mvc pattern master --class ~.web.PersonController --name persontabeditregtabeditreg --type tabular_edit_register --testAutomatically
 web mvc pattern detail --class ~.web.PersonController --name persontabeditregtabeditreg --type tabular_edit_register --field horses --testAutomatically
 web mvc pattern detail --class ~.web.PersonController --name persontabeditregtabeditreg --type tabular_edit_register --field cars --testAutomatically
+
+web mvc pattern update tags
+

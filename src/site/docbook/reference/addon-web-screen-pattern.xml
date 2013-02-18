@@ -74,8 +74,8 @@
     <title xml:lang="es">Instalación</title>
     
   	<para xml:lang="es">El add-on ofrece el comando <link
-    linkend="apendice-comandos_addon-web_mvc_pattern_install">
-    web mvc pattern install</link> que crea en el proyecto los
+    linkend="apendice-comandos_addon-web_mvc_pattern_setup">
+    web mvc pattern setup</link> que crea en el proyecto los
     ficheros que utilizarán los patrones de visualización.</para>
     
     <itemizedlist>
@@ -100,14 +100,17 @@
       </listitem>
     </itemizedlist>
     
-	<para xml:lang="es">Si los ficheros ya se encontraban instalados en el
-	proyecto, el comando los actualizará en el caso de existir una nueva
-    versión de dichos ficheros.</para>
+	<para xml:lang="es">Este comando solo estará disponible para la 
+	inicialización de los artefactos. Si se desea restaurar los 
+	artefactos o acualizarlos después de un cambio de versión
+	del add-on es necesario utilizar el comando <link
+    linkend="apendice-comandos_addon-web_mvc_pattern_update_tags">
+    web mvc pattern update tags</link>.</para>
     
   	<para xml:lang="es">La ejecución del comando realizará las siguientes
   	modificaciones en el proyecto.</para>
     
-	<programlisting>roo-gvNIX> <command>web mvc pattern install</command>
+	<programlisting>roo-gvNIX> <command>web mvc pattern setup</command>
 	Created SRC_MAIN_WEBAPP/images/pattern
 	Created SRC_MAIN_WEBAPP/images/pattern/enEdicion.gif
 	Created SRC_MAIN_WEBAPP/images/pattern/pedi_off.gif
@@ -227,8 +230,9 @@
   	<section xml:id="addon-web-relation-styles_creacion-maestro">
   		<title xml:lang="es">Creación de un patrón maestro</title>
 
-	    <para xml:lang="es">Mediante el commando <emphasis>web mvc
-	    pattern</emphasis> es posible definir un patrón de visualización maestro
+	    <para xml:lang="es">Mediante el commando <link
+          linkend="apendice-comandos_addon-web_mvc_pattern_master">web mvc
+        pattern master</link> es posible definir un patrón de visualización maestro
 	    sobre el controlador de cualquier entidad. Al usar el comando,
 	    además de añadir la anotación <emphasis>@GvNIXPattern</emphasis> al
 	    controlador elegido, se instalarán / crearán / modificarán los componentes
@@ -240,8 +244,9 @@
   	<section xml:id="addon-web-relation-styles_creacion-detalle">
   		<title xml:lang="es">Creación de un patrón detalle</title>
 
-	    <para xml:lang="es">El comando <emphasis>web mvc pattern
-	    detail</emphasis> permite definir el formato de visualización del detalle
+	    <para xml:lang="es">El comando <link
+          linkend="apendice-comandos_addon-web_mvc_relation_pattern_detail">web
+        mvc pattern detail</link> permite definir el formato de visualización del detalle
 	    de una entidad dado su controlador, esto es, como se visualizarán las entidades
 	    relacionadas al visualizar la entidad maestra. Notar que el comando se
 	    aplica sobre un campo, una relación, determinada de la entidad maestra (en

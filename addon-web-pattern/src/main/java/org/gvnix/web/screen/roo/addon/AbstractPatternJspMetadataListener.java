@@ -191,9 +191,11 @@ public abstract class AbstractPatternJspMetadataListener implements
                     destinationDirectory, controllerPath, patternNameType[0]);
 
         }
-        // else {
-        // Pattern type not supported. Nothing to do
-        // }
+        else {
+            // Pattern type not supported. Nothing to do
+            LOGGER.finer("Patter type not supported: "
+                    .concat(patternNameType[1]));
+        }
 
         // Modify some Roo JSPx
         modifyRooJsp(RooJspx.create);
@@ -860,7 +862,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      */
     private void installPatternArtifacts() {
 
-        _webScreenOperations.installPatternArtifacts(false);
+        _webScreenOperations.setup();
 
         // modify load-scripts.tagx
         modifyLoadScriptsTagx();

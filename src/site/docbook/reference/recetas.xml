@@ -228,7 +228,7 @@ Updated ROOT/pom.xml [
     vacía. gvNIX en su <link linkend="addon-web-screen-patterns">Add-on Web
     MVC Pattern</link> incluye un componente
     <emphasis>select-withempty.tagx</emphasis> que sí lo ofrece. Mediante el
-    comando <emphasis>web mvc pattern install</emphasis> se instalan los
+    comando <emphasis>web mvc pattern setup</emphasis> se instalan los
     componentes de MVC Pattern entre los que se incluye el selector con
     opción vacía. Entonces es posible modificar la jspx del buscador findPetsByOwner
     para que utilice <emphasis>select-withempty</emphasis> en lugar del original

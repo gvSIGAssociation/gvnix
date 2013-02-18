@@ -31,16 +31,25 @@
       <tbody>
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web_mvc_relation_pattern">web
-          mvc pattern install</link></entry>
+          linkend="apendice-comandos_addon-web_mvc_pattern_setup">web
+          mvc pattern setup</link></entry>
 
-          <entry xml:lang="es">Crea o actualiza en el proyecto los ficheros que
+          <entry xml:lang="es">Crea en el proyecto los ficheros que
           utilizarán los patrones de visualización</entry>
         </row>
         
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web_mvc_pattern">web mvc
+          linkend="apendice-comandos_addon-web_mvc_pattern_update_tags">web
+          mvc pattern update tags</link></entry>
+
+          <entry xml:lang="es">Actualiza en el proyecto los ficheros que
+          utilizarán los patrones de visualización</entry>
+        </row>
+        
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web_mvc_pattern_master">web mvc
           pattern master</link></entry>
 
           <entry xml:lang="es">Crea un patrón de visualización maestro en el
@@ -49,7 +58,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web_mvc_relation_pattern">web
+          linkend="apendice-comandos_addon-web_mvc_relation_pattern_detail">web
           mvc pattern detail</link></entry>
 
           <entry xml:lang="es">Crea un patrón de visualización detalle en el
@@ -61,10 +70,24 @@
     </tgroup>
   </table>
 
-  <section xml:id="apendice-comandos_addon-web_mvc_pattern_install">
-    <title>web mvc pattern install</title>
+  <section xml:id="apendice-comandos_addon-web_mvc_pattern_setup">
+    <title>web mvc pattern setup</title>
 
-    <para xml:lang="es">Crea o actualiza en el proyecto los ficheros que
+    <para xml:lang="es">Crea en el proyecto los ficheros que
+    utilizarán los patrones de visualización. El comando no tiene ningún
+    parámetro obligatorio ni opcional.</para>
+        
+    <para xml:lang="es">Para una descripción detallada de los ficheros
+    que instala este comando en el proyecto consultar la sección de
+    <link linkend="addon-web-screen-patterns">instalación</link>
+    del add-on Web Screen Patterns.</para>
+    
+  </section>
+
+  <section xml:id="apendice-comandos_addon-web_mvc_pattern_update_tags">
+    <title>web mvc pattern update tags</title>
+
+    <para xml:lang="es">Actualiza en el proyecto los ficheros que
     utilizarán los patrones de visualización. El comando no tiene ningún
     parámetro obligatorio ni opcional.</para>
         
@@ -75,7 +98,7 @@
     
   </section>
   
-  <section xml:id="apendice-comandos_addon-web_mvc_pattern">
+  <section xml:id="apendice-comandos_addon-web_mvc_pattern_master">
     <title xml:lang="es">web mvc pattern master</title>
 
     <para xml:lang="es">Crea un patrón de visualización maestro en el
@@ -159,7 +182,7 @@
       </variablelist></para>
   </section>
 
-  <section xml:id="apendice-comandos_addon-web_mvc_relation_pattern">
+  <section xml:id="apendice-comandos_addon-web_mvc_relation_pattern_detail">
     <title>web mvc pattern detail</title>
 
     <para xml:lang="es">Crea un patrón de visualización detalle en el

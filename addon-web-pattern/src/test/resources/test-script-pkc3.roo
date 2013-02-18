@@ -45,6 +45,8 @@ field set --fieldName cars --type ~.domain.Car --cardinality ONE_TO_MANY --mappe
 web mvc setup
 web mvc all --package ~.web
 
+web mvc pattern setup
+
 # Master register
 web mvc pattern master --class ~.web.PersonController --name personreg --type register --testAutomatically
 web mvc pattern master --class ~.web.CarController --name carreg --type register --testAutomatically

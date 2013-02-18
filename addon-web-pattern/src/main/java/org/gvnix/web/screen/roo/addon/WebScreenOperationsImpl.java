@@ -177,9 +177,6 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         // All checks passed OK
 
-        // Setup project for use annotation
-        configService.setup();
-
         // Test if the annotation already exists on the target type
         AnnotationMetadata annotationMetadata = MemberFindingUtils
                 .getAnnotationOfType(controllerDetails.getAnnotations(),
@@ -298,12 +295,6 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                         .concat("' entity."));
 
         // All checks passed OK.
-
-        // We don't need to do Setup because it must be done by a addPattern
-        // call, but just in case the command is used from an old addon version
-        // we must setup dependencies
-        // Setup project for use annotation
-        configService.setup();
 
         // List of pattern to use in annotation
         List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
@@ -722,22 +713,40 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     /*
      * (non-Javadoc)
      * 
+     * @see org.gvnix.web.screen.roo.addon.WebScreenOperations#setup()
+     */
+    @Override
+    public void setup() {
+        configService.setup();
+        installPatternArtifacts(false);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.gvnix.web.screen.roo.addon.WebScreenOperations#updatePattern()
      */
     public void updatePattern() {
         installPatternArtifacts(true);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Installs or updates pattern Artifacts.
+     * <ul>
+     * <li>images</li>
+     * <li>scripts JS</li>
+     * <li>CSS</li>
+     * <li>TAGx</li>
+     * <li>i18n language properties</li>
+     * <ul>
      * 
-     * @see
-     * org.gvnix.web.screen.roo.addon.WebScreenOperations#installPatternArtifacts
-     * (boolean)
+     * @param forceUpdate
      */
-    public void installPatternArtifacts(boolean forceUpdate) {
+    private void installPatternArtifacts(boolean forceUpdate) {
         PathResolver pathResolver = projectOperations.getPathResolver();
         // install pattern images
+        // Don't use copyDirectoryContents method with binary files and
+        // 'replace' = true: binary files will be corrupted
         if (forceUpdate) {
             OperationUtils.updateDirectoryContents("images/pattern/*.*",
                     pathResolver.getIdentifier(

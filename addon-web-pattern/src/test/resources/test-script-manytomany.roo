@@ -24,5 +24,6 @@ field string --fieldName name
 web mvc setup
 web mvc all --package ~.web
 
+web mvc pattern setup
 web mvc pattern master --class ~.web.PersonController --name personregtab --type register --testAutomatically
 web mvc pattern detail --class ~.web.PersonController --name personregtab --field My_horses --type tabular --testAutomatically

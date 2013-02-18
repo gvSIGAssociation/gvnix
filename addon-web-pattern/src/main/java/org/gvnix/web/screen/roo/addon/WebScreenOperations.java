@@ -100,18 +100,15 @@ public interface WebScreenOperations {
     void updatePattern();
 
     /**
-     * Installs pattern Artifacts.
+     * Setup all add-on artifacts:
      * <ul>
-     * <li>images</li>
-     * <li>scripts JS</li>
-     * <li>CSS</li>
-     * <li>TAGx</li>
-     * <li>i18n language properties</li>
-     * <ul>
-     * 
-     * @param forceUpdate if true forces the update of the existing resources
+     * <li>Maven repositories</>
+     * <li>Maven properties</>
+     * <li>Maven dependencies: the add-on itself</li>
+     * <li>copy all resources needed</>
+     * </ul>
      */
-    void installPatternArtifacts(boolean forceUpdate);
+    void setup();
 
     /**
      * Informs if entity class of <code>controller</code> is a active-record
@@ -121,4 +118,5 @@ public interface WebScreenOperations {
      * @return
      */
     boolean isControllerEntityActiveRecord(JavaType controller);
+
 }

@@ -40,7 +40,6 @@ public interface WebScreenConfigService {
      * <li>Maven repositories</>
      * <li>Maven properties</>
      * <li>Maven dependencies: the add-on itself</li>
-     * <li>copy all resources needed</>
      * </ul>
      */
     void setup();

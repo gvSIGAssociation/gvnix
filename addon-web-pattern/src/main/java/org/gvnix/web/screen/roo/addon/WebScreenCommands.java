@@ -55,14 +55,14 @@ public class WebScreenCommands implements CommandMarker {
     @Reference private SeleniumServices seleniumServices;
 
     /**
-     * Informs if <code>web mvc pattern *</code> command are available
+     * Informs if <code>web mvc pattern setup</code> command are available
      * 
      * @return true if commands are available
      */
-    @CliAvailabilityIndicator({ "web mvc pattern master",
-            "web mvc pattern install" })
+    @CliAvailabilityIndicator({ "web mvc pattern setup" })
     public boolean isWebPatternAvaliable() {
-        return operations.isPatternCommandAvailable();
+        return operations.isPatternCommandAvailable()
+                && !operations.isRelationPatternCommandAvailable();
     }
 
     /**
@@ -116,11 +116,12 @@ public class WebScreenCommands implements CommandMarker {
     }
 
     /**
-     * Informs if <code>web mvc pattern detail</code> command are available
+     * Informs if <code>web mvc pattern *</code> command are available
      * 
      * @return true if commands are available
      */
-    @CliAvailabilityIndicator({ "web mvc pattern detail" })
+    @CliAvailabilityIndicator({ "web mvc pattern detail",
+            "web mvc pattern master", "web mvc pattern update tags" })
     public boolean isWebRelationPatternAvaliable() {
         return operations.isRelationPatternCommandAvailable();
     }
@@ -160,11 +161,20 @@ public class WebScreenCommands implements CommandMarker {
     }
 
     /**
+     * Installs the static resources (images, css, js) and TAGx
+     */
+    @CliCommand(value = "web mvc pattern setup", help = "Installs static resources (images, css, js) and TAGx used by patterns")
+    public void webPatternSetup() {
+        operations.setup();
+
+    }
+
+    /**
      * Forces update the static resources (images, css, js) and TAGx
      */
-    @CliCommand(value = "web mvc pattern install", help = "Installs static resources (images, css, js) and TAGx used by patterns forcing overwrite of them")
-    public void webPatternInstall() {
-        operations.installPatternArtifacts(true);
+    @CliCommand(value = "web mvc pattern update tags", help = "Update static resources (images, css, js) and TAGx used by patterns forcing overwrite of them")
+    public void webPatternUpdateTags() {
+        operations.updatePattern();
     }
 
 }
