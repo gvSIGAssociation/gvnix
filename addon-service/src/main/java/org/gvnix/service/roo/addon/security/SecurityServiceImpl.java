@@ -259,6 +259,11 @@ public class SecurityServiceImpl implements SecurityService {
             KeyManagementException, MalformedURLException, IOException,
             UnknownHostException, SocketException, SAXException {
 
+        // Create a SSL context
+        SSLContext context = SSLContext.getInstance("TLS");
+        TrustManagerFactory tmf = TrustManagerFactory
+                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+
         // Passphrase of the keystore: "changeit" by default
         char[] passArray = (StringUtils.isNotBlank(pass) ? pass.toCharArray()
                 : "changeit".toCharArray());
@@ -266,8 +271,13 @@ public class SecurityServiceImpl implements SecurityService {
         // Get the project keystore and copy it from JVM if not exists
         File keystore = getProjectKeystore();
 
-        // Get SSL socket replacing default trust manager with our trust manager
-        SSLSocketFactory factory = getGvNixSocketFactory(passArray, keystore);
+        tmf.init(GvNix509TrustManager.loadKeyStore(keystore, passArray));
+
+        X509TrustManager defaultTrustManager = (X509TrustManager) tmf
+                .getTrustManagers()[0];
+        GvNix509TrustManager tm = new GvNix509TrustManager(defaultTrustManager);
+        context.init(null, new TrustManager[] { tm }, null);
+        SSLSocketFactory factory = context.getSocketFactory();
 
         // Open URL location (default 443 port if not defined)
         URL url = new URL(loc);
@@ -294,62 +304,17 @@ public class SecurityServiceImpl implements SecurityService {
         catch (SSLException ssle) {
 
             // Get needed certificates for this host
-            getCerts(host, keystore, passArray);
+            getCerts(tm, host, keystore, passArray);
             doc = getWsdl(loc, pass);
 
         }
         catch (IOException ioe) {
 
-            invalidHostCert(passArray, keystore, host);
+            invalidHostCert(passArray, keystore, tm, host);
         }
 
         Validate.notNull(doc, "No valid document format");
         return doc;
-    }
-
-    /**
-     * Get SSL socket factory with gvNIX trust manager.
-     * 
-     * @param pass Password
-     * @param keystore Keystore
-     * @return SSL socket factory with gvNIX trust manager
-     * @throws NoSuchAlgorithmException
-     * @throws KeyStoreException
-     * @throws Exception
-     * @throws KeyManagementException
-     */
-    protected SSLSocketFactory getGvNixSocketFactory(char[] pass, File keystore)
-            throws NoSuchAlgorithmException, KeyStoreException, Exception,
-            KeyManagementException {
-
-        SSLContext ctx = SSLContext.getInstance("TLS");
-        ctx.init(null,
-                new TrustManager[] { getGvNixTrustManager(pass, keystore) },
-                null);
-
-        return ctx.getSocketFactory();
-    }
-
-    /**
-     * Get gvNIX trust manager.
-     * 
-     * @param pass Password
-     * @param keystore Keystore
-     * @return gvNIX trust manager
-     * @throws NoSuchAlgorithmException
-     * @throws KeyStoreException
-     * @throws Exception
-     */
-    protected GvNix509TrustManager getGvNixTrustManager(char[] pass,
-            File keystore) throws NoSuchAlgorithmException, KeyStoreException,
-            Exception {
-
-        TrustManagerFactory tmf = TrustManagerFactory
-                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(GvNix509TrustManager.loadKeyStore(keystore, pass));
-        X509TrustManager defTrust = (X509TrustManager) tmf.getTrustManagers()[0];
-
-        return new GvNix509TrustManager(defTrust);
     }
 
     /**
@@ -359,10 +324,11 @@ public class SecurityServiceImpl implements SecurityService {
      * @param keystore Keystore
      * @param host Host destination
      */
-    protected void invalidHostCert(char[] pass, File keystore, String host) {
+    protected void invalidHostCert(char[] pass, File keystore,
+            GvNix509TrustManager tm, String host) {
 
         StringBuffer msg = new StringBuffer("There is not access to the WSDL.");
-        X509Certificate[] certs = getCerts(host, keystore, pass);
+        X509Certificate[] certs = getCerts(tm, host, keystore, pass);
         if (certs != null) {
 
             msg.append(" Maybe the emited certificate does not match the hostname where WSDL resides.\n");
@@ -420,13 +386,12 @@ public class SecurityServiceImpl implements SecurityService {
      * @param pass
      * @return
      */
-    private X509Certificate[] getCerts(String host, File keystore, char[] pass) {
+    private X509Certificate[] getCerts(GvNix509TrustManager tm, String host,
+            File keystore, char[] pass) {
 
         X509Certificate[] certs = null;
 
         try {
-
-            GvNix509TrustManager tm = getGvNixTrustManager(pass, keystore);
 
             certs = tm.addCerts(host, keystore, pass);
             if (certs != null) {
