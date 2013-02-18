@@ -35,7 +35,7 @@ mkdir -p "$ROO_HOME"/bootstrap/target/osgi/bundle
 mkdir -p "$ROO_HOME"/bootstrap/target/osgi/conf
 
 # gvNIX: copy add-ons
-rm -rf "$GVNIX_HOME"/target/all/org.gvnix.support.*
+rm -rf "$GVNIX_HOME"/target/all/org.gvnix.support*
 cp -f "$GVNIX_HOME"/target/all/org.gvnix.* "$ROO_HOME"/bootstrap/target/osgi/bundle
 
 cp "$ROO_HOME"/bootstrap/src/main/bin/* "$ROO_HOME"/bootstrap/target/osgi/bin
