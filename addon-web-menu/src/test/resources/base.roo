@@ -16,6 +16,3 @@ finder add --finderName findEntity1sByAnEnum
 web mvc setup
 web mvc all --package ~.web
 menu setup
-
-perform tests
-perform assembly

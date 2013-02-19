@@ -92,7 +92,6 @@ finder list --class ~.domain.Pedido --depth 2 --filter Estado
 finder list --class ~.domain.Pedido --depth 3 --filter findPedidoesByTotalGreaterThanEqualsAndEstado
 finder add --finderName findPedidoesByTotalGreaterThanEqualsAndEstadoAndMetodoPago --class ~.domain.Pedido
 
-perform tests
 selenium test --controller ~.web.CategoriaController
 selenium test --controller ~.web.ClienteController
 selenium test --controller ~.web.PedidoController

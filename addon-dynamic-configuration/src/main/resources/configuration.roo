@@ -37,9 +37,6 @@ configuration list
 # Write configurations to project
 configuration export
 
-perform tests
-perform package
-
 # Then you can run the application with distinct profiles:
 #  mvn clean tomcat:run -P dev
 #  mvn clean tomcat:run -P pro -D database.password=

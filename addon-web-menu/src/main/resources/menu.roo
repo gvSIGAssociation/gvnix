@@ -21,9 +21,3 @@ menu entry move --id fi_pet_typeandnamelike --into c_finders
 menu entry move --id fi_visit_descriptionandvisitdate --into c_finders
 menu entry move --id fi_visit_descriptionlike --into c_finders
 menu entry move --id fi_visit_visitdatebetween --into c_finders
-
-// (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/)
-
-
-perform tests
-perform package

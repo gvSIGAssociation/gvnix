@@ -9,9 +9,3 @@ theme install --id cit
 
 // Activate one of the installed themes
 theme set --id cit
-
-// (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/)
-
-perform tests
-perform eclipse
-perform assembly

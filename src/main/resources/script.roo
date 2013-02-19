@@ -17,7 +17,3 @@ remote service export operation --class ~.services.Clase --method returnString -
 remote service import ws --class ~.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
 configuration create --name test
 configuration export
-perform tests
-perform eclipse
-perform package
-perform assembly

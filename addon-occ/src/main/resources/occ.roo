@@ -49,7 +49,3 @@ logging setup --level INFO
 // Set OCC up for Pet entity
 occ checksum set --entity ~.domain.Pet
 occ checksum set --entity ~.domain.Owner
-
-// (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/)
-
-perform assembly

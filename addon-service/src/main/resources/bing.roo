@@ -7,10 +7,6 @@ web mvc setup
 
 controller class --class ~.controller.SearchController
 
-perform tests
-perform eclipse
-perform package
-
 // next steps by hand:
 //
 // * Customize index.jspx and add a form to take parameters that the 
