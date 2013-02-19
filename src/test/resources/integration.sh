@@ -376,6 +376,15 @@
 	cd ..
 	echo gvnix-test-security end
 
+	## gvnix-test-entity
+	echo gvnix-test-entity start
+	mkdir gvnix-test-entity
+	cd gvnix-test-entity
+	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-entity.roo --lineNumbers true
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	cd ..
+	echo gvnix-test-entity end
+
 ##
 ## gvNIX typicalsecurity add-on
 ##
