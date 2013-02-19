@@ -19,4 +19,12 @@
 	<dependency org="javax.xml.ws" name="jaxws-api" rev="2.2.8" />
 	<!-- Avoid ROO-3163 -->
 	<dependency org="org.springframework" name="spring-tx" rev="${spring.version}" />
+	<!-- Avoid ROO-770 -->
+	<!-- Use maven dependency format to set scope -->
+    <dependency>
+        <groupId>javax.persistence</groupId>
+        <artifactId>persistence-api</artifactId>
+        <version>1.0</version>
+        <scope>provided</scope>
+    </dependency>
 </dependencies>
