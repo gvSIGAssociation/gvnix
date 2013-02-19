@@ -1,14 +1,14 @@
 project --topLevelPackage org.gvnix.sample
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
-entity jpa --class ~.domain.Entity1
+entity jpa --class ~.domain.Entity1 --testAutomatically
 field string field1
 field string field2
-entity jpa --class ~.domain.Entity2
+entity jpa --class ~.domain.Entity2 --testAutomatically
 field string otherField1
 field string otherField2
 occ checksum all
 web mvc setup
-web mvc all --package ~.web
+web mvc all --package ~.web --testAutomatically
 theme install --id gvnix 
 theme set --id gvnix 
 remote service class --class ~.services.ClaseServicio

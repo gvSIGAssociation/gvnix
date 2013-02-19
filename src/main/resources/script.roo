@@ -6,8 +6,6 @@ web mvc install language --code ca
 menu setup
 menu tree
 web report setup
-//controller class --class ~.web.MyController
-//web report add --controller ~.web.MyController --reportName Report --format pdf
 menu entry add --label my_test
 remote service class --class ~.services.Clase
 remote service operation --name checkString --service ~.services.Clase

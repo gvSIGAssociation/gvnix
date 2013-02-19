@@ -128,7 +128,9 @@
 	mkdir configuration
 	cd configuration
 	$1/gvnix.sh script --file $2/code/addon-dynamic-configuration/src/main/resources/configuration.roo --lineNumbers true
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	# Start application with both configurations
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true -Pdev
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true -Ppro
 	cd ..
 	echo configuration end
 
@@ -194,6 +196,8 @@
 	mkdir es-i18n
 	cd es-i18n
 	$1/gvnix.sh script --file $2/code/addon-web-i18n/src/main/resources/es-i18n.roo --lineNumbers true
+	# Request the change language URL
+	wget -q --retry-connrefused --tries=30 -O target/langca.html http://localhost:8080/petclinic/?lang=ca &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo es-i18n end
@@ -216,7 +220,7 @@
 	mkdir base
 	cd base
 	$1/gvnix.sh script --file $2/code/addon-web-menu/src/test/resources/base.roo --lineNumbers true
-	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo base end
 
@@ -296,6 +300,9 @@
 	mkdir report
 	cd report
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/main/resources/report.roo --lineNumbers true
+	# Request report form and report generation URLs
+	wget -q --retry-connrefused --tries=30 -O target/reportform.html http://localhost:8080/petclinic/pets/reports/petlist?form &
+	wget -q --retry-connrefused --tries=30 -O target/report.html http://localhost:8080/petclinic/pets/reports/petlist?format=pdf &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo report end
@@ -305,6 +312,9 @@
 	mkdir gvnix-test-report
 	cd gvnix-test-report
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/test/resources/gvnix-test-report.roo --lineNumbers true
+	# Request report form and report generation URLs
+	wget -q --retry-connrefused --tries=30 -O target/reportform.html http://localhost:8080/webreport-test/people/reports/personlist?form &
+	wget -q --retry-connrefused --tries=30 -O target/report.html http://localhost:8080/webreport-test/people/reports/personlist?format=pdf &
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-report end
@@ -318,6 +328,8 @@
 	mkdir bing
 	cd bing
 	$1/gvnix.sh script --file $2/code/addon-service/src/main/resources/bing.roo --lineNumbers true
+	# Get index page
+	wget -q --retry-connrefused --tries=30 -O target/index.html http://localhost:8080/bing-search-app &
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo bing end
@@ -327,6 +339,9 @@
 	mkdir service
 	cd service
 	$1/gvnix.sh script --file $2/code/addon-service/src/main/resources/service.roo --lineNumbers true
+	# Get services summary page and available WSDLs
+	wget -q --retry-connrefused --tries=30 -O target/services.html http://localhost:8080/petclinic/services &
+	wget -q --retry-connrefused --tries=30 -O target/petservice.wsdl http://localhost:8080/petclinic/services/PetService?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo service end
@@ -364,7 +379,9 @@
 	mkdir gvnix-test
 	cd gvnix-test
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test.roo --lineNumbers true
-	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	# Get services summary page and available WSDLs	wget -q --retry-connrefused --tries=30 -O target/services.html http://localhost:8080/service-layer-test/services &
+	wget -q --retry-connrefused --tries=30 -O target/clase.wsdl http://localhost:8080/service-layer-test/services/Clase?wsdl &
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test end
 
@@ -373,7 +390,7 @@
 	mkdir gvnix-test-security
 	cd gvnix-test-security
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-security.roo --lineNumbers true
-	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-security end
 
@@ -382,6 +399,10 @@
 	mkdir gvnix-test-entity
 	cd gvnix-test-entity
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-entity.roo --lineNumbers true
+	# Get services summary page and available WSDLs
+	wget -q --retry-connrefused --tries=30 -O target/services.html http://localhost:8080/petclinic/services &
+	wget -q --retry-connrefused --tries=30 -O target/pet.wsdl http://localhost:8080/petclinic/services/Pet?wsdl &
+	wget -q --retry-connrefused --tries=30 -O target/visit.wsdl http://localhost:8080/petclinic/services/Visit?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-entity end
@@ -395,6 +416,10 @@
 	mkdir typicalsecurity
 	cd typicalsecurity
 	$1/gvnix.sh script --file $2/code/addon-web-mvc-typicalsecurity/src/main/resources/typicalsecurity.roo --lineNumbers true
+	# Get login, forgotpassword and signup pages
+	wget -q --retry-connrefused --tries=30 -O target/login.html http://localhost:8080/petclinic/pets &
+	wget -q --retry-connrefused --tries=30 -O target/forgotpassword.html http://localhost:8080/petclinic/forgotpassword/index &
+	wget -q --retry-connrefused --tries=30 -O target/signup.html http://localhost:8080/petclinic/signup?form &
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo typicalsecurity end
@@ -411,6 +436,15 @@
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo theme end
+	
+	## theme-gvnix
+	echo theme-gvnix start
+	mkdir theme-gvnix
+	cd theme-gvnix
+	$1/gvnix.sh script --file $2/code/addon-web-theme/src/test/resources/theme-gvnix.roo --lineNumbers true
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	cd ..
+	echo theme-gvnix end
 
 ##
 ## gvNIX add-ons
@@ -421,7 +455,10 @@
 	mkdir gvnix-sample
 	cd gvnix-sample
 	$1/gvnix.sh script --file $2/code/src/main/resources/gvnix-sample.roo --lineNumbers true
-	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	# Get services summary page and available WSDLs
+	wget -q --retry-connrefused --tries=30 -O target/services.html http://localhost:8080/sample/services &
+	wget -q --retry-connrefused --tries=30 -O target/claseservicio.wsdl http://localhost:8080/sample/services/ClaseServicio?wsdl &
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-sample end
 
@@ -430,6 +467,11 @@
 	mkdir script
 	cd script
 	$1/gvnix.sh script --file $2/code/src/main/resources/script.roo --lineNumbers true
+	# Request the change language URL
+	wget -q --retry-connrefused --tries=30 -O target/langes.html http://localhost:8080/petclinic/?lang=ca &	
+	# Get services summary page and aavailable WSDLs
+	wget -q --retry-connrefused --tries=30 -O target/services.html http://localhost:8080/petclinic/services &
+	wget -q --retry-connrefused --tries=30 -O target/clase.wsdl http://localhost:8080/petclinic/services/Clase?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo script end
@@ -441,6 +483,13 @@
 	$1/gvnix.sh script --file $2/code/src/main/resources/tiendavirtual.roo --lineNumbers true
 ##  Inter-type declaration conflicts with existing member, avoid it temporally
     mvn test-compile > /dev/null
+    # Get no entities dialog message
+	wget -q --retry-connrefused --tries=30 -O target/dialog.html http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1 &
+	# Change language
+	wget -q --retry-connrefused --tries=30 -O target/langca.html http://localhost:8080/tiendavirtual/?lang=ca &	
+	# Request report form and report generation URLs
+	wget -q --retry-connrefused --tries=30 -O target/reportform.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?form &
+	wget -q --retry-connrefused --tries=30 -O target/report.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?format=pdf &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo tiendavirtual end

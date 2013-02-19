@@ -1,11 +1,9 @@
 // Spring Roo ENGINEERING BUILD [rev unknown] log opened at 2010-04-06 11:43:45
 project --topLevelPackage org.gvnix.test.tomcat5compat --java 5
 jpa setup --provider HIBERNATE --database H2_IN_MEMORY 
-entity jpa --class ~.domain.Entity1
+entity jpa --class ~.domain.Entity1 --testAutomatically
 field string --fieldName field1
 field string --fieldName field2
-dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1
-dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3
 enum type --class ~.domain.AnEnum
 enum constant --class ~.domain.AnEnum --name ONE
 enum constant --class ~.domain.AnEnum --name TWO
@@ -14,5 +12,5 @@ field enum --fieldName anEnum --class ~.domain.Entity1 --type ~.domain.AnEnum
 finder add --finderName findEntity1sByAnEnumAndfindEntity1sByField1LikeAndfindEntity1sByField2Like
 finder add --finderName findEntity1sByAnEnum
 web mvc setup
-web mvc all --package ~.web
+web mvc all --package ~.web --testAutomatically
 menu setup

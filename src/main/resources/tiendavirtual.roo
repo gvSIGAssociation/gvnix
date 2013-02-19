@@ -110,11 +110,11 @@ theme set --id cit
 theme list
 
 web mvc pattern setup
-web mvc pattern master --class ~.web.PedidoController --name pedido --type register
-web mvc pattern detail --class ~.web.PedidoController --name pedido --field lineasPedido --type tabular
-web mvc pattern master --class ~.web.ProductoController --name ficha --type register
-web mvc pattern master --class ~.web.ProductoController --name productos --type tabular
-web mvc pattern master --class ~.web.ClienteController --name clientes --type tabular
+web mvc pattern master --class ~.web.PedidoController --name pedido --type register --testAutomatically
+web mvc pattern detail --class ~.web.PedidoController --name pedido --field lineasPedido --type tabular --testAutomatically
+web mvc pattern master --class ~.web.ProductoController --name ficha --type register --testAutomatically
+web mvc pattern master --class ~.web.ProductoController --name productos --type tabular --testAutomatically
+web mvc pattern master --class ~.web.ClienteController --name clientes --type tabular --testAutomatically
 web mvc pattern update tags
 
 help menu

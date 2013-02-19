@@ -24,7 +24,7 @@ focus --class ~.domain.Person
 field set --fieldName coches --type org.gvnix.test.service.layer.project.domain.Car --cardinality ONE_TO_MANY --mappedBy person
 
 web mvc setup
-web mvc all --package org.gvnix.test.service.layer.project.web
+web mvc all --package org.gvnix.test.service.layer.project.web --testAutomatically
 
 // [CORRECT] Create Service Class.
 remote service class --class org.gvnix.test.service.layer.project.services.Clase
@@ -67,9 +67,6 @@ remote service import ws --class org.gvnix.test.service.layer.project.services.C
 remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy09 --wsdl http://www.thomas-bayer.com/axis2/services/BLZService?wsdl
 
 // Import Remote RPC Style web services: will be generated with Axis
-
-// [CORRECT] Transport: HTTP, Bindings: SOAP, Use: Encoded
-remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy10 --wsdl http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL
 
 // [CORRECT] Transport: HTTP, Operations: 179, Bindings: SOAP, Use: Encoded, Implementation: AXIS
 remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy12 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
