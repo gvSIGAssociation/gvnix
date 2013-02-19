@@ -336,7 +336,7 @@
 	mkdir gvnix-test-no-jpa-no-web
 	cd gvnix-test-no-jpa-no-web
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-no-jpa-no-web.roo --lineNumbers true
-	mvn test package -Dmaven.tomcat.fork=true 
+	mvn test package
 	cd ..
 	echo gvnix-test-no-jpa-no-web end
 
@@ -345,7 +345,8 @@
 	mkdir gvnix-test-no-jpa
 	cd gvnix-test-no-jpa
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-no-jpa.roo --lineNumbers true
-	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	# Error #5832 pending from ROO-770 and SPR-6819 resolution
+#	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-no-jpa end
 
@@ -354,7 +355,7 @@
 	mkdir gvnix-test-no-web
 	cd gvnix-test-no-web
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-no-web.roo --lineNumbers true
-	mvn test package -Dmaven.tomcat.fork=true 
+	mvn test package
 	cd ..
 	echo gvnix-test-no-web end
 	
@@ -381,7 +382,7 @@
 	mkdir gvnix-test-entity
 	cd gvnix-test-entity
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-entity.roo --lineNumbers true
-	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-entity end
 
