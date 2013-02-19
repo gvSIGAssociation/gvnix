@@ -1,5 +1,5 @@
 
-    public String ${entity_class}.checksumDigest() {
+    private String ${entity_class}.checksumDigest() {
         final String nullstr = "__null__";
         final String separator = "#$#";
         StringBuilder sb = new StringBuilder();

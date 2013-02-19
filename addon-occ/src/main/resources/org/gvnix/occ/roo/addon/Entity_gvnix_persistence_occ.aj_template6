@@ -1,6 +1,6 @@
 
     @PostLoad
-    public void ${entity_class}.loadChecksum() {
+    private void ${entity_class}.loadChecksum() {
         if (this.${checksum_field} == null) {
             this.${checksum_field} = this.checksumDigest();
         }

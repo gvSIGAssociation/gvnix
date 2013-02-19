@@ -1,5 +1,5 @@
 
-    public void ${entity_class}.checkConcurrency(${entity_class} attached) {
+    private void ${entity_class}.checkConcurrency(${entity_class} attached) {
         if (attached == null){
             attached = this.entityManager.find(${entity_class}.class, this.${id_field});
             if (attached == null) {
