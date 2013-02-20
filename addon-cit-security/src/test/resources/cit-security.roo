@@ -1,0 +1,4 @@
+
+script clinic.roo
+
+cit security setup --url http://www.myurl.es --login mylogin --password mypassword --appName myapp
