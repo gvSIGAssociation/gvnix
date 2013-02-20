@@ -12,5 +12,6 @@ field enum --fieldName anEnum --class ~.domain.Entity1 --type ~.domain.AnEnum
 finder add --finderName findEntity1sByAnEnumAndfindEntity1sByField1LikeAndfindEntity1sByField2Like
 finder add --finderName findEntity1sByAnEnum
 web mvc setup
-web mvc all --package ~.web --testAutomatically
+web mvc all --package ~.web
+selenium test --controller ~.web.Entity1Controller
 menu setup

@@ -130,7 +130,7 @@
 	$1/gvnix.sh script --file $2/code/addon-dynamic-configuration/src/main/resources/configuration.roo --lineNumbers true
 	# Start application with both configurations
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true -Pdev
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true -Ppro
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true -Ppro -Ddatabase.password=
 	cd ..
 	echo configuration end
 
@@ -455,6 +455,8 @@
 	mkdir gvnix-sample
 	cd gvnix-sample
 	$1/gvnix.sh script --file $2/code/src/main/resources/gvnix-sample.roo --lineNumbers true
+##  Inter-type declaration conflicts with existing member, avoid it temporally
+    mvn test-compile > /dev/null
 	# Get services summary page and available WSDLs
 	wget -q --retry-connrefused --tries=30 -O target/services.html http://localhost:8080/sample/services &
 	wget -q --retry-connrefused --tries=30 -O target/claseservicio.wsdl http://localhost:8080/sample/services/ClaseServicio?wsdl &

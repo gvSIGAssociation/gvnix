@@ -60,7 +60,7 @@
 	Observar que se establece la ruta en donde Jenkins tiene instalada la versión de Maven.</para>
 	
 	<para xml:lang="es">Con el <emphasis>Text-finder Plugin</emphasis> se busca la cadena
-	<emphasis>BUILD FAILURE</emphasis> y en el caso de encontrarla se marca el build como inestable.</para>
+	<emphasis>BUILD FAILURE|Script execution aborted</emphasis> y en el caso de encontrarla se marca el build como inestable.</para>
   	
   	<para xml:lang="es">Se avisa por correo de ejecuciones erróneas al responsable técnico del proyecto 
   	y a las personas que hayan producido el error. Para ello, debe estar configurado en el sistema

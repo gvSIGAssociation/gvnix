@@ -8,7 +8,9 @@ field string otherField1
 field string otherField2
 occ checksum all
 web mvc setup
-web mvc all --package ~.web --testAutomatically
+web mvc all --package ~.web
+selenium test --controller ~.web.Entity1Controller
+selenium test --controller ~.web.Entity2Controller
 theme install --id gvnix 
 theme set --id gvnix 
 remote service class --class ~.services.ClaseServicio
