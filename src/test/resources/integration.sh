@@ -196,6 +196,7 @@
 	mkdir es-i18n
 	cd es-i18n
 	$1/gvnix.sh script --file $2/code/addon-web-i18n/src/main/resources/es-i18n.roo --lineNumbers true
+	mkdir target
 	# Request the change language URL
 	wget --retry-connrefused --tries=5 -O target/langca.html http://localhost:8080/petclinic/?lang=ca &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
@@ -246,6 +247,7 @@
 	mkdir pattern
 	cd pattern
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/main/resources/pattern.roo --lineNumbers true
+##  Reopen shell to generate pending pattern resources
 	$1/gvnix.sh hint
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
@@ -256,6 +258,7 @@
 	mkdir test-script-pkc
 	cd test-script-pkc
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc.roo --lineNumbers true
+##  Reopen shell to generate pending pattern resources
 	$1/gvnix.sh hint
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
@@ -266,6 +269,7 @@
 	mkdir test-script-pkc2
 	cd test-script-pkc2
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc2.roo --lineNumbers true
+##  Reopen shell to generate pending pattern resources
 	$1/gvnix.sh hint
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
@@ -276,6 +280,7 @@
 	mkdir test-script-pkc3
 	cd test-script-pkc3
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc3.roo --lineNumbers true
+##  Reopen shell to generate pending pattern resources
 	$1/gvnix.sh hint
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
@@ -286,6 +291,7 @@
 	mkdir test-script-manytomany
 	cd test-script-manytomany
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-manytomany.roo --lineNumbers true
+##  Reopen shell to generate pending pattern resources
 	$1/gvnix.sh hint
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
@@ -300,6 +306,7 @@
 	mkdir report
 	cd report
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/main/resources/report.roo --lineNumbers true
+	mkdir target
 	# Request report form and report generation URLs
 	wget --retry-connrefused --tries=5 -O target/reportform.html http://localhost:8080/petclinic/pets/reports/petlist?form &
 	wget --retry-connrefused --tries=5 -O target/report.html http://localhost:8080/petclinic/pets/reports/petlist?format=pdf &
@@ -312,6 +319,7 @@
 	mkdir gvnix-test-report
 	cd gvnix-test-report
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/test/resources/gvnix-test-report.roo --lineNumbers true
+	mkdir target
 	# Request report form and report generation URLs
 	wget --retry-connrefused --tries=5 -O target/reportform.html http://localhost:8080/webreport-test/people/reports/personlist?form &
 	wget --retry-connrefused --tries=5 -O target/report.html http://localhost:8080/webreport-test/people/reports/personlist?format=pdf &
@@ -329,7 +337,7 @@
 	cd bing
 	$1/gvnix.sh script --file $2/code/addon-service/src/main/resources/bing.roo --lineNumbers true
 	# Get index page
-	wget --retry-connrefused --tries=5 -O target/index.html http://localhost:8080/bing-search-app &
+	wget --retry-connrefused --tries=5 -O target/index.html http://localhost:8080/bing-search-app/ &
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo bing end
@@ -340,7 +348,7 @@
 	cd service
 	$1/gvnix.sh script --file $2/code/addon-service/src/main/resources/service.roo --lineNumbers true
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused --tries=5 -O target/services.html http://localhost:8080/petclinic/services &
+	wget --retry-connrefused --tries=5 -O target/services.html http://localhost:8080/petclinic/services/ &
 	wget --retry-connrefused --tries=5 -O target/petservice.wsdl http://localhost:8080/petclinic/services/PetService?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
@@ -380,7 +388,7 @@
 	cd gvnix-test
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test.roo --lineNumbers true
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused --tries=5 -O target/services.html http://localhost:8080/service-layer-test/services &
+	wget --retry-connrefused --tries=5 -O target/services.html http://localhost:8080/service-layer-test/services/ &
 	wget --retry-connrefused --tries=5 -O target/clase.wsdl http://localhost:8080/service-layer-test/services/Clase?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
@@ -400,8 +408,9 @@
 	mkdir gvnix-test-entity
 	cd gvnix-test-entity
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-entity.roo --lineNumbers true
+	mkdir target
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused --tries=5 -O target/services.html http://localhost:8080/petclinic/services &
+	wget --retry-connrefused --tries=5 -O target/services.html http://localhost:8080/petclinic/services/ &
 	wget --retry-connrefused --tries=5 -O target/pet.wsdl http://localhost:8080/petclinic/services/Pet?wsdl &
 	wget --retry-connrefused --tries=5 -O target/visit.wsdl http://localhost:8080/petclinic/services/Visit?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
@@ -417,6 +426,7 @@
 	mkdir typicalsecurity
 	cd typicalsecurity
 	$1/gvnix.sh script --file $2/code/addon-web-mvc-typicalsecurity/src/main/resources/typicalsecurity.roo --lineNumbers true
+	mkdir target
 	# Get login, forgotpassword and signup pages
 	wget --retry-connrefused --tries=5 -O target/login.html http://localhost:8080/petclinic/pets &
 	wget --retry-connrefused --tries=5 -O target/forgotpassword.html http://localhost:8080/petclinic/forgotpassword/index &
@@ -459,7 +469,7 @@
 ##  Inter-type declaration conflicts with existing member, avoid it temporally
     mvn test-compile > /dev/null
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused --tries=5 -O target/services.html http://localhost:8080/sample/services &
+	wget --retry-connrefused --tries=5 -O target/services.html http://localhost:8080/sample/services/ &
 	wget --retry-connrefused --tries=5 -O target/claseservicio.wsdl http://localhost:8080/sample/services/ClaseServicio?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
@@ -473,7 +483,7 @@
 	# Request the change language URL
 	wget --retry-connrefused --tries=5 -O target/langca.html http://localhost:8080/petclinic/?lang=ca &	
 	# Get services summary page and aavailable WSDLs
-	wget --retry-connrefused --tries=5 -O target/services.html http://localhost:8080/petclinic/services &
+	wget --retry-connrefused --tries=5 -O target/services.html http://localhost:8080/petclinic/services/ &
 	wget --retry-connrefused --tries=5 -O target/clase.wsdl http://localhost:8080/petclinic/services/Clase?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
@@ -484,6 +494,8 @@
 	mkdir tiendavirtual
 	cd tiendavirtual
 	$1/gvnix.sh script --file $2/code/src/main/resources/tiendavirtual.roo --lineNumbers true
+##  Reopen shell to generate pending pattern resources
+	$1/gvnix.sh hint
 ##  Inter-type declaration conflicts with existing member, avoid it temporally
     mvn test-compile > /dev/null
     # Get no entities dialog message
