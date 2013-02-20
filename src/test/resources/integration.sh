@@ -206,7 +206,7 @@
 	$1/gvnix.sh script --file $2/code/addon-web-i18n/src/main/resources/es-i18n.roo --lineNumbers true
 	mkdir target
 	# Request the change language URL
-	wget --retry-connrefused --tries=10 -O target/langca.html http://localhost:8080/petclinic/?lang=ca &
+	wget --retry-connrefused -O target/langca.html http://localhost:8080/petclinic/?lang=ca &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo es-i18n end
@@ -316,8 +316,8 @@
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/main/resources/report.roo --lineNumbers true
 	mkdir target
 	# Request report form and report generation URLs
-	wget --retry-connrefused --tries=10 -O target/reportform.html http://localhost:8080/petclinic/pets/reports/petlist?form &
-	wget --retry-connrefused --tries=10 -O target/report.html http://localhost:8080/petclinic/pets/reports/petlist?format=pdf &
+	wget --retry-connrefused -O target/reportform.html http://localhost:8080/petclinic/pets/reports/petlist?form &
+	wget --retry-connrefused -O target/report.html http://localhost:8080/petclinic/pets/reports/petlist?format=pdf &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo report end
@@ -329,9 +329,9 @@
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/test/resources/gvnix-test-report.roo --lineNumbers true
 	mkdir target
 	# Request report form and report generation URLs
-	wget --retry-connrefused --tries=10 -O target/reportform.html http://localhost:8080/webreport-test/people/reports/personlist?form &
-	wget --retry-connrefused --tries=10 -O target/report.html http://localhost:8080/webreport-test/people/reports/personlist?format=pdf &
-	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	wget --retry-connrefused -O target/reportform.html http://localhost:8080/webreport-test/people/reports/personlist?form &
+	wget --retry-connrefused -O target/report.html http://localhost:8080/webreport-test/people/reports/personlist?format=pdf &
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-report end
 
@@ -344,8 +344,6 @@
 	mkdir bing
 	cd bing
 	$1/gvnix.sh script --file $2/code/addon-service/src/main/resources/bing.roo --lineNumbers true
-	# Get index page
-	wget --retry-connrefused --tries=10 -O target/index.html http://localhost:8080/bing-search-app/ &
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo bing end
@@ -356,8 +354,8 @@
 	cd service
 	$1/gvnix.sh script --file $2/code/addon-service/src/main/resources/service.roo --lineNumbers true
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused --tries=10 -O target/services.html http://localhost:8080/petclinic/services/ &
-	wget --retry-connrefused --tries=10 -O target/petservice.wsdl http://localhost:8080/petclinic/services/PetService?wsdl &
+	wget --retry-connrefused -O target/services.html http://localhost:8080/petclinic/services/ &
+	wget --retry-connrefused -O target/petservice.wsdl http://localhost:8080/petclinic/services/PetService?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo service end
@@ -396,8 +394,8 @@
 	cd gvnix-test
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test.roo --lineNumbers true
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused --tries=10 -O target/services.html http://localhost:8080/service-layer-test/services/ &
-	wget --retry-connrefused --tries=10 -O target/clase.wsdl http://localhost:8080/service-layer-test/services/Clase?wsdl &
+	wget --retry-connrefused -O target/services.html http://localhost:8080/service-layer-test/services/ &
+	wget --retry-connrefused -O target/clase.wsdl http://localhost:8080/service-layer-test/services/Clase?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test end
@@ -418,9 +416,9 @@
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-entity.roo --lineNumbers true
 	mkdir target
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused --tries=10 -O target/services.html http://localhost:8080/petclinic/services/ &
-	wget --retry-connrefused --tries=10 -O target/pet.wsdl http://localhost:8080/petclinic/services/Pet?wsdl &
-	wget --retry-connrefused --tries=10 -O target/visit.wsdl http://localhost:8080/petclinic/services/Visit?wsdl &
+	wget --retry-connrefused -O target/services.html http://localhost:8080/petclinic/services/ &
+	wget --retry-connrefused -O target/pet.wsdl http://localhost:8080/petclinic/services/Pet?wsdl &
+	wget --retry-connrefused -O target/visit.wsdl http://localhost:8080/petclinic/services/Visit?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-entity end
@@ -435,10 +433,10 @@
 	cd typicalsecurity
 	$1/gvnix.sh script --file $2/code/addon-web-mvc-typicalsecurity/src/main/resources/typicalsecurity.roo --lineNumbers true
 	mkdir target
-	# Get login, forgotpassword and signup pages
-	wget --retry-connrefused --tries=10 -O target/login.html http://localhost:8080/petclinic/pets &
-	wget --retry-connrefused --tries=10 -O target/forgotpassword.html http://localhost:8080/petclinic/forgotpassword/index &
-	wget --retry-connrefused --tries=10 -O target/signup.html http://localhost:8080/petclinic/signup?form &
+	# Get login, forgotpassword and signup pages (can't access because server start and stops inmediatly)
+#	wget --retry-connrefused -O target/login.html http://localhost:8080/petclinic/pets &
+#	wget --retry-connrefused -O target/forgotpassword.html http://localhost:8080/petclinic/forgotpassword/index &
+#	wget --retry-connrefused -O target/signup.html http://localhost:8080/petclinic/signup?form &
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo typicalsecurity end
@@ -477,8 +475,8 @@
 ##  Inter-type declaration conflicts with existing member, avoid it temporally
     mvn test-compile > /dev/null
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused --tries=10 -O target/services.html http://localhost:8080/sample/services/ &
-	wget --retry-connrefused --tries=10 -O target/claseservicio.wsdl http://localhost:8080/sample/services/ClaseServicio?wsdl &
+	wget --retry-connrefused -O target/services.html http://localhost:8080/sample/services/ &
+	wget --retry-connrefused -O target/claseservicio.wsdl http://localhost:8080/sample/services/ClaseServicio?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-sample end
@@ -489,10 +487,10 @@
 	cd script
 	$1/gvnix.sh script --file $2/code/src/main/resources/script.roo --lineNumbers true
 	# Request the change language URL
-	wget --retry-connrefused --tries=10 -O target/langca.html http://localhost:8080/petclinic/?lang=ca &	
+	wget --retry-connrefused -O target/langca.html http://localhost:8080/petclinic/?lang=ca &	
 	# Get services summary page and aavailable WSDLs
-	wget --retry-connrefused --tries=10 -O target/services.html http://localhost:8080/petclinic/services/ &
-	wget --retry-connrefused --tries=10 -O target/clase.wsdl http://localhost:8080/petclinic/services/Clase?wsdl &
+	wget --retry-connrefused -O target/services.html http://localhost:8080/petclinic/services/ &
+	wget --retry-connrefused -O target/clase.wsdl http://localhost:8080/petclinic/services/Clase?wsdl &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo script end
@@ -507,12 +505,12 @@
 ##  Inter-type declaration conflicts with existing member, avoid it temporally
     mvn test-compile > /dev/null
     # Get no entities dialog message
-	wget --retry-connrefused --tries=10 -O target/dialog.html http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1 &
+	wget --retry-connrefused -O target/dialog.html http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1 &
 	# Change language
-	wget --retry-connrefused --tries=10 -O target/langca.html http://localhost:8080/tiendavirtual/?lang=ca &	
+	wget --retry-connrefused -O target/langca.html http://localhost:8080/tiendavirtual/?lang=ca &	
 	# Request report form and report generation URLs
-	wget --retry-connrefused --tries=10 -O target/reportform.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?form &
-	wget --retry-connrefused --tries=10 -O target/report.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?format=pdf &
+	wget --retry-connrefused -O target/reportform.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?form &
+	wget --retry-connrefused -O target/report.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?format=pdf &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo tiendavirtual end

@@ -19,6 +19,10 @@ field set --fieldName coches --type org.gvnix.test.web.report.project.domain.Car
 web mvc setup
 web mvc all --package org.gvnix.test.web.report.project.web
 
+selenium test --controller ~.web.PersonController
+selenium test --controller ~.web.HorseController
+selenium test --controller ~.web.CarController
+
 web report setup
 
 web report add --controller ~.web.PersonController --reportName personlist
