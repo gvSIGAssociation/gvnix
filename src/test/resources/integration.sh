@@ -132,8 +132,8 @@
 	mkdir target
 	# Get login page when accessing a not allowed page and login in es and en languages
 	wget --retry-connrefused -O target/loginredirect.html http://localhost:8080/petclinic/pets
-	wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login/?lang=es
-	wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login/?lang=en
+	wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login?lang=es
+	wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login?lang=en
 	# Get logout URL
 	wget --retry-connrefused -O target/logout.html http://localhost:8080/petclinic/static/j_spring_security_logout
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
@@ -478,8 +478,8 @@
 	mkdir target
 	# Get login page when accessing a not allowed page and login in es and en languages
 	wget --retry-connrefused -O target/loginredirect.html http://localhost:8080/petclinic/pets
-	wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login/?lang=es
-	wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login/?lang=en
+	wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login?lang=es
+	wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login?lang=en
 	# Get forgotpassword and signup pages in es and en languages
 	wget --retry-connrefused -O target/forgotpasswordes.html http://localhost:8080/petclinic/forgotpassword/index?lang=es
 	wget --retry-connrefused -O target/signupes.html http://localhost:8080/petclinic/signup?form&lang=es
