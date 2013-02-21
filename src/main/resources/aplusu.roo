@@ -1,0 +1,346 @@
+
+project --topLevelPackage es.gva.cit.aplusu --projectName aplusu-trunk --java 6
+
+persistence setup --provider HIBERNATE --database POSTGRES --databaseName aplusu --password aplusu --userName aplusu
+
+addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc4
+database introspect --schema aum
+database reverse engineer --schema aum --package ~.domain
+
+web mvc setup
+
+theme install --id cit
+theme set --id cit
+
+occ checksum all
+
+web mvc pattern setup
+
+web mvc scaffold --class ~.web.TaumAplicacionesController --backingType ~.domain.TaumAplicaciones
+web mvc pattern master --class ~.web.TaumAplicacionesController --name AplicacionesListados --type tabular
+
+menu setup
+
+web mvc pattern master --class ~.web.TaumAplicacionesController --name AplicacionesListadosReg --type register
+
+web mvc scaffold --class ~.web.TaumUsuariosController --backingType es.gva.cit.aplusu.domain.TaumUsuarios
+web mvc pattern master --class ~.web.TaumUsuariosController --name UsuariosRoles --type tabular
+
+finder list --class ~.domain.TaumAplicaciones --depth 2
+
+menu tree
+menu entry update --id c_taumaplicaciones
+menu tree
+menu entry update --id c_taumaplicaciones --url  /taumaplicacioneses?gvnixpattern=AplicacionesListados
+menu tree
+menu entry update --id c_taumaplicaciones --nid i_taumaplicaciones
+menu tree
+menu entry visibility --hidden true --id i_taumaplicaciones_list_tabular_aplicacioneslistados
+menu tree
+menu entry visibility --hidden true --id i_taumaplicaciones_list_register_aplicacioneslistadosreg
+menu entry visibility --hidden true --id i_taumaplicaciones_new
+menu entry visibility --hidden true --id i_taumaplicaciones_list
+menu tree
+menu entry update --id i_taumaplicaciones --roles ""
+
+finder list --class ~.domain.TaumAplicaciones --depth 2 --filter "lenguaje"
+finder add --class ~.domain.TaumAplicaciones --finderName findTaumAplicacionesesByVisibusrOrLenguaje
+
+menu tree
+menu entry visibility --hidden true --id i_taumaplicaciones_new
+menu entry visibility --hidden true --id i_taumaplicaciones_list
+menu entry update --id i_taumaplicaciones_new --url /taumaplicacioneses?gvnixpattern=AplicacionesListados
+menu entry info --id i_taumaplicaciones_new
+menu entry info --id i_taumaplicaciones
+menu entry update --id i_taumaplicaciones_new --label menu_category_taumaplicaciones_label
+menu entry update --id i_taumaplicaciones_new --messageCode ""
+menu tree
+menu entry update --id i_taumaplicaciones_list_tabular_aplicacioneslistados --url /taumaplicacioneses?find=ByAplicacionUsuarios
+menu entry update --id i_taumaplicaciones_list_tabular_aplicacioneslistados --nid i_aplicaciones_usuarios_modulos
+menu tree
+menu entry update --id  i_aplicaciones_usuarios_modulos --label menu_category_taumusuarios_label
+menu entry update --id i_aplicaciones_usuarios_modulos --messageCode ""
+menu entry update --id i_aplicaciones_usuarios_modulos --messageCode ""
+menu entry info --id i_aplicaciones_usuarios_modulos
+menu entry update --id i_aplicaciones_usuarios_modulos --messageCode ""
+menu entry update --id i_aplicaciones_usuarios_modulos --messageCode " "
+
+finder list --class ~.domain.TaumUsuarios --filter Aplicacion --depth 1
+finder list --class ~.domain.TaumUsuarios --filter aplicacion --depth 1
+finder list --class ~.domain.TaumAplusu --filter aplicacion --depth 1
+finder list --class ~.domain.TaumAplusu  --depth 1
+finder list --class ~.domain.TaumUsuarios
+finder list --class ~.domain.TaumUsuarios --depth 1
+finder list --class ~.domain.TaumAplusu --depth 1
+finder list --class ~.domain.TaumAplusu
+finder list --class ~.domain.TaumAplicaciones --depth 1
+finder list --class ~.domain.TaumAplusu --depth 1
+finder list --class ~.domain.TaumAplusu --depth 1
+finder add --class ~.domain.TaumAplusu --finderName findTaumAplususByAplicacionEquals
+finder list --class ~.domain.TaumUsuarios --depth 1 --filter findTaumUsuariosesByAliasEqualsAndApellidosEqualsAndCodperEqualsAndCoduEqualsAndCproEqualsAndCredencialEqualsAndCservEqualsAndDcorreointEqualsAndDescEstadoEqualsAndDescServicioEqualsAndDescTipoUsuEqualsAndDgralEqualsAndEstadoEqualsAndFmodEqualsAndNombreEqualsAndNrpEqualsAndObservaEqualsAndOccChekcsumEqualsAndOrdenEqualsAndPasswordEqualsAndTelefonoEqualsAndTipousuEqualsAndUltclaveEqualsAndUsuarioEquals
+finder add --class ~.domain.TaumUsuarios --finderName findTaumUsuariosesByAliasEqualsAndApellidosEquals
+
+configuration create --name dev
+configuration property add --name hibernate.ejb.naming_strategy
+configuration property add --name validationQuery
+configuration list
+configuration create --name pre
+configuration property value --configuration pre --property hibernate.ejb.naming_strategy --value org.hibernate.cfg.DefaultNamingStrategy
+configuration list
+configuration property add --name validationQuery
+configuration property add --name hibernate.hbm2ddl.auto
+configuration property value --configuration pre --property hibernate.hbm2ddl.auto --value none
+configuration property value --property hibernate.hbm2ddl.auto --value update --configuration dev
+configuration list
+configuration export
+
+web mvc update tags --backup
+
+theme list
+theme install --id cit
+theme set --id cit
+
+database reverse engineer --schema aum --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
+
+finder list --class ~.domain.TaumAplicaciones
+finder list
+
+menu tree
+menu tree --id c_taumaplicaciones
+menu entry visibility --id i_taumaplicaciones_new --hidden true
+menu entry info --id i_taumaplicaciones_new
+menu entry update --id i_taumaplicaciones_new --messageCode Aplicacion
+menu tree --id c_taumaplicaciones
+menu entry visibility --id i_taumaplicaciones_new --hidden true
+menu entry update --id i_taumaplicaciones_new --messageCode Aplicacion
+menu entry visibility --id i_taumaplicaciones_new --hidden true
+menu tree --id c_taumaplicaciones
+menu tree --id c_taumaplicaciones
+menu tree --id c_taumaplicaciones
+menu tree
+
+web mvc scaffold --backingType ~.domain.TaumModulos --class ~.web.TaumModulosController
+
+menu tree
+
+web mvc pattern master --class ~.web.TaumModulosController --name MaestroModulos --type tabular
+
+menu tree
+menu tree --id c_taumaplicaciones
+menu entry add --category c_taumaplicaciones --label Modulos --messageCode menu_list_tabular_MaestroModulos --url /taummoduloses?gvnixpattern=MaestroModulos
+menu tree
+
+web mvc scaffold --class ~.web.TaumAplusuController --backingType ~.domain.TaumAplusu
+web mvc scaffold --class ~.web.TaumUsuModulosController --backingType ~.domain.TaumUsumodulos
+
+web mvc pattern master --class ~.web.TaumAplusuController --name AplusuModulo --type tabular
+
+finder list --class ~.domain.TaumAplusu --depth 1
+finder add --finderName findTaumAplususByAplicacionEquals --class ~.domain.TaumAplusu
+finder list --depth 1 --class ~.domain.TaumModulos
+
+web mvc binding stringTrimmer --class ~.web.TaumAplusuController --emptyAsNull
+
+configuration list
+configuration export
+
+finder list --class ~.domain.TaumAplusu --depth 1 --filter aplicaciones
+finder list --class ~.domain.TaumAplusu --depth 1 --filter aplicacion
+finder add --class ~.domain.TaumAplusu --finderName findTaumAplususByAplicacionEquals
+finder list --class ~.domain.TaumModulos
+
+web mvc finder add  --formBackingType ~.domain.TaumModulos --class ~.web.TaumModulosController
+
+menu tree
+menu entry add --category c_taumaplicaciones --label Modulos --messageCode menu_findByAplicacion_tabular_MaestroModulos --url /taummoduloses?find=ByAplicacion&amp;form
+menu tree --id c_taumaplicaciones
+menu entry add --category c_taumaplicaciones --label ModulosFindByAplicacion --messageCode menu_findByAplicacion_tabular_MaestroModulos --url /taummoduloses?find=ByAplicacion&amp;form
+menu tree --id c_taumaplicaciones
+menu entry visibility --id i_taumaplicaciones_modulos --hidden true
+menu tree --id c_taumaplicaciones
+menu tree --id c_taumaplicaciones
+menu entry update --id i_taumaplicaciones_modulosfindbyaplicacion --url /taummoduloses?find=ByAplicacion
+menu tree --id c_taumaplicaciones
+
+database reverse engineer --schema "AUM" --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
+database reverse engineer --schema "AUM PUBLIC" --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
+
+finder list --class ~.domain.TaumUsumodulos
+finder list --class ~.domain.TaumUsumodulos --depth 2
+
+menu tree
+menu entry visibility --id c_taummodulos --hidden true
+
+web mvc binding stringTrimmer --class ~.web.TaumUsuModulosController --emptyAsNull
+
+configuration list
+
+enum type --class ~.domain.enumerated.ListaTipoModulo
+enum constant --name L
+enum constant --name M
+enum constant --name P
+enum constant --name U
+
+configuration property add --name hibernate.jdbc.batch_size
+configuration list
+configuration property value --configuration dev --property hibernate.jdbc.batch_size --value 0
+configuration list
+configuration export
+
+enum type --class ~.domain.enumerated.Orden
+enum type --class ~.domain.enumerated.ListaTipoPersonas
+enum constant --name F
+enum constant --name O
+enum constant --name E
+
+entity jpa --class ~.listado.FiltroListados
+
+field string --fieldName listado
+field string --fieldName dg
+field string --fieldName servicios
+field string --fieldName servicio
+field string --fieldName usuario
+field string --fieldName aplicacion
+field string --fieldName tipoSancion
+field string --fieldName orden
+field string --fieldName orden2
+field string --fieldName agrupar
+field string --fieldName agrupar2
+field string --fieldName agrupar3
+field string --fieldName ubicacion
+field enum --fieldName lenguaje --type ~.domain.enumerated.ListaLenguajes
+field enum --fieldName sgbd --type ~.domain.enumerated.ListaSGBD
+field enum --fieldName sgbd2 --type ~.domain.enumerated.ListaSGBD
+field enum --fieldName estadoApl --type ~.domain.enumerated.ListaEstadosAplicacion
+field enum --fieldName emulador --type ~.domain.enumerated.ListaEmulador
+field enum --fieldName tipoPer --type ~.domain.enumerated.ListaTipoPersonas
+field enum --fieldName orden3 --type ~.domain.enumerated.Orden
+
+web mvc scaffold --class ~.web.FiltroListadosController --backingType ~.listado.FiltroListados
+web mvc scaffold --class ~.web.FiltroListadosController --backingType ~.listado.FiltroListados --disallowedOperations create,update,delete
+
+web mvc pattern master --class ~.web.FiltroListadosController --name FiltroListados --type tabular
+
+finder list
+
+configuration list
+
+finder list --class ~.domain.TaumAplusu
+
+database reverse engineer --schema "AUM COMUN" --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
+
+configuration list
+configuration export
+
+finder list --class ~.domain.TaumUsuarios
+
+web mvc dialog setup
+
+web mvc dialog exception list
+
+finder list --class ~.domain.TaumAplusu --depth 1 --filter rolusua
+finder list --class ~.domain.TaumAplusu --depth 1 --filter rolusu
+finder list --class ~.domain.TaumAplusu --depth 1
+finder add --finderName findTaumAplususByTaumAplusuEquals --class ~.domain.TaumAplusu
+finder add --finderName findTaumAplususByTaumAplusuEquals --class ~.domain.TaumAplusu
+finder list --class ~.domain.TaumAplusu --depth 1
+finder list --class ~.domain.TaumAplusu --depth 2
+finder add --finderName findTaumAplususByTaumAplusuEqualsAndAplicacionEquals --class ~.domain.TaumAplusu
+
+web mvc dialog add --class ~.web.TaumAplusuController --name deleteRolDialog
+
+finder list --class ~.domain.TaumUsuarios
+finder list --class ~.domain.TaumAplicaciones
+finder add --class ~.domain.TaumAplicaciones --finderName findTaumAplicacionesesByAplpadre
+
+configuration list
+configuration export
+configuration list
+
+web mvc dialog add --class ~.web.TaumModulosController --name insertModulosPredefinidos
+
+finder list --class ~.listado.FiltroListados
+
+web report setup
+
+web report add --controller ~.web.TaumAplicacionesController --reportName herrsoft
+
+finder list --class ~.domain.TaumAplicaciones --depth 1 --filter sgbd
+finder list --class ~.domain.TaumAplicaciones --depth 1 --filter lenguaje
+finder list --class ~.domain.TaumAplicaciones --depth 1 --filter aplicacion
+
+web report add --controller ~.web.TaumAplusuController --reportName aplusu
+web report add --controller ~.web.TaumAplusuController --reportName respapl
+
+web mvc dialog add --class ~.web.TaumAplusuController --name searchUsuDialog
+
+json add --class ~.domain.TaumUsuarios
+
+web mvc json add --class ~.web.TaumUsuariosController --jsonObject ~.domain.TaumUsuarios
+
+json add --class ~.domain.TaumModulos
+
+web mvc json add --class ~.web.TaumModulosController --jsonObject ~.domain.TaumModulos
+
+cit security setup --url http://www.aplusu.es --login aplusu --password aplusu --appName aplusu
+
+configuration list
+configuration property add --name wsauth.url
+configuration export
+configuration list
+configuration export
+
+web mvc dialog add --class ~.web.TaumAplicacionesController --name searchCodrespsegDialog
+
+configuration list
+configuration export
+configuration list
+
+menu entry roles --id c_taumaplicaciones --roles "L_INFORM,L_RINF,L_RAPL,L_INF,L_DBA"
+menu entry roles --id i_filtrolistados_list --roles "L_LIS"
+
+web mvc install language --code ca
+
+configuration property add --name log4j.rootLogger
+configuration list
+configuration property value --configuration dev --property log4j.rootLogger --value "INFO, CONSOLE"
+configuration property value --configuration pre --property log4j.rootLogger --value "WARN, FILE"
+configuration property add --name log4j.category.es.gva.cit
+configuration list
+configuration export
+configuration export
+
+finder list --class ~.domain.TaumUsumodulos --depth 2 --filter usuario,modulo
+finder list --class ~.domain.TaumUsumodulos --depth 2 --filter Usuario,TaumModulos
+finder list --class ~.domain.TaumUsumodulos --depth 2 --filter findTaumUsumodulosesByUsuarioEquals
+
+web mvc dialog add --class ~.web.TaumAplusuController --name addDetailAplusuModuloModal
+web mvc dialog add --class ~.web.TaumModulosController --name addDetailMaestroModulosModal
+
+finder list --class ~.domain.TaumAplicaciones --depth 1 --filter rproyinf
+finder add --finderName findTaumAplicacionesesByRproyinf
+finder list --class ~.domain.TaumAplicaciones --depth 2 --filter rproyinf,aplicacion
+finder list --class ~.domain.TaumAplicaciones --depth 2 --filter
+finder list --class ~.domain.TaumAplicaciones --depth 2 --filter findTaumAplicacionesesByRproyinfAnd
+
+web report add --controller ~.web.TaumAplusuController --reportName respperf
+
+database reverse engineer --schema aum --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
+database reverse engineer --schema aum --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
+
+web report add --controller ~.web.TaumUsuariosController --reportName petinf
+web report add --controller ~.web.TaumAplusuController --reportName perfilusu
+
+database reverse engineer --schema aum --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
+
+menu entry roles --id c_taumaplicaciones --roles "L_RAPL, L_CUALIF"
+menu entry roles --id i_filtrolistados_list --roles "L_CUALIF"
+
+web report add --controller ~.web.TaumAplusuController --reportName aplusuperf
+
+database reverse engineer --schema aum --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
+
+configuration list
+configuration export
+
+database reverse engineer --schema aum --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically

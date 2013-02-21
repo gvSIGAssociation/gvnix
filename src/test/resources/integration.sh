@@ -597,3 +597,15 @@
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo tiendavirtual end
+
+	## aplusu
+	echo aplusu start
+	mkdir aplusu
+	cd aplusu
+	$1/gvnix.sh script --file $2/code/src/main/resources/aplusu.roo --lineNumbers true
+	# Request the home URL
+	wget --retry-connrefused -O target/home.html http://localhost:8080/aplusu-trunk/ &
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	cd ..
+	echo aplusu end
+	
