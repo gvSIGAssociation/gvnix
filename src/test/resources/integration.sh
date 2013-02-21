@@ -134,6 +134,8 @@
 	wget --retry-connrefused -O target/loginredirect.html http://localhost:8080/petclinic/pets
 	wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login?lang=es
 	wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login?lang=en
+	# Invalid log in
+	wget --retry-connrefused -O target/logininvalid.html http://localhost:8080/petclinic/static/j_spring_security_check --post-data 'j_username=error&j_password=error'
 	# Get logout URL
 	wget --retry-connrefused -O target/logout.html http://localhost:8080/petclinic/static/j_spring_security_logout
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
@@ -275,6 +277,8 @@
 	mkdir occ
 	cd occ
 	$1/gvnix.sh script --file $2/code/addon-occ/src/main/resources/occ.roo --lineNumbers true
+	# Create new pet
+	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/petclinic/pets --post-data 'name=a&weight=1&type=Dog' &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo occ end
@@ -348,18 +352,22 @@
 	cd report
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/main/resources/report.roo --lineNumbers true
 	mkdir target
+	# Start and execute selenium tests to make data available for reports (wait 30 seconds to selenium execution)
+	mvn test tomcat:run selenium:xvfb selenium:selenese &
+	wget --retry-connrefused -w 30 -O target/index.html http://localhost:8080/petclinic/
 	# Request report form and report generation URLs for en and es languages
-	wget --retry-connrefused -O target/reportformen.html http://localhost:8080/petclinic/pets/reports/petlist?lang=en&form &
-	wget --retry-connrefused -O target/reportpdfen.html http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=en &
-	wget --retry-connrefused -O target/reportxlsen.html http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=en &
-	wget --retry-connrefused -O target/reporthtmlen.html http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=en &
-	wget --retry-connrefused -O target/reportcsven.html http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=en &
-	wget --retry-connrefused -O target/reportformes.html http://localhost:8080/petclinic/pets/reports/petlist?lang=es&form &
-	wget --retry-connrefused -O target/reportpdfes.html http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=es &
-	wget --retry-connrefused -O target/reportxlses.html http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=es &
-	wget --retry-connrefused -O target/reporthtmles.html http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=es &
-	wget --retry-connrefused -O target/reportcsves.html http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=es &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	wget --retry-connrefused -O target/reportformen.html http://localhost:8080/petclinic/pets/reports/petlist?lang=en&form
+	wget --retry-connrefused -O target/reporten.pdf http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=en
+	wget --retry-connrefused -O target/reporten.xls http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=en
+	wget --retry-connrefused -O target/reporten.html http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=en
+	wget --retry-connrefused -O target/reporten.csv http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=en
+	wget --retry-connrefused -O target/reportformes.html http://localhost:8080/petclinic/pets/reports/petlist?lang=es&form
+	wget --retry-connrefused -O target/reportes.pdf http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=es
+	wget --retry-connrefused -O target/reportes.xls http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=es
+	wget --retry-connrefused -O target/reportes.html http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=es
+	wget --retry-connrefused -O target/reportes.csv http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=es
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo report end
 	
@@ -484,6 +492,8 @@
 	wget --retry-connrefused -O target/signupes.html http://localhost:8080/petclinic/signup?form&lang=es
 	wget --retry-connrefused -O target/forgotpassworden.html http://localhost:8080/petclinic/forgotpassword/index?lang=en
 	wget --retry-connrefused -O target/signupen.html http://localhost:8080/petclinic/signup?form&lang=en
+	# Log in with default user
+	wget --retry-connrefused -O target/loged.html http://localhost:8080/petclinic/static/j_spring_security_check --post-data 'j_username=admin&j_password=admin'
 	# Get logout URL
 	wget --retry-connrefused -O target/logout.html http://localhost:8080/petclinic/static/j_spring_security_logout
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
