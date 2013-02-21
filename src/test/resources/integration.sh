@@ -351,17 +351,17 @@
 	mkdir report
 	cd report
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/main/resources/report.roo --lineNumbers true
-	mkdir target
 	# Start and execute selenium tests to make data available for reports (wait 30 seconds to selenium execution)
 	mvn test tomcat:run selenium:xvfb selenium:selenese &
+	mkdir target
 	wget --retry-connrefused -w 30 -O target/index.html http://localhost:8080/petclinic/
 	# Request report form and report generation URLs for en and es languages
-	wget --retry-connrefused -O target/reportformen.html http://localhost:8080/petclinic/pets/reports/petlist?lang=en&form
+	wget --retry-connrefused -O target/reportformen.html http://localhost:8080/petclinic/pets/reports/petlist?form&lang=en
 	wget --retry-connrefused -O target/reporten.pdf http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=en
 	wget --retry-connrefused -O target/reporten.xls http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=en
 	wget --retry-connrefused -O target/reporten.html http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=en
 	wget --retry-connrefused -O target/reporten.csv http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=en
-	wget --retry-connrefused -O target/reportformes.html http://localhost:8080/petclinic/pets/reports/petlist?lang=es&form
+	wget --retry-connrefused -O target/reportformes.html http://localhost:8080/petclinic/pets/reports/petlist?form&lang=es
 	wget --retry-connrefused -O target/reportes.pdf http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=es
 	wget --retry-connrefused -O target/reportes.xls http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=es
 	wget --retry-connrefused -O target/reportes.html http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=es
@@ -582,7 +582,7 @@
     # Get no entities dialog message
 	wget --retry-connrefused -O target/dialog.html http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1 &
 	# Request report form and report generation URLs in ca language
-	wget --retry-connrefused -O target/reportformca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&form &
+	wget --retry-connrefused -O target/reportformca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?form&lang=ca &
 	wget --retry-connrefused -O target/reportpdfca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=pdf &
 	wget --retry-connrefused -O target/reportxlsca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=xls &
 	wget --retry-connrefused -O target/reporthtmlca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=html &
