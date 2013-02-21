@@ -101,7 +101,7 @@ public class ReportCommands implements CommandMarker { // All command types must
     public void add(
             @CliOption(key = "controller", mandatory = true, help = "The name of the controller object which handle the report request") JavaType controller,
             @CliOption(key = "reportName", mandatory = true, help = "The name of the new report.") String reportName,
-            @CliOption(key = "format", mandatory = false, unspecifiedDefaultValue = "pdf", specifiedDefaultValue = "pdf", help = "The format for the new report. Available PDF, Excel (xls), HTML, CSV") String format) {
+            @CliOption(key = "format", mandatory = false, unspecifiedDefaultValue = "pdf", specifiedDefaultValue = "pdf", help = "The available format for the new report with comma separated list format. By example: pdf,xls,html,csv") String format) {
 
         if (!reportConfigService.isJasperViewsProject()) {
             reportConfigService.setup();
