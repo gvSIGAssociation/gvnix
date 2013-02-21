@@ -189,7 +189,20 @@
                   var field = dojo.byId('${fieldId}');
                   // Field keep disabled if required by input attribute
                   field.disabled = ${disabled};
+                  
+                  // Obtain field size in order to display the new element with the same size
+                  var fieldSize = '15'; // Default size: 15
+                  if (field != null && field.size != null) {
+                    fieldSize = field.size;
+                  }
+                  
                   Spring.addDecoration(new Spring.ElementDecoration({elementId : '${fieldId}', widgetType : 'dijit.form.ValidationTextBox', widgetAttrs : {promptMessage: '${sec_field_validation}', invalidMessage: '${sec_field_invalid}', required : ${required}, ${sec_validation_regex} missingMessage : '${sec_field_required}' }}));
+                  
+                  // Set the stored size
+                  var newField = dojo.byId('${fieldId}');
+                  if (newField != null) {
+                    newField.size = fieldSize;
+                  }
                 }
               }
             });

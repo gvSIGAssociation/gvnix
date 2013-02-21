@@ -1274,6 +1274,7 @@ li.size500 .boxDisabled { width: 500px;}
     border: 1px solid #C1CADD;
     height: 18px;
     padding-left: 2px;
+    width: auto;
  }
 
 .formularios span.listTitle {
