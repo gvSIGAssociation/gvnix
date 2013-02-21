@@ -167,8 +167,8 @@
 	$1/gvnix.sh script --file $2/code/addon-web-dialog/src/main/resources/dialog.roo --lineNumbers true
 	mkdir target
     # Get no entities dialog message in es and en languages
-	wget --retry-connrefused -O target/petses.html http://localhost:8080/petclinic/pets?page=1&size=10&lang=es &
-	wget --retry-connrefused -O target/petsen.html http://localhost:8080/petclinic/pets?page=1&size=10&lang=en &	
+	wget --retry-connrefused -O target/petses.html http://localhost:8080/petclinic/pets?lang=es&page=1&size=10 &
+	wget --retry-connrefused -O target/petsen.html http://localhost:8080/petclinic/pets?lang=en&page=1&size=10 &	
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo dialog end
@@ -234,12 +234,12 @@
 	# Request the main pages in ca and es languages (home, create, list and find)
 	wget --retry-connrefused -O target/langca.html http://localhost:8080/petclinic/?lang=ca &
 	wget --retry-connrefused -O target/petsformca.html http://localhost:8080/petclinic/pets?form&lang=ca &
-	wget --retry-connrefused -O target/ownersca.html http://localhost:8080/petclinic/owners?page=1&size=10&lang=ca &
-	wget --retry-connrefused -O target/visitsfindca.html http://localhost:8080/petclinic/visits?find=ByDescriptionAndVisitDate&form&lang=ca &
+	wget --retry-connrefused -O target/ownersca.html http://localhost:8080/petclinic/owners?lang=ca&page=1&size=10 &
+	wget --retry-connrefused -O target/visitsfindca.html http://localhost:8080/petclinic/visits?form&find=ByDescriptionAndVisitDate&lang=ca &
 	wget --retry-connrefused -O target/langes.html http://localhost:8080/petclinic/?lang=es &
 	wget --retry-connrefused -O target/petsformes.html http://localhost:8080/petclinic/pets?form&lang=es &
-	wget --retry-connrefused -O target/ownerses.html http://localhost:8080/petclinic/owners?page=1&size=10&lang=es &
-	wget --retry-connrefused -O target/visitsfindes.html http://localhost:8080/petclinic/visits?find=ByDescriptionAndVisitDate&form&lang=es &
+	wget --retry-connrefused -O target/ownerses.html http://localhost:8080/petclinic/owners?lang=es&page=1&size=10 &
+	wget --retry-connrefused -O target/visitsfindes.html http://localhost:8080/petclinic/visits?form&find=ByDescriptionAndVisitDate&lang=es &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo es-i18n end
@@ -349,12 +349,12 @@
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/main/resources/report.roo --lineNumbers true
 	mkdir target
 	# Request report form and report generation URLs for en and es languages
-	wget --retry-connrefused -O target/reportformen.html http://localhost:8080/petclinic/pets/reports/petlist?form&lang=en &
+	wget --retry-connrefused -O target/reportformen.html http://localhost:8080/petclinic/pets/reports/petlist?lang=en&form &
 	wget --retry-connrefused -O target/reportpdfen.html http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=en &
 	wget --retry-connrefused -O target/reportxlsen.html http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=en &
 	wget --retry-connrefused -O target/reporthtmlen.html http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=en &
 	wget --retry-connrefused -O target/reportcsven.html http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=en &
-	wget --retry-connrefused -O target/reportformes.html http://localhost:8080/petclinic/pets/reports/petlist?form&lang=es &
+	wget --retry-connrefused -O target/reportformes.html http://localhost:8080/petclinic/pets/reports/petlist?lang=es&form &
 	wget --retry-connrefused -O target/reportpdfes.html http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=es &
 	wget --retry-connrefused -O target/reportxlses.html http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=es &
 	wget --retry-connrefused -O target/reporthtmles.html http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=es &
@@ -369,7 +369,7 @@
 	cd gvnix-test-report
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/test/resources/gvnix-test-report.roo --lineNumbers true
 	mkdir target
-	# Request report form and report generation URLs
+	# Request report form and report generation URLs (en language by default)
 	wget --retry-connrefused -O target/reportform.html http://localhost:8080/webreport-test/people/reports/personlist?form &
 	wget --retry-connrefused -O target/report.html http://localhost:8080/webreport-test/people/reports/personlist?format=pdf &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
@@ -573,11 +573,11 @@
     # Get no entities dialog message
 	wget --retry-connrefused -O target/dialog.html http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1 &
 	# Request report form and report generation URLs in ca language
-	wget --retry-connrefused -O target/reportformca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?form&lang=ca &
-	wget --retry-connrefused -O target/reportpdfca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?format=pdf&lang=ca &
-	wget --retry-connrefused -O target/reportxlsca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?format=xls&lang=ca &
-	wget --retry-connrefused -O target/reporthtmlca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?format=html&lang=ca &
-	wget --retry-connrefused -O target/reportcsvca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?format=csv&lang=ca &
+	wget --retry-connrefused -O target/reportformca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&form &
+	wget --retry-connrefused -O target/reportpdfca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=pdf &
+	wget --retry-connrefused -O target/reportxlsca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=xls &
+	wget --retry-connrefused -O target/reporthtmlca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=html &
+	wget --retry-connrefused -O target/reportcsvca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=csv &
 	# Get pattern urls of 3 patterns (one of each type) in ca and en languages
 	wget --retry-connrefused -O target/patternregistroca.html http://localhost:8080/tiendavirtual/productoes?gvnixform&gvnixpattern=ficha&index=1&lang=ca &
 	wget --retry-connrefused -O target/patterntabularca.html http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=ca &
