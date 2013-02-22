@@ -103,12 +103,26 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     private static final String ITD_TEMPLATE_METHOD_CHECKSUM_DIGEST = "Entity_gvnix_persistence_occ.aj_template7";
     private static final String ITD_TEMPLATE_CLASS_END = "Entity_gvnix_persistence_occ.aj_template8";
 
-    private static final String TO_STRING_CODE_LINE_FORMAT = "\tsb.append((String.valueOf(${property}).equals(\"null\") ? nullstr : String.valueOf(${property})) + separator);\n";
+    private static final String PROPERTY_KEY = "${property}";
+    private static final String CODE_FORMAT_PRIMITIVE = "\tsb.append((String.valueOf("
+            + PROPERTY_KEY
+            + ").equals(\"null\") ? nullstr : String.valueOf("
+            + PROPERTY_KEY + ")) + separator);\n";
+    private static final String CODE_FORMAT = "\tsb.append((" + PROPERTY_KEY
+            + " == null ? nullstr : String.valueOf(" + PROPERTY_KEY
+            + ")) + separator);\n";
+    private static final String GET_ID_KEY = "${getId}";
+    private static final String MANY_TO_ONE_CODE_FORMAT = "\tsb.append(("
+            + PROPERTY_KEY + " == null ? nullstr : String.valueOf("
+            + PROPERTY_KEY + "." + GET_ID_KEY + "())) + separator);\n";
 
     private JpaActiveRecordMetadata entityMetadata;
 
     // DiSiD: Used to get the type members
     private final MemberDetailsScanner memberDetailsScanner;
+
+    // Used to get related persistence object
+    private PersistenceMemberLocator persistenceMemberLocator;
 
     private String itdFileContents = null;
 
@@ -134,6 +148,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
         // DiSiD: Initialize memberDetailsScanner
         this.memberDetailsScanner = memberDetailsScanner;
+        this.persistenceMemberLocator = persistenceMemberLocator;
 
         PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
@@ -320,21 +335,35 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
      * conditions:
      * <ol>
      * <li>has accessor</li>
-     * <li>no {@link javax.persistence.Version} annotated</li>
-     * <li>no {@link javax.persistence.EmbeddedId} annotated</li>
-     * <li>no relationship</li>
+     * <li>relationship: only ManyToOne</li>
      * <li>no transient</li>
-     * <li></li>
+     * <li>no version(as it has no sense)</li>
      * </ol>
-     * TODO Include support for relationship and embeddedId
+     * TODO Include embeddedID TODO Include support for relationship and
+     * transient (but not by default) TODO Support include/exclude properties
+     * (by adding attributes to GvNIXOCCCheck annotation)
      * 
      * @return
      */
     private String getCodeToTranformFieldsToString() {
-        StringBuilder strb = new StringBuilder();
 
         MemberDetails members = memberDetailsScanner.getMemberDetails(
                 governorTypeDetails.getClass().getName(), governorTypeDetails);
+
+        return getToStringCodeForRooBean(members, null);
+    }
+
+    /**
+     * Get string of code required to generate the string representation
+     * of a Roo Bean
+     *  
+     * @param members of the Roo Bean
+     * @param prefix for every property (use null for this bean itself)
+     * @return
+     */
+    private String getToStringCodeForRooBean(MemberDetails members,
+            String prefix) {
+        StringBuilder strb = new StringBuilder();
         for (MemberHoldingTypeDetails memberHoldingTypeDetails : members
                 .getDetails()) {
             for (MethodMetadata method : memberHoldingTypeDetails
@@ -378,6 +407,8 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                         if (MemberFindingUtils.getAnnotationOfType(field
                                 .getAnnotations(), new JavaType(
                                 "javax.persistence.ManyToOne")) != null) {
+                            strb.append(getToStringManyToOneProperty(method,
+                                    field, prefix));
                             continue;
                         }
 
@@ -387,14 +418,91 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                             continue;
                         }
 
-                        strb.append(StringUtils.replace(
-                                TO_STRING_CODE_LINE_FORMAT, "${property}",
-                                field.getFieldName().toString()));
+                        strb.append(getToStringCodeForBaseField(prefix,
+                                method.getMethodName(), field));
+
                     }
                 }
             }
         }
         return strb.toString();
+    }
+
+    private String getToStringCodeForBaseField(String prefix,
+            JavaSymbolName fieldAccessorName, FieldMetadata field) {
+        String formatStringToUse = CODE_FORMAT;
+        if (field.getFieldType().isPrimitive()) {
+            formatStringToUse = CODE_FORMAT_PRIMITIVE;
+        }
+
+        return StringUtils.replace(
+                formatStringToUse,
+                PROPERTY_KEY,
+                getPropertyAccesorExpression(prefix, fieldAccessorName,
+                        field.getFieldName()));
+    }
+
+    /**
+     * Generate to-string code for a Many-to-One member property. This method
+     * uses the pk of related object. Supports simple pks or embeddedId pks.
+     * 
+     * @param propAccessor
+     * @param field
+     * @param aPrefix
+     * @return
+     */
+    private Object getToStringManyToOneProperty(MethodMetadata propAccessor,
+            FieldMetadata field, String prefix) {
+
+        // Get related object type
+        final JavaType propertyType = field.getFieldType();
+
+        // Get realted object PK accesor
+        final MethodMetadata idAccesor = persistenceMemberLocator
+                .getIdentifierAccessor(propertyType);
+
+        final JavaType reltatedObjecIdType = idAccesor.getReturnType();
+
+        String propAccessExpression = getPropertyAccesorExpression(prefix,
+                propAccessor.getMethodName(), field.getFieldName());
+
+        // check related object id type
+        if (reltatedObjecIdType.isCoreType()
+                || reltatedObjecIdType.isPrimitive()) {
+            // Is a primitive or core java type
+            return StringUtils.replaceEach(MANY_TO_ONE_CODE_FORMAT,
+                    new String[] { PROPERTY_KEY, GET_ID_KEY }, new String[] {
+                            propAccessExpression,
+                            idAccesor.getMethodName().toString() });
+        }
+        else {
+            // is embededPk
+            List<FieldMetadata> embeddedFields = persistenceMemberLocator
+                    .getEmbeddedIdentifierFields(propertyType);
+            StringBuilder strb = new StringBuilder();
+            propAccessExpression = getPropertyAccesorExpression(
+                    propAccessExpression, idAccesor.getMethodName(),
+                    field.getFieldName());
+            JavaSymbolName embeddedAccessorName;
+            for (FieldMetadata embeddedField : embeddedFields) {
+                embeddedAccessorName = BeanInfoUtils
+                        .getAccessorMethodName(embeddedField);
+                strb.append(getToStringCodeForBaseField(propAccessExpression,
+                        embeddedAccessorName, embeddedField));
+            }
+
+            return strb.toString();
+        }
+    }
+
+    private String getPropertyAccesorExpression(String prefix,
+            JavaSymbolName propAccessorName, JavaSymbolName fieldName) {
+        if (StringUtils.isBlank(prefix)) {
+            return fieldName.toString();
+        }
+        else {
+            return String.format("%s.%s()", prefix, propAccessorName);
+        }
     }
 
     private String replaceParams(String template, Map<String, String> params) {
