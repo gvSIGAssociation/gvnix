@@ -208,11 +208,6 @@ field string --fieldName agrupar
 field string --fieldName agrupar2
 field string --fieldName agrupar3
 field string --fieldName ubicacion
-field enum --fieldName lenguaje --type ~.domain.enumerated.ListaLenguajes
-field enum --fieldName sgbd --type ~.domain.enumerated.ListaSGBD
-field enum --fieldName sgbd2 --type ~.domain.enumerated.ListaSGBD
-field enum --fieldName estadoApl --type ~.domain.enumerated.ListaEstadosAplicacion
-field enum --fieldName emulador --type ~.domain.enumerated.ListaEmulador
 field enum --fieldName tipoPer --type ~.domain.enumerated.ListaTipoPersonas
 field enum --fieldName orden3 --type ~.domain.enumerated.Orden
 
