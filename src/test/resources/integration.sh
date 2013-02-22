@@ -351,21 +351,22 @@
 	mkdir report
 	cd report
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/main/resources/report.roo --lineNumbers true
-	# Start and execute selenium tests to make data available for reports (wait 30 seconds to selenium execution)
-	mvn test tomcat:run selenium:xvfb selenium:selenese &
+	# Start tomcat, wait to start and execute selenium tests to insert data
+	mvn test tomcat:run &
+	sleep 30
+	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
 	mkdir target
-	wget --retry-connrefused -w 30 -O target/index.html http://localhost:8080/petclinic/
 	# Request report form and report generation URLs for en and es languages
-	wget --retry-connrefused -O target/reportformen.html http://localhost:8080/petclinic/pets/reports/petlist?form&lang=en
-	wget --retry-connrefused -O target/reporten.pdf http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=en
-	wget --retry-connrefused -O target/reporten.xls http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=en
-	wget --retry-connrefused -O target/reporten.html http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=en
-	wget --retry-connrefused -O target/reporten.csv http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=en
-	wget --retry-connrefused -O target/reportformes.html http://localhost:8080/petclinic/pets/reports/petlist?form&lang=es
-	wget --retry-connrefused -O target/reportes.pdf http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=es
-	wget --retry-connrefused -O target/reportes.xls http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=es
-	wget --retry-connrefused -O target/reportes.html http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=es
-	wget --retry-connrefused -O target/reportes.csv http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=es
+	wget --retry-connrefused -O target/reportformen.html "http://localhost:8080/petclinic/pets/reports/petlist?form&lang=en"
+	wget --retry-connrefused -O target/reporten.pdf "http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=en"
+	wget --retry-connrefused -O target/reporten.xls "http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=en"
+	wget --retry-connrefused -O target/reporten.html "http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=en"
+	wget --retry-connrefused -O target/reporten.csv "http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=en"
+	wget --retry-connrefused -O target/reportformes.html "http://localhost:8080/petclinic/pets/reports/petlist?form&lang=es"
+	wget --retry-connrefused -O target/reportes.pdf "http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=es"
+	wget --retry-connrefused -O target/reportes.xls "http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=es"
+	wget --retry-connrefused -O target/reportes.html "http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=es"
+	wget --retry-connrefused -O target/reportes.csv "http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=es"
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -578,22 +579,22 @@
 ##  Inter-type declaration conflicts with existing member, avoid it temporally
     mvn test-compile > /dev/null
 	# Request the home URL
-	wget --retry-connrefused -O target/home.html http://localhost:8080/tiendavirtual/ &	
+	wget --retry-connrefused -O target/home.html "http://localhost:8080/tiendavirtual/" &	
     # Get no entities dialog message
-	wget --retry-connrefused -O target/dialog.html http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1 &
+	wget --retry-connrefused -O target/dialog.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1" &
 	# Request report form and report generation URLs in ca language
-	wget --retry-connrefused -O target/reportformca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?form&lang=ca &
-	wget --retry-connrefused -O target/reportpdfca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=pdf &
-	wget --retry-connrefused -O target/reportxlsca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=xls &
-	wget --retry-connrefused -O target/reporthtmlca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=html &
-	wget --retry-connrefused -O target/reportcsvca.html http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=csv &
+	wget --retry-connrefused -O target/reportformca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?form&lang=ca" &
+	wget --retry-connrefused -O target/reportpdfca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=pdf" &
+	wget --retry-connrefused -O target/reportxlsca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=xls" &
+	wget --retry-connrefused -O target/reporthtmlca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=html" &
+	wget --retry-connrefused -O target/reportcsvca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=csv" &
 	# Get pattern urls of 3 patterns (one of each type) in ca and en languages
-	wget --retry-connrefused -O target/patternregistroca.html http://localhost:8080/tiendavirtual/productoes?gvnixform&gvnixpattern=ficha&index=1&lang=ca &
-	wget --retry-connrefused -O target/patterntabularca.html http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=ca &
-	wget --retry-connrefused -O target/patternregistrotabularca.html http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1&lang=ca &
-	wget --retry-connrefused -O target/patternregistroen.html http://localhost:8080/tiendavirtual/productoes?gvnixform&gvnixpattern=ficha&index=1&lang=en &
-	wget --retry-connrefused -O target/patterntabularen.html http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=en &
-	wget --retry-connrefused -O target/patternregistrotabularen.html http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1&lang=en &
+	wget --retry-connrefused -O target/patternregistroca.html "http://localhost:8080/tiendavirtual/productoes?gvnixform&gvnixpattern=ficha&index=1&lang=ca" &
+	wget --retry-connrefused -O target/patterntabularca.html "http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=ca" &
+	wget --retry-connrefused -O target/patternregistrotabularca.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1&lang=ca" &
+	wget --retry-connrefused -O target/patternregistroen.html "http://localhost:8080/tiendavirtual/productoes?gvnixform&gvnixpattern=ficha&index=1&lang=en" &
+	wget --retry-connrefused -O target/patterntabularen.html "http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=en" &
+	wget --retry-connrefused -O target/patternregistrotabularen.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1&lang=en" &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo tiendavirtual end
