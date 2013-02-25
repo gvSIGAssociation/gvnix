@@ -1,8 +1,13 @@
 
+## A POSTGRES database isrequired in local machine with next script loaded:
+##  http://scmcit.gva.es/svn/aplusu/trunk/scripts/produccion/postgres/pg_tablas.sql
+## With "aplusu" user, password and database names.
+
 project --topLevelPackage es.gva.cit.aplusu --projectName aplusu-trunk --java 6
 
 persistence setup --provider HIBERNATE --database POSTGRES --databaseName aplusu --password aplusu --userName aplusu
 
+download accept terms of use
 addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc4
 database introspect --schema aum
 database reverse engineer --schema aum --package ~.domain
