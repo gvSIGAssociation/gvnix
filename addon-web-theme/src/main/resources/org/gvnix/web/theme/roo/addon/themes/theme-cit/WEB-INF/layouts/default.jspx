@@ -34,6 +34,17 @@
         });
   ]]></script>
 
+  <script type="text/javascript">
+  function getDate(){
+		var today = new Date();
+    var hours = ("0" + today.getHours()).slice(-2);
+    var minutes = ("0" + today.getMinutes()).slice(-2);
+    var month = ("0" + (today.getMonth() + 1)).slice(-2);
+    var date = hours + ":" + minutes + " " + today.getDate() +"/"+month+"/"+today.getFullYear();
+		document.write(date);
+	}
+  </script>
+
 <div id="wrapper">
 <table id="application_menu">
   <tbody>
@@ -72,7 +83,7 @@
       </c:choose></td>
 
       <td><span></span></td>
-      <td><span id="fecha">--/--/----</span></td>
+      <td><span id="fecha"><script>getDate()</script></span></td>
       <td id="exit_menu">
 
         <spring:message code="button_home" var="go_home_msg" />
