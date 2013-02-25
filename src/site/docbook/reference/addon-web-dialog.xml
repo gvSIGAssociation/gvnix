@@ -26,6 +26,10 @@
     pueden incluir nuevas excepciones y modificar los textos amigables que se mostrarán
     en lugar de la excepción para cada idioma disponible en la aplicación.</para>
     
+    <para xml:lang="es">Durante su aplicación se instalan algunas cadenas, tanto en
+    ingles como en castellano, para mostrar mensajes para los errores
+    de conversión de datos numéricos y fechas.</para>
+    
     <para xml:lang="es">El add-on también permite mostrar mensajes de
     usuario sin realizar ninguna implementación en la capa web mediante la invocación
     de métodos desde el controlador que son los encargados de mostrar
