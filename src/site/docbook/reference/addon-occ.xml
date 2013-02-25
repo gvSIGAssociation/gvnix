@@ -66,6 +66,15 @@
     cuotidiano de la aplicación excepto en procesos de actualizaciones masivas
     de registros.</para>
     
+    <para xml:lang="es">Para mostrar un mensaje amigable al usuario se puede utilizar el
+    <link linkend="addon-web-exception-handler_descripcion">Add-on Web Dialog</link>
+    que, en el <link linkend="addon-web-exception-handler_excptiones-de-gvnix"> 
+    conjunto de excepciones gestionadas por defecto</link> se incluye esta. Una vez 
+    inicializada la gestión de excepciones es posible personalizar el mensaje
+    usando el comando <link
+    linkend="apendice-comandos_addon-web-exception-handler_exception-handler-set-language">web
+    mvc dialog exception set language</link></para>
+    
   </section>
   <section xml:id="addon-persistence_incluir">
     <title>Añadir el control en las entidades</title>
