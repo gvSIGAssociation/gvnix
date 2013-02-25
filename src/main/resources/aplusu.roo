@@ -8,7 +8,11 @@ project --topLevelPackage es.gva.cit.aplusu --projectName aplusu-trunk --java 6
 persistence setup --provider HIBERNATE --database POSTGRES --databaseName aplusu --password aplusu --userName aplusu
 
 download accept terms of use
+osgi obr url add --url http://spring-roo-repository.springsource.org/repository.xml
+osgi obr start --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc4
+osgi obr url remove --url http://spring-roo-repository.springsource.org/repository.xml
 addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc4
+
 database introspect --schema aum
 database reverse engineer --schema aum --package ~.domain
 

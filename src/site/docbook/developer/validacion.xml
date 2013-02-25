@@ -58,9 +58,12 @@
 	chmod 744 ${WORKSPACE}/code/src/test/resources/integration.sh
 	${WORKSPACE}/code/src/test/resources/integration.sh /tmp/gvNIX-1.1.0-RELEASE/bin ${WORKSPACE}</command>
 	Observar que se establece la ruta en donde Jenkins tiene instalada la versión de Maven.</para>
-	
+
+  	<para xml:lang="es">Algunos scripts ejecutados por <emphasis>integration.sh</emphasis>
+  	requieren que exista alguna base de datos para realizar ingenierías inversas.</para> 
+
 	<para xml:lang="es">Con el <emphasis>Text-finder Plugin</emphasis> se busca la cadena
-	<emphasis>BUILD FAILURE|Script execution aborted|ERROR 404: Not Found</emphasis>
+	<emphasis>BUILD FAILURE|Script execution aborted|ERROR 404: Not Found|ERROR 400: Bad Request</emphasis>
 	y en el caso de encontrarla se marca el build como inestable.</para>
   	
   	<para xml:lang="es">Se avisa por correo de ejecuciones erróneas al responsable técnico del proyecto 
@@ -68,7 +71,8 @@
   	de build continuo el servidor de correo saliente a mail.disid.com y el sufijo de email por defecto
   	a @disid.com.</para>
   	
-  	<para xml:lang="es">Es necesario tener instalados los plugins <emphasis>Run Condition Plugin</emphasis> y <emphasis>Text-finder Plugin</emphasis>.</para>
+  	<para xml:lang="es">Es necesario tener instalados los plugins <emphasis>Run Condition Plugin</emphasis>
+  	y <emphasis>Text-finder Plugin</emphasis>.</para>
   </section>  
   
 </chapter>
