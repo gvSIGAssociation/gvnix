@@ -1,5 +1,5 @@
 
-## A POSTGRES database isrequired in local machine with next script loaded:
+## A POSTGRES database is required in local machine with next script loaded:
 ##  http://scmcit.gva.es/svn/aplusu/trunk/scripts/produccion/postgres/pg_tablas.sql
 ## With "aplusu" user, password and database names.
 

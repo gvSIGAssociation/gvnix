@@ -604,10 +604,25 @@
 	mkdir aplusu
 	cd aplusu
 	$1/gvnix.sh script --file $2/code/src/main/resources/aplusu.roo --lineNumbers true
+	mvn test tomcat:run &
 	mkdir target
 	# Request the home URL
-	wget --retry-connrefused -O target/home.html http://localhost:8080/aplusu-trunk/ &
-	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	wget --retry-connrefused -O target/home.html http://localhost:8080/aplusu-trunk/
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo aplusu end
-	
+
+	## regproy (database required)
+	echo regproy start
+	mkdir regproy
+	cd regproy
+	$1/gvnix.sh script --file $2/code/src/main/resources/regproy.roo --lineNumbers true
+	mvn test tomcat:run & 
+	mkdir target
+	# Request the home URL
+	wget --retry-connrefused -O target/home.html http://localhost:8080/registro_proyectos/
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
+    cd ..
+	echo regproy end

@@ -1,0 +1,252 @@
+
+project --topLevelPackage es.gva.cit --projectName registro_proyectos --java 6
+
+persistence setup --provider HIBERNATE --database POSTGRES --databaseName regproy --userName regproy --password regproy
+database properties list
+
+download accept terms of use
+osgi obr url add --url http://spring-roo-repository.springsource.org/repository.xml
+osgi obr start --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc4
+osgi obr url remove --url http://spring-roo-repository.springsource.org/repository.xml
+addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc4
+
+database introspect --schema public
+database reverse engineer --schema "public" --package ~.domain --includeNonPortableAttributes --includeTables "trgp_contratista trgp_localizacion trgp_tipo_archivo trgp_tipo_documento trgp_tipo_soporte trgp_estado" --excludeTables "trgp_documento trgp_documento_anexado trgp_ejemplar"
+
+controller all --package ~.web
+
+finder list --class ~.domain.TrgpContratista
+finder add --finderName findTrgpContratistasByDescortaContratista
+ 
+database reverse engineer --schema "public" --package ~.domain --includeNonPortableAttributes --includeTables "trgp_contratista trgp_localizacion trgp_tipo_archivo trgp_tipo_documento trgp_tipo_soporte trgp_estado" --excludeTables "trgp_documento trgp_documento_anexado trgp_ejemplar"
+
+controller scaffold --entity ~.domain.TrgpEstado --class ~.web.EstadoController
+
+finder list --class ~.domain.TrgpContratista
+
+database reverse engineer --schema "public" --package ~.domain --includeNonPortableAttributes --includeTables "trgp_contratista trgp_localizacion trgp_tipo_archivo trgp_tipo_documento trgp_tipo_soporte trgp_estado" --excludeTables "trgp_documento trgp_documento_anexado trgp_ejemplar"
+
+finder list --class ~.domain.TrgpEstado
+finder list --class ~.domain.TrgpEstado
+
+database properties list
+persistence setup --provider HIBERNATE --database POSTGRES --databaseName regproy --userName regproy --password regproy
+database properties list
+
+finder list --class ~.domain.TrgpTipoSoporte
+finder add --finderName findTrgpTipoSoportesByTipoSoporteLikeAndDescSoporteLikeAndPrefijoSoporteLike 
+finder add --class ~.domain.TrgpTipoSoporte --finderName findTrgpTipoSoportesByDescSoporteLikeAndPrefijoSoporteLike
+
+web report add --controller ~.web.TrgpEstadoController --reportName listadoEstados --format 
+web report add --controller ~.web.TrgpEstadoController --reportName listadoEstados --format xls
+
+database reverse engineer --schema "public" --package ~.domain --includeNonPortableAttributes --includeTables "trgp_contratista trgp_localizacion trgp_tipo_archivo trgp_tipo_documento trgp_tipo_soporte trgp_estado trgp_documento trgp_documento_anexado trgp_ejemplar" --excludeTables "tcmn_inmuebles"
+
+controller scaffold --entity ~.domain.TrgpDocumento --class ~.web.TrgpDocumentoController
+controller scaffold --entity ~.domain.TrgpDocumentoAnexado --class ~.web.TrgpDocumentoAnexadoController
+controller scaffold --entity ~.domain.TrgpEjemplar --class ~.web.TrgpEjemplarController
+
+theme list
+theme install --id cit
+theme set --id cit
+
+menu setup
+menu tree
+menu entry visibility --id c_trgpejemplar --hidden true
+menu entry visibility --id c_trgpcontratista --hidden true
+menu entry visibility --id c_trgpdocumentoanexado --hidden true 
+menu tree
+menu entry add --label "Proyectos" --category trgpdocumentoes --url /trgpdocumentoes?page=1&size=10
+menu tree
+menu entry visibility --id i_trgpdocumentoes_proyectos --hidden true
+menu entry update --id c_trgpdocumentoes --url /trgpdocumentoes?page=1&size=10
+menu tree
+menu entry update --id c_trgpdocumentoes --label "Proyectos"
+menu tree 
+menu entry update --id c_trgpdocumentoes --label Proyectos
+menu entry move --id c_trgpdocumentoes --before c_trgptiposoporte
+menu entry update --id c_trgpdocumentoes --url "/trgpdocumentoes?codigoDocumento=1"
+menu tree 
+menu entry update --id c_trgpdocumentoes --url "/trgpdocumentoes/1"
+menu tree 
+menu tree
+menu entry visibility --id c_trgpdocumentoanexado --hidden true
+menu entry visibility --id c_trgpdocumentoanexado --hidden true
+menu entry visibility --id c_trgpestado --hidden true 
+menu entry visibility --id c_trgpcontratista --hidden true 
+menu entry visibility --id c_trgplocalizacion --hidden true 
+menu entry visibility --id c_trgpejemplar --hidden true 
+menu entry visibility --id c_trgplocalizacion --hidden true 
+menu entry visibility --id c_trgpejemplar --hidden true
+menu entry visibility --id c_trgpcontratista --hidden true 
+menu entry visibility --id c_trgpestado --hidden true 
+menu entry visibility --id c_trgpdocumentoanexado --hidden true
+menu entry visibility --id c_trgpdocumentoanexado --hidden true
+menu tree
+menu entry visibility --id c_trgpestado --hidden true
+menu entry visibility --hidden true --id c_trgpejemplar
+menu entry visibility --hidden true --id c_trgpdocumentoanexado
+menu entry visibility --hidden true --id c_trgplocalizacion
+menu entry visibility --hidden true --id c_trgpestado
+menu entry visibility --hidden true --id c_trgpcontratista
+
+web mvc pattern setup
+web mvc pattern master --class ~.web.TrgpDocumentoController --name DocumentoRegistro --type register
+web mvc pattern master --class ~.web.TrgpContratistaController --name ContratistaTabular --type tabular
+
+menu tree
+menu entry visibility --hidden true --id i_trgpcontratista_list
+menu entry move --id i_trgpcontratista_list_tabular_contratistatabular --into c_trgpcontratista
+menu tree
+
+web mvc pattern master --class ~.web.TrgpTipoDocumentoController --name TipoDocumentoTabular --type tabular
+web mvc pattern master --class ~.web.TrgpLocalizacionController --name LocalizacionTabular --type tabular
+web mvc pattern master --class ~.web.TrgpTipoArchivoController --name TipoArchivoTabular --type tabular
+web mvc pattern master --class ~.web.TrgpTipoSoporteController --name TipoSoporteTabular --type tabular
+web mvc pattern master --class ~.web.TrgpEstadoController --name EstadoTabular --type tabular
+web mvc pattern master --class ~.web.TrgpDocumentoController --name DocumentosRegister --type register
+
+menu tree
+menu entry move --id i_trgptipodocumento_list_tabular_tipodocumentotabular --into c_trgptipodocumento
+menu tree 
+menu entry visibility --hidden true --id i_trgptipodocumento_list
+menu tree
+menu entry visibility --id c_trgptipodocumento --hidden true
+menu tree
+menu entry move --id i_trgplocalizacion_list_tabular_localizaciontabular --into c_trgplocalizacion
+menu entry visibility --hidden true --id c_trgplocalizacion
+menu tree
+menu entry visibility --hidden true --id c_trgptipoarchivo
+menu tree
+menu entry visibility --hidden true --id i_trgplocalizacion_list
+menu entry visibility --hidden true --id i_trgptipoarchivo_list
+menu tree
+menu entry visibility --hidden true --id c_trgptiposoporte
+menu entry move --id i_trgptiposoporte_list_tabular_tiposoportetabular --into c_trgptiposoporte
+menu entry visibility --hidden true --id i_trgptiposoporte_list
+menu tree
+menu entry visibility --id i_trgpestado_list --hidden true
+menu entry move --id i_trgpestado_list_tabular_estadotabular --into c_trgpestado
+
+web mvc pattern detail --class ~.web.TrgpDocumentoController --name DocumentosRegister --type tabular --field trgpDocumentoAnexadoes
+web mvc pattern detail --class ~.web.TrgpDocumentoController --name DocumentosRegister --type tabular --field trgpEjemplars
+
+menu tree
+menu entry visibility --id c_trgpdocumento --hidden true
+menu entry update --id c_trgpdocumentoes --url "/trgpdocumentoes?gvnixform&gvnixpattern=DocumentosRegister&index=${empty param.index ? 1 : param.index}"
+menu tree
+
+finder list --class ~.domain.TrgpDocumento
+finder list --class ~.domain.TrgpDocumento 
+finder list --class ~.domain.TrgpDocumento --depth 2
+finder list --class ~.domain.TrgpDocumento --depth 2 --filter And,Rececpion,Supervision
+finder list --class ~.domain.TrgpDocumento --depth 2 --filter findTrgpDocumentosBySupervision
+finder list --class ~.domain.TrgpDocumento --depth 2 --filter findTrgpDocumentoesBySupervision
+finder list --class ~.domain.TrgpDocumento --depth 2 --filter findTrgpDocumentoesBySupervisionBetween
+finder list --class ~.domain.TrgpDocumento --depth 2 --filter findTrgpDocumentoesBySupervisionBetweenAnd
+finder add --class ~.domain.TrgpDocumento --finderName findTrgpDocumentoesBySupervisionBetweenAndRecepcionObraBetween
+
+finder list --class es.gva.cit.domain.TrgpDocumento --depth 2 --filter findTrgpDocumentoesByInformacionPubBetweenAnd
+finder add --class ~.domain.TrgpDocumento --finderName findTrgpDocumentoesByInformacionPubBetweenAndCodigoContratista
+
+menu tree
+menu entry update --id i_trgpestado_listadoestados_report --url /trgpdocumentoes?find=ByInformacionPubBetweenAndCodigoContratista&form
+
+finder list --class es.gva.cit.domain.TrgpDocumento --depth 2 --filter findTrgpDocumentoesByInformacionPubBetweenAnd
+finder add --class ~.domain.TrgpDocumento --finderName findTrgpDocumentoesByInformacionPubBetweenAndTipoDocumento
+finder add --finderName findTrgpDocumentoesBySupervisionBetweenAndRecepcionObraBetween --class es.gva.cit.domain.TrgpDocumento
+
+web mvc pattern update tags
+web mvc pattern update tags
+
+web mvc dialog setup
+
+web mvc update tags
+ 
+web report add --controller ~.web.TrgpDocumentoController --reportName trgpDocumentos
+
+menu tree 
+menu entry visibility --id i_trgpdocumento_trgpdocumentos_report --hidden true
+menu tree
+
+theme set --id cit
+
+finder list --class ~.domain.TrgpDocumento --filter codigoDocumento
+finder list --class ~.domain.TrgpDocumento
+finder list --class ~.domain.TrgpDocumento --depth 2
+finder add --class ~.domain.TrgpDocumento --finderName findTrgpDocumentoesByTipoDocumentoEqualsAndCodigoContratista
+ 
+web mvc scaffold --class ~.domain.TrgpDocumentoAnexado
+web mvc scaffold --class ~.web.TrgpDocumentoAnexadoController
+web mvc scaffold --class ~.web.TrgpDocumentoAnexadoController --path testdocanex
+
+cit security setup --url "http://regproy.es" --login "regproy" --password "regproy" --appName "regproy"
+
+configuration create --name local 
+configuration list
+configuration create --name dev
+configuration list
+configuration property add --name database.url 
+configuration property value --configuration dev --property database.url --value jdbc:postgresql://localhost:5432/regproy
+configuration list
+configuration property add --name database.username 
+configuration property value --configuration dev --property database.username --value regproy
+configuration property add --name database.password 
+configuration property value --configuration dev --property database.password --value regproy
+configuration list
+configuration create --name pre
+configuration property add --name database.url 
+configuration property value --configuration pre --property database.url --value jdbc:postgresql://localhost:5432/regproypre
+configuration list
+configuration list
+configuration property value --configuration pre --property database.username --value regproypre
+
+## A POSTGRES database is required in local machine with next script loaded:
+##  http://scmcit.gva.es/svn/regproy/trunk/src/main/sql/script.sql
+## With "regproy" user, password and database names.
+## Remove from script "comun" schema references, execute the script 3 times and create hibernate_sequence.
+
+configuration property value --configuration pre --property database.password --value regproypre
+configuration list
+configuration list
+configuration property add --name wsauth.url
+configuration property add --name wsauth.loggin 
+configuration property add --name wsauth.password 
+configuration property value --configuration dev --property wsauth.url --value http://regproy.es
+configuration property value --configuration pre --property wsauth.url --value http://regproypre.es
+configuration list
+configuration list
+configuration export
+configuration list
+configuration export
+configuration export
+
+theme install --id cit
+theme set --id cit
+
+web mvc dialog exception add --exception org.hibernate.exception.ConstraintViolationException --title ConstraintViolationException --description "No se puede crear/actualizar el registro porque no se cumple una restricción de integridad." --language es
+
+menu tree 
+menu tree 
+
+web mvc dialog exception add --exception org.postgresql.util.PSQLException --title "PSQLException" --description "No se puede crear/actualizar el registro porque no se cumple una restricción de integridad." --language es
+
+// OJO ! ! ! ! No disponible ! ! !
+// web mvc dialog add --class ~.web.TrgpDocumentoController --name duplicarDocumento
+
+configuration create --name pro
+configuration property value --property database.url --configuration pre --value jdbc:postgresql://localhost:5432/regproypre
+configuration property value --property database.url --configuration pre --value jdbc:postgresql://localhost:5432/regproypre
+configuration property value --property database.url --configuration pro --value jdbc:postgresql://localhost:5432/regproypro
+configuration list
+configuration property value --property database.username --configuration pro --value regproypro
+configuration property value --property database.password --configuration pro --value regproypro
+configuration property value --property wsauth.url --configuration pro --value http://regproypro.es
+configuration property value --property wsauth.url --configuration pro --value http://regproypro.es
+configuration list
+configuration property value --property wsauth.url --configuration pro --value http://regproypro.es
+configuration list
+configuration export
+configuration list
+configuration property value --configuration pro --property wsauth.url --value http://regproypro.es
+configuration export
