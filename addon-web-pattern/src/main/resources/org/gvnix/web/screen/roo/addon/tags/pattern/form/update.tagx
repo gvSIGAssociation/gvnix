@@ -84,7 +84,7 @@
     <c:if test="${empty label}">
       <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label" htmlEscape="false" />
     </c:if>
-    <spring:message arguments="${label}" code="entity_show" var="title_msg" />
+    <spring:message arguments="${label}" code="entity_show" var="title_msg" htmlEscape="false"/>
     <util:panel id="${secId}" title="${title_msg}" openPane="${openPane}">
 
       <!-- Show quick links to make available actions over table rows (create, update, delete, ...) -->
