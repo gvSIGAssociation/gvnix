@@ -48,6 +48,8 @@ import org.springframework.roo.classpath.details.annotations.BooleanAttributeVal
 import org.springframework.roo.classpath.details.annotations.ClassAttributeValue;
 import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
+import org.springframework.roo.classpath.scanner.MemberDetails;
+import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
@@ -80,6 +82,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
     @Reference private AnnotationsService annotationsService;
     @Reference private WSExportValidationService wSExportValidationService;
     @Reference private TypeLocationService typeLocationService;
+    @Reference private MemberDetailsScanner memberDetailsScanner;
 
     /**
      * {@inheritDoc}
@@ -776,16 +779,15 @@ public class WSExportOperationsImpl implements WSExportOperations {
         // Get service class details
         ClassOrInterfaceTypeDetails tmpServiceDetails = typeLocationService
                 .getTypeDetails(serviceClass);
+        MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(
+                serviceClass.getFullyQualifiedTypeName(), tmpServiceDetails);
 
         // Checks if it's mutable
         Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
                 tmpServiceDetails,
                 "Can't modify " + tmpServiceDetails.getName());
 
-        ClassOrInterfaceTypeDetails serviceDetails = (ClassOrInterfaceTypeDetails) tmpServiceDetails;
-
-        List<? extends MethodMetadata> methodList = serviceDetails
-                .getDeclaredMethods();
+        List<? extends MethodMetadata> methodList = memberDetails.getMethods();
 
         // If there aren't any methods in class.
         if (methodList == null || methodList.isEmpty()) {
