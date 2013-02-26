@@ -1,4 +1,9 @@
 
+## A POSTGRES database is required in local machine with next script loaded:
+##  http://scmcit.gva.es/svn/regproy/trunk/src/main/sql/script.sql
+## With "regproy" user, password and database names.
+## Remove from script "comun" schema references, execute the script 3 times and create hibernate_sequence.
+
 project --topLevelPackage es.gva.cit --projectName registro_proyectos --java 6
 
 persistence setup --provider HIBERNATE --database POSTGRES --databaseName regproy --userName regproy --password regproy
@@ -200,11 +205,6 @@ configuration property value --configuration pre --property database.url --value
 configuration list
 configuration list
 configuration property value --configuration pre --property database.username --value regproypre
-
-## A POSTGRES database is required in local machine with next script loaded:
-##  http://scmcit.gva.es/svn/regproy/trunk/src/main/sql/script.sql
-## With "regproy" user, password and database names.
-## Remove from script "comun" schema references, execute the script 3 times and create hibernate_sequence.
 
 configuration property value --configuration pre --property database.password --value regproypre
 configuration list
