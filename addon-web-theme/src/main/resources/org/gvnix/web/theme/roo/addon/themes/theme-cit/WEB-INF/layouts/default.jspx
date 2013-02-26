@@ -90,28 +90,25 @@
         <spring:url var="home" value="/" />
         <spring:url var="close_button" value="/resources/images/cit/theme/imagenes/cerrar.gif" />
         <spring:message code="security_logout" var="logout_msg"/>
+        <spring:url var="logout" value="/static/j_spring_security_logout" />
 
+        <span>
+          <a href="${home}" title="${go_home_msg}">
+            <img src="${close_button}" align="center" class="close"
+              alt="${go_home_msg}"/>
+          </a>
+        </span>
+		          
         <c:if test="${pageContext['request'].userPrincipal != null}">
-          <span>
-            <spring:url var="logout" value="/static/j_spring_security_logout" />
-            <a href="${logout}" title="${go_home_msg}">
-              <img src="${close_button}" align="center" class="close"
-                alt="${go_home_msg}"/>
-            </a>
-          </span>
+        	<c:set value="location.href='${logout}';top.window.close();" var="closeAction" />	
         </c:if>
 
         <c:if test="${pageContext['request'].userPrincipal == null}">
-          <span>
-              <a href="${home}" title="${go_home_msg}">
-                <img src="${close_button}" alt="${logout_msg}" align="center" class="close" />
-              </a>
-          </span>
+            <c:set value="top.window.close();" var="closeAction" />
         </c:if>
-
         <spring:message code="button_exit" var="exit_msg"/>
         <spring:url var="min_button" value="/resources/images/cit/theme/imagenes/salir.gif" />
-        <span><a href="#" onclick="top.window.close();" value="close" title="${exit_msg}" class="close"><img
+        <span><a href="#" onclick="${closeAction}" value="close" title="${exit_msg}" class="close"><img
           src="${min_button}" alt="${exit_msg}" align="center" /></a></span>
       </td>
     </tr>

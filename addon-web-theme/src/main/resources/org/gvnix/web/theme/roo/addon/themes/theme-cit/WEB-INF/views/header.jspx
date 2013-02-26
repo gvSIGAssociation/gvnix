@@ -13,27 +13,23 @@
   </c:otherwise>
   </c:choose>
   <div id="exit_menu">
-    <spring:url var="home" value="/" /> 
+    <spring:url var="home" value="/" />
     <spring:url var="close_button" value="/resources/images/cit/theme/imagenes/salir.gif" />
     <spring:message code="button_exit" var="exit_msg"/>
-
+    <spring:url var="logout" value="/static/j_spring_security_logout" />
     <c:if test="${pageContext['request'].userPrincipal != null}">
-      <span>
-        <spring:url var="logout" value="/static/j_spring_security_logout" />
-        <a href="#" onclick="top.window.close();" title="${exit_msg}">
-          <img src="${close_button}" alt="${exit_msg}" align="center" class="close" />
-        </a>
-      </span>
+    	<c:set value="location.href='${logout}';top.window.close();" var="closeAction" />	
     </c:if>
 
     <c:if test="${pageContext['request'].userPrincipal == null}">
-      <span>
-          <a href="#" onclick="top.window.close();" title="${exit_msg}">
-            <img src="${close_button}" alt="${exit_msg}" align="center" class="close" />
-          </a>
-      </span>
+        <c:set value="top.window.close();" var="closeAction" />
     </c:if>
-    </div>
+    <span>
+      <a href="#" onclick="${closeAction}" title="${exit_msg}">
+        <img src="${close_button}" alt="${exit_msg}" align="center" class="close" />
+      </a>
+    </span>
+  </div>
 
   <h2 class="descrip_titaplic"><spring:message code="application_description" htmlEscape="false"/></h2>
   <h1 class="titulo_aplicacion"><spring:message code="application_name" htmlEscape="false"/></h1>
