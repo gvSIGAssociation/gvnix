@@ -19,9 +19,12 @@
 				
 				<spring:message var="stacktrace" code="exception_stacktrace" htmlEscape="false" />
 				<util:panel id="_exception" title="${stacktrace}" openPane="false" >
-					<c:forEach items="${exception.stackTrace}" var="trace">
-						<c:out value="${trace}"/><br/>
-					</c:forEach>
+				    <div style="overflow: auto; height: 160px;">
+						<c:forEach items="${exception.stackTrace}" var="trace">
+							<c:out value="${trace}"/><br/>
+						</c:forEach>
+						<br/>
+					</div>
 				</util:panel>
 			</p>
 		</c:if>
