@@ -354,9 +354,9 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     }
 
     /**
-     * Get string of code required to generate the string representation
-     * of a Roo Bean
-     *  
+     * Get string of code required to generate the string representation of a
+     * Roo Bean
+     * 
      * @param members of the Roo Bean
      * @param prefix for every property (use null for this bean itself)
      * @return
