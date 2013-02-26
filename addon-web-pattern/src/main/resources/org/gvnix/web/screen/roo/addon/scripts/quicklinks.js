@@ -33,6 +33,8 @@ function gvnix_delete_confirm(msg, element, compositePkField) {
       if (r == true) {
           gvnix_delete(element, compositePkField);
       }
+  } else {
+      alert(GVNIX_MSG_SELECT_ROW_TO_DELETE);
   }
 }
 
@@ -310,6 +312,8 @@ function gvnix_edit_ward(element) {
   if ( gvnix_any_selected(element) && !gvNixEditMode ) {
       gvNixChangesControl();
       gvnix_edit(element);
+  } else {
+	  alert(GVNIX_MSG_SELECT_ROW_TO_UPDATE);
   }
 }
 
@@ -334,6 +338,11 @@ function gvnix_create_item(url) {
  * Get selected checkbox and reload page with this one identifier value placed in a URL param.
  */
 function gvnix_edit_item(detailPath, element, urlParams, compositePkField, idField) {
+	
+  if ( !gvnix_any_selected(element)){
+	  alert(GVNIX_MSG_SELECT_ROW_TO_UPDATE);
+	  return;
+  }
 
   // Before edit, copy each visible field value to it related hidden field
   gvnix_copy_values(element, compositePkField, "update");
@@ -344,7 +353,7 @@ function gvnix_edit_item(detailPath, element, urlParams, compositePkField, idFie
   checkBoxes.forEach(function(node, index, arr) {
     if (node.checked == true) {
       if (nodeChecked != undefined) {
-        alert("Solo es posible editar un unico registro");
+        alert(GVNIX_MSG_UPDATE_ONLY_ONE_ROW);
         return;
       }
       nodeChecked = node;

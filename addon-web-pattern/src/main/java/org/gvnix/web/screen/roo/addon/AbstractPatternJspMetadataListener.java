@@ -918,6 +918,31 @@ public abstract class AbstractPatternJspMetadataListener implements
                     loadScriptsXml)
                     .addAttribute("value", "/resources/scripts/quicklinks.js")
                     .addAttribute("var", "qljs_url").build();
+            // Add i18n messages for quicklinks.js
+            List<Element> qlJsI18n = new ArrayList<Element>();
+            qlJsI18n.add(new XmlElementBuilder("spring:message", loadScriptsXml)
+                    .addAttribute("code", "message_selectrowtodelete_alert")
+                    .addAttribute("var", "msg_selectrowtodelete_alert")
+                    .addAttribute("htmlEscape", "false").build());
+            qlJsI18n.add(new XmlElementBuilder("spring:message", loadScriptsXml)
+                    .addAttribute("code", "message_selectrowtoupdate_alert")
+                    .addAttribute("var", "msg_selectrowtoupdate_alert")
+                    .addAttribute("htmlEscape", "false").build());
+            qlJsI18n.add(new XmlElementBuilder("spring:message", loadScriptsXml)
+                    .addAttribute("code", "message_updateonlyonerow_alert")
+                    .addAttribute("var", "msg_updateonlyonerow_alert")
+                    .addAttribute("htmlEscape", "false").build());
+            StringBuilder qlJsI18nScriptText = new StringBuilder("<!--\n");
+            qlJsI18nScriptText
+                    .append("var GVNIX_MSG_SELECT_ROW_TO_DELETE=\"${msg_selectrowtodelete_alert}\";\n");
+            qlJsI18nScriptText
+                    .append("var GVNIX_MSG_SELECT_ROW_TO_UPDATE=\"${msg_selectrowtoupdate_alert}\";\n");
+            qlJsI18nScriptText
+                    .append("var GVNIX_MSG_UPDATE_ONLY_ONE_ROW=\"${msg_updateonlyonerow_alert}\";\n");
+            qlJsI18nScriptText.append("-->\n");
+            Element qlJsI18nScript = new XmlElementBuilder("script",
+                    loadScriptsXml).setText(qlJsI18nScriptText.toString())
+                    .build();
             List<Element> springUrlElements = XmlUtils.findElements(
                     "/root/url", lsRoot);
             // Element lastSpringUrl = null;
@@ -929,12 +954,20 @@ public abstract class AbstractPatternJspMetadataListener implements
                             .getNextSibling();
                     lsRoot.insertBefore(urlPatternCss, nextSibiling);
                     lsRoot.insertBefore(urlQlJs, nextSibiling);
+                    lsRoot.insertBefore(qlJsI18nScript, nextSibiling);
+                    for (Element item : qlJsI18n) {
+                        lsRoot.insertBefore(item, qlJsI18nScript);
+                    }
                 }
             }
             else {
                 // Add at the end of the document
                 lsRoot.appendChild(urlPatternCss);
                 lsRoot.appendChild(urlQlJs);
+                for (Element item : qlJsI18n) {
+                    lsRoot.appendChild(item);
+                }
+                lsRoot.appendChild(qlJsI18nScript);
             }
         }
 
