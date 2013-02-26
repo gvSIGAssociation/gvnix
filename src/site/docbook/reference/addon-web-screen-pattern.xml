@@ -239,6 +239,18 @@
 	    Spring MVC necesarios (diferentes archivos tagx, jspx, imágenes, javascript,
 	    ...) y se generarán los aspectos Java apropiados para lograr
 	    visualizar el patrón elegido.</para>
+	    
+		<figure>
+		<title xml:lang="es">Patrón maestro</title>
+		
+		<mediaobject>
+		  <imageobject>
+		    <imagedata align="center"
+		               fileref="images/tabular.png"/>
+		  </imageobject>
+		</mediaobject>
+		</figure>
+	  
 	</section>
 
   	<section xml:id="addon-web-relation-styles_creacion-detalle">
@@ -266,6 +278,18 @@
 	    maestro sobre el mismo controlador. Es decir, el controlador
 	    debe tener definida la anotación <emphasis>@GvNIXPattern</emphasis>.
 	    </para>
+	    
+		<figure>
+		<title xml:lang="es">Patrón maestro con un detalle</title>
+		
+		<mediaobject>
+		  <imageobject>
+		    <imagedata align="center"
+		               fileref="images/master-detail.png"/>
+		  </imageobject>
+		</mediaobject>
+		</figure>
+	  
 	</section>
   </section>
 
@@ -282,6 +306,17 @@
       simultaneos con la posibilidad de desplazarse a lo largo de todos los
       registros existentes mediante paginación.</para>
 
+	  <figure>
+	  <title xml:lang="es">Tabular</title>
+	
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata align="center"
+	                 fileref="images/tabular.png"/>
+	    </imageobject>
+	  </mediaobject>
+	  </figure>
+    
       <para>Las operaciones de creación, actualización y borrado en este
       formato de visualización se pueden realizar sobre varios registros
       de forma simultánea. Estas operaciones se realizarán de forma transaccional,
@@ -330,6 +365,37 @@
           valor será <emphasis>true</emphasis>.</para>
         </listitem>
 
+		<listitem>
+          <para><emphasis>createLink = true|false</emphasis>
+          booleano que indica si se debe permitir la creación de nuevos
+          registros desde el patrón.</para>
+        </listitem>
+
+		<listitem>
+          <para><emphasis>updateLink = true|false</emphasis>
+          booleano que indica si se debe permitir la actualización de
+          registros existentes desde el patrón.</para>
+        </listitem>
+        
+		<listitem>
+          <para><emphasis>deleteLink = true|false</emphasis>
+          booleano que indica si se debe permitir el borrado de
+          registros existentes desde el patrón.</para>
+        </listitem>
+        
+		<listitem>
+          <para><emphasis>resetLink = true|false</emphasis>
+          booleano que indica si se debe permitir refrescar la lista
+          de registros existentes en el patrón.</para>
+        </listitem>
+                
+		<listitem>
+          <para><emphasis>checkSelect = true|false</emphasis>
+          booleano que indica si se debe mostrar un campo de selección
+          a la izquierda de cada uno de los registros del patrón para
+          marcar uno o varios de ellos.</para>
+        </listitem>
+        
         <listitem>
           <para><emphasis>finder = NombreBuscador</emphasis> si está establecido,
           se mostrará una pestaña con la imagen de una lupa en la parte
@@ -342,14 +408,159 @@
         
 		<listitem>
           <para><emphasis>idRender = true|false</emphasis>
-          booleano que indica si el campo se debe ver en pantalla.</para>
+          booleano que indica si el campo identificador se debe ver en pantalla.</para>
         </listitem>
         
 		<listitem>
           <para><emphasis>idDisabled = true|false</emphasis>
-          booleano que indica si el campo debe estar desactivado,
+          booleano que indica si el campo identificador debe estar desactivado,
           es decir, el usuario no debe poder modificarlo.</para>
         </listitem>
+        
+		<listitem>
+          <para><emphasis>roles = ListaRoles</emphasis>
+          Lista separada por comas con los roles que tienen permiso para
+          realizar las operaciones de creación, actualización, borrado y
+          refresco de los registros del patrón. Este atributo solo es
+          útil si se encuentra aplicada la seguridad, por ejemplo mediante
+          el <link linkend="addon-cit-security">add-on CIT Security</link>
+          o el add-on Typical security.</para>
+        </listitem>
+        
+      </itemizedlist>
+      
+    </section>
+
+    <section>
+      <title>Tabular con edición registro</title>
+      
+      <para>Este patrón se identifica mediante el código
+      <emphasis>tabular_edit_register</emphasis>.</para>
+
+      <para>El patrón tabular define una visualización de varios registros
+      simultaneos con la posibilidad de desplazarse a lo largo de todos los
+      registros existentes mediante paginación.</para>
+      
+	  <figure>
+	  <title xml:lang="es">Tabular</title>
+	
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata align="center"
+	                 fileref="images/tabular.png"/>
+	    </imageobject>
+	  </mediaobject>
+	  </figure>
+
+      <para>Las operaciones de creación, actualización y borrado en este
+      formato de visualización se realizan sobre un único registro seleccionado
+      de la lista tabular y se realiza en una página nueva en formato
+      registro.</para>
+      
+	  <figure>
+	  <title xml:lang="es">Edición</title>
+	
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata align="center"
+	                 fileref="images/edit.png"/>
+	    </imageobject>
+	  </mediaobject>
+	  </figure>
+
+      <para>El Add-on Web Screen Pattern, genera los componentes necesarios para
+      mostrar una entidad en formato tabular con edición registro. Por defecto,
+      la jspx asociada a este patrón utiliza el componente
+      <emphasis>&lt;form:updateregister/&gt;</emphasis> de la librería de tags
+      <emphasis>/pattern/form</emphasis>.</para>
+
+      <para>Este formato de visualización por defecto muestra el campo
+      que representa el identificador. En ocasiones esto puede ser útil en
+      entidades en las que  el identificador se quiera visualizar. Otras veces,
+      en cambio, se desea que el identificador permanezca oculto.
+      El tagx <emphasis>&lt;form:updateregister/&gt;</emphasis> dispone de un
+      atributo <emphasis role="bold">idRender</emphasis> que establecido con el valor
+      <emphasis>false</emphasis>, oculta el campo.
+      También se espera que el campo identificador de la
+      entidad sea el campo con nombre <emphasis>id</emphasis>, si por algún motivo
+      no fuese el caso, se puede indicar el campo que hace las veces de identificador
+      mediante el atributo <emphasis role="bold">idField</emphasis>.</para>
+
+      <para>Otro atributo con el que cuenta el tagx de updateregister es el
+      atributo <emphasis role="bold">finder</emphasis> cuyo valor indica un
+      buscador al que se podrá acceder mediante la <emphasis>pestaña lupa</emphasis>
+      que se muestra a la derecha de la caja principal de la vista del patrón
+      tabular.</para>
+
+      <para>Este componente acepta, entre otros, algunos atributos interesantes:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>list = true|false</emphasis> indica si se desea
+          mostrar una pestaña con la imagen de una tabla en la parte
+          derecha de la pantalla que permite
+          acceder a este patrón. Es útil para volver a este patrón si en la
+          misma pantalla se permite visualizar la misma información con
+          distintos patrones o tiene un buscador asociado. Por defecto, su
+          valor será <emphasis>true</emphasis>.</para>
+        </listitem>
+
+		<listitem>
+          <para><emphasis>createLink = true|false</emphasis>
+          booleano que indica si se debe permitir la creación de nuevos
+          registros desde el patrón.</para>
+        </listitem>
+
+		<listitem>
+          <para><emphasis>updateLink = true|false</emphasis>
+          booleano que indica si se debe permitir la actualización de
+          registros existentes desde el patrón.</para>
+        </listitem>
+        
+		<listitem>
+          <para><emphasis>deleteLink = true|false</emphasis>
+          booleano que indica si se debe permitir el borrado de
+          registros existentes desde el patrón.</para>
+        </listitem>
+        
+		<listitem>
+          <para><emphasis>resetLink = true|false</emphasis>
+          booleano que indica si se debe permitir refrescar la lista
+          de registros existentes en el patrón.</para>
+        </listitem>
+                
+		<listitem>
+          <para><emphasis>checkSelect = true|false</emphasis>
+          booleano que indica si se debe mostrar un campo de selección
+          a la izquierda de cada uno de los registros del patrón para
+          marcar alguno de ellos.</para>
+        </listitem>
+        
+        <listitem>
+          <para><emphasis>finder = NombreBuscador</emphasis> si está establecido,
+          se mostrará una pestaña con la imagen de una lupa en la parte
+          derecha de la pantalla que permite acceder al buscador indicado
+          en el valor del atributo. Es útil para realizar un filtrado de los
+          datos que se están mostrando en el patrón. Por defecto, no tiene valor
+          alguno y por lo tanto no mostrará la pestaña.
+          Por ejemplo, <emphasis>finder="ByOwner"</emphasis>.</para>
+        </listitem>
+        
+		<listitem>
+          <para><emphasis>idRender = true|false</emphasis>
+          booleano que indica si el campo identificador se debe ver en pantalla.</para>
+        </listitem>
+        
+		<listitem>
+          <para><emphasis>roles = ListaRoles</emphasis>
+          Lista separada por comas con los roles que tienen permiso para
+          realizar las operaciones de creación, actualización, borrado y
+          refresco de los registros del patrón. Este atributo solo es
+          útil si se encuentra aplicada la seguridad, por ejemplo mediante
+          el <link linkend="addon-cit-security">add-on CIT Security</link>
+          o el add-on Typical security.</para>
+        </listitem>
+        
       </itemizedlist>
       
     </section>
@@ -363,7 +574,18 @@
       <para>Este patrón realiza la visualización de un único registro pero con la
       posibilidad de avanzar, mediante paginación de uno en uno, entre todos
       los registros existentes.</para>
-
+      
+	  <figure>
+	  <title xml:lang="es">Registro</title>
+	
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata align="center"
+	                 fileref="images/register.png"/>
+	    </imageobject>
+	  </mediaobject>
+	  </figure>
+	  
       <para>La generación automática de código de este patrón posiciona los
       campos de la entidad unos debajo de otros. A parte de generar la
       jspx propia del patrón, también modifica las jspx <emphasis>create,
@@ -452,6 +674,17 @@
           mediante una <emphasis>pestaña con una lupa</emphasis>, a la derecha de la caja principal
           de la vista del patrón.</para>
         </listitem>
+
+		<listitem>
+          <para><emphasis>roles = ListaRoles</emphasis>
+          Lista separada por comas con los roles que tienen permiso para
+          realizar las operaciones de creación, actualización, borrado y
+          refresco de los registros del patrón. Este atributo solo es
+          útil si se encuentra aplicada la seguridad, por ejemplo mediante
+          el <link linkend="addon-cit-security">add-on CIT Security</link>
+          o el add-on Typical security.</para>
+        </listitem>
+        
       </itemizedlist>
     </section>
 
