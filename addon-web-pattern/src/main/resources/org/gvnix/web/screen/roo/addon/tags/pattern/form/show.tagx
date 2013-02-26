@@ -1,4 +1,4 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags" xmlns:pattern="urn:jsptagdir:/WEB-INF/tags/pattern" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:spring="http://www.springframework.org/tags" xmlns:pattern="urn:jsptagdir:/WEB-INF/tags/pattern" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:sec="http://www.springframework.org/security/tags" version="2.0">
   <jsp:output omit-xml-declaration="yes" />
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
@@ -14,6 +14,9 @@
   <jsp:directive.attribute name="openPane" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Control if the title pane is opened or closed by default (default: true)" />
   <jsp:directive.attribute name="finder" type="java.lang.String" required="false" rtexprvalue="true" description="Specify the finder to invoque in panel-tab search if exist." />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+  
+  <!-- gvNIX added attributes not included into Roo by default -->
+  <jsp:directive.attribute name="roles" type="java.lang.String" required="false" rtexprvalue="true" description="Comma separated list of user roles allowed to create, update and delete." />
 
   <c:if test="${empty render or render}">
   
@@ -39,6 +42,12 @@
 
     <c:if test="${empty delete}">
       <c:set var="delete" value="true" />
+    </c:if>
+
+	<!-- When a list of roles is supplied: check if some role is granted and then create, update and delete controls -->
+    <c:set var="authorized" value="true" />
+    <c:if test="${not empty roles}">
+      <sec:authorize var="authorized" ifAnyGranted="${roles}" />
     </c:if>
 
     <!-- Locate i18n for entity name -->
@@ -76,7 +85,7 @@
       <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
         <div class="quicklinks">
           <ul>
-            <c:if test="${create}">
+            <c:if test="${create and authorized}">
               <li>
               <spring:url value="${path}" var="create_form_url" htmlEscape="false">
                 <spring:param name="form" />
@@ -95,7 +104,7 @@
               </li>
             </c:if>
 
-            <c:if test="${update}">
+            <c:if test="${update and authorized}">
               <li>
               <spring:url value="${path}/${itemId}" var="update_form_url" htmlEscape="false">
                 <spring:param name="form" />
@@ -114,7 +123,7 @@
               </li>
             </c:if>
 
-            <c:if test="${delete}">
+            <c:if test="${delete and authorized}">
               <li>
               <spring:url value="${path}/${itemId}" var="delete_form_url" htmlEscape="false">
                 <c:if test="${not empty param.gvnixpattern}">
@@ -135,7 +144,7 @@
               </li>
             </c:if>
 
-            <c:if test="${list}">
+            <c:if test="${list and authorized}">
               <li>
               <spring:url value="${path}" var="list_form_url" htmlEscape="false">
                 <spring:param name="gvnixform" />
