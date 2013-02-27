@@ -148,6 +148,7 @@ Package gvNIX
 
 * If all ok, clean packaging information on the trunk code directory::
 
+   bash:~/gvnix/trunk/code$ mvn release:perform
    bash:~/gvnix/trunk/code$ mvn release:clean
    
   If some errors, revert the changes::
