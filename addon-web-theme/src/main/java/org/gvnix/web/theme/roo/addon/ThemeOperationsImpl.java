@@ -154,6 +154,10 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     /** Themes repository path */
     private File themesRepositoryPath = null;
 
+    private boolean isThemesAvailable = false;
+
+    private boolean isSpringMvcTilesProject = false;
+
     // Public operations -----
 
     /** {@inheritDoc} */
@@ -173,7 +177,11 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      *         otherwise returns false
      */
     public boolean isThemesAvailable() {
-        return !findThemeDescriptors().isEmpty();
+        if (isThemesAvailable) {
+            return true;
+        }
+        isThemesAvailable = !findThemeDescriptors().isEmpty();
+        return isThemesAvailable;
     }
 
     /**
@@ -183,8 +191,12 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * Tiles.
      */
     public boolean isSpringMvcTilesProject() {
-        return fileManager.exists(getMvcConfigFile())
+        if (isSpringMvcTilesProject) {
+            return true;
+        }
+        isSpringMvcTilesProject = fileManager.exists(getMvcConfigFile())
                 && fileManager.exists(getTilesLayoutsFile());
+        return isSpringMvcTilesProject;
     }
 
     /**
