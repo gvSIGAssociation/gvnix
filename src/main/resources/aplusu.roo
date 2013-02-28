@@ -35,8 +35,6 @@ web mvc pattern master --class ~.web.TaumAplicacionesController --name Aplicacio
 web mvc scaffold --class ~.web.TaumUsuariosController --backingType es.gva.cit.aplusu.domain.TaumUsuarios
 web mvc pattern master --class ~.web.TaumUsuariosController --name UsuariosRoles --type tabular
 
-finder list --class ~.domain.TaumAplicaciones --depth 2
-
 menu tree
 menu entry update --id c_taumaplicaciones
 menu tree
@@ -74,16 +72,6 @@ menu entry info --id i_aplicaciones_usuarios_modulos
 menu entry update --id i_aplicaciones_usuarios_modulos --messageCode ""
 menu entry update --id i_aplicaciones_usuarios_modulos --messageCode " "
 
-finder list --class ~.domain.TaumUsuarios --filter Aplicacion --depth 1
-finder list --class ~.domain.TaumUsuarios --filter aplicacion --depth 1
-finder list --class ~.domain.TaumAplusu --filter aplicacion --depth 1
-finder list --class ~.domain.TaumAplusu  --depth 1
-finder list --class ~.domain.TaumUsuarios
-finder list --class ~.domain.TaumUsuarios --depth 1
-finder list --class ~.domain.TaumAplusu --depth 1
-finder list --class ~.domain.TaumAplusu
-finder list --class ~.domain.TaumAplicaciones --depth 1
-finder list --class ~.domain.TaumAplusu --depth 1
 finder list --class ~.domain.TaumAplusu --depth 1
 finder add --class ~.domain.TaumAplusu --finderName findTaumAplususByAplicacionEquals
 finder list --class ~.domain.TaumUsuarios --depth 1 --filter findTaumUsuariosesByAliasEqualsAndApellidosEqualsAndCodperEqualsAndCoduEqualsAndCproEqualsAndCredencialEqualsAndCservEqualsAndDcorreointEqualsAndDescEstadoEqualsAndDescServicioEqualsAndDescTipoUsuEqualsAndDgralEqualsAndEstadoEqualsAndFmodEqualsAndNombreEqualsAndNrpEqualsAndObservaEqualsAndOccChekcsumEqualsAndOrdenEqualsAndPasswordEqualsAndTelefonoEqualsAndTipousuEqualsAndUltclaveEqualsAndUsuarioEquals
@@ -110,9 +98,6 @@ theme install --id cit
 theme set --id cit
 
 database reverse engineer --schema aum --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
-
-finder list --class ~.domain.TaumAplicaciones
-finder list
 
 menu tree
 menu tree --id c_taumaplicaciones
@@ -146,17 +131,14 @@ web mvc pattern master --class ~.web.TaumAplusuController --name AplusuModulo --
 
 finder list --class ~.domain.TaumAplusu --depth 1
 finder add --finderName findTaumAplususByAplicacionEquals --class ~.domain.TaumAplusu
-finder list --depth 1 --class ~.domain.TaumModulos
 
 web mvc binding stringTrimmer --class ~.web.TaumAplusuController --emptyAsNull
 
 configuration list
 configuration export
 
-finder list --class ~.domain.TaumAplusu --depth 1 --filter aplicaciones
 finder list --class ~.domain.TaumAplusu --depth 1 --filter aplicacion
 finder add --class ~.domain.TaumAplusu --finderName findTaumAplususByAplicacionEquals
-finder list --class ~.domain.TaumModulos
 
 web mvc finder add  --formBackingType ~.domain.TaumModulos --class ~.web.TaumModulosController
 
@@ -173,9 +155,6 @@ menu tree --id c_taumaplicaciones
 
 database reverse engineer --schema "AUM" --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
 database reverse engineer --schema "AUM PUBLIC" --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
-
-finder list --class ~.domain.TaumUsumodulos
-finder list --class ~.domain.TaumUsumodulos --depth 2
 
 menu tree
 menu entry visibility --id c_taummodulos --hidden true
@@ -229,31 +208,23 @@ finder list
 
 configuration list
 
-finder list --class ~.domain.TaumAplusu
-
 database reverse engineer --schema "AUM COMUN" --disableGeneratedIdentifiers true --disableVersionFields true --enableViews --package ~.domain --testAutomatically
 
 configuration list
 configuration export
 
-finder list --class ~.domain.TaumUsuarios
-
 web mvc dialog setup
 
 web mvc dialog exception list
 
-finder list --class ~.domain.TaumAplusu --depth 1 --filter rolusua
-finder list --class ~.domain.TaumAplusu --depth 1 --filter rolusu
 finder list --class ~.domain.TaumAplusu --depth 1
 finder add --finderName findTaumAplususByTaumAplusuEquals --class ~.domain.TaumAplusu
 finder add --finderName findTaumAplususByTaumAplusuEquals --class ~.domain.TaumAplusu
-finder list --class ~.domain.TaumAplusu --depth 1
 finder list --class ~.domain.TaumAplusu --depth 2
 finder add --finderName findTaumAplususByTaumAplusuEqualsAndAplicacionEquals --class ~.domain.TaumAplusu
 
 web mvc dialog add --class ~.web.TaumAplusuController --name deleteRolDialog
 
-finder list --class ~.domain.TaumUsuarios
 finder list --class ~.domain.TaumAplicaciones
 finder add --class ~.domain.TaumAplicaciones --finderName findTaumAplicacionesesByAplpadre
 
@@ -263,15 +234,9 @@ configuration list
 
 web mvc dialog add --class ~.web.TaumModulosController --name insertModulosPredefinidos
 
-finder list --class ~.listado.FiltroListados
-
 web report setup
 
 web report add --controller ~.web.TaumAplicacionesController --reportName herrsoft
-
-finder list --class ~.domain.TaumAplicaciones --depth 1 --filter sgbd
-finder list --class ~.domain.TaumAplicaciones --depth 1 --filter lenguaje
-finder list --class ~.domain.TaumAplicaciones --depth 1 --filter aplicacion
 
 web report add --controller ~.web.TaumAplusuController --reportName aplusu
 web report add --controller ~.web.TaumAplusuController --reportName respapl
@@ -314,18 +279,11 @@ configuration list
 configuration export
 configuration export
 
-finder list --class ~.domain.TaumUsumodulos --depth 2 --filter usuario,modulo
-finder list --class ~.domain.TaumUsumodulos --depth 2 --filter Usuario,TaumModulos
-finder list --class ~.domain.TaumUsumodulos --depth 2 --filter findTaumUsumodulosesByUsuarioEquals
-
 web mvc dialog add --class ~.web.TaumAplusuController --name addDetailAplusuModuloModal
 web mvc dialog add --class ~.web.TaumModulosController --name addDetailMaestroModulosModal
 
 finder list --class ~.domain.TaumAplicaciones --depth 1 --filter rproyinf
 finder add --finderName findTaumAplicacionesesByRproyinf
-finder list --class ~.domain.TaumAplicaciones --depth 2 --filter rproyinf,aplicacion
-finder list --class ~.domain.TaumAplicaciones --depth 2 --filter
-finder list --class ~.domain.TaumAplicaciones --depth 2 --filter findTaumAplicacionesesByRproyinfAnd
 
 web report add --controller ~.web.TaumAplusuController --reportName respperf
 

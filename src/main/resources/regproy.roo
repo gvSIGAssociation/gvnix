@@ -27,12 +27,7 @@ database reverse engineer --schema "public" --package ~.domain --includeNonPorta
 
 controller scaffold --entity ~.domain.TrgpEstado --class ~.web.EstadoController
 
-finder list --class ~.domain.TrgpContratista
-
 database reverse engineer --schema "public" --package ~.domain --includeNonPortableAttributes --includeTables "trgp_contratista trgp_localizacion trgp_tipo_archivo trgp_tipo_documento trgp_tipo_soporte trgp_estado" --excludeTables "trgp_documento trgp_documento_anexado trgp_ejemplar"
-
-finder list --class ~.domain.TrgpEstado
-finder list --class ~.domain.TrgpEstado
 
 database properties list
 persistence setup --provider HIBERNATE --database POSTGRES --databaseName regproy --userName regproy --password regproy
@@ -141,13 +136,7 @@ menu entry visibility --id c_trgpdocumento --hidden true
 menu entry update --id c_trgpdocumentoes --url "/trgpdocumentoes?gvnixform&gvnixpattern=DocumentosRegister&index=${empty param.index ? 1 : param.index}"
 menu tree
 
-finder list --class ~.domain.TrgpDocumento
 finder list --class ~.domain.TrgpDocumento 
-finder list --class ~.domain.TrgpDocumento --depth 2
-finder list --class ~.domain.TrgpDocumento --depth 2 --filter And,Rececpion,Supervision
-finder list --class ~.domain.TrgpDocumento --depth 2 --filter findTrgpDocumentosBySupervision
-finder list --class ~.domain.TrgpDocumento --depth 2 --filter findTrgpDocumentoesBySupervision
-finder list --class ~.domain.TrgpDocumento --depth 2 --filter findTrgpDocumentoesBySupervisionBetween
 finder list --class ~.domain.TrgpDocumento --depth 2 --filter findTrgpDocumentoesBySupervisionBetweenAnd
 finder add --class ~.domain.TrgpDocumento --finderName findTrgpDocumentoesBySupervisionBetweenAndRecepcionObraBetween
 
@@ -176,8 +165,6 @@ menu tree
 
 theme set --id cit
 
-finder list --class ~.domain.TrgpDocumento --filter codigoDocumento
-finder list --class ~.domain.TrgpDocumento
 finder list --class ~.domain.TrgpDocumento --depth 2
 finder add --class ~.domain.TrgpDocumento --finderName findTrgpDocumentoesByTipoDocumentoEqualsAndCodigoContratista
  
