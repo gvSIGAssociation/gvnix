@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.validation.FieldError;
 
 /**
  * Bean holding data about the Dialog we want to render with the help
@@ -50,6 +51,9 @@ public class Dialog implements Serializable {
 
   private Map<String, Object> params;
 
+  private List<FieldError> errors;
+
+
   /**
    * Dialog bean constructor which loads data
    */
@@ -81,6 +85,16 @@ public class Dialog implements Serializable {
     this.title = title;
     this.description = description;
     this.params = params;
+  }
+
+  /**
+   * Dialog bean constructor which loads data
+   */
+  public Dialog(DialogType dialogType, String title, String description, List<FieldError> errors) {
+    this.dialogType = dialogType;
+    this.title = title;
+    this.description = description;
+    this.errors = errors;
   }
 
   /**
@@ -180,6 +194,20 @@ public class Dialog implements Serializable {
    */
   public void setParams(Map<String, Object> params) {
     this.params = params;
+  }
+
+  /**
+   * Gets dialog errors
+   */
+  public List<FieldError> getErrors() {
+    return errors;
+  }
+
+  /**
+   * Sets dialog errors
+   */
+  public void setErrors(List<FieldError> errors) {
+    this.errors = errors;
   }
 
   @Override

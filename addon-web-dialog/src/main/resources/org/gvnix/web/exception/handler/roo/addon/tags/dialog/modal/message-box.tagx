@@ -106,7 +106,17 @@
           <div class="avisolargo"><jsp:include page="${dialogPage}" /></div>
         </c:when>
         <c:otherwise>
-          <div class="avisolargo">${description}</div>
+          <div class="avisolargo">
+              ${description}
+          <ul>
+          <c:forEach var="dialogError" items="${dialogMessage.errors}">
+          <li>
+          <spring:message text="${dialogError.field}"/>:
+          <spring:message text="${dialogError.defaultMessage}"/>
+          </li>
+          </c:forEach>
+          </ul>
+          </div>
         </c:otherwise>
       </c:choose>
     </div>

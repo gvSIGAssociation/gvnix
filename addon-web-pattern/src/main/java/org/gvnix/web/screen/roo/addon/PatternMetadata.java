@@ -162,7 +162,7 @@ public class PatternMetadata extends AbstractPatternMetadata {
 
         bodyBuilder.appendFormalLine("if ( bindingResult.hasErrors() ) {");
         bodyBuilder.indent();
-        addBodyLinesForDialogMessage(bodyBuilder, DialogType.Error,
+        addBodyLinesForDialogBinding(bodyBuilder, DialogType.Error,
                 "message_errorbinding_problemdescription");
         bodyBuilder.appendFormalLine("return \"redirect:/".concat(
                 entityNamePlural.toLowerCase()).concat(
@@ -217,7 +217,7 @@ public class PatternMetadata extends AbstractPatternMetadata {
 
         bodyBuilder.appendFormalLine("if ( bindingResult.hasErrors() ) {");
         bodyBuilder.indent();
-        addBodyLinesForDialogMessage(bodyBuilder, DialogType.Error,
+        addBodyLinesForDialogBinding(bodyBuilder, DialogType.Error,
                 "message_errorbinding_problemdescription");
         bodyBuilder.appendFormalLine("return \"redirect:/".concat(
                 entityNamePlural.toLowerCase()).concat(
