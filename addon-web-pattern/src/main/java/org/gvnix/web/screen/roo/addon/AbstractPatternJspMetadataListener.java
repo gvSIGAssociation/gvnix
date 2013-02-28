@@ -19,12 +19,8 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.beans.Introspector;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,12 +32,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.transform.Transformer;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.plural.PluralMetadata;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
@@ -52,7 +45,6 @@ import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.customdata.CustomDataKeys;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
@@ -70,7 +62,6 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
@@ -121,12 +112,10 @@ public abstract class AbstractPatternJspMetadataListener implements
     protected ProjectOperations _projectOperations;
     protected PropFileOperations _propFileOperations;
     protected MetadataService _metadataService;
-    protected PhysicalTypeMetadataProvider _physicalTypeMetadataProvider;
     protected WebScreenOperations _webScreenOperations;
     protected PathResolver _pathResolver;
     protected TypeLocationService _typeLocationService;
 
-    protected ComponentContext context;
     protected WebScaffoldMetadata webScaffoldMetadata;
     protected JavaType formbackingType;
     protected String entityName;
@@ -143,8 +132,6 @@ public abstract class AbstractPatternJspMetadataListener implements
      * @param pattern
      */
     protected void installMvcArtifacts(String pattern) {
-        installPatternArtifacts();
-
         String[] patternNameType = pattern.split("=");
 
         PathResolver pathResolver = _projectOperations.getPathResolver();
@@ -856,252 +843,6 @@ public abstract class AbstractPatternJspMetadataListener implements
     }
 
     /**
-     * Installs static resources (JS, images, CSS) and tagx in the destination
-     * project. Also, sets in application.properties the i18n properties needed
-     * by tagx
-     */
-    private void installPatternArtifacts() {
-
-        _webScreenOperations.setup();
-
-        // modify load-scripts.tagx
-        modifyLoadScriptsTagx();
-
-        // add message-box component to default layout
-        addMessageBoxInLayout();
-    }
-
-    /**
-     * Updates load-scripts.tagx adding in the right position some elements:
-     * <ul>
-     * <li><code>spring:url</code> elements for JS and CSS</li>
-     * <li><code>link</code> element for CSS</li>
-     * <li><code>script</code> element for JS</li>
-     * </ul>
-     */
-    private void modifyLoadScriptsTagx() {
-        PathResolver pathResolver = _projectOperations.getPathResolver();
-        String loadScriptsTagx = pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/tags/util/load-scripts.tagx");
-
-        if (!_fileManager.exists(loadScriptsTagx)) {
-            // load-scripts.tagx doesn't exist, so nothing to do
-            return;
-        }
-
-        InputStream loadScriptsIs = _fileManager
-                .getInputStream(loadScriptsTagx);
-
-        Document loadScriptsXml;
-        try {
-            loadScriptsXml = XmlUtils.getDocumentBuilder().parse(loadScriptsIs);
-        }
-        catch (Exception ex) {
-            throw new IllegalStateException(
-                    "Could not open load-scripts.tagx file", ex);
-        }
-
-        Element lsRoot = loadScriptsXml.getDocumentElement();
-
-        Node nextSibiling;
-
-        // spring:url elements
-        Element testElement = XmlUtils.findFirstElement(
-                "/root/url[@var='pattern_css_url']", lsRoot);
-        if (testElement == null) {
-            Element urlPatternCss = new XmlElementBuilder("spring:url",
-                    loadScriptsXml)
-                    .addAttribute("value", "/resources/styles/pattern.css")
-                    .addAttribute("var", "pattern_css_url").build();
-            Element urlQlJs = new XmlElementBuilder("spring:url",
-                    loadScriptsXml)
-                    .addAttribute("value", "/resources/scripts/quicklinks.js")
-                    .addAttribute("var", "qljs_url").build();
-            // Add i18n messages for quicklinks.js
-            List<Element> qlJsI18n = new ArrayList<Element>();
-            qlJsI18n.add(new XmlElementBuilder("spring:message", loadScriptsXml)
-                    .addAttribute("code", "message_selectrowtodelete_alert")
-                    .addAttribute("var", "msg_selectrowtodelete_alert")
-                    .addAttribute("htmlEscape", "false").build());
-            qlJsI18n.add(new XmlElementBuilder("spring:message", loadScriptsXml)
-                    .addAttribute("code", "message_selectrowtoupdate_alert")
-                    .addAttribute("var", "msg_selectrowtoupdate_alert")
-                    .addAttribute("htmlEscape", "false").build());
-            qlJsI18n.add(new XmlElementBuilder("spring:message", loadScriptsXml)
-                    .addAttribute("code", "message_updateonlyonerow_alert")
-                    .addAttribute("var", "msg_updateonlyonerow_alert")
-                    .addAttribute("htmlEscape", "false").build());
-            StringBuilder qlJsI18nScriptText = new StringBuilder("<!--\n");
-            qlJsI18nScriptText
-                    .append("var GVNIX_MSG_SELECT_ROW_TO_DELETE=\"${msg_selectrowtodelete_alert}\";\n");
-            qlJsI18nScriptText
-                    .append("var GVNIX_MSG_SELECT_ROW_TO_UPDATE=\"${msg_selectrowtoupdate_alert}\";\n");
-            qlJsI18nScriptText
-                    .append("var GVNIX_MSG_UPDATE_ONLY_ONE_ROW=\"${msg_updateonlyonerow_alert}\";\n");
-            qlJsI18nScriptText.append("-->\n");
-            Element qlJsI18nScript = new XmlElementBuilder("script",
-                    loadScriptsXml).setText(qlJsI18nScriptText.toString())
-                    .build();
-            List<Element> springUrlElements = XmlUtils.findElements(
-                    "/root/url", lsRoot);
-            // Element lastSpringUrl = null;
-            if (!springUrlElements.isEmpty()) {
-                Element lastSpringUrl = springUrlElements.get(springUrlElements
-                        .size() - 1);
-                if (lastSpringUrl != null) {
-                    nextSibiling = lastSpringUrl.getNextSibling()
-                            .getNextSibling();
-                    lsRoot.insertBefore(urlPatternCss, nextSibiling);
-                    lsRoot.insertBefore(urlQlJs, nextSibiling);
-                    lsRoot.insertBefore(qlJsI18nScript, nextSibiling);
-                    for (Element item : qlJsI18n) {
-                        lsRoot.insertBefore(item, qlJsI18nScript);
-                    }
-                }
-            }
-            else {
-                // Add at the end of the document
-                lsRoot.appendChild(urlPatternCss);
-                lsRoot.appendChild(urlQlJs);
-                for (Element item : qlJsI18n) {
-                    lsRoot.appendChild(item);
-                }
-                lsRoot.appendChild(qlJsI18nScript);
-            }
-        }
-
-        // pattern.css stylesheet element
-        testElement = XmlUtils.findFirstElement(
-                "/root/link[@href='${pattern_css_url}']", lsRoot);
-        if (testElement == null) {
-            Element linkPatternCss = new XmlElementBuilder("link",
-                    loadScriptsXml).addAttribute("rel", "stylesheet")
-                    .addAttribute("type", "text/css")
-                    .addAttribute("media", "screen")
-                    .addAttribute("href", "${pattern_css_url}").build();
-            linkPatternCss.appendChild(loadScriptsXml
-                    .createComment(" required for FF3 and Opera "));
-            Node linkTrundraCssNode = XmlUtils.findFirstElement(
-                    "/root/link[@href='${tundra_url}']", lsRoot);
-            if (linkTrundraCssNode != null) {
-                nextSibiling = linkTrundraCssNode.getNextSibling()
-                        .getNextSibling();
-                lsRoot.insertBefore(linkPatternCss, nextSibiling);
-            }
-            else {
-                // Add ass last link element
-                // Element lastLink = null;
-                List<Element> linkElements = XmlUtils.findElements(
-                        "/root/link", lsRoot);
-                if (!linkElements.isEmpty()) {
-                    Element lastLink = linkElements
-                            .get(linkElements.size() - 1);
-                    if (lastLink != null) {
-                        nextSibiling = lastLink.getNextSibling()
-                                .getNextSibling();
-                        lsRoot.insertBefore(linkPatternCss, nextSibiling);
-                    }
-                }
-                else {
-                    // Add at the end of document
-                    lsRoot.appendChild(linkPatternCss);
-                }
-            }
-        }
-
-        // quicklinks.js script element
-        testElement = XmlUtils.findFirstElement(
-                "/root/script[@src='${qljs_url}']", lsRoot);
-        if (testElement == null) {
-            Element scriptQlJs = new XmlElementBuilder("script", loadScriptsXml)
-                    .addAttribute("src", "${qljs_url}")
-                    .addAttribute("type", "text/javascript").build();
-            scriptQlJs.appendChild(loadScriptsXml
-                    .createComment(" required for FF3 and Opera "));
-            List<Element> scrtiptElements = XmlUtils.findElements(
-                    "/root/script", lsRoot);
-            // Element lastScript = null;
-            if (!scrtiptElements.isEmpty()) {
-                Element lastScript = scrtiptElements
-                        .get(scrtiptElements.size() - 1);
-                if (lastScript != null) {
-                    nextSibiling = lastScript.getNextSibling().getNextSibling();
-                    lsRoot.insertBefore(scriptQlJs, nextSibiling);
-                }
-            }
-            else {
-                // Add at the end of document
-                lsRoot.appendChild(scriptQlJs);
-            }
-        }
-
-        writeToDiskIfNecessary(loadScriptsTagx,
-                loadScriptsXml.getDocumentElement());
-
-    }
-
-    /**
-     * Adds the element dialog:message-box in the right place in default.jspx
-     * layout
-     */
-    private void addMessageBoxInLayout() {
-        PathResolver pathResolver = _projectOperations.getPathResolver();
-        String defaultJspx = pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/layouts/default.jspx");
-
-        // TODO: Check if it's necessary to add message-box in home-default.jspx
-        // layout (when exists)
-
-        if (!_fileManager.exists(defaultJspx)) {
-            // layouts/default.jspx doesn't exist, so nothing to do
-            return;
-        }
-
-        InputStream defulatJspxIs = _fileManager.getInputStream(defaultJspx);
-
-        Document defaultJspxXml;
-        try {
-            defaultJspxXml = XmlUtils.getDocumentBuilder().parse(defulatJspxIs);
-        }
-        catch (Exception ex) {
-            throw new IllegalStateException("Could not open default.jspx file",
-                    ex);
-        }
-
-        Element lsHtml = defaultJspxXml.getDocumentElement();
-
-        String dialogNsUri = lsHtml.getAttribute("xmlns:dialog");
-
-        if (!dialogNsUri.isEmpty()
-                && dialogNsUri
-                        .equals("urn:jsptagdir:/WEB-INF/tags/dialog/modal")) {
-            // User has applied modal dialog support, so, don't change anything;
-            return;
-        }
-
-        // Set dialog tag lib as attribute in html element
-        lsHtml.setAttribute("xmlns:dialog",
-                "urn:jsptagdir:/WEB-INF/tags/dialog/message");
-
-        Element messageBoxElement = DomUtils.findFirstElementByName(
-                "dialog:message-box", lsHtml);
-        if (messageBoxElement == null) {
-            Element divMain = XmlUtils.findFirstElement(
-                    "/html/body/div/div[@id='main']", lsHtml);
-            Element insertAttributeBodyElement = XmlUtils.findFirstElement(
-                    "/html/body/div/div/insertAttribute[@name='body']", lsHtml);
-            Element messageBox = new XmlElementBuilder("dialog:message-box",
-                    defaultJspxXml).build();
-            divMain.insertBefore(messageBox, insertAttributeBodyElement);
-        }
-
-        writeToDiskIfNecessary(defaultJspx, defaultJspxXml.getDocumentElement());
-
-    }
-
-    /**
      * Returns de XML Document with the JSPx
      * <p>
      * <strong>This method is based in:</strong>
@@ -1671,75 +1412,6 @@ public abstract class AbstractPatternJspMetadataListener implements
             _fileManager.createOrUpdateTextFileIfRequired(jspFilename,
                     XmlUtils.nodeToString(proposed), false);
         }
-    }
-
-    /**
-     * Decides if write to disk is needed (ie updated or created)<br/>
-     * Used for TAGx files
-     * 
-     * @param filePath
-     * @param body
-     * @return
-     */
-    private boolean writeToDiskIfNecessary(String filePath, Element body) {
-        // Build a string representation of the JSP
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        Transformer transformer = XmlUtils.createIndentingTransformer();
-        XmlUtils.writeXml(transformer, byteArrayOutputStream,
-                body.getOwnerDocument());
-        String viewContent = byteArrayOutputStream.toString();
-
-        // If mutableFile becomes non-null, it means we need to use it to write
-        // out the contents of jspContent to the file
-        MutableFile mutableFile = null;
-        if (_fileManager.exists(filePath)) {
-            // First verify if the file has even changed
-            File newFile = new File(filePath);
-            String existing = null;
-            try {
-                existing = IOUtils.toString(new FileReader(newFile));
-            }
-            catch (IOException ignoreAndJustOverwriteIt) {
-                LOGGER.finest("Problems writing ".concat(newFile
-                        .getAbsolutePath()));
-            }
-
-            if (!viewContent.equals(existing)) {
-                mutableFile = _fileManager.updateFile(filePath);
-            }
-        }
-        else {
-            mutableFile = _fileManager.createFile(filePath);
-            Validate.notNull(mutableFile, "Could not create '" + filePath + "'");
-        }
-
-        if (mutableFile != null) {
-            try {
-                // We need to write the file out (it's a new file, or the
-                // existing file has different contents)
-                InputStream inputStream = null;
-                OutputStreamWriter outputStream = null;
-                try {
-                    inputStream = IOUtils.toInputStream(viewContent);
-                    outputStream = new OutputStreamWriter(
-                            mutableFile.getOutputStream());
-                    IOUtils.copy(inputStream, outputStream);
-                }
-                finally {
-                    IOUtils.closeQuietly(inputStream);
-                    IOUtils.closeQuietly(outputStream);
-                }
-                // Return and indicate we wrote out the file
-                return true;
-            }
-            catch (IOException ioe) {
-                throw new IllegalStateException("Could not output '"
-                        + mutableFile.getCanonicalPath() + "'", ioe);
-            }
-        }
-
-        // A file existed, but it contained the same content, so we return false
-        return false;
     }
 
     protected String uncapitalize(String term) {

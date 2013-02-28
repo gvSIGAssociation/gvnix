@@ -31,7 +31,6 @@ import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadata
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
@@ -69,7 +68,6 @@ public class RelatedPatternJspMetadataListener extends
     @Reference private ProjectOperations projectOperations;
     @Reference private PropFileOperations propFileOperations;
     @Reference WebScreenOperations webScreenOperations;
-    @Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     @Reference private PathResolver pathResolver;
     @Reference private TypeLocationService typeLocationService;
     private final Map<JavaType, String> formBackingObjectTypesToLocalMids = new HashMap<JavaType, String>();
@@ -78,7 +76,6 @@ public class RelatedPatternJspMetadataListener extends
         metadataDependencyRegistry.registerDependency(
                 RelatedPatternMetadata.getMetadataIdentiferType(),
                 getProvidesType());
-        this.context = context;
         _fileManager = fileManager;
         _tilesOperations = tilesOperations;
         _menuOperations = menuOperations;
@@ -86,7 +83,6 @@ public class RelatedPatternJspMetadataListener extends
         _propFileOperations = propFileOperations;
         _webScreenOperations = webScreenOperations;
         _metadataService = metadataService;
-        _physicalTypeMetadataProvider = physicalTypeMetadataProvider;
         _pathResolver = pathResolver;
         _typeLocationService = typeLocationService;
     }
