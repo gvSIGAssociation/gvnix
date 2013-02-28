@@ -1033,11 +1033,32 @@ public void testGetHandledExceptionList() throws Exception {
       más sencillos y optimizados posible </emphasis>.</para>
 
       <para>Por ejemplo, intentar ver si comprobando dependencias del proyecto
-      y/o la existencia de algún/os ficheros tenemos suficiente o usar
+      y/o la existencia de algún/os ficheros tenemos suficiente (preparando los
+      identificadores de fichero una única vez) o usar
       variables de estado <emphasis>cacheadas</emphasis>, coordinado con algún
       listener que las limpie cuando convenga.</para>
     </section>
 
+    <section>
+      <title>Los metadatos únicamente generan metadatos</title>
+
+      <para>Evitar en lo posible que los <emphasis>metadatos</emphasis> y
+      sus <emphasis>providers</emphasis> realicen otras operaciones
+      que no sean la gerenación del propio artefacto.</para>
+
+      <para>Por ejemplo, evitar que los <emphasis>metadatos</emphasis> instalen 
+      cualquier elemento común (como Imágenes, css, etc.). Para este fin es 
+      recomendable crear un comando <emphasis>setup</emphasis> o similar
+      que el usuario debe ejecutar antes de tener disponible la funcionalidad.</para>
+      
+      <para>El manejo de mentadatos es un proceso constante durante la ejecución
+      del framework. La instalación de artefactos, normalmente, requiere 
+      la solicitud al los servicios OSGi la búsqueda de los recursos en el 
+      bundle. Estas peticiones son muy costosas y, la ejecución repetida
+      puede llevar a un decremento <emphasis>inmenso</emphasis> del
+      rendimiento.</para>
+    </section>
+    
     <section>
       <title>add-ons genéricos y específicos CIT</title>
 
@@ -1047,11 +1068,11 @@ public void testGetHandledExceptionList() throws Exception {
 
       <para>Adicionalmente, puede ser interesante, en algunos casos, que
       algunos de nuestros add-ons necesiten ejecutar como paso previo otro
-      addon antes de realizar sus tareas. Por ejemplo, la instalación del
+      add-on antes de realizar sus tareas. Por ejemplo, la instalación del
       sistema de seguridad de la CIT requiere que antes se haya ejecutado la
       instalación del sistema de seguridad de Spring, por lo que lo más
-      recomendable es que nuestro addon de seguridad CIT invoque como paso
-      previo al addon de seguridad Spring, si no hubiese sido ejecutado
+      recomendable es que nuestro add-on de seguridad CIT invoque como paso
+      previo al add-on de seguridad Spring, si no hubiese sido ejecutado
       todavía. La finalidad que se busca es que no obligar a invocar a un
       comando manualmente antes de invocar a otro comando.</para>
     </section>
