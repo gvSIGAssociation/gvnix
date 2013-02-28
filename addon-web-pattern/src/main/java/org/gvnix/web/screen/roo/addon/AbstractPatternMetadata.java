@@ -962,9 +962,9 @@ public abstract class AbstractPatternMetadata extends
     protected void addBodyLinesForDialogMessage(
             InvocableMemberBodyBuilder bodyBuilder, DialogType dialogType,
             String messageDescriptionCode) {
-    	
-    	// TODO Código duplicado con método contiguo
-    	
+
+        // TODO Código duplicado con método contiguo
+
         JavaType httpSession = new JavaType("javax.servlet.http.HttpSession");
         bodyBuilder.appendFormalLine(httpSession
                 .getNameIncludingTypeParameters(false,
@@ -1003,7 +1003,7 @@ public abstract class AbstractPatternMetadata extends
             InvocableMemberBodyBuilder bodyBuilder, DialogType dialogType,
             String messageDescriptionCode) {
 
-    	// TODO Código duplicado con método contiguo
+        // TODO Código duplicado con método contiguo
 
         JavaType httpSession = new JavaType("javax.servlet.http.HttpSession");
         bodyBuilder.appendFormalLine(httpSession
@@ -1574,9 +1574,9 @@ public abstract class AbstractPatternMetadata extends
     private InvocableMemberBodyBuilder getMethodBodyBuilder(
             PersistenceMethod persistenceMethod) {
 
-    	// TODO Código duplicado con método contiguo
+        // TODO Código duplicado con método contiguo
 
-    	// Create the method body
+        // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         // test if form has errors
         bodyBuilder.appendFormalLine("if ( !" + getBindingResult().getKey()
@@ -1616,9 +1616,9 @@ public abstract class AbstractPatternMetadata extends
      */
     private InvocableMemberBodyBuilder getMethodBodyBuilderBinding(
             PersistenceMethod persistenceMethod) {
-    	
-    	// TODO Código duplicado con método contiguo
-    	
+
+        // TODO Código duplicado con método contiguo
+
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         // test if form has errors
