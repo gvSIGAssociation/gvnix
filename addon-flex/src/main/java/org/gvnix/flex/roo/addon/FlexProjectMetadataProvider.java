@@ -38,7 +38,18 @@ public class FlexProjectMetadataProvider implements MetadataProvider,
 
     @Reference private PathResolver pathResolver;
 
+    private String flexServicesConfigIndentifier;
+
     protected void activate(ComponentContext context) {
+    }
+
+    private String getFlexServicesConfigIndentifier() {
+        if (flexServicesConfigIndentifier == null) {
+            flexServicesConfigIndentifier = pathResolver.getIdentifier(
+                    LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                    "WEB-INF/flex/services-config.xml");
+        }
+        return flexServicesConfigIndentifier;
     }
 
     public MetadataItem get(String metadataIdentificationString) {
@@ -48,9 +59,7 @@ public class FlexProjectMetadataProvider implements MetadataProvider,
                 "Unexpected metadata request '" + metadataIdentificationString
                         + "' for this provider");
 
-        if (!fileManager.exists(pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/flex/services-config.xml"))) {
+        if (!fileManager.exists(getFlexServicesConfigIndentifier())) {
             return null;
         }
 
@@ -78,12 +87,8 @@ public class FlexProjectMetadataProvider implements MetadataProvider,
     public void onFileEvent(FileEvent fileEvent) {
         Validate.notNull(fileEvent, "File event required");
 
-        if (fileEvent
-                .getFileDetails()
-                .getCanonicalPath()
-                .equals(pathResolver.getIdentifier(
-                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                        "WEB-INF/flex/services-config.xml"))) {
+        if (fileEvent.getFileDetails().getCanonicalPath()
+                .equals(getFlexServicesConfigIndentifier())) {
             // Something happened to the services-config
 
             // Don't notify if we're shutting down
@@ -93,8 +98,8 @@ public class FlexProjectMetadataProvider implements MetadataProvider,
 
             // Otherwise let everyone know something has happened of interest,
             // plus evict any cached entries from the MetadataService
-            metadataService.get(FlexProjectMetadata.getProjectIdentifier(),
-                    true);
+            metadataService.evictAndGet(FlexProjectMetadata
+                    .getProjectIdentifier());
             metadataDependencyRegistry.notifyDownstream(FlexProjectMetadata
                     .getProjectIdentifier());
         }
