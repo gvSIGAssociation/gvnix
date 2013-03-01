@@ -50,7 +50,6 @@ menu entry visibility --hidden true --id i_taumaplicaciones_list
 menu tree
 menu entry update --id i_taumaplicaciones --roles ""
 
-finder list --class ~.domain.TaumAplicaciones --depth 2 --filter "lenguaje"
 finder add --class ~.domain.TaumAplicaciones --finderName findTaumAplicacionesesByVisibusrOrLenguaje
 
 menu tree
