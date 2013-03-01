@@ -220,7 +220,6 @@ web mvc dialog exception list
 finder list --class ~.domain.TaumAplusu --depth 1
 finder add --finderName findTaumAplususByTaumAplusuEquals --class ~.domain.TaumAplusu
 finder add --finderName findTaumAplususByTaumAplusuEquals --class ~.domain.TaumAplusu
-finder list --class ~.domain.TaumAplusu --depth 2
 finder add --finderName findTaumAplususByTaumAplusuEqualsAndAplicacionEquals --class ~.domain.TaumAplusu
 
 web mvc dialog add --class ~.web.TaumAplusuController --name deleteRolDialog

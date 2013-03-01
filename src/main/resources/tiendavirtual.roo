@@ -83,7 +83,6 @@ help finder
 help finder list
 finder list --class ~.domain.Producto
 finder list --class ~.domain.Producto --filter precio
-finder list --class ~.domain.Producto --filter precio --depth 2
 help finder add
 finder list --class ~.domain.Producto --filter precio
 finder add --finderName findProductoesByPrecioBetween --class ~.domain.Producto

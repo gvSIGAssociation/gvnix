@@ -165,7 +165,6 @@ menu tree
 
 theme set --id cit
 
-finder list --class ~.domain.TrgpDocumento --depth 2
 finder add --class ~.domain.TrgpDocumento --finderName findTrgpDocumentoesByTipoDocumentoEqualsAndCodigoContratista
  
 web mvc scaffold --class ~.domain.TrgpDocumentoAnexado
