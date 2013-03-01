@@ -293,7 +293,7 @@
 	cd pattern
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/main/resources/pattern.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform clean
+	$1/gvnix.sh perform tests
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo pattern end
@@ -304,7 +304,7 @@
 	cd test-script-pkc
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform clean
+	$1/gvnix.sh perform tests
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo test-script-pkc end
@@ -315,7 +315,7 @@
 	cd test-script-pkc2
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc2.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform clean
+	$1/gvnix.sh perform tests
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo test-script-pkc2 end
@@ -326,7 +326,7 @@
 	cd test-script-pkc3
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc3.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform clean
+	$1/gvnix.sh perform tests
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo test-script-pkc3 end
@@ -337,7 +337,7 @@
 	cd test-script-manytomany
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-manytomany.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform clean
+	$1/gvnix.sh perform tests
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo test-script-manytomany end
@@ -603,7 +603,7 @@
 	echo aplusu start
 	mkdir aplusu
 	cd aplusu
-	$1/gvnix.sh script --file $2/code/src/main/resources/aplusu.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/src/test/resources/aplusu.roo --lineNumbers true
 	mvn test tomcat:run &
 	mkdir target
 	# Request the home URL
@@ -617,7 +617,7 @@
 	echo regproy start
 	mkdir regproy
 	cd regproy
-	$1/gvnix.sh script --file $2/code/src/main/resources/regproy.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/src/test/resources/regproy.roo --lineNumbers true
 	mvn test tomcat:run & 
 	mkdir target
 	# Request the home URL
