@@ -294,7 +294,6 @@
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/main/resources/pattern.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
 	$1/gvnix.sh perform clean
-	$1/gvnix.sh perform tests	
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo pattern end
@@ -306,7 +305,6 @@
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
 	$1/gvnix.sh perform clean
-	$1/gvnix.sh perform tests
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo test-script-pkc end
