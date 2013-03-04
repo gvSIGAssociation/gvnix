@@ -293,8 +293,9 @@
 	cd pattern
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/main/resources/pattern.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
+	$1/gvnix.sh perform tests
 	$1/gvnix.sh perform clean
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo pattern end
 	
@@ -304,8 +305,9 @@
 	cd test-script-pkc
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
+	$1/gvnix.sh perform tests
 	$1/gvnix.sh perform clean
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo test-script-pkc end
 	
@@ -315,9 +317,9 @@
 	cd test-script-pkc2
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc2.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform clean
 	$1/gvnix.sh perform tests
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	$1/gvnix.sh perform clean
+	mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo test-script-pkc2 end
 
@@ -327,9 +329,9 @@
 	cd test-script-pkc3
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc3.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform clean
 	$1/gvnix.sh perform tests
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	$1/gvnix.sh perform clean
+	mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo test-script-pkc3 end
 
@@ -339,9 +341,9 @@
 	cd test-script-manytomany
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-manytomany.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform clean
 	$1/gvnix.sh perform tests
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	$1/gvnix.sh perform clean
+	mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo test-script-manytomany end
 
@@ -622,7 +624,10 @@
 	mkdir regproy
 	cd regproy
 	$1/gvnix.sh script --file $2/code/src/test/resources/regproy.roo --lineNumbers true
-	mvn test tomcat:run & 
+##  Reopen shell to generate pending pattern resources
+	$1/gvnix.sh perform tests
+	$1/gvnix.sh perform clean
+	mvn tomcat:run & 
 	mkdir target
 	# Request the home URL
 	wget --retry-connrefused -O target/home.html http://localhost:8080/registro_proyectos/
