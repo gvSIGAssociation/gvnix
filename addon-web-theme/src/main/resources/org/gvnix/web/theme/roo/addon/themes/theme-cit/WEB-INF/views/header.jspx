@@ -33,5 +33,7 @@
 
   <h2 class="descrip_titaplic"><spring:message code="application_description" htmlEscape="false"/></h2>
   <h1 class="titulo_aplicacion"><spring:message code="application_name" htmlEscape="false"/></h1>
+  <spring:message code="application_version" var="app_version" htmlEscape="false"/>
+  <h3 class="version_aplicacion">v.${app_version}</h3>
 
 </div> 
