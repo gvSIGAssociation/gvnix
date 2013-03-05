@@ -438,7 +438,7 @@ public class Service {
 		del aspecto Java correspondiente que establece la clave de acceso
 		al certificado que se encuentra en el fichero <filename>ServiceSecurity.properties</filename>.</para>
 
-		<programlisting>privileged aspect Service_Roo_GvNIX_WebSecurity {
+		<programlisting><![CDATA[privileged aspect Service_Roo_GvNIX_WebSecurity {
 
     declare parents: Service implements CallbackHandler;
 
@@ -479,7 +479,7 @@ public class Service {
             throw new IOException("Problem getting ".concat(propPath).concat(" file"),e);
         }
     }
-}</programlisting>
+}]]></programlisting>
 
 
 		<para xml:lang="es">Para realizar cambios en los parámetros de firma del servicio es posible ejecutar
