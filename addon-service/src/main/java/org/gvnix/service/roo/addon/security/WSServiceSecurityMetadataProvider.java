@@ -18,13 +18,6 @@
  */
 package org.gvnix.service.roo.addon.security;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.commons.lang3.Validate;
@@ -32,20 +25,16 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceSecurity;
-import org.gvnix.service.roo.addon.util.WsdlParserUtils;
-import org.gvnix.service.roo.addon.ws.importt.WSImportMetadata;
+import org.gvnix.service.roo.addon.ws.importt.WSImportOperations;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * <p>
@@ -79,6 +68,8 @@ public final class WSServiceSecurityMetadataProvider extends
         AbstractItdMetadataProvider {
 
     @Reference private SecurityService securityService;
+
+    @Reference private WSImportOperations operationsService;
 
     @Reference private ProjectOperations projectOperations;
 
@@ -138,193 +129,47 @@ public final class WSServiceSecurityMetadataProvider extends
         // Setup project
         securityService.setupWSSJ4();
 
-        String serviceName = getServiceName(metadataIdentificationString);
+        JavaType serviceClass = governorPhysicalTypeMetadata.getType();
+        String serviceName = operationsService.getServiceName(serviceClass);
+
+        String certificate = operationsService.getCertificate(serviceClass);
 
         // create Metadata
         WSServiceSecurityMetadata metadata = new WSServiceSecurityMetadata(
                 metadataIdentificationString, aspectName,
-                governorPhysicalTypeMetadata, serviceName);
+                governorPhysicalTypeMetadata, serviceName, certificate);
 
-        try {
-            // update client-config.wsdd
-            securityService.addOrUpdateAxisClientService(
-                    metadata.getServiceName(),
-                    metadata.getServiceWsddConfigurationParameters());
-
-            // write properties file
-            createSecurityPropertiesFile(aspectName, metadata);
-
-        }
-        catch (Exception e) {
-            throw new IllegalStateException(
-                    "Error generating security configuration", e);
-        }
-
-        // Checks for certificated file
-        String certificatePath = projectOperations.getPathResolver()
+        // Check properties file
+        String propertiesPath = WSServiceSecurityMetadata
+                .getPropertiesPath(serviceClass);
+        String propertiesAbsolutePath = projectOperations.getPathResolver()
                 .getIdentifier(
                         LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
-                        metadata.getCertificatePath());
+                        propertiesPath);
 
         Validate.isTrue(
-                fileManager.exists(certificatePath),
+                fileManager.exists(propertiesAbsolutePath),
                 "Missing certificated file '"
                         .concat(Path.SRC_MAIN_RESOURCES.name()).concat("/")
-                        .concat(metadata.getCertificatePath()).concat("' for ")
+                        .concat(propertiesPath).concat("' for ")
+                        .concat(governorPhysicalTypeMetadata.getId()));
+
+        // Checks for certificated file
+        String certificatePath = metadata.getCertificatePath();
+        String certificateAbsolutePath = projectOperations.getPathResolver()
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                        certificatePath);
+
+        Validate.isTrue(
+                fileManager.exists(certificateAbsolutePath),
+                "Missing certificated file '"
+                        .concat(Path.SRC_MAIN_RESOURCES.name()).concat("/")
+                        .concat(certificatePath).concat("' for ")
                         .concat(governorPhysicalTypeMetadata.getId()));
 
         return metadata;
 
-    }
-
-    /**
-     * Creates <code>{governor_Class_Name}Sercurity.properties</code> file in
-     * <code>scr/main/resorces/{governor_Package}</code>
-     * 
-     * @param aspectName
-     * @param metadata
-     * @throws IOException
-     */
-    private void createSecurityPropertiesFile(JavaType aspectName,
-            WSServiceSecurityMetadata metadata) throws IOException {
-
-        // Resolve absolute path
-        String propertiesPath = projectOperations.getPathResolver()
-                .getIdentifier(
-                        LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
-                        metadata.getPropertiesPath());
-
-        OutputStream os;
-
-        // Gets properties form
-        Properties properties = metadata.getSecurityProperties();
-
-        // Checks if file exists
-        MutableFile mutableFile;
-        if (fileManager.exists(propertiesPath)) {
-            // Load current file content
-            Properties storedProperties = new Properties();
-            mutableFile = fileManager.updateFile(propertiesPath);
-            InputStream is = null;
-            try {
-                is = mutableFile.getInputStream();
-                storedProperties.load(is);
-            }
-            finally {
-                if (is != null) {
-                    is.close();
-                }
-            }
-            // Compare content
-            if (propertiesEquals(properties, storedProperties)) {
-                // File Content is up to date --> exit
-                return;
-            }
-        }
-        else {
-            // Unable to find the file, so let's create it
-            mutableFile = fileManager.createFile(propertiesPath);
-        }
-
-        // Store properties in file
-        os = null;
-        try {
-            os = mutableFile.getOutputStream();
-            storeProperties(aspectName, metadata, os, properties);
-        }
-        finally {
-            if (os != null) {
-                os.close();
-            }
-        }
-    }
-
-    /**
-     * Compares the values of two Property instances
-     * 
-     * @param one
-     * @param other
-     * @return
-     */
-    private boolean propertiesEquals(Properties one, Properties other) {
-        if (one.size() != other.size()) {
-            return false;
-        }
-        Set<Entry<Object, Object>> entrySet = one.entrySet();
-        Object otherValue;
-        for (Entry<Object, Object> entry : entrySet) {
-            otherValue = other.get(entry.getKey());
-            if (otherValue == null) {
-                if (entry.getValue() != null) {
-                    return false;
-                }
-            }
-            else if (!otherValue.equals(entry.getValue())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Store properties into a output stream
-     * 
-     * @param aspectName
-     * @param metadata
-     * @param os
-     * @param properties
-     * @throws IOException
-     */
-    private void storeProperties(JavaType aspectName,
-            WSServiceSecurityMetadata metadata, OutputStream os,
-            Properties properties) throws IOException {
-        properties.store(
-                os,
-                "Service '".concat(metadata.getServiceName())
-                        .concat("' security properities. Class ")
-                        .concat(aspectName.getFullyQualifiedTypeName()));
-    }
-
-    /**
-     * Gets Service Name from governors metadata
-     * 
-     * @param metadataIdentificationString
-     * @return
-     */
-    private String getServiceName(String metadataIdentificationString) {
-        // Gets WSImportMetadata id
-        JavaType javaType = WSServiceSecurityMetadata
-                .getJavaType(metadataIdentificationString);
-        LogicalPath path = WSServiceSecurityMetadata
-                .getPath(metadataIdentificationString);
-        String wsImportMetadataId = WSImportMetadata.createIdentifier(javaType,
-                path);
-
-        // Gets WSImpotMetada
-        WSImportMetadata wsImportMetadata = (WSImportMetadata) metadataService
-                .get(wsImportMetadataId);
-
-        Validate.notNull(wsImportMetadata,
-                "Governor must be gvNIX WS import. Can't find metadata '"
-                        .concat(wsImportMetadataId).concat("'"));
-
-        // gets wsdl location
-        String wsdlLocation = wsImportMetadata.getWsdlLocation();
-
-        // loads wsdl
-        Document wsdl = securityService.getWsdl(wsdlLocation);
-
-        Validate.notNull(wsdl, "Can't get WSDl from ".concat(wsdlLocation));
-
-        Validate.isTrue(
-                WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
-                "Only RPC-Encoded services is supported");
-
-        // Gets first port
-        Element port = WsdlParserUtils.findFirstCompatiblePort(wsdl
-                .getDocumentElement());
-
-        return port.getAttribute("name");
     }
 
     /**

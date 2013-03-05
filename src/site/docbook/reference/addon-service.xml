@@ -87,7 +87,7 @@ Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java</programlisting>
 
       <para xml:lang="es">En primer lugar se debe elegir una clase Java que contendrá los
       métodos que se desea ofrecer al exterior mediante el servicio web. La clase puede ser
-      cualquiera existiente previamente o se puede crear una nueva mediante el comando <link
+      cualquiera existente previamente o se puede crear una nueva mediante el comando <link
       linkend="apendice-comandos_addon-service_class">remote service class</link>.</para>
       
       <para xml:lang="es">A continuación, se debe elegir los métodos a
@@ -139,7 +139,7 @@ public class Service {
 }</programlisting>
       
       <para xml:lang="es">La clase Java será enlazada en la definición del servicio
-      con un <emphasis>PortType </emphasis> lo que permitirá la comunicación 
+      con un <emphasis>PortType</emphasis> lo que permitirá la comunicación 
       con la clase desde el exterior mediante los protocolos y tecnologías de
       servicios web.</para>
       
@@ -242,7 +242,7 @@ Updated ROOT/pom.xml [
 Updated ROOT/pom.xml
 </programlisting>
 
-	  <para xml:lang="es">El comandoe dará lugar a la creación, si no existía, de
+	  <para xml:lang="es">El comando dará lugar a la creación, si no existía, de
 	  la clase Java y a la inclusión de la anotación <emphasis>@GvNIXWebServiceProxy
 	  </emphasis> que define el servicio web al que da acceso la clase.</para>
 
@@ -329,7 +329,7 @@ public class Service {
           <para xml:lang="es">Para simplificar el proceso de importación de servicios web,
           se intenta hacer esta tarea de manera transparente para el usuario.</para>
 
-          <para xml:lang="es">Para ello, se manipula el almacen de certificados de la
+          <para xml:lang="es">Para ello, se manipula el almacén de certificados de la
           máquina virtual Java siempre que sea posible. Esto es:</para>
 
           <orderedlist>
@@ -352,7 +352,7 @@ public class Service {
           WS.</para>
 
           <para xml:lang="es">Al mismo tiempo, se crea en
-          <emphasis>src/main/resources</emphasis> una copia del almacen de
+          <emphasis>src/main/resources</emphasis> una copia del almacén de
           certificados en el archivo gvnix-cacerts y una copia local de los
           certificados importados con el nombre
           <emphasis>&lt;servidor&gt;-&lt;indice_certificado&gt;.cer</emphasis>.
@@ -363,7 +363,7 @@ public class Service {
           <para xml:lang="es">Si no puede modificar el keystore de la JVM, porque no
           se cumplen alguna de las 2 condiciones enumeradas anteriormente, de todas
           formas realizará la copia de los certificados necesarios para que sea el
-          usuario quien instale los mismos en el almacen de certificados de su
+          usuario quien instale los mismos en el almacén de certificados de su
           JVM. Para ello se puede hacer uso de la herramienta <link
           xlink:href="http://download.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html">keytool</link>
           (distribuida también con el JDK). La operación de importar los
@@ -422,22 +422,21 @@ Created SRC_MAIN_JAVA/org/gvnix/test/service/Service_Roo_GvNIX_WebSecurity.aj
 
 		<para xml:lang="es">Se crearán dos ficheros con distintos parámetros
 		de configuración en <filename>src/main/resources/org/gvnix/test/service/ServiceSecurity.properties</filename>
-		y <filename>src/main/resources/client-config.wsdd</filename>.</para>
+		y <filename>src/main/resources/client-config.wsdd</filename>. El primero contiene los parámetros introducidos
+		para la configuración de la seguridad y el segundo la configuración para axis.</para>
 
 		<para xml:lang="es">También dará lugar a la inclusión de la
-		anotación <emphasis>@GvNIXWebServiceSecurity</emphasis> con los
-		mismos valores que los atributos que se proporcionaron desde el comando.
+		anotación <emphasis>@GvNIXWebServiceSecurity</emphasis>.
 		</para>
 		
 		<programlisting>...
-@GvNIXWebServiceSecurity(certificate = "certificate.p12",
-		password = "clave", alias = "alias")
+@GvNIXWebServiceSecurity
 public class Service {
 }</programlisting>
 
 		<para xml:lang="es">La anotación anterior dará lugar a la generación
 		del aspecto Java correspondiente que establece la clave de acceso
-		al certificado.</para>
+		al certificado que se encuentra en el fichero <filename>ServiceSecurity.properties</filename>.</para>
 
 		<programlisting>privileged aspect Service_Roo_GvNIX_WebSecurity {
 
@@ -449,9 +448,44 @@ public class Service {
 
     public void Service.handle(Callback[] callbacks)
     		throws IOException, UnsupportedCallbackException {
-        ((org.apache.ws.security.WSPasswordCallback) callbacks[0]).setPassword("clave");
+        final String propPath = "org/gvnix/test/service/ServiceSecurity.properties";
+        final String propKey = "org.apache.ws.security.crypto.merlin.keystore.password";
+        try {
+// Get class loader to get file from project            
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            java.io.File file = new java.io.File(classLoader.getResource(propPath).toURI());
+            if (file != null && file.exists()) {
+// Load properties                
+                java.util.Properties properties = new java.util.Properties();
+                java.io.FileInputStream ins = null;
+                try {
+                    ins = new java.io.FileInputStream(file);
+                    properties.load(ins);
+                } finally {
+                    if (ins != null) {
+                        ins.close();
+                    }
+                }
+                String value = properties.getProperty(propKey);
+                if (value != null) {
+                    ((org.apache.ws.security.WSPasswordCallback) callbacks[0]).setPassword(value);
+                } else {
+                    throw new IOException("Property ".concat(propKey).concat(" not exists"));
+                }
+            } else {
+                throw new IOException("File ".concat(propPath).concat(" not exists"));
+            }
+        } catch (java.net.URISyntaxException e) {
+            throw new IOException("Problem getting ".concat(propPath).concat(" file"),e);
+        }
     }
 }</programlisting>
+
+
+		<para xml:lang="es">Para realizar cambios en los parámetros de firma del servicio es posible ejecutar
+		de nuevo el comando <link linkend="apendice-comandos_addon-service_security_ws">remote service
+        security ws</link> con los nuevos datos sobre la misma clase (opción recomendada) o modificar 
+        los ficheros antes mencionados a mano.</para>
         
       </section>
     </section>

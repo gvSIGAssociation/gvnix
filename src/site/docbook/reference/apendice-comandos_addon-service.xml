@@ -107,7 +107,7 @@
           linkend="apendice-comandos_addon-service_security_ws">remote service
           security ws</link></entry>
 
-          <entry xml:lang="es">Añade la configuración necesaria para firmar las
+          <entry xml:lang="es">Añade o actualiza la configuración necesaria para firmar las
           peticiones que se hacen a un servicio web remoto</entry>
         </row>
       </tbody>
@@ -230,7 +230,7 @@
     cada parámetro se proporcionará un valor adecuado para facilitar
     la máxima interoperabilidad del servicio web con el exterior.</para>
     
-    <para xml:lang="es">Trás publicar una clase Java a través de un
+    <para xml:lang="es">Tras publicar una clase Java a través de un
     servicio web, sus métodos todavía no serán accesibles como
     operaciones del servicio web hasta que no se le indique
     para cada método.</para>
@@ -501,7 +501,7 @@
         <listitem>
           <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
 
-          <para xml:lang="es">Ruta al archivo que define el contrado de servicio o
+          <para xml:lang="es">Ruta al archivo que define el contrato de servicio o
           <emphasis>WSDL</emphasis> cuya infraestructura Java se desea crear en
           el proyecto. La ruta puede ser a un archivo local 
           mediante <emphasis>file://ruta</emphasis>, a una dirección web mediante
@@ -535,7 +535,7 @@
         <listitem>
           <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
 
-          <para xml:lang="es">Ruta al archivo que define el contrado de servicio o
+          <para xml:lang="es">Ruta al archivo que define el contrato de servicio o
           <emphasis>WSDL</emphasis> cuya infraestructura Java se desea crear en
           el proyecto. La ruta puede ser a un archivo local 
           mediante <emphasis>file://ruta</emphasis>, a una dirección web mediante
@@ -577,7 +577,7 @@
   <section xml:id="apendice-comandos_addon-service_security_ws">
     <title>remote service security ws</title>
 
-    <para xml:lang="es">Añade la configuración necesaria para firmar las
+    <para xml:lang="es">Añade o actualiza la configuración necesaria para firmar las
     peticiones que se hacen a un servicio web remoto.</para>
 
     <para xml:lang="es">Sus parámetros son:

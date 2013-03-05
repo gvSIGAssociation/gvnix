@@ -78,4 +78,48 @@ public interface WSImportOperations {
      * @return wsdl or null if it's not a proxy class
      */
     public Document getWSDLFromClass(JavaType serviceClass);
+
+    /**
+     * Returns the service name for a wsdl
+     * 
+     * @param wsdl
+     * @return
+     */
+    public String getServiceName(Document wsdl);
+
+    /**
+     * Returns the service name for a wsdl
+     * 
+     * @param wsdlLocation path
+     * @return
+     */
+    public String getServiceName(String wsdlLocation);
+
+    /**
+     * Returns the service name for a class based on
+     * <code>GvNIXWebServiceProxy</code> information.
+     * 
+     * @param serviceClass
+     * @return
+     */
+    public String getServiceName(JavaType serviceClass);
+
+    /**
+     * Returns absolute path of a security properties of a imported service
+     * class
+     * 
+     * @param importedServiceClass
+     * @return
+     */
+    public String getSecurityPropertiesAbsolutePath(
+            JavaType importedServiceClass);
+
+    /**
+     * Returns certificate file name for given imported service class
+     * 
+     * @param serviceClass
+     * @return
+     */
+    public String getCertificate(JavaType serviceClass);
+
 }

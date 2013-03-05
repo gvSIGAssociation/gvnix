@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -39,7 +38,6 @@ import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
@@ -82,17 +80,24 @@ import org.springframework.roo.project.LogicalPath;
  */
 public class WSServiceSecurityMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
+    private static final JavaSymbolName CALBACK_PARAM_NAME = new JavaSymbolName(
+            "callbacks");
+    private static final JavaType CALLBACKS_PARAM_TYPE = new JavaType(
+            "javax.security.auth.callback.Callback", 1, DataType.TYPE, null,
+            null);
+    private static final JavaType UNSUPPORTED_CALLBACK_TYPE = new JavaType(
+            "javax.security.auth.callback.UnsupportedCallbackException");
+    private static final JavaType IO_EXCEPTION_TYPE = new JavaType(
+            "java.io.IOException");
     private static final String PROVIDES_TYPE_STRING = WSServiceSecurityMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    // From annotation
-    @AutoPopulate private String password;
+    private static final JavaSymbolName HANDLE_METHOD_NAME = new JavaSymbolName(
+            "handle");
 
-    @AutoPopulate private String alias;
-
-    @AutoPopulate private String certificate;
+    private final String certificate;
 
     /**
      * Path (relative to classpath ) to Certificate
@@ -106,9 +111,11 @@ public class WSServiceSecurityMetadata extends
 
     private final String serviceName;
 
+    private final JavaType serviceClass;
+
     public WSServiceSecurityMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            String serviceName) {
+            String serviceName, String certificate) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -123,12 +130,17 @@ public class WSServiceSecurityMetadata extends
             AutoPopulationUtils.populate(this, annotation);
         }
 
+        // ServiceClass
+        this.serviceClass = governorTypeDetails.getName();
+
         // ServiceName
         this.serviceName = serviceName;
 
-        // Compute path to certificate
-        certificatePath = getCertificatePath(governorTypeDetails.getName(),
-                certificate);
+        // Certificate
+        this.certificate = certificate;
+
+        // CertificatePath
+        this.certificatePath = getCertificatePath(serviceClass, certificate);
 
         // Compute path to properties
         propertiesPath = getPropertiesPath(governorTypeDetails.getName());
@@ -184,14 +196,10 @@ public class WSServiceSecurityMetadata extends
      * @return
      */
     private MethodMetadata getCallBackHandlerMethod() {
-        // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("handle");
 
         // Prepare method parameter definition
         List<JavaType> parameterTypes = new ArrayList<JavaType>();
-        parameterTypes.add(new JavaType(
-                "javax.security.auth.callback.Callback", 1, DataType.TYPE,
-                null, null));
+        parameterTypes.add(CALLBACKS_PARAM_TYPE);
 
         List<AnnotatedJavaType> parameters = AnnotatedJavaType
                 .convertFromJavaTypes(parameterTypes);
@@ -199,7 +207,7 @@ public class WSServiceSecurityMetadata extends
         // Check if a method with the same signature already exists in the
         // target type
         if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
-                methodName, parameterTypes) != null) {
+                HANDLE_METHOD_NAME, parameterTypes) != null) {
             // If it already exists, just return the method and omit its
             // generation via the ITD
             return null;
@@ -207,24 +215,85 @@ public class WSServiceSecurityMetadata extends
 
         // Define method throws types
         List<JavaType> throwsTypes = new ArrayList<JavaType>();
-        throwsTypes.add(new JavaType("java.io.IOException"));
-        throwsTypes.add(new JavaType(
-                "javax.security.auth.callback.UnsupportedCallbackException"));
+        throwsTypes.add(IO_EXCEPTION_TYPE);
+        throwsTypes.add(UNSUPPORTED_CALLBACK_TYPE);
 
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-        parameterNames.add(new JavaSymbolName("callbacks"));
+        parameterNames.add(CALBACK_PARAM_NAME);
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        bodyBuilder.appendFormalLine("final String propPath = \"".concat(
+                propertiesPath).concat("\";"));
         bodyBuilder
-                .appendFormalLine("((org.apache.ws.security.WSPasswordCallback) callbacks[0]).setPassword(\""
-                        .concat(password).concat("\");"));
+                .appendFormalLine("final String propKey = \"org.apache.ws.security.crypto.merlin.keystore.password\";");
+        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.indent();
+        bodyBuilder.append("// Get class loader to get file from project");
+        bodyBuilder.newLine();
+        bodyBuilder
+                .appendFormalLine("ClassLoader classLoader = Thread.currentThread().getContextClassLoader();");
+
+        bodyBuilder
+                .appendFormalLine("java.io.File file = new java.io.File(classLoader.getResource(propPath).toURI());");
+        bodyBuilder.appendFormalLine("if (file != null && file.exists()) {");
+        bodyBuilder.indent();
+        bodyBuilder.append("// Load properties");
+        bodyBuilder.newLine();
+        bodyBuilder
+                .appendFormalLine("java.util.Properties properties = new java.util.Properties();");
+        bodyBuilder.appendFormalLine("java.io.FileInputStream ins = null;");
+        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("ins = new java.io.FileInputStream(file);");
+        bodyBuilder.appendFormalLine("properties.load(ins);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} finally {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("if (ins != null) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("ins.close();");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}"); // End if
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}"); // End try (ins)
+        bodyBuilder
+                .appendFormalLine("String value = properties.getProperty(propKey);");
+        bodyBuilder.appendFormalLine("if (value != null) {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("((org.apache.ws.security.WSPasswordCallback) callbacks[0]).setPassword(value);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} else {"); // Else value != null
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("throw new IOException(\"Property \".concat(propKey).concat(\" not exists\"));");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}"); // Endif value != null
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} else {"); // Else file.exists()
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("throw new IOException(\"File \".concat(propPath).concat(\" not exists\"));");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}"); // Endif file.exists()
+        bodyBuilder.indentRemove();
+        bodyBuilder
+                .appendFormalLine("} catch (java.net.URISyntaxException e) {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("throw new IOException(\"Problem getting \".concat(propPath).concat(\" file\"),e);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}"); // End try
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.VOID_PRIMITIVE,
-                parameters, parameterNames, bodyBuilder);
+                getId(), Modifier.PUBLIC, HANDLE_METHOD_NAME,
+                JavaType.VOID_PRIMITIVE, parameters, parameterNames,
+                bodyBuilder);
         methodBuilder.setThrowsTypes(throwsTypes);
 
         return methodBuilder.build(); // Build and return a MethodMetadata
@@ -232,57 +301,22 @@ public class WSServiceSecurityMetadata extends
     }
 
     /**
-     * Returns properties for service configuration
-     * 
-     * @return
-     */
-    public Properties getSecurityProperties() {
-        Properties properties = new Properties();
-
-        // security provider
-        properties.put("org.apache.ws.security.crypto.provider",
-                "org.apache.ws.security.components.crypto.Merlin");
-
-        // certificate Keystore type
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.type",
-                getKeystoreTypeString());
-
-        // certificate keystore password
-        properties.put(
-                "org.apache.ws.security.crypto.merlin.keystore.password",
-                password);
-
-        // alias password
-        properties.put("org.apache.ws.security.crypto.merlin.alias.password",
-                password);
-
-        // certificate keystore alias
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.alias",
-                alias);
-
-        // certificate keystore file
-        properties.put("org.apache.ws.security.crypto.merlin.file",
-                certificatePath);
-
-        return properties;
-    }
-
-    /**
      * @return Map with parameters for client-config.wsdd
      */
-    public Map<String, String> getServiceWsddConfigurationParameters() {
+    public static Map<String, String> getServiceWsddConfigurationParameters(
+            JavaType serviceClass, String alias, String propertiesPath) {
 
         Map<String, String> parameters = new HashMap<String, String>();
 
         // <parameter name="action" value="Signature"/>
-        parameters.put("action", getActionString());
+        parameters.put("action", "Signature");
 
         // <parameter name="user" value="alias"/>
         parameters.put("user", alias);
 
         // <parameter name="passwordCallbackClass" value="governor"/>
-        parameters.put("passwordCallbackClass", governorTypeDetails.getName()
-                .getFullyQualifiedTypeName());
+        parameters.put("passwordCallbackClass",
+                serviceClass.getFullyQualifiedTypeName());
 
         // <parameter name="signaturePropFile" value="path_To_Properties"/>
         parameters.put("signaturePropFile", propertiesPath);
@@ -294,40 +328,6 @@ public class WSServiceSecurityMetadata extends
     }
 
     /**
-     * <p>
-     * Return security action string
-     * </p>
-     * <p>
-     * currently a constant (<code>Signature</code>)
-     * </p>
-     * <p>
-     * TODO parameterize it
-     * </p>
-     * 
-     * @return
-     */
-    private String getActionString() {
-        return "Signature";
-    }
-
-    /**
-     * <p>
-     * Returns keystore type string identifier
-     * </p>
-     * <p>
-     * currently constant (<code>pkcs12</code>)
-     * </p>
-     * <p>
-     * TODO identify it from values
-     * </p>
-     * 
-     * @return
-     */
-    private String getKeystoreTypeString() {
-        return "pkcs12";
-    }
-
-    /**
      * @return service name (identifier)
      */
     public String getServiceName() {
@@ -335,17 +335,10 @@ public class WSServiceSecurityMetadata extends
     }
 
     /**
-     * @return password for certificate keystore
+     * @return service class
      */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * @return alias to use form certificate keystore
-     */
-    public String getAlias() {
-        return alias;
+    public JavaType getServiceClass() {
+        return serviceClass;
     }
 
     /**

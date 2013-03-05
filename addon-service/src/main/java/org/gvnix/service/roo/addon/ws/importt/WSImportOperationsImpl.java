@@ -20,11 +20,14 @@ package org.gvnix.service.roo.addon.ws.importt;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,10 +52,12 @@ import org.springframework.roo.classpath.details.annotations.StringAttributeValu
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Addon for Handle Web Service Proxy Layer
@@ -66,7 +71,9 @@ import org.w3c.dom.Document;
 @Service
 public class WSImportOperationsImpl implements WSImportOperations {
 
-    private static Logger logger = Logger.getLogger(WSImportOperations.class
+    private static final String CERTIFICATION_FILE_KEY = "org.apache.ws.security.crypto.merlin.file";
+
+    private static Logger LOGGER = Logger.getLogger(WSImportOperations.class
             .getName());
 
     @Reference private FileManager fileManager;
@@ -101,7 +108,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
 
             // Create service class with Service Annotation.
             javaParserService.createServiceClass(serviceClass);
-            logger.log(
+            LOGGER.log(
                     Level.FINE,
                     "New service class created: "
                             + serviceClass.getFullyQualifiedTypeName());
@@ -112,7 +119,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
                 GvNIXWebServiceProxy.class.getName(),
                 typeLocationService.getTypeDetails(serviceClass))) {
 
-            logger.log(Level.WARNING,
+            LOGGER.log(Level.WARNING,
                     "Provided class is already importing a service");
         }
         else {
@@ -154,16 +161,10 @@ public class WSImportOperationsImpl implements WSImportOperations {
                 .getTypeDetails(importedServiceClass);
 
         // checks if already has security annotation
-        boolean alreadyAnnotated = javaParserService
+        final boolean alreadyAnnotated = javaParserService
                 .isAnnotationIntroduced(
                         GvNIXWebServiceSecurity.class.getName(),
                         importedServiceDetails);
-        Validate.isTrue(
-                !alreadyAnnotated,
-                importedServiceDetails.getName().toString()
-                        .concat(" already has ")
-                        .concat(GvNIXWebServiceSecurity.class.getSimpleName())
-                        .concat(" annotation."));
 
         // checks if class is really a imported service and if it's a
         // RPC-Encoded
@@ -174,6 +175,9 @@ public class WSImportOperationsImpl implements WSImportOperations {
                 WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
                 "Only RPC-Encoded services is supported");
 
+        // Get service name from wsdl
+        String serviceName = getServiceName(wsdl);
+
         // Check if certificate file exist
         Validate.isTrue(certificate.exists(), certificate.getAbsolutePath()
                 .concat(" not found"));
@@ -183,7 +187,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
         // Check certificate extension
         if (!certificate.getName().endsWith(".p12")) {
             // if it's not .p12 show a warning
-            logger.warning("Currently this action only supports pkcs12. "
+            LOGGER.warning("Currently this action only supports pkcs12. "
                     .concat(certificate.getAbsolutePath()).concat(
                             " has no '.p12' extension"));
         }
@@ -192,23 +196,89 @@ public class WSImportOperationsImpl implements WSImportOperations {
         File targetCertificated = copyCertificateFileIntoResources(
                 importedServiceClass, certificate);
 
-        // Add annotation to class
-        List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
-        annotationAttributeValues
-                .add(new StringAttributeValue(
-                        new JavaSymbolName("certificate"), targetCertificated
-                                .getName()));
-        annotationAttributeValues.add(new StringAttributeValue(
-                new JavaSymbolName("password"), password));
-        annotationAttributeValues.add(new StringAttributeValue(
-                new JavaSymbolName("alias"), alias));
-        annotationsService.addJavaTypeAnnotation(importedServiceClass,
-                GvNIXWebServiceSecurity.class.getName(),
-                annotationAttributeValues, false);
+        String propertiesPath = WSServiceSecurityMetadata
+                .getPropertiesPath(importedServiceClass);
+        String propertiesAbsolutePath = getSecurityPropertiesAbsolutePath(importedServiceClass);
+
+        try {
+            // update client-config.wsdd
+            securityService
+                    .addOrUpdateAxisClientService(serviceName,
+                            WSServiceSecurityMetadata
+                                    .getServiceWsddConfigurationParameters(
+                                            importedServiceClass, alias,
+                                            propertiesPath));
+
+            // write properties file
+            createSecurityPropertiesFile(importedServiceClass, serviceName,
+                    password, alias, targetCertificated.getName(),
+                    propertiesAbsolutePath);
+
+        }
+        catch (Exception e) {
+            throw new IllegalStateException(
+                    "Error generating security configuration", e);
+        }
+
+        if (!alreadyAnnotated) {
+            // Add annotation to class
+            List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
+            annotationsService.addJavaTypeAnnotation(importedServiceClass,
+                    GvNIXWebServiceSecurity.class.getName(),
+                    annotationAttributeValues, false);
+        }
 
         // Add GvNixAnnotations to the project.
         annotationsService.addAddonDependency();
 
+    }
+
+    @Override
+    public String getSecurityPropertiesAbsolutePath(
+            JavaType importedServiceClass) {
+        // Resolve properties absolute path
+        String propertiesPath = projectOperations.getPathResolver()
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                        WSServiceSecurityMetadata
+                                .getPropertiesPath(importedServiceClass));
+        return propertiesPath;
+    }
+
+    /**
+     * Returns properties for service configuration
+     * 
+     * @return
+     */
+    private Properties getSecurityProperties(String password, String alias,
+            String certificatePath) {
+        Properties properties = new Properties();
+
+        // security provider
+        properties.put("org.apache.ws.security.crypto.provider",
+                "org.apache.ws.security.components.crypto.Merlin");
+
+        // certificate Keystore type
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.type",
+                "pkcs12");
+
+        // certificate keystore password
+        properties.put(
+                "org.apache.ws.security.crypto.merlin.keystore.password",
+                password);
+
+        // alias password
+        properties.put("org.apache.ws.security.crypto.merlin.alias.password",
+                password);
+
+        // certificate keystore alias
+        properties.put("org.apache.ws.security.crypto.merlin.keystore.alias",
+                alias);
+
+        // certificate keystore file
+        properties.put(CERTIFICATION_FILE_KEY, certificatePath);
+
+        return properties;
     }
 
     /**
@@ -324,5 +394,185 @@ public class WSImportOperationsImpl implements WSImportOperations {
                 .getAttribute(new JavaSymbolName("wsdlLocation")).getValue());
 
         return wsdl;
+    }
+
+    /**
+     * Creates <code>{Service_Class}Sercurity.properties</code> file in
+     * <code>scr/main/resorces/{Service_Class_Package}</code>
+     * 
+     * @param serviceClass
+     * @param serviceName
+     * @param password
+     * @param alias
+     * @param certificatePath
+     * @param propertiesAbsolutePath
+     */
+    private void createSecurityPropertiesFile(JavaType serviceClass,
+            String serviceName, String password, String alias,
+            String certificatePath, String propertiesAbsolutePath) {
+
+        OutputStream os;
+
+        // Gets final properties
+        Properties properties = getSecurityProperties(password, alias,
+                certificatePath);
+
+        // Checks if file exists
+        MutableFile mutableFile;
+        if (fileManager.exists(propertiesAbsolutePath)) {
+            // Load current file content
+            Properties storedProperties = new Properties();
+            mutableFile = fileManager.updateFile(propertiesAbsolutePath);
+            InputStream is = null;
+            try {
+                is = mutableFile.getInputStream();
+                storedProperties.load(is);
+            }
+            catch (IOException ioException) {
+                throw new IllegalStateException(ioException);
+            }
+            finally {
+                IOUtils.closeQuietly(is);
+            }
+            // Compare content
+            if (propertiesEquals(properties, storedProperties)) {
+                // File Content is up to date --> exit
+                return;
+            }
+        }
+        else {
+            // Unable to find the file, so let's create it
+            mutableFile = fileManager.createFile(propertiesAbsolutePath);
+        }
+
+        // Store properties in file
+        os = null;
+        try {
+            os = mutableFile.getOutputStream();
+            storeProperties(serviceClass, serviceName, os, properties);
+        }
+        catch (IOException ioException) {
+            throw new IllegalStateException(ioException);
+        }
+        finally {
+            IOUtils.closeQuietly(os);
+        }
+    }
+
+    /**
+     * Compares the values of two Property instances
+     * 
+     * @param one
+     * @param other
+     * @return
+     */
+    private boolean propertiesEquals(Properties one, Properties other) {
+        if (one.size() != other.size()) {
+            return false;
+        }
+        Set<Entry<Object, Object>> entrySet = one.entrySet();
+        Object otherValue;
+        for (Entry<Object, Object> entry : entrySet) {
+            otherValue = other.get(entry.getKey());
+            if (otherValue == null) {
+                if (entry.getValue() != null) {
+                    return false;
+                }
+            }
+            else if (!otherValue.equals(entry.getValue())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Store properties into a output stream
+     * 
+     * @param serviceClass
+     * @param serviceName
+     * @param os
+     * @param properties
+     * @throws IOException
+     */
+    private void storeProperties(JavaType serviceClass, String serviceName,
+            OutputStream os, Properties properties) throws IOException {
+        properties.store(
+                os,
+                "Service '".concat(serviceName).concat(
+                        "' security properities. Class ".concat(serviceClass
+                                .getFullyQualifiedTypeName())));
+    }
+
+    @Override
+    public String getServiceName(JavaType serviceClass) {
+        Document wsdl = getWSDLFromClass(serviceClass);
+        return getServiceName(wsdl);
+    }
+
+    @Override
+    public String getServiceName(String wsdlLocation) {
+        Document wsdl = securityService.getWsdl(wsdlLocation);
+
+        Validate.notNull(wsdl, "Can't get WSDl from ".concat(wsdlLocation));
+        return getServiceName(wsdl);
+
+    }
+
+    @Override
+    public String getServiceName(Document wsdl) {
+        // loads wsdl
+        Validate.isTrue(
+                WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
+                "Only RPC-Encoded services is supported");
+
+        // Gets first port
+        Element port = WsdlParserUtils.findFirstCompatiblePort(wsdl
+                .getDocumentElement());
+
+        return port.getAttribute("name");
+    }
+
+    @Override
+    public String getCertificate(JavaType serviceClass) {
+        Properties properties;
+        try {
+            properties = loadSecurityProperties(serviceClass);
+        }
+        catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
+        return properties.getProperty(CERTIFICATION_FILE_KEY);
+    }
+
+    /**
+     * Load security properties file for <code>serviceClass</code>
+     * 
+     * @param serviceClass
+     * @return
+     * @throws IOException
+     */
+    private Properties loadSecurityProperties(JavaType serviceClass)
+            throws IOException {
+        String path = getSecurityPropertiesAbsolutePath(serviceClass);
+        File file = new File(path);
+        if (!file.exists() || !file.isFile()) {
+            throw new IOException("Sercurity properties file for '"
+                    .concat(serviceClass.getFullyQualifiedTypeName())
+                    .concat("' not found: ").concat(path));
+        }
+        FileInputStream fileIn = null;
+        Properties properties = null;
+        try {
+            properties = new Properties();
+            fileIn = new FileInputStream(file);
+            if (fileIn != null) {
+                properties.load(fileIn);
+            }
+        }
+        finally {
+            IOUtils.closeQuietly(fileIn);
+        }
+        return properties;
     }
 }

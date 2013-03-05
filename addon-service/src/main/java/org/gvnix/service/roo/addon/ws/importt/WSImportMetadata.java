@@ -72,7 +72,7 @@ import org.xml.sax.SAXException;
 public class WSImportMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
-    private static Logger logger = Logger.getLogger(WSImportMetadata.class
+    private static Logger LOGGER = Logger.getLogger(WSImportMetadata.class
             .getName());
 
     private static final String WEB_SERVICE_TYPE_STRING = WSImportMetadata.class
@@ -110,7 +110,7 @@ public class WSImportMetadata extends
 
             // Populate wsdlLocation property class from annotation attribute
             AutoPopulationUtils.populate(this, annotationMetadata);
-            logger.log(Level.FINE, "Wsdl location = " + wsdlLocation);
+            LOGGER.log(Level.FINE, "Wsdl location = " + wsdlLocation);
 
             try {
 
@@ -130,18 +130,18 @@ public class WSImportMetadata extends
 
             }
             catch (IOException e) {
-
+            	LOGGER.log(Level.SEVERE, "Web service has been imported",e);
                 throw new IllegalStateException(
                         "Error accessing generated web service sources");
 
             }
             catch (ParseException e) {
-
+            	LOGGER.log(Level.SEVERE, "Web service has been imported",e);
                 throw new IllegalStateException(
                         "Error parsing generated web service sources");
             }
 
-            logger.log(Level.FINE, "Web service has been imported");
+            LOGGER.log(Level.FINE, "Web service has been imported");
         }
 
         // Create a representation of the desired output ITD
@@ -388,7 +388,7 @@ public class WSImportMetadata extends
             // Collection type name an inner type params
             String typeName = name.substring(0, index);
             String typeParam = name.substring(index + 1, name.indexOf('>'));
-            logger.log(Level.FINE, "Collection: class=" + typeName + ", type="
+            LOGGER.log(Level.FINE, "Collection: class=" + typeName + ", type="
                     + typeParam);
 
             // Include param into List, required by JavaType

@@ -39,18 +39,23 @@ public @interface GvNIXWebServiceSecurity {
 
     /**
      * @return alias name in certificate keystore
+     * @deprecated to change this value use related property file or use dynamic
+     *             configuration
      */
-    String alias();
+    String alias() default "";
 
     /**
      * @return certificate keystore file name. (this file must be in the very
      *         same package of target class)
+     * @deprecated to change this value use related property file or use dynamic
+     *             configuration
      */
-    String certificate();
+    String certificate() default "";
 
     /**
      * @return password for certificate keystore and alias
+     * @deprecated to change this value use related property file or use dynamic
+     *             configuration
      */
-    String password();
-
+    String password() default "";
 }
