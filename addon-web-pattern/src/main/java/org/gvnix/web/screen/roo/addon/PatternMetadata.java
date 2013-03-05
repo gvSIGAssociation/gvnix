@@ -164,7 +164,7 @@ public class PatternMetadata extends AbstractPatternMetadata {
         bodyBuilder.indent();
         addBodyLinesForDialogBinding(bodyBuilder, DialogType.Error,
                 "message_errorbinding_problemdescription");
-        bodyBuilder.appendFormalLine("return \"redirect:/".concat(
+        bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/create\";"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
@@ -218,7 +218,7 @@ public class PatternMetadata extends AbstractPatternMetadata {
         bodyBuilder.indent();
         addBodyLinesForDialogBinding(bodyBuilder, DialogType.Error,
                 "message_errorbinding_problemdescription");
-        bodyBuilder.appendFormalLine("return \"redirect:/".concat(
+        bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/update\";"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
