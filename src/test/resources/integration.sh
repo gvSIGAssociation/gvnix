@@ -293,9 +293,12 @@
 	cd pattern
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/main/resources/pattern.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform tests
-	$1/gvnix.sh perform clean
-	mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	$1/gvnix.sh hint
+	mvn test tomcat:run & 
+	sleep 30
+	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo pattern end
 	
@@ -305,9 +308,12 @@
 	cd test-script-pkc
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform tests
-	$1/gvnix.sh perform clean
-	mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	$1/gvnix.sh hint
+	mvn test tomcat:run &
+	sleep 30
+	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo test-script-pkc end
 	
@@ -317,9 +323,12 @@
 	cd test-script-pkc2
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc2.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform tests
-	$1/gvnix.sh perform clean
-	mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	$1/gvnix.sh hint
+	mvn test tomcat:run &
+	sleep 30
+	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo test-script-pkc2 end
 
@@ -329,9 +338,12 @@
 	cd test-script-pkc3
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc3.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform tests
-	$1/gvnix.sh perform clean
-	mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	$1/gvnix.sh hint
+	mvn test tomcat:run &
+	sleep 30
+	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo test-script-pkc3 end
 
@@ -341,9 +353,12 @@
 	cd test-script-manytomany
 	$1/gvnix.sh script --file $2/code/addon-web-pattern/src/test/resources/test-script-manytomany.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform tests
-	$1/gvnix.sh perform clean
-	mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	$1/gvnix.sh hint
+	mvn test tomcat:run &
+	sleep 30
+	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo test-script-manytomany end
 
@@ -580,8 +595,7 @@
 	cd tiendavirtual
 	$1/gvnix.sh script --file $2/code/src/main/resources/tiendavirtual.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform clean
-	$1/gvnix.sh perform clean
+	$1/gvnix.sh hint
 ##  Inter-type declaration conflicts with existing member, avoid it temporally
     mvn test-compile > /dev/null
 	# Request the home URL
@@ -625,9 +639,8 @@
 	cd regproy
 	$1/gvnix.sh script --file $2/code/src/test/resources/regproy.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh perform tests
-	$1/gvnix.sh perform clean
-	mvn tomcat:run & 
+	$1/gvnix.sh hint
+	mvn test tomcat:run & 
 	mkdir target
 	# Request the home URL
 	wget --retry-connrefused -O target/home.html http://localhost:8080/registro_proyectos/
