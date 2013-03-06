@@ -428,7 +428,7 @@ public class FlexOperationsImpl implements FlexOperations {
                 projectOperations.getFocusedModuleName(), dependencies);
         this.projectOperations.addProperty(projectOperations
                 .getFocusedModuleName(), new Property("flex.version",
-                "4.5.1.21328"));
+                "4.1.0.16248"));
 
         fixBrokenFlexDependency();
 

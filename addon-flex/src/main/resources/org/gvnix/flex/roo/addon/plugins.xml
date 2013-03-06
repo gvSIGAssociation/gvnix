@@ -5,7 +5,7 @@
 		<plugin>
 			<groupId>org.sonatype.flexmojos</groupId>
 			<artifactId>flexmojos-maven-plugin</artifactId>
-			<version>4.0-RC2</version>
+			<version>3.8</version>
 			<dependencies>
 				<dependency>
 					<groupId>com.adobe.flex</groupId>
