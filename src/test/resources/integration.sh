@@ -184,9 +184,12 @@
 	mkdir basic-flex-scaffold-test
 	cd basic-flex-scaffold-test
 	$1/gvnix.sh script --file $2/code/addon-flex/src/test/resources/basic-flex-scaffold-test.roo --lineNumbers true
-##  java.lang.ClassNotFoundException: org.hibernate.collection.PersistentCollection
-##	mvn test tomcat:run -Dmaven.tomcat.fork=true
-    mvn test 
+	mvn test tomcat:run &
+	mkdir target
+	# Request the main html with the flash 
+	wget --retry-connrefused -O target/flexrocks_scaffold.html http://localhost:8080/flexrocks/flexrocks_scaffold.html
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo basic-flex-scaffold-test end
 
@@ -195,9 +198,12 @@
 	mkdir remoting-scaffold-all-test
 	cd remoting-scaffold-all-test
 	$1/gvnix.sh script --file $2/code/addon-flex/src/test/resources/remoting-scaffold-all-test.roo --lineNumbers true
-##  java.lang.ClassNotFoundException: org.hibernate.collection.PersistentCollection
-##	mvn test tomcat:run -Dmaven.tomcat.fork=true
-    mvn test 
+	mvn test tomcat:run &
+	mkdir target
+	# Request the main html with the flash 
+	wget --retry-connrefused -O target/flexrocks_scaffold.html http://localhost:8080/flexrocks/flexrocks_scaffold.html
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo remoting-scaffold-all-test end
 
@@ -206,9 +212,12 @@
 	mkdir flex
 	cd flex
 	$1/gvnix.sh script --file $2/code/addon-flex/src/main/resources/flex.roo --lineNumbers true
-##  java.lang.ClassNotFoundException: org.hibernate.collection.PersistentCollection
-##	mvn test tomcat:run -Dmaven.tomcat.fork=true
-    mvn test 
+	mvn test tomcat:run &
+	mkdir target
+	# Request the main html with the flash 
+	wget --retry-connrefused -O target/flexrocks_scaffold.html http://localhost:8080/flexrocks/flexrocks_scaffold.html
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo flex end
 
@@ -217,9 +226,12 @@
 	mkdir rootunes
 	cd rootunes
 	$1/gvnix.sh script --file $2/code/addon-flex/src/main/resources/rootunes.roo --lineNumbers true
-##  java.lang.ClassNotFoundException: org.hibernate.collection.PersistentCollection
-##	mvn test tomcat:run -Dmaven.tomcat.fork=true
-    mvn test 
+	mvn test tomcat:run &
+	mkdir target
+	# Request the main html with the flash 
+	wget --retry-connrefused -O target/rootunes_scaffold.html http://localhost:8080/rootunes/rootunes_scaffold.html
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo rootunes end
 
