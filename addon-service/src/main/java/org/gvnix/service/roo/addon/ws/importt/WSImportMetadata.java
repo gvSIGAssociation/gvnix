@@ -130,13 +130,13 @@ public class WSImportMetadata extends
 
             }
             catch (IOException e) {
-            	LOGGER.log(Level.SEVERE, "Web service has been imported",e);
+                LOGGER.log(Level.SEVERE, "Web service has been imported", e);
                 throw new IllegalStateException(
                         "Error accessing generated web service sources");
 
             }
             catch (ParseException e) {
-            	LOGGER.log(Level.SEVERE, "Web service has been imported",e);
+                LOGGER.log(Level.SEVERE, "Web service has been imported", e);
                 throw new IllegalStateException(
                         "Error parsing generated web service sources");
             }

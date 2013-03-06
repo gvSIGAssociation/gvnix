@@ -89,8 +89,9 @@ public class SecurityServiceImpl implements SecurityService {
 
     private static final String DEPENDENCIES_FILE = "dependencies-wssl4.xml";
     private static final String AXIS_CLIENT_CONFIG_TEMPLATE_FILE = "client-config-axis-template.xml";
-    
-    private static Logger LOGGER = Logger.getLogger(SecurityServiceImpl.class.getName());
+
+    private static Logger LOGGER = Logger.getLogger(SecurityServiceImpl.class
+            .getName());
 
     @Reference private FileManager fileManager;
     @Reference private ProjectOperations projectOperations;
@@ -220,13 +221,15 @@ public class SecurityServiceImpl implements SecurityService {
 
         }
         catch (SAXException e) {
-        	LOGGER.log(Level.SEVERE, "The format of the wsdl has errors: ".concat(loc),e);
+            LOGGER.log(Level.SEVERE,
+                    "The format of the wsdl has errors: ".concat(loc), e);
             throw new IllegalStateException(
                     "The format of the wsdl has errors: ".concat(loc));
 
         }
         catch (IOException e) {
-        	LOGGER.log(Level.SEVERE, "The format of the wsdl has errors: ".concat(loc),e);
+            LOGGER.log(Level.SEVERE,
+                    "The format of the wsdl has errors: ".concat(loc), e);
             throw new IllegalStateException(
                     "There is not access to the wsdl: ".concat(loc));
         }
@@ -414,7 +417,8 @@ public class SecurityServiceImpl implements SecurityService {
             }
         }
         catch (Exception e) {
-        	LOGGER.log(Level.SEVERE, "Error loading or saving X509 certificates in keystore",e);
+            LOGGER.log(Level.SEVERE,
+                    "Error loading or saving X509 certificates in keystore", e);
             throw new IllegalStateException(
                     "Error loading or saving X509 certificates in keystore");
         }
