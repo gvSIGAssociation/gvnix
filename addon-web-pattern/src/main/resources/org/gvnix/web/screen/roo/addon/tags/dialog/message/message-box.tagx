@@ -102,17 +102,7 @@
         <span class="title">${title}</span>
         <span class="MessageCloseIcon" id="MessageCloseIcon" onclick="dojo.style('${id}', 'display', 'none');">x</span>
       </div>
-      <div class="avisolargo">
-          ${description}
-      <ul>
-      <c:forEach var="dialogError" items="${dialogMessage.errors}">
-      <li>
-      <spring:message text="${dialogError.field}"/>:
-      <spring:message text="${dialogError.defaultMessage}"/>
-      </li>
-      </c:forEach>
-      </ul>
-      </div>
+      <div class="avisolargo">${description}</div>
     </div>
 
     <spring:message code="application_name" var="applicationName" htmlEscape="true"/>

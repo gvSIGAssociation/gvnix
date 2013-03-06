@@ -646,10 +646,8 @@ public abstract class AbstractPatternMetadata extends
                 .concat(entityTypeDetails.getPersistenceDetails()
                         .getFindAllMethod().getMethodName().concat("();")));
 
-        bodyBuilder
-                .appendFormalLine("if ("
-                        .concat(entityNamePlural.toLowerCase())
-                        .concat(".isEmpty() && httpServletRequest.getSession().getAttribute(\"dialogMessage\") == null) {"));
+        bodyBuilder.appendFormalLine("if (".concat(
+                entityNamePlural.toLowerCase()).concat(".isEmpty()) {"));
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
                 entityNamePlural.toLowerCase()).concat("Tab\", null);"));
@@ -778,10 +776,8 @@ public abstract class AbstractPatternMetadata extends
                                 .getMethodName()
                                 .concat("(index == null ? 0 : (index.intValue() - 1), 1);")));
 
-        bodyBuilder
-                .appendFormalLine("if ("
-                        .concat(entityNamePlural.toLowerCase())
-                        .concat(".isEmpty() && httpServletRequest.getSession().getAttribute(\"dialogMessage\") == null) {"));
+        bodyBuilder.appendFormalLine("if (".concat(
+                entityNamePlural.toLowerCase()).concat(".isEmpty()) {"));
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
                 entityName.toLowerCase()).concat("\", null);"));
@@ -962,9 +958,6 @@ public abstract class AbstractPatternMetadata extends
     protected void addBodyLinesForDialogMessage(
             InvocableMemberBodyBuilder bodyBuilder, DialogType dialogType,
             String messageDescriptionCode) {
-
-        // TODO Código duplicado con método contiguo
-
         JavaType httpSession = new JavaType("javax.servlet.http.HttpSession");
         bodyBuilder.appendFormalLine(httpSession
                 .getNameIncludingTypeParameters(false,
@@ -987,46 +980,6 @@ public abstract class AbstractPatternMetadata extends
                         .concat(dialogType.name().toLowerCase())
                         .concat("_title\", \"").concat(messageDescriptionCode)
                         .concat("\");")));
-        bodyBuilder
-                .appendFormalLine("session.setAttribute(\"dialogMessage\", dialog);");
-    }
-
-    /**
-     * Using the given bodyBuilder adds code lines for set a Session Attribute
-     * with an instance of Dialog bean
-     * 
-     * @param bodyBuilder
-     * @param dialogType
-     * @param messageDescriptionCode
-     */
-    protected void addBodyLinesForDialogBinding(
-            InvocableMemberBodyBuilder bodyBuilder, DialogType dialogType,
-            String messageDescriptionCode) {
-
-        // TODO Código duplicado con método contiguo
-
-        JavaType httpSession = new JavaType("javax.servlet.http.HttpSession");
-        bodyBuilder.appendFormalLine(httpSession
-                .getNameIncludingTypeParameters(false,
-                        builder.getImportRegistrationResolver()).concat(
-                        " session = " + getHttpServletRequest().getKey()
-                                + ".getSession();"));
-        JavaType dialogJavaType = new JavaType(
-                this.aspectPackage.concat(".dialog.Dialog"));
-        JavaType dialogTypeJavaType = new JavaType(dialogJavaType
-                .getFullyQualifiedTypeName().concat(".DialogType"));
-        bodyBuilder.appendFormalLine(dialogJavaType
-                .getNameIncludingTypeParameters(false,
-                        builder.getImportRegistrationResolver())
-                .concat(" dialog = new Dialog(")
-                .concat(dialogTypeJavaType
-                        .getNameIncludingTypeParameters(false,
-                                builder.getImportRegistrationResolver())
-                        .concat(".").concat(dialogType.name())
-                        .concat(", \"message_")
-                        .concat(dialogType.name().toLowerCase())
-                        .concat("_title\", \"").concat(messageDescriptionCode)
-                        .concat("\", bindingResult.getFieldErrors());")));
         bodyBuilder
                 .appendFormalLine("session.setAttribute(\"dialogMessage\", dialog);");
     }
@@ -1060,7 +1013,7 @@ public abstract class AbstractPatternMetadata extends
         List<JavaSymbolName> methodParamNames = getMethodParameterNames();
 
         // Create method body
-        InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilderBinding(PersistenceMethod.PERSIST);
+        InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(PersistenceMethod.PERSIST);
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
@@ -1106,7 +1059,7 @@ public abstract class AbstractPatternMetadata extends
         List<JavaSymbolName> methodParamNames = getMethodParameterNames();
 
         // Create method body
-        InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilderBinding(PersistenceMethod.MERGE);
+        InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(PersistenceMethod.MERGE);
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
@@ -1573,9 +1526,6 @@ public abstract class AbstractPatternMetadata extends
      */
     private InvocableMemberBodyBuilder getMethodBodyBuilder(
             PersistenceMethod persistenceMethod) {
-
-        // TODO Código duplicado con método contiguo
-
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         // test if form has errors
@@ -1591,49 +1541,6 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("} else {");
         bodyBuilder.indent();
         addBodyLinesForDialogMessage(bodyBuilder, DialogType.Error,
-                "message_errorbinding_problemdescription");
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-        bodyBuilder.appendFormalLine("return getRefererRedirectViewName("
-                + getHttpServletRequest().getKey() + ");");
-
-        return bodyBuilder;
-    }
-
-    /**
-     * Returns the method body of the methods given a {@link PersistenceMethod}
-     * <p>
-     * Example:<br/>
-     * <code>
-     * if ( !bindingResult.hasErrors() ) {<br/>
-     * &nbsp;&nbsp;Car.persist(filterList(entities));<br/>
-     * }<br/>
-     * return getRefererRedirectViewName(httpServletRequest);
-     * </code>
-     * 
-     * @param persistenceMethod
-     * @return
-     */
-    private InvocableMemberBodyBuilder getMethodBodyBuilderBinding(
-            PersistenceMethod persistenceMethod) {
-
-        // TODO Código duplicado con método contiguo
-
-        // Create the method body
-        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        // test if form has errors
-        bodyBuilder.appendFormalLine("if ( !" + getBindingResult().getKey()
-                + ".hasErrors() ) {");
-        bodyBuilder.indent();
-        bodyBuilder.appendFormalLine(entity
-                .getNameIncludingTypeParameters(false,
-                        builder.getImportRegistrationResolver()).concat(".")
-                .concat(persistenceMethod.getName())
-                .concat("(filterList(entities));"));
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("} else {");
-        bodyBuilder.indent();
-        addBodyLinesForDialogBinding(bodyBuilder, DialogType.Error,
                 "message_errorbinding_problemdescription");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
