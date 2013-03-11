@@ -191,6 +191,8 @@
           <c:set var="beginItem" value="${empty param[page] or empty param[pageSize] ? 0 : param[page] * param[pageSize] - param[pageSize]}" scope="request"/>
           <c:set var="endItem" value="${empty param[page] or empty param[pageSize] ? 9 : param[page] * param[pageSize] - 1}" scope="request"/>
 
+          <!-- Flag to informs to select field if has to declare its data. This var is true in firts iteration only -->
+          <c:set var="prepare_widgets_data" value="true" scope="request"/>
           <!-- Create a row for each item on data collection between pagination items -->
           <c:forEach items="${data}" var="item" varStatus="pos" begin="${beginItem}" end="${endItem}">
             <tr class="${rowStylePrefix}${pos.count}">

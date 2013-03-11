@@ -170,6 +170,9 @@
         <c:set var="rowStylePrefix" value="gvNixTableRow ${secId}_row_" scope="request" />
         <c:set var="colStylePrefix" value="gvNixTableData ${secId}_col_" scope="request" />
 
+        <!-- Flag to informs to select field if has to declare its data -->
+        <c:set var="prepare_widgets_data" value="true" scope="request"/>
+
         <!-- Starts data table -->
         <table>
 

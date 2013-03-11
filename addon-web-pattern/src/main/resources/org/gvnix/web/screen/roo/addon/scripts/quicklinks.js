@@ -235,7 +235,12 @@ function gvnix_copy_values(element, compositePkField, mode) {
   hiddens.forEach(function(hidden, index, arr) {
 
 	// Get field value to submit from dojo visible field and set it on dojo related hidden field value
-	hidden.value = gvnix_get_value("_" + hidden.id);
+	// but only if the hidden field has not value or is empty, which is the case of all the field types
+	// except the select one, which sets the hidden value by itself when a new value is selected from the options
+	if (hidden.value == null || hidden.value == '') {
+		hidden.value = gvnix_get_value("_" + hidden.id);
+	}
+
 
 	// When field is part of a composite primary key, encode them into a unique hidden field for this register 
 	if (compositePkField != '' && hidden.name.indexOf("." + compositePkField) != -1) {
@@ -367,3 +372,100 @@ function gvnix_edit_item(detailPath, element, urlParams, compositePkField, idFie
   url += dojo.byId(pkId).value;
   location.href = url + urlParams;
 }
+
+/*
+ * Create a pattern/select.tagx
+ */
+var select_tags_data = new Array();
+      
+dojo.require("dijit.form.FilteringSelect");
+dojo.require("dojo.data.ItemFileReadStore");
+
+/*
+ * Create a pattern/select.tagx widgets
+ * params requires:
+ *    select_data_id: '${select_data_id}',
+ *    parentId: '${parentId}',
+ *    fieldId: '${fieldId}',
+ *    fieldName: '${fieldName}',
+ *    createOrUpdate: '${createOrUpdate}',
+ *    secParentId: '${secParentId}',
+ *    fieldPos: ${fieldPos},
+ *    disabled: ${disabled},
+ *    disabledEdit: ${disabledEdit},
+ *    widgetAttrs: {promptMessage: '${sec_field_validation}', invalidMessage: '${sec_field_invalid}', required : ${required}, ${sec_validation_regex} missingMessage : '${sec_field_required}' },
+ *    multiple: ${multiple},
+ *    optionValueSelected: "${optionValueSelected}",
+ *    readOnly: ${isReadOnlySelect}
+ */   
+function create_pattern_select_widget(params){
+	// Get update or create button
+	var link = dojo.byId(params.parentId + '_' + params.createOrUpdate);
+	if(link!=null){
+		// Function to execute when user clicks on create, update or delete control images
+		var eventFunction = function(event) {
+			var decorate = true;
+			// On update, only apply validations if row selected; on create always apply
+			if (params.createOrUpdate == 'update') {
+				var checkbox = dojo.byId('gvnix_checkbox_'+ params.secParentId +'_'+ params.fieldPos);
+				decorate = checkbox.checked;
+			}
+			// if field is disabled insn't showed like select, field is showed like input
+			if((params.disabled == true) || 
+					(params.disabledEdit == true && params.createOrUpdate == 'update')){
+				if(decorate || params.createOrUpdate == 'create'){
+					var textSelect = dojo.byId( params.fieldId);
+					if(textSelect !=null){
+						textSelect.disabled = params.disabled || params.disabledEdit;
+						Spring.addDecoration(new Spring.ElementDecoration({
+							elementId : params.fieldId, 
+							widgetType : 'dijit.form.ValidationTextBox', 
+							widgetAttrs : params.widgetAttrs}));
+					}
+				}
+			}
+			if (!gvNixEditMode && (params.disabled == false &&
+					((params.disabledEdit == false &&  params.createOrUpdate == 'update') || (params.createOrUpdate == 'create')))){
+				// Prevent an event's default behavior (e.g., a link from loading a new page)
+				event.preventDefault();
+				if (decorate) {
+					// Get field element to decorate
+					// FUNCIONA EDICION: var field = dojo.byId('${fieldId}_RO');
+					var field = dojo.byId(params.fieldId);
+					// Field keep disabled if required by input attribute
+					field.disabled = params.disabled;
+					if (params.multiple == false) {
+						// Multiple disabled due to http://jira.springframework.org/browse/ROO-909
+						var storeData = select_tags_data[params.select_data_id];
+						new dijit.form.FilteringSelect({
+							store: storeData,
+							id: params.fieldId,
+							value: params.optionValueSelected,
+							searchAttr: "label",
+							name: params.fieldId,
+							labelAttr: "label",
+							autoComplete: true,
+							readOnly: params.readOnly,
+							onChange: function (newValue) {
+								var attr = dojo.query('input[name="'+params.fieldName+ '"]');
+								attr[0].value = dijit.byId(params.fieldId).item['value'];
+							}
+						},
+						params.fieldId);
+					}
+				}
+			}
+		};
+		dojo.connect(link, "onclick", eventFunction);
+	}
+	if (params.createOrUpdate == 'update') {
+		// When this is an existing row, attach method to delete image button too
+		// Required to convert input element to dojo select element in order to submit valid value
+		// Valid value is the identifier and not the object string representation
+		var link2 = dojo.byId(params.parentId+'_delete');
+		if (link2 != null) {
+			dojo.connect(link2, "onclick", eventFunction);
+        }
+  	}
+} 
+
