@@ -46,6 +46,27 @@
 
   <url>http://www.gvnix.org</url>
 
+  <build>
+    <plugins>
+      <plugin>
+          <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+          <artifactId>maven-java-formatter-plugin</artifactId>
+          <version>0.4.0.e371sr1</version>
+          <configuration>
+              <lineEnding>LF</lineEnding>
+              <configFile>../../../roo/deployment-support/eclipse-formatter-config.xml</configFile>
+          </configuration>
+          <executions>
+              <execution>
+                  <goals>
+                      <goal>format</goal>
+                  </goals>
+              </execution>
+          </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <modules>
     <module>hibernate-core-entity</module>
     <module>hibernate-validator</module>
