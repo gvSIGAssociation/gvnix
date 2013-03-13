@@ -31,7 +31,7 @@
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
   <artifactId>org.gvnix.web.mvc.roo.addon</artifactId>
@@ -45,6 +45,7 @@
 
   <!-- DiSiD: Add gvnix version from parent pom and google code project name and repo folder values --> 
   <properties>
+    <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/web/mvc/roo/addon</repo.folder>
     <pkgEmbed>vaadin;inline=true,gwt-user;inline=true</pkgEmbed>

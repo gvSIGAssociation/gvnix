@@ -31,7 +31,7 @@
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.root</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
   <artifactId>org.gvnix.support</artifactId>
   <name>gvNIX - Support Module</name>
