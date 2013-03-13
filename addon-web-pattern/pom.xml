@@ -31,7 +31,7 @@
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
-    <version>1.1.0</version>
+    <version>1.0.1</version>
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
   <artifactId>org.gvnix.web.screen.roo.addon</artifactId>

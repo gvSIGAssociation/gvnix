@@ -42,7 +42,7 @@
 
 <programlisting>roo-gvNIX> <command>web mvc binding stringTrimmer --class ~.web.EntityController</command>
 Updated SRC_MAIN_JAVA/org/gvnix/test/web/EntityController.java
-Updated ROOT/pom.xml added dependency org.gvnix:org.gvnix.web.mvc.binding.roo.addon:1.1.0
+Updated ROOT/pom.xml added dependency org.gvnix:org.gvnix.web.mvc.binding.roo.addon:1.0.1
 Created SRC_MAIN_JAVA/org/gvnix/test/web/EntityController_Roo_GvNIXStringTrimmerBinder.aj</programlisting>
 
     <para xml:lang="es">Al ejecutar el comando, el add-on incluirá la

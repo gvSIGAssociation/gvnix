@@ -104,7 +104,7 @@ Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java</programlisting>
       <programlisting>roo-gvNIX> <command>remote service define ws --class ~.service.Service</command>
 Updated ROOT/pom.xml [
 		added repository https://gvnix.googlecode.com/svn/repo; 
-		added dependency org.gvnix:org.gvnix.service.roo.addon:1.1.0; 
+		added dependency org.gvnix:org.gvnix.service.roo.addon:1.0.1; 
 		added plugin org.apache.cxf:cxf-java2ws-plugin:${cxf.version}]
 Created SRC_MAIN_WEBAPP/WEB-INF/cxf-appname.xml
 Updated SRC_MAIN_WEBAPP/WEB-INF/web.xml

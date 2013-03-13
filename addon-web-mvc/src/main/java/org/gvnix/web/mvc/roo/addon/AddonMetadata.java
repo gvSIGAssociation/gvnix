@@ -25,7 +25,7 @@ import org.springframework.roo.support.util.Assert;
  * This type produces metadata for a new ITD. It uses an {@link ItdTypeDetailsBuilder} provided by 
  * {@link AbstractItdTypeDetailsProvidingMetadataItem} to register a field in the ITD and a new method.
  * 
- * @since 1.1.0
+ * @since 1.0.0
  */
 public class AddonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 	private static final String PROVIDES_TYPE_STRING = AddonMetadata.class.getName();

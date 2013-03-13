@@ -154,7 +154,7 @@ Created SRC_MAIN_JAVA/org/gvnix/test/web/menu/URLChildrenContextMenuStrategy.jav
 Created SRC_MAIN_WEBAPP/WEB-INF/tags/menu/gvnixmenu.tagx
 Created SRC_MAIN_WEBAPP/WEB-INF/tags/menu/gvnixitem.tagx
 Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
-Updated ROOT/pom.xml [added property 'gvnix.version' = '1.1.0']</programlisting>
+Updated ROOT/pom.xml [added property 'gvnix.version' = '1.0.1']</programlisting>
     
     <para>Este comando añadirá los siguientes elementos:</para>
 
