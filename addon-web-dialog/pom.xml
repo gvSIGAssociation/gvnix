@@ -171,7 +171,6 @@
   </build>
 
   <properties>
-    <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/web/exception/handler/roo/addon</repo.folder>
   </properties>

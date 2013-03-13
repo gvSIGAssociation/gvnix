@@ -1285,6 +1285,7 @@
     </plugins>
   </reporting-->
   <properties>
+  	<gvnix.version>${project.version}</gvnix.version>
     <powermock.version>1.4.12</powermock.version>
     <spring.version>3.1.3.RELEASE</spring.version>
     <roo.version>1.2.4.BUILD-SNAPSHOT</roo.version>
