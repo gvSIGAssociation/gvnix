@@ -85,14 +85,15 @@ public class OperationUtils {
 
     /**
      * Check if current project is a Spring MVC one
-     * <p>
+     * <p/>
      * Search webmvc-config.xml file exists.
-     * </p>
      * 
      * @param metadataService Metadata Service component
      * @param fileManager File manager component
      * @param projectOperations Project operations component
      * @return Is a Spring MVC project ?
+     * @deprecated Use
+     *             {@link WebProjectUtils#isSpringMvcProject(MetadataService, FileManager, ProjectOperations)}
      */
     public static boolean isSpringMvcProject(MetadataService metadataService,
             FileManager fileManager, ProjectOperations projectOperations) {
@@ -108,14 +109,15 @@ public class OperationUtils {
 
     /**
      * Check if current project is a web project
-     * <p>
+     * <p/>
      * Search web.xml file exists.
-     * </p>
      * 
      * @param metadataService Metadata Service component
      * @param fileManager File manager component
      * @param projectOperations Project operations component
      * @return Is a web project ?
+     * @deprecated Use
+     *             {@link WebProjectUtils#isWebProject(MetadataService, FileManager, ProjectOperations)}
      */
     public static boolean isWebProject(MetadataService metadataService,
             FileManager fileManager, ProjectOperations projectOperations) {
@@ -136,6 +138,8 @@ public class OperationUtils {
      *            Dialog Bean. ie. <code>com.disid.myapp.web.dialog</code>
      * @param pathResolver
      * @param fileManager
+     * @deprecated Use
+     *             {@link WebProjectUtils#installWebDialogClass(String, PathResolver, FileManager)}
      */
     public static void installWebDialogClass(String packageFullName,
             PathResolver pathResolver, FileManager fileManager) {
@@ -163,7 +167,7 @@ public class OperationUtils {
      * @param pathResolver
      * @param fileManager
      */
-    private static void installJavaClassFromTemplate(String packageFullName,
+    protected static void installJavaClassFromTemplate(String packageFullName,
             String classFullName, String javaClassTemplateName,
             PathResolver pathResolver, FileManager fileManager) {
 
@@ -282,6 +286,5 @@ public class OperationUtils {
                         e);
             }
         }
-
     }
 }

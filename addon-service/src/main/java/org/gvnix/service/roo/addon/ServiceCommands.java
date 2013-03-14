@@ -36,9 +36,11 @@ import org.gvnix.service.roo.addon.ws.export.WSExportOperations;
 import org.gvnix.service.roo.addon.ws.export.WSExportWsdlOperations;
 import org.gvnix.service.roo.addon.ws.importt.WSImportOperations;
 import org.gvnix.support.OperationUtils;
+import org.gvnix.support.WebProjectUtils;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
@@ -63,6 +65,7 @@ public class ServiceCommands implements CommandMarker {
     @Reference private WSExportWsdlOperations wSExportWsdlOperations;
     @Reference private MetadataService metadataService;
     @Reference private ProjectOperations projectOperations;
+    @Reference private FileManager fileManager;
 
     @CliAvailabilityIndicator({ "remote service class",
             "remote service operation" })
@@ -137,9 +140,10 @@ public class ServiceCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("remote service define ws")
     public boolean isServiceExportAvailable() {
-
         return OperationUtils.isProjectAvailable(metadataService,
-                projectOperations);
+                projectOperations)
+                && WebProjectUtils.isWebProject(metadataService, fileManager,
+                        projectOperations);
     }
 
     @CliCommand(value = "remote service define ws", help = "Defines a service endpoint interface (SEI) that will be mapped to a PortType in service contract. If target class doesn't exist the add-on will create it.")
@@ -162,16 +166,18 @@ public class ServiceCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("remote service export operation")
     public boolean isServiceExportOperationAvailable() {
-
         return OperationUtils.isProjectAvailable(metadataService,
-                projectOperations);
+                projectOperations)
+                && WebProjectUtils.isWebProject(metadataService, fileManager,
+                        projectOperations);
     }
 
     @CliAvailabilityIndicator("remote service list operation")
     public boolean isServiceListOperationAvailable() {
-
         return OperationUtils.isProjectAvailable(metadataService,
-                projectOperations);
+                projectOperations)
+                && WebProjectUtils.isWebProject(metadataService, fileManager,
+                        projectOperations);
     }
 
     /**
@@ -265,9 +271,10 @@ public class ServiceCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("remote service export ws")
     public boolean isServiceExportWsdl() {
-
         return OperationUtils.isProjectAvailable(metadataService,
-                projectOperations);
+                projectOperations)
+                && WebProjectUtils.isWebProject(metadataService, fileManager,
+                        projectOperations);
     }
 
     @CliCommand(value = "remote service export ws", help = "Exports a Web Service from WSDL to java code with gvNIX annotations to generate this Web Service in project with dummy methods.")
