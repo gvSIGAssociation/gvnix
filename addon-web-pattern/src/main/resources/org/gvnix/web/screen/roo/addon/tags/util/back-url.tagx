@@ -1,0 +1,43 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+  <jsp:directive.tag import="org.apache.commons.codec.binary.Base64"/>
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="var" type="java.lang.String" required="true" rtexprvalue="false" description="" />
+
+  <jsp:directive.variable alias="result" name-from-attribute="var" scope="AT_BEGIN" />
+
+  <!-- === Default values === -->
+  <c:set var="parameterName" value="gvnixBackUrl" />
+  <c:set var="result" value="${header.referer}"/>
+  <c:set var="tmpResult" value=""/>
+  
+  <c:forEach var="p" items="${param}" >
+  	<c:if test="${p.key eq parameterName }">
+  		<c:set var="tmpResult" value="${p.value}"/>
+  	</c:if>
+  </c:forEach>
+  <c:if test="${not empty tmpResult}">
+     <jsp:scriptlet>
+     	<![CDATA[ 
+    	String decoded = new String(Base64.decodeBase64(((String)jspContext.getAttribute("tmpResult"))));
+    	jspContext.setAttribute("tmpResult",decoded);
+    	
+    	String decoded = new String(Base64.decodeBase64(((String)jspContext.getAttribute("tmpResult"))));
+    	// check decoded url
+    	if (decoded.startsWith("?")){
+    		// same base: ok
+    	} else if (decoded.startsWith(request.getContextPath())) {
+    		// same context path: ok
+    	} else if (decoded.startsWith("/")){
+    		// root relative url: ok
+    	} else {
+    		// differnet root throw an exception
+    		throw new IllegalArgumentException("Found back-url to an url out of this application: ".concat(decoded));
+    	}
+    	jspContext.setAttribute("tmpResult",decoded);
+     	]]>
+     </jsp:scriptlet>
+     <c:set var="result" value="${tmpResult}"/>
+  </c:if>
+  <!-- TODO check is app uri -->
+</jsp:root>
