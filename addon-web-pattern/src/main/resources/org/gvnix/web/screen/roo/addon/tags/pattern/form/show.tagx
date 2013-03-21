@@ -91,7 +91,7 @@
           </c:if>
         </c:forEach>
       </spring:url>
-      <util:back-url-remove value="${current_url}" var="current_url"/>
+      <util:url-remove-param value="${current_url}" var="current_url"/>
 
       <spring:message arguments="${label}" code="entity_show" var="title_msg" htmlEscape="false" />
       <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
@@ -107,7 +107,7 @@
                   </c:if>
                 </c:forEach>
               </spring:url>
-              <util:url-backable targetURL="${create_form_url}" backToURL="${current_url}" var="create_form_url"/>
+              <util:url-referer targetURL="${create_form_url}" backToURL="${current_url}" var="create_form_url"/>
 
               <spring:url value="/resources/images/create.png" var="create_image_url" />
               <spring:message arguments="${typeName}" code="entity_create" var="create_label" htmlEscape="false" />
@@ -127,7 +127,7 @@
                   </c:if>
                 </c:forEach>
               </spring:url>
-              <util:url-backable targetURL="${update_form_url}" backToURL="${current_url}" var="update_form_url"/>
+              <util:url-referer targetURL="${update_form_url}" backToURL="${current_url}" var="update_form_url"/>
 
               <spring:url value="/resources/images/update.png" var="update_image_url" />
               <spring:message arguments="${typeName}" code="entity_update" var="update_label" htmlEscape="false" />

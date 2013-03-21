@@ -17,6 +17,10 @@
           dojo.place(cancelButton, dojo.byId("proceed"), "after");
       });
     ]]></script>
+    <c:if test="${not empty param.gvnixBackUrl}">
+      <!-- include gvnixBackUrl in post request to avoid lost it in binding error -->
+      <input id="_gvnixBackUrl_field" type="hidden" name="gvnixBackUrl" value="${param.gvnixBackUrl}"/>
+    </c:if>
   </c:if>
 
 </jsp:root>

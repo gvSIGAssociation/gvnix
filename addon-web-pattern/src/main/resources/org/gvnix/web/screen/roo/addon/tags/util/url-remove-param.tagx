@@ -1,21 +1,32 @@
 <jsp:root xmlns:portlet="http://java.sun.com/portlet_2_0" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+  <!--
+    Removes a parameter of a URL.
+    
+    This tags uses a regular expression to remove the parameter.
+
+    By default removes the "referer" parameters ("gvnixBackUrl") included by url-referer.tagx. 
+  -->
   <jsp:directive.tag import="org.apache.commons.codec.binary.Base64"/>
   <jsp:output omit-xml-declaration="yes" />
 
   <jsp:directive.attribute name="value" type="java.lang.String" required="true" rtexprvalue="true" 
-		description="Target URL (relative to base)" />
-  <jsp:directive.attribute name="var" type="java.lang.String" required="true" rtexprvalue="false" description="" />
+		description="URL to remove parameter" />
+  <jsp:directive.attribute name="param" type="java.lang.String" required="false" rtexprvalue="false" description="Param to remove from URL (default 'gvnixBackUrl'. See url-referer.tagx)" />
+  <jsp:directive.attribute name="var" type="java.lang.String" required="true" rtexprvalue="false" description="Variable to store result" />
 
   <jsp:directive.variable alias="result" name-from-attribute="var" scope="AT_END" />
 
   <!-- === Default values === -->
-  <c:set var="parameterName" value="gvnixBackUrl" />
-  <!-- remove back-url parameter -->
+   <!-- remove parameter -->
   <jsp:scriptlet>
 	<![CDATA[
 		// remove previous url-backabel from target
 		String targetURL = (String) jspContext.getAttribute("value");
-		String parameterName = (String) jspContext.getAttribute("parameterName");
+		String parameterName = (String) jspContext.getAttribute("param");
+		if (parameterName == null) {
+			// use the defautl value (from url-referer.tagx)
+			parameterName = "gvnixBackUrl";
+		}
 		targetURL = targetURL.replaceAll(parameterName.concat("=[^&]*"), "");
 		targetURL = targetURL.replaceAll("&&", "&");
 		jspContext.setAttribute("value",targetURL.trim());

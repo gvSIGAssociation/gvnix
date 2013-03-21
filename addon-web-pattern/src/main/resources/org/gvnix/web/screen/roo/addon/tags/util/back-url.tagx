@@ -1,4 +1,13 @@
 <jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+  <!-- 
+  Gets the "referer" url to back to.
+  
+  This tries to use the "gvnixBackUrl" parameter from current request (see url-referer.tagx). If this 
+  parameter doesn't found uses the "header.referer" property (from http request). 
+  
+  Before store result, this perform a check to identify if restore url belongs to current application.
+  If not throws an IllegalArgumentException exception. 
+   -->
   <jsp:directive.tag import="org.apache.commons.codec.binary.Base64"/>
   <jsp:output omit-xml-declaration="yes" />
 
@@ -20,18 +29,15 @@
      <jsp:scriptlet>
      	<![CDATA[ 
     	String decoded = new String(Base64.decodeBase64(((String)jspContext.getAttribute("tmpResult"))));
-    	jspContext.setAttribute("tmpResult",decoded);
-    	
-    	String decoded = new String(Base64.decodeBase64(((String)jspContext.getAttribute("tmpResult"))));
     	// check decoded url
     	if (decoded.startsWith("?")){
-    		// same base: ok
+    		// same path: ok
     	} else if (decoded.startsWith(request.getContextPath())) {
     		// same context path: ok
     	} else if (decoded.startsWith("/")){
     		// root relative url: ok
     	} else {
-    		// differnet root throw an exception
+    		// different root: throw an exception
     		throw new IllegalArgumentException("Found back-url to an url out of this application: ".concat(decoded));
     	}
     	jspContext.setAttribute("tmpResult",decoded);
@@ -39,5 +45,4 @@
      </jsp:scriptlet>
      <c:set var="result" value="${tmpResult}"/>
   </c:if>
-  <!-- TODO check is app uri -->
 </jsp:root>
