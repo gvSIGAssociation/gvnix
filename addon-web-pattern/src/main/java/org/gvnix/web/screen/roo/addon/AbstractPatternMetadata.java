@@ -18,13 +18,16 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import static org.springframework.roo.model.JdkJavaType.LIST;
+
 import java.beans.Introspector;
 import java.lang.reflect.Modifier;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
@@ -56,6 +59,7 @@ import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.EnumDetails;
+import org.springframework.roo.model.ImportRegistrationResolver;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
@@ -78,6 +82,33 @@ import org.springframework.roo.model.JavaType;
 public abstract class AbstractPatternMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static final JavaSymbolName METHOD_SYMBOL_NAME = new JavaSymbolName(
+            "method");
+    private static final StringAttributeValue PRODUCES_PARAM_MAPPING = new StringAttributeValue(
+            new JavaSymbolName("produces"), "text/html");
+    private static final String GVNIXPATTERN = "gvnixpattern";
+    private static final SimpleEntry<JavaSymbolName, AnnotatedJavaType> MODEL_REQUEST_PARAM = new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
+            new JavaSymbolName("uiModel"), new AnnotatedJavaType(new JavaType(
+                    "org.springframework.ui.Model"),
+                    new ArrayList<AnnotationMetadata>()));
+    private static final SimpleEntry<JavaSymbolName, AnnotatedJavaType> HTTP_SERVLET_REQUEST_PARAM = new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
+            new JavaSymbolName("httpServletRequest"), new AnnotatedJavaType(
+                    new JavaType("javax.servlet.http.HttpServletRequest"),
+                    new ArrayList<AnnotationMetadata>()));
+    private static final JavaType OBJECT_ERROR_TYPE = new JavaType(
+            "org.springframework.validation.ObjectError");
+    private static final JavaType OBJECT_ERROR_LIST_TYPE = new JavaType(
+            LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(OBJECT_ERROR_TYPE));
+    private static final JavaSymbolName FILTER_BINDING_ERRORS_NAME = new JavaSymbolName(
+            "filterBindingErrors");
+    private static final AnnotationMetadata VALID_ANNOTATION = new AnnotationMetadataBuilder(
+            new JavaType("javax.validation.Valid")).build();
+    private static final SimpleEntry<JavaSymbolName, AnnotatedJavaType> BINDING_RESULT = new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
+            new JavaSymbolName("bindingResult"),
+            new AnnotatedJavaType(new JavaType(
+                    "org.springframework.validation.BindingResult"),
+                    new ArrayList<AnnotationMetadata>()));
     private static final JavaSymbolName PAGE_PARAM_NAME = new JavaSymbolName(
             "page");
     private static final JavaSymbolName SIZE_PARAM_NAME = new JavaSymbolName(
@@ -88,6 +119,7 @@ public abstract class AbstractPatternMetadata extends
             "value");
     private static final JavaType REQUEST_MAPPING_ANNOTATION_TYPE = new JavaType(
             "org.springframework.web.bind.annotation.RequestMapping");
+
     protected WebScaffoldMetadata webScaffoldMetadata;
     private SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities;
     protected JavaType entity;
@@ -189,6 +221,7 @@ public abstract class AbstractPatternMetadata extends
             builder.addMethod(getDeleteListMethod());
             builder.addMethod(getFilterListMethod());
             builder.addMethod(getRefererRedirectMethod());
+            builder.addMethod(getFilterBindingErrorsMethod());
         }
 
         List<String> registerPatterns = getPatternTypeDefined(
@@ -289,9 +322,9 @@ public abstract class AbstractPatternMetadata extends
         methodParamTypes.add(new AnnotatedJavaType(JavaType.INT_OBJECT,
                 methodAttrSizeAnnotations));
 
-        Entry<JavaSymbolName, AnnotatedJavaType> modelRequestParam = getModelRequestParam();
+        Entry<JavaSymbolName, AnnotatedJavaType> modelRequestParam = MODEL_REQUEST_PARAM;
         methodParamTypes.add(modelRequestParam.getValue());
-        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = getHttpServletRequest();
+        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = HTTP_SERVLET_REQUEST_PARAM;
         methodParamTypes.add(httpServletRequest.getValue());
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
@@ -342,7 +375,7 @@ public abstract class AbstractPatternMetadata extends
                         PARAMS_ATTRIBUTE_NAME, paramValues));
         requestMappingAttributes
                 .add(getMethodRequestMapping(RequestMethod.DELETE));
-        requestMappingAttributes.add(getProducesParamRequestMapping());
+        requestMappingAttributes.add(PRODUCES_PARAM_MAPPING);
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
                 REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
@@ -373,7 +406,7 @@ public abstract class AbstractPatternMetadata extends
         // Define method parameter types
         List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
 
-        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = getHttpServletRequest();
+        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = HTTP_SERVLET_REQUEST_PARAM;
         methodParamTypes.add(httpServletRequest.getValue());
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
@@ -450,7 +483,7 @@ public abstract class AbstractPatternMetadata extends
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         PARAMS_ATTRIBUTE_NAME, paramValues));
         requestMappingAttributes.add(getMethodRequestMapping(requestMethod));
-        requestMappingAttributes.add(getProducesParamRequestMapping());
+        requestMappingAttributes.add(PRODUCES_PARAM_MAPPING);
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
                 REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
@@ -505,7 +538,7 @@ public abstract class AbstractPatternMetadata extends
     protected FieldMetadataBuilder getGvNIXPatternField() {
         return new FieldMetadataBuilder(getId(), Modifier.PRIVATE
                 | Modifier.STATIC | Modifier.FINAL, new JavaSymbolName(
-                "PATTERN_PARAM_NAME"), JavaType.STRING, "\"" + getPattern()
+                "PATTERN_PARAM_NAME"), JavaType.STRING, "\"" + GVNIXPATTERN
                 + "\"");
     }
 
@@ -600,9 +633,9 @@ public abstract class AbstractPatternMetadata extends
         List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
 
         methodParamTypes.add(getPatternRequestParam(true).getValue());
-        Entry<JavaSymbolName, AnnotatedJavaType> modelRequestParam = getModelRequestParam();
+        Entry<JavaSymbolName, AnnotatedJavaType> modelRequestParam = MODEL_REQUEST_PARAM;
         methodParamTypes.add(modelRequestParam.getValue());
-        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = getHttpServletRequest();
+        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = HTTP_SERVLET_REQUEST_PARAM;
         methodParamTypes.add(httpServletRequest.getValue());
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
@@ -657,7 +690,7 @@ public abstract class AbstractPatternMetadata extends
 
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat(
-                "/\".concat(" + getPattern() + ");"));
+                "/\".concat(" + GVNIXPATTERN + ");"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
@@ -670,7 +703,7 @@ public abstract class AbstractPatternMetadata extends
                 .concat(entityNamePlural.toLowerCase()).concat(");"));
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat(
-                "/\".concat(" + getPattern() + ");"));
+                "/\".concat(" + GVNIXPATTERN + ");"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
@@ -688,7 +721,7 @@ public abstract class AbstractPatternMetadata extends
                         PARAMS_ATTRIBUTE_NAME, paramValues));
         requestMappingAttributes
                 .add(getMethodRequestMapping(RequestMethod.GET));
-        requestMappingAttributes.add(getProducesParamRequestMapping());
+        requestMappingAttributes.add(PRODUCES_PARAM_MAPPING);
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
                 REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
@@ -724,9 +757,9 @@ public abstract class AbstractPatternMetadata extends
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(Integer.class
                 .getName()), methodAttrIndexAnnotations));
         methodParamTypes.add(getPatternRequestParam(true).getValue());
-        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = getHttpServletRequest();
+        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = HTTP_SERVLET_REQUEST_PARAM;
         methodParamTypes.add(httpServletRequest.getValue());
-        Entry<JavaSymbolName, AnnotatedJavaType> modelRequestParam = getModelRequestParam();
+        Entry<JavaSymbolName, AnnotatedJavaType> modelRequestParam = MODEL_REQUEST_PARAM;
         methodParamTypes.add(modelRequestParam.getValue());
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
@@ -787,7 +820,7 @@ public abstract class AbstractPatternMetadata extends
 
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat(
-                "/\".concat(" + getPattern() + ");"));
+                "/\".concat(" + GVNIXPATTERN + ");"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
@@ -818,7 +851,7 @@ public abstract class AbstractPatternMetadata extends
 
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat(
-                "/\".concat(" + getPattern() + ");"));
+                "/\".concat(" + GVNIXPATTERN + ");"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
@@ -837,7 +870,7 @@ public abstract class AbstractPatternMetadata extends
                         PARAMS_ATTRIBUTE_NAME, paramValues));
         requestMappingAttributes
                 .add(getMethodRequestMapping(RequestMethod.GET));
-        requestMappingAttributes.add(getProducesParamRequestMapping());
+        requestMappingAttributes.add(PRODUCES_PARAM_MAPPING);
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
                 REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
@@ -962,7 +995,7 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine(httpSession
                 .getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver()).concat(
-                        " session = " + getHttpServletRequest().getKey()
+                        " session = " + HTTP_SERVLET_REQUEST_PARAM.getKey()
                                 + ".getSession();"));
         JavaType dialogJavaType = new JavaType(
                 this.aspectPackage.concat(".dialog.Dialog"));
@@ -1138,10 +1171,7 @@ public abstract class AbstractPatternMetadata extends
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
         List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>();
-        parameterTypes.add(new AnnotatedJavaType(new JavaType(entity
-                .getFullyQualifiedTypeName().concat(".")
-                .concat(entity.getSimpleTypeName()).concat("List")),
-                annotations));
+        parameterTypes.add(new AnnotatedJavaType(getEntityList(), annotations));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -1177,9 +1207,7 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("return list;");
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, new JavaType(entity
-                        .getFullyQualifiedTypeName().concat(".")
-                        .concat(entity.getSimpleTypeName()).concat("List")),
+                getId(), Modifier.PUBLIC, methodName, getEntityList(),
                 parameterTypes, parameterNames, bodyBuilder);
 
         method = methodBuilder.build();
@@ -1203,7 +1231,7 @@ public abstract class AbstractPatternMetadata extends
 
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
-        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = getHttpServletRequest();
+        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = HTTP_SERVLET_REQUEST_PARAM;
         parameterTypes.add(httpServletRequest.getValue());
 
         // Check if a method with the same signature already exists in the
@@ -1267,7 +1295,7 @@ public abstract class AbstractPatternMetadata extends
         requestMappingAttributes.add(new StringAttributeValue(
                 VALUE_ATTRIBUTE_NAME, "/list"));
         requestMappingAttributes.add(getMethodRequestMapping(requestMethod));
-        requestMappingAttributes.add(getProducesParamRequestMapping());
+        requestMappingAttributes.add(PRODUCES_PARAM_MAPPING);
 
         return requestMappingAttributes;
     }
@@ -1288,14 +1316,16 @@ public abstract class AbstractPatternMetadata extends
          */
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
 
-        parameterTypes.add(getEntity(
-                new JavaType(entity.getFullyQualifiedTypeName().concat(".")
-                        .concat(entity.getSimpleTypeName()).concat("List")))
-                .getValue());
-        parameterTypes.add(getBindingResult().getValue());
-        parameterTypes.add(getHttpServletRequest().getValue());
+        parameterTypes.add(getEntity(getEntityList()).getValue());
+        parameterTypes.add(BINDING_RESULT.getValue());
+        parameterTypes.add(HTTP_SERVLET_REQUEST_PARAM.getValue());
 
         return parameterTypes;
+    }
+
+    protected JavaType getEntityList() {
+        return new JavaType(entity.getFullyQualifiedTypeName().concat(".")
+                .concat(entity.getSimpleTypeName()).concat("List"));
     }
 
     /**
@@ -1313,8 +1343,8 @@ public abstract class AbstractPatternMetadata extends
         // httpServletRequest)
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(new JavaSymbolName("entities"));
-        parameterNames.add(getBindingResult().getKey());
-        parameterNames.add(getHttpServletRequest().getKey());
+        parameterNames.add(BINDING_RESULT.getKey());
+        parameterNames.add(HTTP_SERVLET_REQUEST_PARAM.getKey());
 
         return parameterNames;
     }
@@ -1337,13 +1367,13 @@ public abstract class AbstractPatternMetadata extends
         AnnotationMetadataBuilder gvnixpatternParamBuilder = new AnnotationMetadataBuilder(
                 new JavaType(
                         "org.springframework.web.bind.annotation.RequestParam"));
-        gvnixpatternParamBuilder.addStringAttribute("value", getPattern());
+        gvnixpatternParamBuilder.addStringAttribute("value", GVNIXPATTERN);
         gvnixpatternParamBuilder.addBooleanAttribute("required", required);
         List<AnnotationMetadata> gvnixpatternParam = new ArrayList<AnnotationMetadata>();
         gvnixpatternParam.add(gvnixpatternParamBuilder.build());
 
         return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
-                new JavaSymbolName(getPattern()), new AnnotatedJavaType(
+                new JavaSymbolName(GVNIXPATTERN), new AnnotatedJavaType(
                         new JavaType("java.lang.String"), gvnixpatternParam));
     }
 
@@ -1357,12 +1387,7 @@ public abstract class AbstractPatternMetadata extends
      * @return Request param name and annotation
      */
     protected Entry<JavaSymbolName, AnnotatedJavaType> getModelRequestParam() {
-
-        List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>();
-        return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
-                new JavaSymbolName("uiModel"), new AnnotatedJavaType(
-                        new JavaType("org.springframework.ui.Model"),
-                        annotations));
+        return MODEL_REQUEST_PARAM;
     }
 
     /**
@@ -1378,7 +1403,7 @@ public abstract class AbstractPatternMetadata extends
 
         List<AnnotationAttributeValue<?>> requestMappingAnnotation = getParamsRequestMapping(patternName);
         requestMappingAnnotation.add(getMethodRequestMapping(method));
-        requestMappingAnnotation.add(getProducesParamRequestMapping());
+        requestMappingAnnotation.add(PRODUCES_PARAM_MAPPING);
         return new AnnotationMetadataBuilder(REQUEST_MAPPING_ANNOTATION_TYPE,
                 requestMappingAnnotation);
     }
@@ -1402,7 +1427,7 @@ public abstract class AbstractPatternMetadata extends
     protected EnumAttributeValue getMethodRequestMapping(RequestMethod method) {
 
         return new EnumAttributeValue(
-                new JavaSymbolName("method"),
+                METHOD_SYMBOL_NAME,
                 new EnumDetails(
                         new JavaType(
                                 "org.springframework.web.bind.annotation.RequestMethod"),
@@ -1419,21 +1444,8 @@ public abstract class AbstractPatternMetadata extends
             String patternName) {
 
         // TODO Refactor
-        return new StringAttributeValue(VALUE_ATTRIBUTE_NAME, getPattern()
+        return new StringAttributeValue(VALUE_ATTRIBUTE_NAME, GVNIXPATTERN
                 + "=" + patternName);
-    }
-
-    protected StringAttributeValue getProducesParamRequestMapping() {
-
-        // TODO Refactor
-        return new StringAttributeValue(new JavaSymbolName("produces"),
-                "text/html");
-    }
-
-    protected String getPattern() {
-
-        // TODO Refactor
-        return "gvnixpattern";
     }
 
     protected StringAttributeValue getFormParamRequestMapping(boolean exists) {
@@ -1448,36 +1460,10 @@ public abstract class AbstractPatternMetadata extends
     }
 
     // TODO Refactor method name
-    protected AnnotationMetadata getValid() {
-
-        return new AnnotationMetadataBuilder(new JavaType(
-                "javax.validation.Valid")).build();
-    }
-
-    protected Entry<JavaSymbolName, AnnotatedJavaType> getHttpServletRequest() {
-
-        List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>();
-        return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
-                new JavaSymbolName("httpServletRequest"),
-                new AnnotatedJavaType(new JavaType(
-                        "javax.servlet.http.HttpServletRequest"), annotations));
-    }
-
-    protected Entry<JavaSymbolName, AnnotatedJavaType> getBindingResult() {
-
-        List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>();
-        return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
-                new JavaSymbolName("bindingResult"),
-                new AnnotatedJavaType(new JavaType(
-                        "org.springframework.validation.BindingResult"),
-                        annotations));
-    }
-
-    // TODO Refactor method name
     protected Entry<JavaSymbolName, AnnotatedJavaType> getEntity(JavaType name) {
 
         List<AnnotationMetadata> methodAttrValidAnnotations = new ArrayList<AnnotationMetadata>();
-        methodAttrValidAnnotations.add(getValid());
+        methodAttrValidAnnotations.add(VALID_ANNOTATION);
 
         return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
                 new JavaSymbolName(name.getSimpleTypeName().toLowerCase()),
@@ -1497,15 +1483,14 @@ public abstract class AbstractPatternMetadata extends
         methodParamTypes.add(validEntity.getValue());
         methodParamNames.add(validEntity.getKey());
 
-        Entry<JavaSymbolName, AnnotatedJavaType> bindingResult = getBindingResult();
-        methodParamTypes.add(bindingResult.getValue());
-        methodParamNames.add(bindingResult.getKey());
+        methodParamTypes.add(BINDING_RESULT.getValue());
+        methodParamNames.add(BINDING_RESULT.getKey());
 
-        Entry<JavaSymbolName, AnnotatedJavaType> modelRequestParam = getModelRequestParam();
+        Entry<JavaSymbolName, AnnotatedJavaType> modelRequestParam = MODEL_REQUEST_PARAM;
         methodParamTypes.add(modelRequestParam.getValue());
         methodParamNames.add(modelRequestParam.getKey());
 
-        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = getHttpServletRequest();
+        Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = HTTP_SERVLET_REQUEST_PARAM;
         methodParamTypes.add(httpServletRequest.getValue());
         methodParamNames.add(httpServletRequest.getKey());
     }
@@ -1528,9 +1513,22 @@ public abstract class AbstractPatternMetadata extends
             PersistenceMethod persistenceMethod) {
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        String bindingResutlParam = BINDING_RESULT.getKey().getSymbolName();
+
+        bodyBuilder
+                .appendFormalLine("// Filter binding errors to get only the related to selected rows");
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("%s bindingErrors = %s(entities,%s);",
+                                OBJECT_ERROR_LIST_TYPE
+                                        .getNameIncludingTypeParameters(
+                                                false,
+                                                builder.getImportRegistrationResolver()),
+                                FILTER_BINDING_ERRORS_NAME.getSymbolName(),
+                                bindingResutlParam));
+
         // test if form has errors
-        bodyBuilder.appendFormalLine("if ( !" + getBindingResult().getKey()
-                + ".hasErrors() ) {");
+        bodyBuilder.appendFormalLine("if (bindingErrors.isEmpty()) {");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine(entity
                 .getNameIncludingTypeParameters(false,
@@ -1545,7 +1543,7 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
         bodyBuilder.appendFormalLine("return getRefererRedirectViewName("
-                + getHttpServletRequest().getKey() + ");");
+                + HTTP_SERVLET_REQUEST_PARAM.getKey() + ");");
 
         return bodyBuilder;
     }
@@ -1633,5 +1631,131 @@ public abstract class AbstractPatternMetadata extends
         tsc.append("governor", governorPhysicalTypeMetadata.getId());
         tsc.append("itdTypeDetails", itdTypeDetails);
         return tsc.toString();
+    }
+
+    /**
+     * Generates the MethodMedata of
+     * filterBindingErrors(entityList,BindingResult) method for ITD
+     * <p>
+     * The generated method returns a list of ObjectErrors related to selected
+     * rows.
+     * </p>
+     * 
+     * @return
+     */
+    protected MethodMetadata getFilterBindingErrorsMethod() {
+        // Specify the desired method name
+        JavaSymbolName methodName = FILTER_BINDING_ERRORS_NAME;
+        ImportRegistrationResolver importResolver = builder
+                .getImportRegistrationResolver();
+
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>();
+        parameterTypes.add(new AnnotatedJavaType(getEntityList(), annotations));
+        parameterTypes.add(BINDING_RESULT.getValue());
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        MethodMetadata method = methodExists(methodName, parameterTypes);
+        if (method != null) {
+            // If it already exists, just return null and omit its
+            // generation via the ITD
+            return null;
+        }
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        String entitiesParamName = "entities";
+        parameterNames.add(new JavaSymbolName(entitiesParamName));
+        parameterNames.add(BINDING_RESULT.getKey());
+        String bindingParamName = BINDING_RESULT.getKey().getSymbolName();
+
+        JavaType returnType = OBJECT_ERROR_LIST_TYPE;
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        JavaType returnImplementedType = new JavaType("java.util.ArrayList", 0,
+                DataType.TYPE, null, Arrays.asList(OBJECT_ERROR_TYPE));
+
+        JavaType selecteItemsType = new JavaType(
+                LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+                Arrays.asList(JavaType.INT_OBJECT));
+
+        bodyBuilder.appendFormalLine(String.format("%s result = new %s();",
+                returnType
+                        .getNameIncludingTypeParameters(false, importResolver),
+                returnImplementedType.getNameIncludingTypeParameters(false,
+                        importResolver)));
+
+        bodyBuilder
+                .appendFormalLine(String.format(
+                        "%s selecteds = entities.getSelected();",
+                        selecteItemsType.getNameIncludingTypeParameters(false,
+                                importResolver)));
+
+        bodyBuilder.appendFormalLine(String.format(
+                "for (%s objError : %s.getAllErrors()) {", OBJECT_ERROR_TYPE
+                        .getNameIncludingTypeParameters(false, importResolver),
+                bindingParamName));
+
+        bodyBuilder.indent();
+
+        JavaType fieldValidationErrorType = new JavaType(
+                "org.springframework.validation.FieldError");
+
+        String fieldValidationError = fieldValidationErrorType
+                .getNameIncludingTypeParameters(false, importResolver);
+
+        bodyBuilder.appendFormalLine(String.format(
+                "if (objError instanceof %s) {", fieldValidationError));
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("String[] str = ((%s)objError).getField().split(\"[\\\\[\\\\]]\");",
+                                fieldValidationError));
+
+        bodyBuilder.appendFormalLine("if (str.length == 3) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("Integer row = null;");
+        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("// name == \"list[0]fieldName\"");
+        bodyBuilder.appendFormalLine("row = Integer.parseInt(str[1]);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} catch (NumberFormatException e) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("// unexpected name format: add error");
+        bodyBuilder.appendFormalLine("result.add(objError);");
+        bodyBuilder.appendFormalLine("continue;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine("if (selecteds.contains(row)) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("result.add(objError);");
+        bodyBuilder.appendFormalLine("continue;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} else {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("continue;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine("result.add(objError);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine("return result;");
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, returnType,
+                parameterTypes, parameterNames, bodyBuilder);
+
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
     }
 }
