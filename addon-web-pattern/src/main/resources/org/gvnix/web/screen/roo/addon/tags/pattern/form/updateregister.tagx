@@ -84,6 +84,15 @@
     <c:if test="${not empty roles}">
       <sec:authorize var="authorized" ifAnyGranted="${roles}" />
     </c:if>
+    
+    <spring:url value="${path}" var="current_url" htmlEscape="false">
+    <c:forEach var="p" items="${param}">
+        <c:if test="${p.key ne 'gvnixform'}">
+          <spring:param name="${p.key}" value="${p.value}" />
+        </c:if>
+      </c:forEach>
+    </spring:url>
+    <util:url-remove-param value="${current_url}" var="current_url"/>
 
     <c:set var="typeName" value="${fn:split(id,'_')[fn:length(fn:split(id,'_')) - 1]}" scope="request" />
 
@@ -137,6 +146,7 @@
           </c:if>
         </c:forEach>
       </spring:url>
+      <util:url-referer targetURL="${createUrl}" backToURL="${current_url}" var="createUrl"/>
       <spring:url value="" var="updateUrl" htmlEscape="false">
         <spring:param name="form" />
         <c:forEach var="p" items="${param}">
@@ -145,6 +155,7 @@
           </c:if>
         </c:forEach>
       </spring:url>
+      <util:url-referer targetURL="${updateUrl}" backToURL="${current_url}" var="updateUrl"/>
       <spring:url value="${path}" var="detailPath"/>
       <util:quicklinks id="${id}">
         <c:if test="${createLink and authorized}">
