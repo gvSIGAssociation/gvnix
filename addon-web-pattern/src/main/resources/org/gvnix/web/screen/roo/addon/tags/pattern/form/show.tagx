@@ -181,9 +181,9 @@
         <c:choose>
           <c:when test="${not empty object}">
             <jsp:doBody />
-              <c:if test="${not empty param.index}">
+              <c:if test="${not empty index}">
                 <!-- don't add slider when show is rendered from Roo components -->
-                <util:slider index="${param.index}" maxEntities="${maxEntities}"/>
+                <util:slider index="${index}" maxEntities="${maxEntities}"/>
               </c:if>
           </c:when>
           <c:otherwise>

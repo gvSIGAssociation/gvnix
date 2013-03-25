@@ -755,8 +755,8 @@ public abstract class AbstractPatternMetadata extends
                 reqParamAttrIndex);
         methodAttrIndexAnnotations.add(methodAttrIndexAnnotation.build());
 
-        methodParamTypes.add(new AnnotatedJavaType(new JavaType(Integer.class
-                .getName()), methodAttrIndexAnnotations));
+        methodParamTypes.add(new AnnotatedJavaType(JavaType.LONG_OBJECT,
+                methodAttrIndexAnnotations));
         methodParamTypes.add(getPatternRequestParam(true).getValue());
         Entry<JavaSymbolName, AnnotatedJavaType> httpServletRequest = HTTP_SERVLET_REQUEST_PARAM;
         methodParamTypes.add(httpServletRequest.getValue());
@@ -792,23 +792,56 @@ public abstract class AbstractPatternMetadata extends
             bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
         }
 
+        // Check entity count
+        bodyBuilder.appendFormalLine("// Check entity count");
+        bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
+                .getNameIncludingTypeParameters()
+                .concat(" count = ")
+                .concat(entity.getSimpleTypeName())
+                .concat(".")
+                .concat(entityTypeDetails.getPersistenceDetails()
+                        .getCountMethod().getMethodName()).concat("();"));
+
+        bodyBuilder.appendFormalLine("if (count < 1) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("// None register found");
+        bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
+                entityName.toLowerCase()).concat("\", null);"));
+
+        addBodyLinesForDialogMessage(bodyBuilder, DialogType.Info,
+                "message_entitynotfound_problemdescription");
+
+        bodyBuilder.appendFormalLine("return \"".concat(
+                entityNamePlural.toLowerCase()).concat(
+                "/\".concat(" + GVNIXPATTERN + ");"));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
+                .getNameIncludingTypeParameters().concat(
+                        " curIndex = index == null ? 0 : index;"));
+
+        bodyBuilder.appendFormalLine("// Check index");
+        bodyBuilder.appendFormalLine("if (curIndex > count) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("curIndex = count;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
         JavaType javaUtilList = new JavaType("java.util.List", 0,
                 DataType.TYPE, null, typeParams);
-        bodyBuilder
-                .appendFormalLine(javaUtilList
-                        .getNameIncludingTypeParameters(false,
-                                builder.getImportRegistrationResolver())
-                        .concat(" ")
-                        .concat(entityNamePlural.toLowerCase())
-                        .concat(" = ")
-                        .concat(entity.getNameIncludingTypeParameters(false,
-                                builder.getImportRegistrationResolver()))
-                        .concat(".")
-                        .concat(entityTypeDetails
-                                .getPersistenceDetails()
-                                .getFindEntriesMethod()
-                                .getMethodName()
-                                .concat("(index == null ? 0 : (index.intValue() - 1), 1);")));
+        bodyBuilder.appendFormalLine(javaUtilList
+                .getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver())
+                .concat(" ")
+                .concat(entityNamePlural.toLowerCase())
+                .concat(" = ")
+                .concat(entity.getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver()))
+                .concat(".")
+                .concat(entityTypeDetails.getPersistenceDetails()
+                        .getFindEntriesMethod().getMethodName()
+                        .concat("((int)curIndex -1, 1);")));
 
         bodyBuilder.appendFormalLine("if (".concat(
                 entityNamePlural.toLowerCase()).concat(".isEmpty()) {"));
@@ -833,15 +866,11 @@ public abstract class AbstractPatternMetadata extends
                 .concat(entityName.toLowerCase()).concat("\", ")
                 .concat(entityName.toLowerCase()).concat(");"));
 
-        bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
-                .getNameIncludingTypeParameters()
-                .concat(" count = ")
-                .concat(entity.getSimpleTypeName())
-                .concat(".")
-                .concat(entityTypeDetails.getPersistenceDetails()
-                        .getCountMethod().getMethodName()).concat("();"));
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"maxEntities"
-                .concat("\", count == 0 ? 1 : count);"));
+                .concat("\", count);"));
+
+        bodyBuilder.appendFormalLine("uiModel.addAttribute(\"index"
+                .concat("\", curIndex);"));
 
         // May we need to populate some Model Attributes with the data of
         // related entities
