@@ -58,7 +58,8 @@
     <module>postgis</module>
     <module>jts</module>
     <module>features</module>
-    <module>javaparser-fork</module> <!-- TO REMOVE -->
+    <module>mysql</module>
+    <module>mssql</module>
   </modules>
 
   <!-- Pendiente de URL
