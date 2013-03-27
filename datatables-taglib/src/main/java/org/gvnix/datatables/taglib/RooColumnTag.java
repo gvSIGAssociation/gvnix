@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
- * Copyright (C) 2013 Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
+ * 2013 Generalitat Valenciana
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
  */
 package org.gvnix.datatables.taglib;
 
@@ -48,9 +48,9 @@ public class RooColumnTag extends ColumnTag {
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = -7713119991577135048L;
+    private static final long serialVersionUID = -7713119991577135048L;
 
-	/** Max displayed text length (default '-1'). Unlimited if negative. */
+    /** Max displayed text length (default '-1'). Unlimited if negative. */
     private Integer maxLength = Integer.valueOf(-1);
 
     /** The column label to be used in the table (optional). */
