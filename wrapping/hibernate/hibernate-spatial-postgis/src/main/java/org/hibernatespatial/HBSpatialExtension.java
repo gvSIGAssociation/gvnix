@@ -1,30 +1,20 @@
 /**
- * $Id: HBSpatialExtension.java 253 2010-10-02 15:14:52Z maesenka $
- *
- * This file is part of Hibernate Spatial, an extension to the 
- * hibernate ORM solution for geographic data. 
- *
- * Copyright © 2007 Geovise BVBA
- * Copyright © 2007 K.U. Leuven LRD, Spatial Applications Division, Belgium
- *
- * This work was partially supported by the European Commission, 
- * under the 6th Framework Programme, contract IST-2-004688-STP.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * For more information, visit: http://www.hibernatespatial.org/
+ * $Id: HBSpatialExtension.java 253 2010-10-02 15:14:52Z maesenka $ This file is
+ * part of Hibernate Spatial, an extension to the hibernate ORM solution for
+ * geographic data. Copyright © 2007 Geovise BVBA Copyright © 2007 K.U. Leuven
+ * LRD, Spatial Applications Division, Belgium This work was partially supported
+ * by the European Commission, under the 6th Framework Programme, contract
+ * IST-2-004688-STP. This library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of the License,
+ * or (at your option) any later version. This library is distributed in the
+ * hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+ * the GNU Lesser General Public License for more details. You should have
+ * received a copy of the GNU Lesser General Public License along with this
+ * library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA For more information, visit:
+ * http://www.hibernatespatial.org/
  */
 package org.hibernatespatial;
 
@@ -53,18 +43,18 @@ import java.util.*;
  * returned by the <code>getDefaultDialect</code> method of the provider at
  * least if it is non null.
  * <p/>
- * Upgraded by DiSiD at gvNIX projec to work well in OSGi. The upgrade is 
- * based on system properties. For a better solution follow Guillaume Nodet's 
- * article: 
+ * Upgraded by DiSiD at gvNIX projec to work well in OSGi. The upgrade is based
+ * on system properties. For a better solution follow Guillaume Nodet's article:
  * http://gnodet.blogspot.com/2008/05/jee-specs-in-osgi.html
- *
+ * 
  * @author Karel Maesen
  */
 public class HBSpatialExtension {
 
     protected static List<SpatialDialectProvider> providers = new ArrayList<SpatialDialectProvider>();
 
-    private static final Logger log = LoggerFactory.getLogger(HBSpatialExtension.class);
+    private static final Logger log = LoggerFactory
+            .getLogger(HBSpatialExtension.class);
 
     private static SpatialDialect defaultSpatialDialect = null;
 
@@ -84,15 +74,16 @@ public class HBSpatialExtension {
 
         // DiSiD TODO: This code should work
         // http://gnodet.blogspot.com/2008/05/jee-specs-in-osgi.html
-	// try {
-	// 	// If we are deployed into an OSGi environment, leverage it
-	// 	Class<? extends SpatialDialectProvider> providerClass = org.apache.servicemix.specs.locator.OsgiLocator.locate(SpatialDialectProvider.class);
-	// 	if (providerClass != null) {
-	// 		providers.add(providerClass.newInstance());
-	// 	}
-	// } catch (Throwable e) {
-	// 	// Do nothing here
-	// } 
+        // try {
+        // // If we are deployed into an OSGi environment, leverage it
+        // Class<? extends SpatialDialectProvider> providerClass =
+        // org.apache.servicemix.specs.locator.OsgiLocator.locate(SpatialDialectProvider.class);
+        // if (providerClass != null) {
+        // providers.add(providerClass.newInstance());
+        // }
+        // } catch (Throwable e) {
+        // // Do nothing here
+        // }
 
         try {
             resources = loader.getResources("META-INF/services/"
@@ -103,7 +94,8 @@ public class HBSpatialExtension {
                 InputStream is = url.openStream();
                 try {
                     names.addAll(providerNamesFromReader(is));
-                } finally {
+                }
+                finally {
                     is.close();
                 }
             }
@@ -115,30 +107,36 @@ public class HBSpatialExtension {
                     SpatialDialectProvider provider = (SpatialDialectProvider) loader
                             .loadClass(s).newInstance();
                     providers.add(provider);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     throw new HibernateSpatialException(
                             "Problem loading provider class", e);
                 }
 
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new HibernateSpatialException("No "
                     + SpatialDialectProvider.class.getName()
                     + " found in META-INF/services", e);
         }
 
         // DiSiD configuration - check if there is a system property
-        // TODO: Change this way to http://gnodet.blogspot.com/2008/05/jee-specs-in-osgi.html
-        String dialectProvider = System.getProperty("hibernate.spatial.dialect.provider");
+        // TODO: Change this way to
+        // http://gnodet.blogspot.com/2008/05/jee-specs-in-osgi.html
+        String dialectProvider = System
+                .getProperty("hibernate.spatial.dialect.provider");
         if (dialectProvider != null) {
-          log.info("Default dialect provider found: ".concat(dialectProvider));
-          try {
-            SpatialDialectProvider provider = (SpatialDialectProvider) loader
-                 .loadClass(dialectProvider).newInstance();
-            providers.add(provider);
-          } catch (Exception e) {
-            throw new HibernateSpatialException("Problem loading default provider class", e);
-          }
+            log.info("Default dialect provider found: ".concat(dialectProvider));
+            try {
+                SpatialDialectProvider provider = (SpatialDialectProvider) loader
+                        .loadClass(dialectProvider).newInstance();
+                providers.add(provider);
+            }
+            catch (Exception e) {
+                throw new HibernateSpatialException(
+                        "Problem loading default provider class", e);
+            }
         }
 
         // configuration - check if there is a system property
@@ -167,21 +165,20 @@ public class HBSpatialExtension {
     public static void setConfiguration(HSConfiguration c) {
         log.info("Setting configuration object:" + c);
         configuration = c;
-        //if the HSExtension has already been initialized,
-        //then it should be reconfigured.
+        // if the HSExtension has already been initialized,
+        // then it should be reconfigured.
         if (configured == true) {
             forceConfigure();
         }
     }
 
     private static synchronized void configure() {
-//		// do nothing if already configured
+        // // do nothing if already configured
         if (configured) {
             return;
         }
         configured = true;
         forceConfigure();
-
 
     }
 
@@ -190,7 +187,8 @@ public class HBSpatialExtension {
         if (configuration == null) {
             setDefaultSpatialDialect(providers.get(0).getDefaultDialect());
             return;
-        } else {
+        }
+        else {
             log.info("Configuring HBSpatialExtension from "
                     + configuration.getSource());
             String dialectName = configuration.getDefaultDialect();
@@ -211,7 +209,8 @@ public class HBSpatialExtension {
 
         if (defaultSpatialDialect == null) {
             log.warn("Hibernate Spatial Configured but no spatial dialect");
-        } else {
+        }
+        else {
             log.info("Hibernate Spatial configured. Using dialect: "
                     + defaultSpatialDialect.getClass().getCanonicalName());
         }
@@ -249,8 +248,8 @@ public class HBSpatialExtension {
         return dialect;
     }
 
-    //TODO -- this is not thread-safe!
-    //find another way to initialize
+    // TODO -- this is not thread-safe!
+    // find another way to initialize
 
     public static MGeometryFactory getDefaultGeomFactory() {
         configure();
