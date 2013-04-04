@@ -1242,8 +1242,8 @@ public class Repartidor {
 
       <para>El Add-on DBRE soporta las principales bases de datos
       relacionales del mercado (MySQL, MS SQL, PostgreSQL, Oracle, ...).
-      El driver a necesario será detecta y se ofrecerá
-      su descargar e instalación automática la primera vez que lo requiera
+      El driver necesario será detectado y se ofrecerá
+      su descarga e instalación automática la primera vez que lo requiera
       alguno de los comandos <emphasis>database introspect</emphasis> o
       <emphasis>database reverse engineer.</emphasis></para>
 
@@ -1279,8 +1279,8 @@ JDBC driver not available for 'org.postgresql.Driver'</programlisting>Esta
       <para>Se puede obtener más información sobre el driver mediante:</para>
 
       <programlisting>roo-gvNIX&gt; <command>addon info id --searchResultId 01</command>
-Name.........: Spring Roo - Wrapping - postgresql-jdbc3
-BSN..........: org.springframework.roo.wrapping.postgresql-jdbc3
+Name.........: Spring Roo - Wrapping - postgresql-jdbc4
+BSN..........: org.springframework.roo.wrapping.postgresql-jdbc4
 Version......: 9.1.0.901_0001 [available versions: 9.0.801.0001,
                9.1.0.901_0001]
 Roo Version..: 1.2
@@ -1299,7 +1299,7 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
       <para>o</para>
 
       <programlisting><command>addon install bundle
-      		--bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc3</command></programlisting>
+      		--bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc4</command></programlisting>
 
       <para>Al instante estará disponible el driver JDBC y se podrá empezar
       a usar los comandos <emphasis>database introspect</emphasis> y
@@ -1311,7 +1311,7 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
       <title>Comandos de la ingeniería inversa</title>
 
       <para>DBRE ofrece dos comandos: <emphasis>database introspect</emphasis>
-      o <emphasis>database reverse engineer.</emphasis></para>
+      y <emphasis>database reverse engineer.</emphasis></para>
 
       <programlisting><command>database introspect --schema</command> &lt;nombre del esquema&gt;
       		--file &lt;nombre del fichero&gt; --enableViews</programlisting>
@@ -1342,7 +1342,7 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
 
       <para>Si se especifica la opción --enableViews en este comando, se crearan
       entidades JPA que representen las vistas que se encuentren en la
-      introspección de la BBDD.</para>
+      inspección de la BBDD.</para>
 
       <para>Se pueden filtrar las tablas que se van a considerar en la
       operación. --includeTables indicará cuales son las tablas que deben
@@ -1374,7 +1374,7 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
 
       <para>Como DBRE ofrece ingeniería inversa incremental, se puede ejecutar
       este comando tantas veces como sea necesario y de esta forma se
-      mantendrá todas las entidades JPA de manera automática.</para>
+      mantendrán todas las entidades JPA de manera automática.</para>
 
       <para>El parámetro <emphasis
       role="bold">--includeNonPortableAttributes</emphasis> puede ser de
@@ -1396,8 +1396,8 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
       proyecto cumplen con el esquema de BBDD y por tanto son
       compatibles.</para>
 
-      <para>Por tanto hay que tener en cuenta este detalle al hacer la
-      ingeniería inversa de la BBDD. Si se va a seguir trabajando con la mismo
+      <para>Por lo tanto, hay que tener en cuenta este detalle al hacer la
+      ingeniería inversa de la BBDD. Si se va a seguir trabajando con la misma
       BBDD, se puede optar por requerir que se incluyan los atributos
       "no portables" en la generación de las entidades. Por contra, si la
       aplicación se va a ejecutar en distintas bases de datos, es mejor no incluir
@@ -1484,14 +1484,11 @@ public class LineItemPK {
         <para>En el aspecto java de la entidad LineItem existirá un campo anotado con
         @EmbeddedId del tipo LineItemPK:</para>
 
-        <programlisting>privileged aspect LineItem_Roo_Jpa_ActiveRecord {
+        <programlisting>privileged aspect LineItem_Roo_Jpa_Entity {
     
     declare @type: LineItem: @Entity;
     
     declare @type: LineItem: @Table(name = "line_item", schema = "order");
-    
-    @PersistenceContext
-    transient EntityManager LineItem.entityManager;
     
     @EmbeddedId
     private LineItemPK LineItem.id;
@@ -1564,13 +1561,79 @@ public class LineItemPK {
       que se pueden modificar las características y elementos
       incluidos en ingenierías inversas anteriores.</para>
       
-      <para>Si al ahcer una ingeniería inversa no se incluyó
+      <para>Si al hacer una ingeniería inversa no se incluyó
       alguna tabla que posteriormente se ha visto necesario,
       basta con volver a ejecutar el comando de ingeniería
       inversa incluyendo la nueva tabla. Todas las modificaciones
       realizadas sobre las entidades que ya existían no se perderán.</para>
 
       <para/>
+    </section>
+
+    <section>
+      <title xml:lang="es">Ingeniería inversa de vistas</title>
+
+      <para xml:lang="es">Tras realizar la ingeniería inversa de una
+      vista de la base de datos es muy probable que se tengan que
+      realizar algunas modificaciones manuales para que funcione
+      correctamente y que no son posibles realizar de manera automática
+      ya que se requiere tomar ciertas decisiones de diseño.</para>
+      
+      <para xml:lang="es">En una vista, por definición, no existe definida
+      ninguna clave primaria. Sin embargo, al convertir esta estructura
+      relacional al modelo orientado a objetos es necesario definir uno
+      o varios campos que identifiquen de forma unívoca cada resultado
+      que se vaya a obtener de la vista.</para>
+      
+      <para xml:lang="es">La ingeniería inversa de vistas, por defecto,
+      configura todas las columnas de la vista como clave primaria compuesta.
+      Es por ello que todas las propiedades serán creadas en la clase con sufijo
+      PK, por ejemplo EntidadPK, y no se creará ninguna propiedad en la clase
+      base, por ejemplo Entidad.</para>
+      
+      <para xml:lang="es">Habitualmente algunas columnas de la vista serán
+      opcionales. Sin embargo, en el modelo orientado a objetos es incorrecto que
+      alguna de las propiedades que representan a la clave primaria compuesta
+      tenga valores nulos.</para> 
+      
+      <para xml:lang="es">Es por ello que deberemos analizar el modo en el que está
+      construida la vista en la base de datos para así identificar uno o varios
+      campos que representen de forma unívoca cada resultado de la vista. En algunos
+      casos en los que la vista de alimenta de otra tabla, la clave primaria de la
+      vista suele ser la misma que la de la tabla.</para>
+      
+      <para xml:lang="es">Una vez detectadas las propiedades que conforman la clave
+      primaria de la vista deberán realizarse las siguientes modificaciones:
+
+      <variablelist>
+        <varlistentry>
+        Copiar las propiedades de la clase EntidadPK que no representan a la clave primaria
+        en la clase Entidad. Las propiedades de la clase EntidadPK se encuentran en el
+        fichero EntidadPK_Roo_Identifier.aj. Al copiar las propiedades, recordar eliminar
+        el prefijo "EntidadPK." que tiene cada una de las propiedades.
+        </varlistentry>
+        <varlistentry>
+		Hacer push-in de las propiedades de la clase EntidadPK que no representan a la clave primaria
+        compuesta, añadirles la anotación @Transient y eliminar cualquier otra anotación que tengan.
+        Las propiedades de la clase EntidadPK se encuentran en el fichero EntidadPK_Roo_Identifier.aj
+        y al hacer push-in pasarán a estar en el fichero EntidadPK.java.
+        </varlistentry>
+        <varlistentry>
+		Añadir a la anotación @RooJpaActiveRecord de la clase Entidad los siguientes atributos
+		que desactivarán el borrado, creación y actualización en la capa de entidades: 
+		removeMethod = "", persistMethod = "", mergeMethod = "".
+        </varlistentry>
+        <varlistentry>
+		Si se ha generado la capa web asociada a la entidad que representa a la vista,
+		añadir a la anotación @RooWebScaffold de la clase EntidadController los siguientes atributos
+		que desactivarán el borrado, creación y actualización en la capa web: 
+		removeMethod = "", persistMethod = "", mergeMethod = "".
+        </varlistentry>
+      </variablelist>
+      
+      </para>
+      
+      <para xml:lang="es"></para>
     </section>
 
   </section>
