@@ -636,13 +636,14 @@ roo-gvNIX&gt; </programlisting>
         
         <listitem>
           <para xml:lang="es">En la clase Java de la entidad, por ejemplo,
-          <emphasis>src/main/java/.../domain/Entidad.java</emphasis> hacer un push-in de
-          la propiedad <emphasis>entityManager</emphasis> y añadirle la siguiente
-          anotación haciendo referencia a la nueva conexión configurada:</para>
+          <emphasis>src/main/java/.../domain/Entidad.java</emphasis> añadir en la
+          anotación <emphasis>@RooJpaActiveRecord</emphasis> el atributo 
+          <emphasis>persistenceUnit = "persistenceUnit2"</emphasis> haciendo
+          referencia a la nueva conexión configurada:</para>
           
           <programlisting>
-		    @PersistenceContext(unitName="persistenceUnit2")
-		    transient EntityManager entityManager;
+		    @RooJpaActiveRecord(persistenceUnit = "persistenceUnit2")
+		    class Entity
 		  </programlisting>
 		  
 		  <para xml:lang="es">De esta forma, para cada entidad de datos se
