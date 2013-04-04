@@ -1415,6 +1415,14 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
         <emphasis>validate</emphasis> de modo que en el arranque de la aplicación
         se realizará la fase de validación del esquema.</para>
       </important>
+      
+      <important>
+	      <para>Si se realiza la ingeniería inversa de alguna vista,
+	      es recomendable leer la sección <link
+	      linkend="guia-desarrollo_gestion-entidades_ingenieria_inversa-vistas">
+	      Ingeniería inversa de vistas</link> ya que puede ser necario
+	      realizar alguna personalización.</para>
+      </important>
     </section>
 
     <section>
@@ -1571,7 +1579,7 @@ public class LineItemPK {
     </section>
 
     <section>
-      <title xml:lang="es">Ingeniería inversa de vistas</title>
+      <title xml:lang="es" xml:id="guia-desarrollo_gestion-entidades_ingenieria_inversa-vistas">Ingeniería inversa de vistas</title>
 
       <para xml:lang="es">Tras realizar la ingeniería inversa de una
       vista de la base de datos es muy probable que se tengan que
