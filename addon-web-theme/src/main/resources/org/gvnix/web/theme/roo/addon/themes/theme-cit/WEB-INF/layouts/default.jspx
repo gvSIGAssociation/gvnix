@@ -114,9 +114,16 @@
     </tr>
   </tbody>
 </table>
-<div id="main">
+<div id="main" style="visibility:hidden">
   <tiles:insertAttribute name="body" />
 </div>
+
+<SCRIPT type="text/javascript">
+dojo.addOnLoad(function() {
+  document.getElementById("main").style.visibility='visible';
+});
+</SCRIPT>
+
 </div>
 </body>
 </html>

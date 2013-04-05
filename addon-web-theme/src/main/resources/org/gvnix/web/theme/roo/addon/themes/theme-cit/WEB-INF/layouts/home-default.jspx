@@ -37,7 +37,7 @@
 <div id="header">
   <tiles:insertAttribute name="header" ignore="true" />
 </div>
-<div id="main" class="clearfix">
+<div id="main" class="clearfix" style="visibility:hidden">
 <table>
   <tbody>
     <tr>
@@ -85,8 +85,15 @@
 </div>
 <!-- /main -->
 
-<div id="cit-footer"></div>
+<div id="cit-footer" style="visibility:hidden"></div>
 </div>
+<SCRIPT type="text/javascript">
+dojo.addOnLoad(function() {
+  document.getElementById("main").style.visibility='visible';
+  document.getElementById("cit-footer").style.visibility='visible';
+});
+</SCRIPT>
+
 </body>
 </html>
 
