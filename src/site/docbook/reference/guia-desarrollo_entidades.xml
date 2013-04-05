@@ -1613,31 +1613,53 @@ public class LineItemPK {
       <para xml:lang="es">Una vez detectadas las propiedades que conforman la clave
       primaria de la vista deberán realizarse las siguientes modificaciones:
 
-      <variablelist>
-        <varlistentry>
-        Copiar las propiedades de la clase EntidadPK que no representan a la clave primaria
-        en la clase Entidad. Las propiedades de la clase EntidadPK se encuentran en el
-        fichero EntidadPK_Roo_Identifier.aj. Al copiar las propiedades, recordar eliminar
-        el prefijo "EntidadPK." que tiene cada una de las propiedades.
-        </varlistentry>
-        <varlistentry>
-		Hacer push-in de las propiedades de la clase EntidadPK que no representan a la clave primaria
-        compuesta, añadirles la anotación @Transient y eliminar cualquier otra anotación que tengan.
-        Las propiedades de la clase EntidadPK se encuentran en el fichero EntidadPK_Roo_Identifier.aj
-        y al hacer push-in pasarán a estar en el fichero EntidadPK.java.
-        </varlistentry>
-        <varlistentry>
-		Añadir a la anotación @RooJpaActiveRecord de la clase Entidad los siguientes atributos
-		que desactivarán el borrado, creación y actualización en la capa de entidades: 
-		removeMethod = "", persistMethod = "", mergeMethod = "".
-        </varlistentry>
-        <varlistentry>
-		Si se ha generado la capa web asociada a la entidad que representa a la vista,
-		añadir a la anotación @RooWebScaffold de la clase EntidadController los siguientes atributos
-		que desactivarán el borrado, creación y actualización en la capa web: 
-		removeMethod = "", persistMethod = "", mergeMethod = "".
-        </varlistentry>
-      </variablelist>
+      <para xml:lang="es">
+	      <variablelist>
+	        <varlistentry>
+		        <term>Copiar propiedades en la entidad.</term>
+		        <listitem>
+		        <para xml:lang="es">
+		        Copiar las propiedades de la clase EntidadPK que no representan a la clave primaria
+		        en la clase Entidad. Las propiedades de la clase EntidadPK se encuentran en el
+		        fichero EntidadPK_Roo_Identifier.aj. Al copiar las propiedades, recordar eliminar
+		        el prefijo "EntidadPK." que tiene cada una de las propiedades.
+		        </para>
+		        </listitem>
+	        </varlistentry>
+	        <varlistentry>
+		        <term>Modificar propiedades en la clave primaria.</term>
+		        <listitem>
+		        <para xml:lang="es">
+				Hacer push-in de las propiedades de la clase EntidadPK que no representan a la clave primaria
+		        compuesta, añadirles la anotación @Transient y eliminar cualquier otra anotación que tengan.
+		        Las propiedades de la clase EntidadPK se encuentran en el fichero EntidadPK_Roo_Identifier.aj
+		        y al hacer push-in pasarán a estar en el fichero EntidadPK.java.
+		        </para>
+		        </listitem>
+	        </varlistentry>
+	        <varlistentry>
+		        <term>Desactivar operaciones en la capa de entidades.</term>
+		        <listitem>
+		        <para xml:lang="es">
+				Añadir a la anotación @RooJpaActiveRecord de la clase Entidad los siguientes atributos
+				que desactivarán el borrado, creación y actualización en la capa de entidades: 
+				removeMethod = "", persistMethod = "", mergeMethod = "".
+				</para>
+				</listitem>
+	        </varlistentry>
+	        <varlistentry>
+		        <term>Desactivar operaciones en la capa web.</term>
+		        <listitem>
+		        <para xml:lang="es">
+				Si se ha generado la capa web asociada a la entidad que representa a la vista,
+				añadir a la anotación @RooWebScaffold de la clase EntidadController los siguientes atributos
+				que desactivarán el borrado, creación y actualización en la capa web: 
+				removeMethod = "", persistMethod = "", mergeMethod = "".
+				</para>
+				</listitem>
+	        </varlistentry>
+	      </variablelist>
+      </para>
       
       </para>
       
