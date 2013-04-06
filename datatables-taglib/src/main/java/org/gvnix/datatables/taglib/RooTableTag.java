@@ -17,14 +17,22 @@
  */
 package org.gvnix.datatables.taglib;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.dandelion.datatables.core.constants.ExportConstants;
 import com.github.dandelion.datatables.core.export.ExportConf;
 import com.github.dandelion.datatables.core.export.ExportType;
+import com.github.dandelion.datatables.jsp.tag.AbstractColumnTag;
 import com.github.dandelion.datatables.jsp.tag.TableTag;
 
 /**
@@ -36,12 +44,15 @@ import com.github.dandelion.datatables.jsp.tag.TableTag;
  */
 public class RooTableTag extends TableTag {
 
+    // Logger
+    private static Logger LOGGER = LoggerFactory.getLogger(RooTableTag.class);
+
     /**
 	 * 
 	 */
     private static final long serialVersionUID = 8646911296425084063L;
 
-    public static final String TABLE_TAG = "TableTag";
+    public static final String TABLE_TAG_VARIABLE = "__datatables_table_tag_instance__";
 
     /** The identifier field name for the type (defaults to 'id'). */
     private String typeIdFieldName = "id";
@@ -67,34 +78,7 @@ public class RooTableTag extends TableTag {
      */
     private String z;
 
-    private SpringContextHelper helper = new SpringContextHelper();
-
-    public RooTableTag() {
-        // TODO: extract the default values to an external configuration file,
-        // or to the Spring app context.
-        /* Override default values. */
-        setAutoWidth(Boolean.FALSE);
-        setPaginationType("full_numbers");
-        setProcessing(Boolean.TRUE);
-        // TODO: ajax
-        // setServerSide(Boolean.TRUE);
-        setStateSave(Boolean.TRUE);
-        setAppear("fadein,0");
-        setRow("item");
-        // Seems to have some bugs, disable just in case
-        // setColReorder(Boolean.TRUE);
-        setPaginationType("full_numbers");
-        setExport("CSV,XLS,PDF");
-        setExportLinks("top_middle");
-    }
-
-    @Override
-    public void setPageContext(PageContext pageContext) {
-        super.setPageContext(pageContext);
-        Locale locale = helper.getRequestLocale(pageContext);
-        setLabels("/resources/datatables/i18n/labels_" + locale.getLanguage()
-                + ".txt");
-    }
+    private String path;
 
     private void configureExport(ExportType exportType) {
 
@@ -121,17 +105,54 @@ public class RooTableTag extends TableTag {
         return Boolean.TRUE.equals(render) || render == null;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public int doStartTag() throws JspException {
         if (!doRender()) {
             return SKIP_BODY;
         }
 
+        // Add reference to this tag as request attributes
+        // to assure it's available for columns tags
+        pageContext.setAttribute(TABLE_TAG_VARIABLE, this,
+                PageContext.REQUEST_SCOPE);
+
+        // Check url value
+        if (serverSide != null && serverSide) {
+            if (StringUtils.isBlank(url) && StringUtils.isNotBlank(path)) {
+                // generate url based on path
+                setUrl(path.concat("/datatables/ajax"));
+            }
+            else {
+                setUrl(url);
+            }
+        }
+        else {
+            // Check dom data
+            if (data != null) {
+                setData((Collection) data);
+            }
+        }
+
         int value = super.doStartTag();
 
-        configureExport(ExportType.CSV);
-        configureExport(ExportType.XLS);
-        configureExport(ExportType.PDF);
+        // Configure export
+        if (StringUtils.isNotBlank(getExport())) {
+            List<String> selectedExport = Arrays.asList(StringUtils.split(
+                    getExport(), ','));
+            ExportType exportType;
+            for (String type : selectedExport) {
+                try {
+                    exportType = ExportType.valueOf(type);
+                }
+                catch (Exception e) {
+                    LOGGER.debug("Unknow export type '".concat(type).concat(
+                            "'."));
+                    continue;
+                }
+                configureExport(exportType);
+            }
+        }
 
         return value;
     }
@@ -141,7 +162,13 @@ public class RooTableTag extends TableTag {
         if (!doRender()) {
             return SKIP_PAGE;
         }
-        return super.doEndTag();
+
+        int result = super.doEndTag();
+
+        // Remove this tag reference as tag is finished
+        pageContext.removeAttribute(TABLE_TAG_VARIABLE);
+
+        return result;
     }
 
     @Override
@@ -153,11 +180,11 @@ public class RooTableTag extends TableTag {
     }
 
     public String getPath() {
-        return getUrl();
+        return path;
     }
 
     public void setPath(String path) {
-        setUrl(path);
+        this.path = path;
     }
 
     public String getTypeIdFieldName() {
@@ -207,4 +234,5 @@ public class RooTableTag extends TableTag {
     public void setZ(String z) {
         this.z = z;
     }
+
 }

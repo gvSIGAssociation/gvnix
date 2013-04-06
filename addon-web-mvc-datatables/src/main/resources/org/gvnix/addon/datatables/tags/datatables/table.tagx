@@ -1,0 +1,345 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:datatables="http://www.gvnix.org/gvnix-datatables" version="2.0">
+  <jsp:directive.tag import="java.util.ArrayList" />
+  <jsp:output omit-xml-declaration="yes" />
+
+  <!-- ====================================== -->
+  <!-- ====================================== -->
+  <!-- Roo parameters -->
+  <!-- ====================================== -->
+  <!-- ====================================== -->
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute name="data" type="java.util.Collection" required="true" rtexprvalue="true" description="The collection to be displayed in the table" />
+  <jsp:directive.attribute name="path" type="java.lang.String" required="true" rtexprvalue="true" description="Specify the URL path" />
+  <jsp:directive.attribute name="typeIdFieldName" type="java.lang.String" required="false" rtexprvalue="true" description="The identifier field name for the type (defaults to 'id')" />
+  <jsp:directive.attribute name="create" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Include 'create' link into table (default true)" />
+  <jsp:directive.attribute name="update" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Include 'update' link into table (default true)" />
+  <jsp:directive.attribute name="delete" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Include 'delete' link into table (default true)" />
+  <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+  <!-- ====================================== -->
+  <!-- ====================================== -->
+  <!-- Datatables parameters -->
+  <!-- ====================================== -->
+  <!-- ====================================== -->
+
+
+  <jsp:directive.attribute name="url" type="java.lang.String" rtexprvalue="true"  required="false" description="Web service URL used to populate the table.  (Either data or url attribute is required)" />
+  <jsp:directive.attribute name="appear" type="java.lang.String" rtexprvalue="true" required="false" description="(block|fadein[,duration]) Display mode used when the table has finished loading and must appear in the page.  A duration can be set (in milliseconds) if the display mode is set to 'fadein'. (Default : 'fadein')" />
+  <jsp:directive.attribute name="jsonp" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Allows to retrieve JSON data from any domain name, regardless of XSS protection." />
+  <jsp:directive.attribute name="cdn" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable the DataTables source files to be loaded from the Microsoft CDN (Content Delivery Framework) preventing you from hosting the files yourself. (Default : false)" />
+  <jsp:directive.attribute name="cssStyle" type="java.lang.String" rtexprvalue="true" required="false" description="CSS style applied on the HTML table. (HTML style attribute)" />
+  <jsp:directive.attribute name="cssClass" type="java.lang.String" rtexprvalue="true" required="false" description="CSS class(es) applied on the HTML table. (HTML class attribute)" />
+  <jsp:directive.attribute name="rowIdBase" type="java.lang.String" rtexprvalue="true" required="false" description="Useful if you want each row has a DOM id. This attribute is evaluated as a property of the current iterated bean. (Only if DOM datasource)" />
+  <jsp:directive.attribute name="rowIdPrefix" type="java.lang.String" rtexprvalue="true" required="false" description="String which is prepended to the rowIdBase attribute, in order to build row id. (HTML id attribute)" />
+  <jsp:directive.attribute name="rowIdSufix" type="java.lang.String" rtexprvalue="true" required="false" description="String which is appended to the rowIdBase attribute, in order to build row id. (HTML id attribute)" />
+  <jsp:directive.attribute name="labels" type="java.lang.String" rtexprvalue="true" required="false" description="Base URL of an AJAX loaded file which contains all the labels used in tables. (See : http://www.datatables.net/release-datatables/examples/advanced_init/language_file.html)" />
+  <jsp:directive.attribute name="deferRender" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Defer the creation of the table elements for each row until they are needed for a draw.  (Default : false, see http://datatables.net/ref#bDeferRender)" />
+
+  <!-- ====================================== -->
+  <!-- Basic features -->
+  <!-- ====================================== -->
+  <jsp:directive.attribute name="info" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable or disable the table information display. This shows information about the data that is currently visible on the page, including information about filtered data if that action is being performed.  (Default : true, see http://datatables.net/ref#bInfo)" />
+  <jsp:directive.attribute name="paginate" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable pagination.  (Default : true, see http://datatables.net/ref#bPaginate)" />
+  <jsp:directive.attribute name="lengthChange" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) If paginate is enabled, allows the end user to select the size of a formatted page from a select menu (sizes are 10, 25, 50 and 100). (Default : true, see http://datatables.net/ref#bLengthChange)" />
+  <jsp:directive.attribute name="paginationType" type="java.lang.String" rtexprvalue="true" required="false" description="(two_button|full_numbers) Choice between the two different built-in pagination interaction methods ('two_button' or 'full_numbers') which present different page controls to the end user. (Default : two_button, see http://datatables.net/ref#sPaginationType)" />
+  <jsp:directive.attribute name="filter" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable filtering of data.  (Default : true, see http://datatables.net/ref#bFilter)" />
+  <jsp:directive.attribute name="sort" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable sorting of all columns.  Sorting of individual columns can be disabled by the 'sortable' attribute of column tag. (Default : true, see http://datatables.net/ref#bSort)" />
+  <jsp:directive.attribute name="autoWidth" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable automatic column width calculation. (Default : true, see http://datatables.net/ref#bAutoWidth)" />
+
+  <jsp:directive.attribute name="processing" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable or disable the display of a 'processing' indicator when the table is being processed (e.g. a sort). This is particularly useful for tables with large amounts of data where it can take a noticeable amount of time to sort the entries. (Default : false, see http://datatables.net/ref#bProcessing)" />
+  <jsp:directive.attribute name="serverSide" type="java.lang.Boolean" rtexprvalue="true" required="false" description="Configure DataTables to use server-side processing" />
+  <jsp:directive.attribute name="pipelining" type="java.lang.Boolean" rtexprvalue="true" required="false" description="Enable pipelining data for paging when server-side processing is enabled" />
+  <jsp:directive.attribute name="pipeSize" type="java.lang.Integer" rtexprvalue="true" required="false" description="Pipe size used when pipelining is enabled, ie times that the user can page before a request must be made of the server. (Default : 5)" />
+  <jsp:directive.attribute name="stateSave" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable state saving.  When enabled a cookie will be used to save table display information such as pagination information, display length, filtering and sorting. As such when the end user reloads the page the display display will match what thy had previously set up. (Default : false, see http://datatables.net/ref#bStateSave)" />
+  <jsp:directive.attribute name="export" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the export functionality" />
+  <jsp:directive.attribute name="exportLinks" type="java.lang.String" rtexprvalue="true" required="false" description="(TOP_LEFT|TOP_MIDDLE|TOP_RIGHT|BOTTOM_LEFT|BOTTOM_MIDDLE|BOTTOM_RIGHT) Comma-separated list of positions where the export links will be generated (Default : TOP_RIGHT)" />
+  <jsp:directive.attribute name="jqueryUI" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable jQuery UI ThemeRoller support (Default : false, see http://datatables.net/ref#bJQueryUI)" />
+  <jsp:directive.attribute name="footer" type="java.lang.String" rtexprvalue="true" required="false" description="(header) Choose if you want to have the footer appear.  (Default : none)" />
+  <jsp:directive.attribute name="theme" type="java.lang.String" rtexprvalue="true" required="false" description="Name of a theme to activate for the current table.  (Default : none)" />
+  <jsp:directive.attribute name="themeOption" type="java.lang.String" rtexprvalue="true" required="false" description="Name of an option to activate in relation to the current activated theme." />
+  <jsp:directive.attribute name="lengthMenu" type="java.lang.String" rtexprvalue="true" required="false" description="Specify the entries in the length drop down menu that DataTables show when pagination is enabled." />
+  <jsp:directive.attribute name="cssStripes" type="java.lang.String" rtexprvalue="true" required="false" description="Comma-separated list of CSS classes that should be applied to displayed rows. This array may be of any length, and DataTables will apply each class sequentially, looping when required." />
+
+  <!-- ====================================== -->
+  <!-- Extra features -->
+  <!-- ====================================== -->
+
+  <!-- FixedHeader -->
+  <jsp:directive.attribute name="fixedHeader" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the DataTables FixedHeader plugin. (Default : false) (See : http://datatables.net/extras/fixedheader/)" />
+  <jsp:directive.attribute name="fixedPosition" type="java.lang.String" rtexprvalue="true" required="false" description="(top|bottom|left|right) Respectively fix the header, footer, left column, right column. (Default : top)" />
+  <jsp:directive.attribute name="offsetTop" type="java.lang.Integer" rtexprvalue="true" required="false" description="Offset applied on the top." />
+
+  <!-- Scroller -->
+  <jsp:directive.attribute name="scroller" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the DataTables Scroller plugin. (Default : false) (See : http://datatables.net/extras/scroller/)" />
+  <jsp:directive.attribute name="scrollY" type="java.lang.String" rtexprvalue="true" required="false" description="Table's height to display in scrolling mode.  (default : 300px)" />
+
+  <!-- ColReorder -->
+  <jsp:directive.attribute name="colReorder" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the DataTables ColReorder plugin. (Default : false) (See : http://datatables.net/extras/colreorder/)" />
+
+
+  <!-- ====================== -->
+  <!-- Prepare default values -->
+  <!-- ====================== -->
+  <!-- typeIdFieldName -->
+  <c:if test="${empty typeIdFieldName}">
+      <c:set var="typeIdFieldName" value="id" />
+  </c:if>
+    
+  <!-- Type Name -->  
+  <spring:message var="typeName" code="menu_item_${fn:toLowerCase(fn:split(id,'_')[fn:length(fn:split(id,'_')) - 1])}_new_label" htmlEscape="false" />
+  
+  <c:if test="${empty appear}">
+  	<c:set var="appear" value="fadein,0"/>
+  </c:if>
+  <c:if test="${empty deferRender}">
+  	<c:set var="deferRender" value="false"/>
+  </c:if>
+  <c:if test="${empty paginationType}">
+  	<c:set var="paginationType" value="full_numbers"/>
+  </c:if>
+  <c:if test="${empty pipeSize}">
+  	<c:set var="pipeSize" value="5"/>
+  </c:if>
+  <c:if test="${empty export}">
+  	<c:set var="export" value="CSV,XLS,PDF"/>
+  </c:if>
+  <c:if test="${empty exportLinks}">
+  	<c:set var="exportLinks" value="top_middle"/>
+  </c:if>
+  <c:if test="${empty fixedPosition}">
+  	<c:set var="fixedPosition" value="top"/>
+  </c:if>
+  
+  <c:if test="${empty offsetTop}">
+  	<c:set var="offsetTop" value="5"/>
+  </c:if>
+  <c:if test="${empty scrollY}">
+  	<c:set var="scrollY" value="300px"/>
+  </c:if>
+  <jsp:scriptlet>
+  	jspContext.setAttribute("locale", request.getLocale().getLanguage());
+  </jsp:scriptlet>
+  <c:if test="${empty labels}">
+  	<c:set var="labels" value="/resources/scripts/datatables/i18n/labels_${locale}.txt"/>
+  </c:if>
+  
+  <spring:url value="${path}" var="urlPath" />
+  
+  
+  <!-- show -->
+  <c:set var="showColumnId" value="${id}_show_col"/>
+  <c:if test="${serverSide}">
+      <!-- function to render cell -->
+      <c:set var="show_label">
+	      <spring:escapeBody javaScriptEscape="true">
+	         <spring:message arguments="${typeName}" code="entity_show" />
+	      </spring:escapeBody>
+      </c:set>
+      <spring:url value="/resources/images/show.png" var="show_image_url" />
+	  <script type="text/javascript">
+	    function ${showColumnId}(data, type, full) {
+		    var result =  
+	           '<a href="${urlPath}/'+full.${typeIdFieldName}+'" alt="${show_label}" title="${show_label}">'
+	           + '  <img alt="${show_label}" class="image" src="${show_image_url}" title="${show_label}" />'
+	           + '</a>';
+	           
+	        return result;
+		}	
+	  </script>
+  </c:if>
+
+  <!-- update -->  
+  <c:if test="${empty update}">
+  	<c:set var="update" value="true"/>  	
+  </c:if>
+  
+  <c:if test="${update}">
+  	<c:set var="updateColumnId" value="${id}_update_col"/>
+  	  <c:if test="${serverSide}">
+        <!-- function to render cell -->
+        <c:set var="update_label">
+	      <spring:escapeBody javaScriptEscape="true">  	  
+            <spring:message arguments="${typeName}" code="entity_update"/>
+          </spring:escapeBody>
+        </c:set>
+        <spring:url value="/resources/images/update.png" var="update_image_url" />
+	    <script type="text/javascript">
+	        function ${updateColumnId}(data, type, full) {
+	        	var result =
+	              '<a href="${urlPath}/'+full.${typeIdFieldName}+'?form" alt="${update_label}" title="${update_label}">'
+	               + '  <img alt="${update_label}" class="image" src="${update_image_url}" title="${update_label}" />'
+	               + '</a>';
+	            return result;
+		    }
+	      </script>
+      </c:if>  	
+  </c:if>
+  
+  <!-- remove -->  
+  <c:if test="${empty remove}">
+  	<c:set var="remove" value="true"/>  	
+  </c:if>
+  
+  <c:if test="${remove}">
+  	<c:set var="removeColumnId" value="${id}_remove_col"/>
+  	<c:if test="${serverSide}">
+  	    <c:set var="delete_label">
+	      <spring:escapeBody javaScriptEscape="true">  	  
+            <spring:message arguments="${typeName}" code="entity_delete"/>
+          </spring:escapeBody>
+        </c:set>
+        <c:set var="delete_confirm_msg">
+          <spring:escapeBody javaScriptEscape="true">
+             <spring:message code="entity_delete_confirm" />
+          </spring:escapeBody>
+        </c:set>        
+        <spring:url value="/resources/images/delete.png" var="delete_image_url" />
+        <!-- function to render cell -->
+	    <script type="text/javascript">
+	        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
+	        function ${removeColumnId}(data, type, full) {
+	        	var result =
+	                '<form action="${urlPath}/'+full.${typeIdFieldName}+'" method="post">'
+	                + '  <input type="hidden" value="DELETE" name="_method"/>'
+	                + '  <input alt="${delete_label}" class="image" src="${delete_image_url}" title="${delete_label}" type="image" value="${delete_label}" onclick="return confirm(${removeColumnId}_confirmation);" />'
+	                + '</form>';
+	                
+                return result;
+		    }
+	     </script>
+     </c:if>
+  </c:if>
+    
+  <datatables:table
+		id="${id}"
+		data="${data}"
+		path="${path}"
+		typeIdFieldName="${typeIdFieldName}"
+		create="${create}"
+		update="${update}"
+		delete="${delete}"
+		render="${empty render or render}"
+		z="${z}"
+				
+      url="${url}"
+      row="item"
+      appear="${appear}"
+      jsonp="${jsonp}"
+      cdn="${cdn}"
+      cssStyle="${cssStyle}"
+      cssClass="${cssClass}"
+      rowIdBase="${rowIdBase}"
+      rowIdPrefix="${rowIdPrefix}"
+      rowIdSufix="${rowIdSufix}"
+      labels="${labels}"
+      deferRender="${deferRender}"
+
+      info="${empty info or info}"
+      paginate="${empty paginate or paginate}"
+      lengthChange="${empty lengthChange or lengthChange}"
+      paginationType="${paginationType}"
+      filter="${empty filter or filter}"
+      sort="${empty sort or sort}"
+      autoWidth="${autoWidth}"
+
+      processing="${empty processing or processing}"
+      serverSide="${empty serverSide or serverSide}"
+      pipelining="${pipelining}"
+      pipeSize="${pipeSize}"
+      stateSave="${empty stateSave or stateSave}"
+      export="${export}"
+      exportLinks="${exportLinks}"
+      jqueryUI="${jqueryUI}"
+      footer="${footer}"
+      theme="${theme}"
+      themeOption="${themeOption}"
+      lengthMenu="${lengthMenu}"
+      cssStripes="${cssStripes}"
+
+      fixedHeader="${fixedHeader}"
+      fixedPosition="${fixedPosition}"
+      offsetTop="${offsetTop}"
+
+      scroller="${scroller}"
+      scrollY="${scrollY}"
+
+      colReorder="${colReorder}"
+    >
+  
+        <jsp:doBody />
+        
+        <!-- Go-show-view (of current row) column --> 
+        <c:choose>
+          <c:when test="${serverSide}">
+            <!-- AJAX cell render -->
+			<datatables:column id="${showColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" renderFunction="${showColumnId}"/>
+          </c:when>
+		  <c:otherwise>
+			  <!-- DOM cell render -->
+			  <datatables:column id="${showColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false">
+	            <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
+                  <spring:url value="${path}/${itemId}" var="show_form_url" />
+                  <spring:url value="/resources/images/show.png" var="show_image_url" />
+                  <spring:message arguments="${typeName}" code="entity_show" var="show_label" htmlEscape="false" />
+                  <a href="${show_form_url}" alt="${fn:escapeXml(show_label)}" title="${fn:escapeXml(show_label)}">
+                    <img alt="${fn:escapeXml(show_label)}" class="image" src="${show_image_url}" title="${fn:escapeXml(show_label)}" />
+                  </a>
+		     </datatables:column>
+		   </c:otherwise>
+         </c:choose>
+     
+         <!-- Go-update-view (of current row) column -->
+         <c:if test="${update}">
+           <c:choose>
+			  <c:when test="${serverSide}">
+			    <!-- AJAX cell render -->
+			    <datatables:column id="${updateColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" renderFunction="${updateColumnId}"/>
+			  </c:when>
+			  <c:otherwise>
+			    <!-- DOM cell render -->
+			    <datatables:column id="${updateColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false">
+	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
+	              <spring:url value="${path}/${itemId}" var="update_form_url">
+	                <spring:param name="form" />
+	              </spring:url>
+	              <spring:url value="/resources/images/update.png" var="update_image_url" />
+	              <spring:message arguments="${typeName}" code="entity_update" var="update_label" htmlEscape="false" />
+	              <a href="${update_form_url}" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}">
+	                <img alt="${fn:escapeXml(update_label)}" class="image" src="${update_image_url}" title="${fn:escapeXml(update_label)}" />
+	              </a>				  
+			    </datatables:column>
+			  </c:otherwise>
+            </c:choose>
+          </c:if>
+
+         <!-- Remove current row column -->
+         <c:if test="${remove}">
+           <c:choose>
+			  <c:when test="${serverSide}">
+			    <!-- AJAX cell render -->
+			    <datatables:column id="${removeColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" renderFunction="${removeColumnId}"/>
+			  </c:when>
+			  <c:otherwise>
+			    <!-- DOM cell render -->
+			    <datatables:column id="${removeColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false">
+	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
+                  <spring:url value="${path}/${itemId}" var="delete_form_url" />
+                  <spring:url value="/resources/images/delete.png" var="delete_image_url" />
+                  <form:form action="${delete_form_url}" method="DELETE">
+                    <spring:message arguments="${typeName}" code="entity_delete" var="delete_label" htmlEscape="false" />
+                    <c:set var="delete_confirm_msg">
+                      <spring:escapeBody javaScriptEscape="true">
+                         <spring:message code="entity_delete_confirm" />
+                      </spring:escapeBody>
+                    </c:set>
+                    <input alt="${fn:escapeXml(delete_label)}" class="image" src="${delete_image_url}" title="${fn:escapeXml(delete_label)}" type="image" value="${fn:escapeXml(delete_label)}" onclick="return confirm('${delete_confirm_msg}');" />
+                  </form:form>			  
+			    </datatables:column>
+			  </c:otherwise>
+            </c:choose>
+          </c:if>
+     
+  </datatables:table>
+</jsp:root>

@@ -1,0 +1,104 @@
+/* gvNIX updates to the datatables css files so the rendering
+   appears as expected in roo apps. */
+
+/* TABLE HEADER */
+
+/* A bit of padding between the pagination length and the table. */
+div.dataTables_length {
+  padding-bottom: 4px;
+}
+
+/* Show pagination number label in the same line as the pagination number combo */
+div.dataTables_length label {
+  float: none;
+}
+
+/* Smaller pagination length select field. */
+div.dataTables_length select {
+  font-size: 12px;
+}
+
+/* A bit of padding between the filter and the table. */
+div.dataTables_filter {
+  padding-bottom: 4px;
+}
+
+
+/* Show filter label in the same line as the filter input */
+div.dataTables_filter label {
+  float: none;
+}
+
+/* Smaller filter input field. */
+div.dataTables_filter input {
+  width: 160px;
+  height: 14px;
+  font-size: 12px;
+}
+
+/* Add lower padding for the pagination buttons, so they appear into the parent panel */
+.tundra .dijitTitlePaneContentInner {
+    padding: 10px 10px 30px;
+}
+
+/* Make the column filter fields smaller */
+input.text_filter {
+  width: 100px;
+  height: 14px;
+  font-size: 12px;
+}
+
+select.select_filter {
+  font-size: 12px;
+  max-width: 100px;
+}
+
+table.dataTable thead th {
+  color: #666666;
+}
+
+/* Change the datatable footer to look like the header,
+   And remove padding, which is too much if there are
+   filtering input fields. */
+table.dataTable tfoot th {
+  color: #666666;
+  background: #ffffff;
+  font-style: italic;
+  padding: 2px;
+}
+
+/* Export links */
+a.icon {
+  /* If not block, the size cannot be set. */
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  /* Make the link text invisible. */
+  overflow: hidden;
+  text-indent: 100%;
+  white-space: nowrap;
+}
+
+a.export_pdf {
+  background: url("../images/page_white_acrobat.png") no-repeat scroll center center transparent;
+}
+
+a.export_xls {
+  background: url("../images/page_excel.png") no-repeat scroll center center transparent;
+}
+
+a.export_csv {
+  background: url("../images/page_white_text.png") no-repeat scroll center center transparent;
+}
+
+/* TABLE FOOT */
+
+/* A bit of padding between the table info and the table. */
+div.dataTables_info {
+  padding-top: 4px;
+}
+
+/* A bit of padding between the pagination and the table. */
+div.dataTables_paginate {
+  padding-top: 4px;
+}

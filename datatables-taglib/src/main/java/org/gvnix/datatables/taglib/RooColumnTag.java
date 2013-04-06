@@ -23,6 +23,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.Tag;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.core.convert.ConversionService;
@@ -92,12 +94,13 @@ public class RooColumnTag extends ColumnTag {
 
     public int doStartTag() throws JspException {
         TableTag parent = (TableTag) getParent();
-        if (!doRender() || "AJAX".equals(parent.getLoadingType())) {
+        if (!doRender()) {
             return SKIP_BODY;
         }
-
         doInitialization();
-
+        if ("AJAX".equals(parent.getLoadingType())) {
+            return SKIP_BODY;
+        }
         return super.doStartTag();
     }
 
@@ -108,13 +111,15 @@ public class RooColumnTag extends ColumnTag {
         // code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label"
         // htmlEscape="false" />
         String label = getLabel();
-        if (label == null || label.trim().isEmpty()) {
-            String id = getId();
-            String code = "label".concat(id.substring(id.indexOf('_'))
-                    .toLowerCase());
-            label = helper.resolveMessage(this.pageContext, code);
+        if (StringUtils.isEmpty(getTitle())) {
+            if (StringUtils.isEmpty(label)) {
+                String id = getId();
+                String code = "label".concat(id.substring(id.indexOf('_'))
+                        .toLowerCase());
+                label = helper.resolveMessage(this.pageContext, code);
+            }
+            setTitle(label);
         }
-        setTitle(label);
     }
 
     @Override
@@ -157,7 +162,7 @@ public class RooColumnTag extends ColumnTag {
         Object value = exp.getValue(context);
         String result = "";
 
-        if (StringUtils.isNotBlank(property)) {
+        if (StringUtils.isNotBlank(property) && value != null) {
 
             if (this.date) {
                 value = dateTimePattern.format(value);
@@ -280,4 +285,30 @@ public class RooColumnTag extends ColumnTag {
         this.conversionServiceId = conversionServiceId;
     }
 
+    /**
+     * Override to avoid problems to locate TableTag when it isn't the direct
+     * parent
+     */
+    @Override
+    public Tag getParent() {
+
+        // locate TableTag on hierarchy
+        Tag parent = super.getParent();
+        while (parent != null) {
+            if (parent instanceof TableTag) {
+                return parent;
+            }
+            parent = parent.getParent();
+        }
+
+        // not found so we try to
+        // use context variable
+        parent = (Tag) pageContext.getAttribute(RooTableTag.TABLE_TAG_VARIABLE,
+                PageContext.REQUEST_SCOPE);
+        if (parent instanceof TableTag) {
+            return parent;
+        }
+
+        return null;
+    }
 }

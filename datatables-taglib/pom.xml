@@ -36,7 +36,7 @@
   <artifactId>org.gvnix.datatables.taglib</artifactId>
   <name>gvNIX - Datatables JSP Tag library</name>
   <organization>
-    <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
+    <name>Generalitat Valenciana</name>
   </organization>
   <description>JSP Tag lib which adaptes Dandelion datatables (http://dandelion.github.com/datatables) to work in gvNIX</description>
   <url>http://www.gvnix.org</url>
@@ -99,10 +99,29 @@
         </dependency>
   </dependencies>
   <properties>
-        <dandelion-datatables.version>0.8.8</dandelion-datatables.version>
+        <dandelion-datatables.version>0.8.10</dandelion-datatables.version>
         <jackson.version>1.9.12</jackson.version>
   </properties>
   <build>
+  
+  	<!-- DiSiD: Add build resources filtering -->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/META-INF/gvnix-table.tld</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/META-INF/gvnix-table.tld</include>
+        </includes>
+      </resource>
+    </resources>
+    
   	<pluginManagement>
   		<plugins>
   			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
