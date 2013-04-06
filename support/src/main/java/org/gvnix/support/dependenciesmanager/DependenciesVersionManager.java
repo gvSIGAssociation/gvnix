@@ -92,11 +92,11 @@ public class DependenciesVersionManager {
                     }
                 }
             }
-        }
-        // Add the new dependency just if needed
-        if (updateDependency) {
-            projectOperations.addDependency(
-                    projectOperations.getFocusedModuleName(), dependency);
+            // Add the new dependency just if needed
+            if (updateDependency) {
+                projectOperations.addDependency(
+                        projectOperations.getFocusedModuleName(), dependency);
+            }
         }
         return updateDependency;
     }
