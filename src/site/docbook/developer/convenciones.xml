@@ -160,6 +160,13 @@ web binding setup // Comando de gvNIX</programlisting>
    *
    * @author DEVELOPER_NAME (DEVELOPER_USERNAME at CIT_PROVIDER dot com) at &lt;a href="http://www.CIT_PROVIDER.com"&gt;CIT_PROVIDER&lt;/a&gt; made for &lt;a href="http://www.cit.gva.es"&gt;Conselleria d'Infraestructures i Transport&lt;/a&gt;
    */</programlisting>
+
+	<para xml:lang="es">O simplemente:</para>
+    <programlisting> /**
+   * Provides strategies management shell commands.
+   *
+   * @author gvNIX Team
+   */</programlisting>
   </section>
   
   <section xml:id="escritura_javadoc" xml:lang="es">
@@ -288,9 +295,8 @@ web binding setup // Comando de gvNIX</programlisting>
     <para>Licencia a integrar en las cabeceras de las clases java:</para>
 
     <programlisting>/*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures     
- * i Transport - Generalitat Valenciana
- * Copyright (C) 2011 CIT - Generalitat Valenciana
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

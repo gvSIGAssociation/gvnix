@@ -8,9 +8,6 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Creación de proyecto de add-on</title>
 
-  <para xml:lang="es">TBC: Sección obsoleta. Actualizar a nuevos comandos de
-  ROO 1.1.2</para>
-
   <para xml:lang="es">Estos son los a seguir para prepara un proyecto de
   add-on:</para>
 
@@ -25,22 +22,20 @@
     </listitem>
 
     <listitem>
-      <para>Crear el proyecto con el comando <command>project</command> usando
-      el <emphasis>template</emphasis> de add-on. Ejemplo:</para>
+      <para>Existen varios comando para creación de add-on dependiendo
+        de los requisitos y tipo de add-on. En este apartado usaremos
+        el <command>addon create simple<command>. Ejemplo:</para>
 
-      <programlisting>project --topLevelPackage org.gvnix.cxf.roo.addon --template ROO_ADDON_SIMPLE</programlisting>
+      <programlisting>roo> addon create simple --topLevelPackage org.gvnix.addon.cxf</programlisting>
 
       <para>El nombre del paquete base tiene las siguientes
       limitaciones:</para>
 
       <itemizedlist>
-        <listitem>
-          <para>Debe empezar por <package>org.</package>,
-          <package>net.</package> o <package>com.</package>.</para>
-        </listitem>
 
         <listitem>
-          <para>Debe terminar en <package>roo.addon</package>.</para>
+          <para>El último elemento del paquete se utilizará como identificador del add-on
+            y como nombre base de las clases generadas.</para>
         </listitem>
       </itemizedlist>
     </listitem>
@@ -52,11 +47,11 @@
 
       <itemizedlist>
         <listitem>
-          <para><package>org.gvnix.cxf.roo.addon</package></para>
+          <para><package>org.gvnix.addon.cxf</package></para>
         </listitem>
 
         <listitem>
-          <para><package>org.gvnix.security.roo.addon</package></para>
+          <para><package>org.gvnix.addon.security</package></para>
         </listitem>
       </itemizedlist>
     </listitem>
