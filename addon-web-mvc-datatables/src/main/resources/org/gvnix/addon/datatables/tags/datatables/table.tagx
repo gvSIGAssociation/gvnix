@@ -104,7 +104,14 @@
   	<c:set var="deferRender" value="false"/>
   </c:if>
   <c:if test="${empty serverSide}">
-  	<c:set var="serverSide" value="true"/>
+    <c:choose>
+	    <c:when test="${empty datatablesUseAjax}">
+	  	  <c:set var="serverSide" value="true"/>
+	  	</c:when>
+	  	<c:otherwise>
+	  		<c:set var="serverSide" value="${datatablesUseAjax}"/>
+	  	</c:otherwise>
+  	</c:choose>
   </c:if>
   <c:if test="${empty paginationType}">
   	<c:set var="paginationType" value="full_numbers"/>

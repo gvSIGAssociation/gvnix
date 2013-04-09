@@ -32,4 +32,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface GvNIXDatatables {
+
+    /**
+     * Defines how datatables gets data (default AJAX)
+     */
+    boolean ajax() default true;
 }

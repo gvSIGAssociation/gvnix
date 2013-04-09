@@ -24,12 +24,14 @@ import static org.springframework.roo.model.JdkJavaType.MAP;
 import static org.springframework.roo.model.JdkJavaType.SET;
 import static org.springframework.roo.model.SpringJavaType.REQUEST_MAPPING;
 import static org.springframework.roo.model.SpringJavaType.RESPONSE_BODY;
+import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -54,6 +56,7 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * {@link GvNIXDatatables} metadata
@@ -64,11 +67,14 @@ import org.springframework.roo.project.LogicalPath;
 public class DatatablesMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(DatatablesMetadata.class);
+
     private static final JavaType REQUEST_METHOD = new JavaType(
             "org.springframework.web.bind.annotation.RequestMethod");
 
-    private static final JavaType CONVERSION_SERVICE = // name
-    new JavaType("org.springframework.core.convert.ConversionService");
+    private static final JavaType CONVERSION_SERVICE = new JavaType(
+            "org.springframework.core.convert.ConversionService");
 
     private static final JavaType AUTOWIRED = new JavaType(
             "org.springframework.beans.factory.annotation.Autowired");
@@ -139,6 +145,8 @@ public class DatatablesMetadata extends
             "getDatatablesData");
     private static final JavaSymbolName LIST_DATATABLES = new JavaSymbolName(
             "listDatatables");
+    private static final JavaSymbolName POPULATE_AJAX_DATATABLES = new JavaSymbolName(
+            "populateDatatablesUseAjax");
     private static final JavaSymbolName UI_MODEL = new JavaSymbolName("uiModel");
 
     // Constants
@@ -173,6 +181,11 @@ public class DatatablesMetadata extends
     }
 
     /**
+     * Annotation values
+     */
+    private DatatablesAnnotationValues annotationValues;
+
+    /**
      * Entity properties which compound its identifier
      */
     private List<FieldMetadata> identifierProperties;
@@ -187,30 +200,96 @@ public class DatatablesMetadata extends
      */
     private String entityPlural;
 
+    /**
+     * Field which holds conversionService
+     */
     private FieldMetadata conversionService;
 
+    /**
+     * Field which holds current data mode
+     */
+    private FieldMetadata dataMode;
+
     public DatatablesMetadata(String identifier, JavaType aspectName,
-            PhysicalTypeMetadata governorPhysicalTypeMetadata, JavaType entity,
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            DatatablesAnnotationValues annotationValues, JavaType entity,
             List<FieldMetadata> identifierProperties, String entityPlural) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
 
+        this.annotationValues = annotationValues;
         this.identifierProperties = identifierProperties;
         this.entity = entity;
         this.entityPlural = entityPlural;
 
         // Adding field definition
         builder.addField(getConversionServiceField());
+        builder.addField(getUseAjaxField());
 
         // Adding methods definition
         builder.addMethod(getRenderForDatatablesMethod());
         builder.addMethod(getGetDatatablesDataMethod());
         builder.addMethod(getFindByCriteriaMethod());
         builder.addMethod(getListDatatablesRequestMethod());
+        builder.addMethod(getPopulateAJAXDatatablesMethod());
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
+    }
+
+    private MethodMetadata getPopulateAJAXDatatablesMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(POPULATE_AJAX_DATATABLES,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        AnnotationMetadataBuilder annotation = new AnnotationMetadataBuilder(
+                MODEL_ATTRIBUTE);
+        annotation.addStringAttribute("value", "datatablesUseAjax");
+        // @ModelAttribute
+        annotations.add(annotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildPopulateAjaxDatatablesMethod(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, POPULATE_AJAX_DATATABLES,
+                JavaType.BOOLEAN_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    private void buildPopulateAjaxDatatablesMethod(
+            InvocableMemberBodyBuilder bodyBuilder) {
+
+        // return datatablesUseAjax;
+        bodyBuilder.appendFormalLine(String.format("return %s;",
+                getUseAjaxField().getFieldName().getSymbolName()));
+
     }
 
     private MethodMetadata getListDatatablesRequestMethod() {
@@ -283,32 +362,54 @@ public class DatatablesMetadata extends
 
     private void buildListDatatablesRequesMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder
-                .appendFormalLine("// create a list with a empty item to avoid 'not items found' message");
 
         JavaType objectList = new JavaType(LIST.getFullyQualifiedTypeName(), 0,
                 DataType.TYPE, null, Arrays.asList(entity));
         JavaType objectArrayList = new JavaType(
                 ARRAY_LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
                 Arrays.asList(entity));
+        String listVarName = StringUtils.uncapitalize(entityPlural);
 
         // List<Pet> pets = new ArrayList<Pet>(1);
         bodyBuilder.appendFormalLine(String.format("%s %s = new %s(1);",
-                getFinalTypeName(objectList),
-                StringUtils.uncapitalize(entityPlural),
+                getFinalTypeName(objectList), listVarName,
                 getFinalTypeName(objectArrayList)));
+
+        bodyBuilder.appendFormalLine("// Check mode");
+
+        bodyBuilder.appendFormalLine(String.format("if (%s) {",
+                getUseAjaxField().getFieldName().getSymbolName()));
+        bodyBuilder.indent();
+
+        bodyBuilder
+                .appendFormalLine("// create a list with a empty item to avoid 'not items found' message");
 
         // pets.add(new Pet());
         bodyBuilder.appendFormalLine(String.format("%s.add(new %s());",
                 StringUtils.uncapitalize(entityPlural),
                 getFinalTypeName(entity)));
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} else {");
+        bodyBuilder.indent();
+
+        bodyBuilder
+                .appendFormalLine("// Get all data to put it on pageContext");
+        bodyBuilder.appendFormalLine(String.format("%s = %s.findAll%s();",
+                listVarName, getFinalTypeName(entity), entityPlural));
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
         // uiModel.addAttribute("pets",pets);
         bodyBuilder.appendFormalLine(String.format(
                 "%s.addAttribute(\"%2$s\",%2$s);", UI_MODEL.getSymbolName(),
-                StringUtils.uncapitalize(entityPlural)));
+                listVarName));
+
         // return "pets/list";
         bodyBuilder.appendFormalLine(String.format("return \"%s/list\";",
                 StringUtils.uncapitalize(entityPlural)));
+
     }
 
     private MethodMetadata getFindByCriteriaMethod() {
@@ -686,7 +787,69 @@ public class DatatablesMetadata extends
      * 
      * @return a FieldMetadata object
      */
-    private FieldMetadata getConversionServiceField() {
+    public FieldMetadata getUseAjaxField() {
+        if (dataMode == null) {
+            JavaSymbolName curName = new JavaSymbolName("datatablesUseAjax");
+            String initializer = String.format("%s",
+                    String.valueOf(annotationValues.isAjax()));
+
+            // Check if field exist
+            FieldMetadata currentField = governorTypeDetails
+                    .getDeclaredField(curName);
+            if (currentField != null) {
+                if (!currentField.getFieldType().equals(
+                        JavaType.BOOLEAN_PRIMITIVE)) {
+                    // No compatible field: look for new name
+                    currentField = null;
+                    JavaSymbolName newName = curName;
+                    int i = 1;
+                    while (governorTypeDetails.getDeclaredField(newName) != null) {
+                        newName = new JavaSymbolName(curName.getSymbolName()
+                                .concat(StringUtils.repeat('_', i)));
+                        i++;
+                    }
+                    curName = newName;
+                }
+            }
+            if (currentField != null) {
+                // check initializer value
+                if (StringUtils.equalsIgnoreCase(initializer.trim(),
+                        currentField.getFieldInitializer().trim())) {
+                    dataMode = currentField;
+                }
+                else {
+                    // Show a warning
+                    LOGGER.warning(String.format(
+                            "%s.%s has a different value than %s.ajax",
+                            getId(), currentField.getFieldName()
+                                    .getReadableSymbolName(),
+                            GvNIXDatatables.class.getSimpleName()));
+                }
+            }
+            else {
+                // create field
+                List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                        0);
+                // Using the FieldMetadataBuilder to create the field
+                // definition.
+                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                        getId(), Modifier.PUBLIC, annotations, curName, // Field
+                        JavaType.BOOLEAN_PRIMITIVE); // Field type
+                fieldBuilder.setFieldInitializer(initializer);
+                dataMode = fieldBuilder.build(); // Build and return a
+                // FieldMetadata
+                // instance
+            }
+        }
+        return dataMode;
+    }
+
+    /**
+     * Create metadata for auto-wired convertionService field.
+     * 
+     * @return a FieldMetadata object
+     */
+    public FieldMetadata getConversionServiceField() {
         if (conversionService == null) {
             JavaSymbolName curName = new JavaSymbolName("conversionService");
             // Check if field exist
@@ -746,7 +909,16 @@ public class DatatablesMetadata extends
         builder.append("aspectName", aspectName);
         builder.append("destinationType", destination);
         builder.append("governor", governorPhysicalTypeMetadata.getId());
+        builder.append("ajax", String.valueOf(annotationValues.isAjax()));
         builder.append("itdTypeDetails", itdTypeDetails);
         return builder.toString();
+    }
+
+    public JavaType getEntity() {
+        return entity;
+    }
+
+    public DatatablesAnnotationValues getAnnotationValues() {
+        return annotationValues;
     }
 }

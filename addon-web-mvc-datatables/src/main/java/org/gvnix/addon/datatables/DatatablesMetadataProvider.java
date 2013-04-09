@@ -80,6 +80,9 @@ public final class DatatablesMetadataProvider extends
         LogicalPath path = DatatablesMetadata
                 .getPath(metadataIdentificationString);
 
+        final DatatablesAnnotationValues annotationValues = new DatatablesAnnotationValues(
+                governorPhysicalTypeMetadata);
+
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
                 javaType, path);
         WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
@@ -97,7 +100,8 @@ public final class DatatablesMetadataProvider extends
         String plural = jpaMetadata.getPlural();
 
         return new DatatablesMetadata(metadataIdentificationString, aspectName,
-                governorPhysicalTypeMetadata, entity, identifiers, plural);
+                governorPhysicalTypeMetadata, annotationValues, entity,
+                identifiers, plural);
     }
 
     /**

@@ -80,9 +80,6 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     private static final JavaType JPA_ACTIVE_RECORD_ANNOTATION = new JavaType(
             RooJpaActiveRecord.class.getName());
 
-    private static final AnnotationMetadataBuilder DATATABLES_ANNOTATION_BUILDER = new AnnotationMetadataBuilder(
-            DATATABLES_ANNOTATION);
-
     private static final String DATATABLES_CRITERIA_RESOLVER = "com.github.dandelion.datatables.extras.spring3.ajax.DatatablesCriteriasResolver";
 
     /**
@@ -144,7 +141,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     }
 
     /** {@inheritDoc} */
-    public void annotateController(JavaType javaType) {
+    public void annotateController(JavaType javaType, boolean ajax) {
         Validate.notNull(javaType, "Controller required");
 
         // Obtain ClassOrInterfaceTypeDetails for this java type
@@ -189,9 +186,14 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                     existing);
 
+            AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                    DATATABLES_ANNOTATION);
+
+            annotationBuilder.addBooleanAttribute("ajax", ajax);
+
             // Add annotation to target type
-            classOrInterfaceTypeDetailsBuilder
-                    .addAnnotation(DATATABLES_ANNOTATION_BUILDER.build());
+            classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder
+                    .build());
 
             // Save changes to disk
             typeManagementService
@@ -276,11 +278,11 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     }
 
     /** {@inheritDoc} */
-    public void annotateAll() {
+    public void annotateAll(boolean ajax) {
         // Locate all controllers and annotate it
         for (JavaType type : typeLocationService
                 .findTypesWithAnnotation(SCAFFOLD_ANNOTATION)) {
-            annotateController(type);
+            annotateController(type, ajax);
         }
     }
 

@@ -36,13 +36,18 @@ public interface DatatablesOperations {
 
     /**
      * Annotate the provided web mvc controller with {@link GvNIXDatatables}
+     * 
+     * @param controller
+     * @param ajax
      */
-    void annotateController(JavaType controller);
+    void annotateController(JavaType controller, boolean ajax);
 
     /**
      * Annotate all controllers with {@link GvNIXDatatables}
+     * 
+     * @param ajax
      */
-    void annotateAll();
+    void annotateAll(boolean ajax);
 
     /**
      * Setup all artifacts

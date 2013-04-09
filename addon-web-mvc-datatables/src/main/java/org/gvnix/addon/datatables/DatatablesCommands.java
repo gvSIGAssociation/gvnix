@@ -77,8 +77,9 @@ public class DatatablesCommands implements CommandMarker {
      */
     @CliCommand(value = "web mvc datatables add", help = "Use datatable component for a controller list view")
     public void add(
-            @CliOption(key = "type", mandatory = true, help = "The controller to apply this component to") JavaType target) {
-        operations.annotateController(target);
+            @CliOption(key = "type", mandatory = true, help = "The controller to apply this component to") JavaType target,
+            @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "Datatables will use AJAX request to get data data or not") boolean ajax) {
+        operations.annotateController(target, ajax);
     }
 
     /**
@@ -86,8 +87,9 @@ public class DatatablesCommands implements CommandMarker {
      * attribute.
      */
     @CliCommand(value = "web mvc datatables all", help = "Use datatable component for all list view in this application")
-    public void all() {
-        operations.annotateAll();
+    public void all(
+            @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "Datatables will use AJAX request to get data data or not") boolean ajax) {
+        operations.annotateAll(ajax);
     }
 
     /**
