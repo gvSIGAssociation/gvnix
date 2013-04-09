@@ -79,7 +79,7 @@
   		sortable="${empty sortable or sortable}"
   		sortInit="${sortInit}"
   		sortDirection="${sortDirection}"
-  		filterable="${empty filterable or filterable}"
+  		filterable="${filterable}"
   		searchable="${empty searchable or searchable}"
   		filterType="${filterType}"
   		filterCssClass="${filterCssClass}"
