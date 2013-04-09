@@ -24,7 +24,7 @@
     <listitem>
       <para>Existen varios comando para creación de add-on dependiendo
         de los requisitos y tipo de add-on. En este apartado usaremos
-        el <command>addon create simple<command>. Ejemplo:</para>
+        el <command>addon create simple</command>. Ejemplo:</para>
 
       <programlisting>roo> addon create simple --topLevelPackage org.gvnix.addon.cxf</programlisting>
 
