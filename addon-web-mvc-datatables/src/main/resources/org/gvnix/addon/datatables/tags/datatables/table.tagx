@@ -96,6 +96,9 @@
   <c:if test="${empty deferRender}">
   	<c:set var="deferRender" value="false"/>
   </c:if>
+  <c:if test="${empty serverSide}">
+  	<c:set var="serverSide" value="true"/>
+  </c:if>
   <c:if test="${empty paginationType}">
   	<c:set var="paginationType" value="full_numbers"/>
   </c:if>
@@ -245,7 +248,7 @@
       autoWidth="${autoWidth}"
 
       processing="${empty processing or processing}"
-      serverSide="${empty serverSide or serverSide}"
+      serverSide="${serverSide}"
       pipelining="${pipelining}"
       pipeSize="${pipeSize}"
       stateSave="${empty stateSave or stateSave}"
