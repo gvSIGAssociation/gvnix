@@ -17,6 +17,8 @@
   <jsp:directive.attribute name="delete" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Include 'delete' link into table (default true)" />
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+  <jsp:directive.attribute name="actionHeaderCssStyle" type="java.lang.String" required="false" description="Custom css-style for action columns header" />
+  
 
   <!-- ====================================== -->
   <!-- ====================================== -->
@@ -85,6 +87,11 @@
   <!-- typeIdFieldName -->
   <c:if test="${empty typeIdFieldName}">
       <c:set var="typeIdFieldName" value="id" />
+  </c:if>
+  
+  <!-- actionHeaderCssStyle -->
+  <c:if test="${empty actionHeaderCssStyle}">
+      <c:set var="actionHeaderCssStyle" value="color: #ffffff;background: #ffffff;padding: 2px;" />
   </c:if>
     
   <!-- Type Name -->  
@@ -277,11 +284,11 @@
         <c:choose>
           <c:when test="${serverSide}">
             <!-- AJAX cell render -->
-			<datatables:column id="${showColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" renderFunction="${showColumnId}"/>
+			<datatables:column id="${showColumnId}" title=" " property=""  cssCellClass="utilbox" sortable="false" renderFunction="${showColumnId}" cssStyle="${actionHeaderCssStyle}"  filterable="false"/>
           </c:when>
 		  <c:otherwise>
 			  <!-- DOM cell render -->
-			  <datatables:column id="${showColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false">
+			  <datatables:column id="${showColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" cssStyle="${actionHeaderCssStyle}"  filterable="false">
 	            <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
                   <spring:url value="${path}/${itemId}" var="show_form_url" />
                   <spring:url value="/resources/images/show.png" var="show_image_url" />
@@ -298,11 +305,11 @@
            <c:choose>
 			  <c:when test="${serverSide}">
 			    <!-- AJAX cell render -->
-			    <datatables:column id="${updateColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" renderFunction="${updateColumnId}"/>
+			    <datatables:column id="${updateColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" renderFunction="${updateColumnId}" cssStyle="${actionHeaderCssStyle}"  filterable="false"/>
 			  </c:when>
 			  <c:otherwise>
 			    <!-- DOM cell render -->
-			    <datatables:column id="${updateColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false">
+			    <datatables:column id="${updateColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" cssStyle="${actionHeaderCssStyle}"  filterable="false">
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
 	              <spring:url value="${path}/${itemId}" var="update_form_url">
 	                <spring:param name="form" />
@@ -322,11 +329,11 @@
            <c:choose>
 			  <c:when test="${serverSide}">
 			    <!-- AJAX cell render -->
-			    <datatables:column id="${removeColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" renderFunction="${removeColumnId}"/>
+			    <datatables:column id="${removeColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" renderFunction="${removeColumnId}" cssStyle="${actionHeaderCssStyle}"  filterable="false"/>
 			  </c:when>
 			  <c:otherwise>
 			    <!-- DOM cell render -->
-			    <datatables:column id="${removeColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false">
+			    <datatables:column id="${removeColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" cssStyle="${actionHeaderCssStyle}"  filterable="false">
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
                   <spring:url value="${path}/${itemId}" var="delete_form_url" />
                   <spring:url value="/resources/images/delete.png" var="delete_image_url" />

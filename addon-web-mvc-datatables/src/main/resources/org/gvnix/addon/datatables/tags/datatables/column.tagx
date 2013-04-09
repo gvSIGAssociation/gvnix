@@ -59,14 +59,15 @@
   	<c:set var="filterType" value="INPUT" />
   </c:if>
   <c:if test="${empty display}">
-  	<c:set var="display" value="ALL" />
+  	<!--  <c:set var="display" value="ALL" />  XXX This must be enougth to show this column -->
+  	<c:set var="display" value="ALL,HTML,CSV,XML,XLS,XLSX,PDF,RTF,JSON" /> 
   </c:if>
   
 
   <datatables:column
   		id="${id}" 
   		property="${property}" 
-  		maxLength="${maxLength}" 
+  		maxLength="${empty maxLength ? 128 : maxLength}" 
   		label="${label}"
   		date="${date}"
   		calendar="${calendar}"
