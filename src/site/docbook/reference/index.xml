@@ -105,6 +105,8 @@
     <xi:include href="guia-desarrollo_capa-web-buscadores.xml"/>
     
     <xi:include href="guia-desarrollo_capa-web-arranque-pruebas.xml"/>
+    
+    <xi:include href="guia-desarrollo_mejoras-rendimiento.xml"/>
   </part>
 
   <part xml:id="addons-gvnix">

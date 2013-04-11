@@ -242,6 +242,16 @@ shell&gt; <emphasis role="bold">mvn clean package -P pro -D database.password=my
 	</figure>
 	
   </section>
+
+  <section>
+  	<title>Mejoras de renimiento</title>
+  
+  	<para xml:lang="es">Se pueden definir algunos valores óptimos 
+  	de rendimiento definidos en la sección
+  	<link linkend="guia-desarrollo_mejoras-rendimiento-patrones-log">
+  	Patrones de conversión óptimos en el log</link>.
+  	</para>
+  </section>
   
   <section xml:id="addon-dynamic_config_futuras-versiones">
     <title xml:lang="es">Futuras versiones</title>

@@ -753,5 +753,15 @@ public class BaseController {
     adaptarlo a sus requerimientos. En la sección sobre modificación de código se
     explica como hacerlo.</para>
   </section>
+  
+  <section>
+  	<title>Mejoras de renimiento</title>
+  
+  	<para xml:lang="es">Se pueden implementar algunas mejoras de rendimiento
+  	definidas en la sección
+  	<link linkend="guia-desarrollo_mejoras-rendimiento-evitar-carga-listas-innecesarias">
+  	Evitar la carga de listas de valores innecesarias</link>.
+  	</para>
+  </section>
 
 </chapter>
