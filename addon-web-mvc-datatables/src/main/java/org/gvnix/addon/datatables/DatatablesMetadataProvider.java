@@ -17,18 +17,28 @@
  */
 package org.gvnix.addon.datatables;
 
+import static org.springframework.roo.classpath.customdata.CustomDataKeys.PERSISTENT_TYPE;
+
 import java.util.List;
+import java.util.Map;
 
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
+import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
+import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.scanner.MemberDetails;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 
@@ -42,6 +52,8 @@ import org.springframework.roo.project.LogicalPath;
 @Service
 public final class DatatablesMetadataProvider extends
         AbstractItdMetadataProvider {
+
+    @Reference private WebMetadataService webMetadataService;
 
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
@@ -99,9 +111,20 @@ public final class DatatablesMetadataProvider extends
                 .get(JpaMetadataId);
         String plural = jpaMetadata.getPlural();
 
+        JavaSymbolName entityManagerMethodName = jpaMetadata
+                .getEntityManagerMethod().getMethodName();
+
+        // check if has metadata types
+        final MemberDetails entityMemberDetails = getMemberDetails(entity);
+
+        final Map<JavaSymbolName, DateTimeFormatDetails> datePatterns = webMetadataService
+                .getDatePatterns(entity, entityMemberDetails,
+                        metadataIdentificationString);
+        boolean hasDateTypes = !datePatterns.isEmpty();
+
         return new DatatablesMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, entity,
-                identifiers, plural);
+                identifiers, plural, entityManagerMethodName, hasDateTypes);
     }
 
     /**

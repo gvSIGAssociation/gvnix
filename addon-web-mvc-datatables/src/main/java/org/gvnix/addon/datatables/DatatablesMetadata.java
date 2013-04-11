@@ -22,13 +22,15 @@ import static org.springframework.roo.model.JdkJavaType.HASH_SET;
 import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.JdkJavaType.MAP;
 import static org.springframework.roo.model.JdkJavaType.SET;
+import static org.springframework.roo.model.SpringJavaType.MODEL;
+import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
 import static org.springframework.roo.model.SpringJavaType.REQUEST_MAPPING;
 import static org.springframework.roo.model.SpringJavaType.RESPONSE_BODY;
-import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -54,7 +56,6 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.logging.HandlerUtils;
 
@@ -131,6 +132,17 @@ public class DatatablesMetadata extends
             HASH_SET.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING));
 
+    private static final JavaType DATATABLES_UTILS = new JavaType(
+            "org.gvnix.datatables.utils.DatatablesUtils");
+
+    private static final JavaType DATATABLES_UTILS_RESULT = new JavaType(
+            "org.gvnix.datatables.utils.DatatablesUtils.FindResult");
+
+    private static final JavaType DATE_FORMAT = new JavaType(
+            "java.text.DateFormat");
+    private static final JavaType SIMPLE_DATE_FORMAT = new JavaType(
+            "java.text.SimpleDateFormat");
+
     private static final JavaSymbolName CRITERIA_PARAM_NAME = new JavaSymbolName(
             "criterias");
     private static final JavaSymbolName ITEM_LIST_PARAM_NAME = new JavaSymbolName(
@@ -139,8 +151,6 @@ public class DatatablesMetadata extends
             "com.github.dandelion.datatables.core.ajax.DatatablesCriterias");
     private static final JavaSymbolName RENDER_FOR_DATATABLES = new JavaSymbolName(
             "renderForDatatables");
-    private static final JavaSymbolName FIND_BY_CRITERIA = new JavaSymbolName(
-            "findByCriteria");
     private static final JavaSymbolName GET_DATATABLES_DATA = new JavaSymbolName(
             "getDatatablesData");
     private static final JavaSymbolName LIST_DATATABLES = new JavaSymbolName(
@@ -183,22 +193,32 @@ public class DatatablesMetadata extends
     /**
      * Annotation values
      */
-    private DatatablesAnnotationValues annotationValues;
+    private final DatatablesAnnotationValues annotationValues;
 
     /**
      * Entity properties which compound its identifier
      */
-    private List<FieldMetadata> identifierProperties;
+    private final List<FieldMetadata> identifierProperties;
 
     /**
      * Related entity
      */
-    private JavaType entity;
+    private final JavaType entity;
 
     /**
      * Related entity plural
      */
-    private String entityPlural;
+    private final String entityPlural;
+
+    /**
+     * Method name to get entity manager from entity class
+     */
+    private final JavaSymbolName entityEntityManagerMethod;
+
+    /**
+     * If related entity has date types
+     */
+    private final boolean entityHasDateTypes;
 
     /**
      * Field which holds conversionService
@@ -213,15 +233,19 @@ public class DatatablesMetadata extends
     public DatatablesMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             DatatablesAnnotationValues annotationValues, JavaType entity,
-            List<FieldMetadata> identifierProperties, String entityPlural) {
+            List<FieldMetadata> identifierProperties, String entityPlural,
+            JavaSymbolName entityManagerMethodName, boolean hasDateTypes) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
 
         this.annotationValues = annotationValues;
-        this.identifierProperties = identifierProperties;
+        this.identifierProperties = Collections
+                .unmodifiableList(identifierProperties);
         this.entity = entity;
         this.entityPlural = entityPlural;
+        this.entityEntityManagerMethod = entityManagerMethodName;
+        this.entityHasDateTypes = hasDateTypes;
 
         // Adding field definition
         builder.addField(getConversionServiceField());
@@ -230,7 +254,6 @@ public class DatatablesMetadata extends
         // Adding methods definition
         builder.addMethod(getRenderForDatatablesMethod());
         builder.addMethod(getGetDatatablesDataMethod());
-        builder.addMethod(getFindByCriteriaMethod());
         builder.addMethod(getListDatatablesRequestMethod());
         builder.addMethod(getPopulateAJAXDatatablesMethod());
 
@@ -295,7 +318,7 @@ public class DatatablesMetadata extends
     private MethodMetadata getListDatatablesRequestMethod() {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
-                .convertFromJavaTypes(SpringJavaType.MODEL);
+                .convertFromJavaTypes(MODEL);
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -412,68 +435,13 @@ public class DatatablesMetadata extends
 
     }
 
-    private MethodMetadata getFindByCriteriaMethod() {
-        // Define method parameter types
-        JavaType objectList = new JavaType(LIST.getFullyQualifiedTypeName(), 0,
-                DataType.TYPE, null, Arrays.asList(entity));
-        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
-                .convertFromJavaTypes(DATATABLES_CRITERIA_TYPE);
-
-        // Check if a method with the same signature already exists in the
-        // target type
-        final MethodMetadata method = methodExists(FIND_BY_CRITERIA,
-                parameterTypes);
-        if (method != null) {
-            // If it already exists, just return the method and omit its
-            // generation via the ITD
-            return method;
-        }
-
-        // Define method annotations (none in this case)
-        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
-
-        // Define method throws types (none in this case)
-        List<JavaType> throwsTypes = new ArrayList<JavaType>();
-
-        // Define method parameter names
-        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-        parameterNames.add(CRITERIA_PARAM_NAME);
-
-        // Create the method body
-        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildFindByCriteriaMethodBody(bodyBuilder);
-
-        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
-        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, FIND_BY_CRITERIA, objectList,
-                parameterTypes, parameterNames, bodyBuilder);
-        methodBuilder.setAnnotations(annotations);
-        methodBuilder.setThrowsTypes(throwsTypes);
-
-        return methodBuilder.build(); // Build and return a MethodMetadata
-                                      // instance
-    }
-
-    private void buildFindByCriteriaMethodBody(
-            InvocableMemberBodyBuilder bodyBuilder) {
-        // TODO filter by criteria
-        bodyBuilder.appendFormalLine("// TODO Filter by critera");
-        // return Pet.findPetEntries(
-        // criterias.getDisplayStart(), criterias.getDisplaySize());;
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("return %1$s.find%2$sEntries(%3$s.getDisplayStart(), %3$s.getDisplaySize());",
-                                getFinalTypeName(entity),
-                                entity.getSimpleTypeName(),
-                                CRITERIA_PARAM_NAME.getSymbolName()));
-    }
-
     private MethodMetadata getGetDatatablesDataMethod() {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
 
         parameterTypes.add(new AnnotatedJavaType(DATATABLES_CRITERIA_TYPE,
                 new AnnotationMetadataBuilder(DATATABLES_PARAMS).build()));
+        parameterTypes.add(AnnotatedJavaType.convertFromJavaType(MODEL));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -502,6 +470,7 @@ public class DatatablesMetadata extends
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(CRITERIA_PARAM_NAME);
+        parameterNames.add(UI_MODEL);
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -527,42 +496,55 @@ public class DatatablesMetadata extends
                 getFinalTypeName(LIST_MAP_STRING_STRING),
                 getFinalTypeName(RENDER_FOR_DATATABLES_RETURN_IMP)));
 
+        JavaType findResult = new JavaType(
+                DATATABLES_UTILS_RESULT.getFullyQualifiedTypeName(), 0,
+                DataType.TYPE, null, Arrays.asList(entity));
+
+        // FindResult<Pet> findResult =
+        // DatatablesUtils.findByCriteria(Pet.class, Pet.entityManager(),
+        // criterias);
+        bodyBuilder.appendFormalLine(String.format(
+                "%s findResult = %s.findByCriteria(%s.class, %s.%s(), %s);",
+                getFinalTypeName(findResult),
+                getFinalTypeName(DATATABLES_UTILS), getFinalTypeName(entity),
+                getFinalTypeName(entity),
+                entityEntityManagerMethod.getSymbolName(),
+                CRITERIA_PARAM_NAME.getSymbolName()));
+
         JavaType objectList = new JavaType(LIST.getFullyQualifiedTypeName(), 0,
                 DataType.TYPE, null, Arrays.asList(entity));
-        // List<Pet> petList = findByCriteria(criterias);
+        // List<Pet> petList = findResult.getResult();
         String itemListVar = StringUtils.uncapitalize(
                 entity.getSimpleTypeName()).concat("List");
-        bodyBuilder.appendFormalLine(String.format("%s %s = %s(%s);",
-                getFinalTypeName(objectList), itemListVar, FIND_BY_CRITERIA,
-                CRITERIA_PARAM_NAME.getSymbolName()));
+        bodyBuilder.appendFormalLine(String.format(
+                "%s %s = findResult.getResult();",
+                getFinalTypeName(objectList), itemListVar));
         // if (petList != null) {
         bodyBuilder.appendFormalLine(String.format("if (%s != null) {",
                 itemListVar));
         bodyBuilder.indent();
-        // rendered = renderForDatatables(petList,criterias);
-        bodyBuilder.appendFormalLine(String.format("rendered = %s(%s,%s);",
+        // rendered = renderForDatatables(petList,criterias,uiModel);
+        bodyBuilder.appendFormalLine(String.format("rendered = %s(%s,%s,%s);",
                 RENDER_FOR_DATATABLES.getSymbolName(), itemListVar,
-                CRITERIA_PARAM_NAME.getSymbolName()));
+                CRITERIA_PARAM_NAME.getSymbolName(), UI_MODEL.getSymbolName()));
 
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        // long recordsFound = (long)petList.size();
-        bodyBuilder.appendFormalLine(String.format(
-                "long recordsFound = (long)%s.size();", itemListVar));
+        // long recordsFound = findResult.getTotalResultCount();
+        bodyBuilder
+                .appendFormalLine("long recordsFound = findResult.getTotalResultCount();");
 
         JavaType dataSet = new JavaType(
                 "com.github.dandelion.datatables.core.ajax.DataSet", 0,
                 DataType.TYPE, null, Arrays.asList(MAP_STRING_STRING));
 
         // DataSet<Map<String, String>> dataSet = new DataSet<Map<String,
-        // String>>(rendered, recordsFound, Math.min(recordsFound,
-        // criterias.getDisplaySize()));
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("%s dataSet =  new %1$s(rendered,recordsFound,Math.min(recordsFound,(long)%s.getDisplaySize()));",
-                                getFinalTypeName(dataSet),
-                                CRITERIA_PARAM_NAME.getSymbolName()));
+        // String>>(rendered, Pet.countPets(), recordsFound);
+        bodyBuilder.appendFormalLine(String.format(
+                "%s dataSet =  new %1$s(rendered,%s.count%s(),recordsFound);",
+                getFinalTypeName(dataSet), getFinalTypeName(entity),
+                entityPlural));
 
         // return DatatablesResponse.build(dataSet, criterias);
         bodyBuilder.appendFormalLine(String.format(
@@ -576,7 +558,8 @@ public class DatatablesMetadata extends
         JavaType objectList = new JavaType(LIST.getFullyQualifiedTypeName(), 0,
                 DataType.TYPE, null, Arrays.asList(entity));
         List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
-                .convertFromJavaTypes(objectList, DATATABLES_CRITERIA_TYPE);
+                .convertFromJavaTypes(objectList, DATATABLES_CRITERIA_TYPE,
+                        MODEL);
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -598,6 +581,7 @@ public class DatatablesMetadata extends
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(ITEM_LIST_PARAM_NAME);
         parameterNames.add(CRITERIA_PARAM_NAME);
+        parameterNames.add(UI_MODEL);
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -622,7 +606,6 @@ public class DatatablesMetadata extends
      */
     private void buildRenderForDatatablesMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        // XXX
         // Get logger to trace data load problems
         // Logger logger = Logger.getLogger(getClass().getName());
         bodyBuilder.appendFormalLine(String.format(
@@ -658,9 +641,26 @@ public class DatatablesMetadata extends
                 getFinalTypeName(DATATABLES_COLUMNDEF),
                 CRITERIA_PARAM_NAME.getSymbolName()));
         bodyBuilder.indent();
+        // fields.add(colum.getName());
         bodyBuilder.appendFormalLine("fields.add(colum.getName());");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("// Date formaters");
+        // DateFormat defaultFormat = SimpleDateFormat.getDateInstance();
+        bodyBuilder.appendFormalLine(String.format(
+                "%s defaultFormat = %s.getDateInstance();",
+                getFinalTypeName(DATE_FORMAT),
+                getFinalTypeName(SIMPLE_DATE_FORMAT)));
+
+        // If entity has date attributes use addDateTimeFormatPatterns method
+        // to initialize formatters
+        if (entityHasDateTypes) {
+            bodyBuilder
+                    .appendFormalLine(String.format(
+                            "addDateTimeFormatPatterns(%s);",
+                            UI_MODEL.getSymbolName()));
+        }
 
         bodyBuilder.appendFormalLine("// Load result");
         // Map<String, String> rendered = null;
@@ -722,9 +722,38 @@ public class DatatablesMetadata extends
         String conversionService = getConversionServiceField().getFieldName()
                 .getSymbolName();
 
-        // if (conversionService.canConvert(value.getClass(), String.class)) {
+        // if (DatatablesUtils.DATE_CLASSES.contains(value.getClass())) {
         bodyBuilder.appendFormalLine(String.format(
-                "if (%s.canConvert(value.getClass(), String.class)) {",
+                "if (%s.DATE_CLASSES.contains(value.getClass())) {",
+                getFinalTypeName(DATATABLES_UTILS)));
+        bodyBuilder.indent();
+        if (entityHasDateTypes) {
+            // DateFormat format = (DateFormat)
+            // uiModel.asMap().get("pet_".concat(fieldName).concat("_date_format"));
+            bodyBuilder
+                    .appendFormalLine(String
+                            .format("%s format = (%s) uiModel.asMap().get(\"%s_\".concat(fieldName).concat(\"_date_format\"));",
+                                    getFinalTypeName(DATE_FORMAT),
+                                    getFinalTypeName(DATE_FORMAT), StringUtils
+                                            .uncapitalize(entity
+                                                    .getSimpleTypeName())));
+            // format = format == null ? defaultFormat : format;
+            bodyBuilder
+                    .appendFormalLine("format = format == null ? defaultFormat : format;");
+            // valueStr = format.format(value);
+            bodyBuilder.appendFormalLine("valueStr = format.format(value);");
+        }
+        else {
+            // valueStr = defaultFormat.format(value);
+            bodyBuilder
+                    .appendFormalLine("valueStr = defaultFormat.format(value);");
+        }
+
+        bodyBuilder.indentRemove();
+        // } else if (conversionService.canConvert(value.getClass(),
+        // String.class)) {
+        bodyBuilder.appendFormalLine(String.format(
+                "} else if (%s.canConvert(value.getClass(), String.class)) {",
                 conversionService));
         bodyBuilder.indent();
         // valueStr = conversionService.convert(value, String.class);

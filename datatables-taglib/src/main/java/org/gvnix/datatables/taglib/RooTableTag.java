@@ -20,7 +20,6 @@ package org.gvnix.datatables.taglib;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
@@ -32,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import com.github.dandelion.datatables.core.constants.ExportConstants;
 import com.github.dandelion.datatables.core.export.ExportConf;
 import com.github.dandelion.datatables.core.export.ExportType;
-import com.github.dandelion.datatables.jsp.tag.AbstractColumnTag;
 import com.github.dandelion.datatables.jsp.tag.TableTag;
 
 /**
