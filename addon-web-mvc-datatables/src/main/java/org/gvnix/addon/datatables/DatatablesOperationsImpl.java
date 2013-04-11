@@ -346,6 +346,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         copyDirectoryContents("scripts/datatables/*.js",
                 pathResolver.getIdentifier(webappPath, "/scripts/datatables"),
                 true);
+        copyDirectoryContents("scripts/datatables/README.txt",
+                pathResolver.getIdentifier(webappPath, "/scripts/datatables"),
+                true);
 
         // install js i18n
         copyDirectoryContents("scripts/datatables/i18n/*.txt",
@@ -418,7 +421,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             jqueryJsUrl = docTagx.createElement("spring:url");
             jqueryJsUrl.setAttribute("var", "js_jquery_url");
             jqueryJsUrl.setAttribute("value",
-                    "/resources/scripts/datatables/jquery.js");
+                    "/resources/scripts/datatables/jquery-min.js");
             root.appendChild(jqueryJsUrl);
             modified = true;
         }
@@ -429,7 +432,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             jqueryDtJsUrl = docTagx.createElement("spring:url");
             jqueryDtJsUrl.setAttribute("var", "js_jquery_datatables_url");
             jqueryDtJsUrl.setAttribute("value",
-                    "/resources/scripts/datatables/jquery.dataTables.js");
+                    "/resources/scripts/datatables/jquery.dataTables.min.js");
             root.appendChild(jqueryDtJsUrl);
             modified = true;
         }
