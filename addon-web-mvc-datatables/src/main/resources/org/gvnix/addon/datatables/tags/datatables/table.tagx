@@ -28,7 +28,7 @@
 
 
   <jsp:directive.attribute name="url" type="java.lang.String" rtexprvalue="true"  required="false" description="Web service URL used to populate the table.  (Either data or url attribute is required)" />
-  <jsp:directive.attribute name="appear" type="java.lang.String" rtexprvalue="true" required="false" description="(block|fadein[,duration]) Display mode used when the table has finished loading and must appear in the page.  A duration can be set (in milliseconds) if the display mode is set to 'fadein'. (Default : 'fadein')" />
+  <jsp:directive.attribute name="appear" type="java.lang.String" rtexprvalue="true" required="false" description="(block|fadein[,duration]) Display mode used when the table has finished loading and must appear in the page.  A duration can be set (in milliseconds) if the display mode is set to 'fadein'. (Default : 'block')" />
   <jsp:directive.attribute name="jsonp" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Allows to retrieve JSON data from any domain name, regardless of XSS protection." />
   <jsp:directive.attribute name="cdn" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable the DataTables source files to be loaded from the Microsoft CDN (Content Delivery Framework) preventing you from hosting the files yourself. (Default : false)" />
   <jsp:directive.attribute name="cssStyle" type="java.lang.String" rtexprvalue="true" required="false" description="CSS style applied on the HTML table. (HTML style attribute)" />
@@ -98,7 +98,7 @@
   <spring:message var="typeName" code="menu_item_${fn:toLowerCase(fn:split(id,'_')[fn:length(fn:split(id,'_')) - 1])}_new_label" htmlEscape="false" />
   
   <c:if test="${empty appear}">
-  	<c:set var="appear" value="fadein,0"/>
+  	<c:set var="appear" value="block"/>
   </c:if>
   <c:if test="${empty deferRender}">
   	<c:set var="deferRender" value="false"/>
