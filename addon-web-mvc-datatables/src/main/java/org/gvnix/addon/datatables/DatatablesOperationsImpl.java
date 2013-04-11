@@ -41,6 +41,7 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.operations.AbstractOperations;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.FeatureNames;
@@ -144,11 +145,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     public void annotateController(JavaType javaType, boolean ajax) {
         Validate.notNull(javaType, "Controller required");
 
-        // Obtain ClassOrInterfaceTypeDetails for this java type
-        ClassOrInterfaceTypeDetails existing = typeLocationService
-                .getTypeDetails(javaType);
-
-        Validate.notNull(existing, "Can't get Type details");
+        ClassOrInterfaceTypeDetails existing = getControllerDetails(javaType);
 
         // Get controller annotation
         final AnnotationMetadata controllerAnnotation = MemberFindingUtils
@@ -164,13 +161,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
         // Check is JPA active record (currently add-on only supports this
         // entities)
-        AnnotationAttributeValue<Object> entityValue = controllerAnnotation
-                .getAttribute("formBackingObject");
-        Validate.notNull(entityValue,
-                "formBackingObject annotation value not found");
-        JavaType entityValueType = (JavaType) entityValue.getValue();
-        Validate.notNull(entityValueType,
-                "formBackingObject annotation value not found");
+        JavaType entityValueType = getControllerFormBackingObject(controllerAnnotation);
         ClassOrInterfaceTypeDetails entity = typeLocationService
                 .getTypeDetails(entityValueType);
         final boolean isActiveRecord = MemberFindingUtils.getAnnotationOfType(
@@ -200,9 +191,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                     .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
                             .build());
 
-            doUpdateControllerListJsp(existing, controllerAnnotation);
+            doUpdateControllerListJsp(javaType, controllerAnnotation);
 
-            updateListMenuUrl(javaType);
+            doUpdateListMenuUrl(javaType, controllerAnnotation);
         }
     }
 
@@ -217,36 +208,38 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         Validate.notNull(controller, "Controller required");
 
         // Obtain ClassOrInterfaceTypeDetails for this java type
-        ClassOrInterfaceTypeDetails existing = typeLocationService
-                .getTypeDetails(controller);
-
-        Validate.notNull(existing, "Can't get Type details");
+        ClassOrInterfaceTypeDetails existing = getControllerDetails(controller);
 
         // Get controller annotation
         final AnnotationMetadata controllerAnnotation = MemberFindingUtils
                 .getAnnotationOfType(existing.getAnnotations(),
                         SCAFFOLD_ANNOTATION);
 
-        doUpdateControllerListJsp(existing, controllerAnnotation);
+        doUpdateControllerListJsp(controller, controllerAnnotation);
+    }
+
+    private ClassOrInterfaceTypeDetails getControllerDetails(JavaType controller) {
+        ClassOrInterfaceTypeDetails existing = typeLocationService
+                .getTypeDetails(controller);
+
+        Validate.notNull(existing, "Can't get Type details");
+        return existing;
     }
 
     /**
      * Updates de list.jspx page of target controller to use datatables
      * component.
      */
-    private void doUpdateControllerListJsp(
-            ClassOrInterfaceTypeDetails controllerDetails,
+    private void doUpdateControllerListJsp(JavaType controller,
             AnnotationMetadata controllerAnnotation) {
         // locate list.jspx application path from @RooWebScaffold path value
-        AnnotationAttributeValue<Object> controllerPathAttribute = controllerAnnotation
-                .getAttribute("path");
-        Validate.notNull(controllerPathAttribute,
+        String controllerPath = getControllerPath(controllerAnnotation);
+        Validate.notBlank(controllerPath,
                 "Path is not specified in the @RooWebScaffold annotation for '"
-                        + controllerDetails.getName() + "'");
-        String controllerPath = (String) controllerPathAttribute.getValue();
+                        + controller.getSimpleTypeName() + "'");
         Validate.isTrue(controllerPath != null && !controllerPath.isEmpty(),
                 "Path is not specified in the @RooWebScaffold annotation for '"
-                        + controllerDetails.getName() + "'");
+                        + controller.getSimpleTypeName() + "'");
         if (!controllerPath.startsWith("/")) {
             controllerPath = "/".concat(controllerPath);
         }
@@ -275,6 +268,41 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         DomUtils.removeTextNodes(docJspXml);
         fileManager.createOrUpdateTextFileIfRequired(docJspx,
                 XmlUtils.nodeToString(docJspXml), true);
+    }
+
+    /**
+     * Gets attribute value {@code path} from a controller annotation
+     * 
+     * @param controllerAnnotation
+     * @return
+     */
+    private String getControllerPath(AnnotationMetadata controllerAnnotation) {
+        AnnotationAttributeValue<Object> controllerPathAttribute = controllerAnnotation
+                .getAttribute("path");
+        if (controllerPathAttribute == null) {
+            return null;
+        }
+
+        String controllerPath = (String) controllerPathAttribute.getValue();
+        return controllerPath;
+    }
+
+    /**
+     * Gets attribute value {@code formBackingObject} from a controller
+     * annotation
+     * 
+     * @param controllerAnnotation
+     * @return
+     */
+    private JavaType getControllerFormBackingObject(
+            AnnotationMetadata controllerAnnotation) {
+        AnnotationAttributeValue<Object> controllerAttribute = controllerAnnotation
+                .getAttribute("formBackingObject");
+        if (controllerAttribute == null) {
+            return null;
+        }
+        JavaType controllerPath = (JavaType) controllerAttribute.getValue();
+        return controllerPath;
     }
 
     /** {@inheritDoc} */
@@ -332,6 +360,11 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 projectOperations, depens);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.gvnix.addon.datatables.DatatablesOperations#updateTags()
+     */
     @Override
     public void updateTags() {
         PathResolver pathResolver = projectOperations.getPathResolver();
@@ -374,7 +407,50 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * springframework.roo.model.JavaType)
      */
     public void updateListMenuUrl(JavaType controller) {
-        // TODO Auto-generated method stub
+
+        Validate.notNull(controller, "Controller required");
+
+        // Obtain ClassOrInterfaceTypeDetails for this java type
+        ClassOrInterfaceTypeDetails existing = getControllerDetails(controller);
+
+        // Get controller annotation
+        final AnnotationMetadata controllerAnnotation = MemberFindingUtils
+                .getAnnotationOfType(existing.getAnnotations(),
+                        SCAFFOLD_ANNOTATION);
+
+        doUpdateListMenuUrl(controller, controllerAnnotation);
+
+    }
+
+    /**
+     * Remove <code>page</code> and <code>size</code> parameters from list menu
+     * link for target controller
+     * 
+     * @param controllerDetails
+     * @param controllerAnnotation
+     */
+    public void doUpdateListMenuUrl(JavaType controller,
+            AnnotationMetadata controllerAnnotation) {
+
+        String controllerPath = getControllerPath(controllerAnnotation);
+
+        JavaType formBackingType = getControllerFormBackingObject(controllerAnnotation);
+        Validate.notNull(formBackingType,
+                "formBackingObject is not specified in the @RooWebScaffold annotation for '"
+                        + controller.getSimpleTypeName() + "'");
+        final JavaSymbolName categoryName = new JavaSymbolName(
+                formBackingType.getSimpleTypeName());
+
+        final LogicalPath webappPath = LogicalPath.getInstance(
+                Path.SRC_MAIN_WEBAPP, "");
+
+        final JavaSymbolName listMenuItemId = new JavaSymbolName("list");
+        menuOperations.cleanUpMenuItem(categoryName, listMenuItemId,
+                MenuOperations.DEFAULT_MENU_ITEM_PREFIX, webappPath);
+
+        menuOperations.addMenuItem(categoryName, listMenuItemId,
+                "global_menu_list", "/" + controllerPath,
+                MenuOperations.DEFAULT_MENU_ITEM_PREFIX, webappPath);
     }
 
     private LogicalPath getWebappPath() {

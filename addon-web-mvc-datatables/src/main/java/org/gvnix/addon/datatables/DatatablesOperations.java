@@ -84,6 +84,8 @@ public interface DatatablesOperations {
     /**
      * Remove <code>page</code> and <code>size</code> parameters from list menu
      * link for target controller
+     * 
+     * @param controller
      */
     void updateListMenuUrl(JavaType controller);
 
