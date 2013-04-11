@@ -194,12 +194,12 @@
       </c:if>  	
   </c:if>
   
-  <!-- remove -->  
-  <c:if test="${empty remove}">
-  	<c:set var="remove" value="true"/>  	
+  <!-- delete -->  
+  <c:if test="${empty delete}">
+  	<c:set var="delete" value="true"/>  	
   </c:if>
   
-  <c:if test="${remove}">
+  <c:if test="${delete}">
   	<c:set var="removeColumnId" value="${id}_remove_col"/>
   	<c:if test="${serverSide}">
   	    <c:set var="delete_label">
@@ -332,7 +332,7 @@
           </c:if>
 
          <!-- Remove current row column -->
-         <c:if test="${remove}">
+         <c:if test="${delete}">
            <c:choose>
 			  <c:when test="${serverSide}">
 			    <!-- AJAX cell render -->
