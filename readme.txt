@@ -40,15 +40,23 @@ Setup instructions
 Roo
 ---
 
-If you have any questions about MAVEN, GIT, GPG or ECLIPSE setup see the following document::
+gvNIX provides its own distribution of the Spring Roo source code. This is needed because gvNIX has some patches still not included in a Roo published distribution, and the process to generate a distribution of gvNIX needs all the sources.
+
+Then, first of all you must configure and compile the roo projects, by following the steps provided in the document::
 
  roo/readme.txt
+
+It provides more information of projects requirements and setup, like MAVEN, GIT, GPG or ECLIPSE.
+
+If you don't want to perform the GPG configuration needed to sign build outputs, just add the following parameter each time you call mvn to build the project::
+
+  -Dgpg.skip=true
 
 Git
 ---
 
 Git is used for download Roo source code, but Roo is stored into gvNIX SVN too.
-To compile gvNIX project you don't need Git installed, it is only required for upgrade gvNIX based Roo source code.
+To compile the gvNIX project source code you don't need Git installed, it is only required to upgrade the gvNIX based Roo source code.
 
 First, you need a GitHub account:
 
@@ -56,8 +64,8 @@ First, you need a GitHub account:
 
 And your SSH public key from your account settings (http://help.github.com/linux-set-up-git/).
 
-Roo source code is commited on gvNIX project at ``roo`` folder.
-However, Roo source code can be updated to a new tag with next commands:
+Roo source code is commited on gvNIX project in the ``roo`` folder.
+However, Roo source code can be updated to a new tag with the following commands:
 
 * Ask which branch is current:	git status
 * Revert working copy changes:  git checkout .
@@ -73,8 +81,8 @@ However, Roo source code can be updated to a new tag with next commands:
 * Remove all stashed states:	git stash clear
 * Save in SVN:					svn commit
 
-Update gvNIX parent pom roo.version property to new value.
-Be careful, git deleted files could be not deleted into SVN ! 
+Update gvNIX parent pom roo.version property to the new value.
+Be careful, git deleted files could be not deleted from SVN ! 
 
 Other userful Git commands:
 
@@ -88,13 +96,13 @@ Run gvNIX dev
     bash:~/gvnix/trunk/code/roo$ mvn clean install
     
    Roo is only necessary to be installed the first time.
-   Only reinstall it if Roo source code change.
+   Only reinstall it if Roo there are changes in the source code.
 
 #. Build gvNIX::
 
     bash:~/gvnix/trunk/code$ mvn clean install
     
-   From now, you will need to reinstall only each modified module instead of reinstall all gvNIX again::
+   From now on, you will need to reinstall only each modified module instead of reinstalling all the gvNIX projects again::
    
     bash:~/gvnix/trunk/code/module$ mvn clean install
 
@@ -222,7 +230,7 @@ Documentation
 Documentation index
 -------------------
 
-* On each gvNIX project module you can find technical and user guides at module/docs/ in reStructuredText format and English:
+* On each gvNIX project module you can find technical and user guides in the *module/docs/* folder in reStructuredText format and English:
 
   * td-module.rst: Technical design
   * ug-module.rst: User guide
