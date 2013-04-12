@@ -20,6 +20,7 @@ package org.gvnix.datatables.utils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -125,10 +126,6 @@ public class DatatablesUtils {
         }
 
     }
-
-    public static final Set<Class<?>> DATE_CLASSES = new HashSet<Class<?>>(
-            Arrays.asList(new Class<?>[] { Date.class, java.sql.Date.class,
-                    java.sql.Timestamp.class, java.sql.Time.class }));
 
     public static final Set<Class<?>> NUMBER_PRIMITIVES = new HashSet<Class<?>>(
             Arrays.asList(new Class<?>[] { int.class, long.class, double.class,
@@ -308,6 +305,7 @@ public class DatatablesUtils {
      * @return condition or null if (field not found || field type not supported
      *         || stringExpression not applicable)
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate getFindCondition(EntityType<T> entity,
             Root<T> from, String fieldName, String stringExpression,
             CriteriaBuilder builder) {
@@ -338,7 +336,8 @@ public class DatatablesUtils {
             return getTextSearchFindCondition(from, stringExpression, builder,
                     field, false);
         }
-        else if (DATE_CLASSES.contains(type)) {
+        else if (Date.class.isAssignableFrom(type)
+                || Calendar.class.isAssignableFrom(type)) {
             return getTextSearchFindCondition(from, stringExpression, builder,
                     field, true);
         }
@@ -371,11 +370,14 @@ public class DatatablesUtils {
                 "%".concat(likeString).concat("%"));
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private static <T> Predicate getEnumFindCondition(Root<T> from,
             String stringToSearch, CriteriaBuilder builder,
             Attribute<? super T, ?> field, Class<? extends Enum> enumClass) {
 
         // TODO i18n of enum name
+
+        // Filter string to search than cann't be a identifier
         if (!StringUtils.isAlphanumeric(stringToSearch)) {
             return null;
         }
@@ -389,15 +391,19 @@ public class DatatablesUtils {
         for (Field enumField : enumClass.getDeclaredFields()) {
             if (enumField.isEnumConstant()) {
                 enumValueName = enumField.getName();
+                // Check enum name contains string to search
                 if (enumValueName.toLowerCase().contains(stringToSearch)) {
+                    // Add to matching enum
                     matching.add(Enum.valueOf(enumClass, enumValueName));
                 }
             }
         }
         if (matching.isEmpty()) {
+            // no matching constants: no condition
             return null;
         }
 
+        // create a enum in manching condition
         return from.<String> get(field.getName()).in(matching);
     }
 

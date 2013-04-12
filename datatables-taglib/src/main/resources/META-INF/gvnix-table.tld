@@ -571,14 +571,14 @@
          <type>java.lang.String</type>
       </attribute>
       <attribute>
-         <description>Indicate that this field is of type java.util.Date</description>
+         <description>(Ignored just for Roo compatibility)</description>
          <name>date</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
          <type>java.lang.Boolean</type>
       </attribute>
       <attribute>
-         <description>Indicate that this field is of type java.util.Calendar</description>
+         <description>(Ignored just for Roo compatibility)</description>
          <name>calendar</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>

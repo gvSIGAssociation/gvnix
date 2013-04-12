@@ -56,6 +56,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.JdkJavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.logging.HandlerUtils;
 
@@ -137,6 +138,9 @@ public class DatatablesMetadata extends
 
     private static final JavaType DATATABLES_UTILS_RESULT = new JavaType(
             "org.gvnix.datatables.utils.DatatablesUtils.FindResult");
+
+    private static final JavaType STRING_UTILS = new JavaType(
+            "org.apache.commons.lang3.StringUtils");
 
     private static final JavaType DATE_FORMAT = new JavaType(
             "java.text.DateFormat");
@@ -722,24 +726,41 @@ public class DatatablesMetadata extends
         String conversionService = getConversionServiceField().getFieldName()
                 .getSymbolName();
 
-        // if (DatatablesUtils.DATE_CLASSES.contains(value.getClass())) {
+        // if (Calencar.class.isAssignableFrom(value.getClass())) {
         bodyBuilder.appendFormalLine(String.format(
-                "if (%s.DATE_CLASSES.contains(value.getClass())) {",
-                getFinalTypeName(DATATABLES_UTILS)));
+                "if (%s.class.isAssignableFrom(value.getClass())) {",
+                getFinalTypeName(JdkJavaType.CALENDAR)));
+        bodyBuilder.indent();
+        // value = ((Calendar) value).getTime();
+        bodyBuilder.appendFormalLine(String.format(
+                "value = ((%s) value).getTime();",
+                getFinalTypeName(JdkJavaType.CALENDAR)));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // if (Date.class.isAssignableFrom(value.getClass())) {
+        bodyBuilder.appendFormalLine(String.format(
+                "if (%s.class.isAssignableFrom(value.getClass())) {",
+                getFinalTypeName(JdkJavaType.DATE)));
         bodyBuilder.indent();
         if (entityHasDateTypes) {
-            // DateFormat format = (DateFormat)
-            // uiModel.asMap().get("pet_".concat(fieldName).concat("_date_format"));
+            // String pattern = (String)
+            // uiModel.asMap().get("pet_".concat(fieldName.toLowerCase()).concat("_date_format"));
             bodyBuilder
                     .appendFormalLine(String
-                            .format("%s format = (%s) uiModel.asMap().get(\"%s_\".concat(fieldName).concat(\"_date_format\"));",
-                                    getFinalTypeName(DATE_FORMAT),
-                                    getFinalTypeName(DATE_FORMAT), StringUtils
-                                            .uncapitalize(entity
-                                                    .getSimpleTypeName())));
-            // format = format == null ? defaultFormat : format;
+                            .format("String pattern = (String) uiModel.asMap().get(\"%s_\".concat(fieldName.toLowerCase()).concat(\"_date_format\"));",
+                                    StringUtils.uncapitalize(entity
+                                            .getSimpleTypeName())));
+            // DateFormat format = StringUtils.isBlank(pattern) ? defaultFormat
+            // : new SimpleDateFormat(pattern);
             bodyBuilder
-                    .appendFormalLine("format = format == null ? defaultFormat : format;");
+                    .appendFormalLine(String
+                            .format("%s format = %s.isBlank(pattern) ? defaultFormat : new %s(pattern);",
+                                    getFinalTypeName(DATE_FORMAT),
+                                    getFinalTypeName(STRING_UTILS),
+                                    getFinalTypeName(SIMPLE_DATE_FORMAT),
+                                    StringUtils.uncapitalize(entity
+                                            .getSimpleTypeName())));
             // valueStr = format.format(value);
             bodyBuilder.appendFormalLine("valueStr = format.format(value);");
         }

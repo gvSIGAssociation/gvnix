@@ -26,7 +26,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
@@ -164,11 +164,11 @@ public class RooColumnTag extends ColumnTag {
 
         if (StringUtils.isNotBlank(property) && value != null) {
 
-            if (this.date) {
-                value = dateTimePattern.format(value);
+            if (Date.class.isAssignableFrom(value.getClass())) {
+                result = dateTimePattern.format(value);
             }
-            else if (this.calendar) {
-                value = dateTimePattern.format(((Calendar) value).getTime());
+            else if (value instanceof Calendar) {
+                result = dateTimePattern.format(((Calendar) value).getTime());
             }
             else {
                 ConversionService conversionService = (ConversionService) helper
@@ -257,6 +257,10 @@ public class RooColumnTag extends ColumnTag {
     }
 
     public void setDateTimePattern(String dateTimePattern) {
+        if (StringUtils.isBlank(dateTimePattern)) {
+            this.dateTimePattern = SimpleDateFormat.getDateInstance();
+            return;
+        }
         this.dateTimePattern = new SimpleDateFormat(dateTimePattern,
                 helper.getRequestLocale(this.pageContext));
     }
