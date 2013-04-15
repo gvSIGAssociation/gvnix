@@ -596,7 +596,7 @@ public abstract class AbstractShell extends AbstractShellStatusPublisher
         sb.append("   / __ \\/ __ \\/ __ \\ ").append(LINE_SEPARATOR);
         sb.append("  / /_/ / / / / / / / ").append(LINE_SEPARATOR);
         sb.append(" / _, _/ /_/ / /_/ /  ").append("  ")
-                .append("gvNIX 1.0.1 distribution").append(LINE_SEPARATOR);
+                .append("gvNIX 1.0.2-SNAPSHOT distribution").append(LINE_SEPARATOR);
         sb.append("/_/ |_|\\____/\\____/   ").append(" ").append(versionInfo())
                 .append(LINE_SEPARATOR);
         sb.append(LINE_SEPARATOR);

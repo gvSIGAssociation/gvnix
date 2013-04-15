@@ -75,7 +75,7 @@
 	Created SRC_MAIN_WEBAPP/WEB-INF/classes/jasperfonts/FreeSansBoldOblique.ttf
 	Created SRC_MAIN_WEBAPP/WEB-INF/classes/jasperfonts/FreeSansOblique.ttf
 	Created SRC_MAIN_WEBAPP/WEB-INF/classes/jasperfonts/gvnix_reportfonts.xml
-	Updated ROOT/pom.xml [added dependency org.gvnix:org.gvnix.web.report.roo.addon:1.0.1; 
+	Updated ROOT/pom.xml [added dependency org.gvnix:org.gvnix.web.report.roo.addon:1.0.2; 
 			added property 'jasperreports.version' = '4.0.1';
 			added property 'jasperreportsfonts.version' = '4.0.0';
 			added property 'apachepoi.version' = '3.7';

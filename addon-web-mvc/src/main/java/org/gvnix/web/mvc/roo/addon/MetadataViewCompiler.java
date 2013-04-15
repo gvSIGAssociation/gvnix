@@ -44,7 +44,7 @@ public class MetadataViewCompiler {
                     "/home/orovira/.m2/repository/com/google/gwt/gwt-user/2.4.0/gwt-user-2.4.0.jar"));
 
             jars.add(new File(
-                    "/home/mmartinez/.m2/repository/org/gvnix/org.gvnix.weblayer.roo.addon/1.0.1/org.gvnix.weblayer.roo.addon-1.0.1.jar"));
+                    "/home/mmartinez/.m2/repository/org/gvnix/org.gvnix.weblayer.roo.addon/1.0.2-SNAPSHOT/org.gvnix.weblayer.roo.addon-1.0.1.jar"));
             fileManager.setLocation(StandardLocation.CLASS_PATH, jars);
             ArrayList<File> outfolder = new ArrayList<File>();
             File targetDir = new File("target/gvnix-metadata");
