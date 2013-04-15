@@ -200,13 +200,6 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
     public int doEndTag() throws JspException {
         String url = createUrl();
 
-        // RequestDataValueProcessor processor =
-        // getRequestContext().getRequestDataValueProcessor();
-        // ServletRequest request = this.pageContext.getRequest();
-        // if ((processor != null) && (request instanceof HttpServletRequest)) {
-        // url = processor.processUrl((HttpServletRequest) request, url);
-        // }
-
         if (this.var == null) {
             // print the url to the writer
             try {
@@ -344,26 +337,36 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
                     "the argument key must not be null or empty!");
         }
 
-        if (value == null) { // remove parameter
-            if (parametersMap.containsKey(key)) {
-                parametersMap.remove(key);
-            }
-            removedParametersList.add(key);
+        // if (value == null) { // remove parameter
+        // if (parametersMap.containsKey(key)) {
+        // parametersMap.remove(key);
+        // }
+        // removedParametersList.add(key);
+        // }
+        // else {
+
+        // Note a parameter value of null indicates that this parameter should
+        // be removed, but Spring Roo generates URLs with null values that
+        // are mapped to handler methods, so null values will be changed to
+        // empty values
+        if (value == null) {
+            value = "";
         }
-        else { // add value
-            List<String> valueList = null;
 
-            if (parametersMap.containsKey(key)) {
-                valueList = parametersMap.get(key); // get old value list
-            }
-            else {
-                valueList = new ArrayList<String>(); // create new value list
-            }
+        // Add value, including null values
+        List<String> valueList = null;
 
-            valueList.add(value);
-
-            parametersMap.put(key, valueList);
+        if (parametersMap.containsKey(key)) {
+            valueList = parametersMap.get(key); // get old value list
         }
+        else {
+            valueList = new ArrayList<String>(); // create new value list
+        }
+
+        valueList.add(value);
+
+        parametersMap.put(key, valueList);
+        // }
     }
 
     /**
