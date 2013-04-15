@@ -18,6 +18,7 @@
 package org.gvnix.addon.datatables;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -347,9 +348,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         List<Element> repos = XmlUtils.findElements(
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
-
-            projectOperations.addRepository(projectOperations
-                    .getFocusedModuleName(), new Repository(repo));
+            projectOperations.addRepositories(
+                    projectOperations.getFocusedModuleName(),
+                    Collections.singleton(new Repository(repo)));
         }
 
         // Install dependencies
