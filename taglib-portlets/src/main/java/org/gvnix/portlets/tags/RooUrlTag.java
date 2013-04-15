@@ -72,6 +72,8 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
 
     private boolean javaScriptEscape = false;
 
+    private String queryString;
+
     private RequestAttributes requestAttributes;
 
     protected Map<String, List<String>> parametersMap = new HashMap<String, List<String>>();
@@ -113,6 +115,8 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
             setContext(extractContext(value));
         }
         if (value != null && value.contains(QUERY_SEPARATOR)) {
+            setQueryString(extractQueryString(value));
+
             Map<String, String> queryParams = extractParameters(value);
 
             // Iterate over query parameters and add them as Portlet param
@@ -125,7 +129,14 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
         this.value = extractValue(value);
     }
 
-    /** Sets the type of the URL: RENDER or ACTION */
+    /**
+     * Sets the type of the URL: RENDER, ACTION, RESOURCE, STATIC
+     * <p/>
+     * RENDER, ACTION and RESOURCE are Portlet URLs whereas STATIC allows static
+     * resource requests following a particular URL pattern to be served. This
+     * provides a convenient way to serve static resources from locations other
+     * than the Portlet.
+     */
     public void setContext(String context) {
         this.context = context;
         if ("ACTION".equalsIgnoreCase(context)) {
@@ -134,9 +145,19 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
         else if ("RESOURCE".equalsIgnoreCase(context)) {
             this.type = UrlType.RESOURCE;
         }
+        else if ("STATIC".equalsIgnoreCase(context)) {
+            this.type = UrlType.STATIC;
+        }
         else {
             this.type = UrlType.RENDER;
         }
+    }
+
+    /**
+     * Sets the query string of the URL.
+     */
+    public void setQueryString(String query) {
+        this.queryString = query;
     }
 
     /**
@@ -280,13 +301,36 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
                     portletURL = createPortletUrl(portletResponse);
                 }
 
-                // Set parameters
-                setUrlParameters(portletURL);
+                // STATIC won't create a portlet URL it creates an encoded
+                // URL of the resource, like servlets, JSPs, images and other
+                // static files, at the given path.
+                // It allows static resource requests following a particular
+                // URL pattern to be served.
+                if (this.type == UrlType.STATIC) {
+                    String contextPath = ((PortletRequestAttributes) this.requestAttributes)
+                            .getRequest().getContextPath();
 
-                // properly encoding urls to allow non-cookie enabled sessions
-                HttpServletResponse response = (HttpServletResponse) pageContext
-                        .getResponse();
-                urlString = response.encodeURL(portletURL.toString());
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.append(contextPath).append(value);
+
+                    if (this.queryString != null) {
+                        stringBuilder.append(QUERY_SEPARATOR).append(
+                                this.queryString);
+                    }
+                    urlString = portletResponse.encodeURL(stringBuilder
+                            .toString());
+                }
+                else {
+
+                    // Set parameters
+                    setUrlParameters(portletURL);
+
+                    // properly encoding urls to allow non-cookie enabled
+                    // sessions
+                    HttpServletResponse response = (HttpServletResponse) pageContext
+                            .getResponse();
+                    urlString = response.encodeURL(portletURL.toString());
+                }
             }
         }
         else {
@@ -488,6 +532,28 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
         return queryParams;
     }
 
+    /**
+     * Extract the query string from the given URL value.
+     * 
+     * @param value the URL value; for example
+     *            {@code "/owners?page=1&size=10&form"}
+     * @return the extracted query string; for example
+     *         {@code "page=1&size=10&form"}
+     */
+    protected String extractQueryString(String value) {
+
+        // If no query separator return empty Map
+        int start = value.indexOf(QUERY_SEPARATOR);
+        if (start == -1) {
+            return null;
+        }
+
+        // Parse query string and build parameters Map
+        String querySt = value.substring(start + 1);
+
+        return querySt;
+    }
+
     @Override
     public void doCatch(Throwable t) throws Throwable {
         throw t;
@@ -513,7 +579,7 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
      * Internal enum that classifies URLs by type.
      */
     private enum UrlType {
-        RENDER, ACTION, RESOURCE
+        RENDER, ACTION, RESOURCE, STATIC
     }
 
 }
