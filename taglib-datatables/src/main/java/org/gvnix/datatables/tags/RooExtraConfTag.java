@@ -15,25 +15,23 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
  */
-package org.gvnix.datatables.taglib;
+package org.gvnix.datatables.tags;
 
-import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
 
-import com.github.dandelion.datatables.jsp.tag.AbstractTableTag;
-import com.github.dandelion.datatables.jsp.tag.CallbackTag;
+import com.github.dandelion.datatables.jsp.tag.ExtraConfTag;
 
 /**
- * Extends {@link CallbackTag} to avoid locate table tag container problems
+ * Extends {@link ExtraConfTag} to avoid locate table tag container problems
  * 
  * @author gvNIX Team
  */
-public class RooCallbackTag extends CallbackTag {
+public class RooExtraConfTag extends ExtraConfTag {
 
     /**
 	 * 
 	 */
-    private static final long serialVersionUID = -4784441727259846806L;
+    private static final long serialVersionUID = 3518257113918985468L;
 
     /**
      * Override to avoid problems to locate TableTag when it isn't the direct
@@ -43,4 +41,5 @@ public class RooCallbackTag extends CallbackTag {
     public Tag getParent() {
         return RooTableTag.getTableTag(super.getParent(), pageContext);
     }
+
 }

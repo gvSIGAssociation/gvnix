@@ -18,7 +18,7 @@
    <!-- ====================================== -->
    <tag>
       <name>table</name>
-      <tag-class>org.gvnix.datatables.taglib.RooTableTag</tag-class>
+      <tag-class>org.gvnix.datatables.tags.RooTableTag</tag-class>
       <tei-class>com.github.dandelion.datatables.jsp.tei.TableTagExtraInfo</tei-class>
       <body-content>JSP</body-content>
       <description>Generate a HTML table thanks to the awesome
@@ -423,7 +423,7 @@
    <tag>
       <description>Describe a column of the HTML table.</description>
       <name>column</name>
-      <tag-class>org.gvnix.datatables.taglib.RooColumnTag</tag-class>
+      <tag-class>org.gvnix.datatables.tags.RooColumnTag</tag-class>
       <body-content>JSP</body-content>
       <!-- Replaced by the roo id attribute
       <attribute>
@@ -620,7 +620,7 @@
    <tag>
       <description></description>
       <name>extraFile</name>
-      <tag-class>org.gvnix.datatables.taglib.RooExtraFileTag</tag-class>
+      <tag-class>org.gvnix.datatables.tags.RooExtraFileTag</tag-class>
       <body-content>empty</body-content>
       <attribute>
          <description>Location of the file containing DataTables
@@ -647,7 +647,7 @@
          JSON-formatted DataTables configuration to merge with the
          generated one.</description>
       <name>extraConf</name>
-      <tag-class>org.gvnix.datatables.taglib.RooExtraConfTag</tag-class>
+      <tag-class>org.gvnix.datatables.tags.RooExtraConfTag</tag-class>
       <body-content>empty</body-content>
       <attribute>
          <description>Location of the file containing the extra
@@ -666,7 +666,7 @@
          the
          Dandelion properties file.</description>
       <name>prop</name>
-      <tag-class>org.gvnix.datatables.taglib.RooPropTag</tag-class>
+      <tag-class>org.gvnix.datatables.tags.RooPropTag</tag-class>
       <body-content>empty</body-content>
       <attribute>
          <description>Property's name to override.</description>
@@ -687,7 +687,7 @@
       <description>Configure the HTML link and properties for a given
          export type.</description>
       <name>export</name>
-      <tag-class>org.gvnix.datatables.taglib.RooExportTag</tag-class>
+      <tag-class>org.gvnix.datatables.tags.RooExportTag</tag-class>
       <body-content>empty</body-content>
       <attribute>
          <description>(XML|CSV) Type of export (Default : XML,CSV)</description>
@@ -740,7 +740,7 @@
    <tag>
        <description>Add a DataTables callback.</description>
        <name>callback</name>
-       <tag-class>org.gvnix.datatables.taglib.RooCallbackTag</tag-class>
+       <tag-class>org.gvnix.datatables.tags.RooCallbackTag</tag-class>
        <body-content>empty</body-content>
       <attribute>
           <description>Type of callback</description>

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
  */
-package org.gvnix.datatables.taglib;
+package org.gvnix.datatables.tags;
 
 import java.util.Arrays;
 import java.util.Collection;

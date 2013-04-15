@@ -15,23 +15,25 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
  */
-package org.gvnix.datatables.taglib;
+package org.gvnix.datatables.tags;
 
+import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
 
-import com.github.dandelion.datatables.jsp.tag.PropTag;
+import com.github.dandelion.datatables.jsp.tag.AbstractTableTag;
+import com.github.dandelion.datatables.jsp.tag.ExportTag;
 
 /**
- * Extends {@link PropTag} to avoid locate table tag container problems
+ * Extends {@link ExportTag} to avoid locate table tag container problems
  * 
  * @author gvNIX Team
  */
-public class RooPropTag extends PropTag {
+public class RooExportTag extends ExportTag {
 
     /**
 	 * 
 	 */
-    private static final long serialVersionUID = -1862222175883117919L;
+    private static final long serialVersionUID = -7258175788902290449L;
 
     /**
      * Override to avoid problems to locate TableTag when it isn't the direct

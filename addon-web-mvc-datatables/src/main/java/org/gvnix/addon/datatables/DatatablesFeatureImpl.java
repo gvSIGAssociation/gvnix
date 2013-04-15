@@ -53,8 +53,7 @@ public class DatatablesFeatureImpl implements DatatablesFeature {
         }
         // Look for datatables taglib dependency
         for (final Dependency dependency : pom.getDependencies()) {
-            if ("org.gvnix.datatables.taglib"
-                    .equals(dependency.getArtifactId())) {
+            if ("org.gvnix.datatables.tags".equals(dependency.getArtifactId())) {
                 return true;
             }
         }

@@ -33,7 +33,7 @@
     <version>1.0.1</version>
     <relativePath>..</relativePath>
   </parent>
-  <artifactId>org.gvnix.datatables.taglib</artifactId>
+  <artifactId>org.gvnix.datatables.tags</artifactId>
   <name>gvNIX - Datatables JSP Tag library</name>
   <organization>
     <name>Generalitat Valenciana</name>

@@ -18,7 +18,7 @@
       		</dependency>
     		<dependency>
         		<groupId>org.gvnix</groupId>
-				<artifactId>org.gvnix.datatables.taglib</artifactId>
+				<artifactId>org.gvnix.datatables.tags</artifactId>
 		       	<version>${gvnix.version}</version>
 		       	<type>jar</type>
       		</dependency>

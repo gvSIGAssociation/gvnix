@@ -48,7 +48,7 @@
     <module>osgi-bundle</module>
     <module>osgi-roo-bundle</module>
     <module>support</module>
-    <module>datatables-taglib</module>
+    <module>taglib-datatables</module>
     <module>addon-web-mvc-datatables</module>
     <module>addon-dynamic-configuration</module>
     <module>addon-web-i18n</module>
