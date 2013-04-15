@@ -166,6 +166,32 @@
 		}	
 	  </script>
   </c:if>
+  
+  <!-- create -->
+  <c:if test="${empty create}">
+    <c:set var="create" value="true"/>
+  </c:if>
+  <c:if test="${create}">
+    <c:set var="createButtonCallbackId" value="${id}_create_btn_callbk"/>
+    <!-- function to render cell -->
+    <c:set var="create_label">
+	  <spring:escapeBody javaScriptEscape="true">  	  
+    	<spring:message arguments="${typeName}" code="entity_create"/>
+      </spring:escapeBody>
+    </c:set>
+    <spring:url value="/resources/images/add.png" var="create_image_url" />
+	<script type="text/javascript">
+        function ${createButtonCallbackId}(oSettings, json) {
+        	var result =
+               '<div class="gvnix_dataTables_createItem">'
+               +'<a href="${urlPath}?form" alt="${create_label}" title="${create_label}">'
+               + '  <img alt="${create_label}" class="image" src="${create_image_url}" title="${create_label}" />'
+               + '</a>'
+               + '</div>';
+               $('#${id}_info').after(result);
+	    }
+    </script>
+  </c:if>
 
   <!-- update -->  
   <c:if test="${empty update}">
@@ -358,5 +384,9 @@
             </c:choose>
           </c:if>
      
+     <!-- callback to include create button at widget foot -->
+     <c:if test="${create}">
+       <datatables:callback type="init" function="${createButtonCallbackId}" />
+     </c:if>
   </datatables:table>
 </jsp:root>

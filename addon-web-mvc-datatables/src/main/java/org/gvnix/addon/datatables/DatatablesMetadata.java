@@ -901,7 +901,8 @@ public class DatatablesMetadata extends
      */
     public FieldMetadata getConversionServiceField() {
         if (conversionService == null) {
-            JavaSymbolName curName = new JavaSymbolName("conversionService");
+            JavaSymbolName curName = new JavaSymbolName(
+                    "conversionService_datatables");
             // Check if field exist
             FieldMetadata currentField = governorTypeDetails
                     .getDeclaredField(curName);

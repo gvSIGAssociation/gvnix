@@ -295,24 +295,6 @@ public class RooColumnTag extends ColumnTag {
      */
     @Override
     public Tag getParent() {
-
-        // locate TableTag on hierarchy
-        Tag parent = super.getParent();
-        while (parent != null) {
-            if (parent instanceof TableTag) {
-                return parent;
-            }
-            parent = parent.getParent();
-        }
-
-        // not found so we try to
-        // use context variable
-        parent = (Tag) pageContext.getAttribute(RooTableTag.TABLE_TAG_VARIABLE,
-                PageContext.REQUEST_SCOPE);
-        if (parent instanceof TableTag) {
-            return parent;
-        }
-
-        return null;
+        return RooTableTag.getTableTag(super.getParent(), pageContext);
     }
 }

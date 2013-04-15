@@ -23,6 +23,8 @@ import java.util.List;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.Tag;
+import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.github.dandelion.datatables.core.constants.ExportConstants;
 import com.github.dandelion.datatables.core.export.ExportConf;
 import com.github.dandelion.datatables.core.export.ExportType;
+import com.github.dandelion.datatables.jsp.tag.AbstractTableTag;
 import com.github.dandelion.datatables.jsp.tag.TableTag;
 
 /**
@@ -76,7 +79,35 @@ public class RooTableTag extends TableTag {
      */
     private String z;
 
+    /**
+     * View path. Used for compute default AJAX request url
+     */
     private String path;
+
+    /**
+     * Locates container {@link AbstractTableTag} from any {@link TagSupport} of
+     * this package
+     * 
+     * @param tag
+     * @param pageContext
+     * @return
+     */
+    static final AbstractTableTag getTableTag(Tag tag, PageContext pageContext) {
+        // locate TableTag on hierarchy
+        Tag parent = findAncestorWithClass(tag, AbstractTableTag.class);
+        if (parent != null) {
+            return (AbstractTableTag) parent;
+        }
+
+        // not found so we try to
+        // use context variable
+        parent = (Tag) pageContext.getAttribute(TABLE_TAG_VARIABLE,
+                PageContext.REQUEST_SCOPE);
+        if (parent instanceof AbstractTableTag) {
+            return (AbstractTableTag) parent;
+        }
+        return null;
+    }
 
     private void configureExport(ExportType exportType) {
 

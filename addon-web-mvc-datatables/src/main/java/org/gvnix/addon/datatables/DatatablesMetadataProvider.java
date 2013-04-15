@@ -17,8 +17,6 @@
  */
 package org.gvnix.addon.datatables;
 
-import static org.springframework.roo.classpath.customdata.CustomDataKeys.PERSISTENT_TYPE;
-
 import java.util.List;
 import java.util.Map;
 
@@ -33,8 +31,6 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMeta
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.scanner.MemberDetails;
@@ -105,6 +101,7 @@ public final class DatatablesMetadataProvider extends
 
         List<FieldMetadata> identifiers = persistenceMemberLocator
                 .getIdentifierFields(entity);
+
         String JpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
                 path);
         JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
