@@ -350,6 +350,7 @@ public class DatatablesMetadata extends
         requestParams.add(new StringAttributeValue(ignored, "!size"));
         requestParams.add(new StringAttributeValue(ignored, "!page"));
         requestParams.add(new StringAttributeValue(ignored, "!form"));
+        requestParams.add(new StringAttributeValue(ignored, "!find"));
 
         mappingAttributes.add(new ArrayAttributeValue<StringAttributeValue>(
                 new JavaSymbolName("params"), requestParams));
@@ -392,46 +393,23 @@ public class DatatablesMetadata extends
 
         JavaType objectList = new JavaType(LIST.getFullyQualifiedTypeName(), 0,
                 DataType.TYPE, null, Arrays.asList(entity));
-        JavaType objectArrayList = new JavaType(
-                ARRAY_LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-                Arrays.asList(entity));
         String listVarName = StringUtils.uncapitalize(entityPlural);
 
-        // List<Pet> pets = new ArrayList<Pet>(1);
-        bodyBuilder.appendFormalLine(String.format("%s %s = new %s(1);",
-                getFinalTypeName(objectList), listVarName,
-                getFinalTypeName(objectArrayList)));
-
-        bodyBuilder.appendFormalLine("// Check mode");
-
-        bodyBuilder.appendFormalLine(String.format("if (%s) {",
+        bodyBuilder.appendFormalLine(String.format("if (!%s) {",
                 getUseAjaxField().getFieldName().getSymbolName()));
         bodyBuilder.indent();
-
-        bodyBuilder
-                .appendFormalLine("// create a list with a empty item to avoid 'not items found' message");
-
-        // pets.add(new Pet());
-        bodyBuilder.appendFormalLine(String.format("%s.add(new %s());",
-                StringUtils.uncapitalize(entityPlural),
-                getFinalTypeName(entity)));
-
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("} else {");
-        bodyBuilder.indent();
-
         bodyBuilder
                 .appendFormalLine("// Get all data to put it on pageContext");
-        bodyBuilder.appendFormalLine(String.format("%s = %s.findAll%s();",
-                listVarName, getFinalTypeName(entity), entityPlural));
-
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine(String.format("%s %s = %s.findAll%s();",
+                getFinalTypeName(objectList), listVarName,
+                getFinalTypeName(entity), entityPlural));
 
         // uiModel.addAttribute("pets",pets);
         bodyBuilder.appendFormalLine(String.format(
                 "%s.addAttribute(\"%2$s\",%2$s);", UI_MODEL.getSymbolName(),
                 listVarName));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
 
         // return "pets/list";
         bodyBuilder.appendFormalLine(String.format("return \"%s/list\";",

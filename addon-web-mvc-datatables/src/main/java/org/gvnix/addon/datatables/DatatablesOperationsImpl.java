@@ -265,6 +265,10 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         divMain.setAttribute("xmlns:table",
                 "urn:jsptagdir:/WEB-INF/tags/datatables");
 
+        // Update page tag namespace
+        divMain.setAttribute("xmlns:page",
+                "urn:jsptagdir:/WEB-INF/tags/datatables");
+
         // Update list.jspx file
         DomUtils.removeTextNodes(docJspXml);
         fileManager.createOrUpdateTextFileIfRequired(docJspx,
