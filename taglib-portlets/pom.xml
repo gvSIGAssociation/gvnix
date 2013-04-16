@@ -31,7 +31,6 @@
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.root</artifactId>
     <version>1.0.2-SNAPSHOT</version>
-    <relativePath>..</relativePath>
   </parent>
   <artifactId>org.gvnix.portlets.tags</artifactId>
   <name>gvNIX - Portlets JSP Tag library</name>

@@ -31,7 +31,6 @@
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.root</artifactId>
     <version>1.0.2-SNAPSHOT</version>
-    <relativePath>..</relativePath>
   </parent>
   <artifactId>org.gvnix.datatables.tags</artifactId>
   <name>gvNIX - Datatables JSP Tag library</name>

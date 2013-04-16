@@ -30,9 +30,8 @@
   </licenses>
   <parent>
     <groupId>org.gvnix</groupId>
-    <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
+    <artifactId>org.gvnix.root</artifactId>
     <version>1.0.2-SNAPSHOT</version>
-    <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
   <artifactId>org.gvnix.web.report.roo.addon</artifactId>
   <packaging>bundle</packaging>
