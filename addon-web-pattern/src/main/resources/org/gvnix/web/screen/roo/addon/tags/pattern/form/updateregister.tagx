@@ -220,8 +220,8 @@
           <!-- Calculate pagination parameters -->
           <c:set var="page" value="${id}Page" scope="request"/>
           <c:set var="pageSize" value="${id}PageSize" scope="request"/>
-          <c:set var="beginItem" value="${empty param[page] or empty param[pageSize] ? 0 : param[page] * param[pageSize] - param[pageSize]}" scope="request"/>
-          <c:set var="endItem" value="${empty param[page] or empty param[pageSize] ? 9 : param[page] * param[pageSize] - 1}" scope="request"/>
+          <c:set var="beginItem" value="0" scope="request"/>
+          <c:set var="endItem" value="${fn:length(data) == 0 ? 0 : fn:length(data) - 1}" scope="request"/>            
 
           <!-- Create a row for each item on data collection between pagination items -->
           <c:forEach items="${data}" var="item" varStatus="pos" begin="${beginItem}" end="${endItem}">
@@ -307,15 +307,8 @@
           <tr class="footer">
             <td colspan="${colCounter}">
 
-              <!-- If maxPages not empty use Roo pagination, else gvnix pagination -->
-              <c:choose>
-                <c:when test="${not empty maxPages}">
-                  <util:pagination maxPages="${maxPages}" page="${param.page}" size="${param.size}" />
-                </c:when>
-                <c:otherwise>
-                  <pattern:paginationadd field="${id}" relatedEntitySet="${data}" />
-                </c:otherwise>
-              </c:choose>
+              <!-- gvnix pagination -->
+              <pattern:paginationadd field="${id}" relatedEntitySet="${data}" />
 
               <!-- Add all URL params, except 'exception' to avoid repetition -->
               <spring:url value="" var="currentUrl" htmlEscape="false">

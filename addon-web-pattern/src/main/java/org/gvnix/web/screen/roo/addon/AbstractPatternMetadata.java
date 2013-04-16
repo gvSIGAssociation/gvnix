@@ -62,6 +62,7 @@ import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.ImportRegistrationResolver;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.support.util.XmlUtils;
 
 /**
  * This type produces metadata for a new ITD. It uses an
@@ -629,10 +630,18 @@ public abstract class AbstractPatternMetadata extends
         JavaSymbolName methodName = new JavaSymbolName("tabular" + patternName);
 
         // Define method parameter types
+        // @RequestParam(value =
+        // "fu_org_gvnix_tiendavirtual_domain_ProductoPage", required = false)
+        // Integer page,
+        // @RequestParam(value =
+        // "fu_org_gvnix_tiendavirtual_domain_ProductoPageSize", required =
+        // false) Integer pageSize,
         // @RequestParam(value = "gvnixpattern", required = true) String
         // pattern, HttpServletRequest req, Model uiModel)
         List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
 
+        methodParamTypes.add(getPageRequestParam().getValue());
+        methodParamTypes.add(getPageSizeRequestParam().getValue());
         methodParamTypes.add(getPatternRequestParam(true).getValue());
         Entry<JavaSymbolName, AnnotatedJavaType> modelRequestParam = MODEL_REQUEST_PARAM;
         methodParamTypes.add(modelRequestParam.getValue());
@@ -650,6 +659,11 @@ public abstract class AbstractPatternMetadata extends
         // pattern, uiModel, httpServletRequest
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         Entry<JavaSymbolName, AnnotatedJavaType> patternRequestParam = getPatternRequestParam(false);
+        Entry<JavaSymbolName, AnnotatedJavaType> pageRequestParam = getPageRequestParam();
+        Entry<JavaSymbolName, AnnotatedJavaType> pageSizeRequestParam = getPageSizeRequestParam();
+
+        methodParamNames.add(pageRequestParam.getKey());
+        methodParamNames.add(pageSizeRequestParam.getKey());
         methodParamNames.add(patternRequestParam.getKey());
         methodParamNames.add(modelRequestParam.getKey());
         methodParamNames.add(httpServletRequest.getKey());
@@ -666,6 +680,19 @@ public abstract class AbstractPatternMetadata extends
             bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
         }
 
+        bodyBuilder
+                .appendFormalLine("int sizeNo = pageSize == null ? 10 : pageSize.intValue();");
+        bodyBuilder.appendFormalLine("float nrOfPages = (float) "
+                .concat(entity.getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver()))
+                .concat(".")
+                .concat(entityTypeDetails.getPersistenceDetails()
+                        .getCountMethod().getMethodName().concat("()"))
+                .concat(" / sizeNo;"));
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"maxPages\", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));");
+        bodyBuilder
+                .appendFormalLine("final int firstResult = page == null || page < 1 ? 0 : (page.intValue() - 1) * sizeNo;");
         JavaType javaUtilList = new JavaType("java.util.List", 0,
                 DataType.TYPE, null, typeParams);
         bodyBuilder.appendFormalLine(javaUtilList
@@ -678,7 +705,8 @@ public abstract class AbstractPatternMetadata extends
                         builder.getImportRegistrationResolver()))
                 .concat(".")
                 .concat(entityTypeDetails.getPersistenceDetails()
-                        .getFindAllMethod().getMethodName().concat("();")));
+                        .getFindEntriesMethod().getMethodName()
+                        .concat("(firstResult, sizeNo);")));
 
         bodyBuilder
                 .appendFormalLine("if ("
@@ -1452,6 +1480,65 @@ public abstract class AbstractPatternMetadata extends
         return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
                 new JavaSymbolName(GVNIXPATTERN), new AnnotatedJavaType(
                         new JavaType("java.lang.String"), gvnixpatternParam));
+    }
+
+    /**
+     * Get the RequestParam annotation for page pagination.
+     * <p>
+     * Key has the param name and value has the annotation.
+     * </p>
+     * <code>
+     * 
+     * @RequestParam(value = "fu_org_gvnix_tiendavirtual_domain_ProductoPage",
+     *                     required = false) Integer page, </code>
+     * @return Request param name and annotation
+     */
+    protected Entry<JavaSymbolName, AnnotatedJavaType> getPageRequestParam() {
+
+        AnnotationMetadataBuilder gvnixpatternParamBuilder = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestParam"));
+        gvnixpatternParamBuilder.addStringAttribute(
+                "value",
+                XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()
+                        + "Page"));
+        gvnixpatternParamBuilder.addBooleanAttribute("required", false);
+        List<AnnotationMetadata> gvnixpatternParam = new ArrayList<AnnotationMetadata>();
+        gvnixpatternParam.add(gvnixpatternParamBuilder.build());
+
+        return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
+                new JavaSymbolName("page"), new AnnotatedJavaType(new JavaType(
+                        "java.lang.Integer"), gvnixpatternParam));
+    }
+
+    /**
+     * Get the RequestParam annotation for page size pagination.
+     * <p>
+     * Key has the param name and value has the annotation.
+     * </p>
+     * <code>
+     * 
+     * @RequestParam(value =
+     *                     "fu_org_gvnix_tiendavirtual_domain_ProductoPageSize",
+     *                     required = false) Integer pageSize, </code>
+     * @return Request param name and annotation
+     */
+    protected Entry<JavaSymbolName, AnnotatedJavaType> getPageSizeRequestParam() {
+
+        AnnotationMetadataBuilder gvnixpatternParamBuilder = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestParam"));
+        gvnixpatternParamBuilder.addStringAttribute(
+                "value",
+                XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()
+                        + "PageSize"));
+        gvnixpatternParamBuilder.addBooleanAttribute("required", false);
+        List<AnnotationMetadata> gvnixpatternParam = new ArrayList<AnnotationMetadata>();
+        gvnixpatternParam.add(gvnixpatternParamBuilder.build());
+
+        return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
+                new JavaSymbolName("pageSize"), new AnnotatedJavaType(
+                        new JavaType("java.lang.Integer"), gvnixpatternParam));
     }
 
     /**

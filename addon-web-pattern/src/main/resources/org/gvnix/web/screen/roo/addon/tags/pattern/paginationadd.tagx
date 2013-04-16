@@ -63,8 +63,6 @@
               Integer maxPages = relatedEntitySet.size() / Integer.parseInt(parameterValuesList.get(1).toString());
               Integer lastpage = relatedEntitySet.size() % Integer.parseInt(parameterValuesList.get(1).toString());
 
-              jspContext.setAttribute("maxPages", lastpage == 0 ? maxPages : maxPages + 1);
-
             //]]></jsp:scriptlet>
 
             <!-- If pages, show pagination -->
