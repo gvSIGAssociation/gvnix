@@ -21,8 +21,16 @@ Datatables
 * Downloaded from: http://datatables.net/download/
 
 
+Datatables Custom API functions
+--------------------------------
+
+Custom API functions (from http://datatables.net/plug-ins/api).
+Use 'datatables_init_custom_api_functions' function to load desired functions
+by default.
+ 
+
 NOTE
 -----
 
-By default the addon will use the uncompressed versions, change the reference
+By default the addon will use the compressed versions, change the reference
 to the uncompressed ones in the "load-scripts.tagx" if needed. 

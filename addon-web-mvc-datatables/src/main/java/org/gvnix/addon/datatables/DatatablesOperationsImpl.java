@@ -513,6 +513,19 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             root.appendChild(jqueryDtJsUrl);
             modified = true;
         }
+        // Add dataTables.custom.api.functions.js url resolution
+        Element jqueryDtCustomJsUrl = XmlUtils.findFirstElement(
+                "url[@var='js_jquery_datatables_custom_api_url']", root);
+        if (jqueryDtCustomJsUrl == null) {
+            jqueryDtCustomJsUrl = docTagx.createElement("spring:url");
+            jqueryDtCustomJsUrl.setAttribute("var",
+                    "js_jquery_datatables_custom_api_url");
+            jqueryDtCustomJsUrl
+                    .setAttribute("value",
+                            "/resources/scripts/datatables/dataTables.custom.api.functions.js");
+            root.appendChild(jqueryDtCustomJsUrl);
+            modified = true;
+        }
         // Add jquery.datatables.css url resolution
         Element jqueryDtCssUrl = XmlUtils.findFirstElement(
                 "url[@var='css_jquery_datatables_url']", root);
@@ -586,6 +599,19 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             jqueryDtJs.appendChild(docTagx
                     .createComment("required for FF3 and Opera"));
             root.appendChild(jqueryDtJs);
+            modified = true;
+        }
+        // Add dataTables.custom.api.functions.js
+        Element jqueryDtCustomJs = XmlUtils.findFirstElement(
+                "script[@src='${js_jquery_datatables_custom_api_url}']", root);
+        if (jqueryDtCustomJs == null) {
+            jqueryDtCustomJs = docTagx.createElement("script");
+            jqueryDtCustomJs.setAttribute("src",
+                    "${js_jquery_datatables_custom_api_url}");
+            jqueryDtCustomJs.setAttribute("type", "text/javascript");
+            jqueryDtCustomJs.appendChild(docTagx
+                    .createComment("required for FF3 and Opera"));
+            root.appendChild(jqueryDtCustomJs);
             modified = true;
         }
 

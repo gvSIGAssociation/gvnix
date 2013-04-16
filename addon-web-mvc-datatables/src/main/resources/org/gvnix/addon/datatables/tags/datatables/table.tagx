@@ -84,6 +84,16 @@
   <!-- ====================== -->
   <!-- Prepare default values -->
   <!-- ====================== -->
+  
+  <!-- init custom api functions -->
+  <c:set var="initCustionFunctionsCallbackId" value="${id}_init_custom_callbk"/>
+  <script type="text/javascript">
+        /* init custom api functions for this table */
+	    function ${initCustionFunctionsCallbackId}() {
+	    	datatables_init_custom_api_functions('${id}');
+	    }
+  </script>
+  
   <!-- typeIdFieldName -->
   <c:if test="${empty typeIdFieldName}">
       <c:set var="typeIdFieldName" value="id" />
@@ -383,6 +393,9 @@
 			  </c:otherwise>
             </c:choose>
           </c:if>
+     
+     <!--  callback to initialize custom api functions -->
+     <datatables:callback type="init" function="${initCustionFunctionsCallbackId}" />
      
      <!-- callback to include create button at widget foot -->
      <c:if test="${create}">
