@@ -39,6 +39,7 @@ import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.github.dandelion.datatables.core.ajax.ColumnDef;
 import com.github.dandelion.datatables.core.ajax.ColumnDef.SortDirection;
@@ -153,12 +154,12 @@ public class DatatablesUtils {
      * @param entityClass entity to use in search
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
-     * @param distinc use distinc query
+     * @param distinct use distinct query
      * @return
      */
     public static <T> FindResult<T> findByCriteria(Class<T> entityClass,
             EntityManager entityManager,
-            DatatablesCriterias datatablesCriterias, boolean distinc) {
+            DatatablesCriterias datatablesCriterias, boolean distinct) {
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<T> query = builder.createQuery(entityClass);
@@ -254,7 +255,7 @@ public class DatatablesUtils {
         CriteriaQuery<T> select = query.select(from);
         CriteriaQuery<Long> count = null;
 
-        if (distinc) {
+        if (distinct) {
             count = countQuery.select(builder.countDistinct(countQuery
                     .from(entityClass)));
         }
@@ -263,7 +264,7 @@ public class DatatablesUtils {
                     .from(entityClass)));
         }
 
-        select.distinct(distinc);
+        select.distinct(distinct);
 
         TypedQuery<T> typedQuery = entityManager.createQuery(select);
 
@@ -333,8 +334,13 @@ public class DatatablesUtils {
         }
         else if (Number.class.isAssignableFrom(type)
                 || NUMBER_PRIMITIVES.contains(type)) {
-            return getTextSearchFindCondition(from, stringExpression, builder,
-                    field, false);
+            if (NumberUtils.isNumber(stringExpression)) {
+                return getTextSearchFindCondition(from, stringExpression,
+                        builder, field, false);
+            }
+            else {
+                return null;
+            }
         }
         else if (Date.class.isAssignableFrom(type)
                 || Calendar.class.isAssignableFrom(type)) {
