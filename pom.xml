@@ -276,7 +276,7 @@
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.log</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.apache.felix</groupId>
