@@ -960,7 +960,7 @@
           </execution>
         </executions>
         <configuration>
-          <outputDirectory>${project.build.directory}/../../target/all</outputDirectory>
+          <outputDirectory>${project.build.directory}/../target/all</outputDirectory>
           <silent>true</silent>
           <includeScope>compile</includeScope>
           <excludeArtifactIds>org.apache.felix.scr.annotations</excludeArtifactIds>
@@ -978,7 +978,7 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <copy todir="${project.build.directory}/../../target/all" preservelastmodified="true">
+                <copy todir="${project.build.directory}/../target/all" preservelastmodified="true">
                   <fileset dir="${project.build.directory}">
                     <include name="*.jar" />
                     <exclude name="*-tests.jar" />
