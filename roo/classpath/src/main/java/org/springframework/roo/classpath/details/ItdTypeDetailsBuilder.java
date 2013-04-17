@@ -2,11 +2,8 @@ package org.springframework.roo.classpath.details;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -16,7 +13,6 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadataB
 import org.springframework.roo.model.ImportRegistrationResolver;
 import org.springframework.roo.model.ImportRegistrationResolverImpl;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.support.util.CollectionUtils;
 
 /**
  * Assists in the building of an {@link ItdTypeDetails} instance.
@@ -45,7 +41,6 @@ public class ItdTypeDetailsBuilder extends
     private final ImportRegistrationResolver importRegistrationResolver;
     private final List<DeclaredMethodAnnotationDetails> methodAnnotations = new ArrayList<DeclaredMethodAnnotationDetails>();
     private final boolean privilegedAspect;
-    private final Set<JavaType> declarePrecedence;
 
     /**
      * Constructor based on an existing ITD
@@ -59,7 +54,6 @@ public class ItdTypeDetailsBuilder extends
         importRegistrationResolver = new ImportRegistrationResolverImpl(
                 aspect.getPackage());
         privilegedAspect = existing.isPrivilegedAspect();
-        declarePrecedence = existing.getDeclarePrecedence();
     }
 
     /**
@@ -82,7 +76,6 @@ public class ItdTypeDetailsBuilder extends
         importRegistrationResolver = new ImportRegistrationResolverImpl(
                 aspect.getPackage());
         this.privilegedAspect = privilegedAspect;
-        this.declarePrecedence = new LinkedHashSet<JavaType>();
     }
 
     public void addFieldAnnotation(
@@ -160,19 +153,6 @@ public class ItdTypeDetailsBuilder extends
     public void addTypeAnnotation(final AnnotationMetadata annotationMetadata) {
         addAnnotation(annotationMetadata);
     }
-    
-    /**
-     * Set the aspects to use on {@code declare precedence}
-     * AspectJ declaration.
-     *  
-     * @param aspects
-     */
-    public void setDeclarePrecedence(JavaType...aspects) {
-    	if (aspects != null && aspects.length > 0 ){
-    		Validate.isTrue(aspects.length > 1,"precedence must contain, at least, 2 aspects");
-    	}
-    	CollectionUtils.populate(declarePrecedence, Arrays.asList(aspects));
-    }
 
     public ItdTypeDetails build() {
         return new DefaultItdTypeDetails(getCustomData().build(),
@@ -181,8 +161,7 @@ public class ItdTypeDetailsBuilder extends
                 importRegistrationResolver.getRegisteredImports(),
                 buildConstructors(), buildFields(), buildMethods(),
                 getExtendsTypes(), getImplementsTypes(), buildAnnotations(),
-                fieldAnnotations, methodAnnotations, buildInnerTypes(), 
-                declarePrecedence);
+                fieldAnnotations, methodAnnotations, buildInnerTypes());
     }
 
     public ImportRegistrationResolver getImportRegistrationResolver() {
