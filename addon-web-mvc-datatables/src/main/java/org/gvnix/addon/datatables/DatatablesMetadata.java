@@ -25,6 +25,7 @@ import static org.springframework.roo.model.JdkJavaType.SET;
 import static org.springframework.roo.model.SpringJavaType.MODEL;
 import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
 import static org.springframework.roo.model.SpringJavaType.REQUEST_MAPPING;
+import static org.springframework.roo.model.SpringJavaType.REQUEST_PARAM;
 import static org.springframework.roo.model.SpringJavaType.RESPONSE_BODY;
 
 import java.lang.reflect.Modifier;
@@ -49,6 +50,7 @@ import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
@@ -159,6 +161,7 @@ public class DatatablesMetadata extends
             "getDatatablesData");
     private static final JavaSymbolName LIST_DATATABLES = new JavaSymbolName(
             "listDatatables");
+    private static final JavaSymbolName LIST_ROO = new JavaSymbolName("list");
     private static final JavaSymbolName POPULATE_AJAX_DATATABLES = new JavaSymbolName(
             "populateDatatablesUseAjax");
     private static final JavaSymbolName UI_MODEL = new JavaSymbolName("uiModel");
@@ -238,7 +241,8 @@ public class DatatablesMetadata extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             DatatablesAnnotationValues annotationValues, JavaType entity,
             List<FieldMetadata> identifierProperties, String entityPlural,
-            JavaSymbolName entityManagerMethodName, boolean hasDateTypes) {
+            JavaSymbolName entityManagerMethodName, boolean hasDateTypes,
+            JavaType webScaffoldAspectName) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -251,6 +255,10 @@ public class DatatablesMetadata extends
         this.entityEntityManagerMethod = entityManagerMethodName;
         this.entityHasDateTypes = hasDateTypes;
 
+        // Adding precedence declaration
+        // This aspect before webScaffold
+        builder.setDeclarePrecedence(aspectName, webScaffoldAspectName);
+
         // Adding field definition
         builder.addField(getConversionServiceField());
         builder.addField(getUseAjaxField());
@@ -259,6 +267,7 @@ public class DatatablesMetadata extends
         builder.addMethod(getRenderForDatatablesMethod());
         builder.addMethod(getGetDatatablesDataMethod());
         builder.addMethod(getListDatatablesRequestMethod());
+        builder.addMethod(getListRooRequestMethod());
         builder.addMethod(getPopulateAJAXDatatablesMethod());
 
         // Create a representation of the desired output ITD
@@ -341,30 +350,13 @@ public class DatatablesMetadata extends
         AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
 
-        // @RequestMapping( params={"!size","!page","!form"}...
-        final List<AnnotationAttributeValue<?>> mappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-        final List<StringAttributeValue> requestParams = new ArrayList<StringAttributeValue>();
-
-        JavaSymbolName ignored = new JavaSymbolName("ignored");
-
-        requestParams.add(new StringAttributeValue(ignored, "!size"));
-        requestParams.add(new StringAttributeValue(ignored, "!page"));
-        requestParams.add(new StringAttributeValue(ignored, "!form"));
-        requestParams.add(new StringAttributeValue(ignored, "!find"));
-
-        mappingAttributes.add(new ArrayAttributeValue<StringAttributeValue>(
-                new JavaSymbolName("params"), requestParams));
-        methodAnnotation.setAttributes(mappingAttributes);
-
-        // @RequestMapping(.... method = RequestMethod.GET...
+        // @RequestMapping(method = RequestMethod.GET...
         methodAnnotation.addEnumAttribute("method", REQUEST_METHOD, "GET");
 
         // @RequestMapping(... produces = "text/html")
         methodAnnotation.addStringAttribute("produces", "text/html");
 
         annotations.add(methodAnnotation);
-
-        //
 
         // Define method throws types (none in this case)
         List<JavaType> throwsTypes = new ArrayList<JavaType>();
@@ -385,7 +377,7 @@ public class DatatablesMetadata extends
         methodBuilder.setThrowsTypes(throwsTypes);
 
         return methodBuilder.build(); // Build and return a MethodMetadata
-                                      // instance
+        // instance
     }
 
     private void buildListDatatablesRequesMethodBody(
@@ -415,6 +407,100 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine(String.format("return \"%s/list\";",
                 StringUtils.uncapitalize(entityPlural)));
 
+    }
+
+    /**
+     * Redefines {@code list} Roo webScaffod method to delegate on
+     * {@link #LIST_DATATABLES}
+     * 
+     * @return
+     */
+    private MethodMetadata getListRooRequestMethod() {
+
+        // public String OwnerController.list(
+        // @RequestParam(value = "page", required = false) Integer page,
+        // @RequestParam(value = "size", required = false) Integer size,
+        // Model uiModel) {
+
+        // Define method parameter types
+        final List<AnnotationAttributeValue<?>> firstResultAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        firstResultAttributes.add(new StringAttributeValue(new JavaSymbolName(
+                "value"), "page"));
+        firstResultAttributes.add(new BooleanAttributeValue(new JavaSymbolName(
+                "required"), false));
+        final AnnotationMetadataBuilder firstResultAnnotation = new AnnotationMetadataBuilder(
+                REQUEST_PARAM, firstResultAttributes);
+
+        final List<AnnotationAttributeValue<?>> maxResultsAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        maxResultsAttributes.add(new StringAttributeValue(new JavaSymbolName(
+                "value"), "size"));
+        maxResultsAttributes.add(new BooleanAttributeValue(new JavaSymbolName(
+                "required"), false));
+        final AnnotationMetadataBuilder maxResultAnnotation = new AnnotationMetadataBuilder(
+                REQUEST_PARAM, maxResultsAttributes);
+
+        final List<AnnotatedJavaType> parameterTypes = Arrays.asList(
+                new AnnotatedJavaType(JavaType.INT_OBJECT,
+                        firstResultAnnotation.build()), new AnnotatedJavaType(
+                        JavaType.INT_OBJECT, maxResultAnnotation.build()),
+                new AnnotatedJavaType(MODEL));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(LIST_ROO, parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // @RequestMapping
+        AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
+        methodAnnotation.setAnnotationType(REQUEST_MAPPING);
+
+        final List<StringAttributeValue> requestParams = new ArrayList<StringAttributeValue>();
+        // @RequestMapping(produces = "text/html")
+        methodAnnotation.addStringAttribute("produces", "text/html");
+
+        annotations.add(methodAnnotation);
+
+        //
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        final List<JavaSymbolName> parameterNames = Arrays.asList(
+                new JavaSymbolName("page"), new JavaSymbolName("size"),
+                UI_MODEL);
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildListRooRequesMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, LIST_ROO, JavaType.STRING,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    private void buildListRooRequesMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+
+        bodyBuilder
+                .appendFormalLine("// overrides the standar Roo list method and");
+        bodyBuilder.appendFormalLine("// delegates on datatables list method");
+        // return listDatatables(uiModel);
+        bodyBuilder.appendFormalLine(String.format("return %s(%s);",
+                LIST_DATATABLES.getSymbolName(), UI_MODEL.getSymbolName()));
     }
 
     private MethodMetadata getGetDatatablesDataMethod() {

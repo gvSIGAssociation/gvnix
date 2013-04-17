@@ -96,6 +96,8 @@ public final class DatatablesMetadataProvider extends
         WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
                 .get(webScaffoldMetadataId);
 
+        JavaType webScaffoldAspectName = webScaffoldMetadata.getAspectName();
+
         JavaType entity = webScaffoldMetadata.getAnnotationValues()
                 .getFormBackingObject();
 
@@ -121,7 +123,8 @@ public final class DatatablesMetadataProvider extends
 
         return new DatatablesMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, entity,
-                identifiers, plural, entityManagerMethodName, hasDateTypes);
+                identifiers, plural, entityManagerMethodName, hasDateTypes,
+                webScaffoldAspectName);
     }
 
     /**
