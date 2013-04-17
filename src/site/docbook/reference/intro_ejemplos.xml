@@ -24,8 +24,8 @@ project ...
   <para>Donde <filename>SCRIPT.roo</filename> es el nombre del fichero de
   ejemplo que se desea ejecutar.</para>
 
-  <para>No todos los scripts se pueden ser en el directorio samples, pero
-  todos sí pueden ser ejecutados.</para>
+  <para>No todos los scripts descritos a continuación están en el directorio samples,
+  pero todos sí pueden ser ejecutados tal y como se ha indicado.</para>
 
   <variablelist>
     <varlistentry>
