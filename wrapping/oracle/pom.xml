@@ -30,12 +30,12 @@
   </licenses>
 
   <parent>
-    <groupId>org.gvnix</groupId>
-    <artifactId>wrapping</artifactId>
+    <groupId>org.gvnix.wrapping</groupId>
+    <artifactId>org.gvnix.wrapping.root</artifactId>
     <version>1.0.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>wrapping.oracle</artifactId>
+  <artifactId>org.gvnix.wrapping.com.oracle.root</artifactId>
   <packaging>pom</packaging>
   <name>gvNIX - OSGi - Oracle</name>
   <description>Oracle JDBC driver. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>

@@ -30,14 +30,13 @@
   </licenses>
 
   <parent>
-    <groupId>org.gvnix</groupId>
-    <artifactId>wrapping</artifactId>
+    <groupId>org.gvnix.wrapping</groupId>
+    <artifactId>org.gvnix.wrapping.root</artifactId>
     <version>1.0.2-SNAPSHOT</version>
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <groupId>${pkgGroupId}</groupId>
-  <artifactId>${project.parent.groupId}.${pkgArtifactId}</artifactId>
+  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - PostgreSQL Fragment - PostGIS JDBC driver</name>

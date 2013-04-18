@@ -30,14 +30,13 @@
   </licenses>
 
   <parent>
-    <groupId>org.gvnix</groupId>
-    <artifactId>wrapping.postgresql</artifactId>
+    <groupId>org.gvnix.wrapping</groupId>
+    <artifactId>org.gvnix.wrapping.postgresql.root</artifactId>
     <version>1.0.2-SNAPSHOT</version>
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <groupId>${pkgGroupId}</groupId>
-  <artifactId>${project.parent.groupId}.${pkgGroupId}</artifactId>
+  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
   <version>${depVersion}</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - PostgreSQL JDBC3 driver</name>

@@ -35,7 +35,8 @@
     <version>1.0.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>org.gvnix.wrapping</artifactId>
+  <groupId>org.gvnix.wrapping</groupId>
+  <artifactId>org.gvnix.wrapping.root</artifactId>
   <packaging>pom</packaging>
   <name>gvNIX - OSGi - Wrapping</name>
   <description>Automates the conversion of standard JARs into OSGi bundles.</description>

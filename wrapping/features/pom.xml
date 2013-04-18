@@ -30,13 +30,12 @@
   </licenses>
 
   <parent>
-    <groupId>org.gvnix</groupId>
-    <artifactId>wrapping</artifactId>
+    <groupId>org.gvnix.wrapping</groupId>
+    <artifactId>org.gvnix.wrapping.root</artifactId>
     <version>1.0.2-SNAPSHOT</version>
   </parent>
 
-  <groupId>${pkgGroupId}</groupId>
-  <artifactId>${pkgGroupId}.${pkgArtifactId}</artifactId>
+  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
   <packaging>pom</packaging>
 
   <name>gvNIX - OSGi - Karaf Features</name>
@@ -50,8 +49,8 @@
   </organization>
 
   <properties>
-    <pkgGroupId>org.gvnix</pkgGroupId>
-    <pkgArtifactId>servicemix.features</pkgArtifactId>
+  	<pkgGroupId>servicemix</pkgGroupId>
+    <pkgArtifactId>features</pkgArtifactId>
   </properties>
 
   <build>

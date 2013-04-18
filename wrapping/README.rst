@@ -37,23 +37,11 @@ GroupId y ArtifactId
 
 Springsource mantiene toda la información del artifact original y le prefija su propio grupo, de esta manera en el JAR se identifica fácilmente que se ha generado por el proyecto Spring y qué contiene.
 
-En gvNIX el artifactId se genera:
+En gvNIX el artifactId se genera de la misma forma:
 
-#. *groupId* y *artifactId* del proyecto original son distintos::
-
-    groupId raíz de gvNIZ 
+    groupId raíz de los wrappings de gvNIX (org.gvnix.wrapping) 
       + groupId proyecto original 
       + artifactId del proyecto original
-
-#. Cuando *groupId* y *artifactId* del proyecto original son iguales::
-
-    groupId raíz de gvNIX 
-      + groupId proyecto original
-
-#. *artifactId* del proyecto original no aporta información extra al *groupId*::
-
-    groupId raíz de gvNIX 
-      + groupId proyeto original
 
 Ejemplos
 ----------
@@ -61,31 +49,21 @@ Ejemplos
 Apache Commons Collections 3.2.1 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*ArtifactId igual al groupId*
-
-* JAR original: commons-collections-3.2.1.jar
+* JAR original: org.apache.commons-collections-3.2.1.jar
 * Bundle de Springsource: com.springsource.org.apache.commons.collections-3.2.1.jar
-* Bundle de gvNIX: org.gvnix.commons-collections-3.2.1.jar
+* Bundle de gvNIX: org.gvnix.wrapping.org.apache.commons-collections-3.2.1.jar
 
 Oracle JDBC Driver
 ~~~~~~~~~~~~~~~~~~~~~
 
-*ArtifactId distinto a groupId*
-
-* JAR original: ojdbc14-10.2.0.5.jar
-* Bundle de gvNIX: org.gvnix.com.oracle.ojdbc14-10.2.0.5.jar
+* JAR original: com.oracle.ojdbc14-10.2.0.5.jar
+* Bundle de gvNIX: org.gvnix.wrapping.com.oracle.ojdbc14-10.2.0.5.jar
 
 JavaBeans(TM) Activation Framework
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*ArtifactId no aporta más info a groupId*
-
-* JAR original: activation-1.1.1.jar
-* Bundle de gvNIX: org.gvnix.javax.activation-1.1.1.jar
-
-.. note::
-
-  El formato 'groupId + artifactId' sería muy repetitivo: org.gvnix.javax.activation.activation-1.1.1.jar
+* JAR original: javax.activation.activation-1.1.1.jar
+* Bundle de gvNIX: org.gvnix.wrapping.javax.activation-1.1.1.jar
 
 Conclusión
 ------------
