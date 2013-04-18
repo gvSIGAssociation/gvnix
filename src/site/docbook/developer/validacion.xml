@@ -56,7 +56,7 @@
 	export PATH=$M2_HOME/bin:$PATH
 	export MAVEN_OPTS="$MAVEN_OPTS -Xmx1024m -XX:MaxPermSize=512m"
 	chmod 744 ${WORKSPACE}/code/src/test/resources/integration.sh
-	${WORKSPACE}/code/src/test/resources/integration.sh /tmp/gvNIX-1.0.2-RELEASE/bin ${WORKSPACE}</command>
+	${WORKSPACE}/code/src/test/resources/integration.sh /tmp/gvNIX-X.Y.Z-RELEASE/bin ${WORKSPACE}</command>
 	Observar que se establece la ruta en donde Jenkins tiene instalada la versión de Maven.</para>
 
   	<para xml:lang="es">Algunos scripts ejecutados por <emphasis>integration.sh</emphasis>
