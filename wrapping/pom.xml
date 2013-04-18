@@ -35,7 +35,7 @@
     <version>1.0.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>wrapping</artifactId>
+  <artifactId>org.gvnix.wrapping</artifactId>
   <packaging>pom</packaging>
   <name>gvNIX - OSGi - Wrapping</name>
   <description>Automates the conversion of standard JARs into OSGi bundles.</description>
@@ -63,40 +63,7 @@
     <module>jtds</module>
   </modules>
 
-  <!-- Pendiente de URL
-  <repositories>
-    <repository>
-      <id>maven.org.gvnix.internal</id>
-      <name>CIT Maven Repository - Internal Releases</name>
-      <url>http://TODO/internal</url>
-    </repository>
-  </repositories>
-  -->
-
-  <!-- Pendiente de determinar cómo se distribuye internamente: http://projects.disid.com/issues/4907 
-  <scm>
-    <connection>scm:svn:https://${google.code.project.name}.googlecode.com/svn/trunk</connection>
-    <developerConnection>scm:svn:https://${google.code.project.name}.googlecode.com/svn/trunk</developerConnection>
-    <url>http://code.google.com/p/${google.code.project.name}/source/browse</url>
-  </scm>
-  <distributionManagement>
-    <repository>
-      <id>Google Code</id>
-      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
-    </repository>
-  </distributionManagement> 
-  -->
-
   <build>
-    <!-- Pendiente de determinar cómo se distribuye internamente: http://projects.disid.com/issues/4907 
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-webdav-jackrabbit</artifactId>
-        <version>1.0-beta-6</version>
-      </extension>
-    </extensions>
-    -->
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -104,10 +71,6 @@
         <version>${bndPluginVersion}</version>
         <extensions>true</extensions>
         <configuration>
-          <!-- Pendiente de determinar cómo se distribuye internamente: http://projects.disid.com/issues/4907 
-          <remoteOBR>true</remoteOBR>
-          <bundleUrl>httppgp://${google.code.project.name}.googlecode.com/svn/repo/${repo.folder}/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar</bundleUrl> 
-          -->
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Vendor>${pkgVendor} (wrapped into an OSGi bundle by the gvNIX project build system)</Bundle-Vendor>

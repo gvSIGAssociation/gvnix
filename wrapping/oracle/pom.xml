@@ -49,4 +49,17 @@
     <module>ojdbc6</module>
   </modules>
 
+  <build>
+  	<plugins>
+      <plugin>
+      	<!-- Oracle jdbc driver license not allow distribution -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+        	<skip>true</skip>
+        </configuration>
+      </plugin>
+  	</plugins>
+  </build>
+
 </project>
