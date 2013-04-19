@@ -23,15 +23,15 @@
   </section>
 
   <section>
-  	<title xml:lang="es">Build continuo</title>
+  	<title xml:lang="es">Integración contínua</title>
 
-  	<para xml:lang="es">Servidor Jenkins: http://hq02.disid.com:8081/</para>
+  	<para xml:lang="es">Servidor Jenkins: http://dailybuild.disid.com:8081/</para>
   	
   	<para xml:lang="es">En el servidor será necesario tener instalado y, por lo tanto, disponible desde la consola:
   	startx (iniciador de interfaces gráficas para lanzar los tests de integración de selenium) y zip (para empaquetar
   	la distribución) ya que los utiliza el script de shell que ejecuta todas las pruebas.</para>
   	
-  	<para xml:lang="es">También será necesario disponer en Jenkins del siguiente software instalado:
+  	<para xml:lang="es">También será necesario disponer desde Jenkins del siguiente software instalado:
   	Maven 3.0.X (mayor revisión) y Java 1.6.X (mayor revisión).</para> 
   	
   	<para xml:lang="es">Se descarga el código de http://scmcit.gva.es/svn/gvnix/trunk/code
@@ -56,14 +56,148 @@
 	export PATH=$M2_HOME/bin:$PATH
 	export MAVEN_OPTS="$MAVEN_OPTS -Xmx1024m -XX:MaxPermSize=512m"
 	chmod 744 ${WORKSPACE}/code/src/test/resources/integration.sh
-	${WORKSPACE}/code/src/test/resources/integration.sh /tmp/gvNIX-X.Y.Z-RELEASE/bin ${WORKSPACE}</command>
-	Observar que se establece la ruta en donde Jenkins tiene instalada la versión de Maven.</para>
+	${WORKSPACE}/code/src/test/resources/integration.sh /tmp/gvNIX-X.Y.Z-SNAPSHOT/bin ${WORKSPACE}</command>
+	Observar que se establece la ruta en donde Jenkins tiene instalada la versión de Maven.
+	Tener precaución ya que la ruta al empaquetado de la versión X.Y.Z de gvNIX se estable en la configuración,
+	por lo que si cambia la versión habrá que modificar este valor.</para>
 
   	<para xml:lang="es">Algunos scripts ejecutados por <emphasis>integration.sh</emphasis>
-  	requieren que exista alguna base de datos para realizar ingenierías inversas.</para> 
+  	requieren que exista alguna base de datos para realizar ingenierías inversas.
+  	Consultar dicho script para conocer mas detalles sobre este requerimiento.</para> 
 
 	<para xml:lang="es">Con el <emphasis>Text-finder Plugin</emphasis> se busca la cadena
 	<emphasis>BUILD FAILURE|Script execution aborted|ERROR 404: Not Found|ERROR 400: Bad Request</emphasis>
+	y en el caso de encontrarla se marca el build como inestable.</para>
+  	
+  	<para xml:lang="es">Se avisa por correo de ejecuciones erróneas al responsable técnico del proyecto 
+  	y a las personas que hayan producido el error. Para ello, debe estar configurado en el sistema
+  	de build continuo el servidor de correo saliente a mail.disid.com y el sufijo de email por defecto
+  	a @disid.com.</para>
+  	
+  	<para xml:lang="es">Es necesario tener instalados los plugins <emphasis>Run Condition Plugin</emphasis>
+  	y <emphasis>Text-finder Plugin</emphasis>.</para>
+  </section>  
+  
+  <section>
+  	<title xml:lang="es">Desplegado nocturno de snapshots</title>
+
+  	<para xml:lang="es">Servidor Jenkins: http://dailybuild.disid.com:8081/</para>
+  	
+  	<para xml:lang="es">En el servidor será necesario tener configurado desde la consola:</para>
+  	
+	<para xml:lang="es">Añadir la cuenta con la que se subirán los snapshots al repositorio de google code en
+	/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/apache-maven-3.0.4/conf/settings.xml
+	<command>
+    &lt;server&gt;
+      &lt;id&gt;Google Code&lt;/id&gt;
+      &lt;username&gt;gvnixscm@gmail.com&lt;/username&gt;
+      &lt;password&gt;XXXXXXXXXXXX&lt;/password&gt;
+    &lt;/server&gt;
+    </command>
+    </para>
+    
+    <para xml:lang="es">
+    Algunas librerías deben ser instaladas de forma manual en el repositorio local de maven:
+    <command>
+    mssql-4.0.2206.100.jar
+    ojdbc14-10.2.0.5.jar
+    ojdbc6-11.2.0.3.jar
+    postgresql-9.1-902.jdbc3.jar
+    postgresql-9.1-902.jdbc4.jar
+    postgis-jdbc-1.5.3.jar
+    </command>
+    </para>
+
+  	<para xml:lang="es">Será necesario disponer desde Jenkins del siguiente software instalado:
+  	Maven 3.0.X (mayor revisión) y Java 1.6.X (mayor revisión).</para> 
+  	
+  	<para xml:lang="es">Se descarga el código de http://scmcit.gva.es/svn/gvnix/trunk/code
+  	haciendo una descarga limpia del código (delete and checkout) para empaquetar la
+  	última versión de código disponible y sin posibles cambios locales. La fecha y hora del
+  	servidor debe ser correcta para asegurar que las descargas de código sean correctas.</para>
+  	
+  	<para xml:lang="es">La tarea de prueba se ejecuta todas las noches a la 1am.</para>
+  	
+  	<para xml:lang="es">Se ejecuta el siguiente código:
+	<command>export M2_HOME=/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/apache-maven-3.0.4
+	export PATH=$M2_HOME/bin:$PATH
+	export MAVEN_OPTS="$MAVEN_OPTS -Dgpg.skip=true -Xmx1024m -XX:MaxPermSize=512m"
+	cd ${WORKSPACE}/code
+	mvn deploy</command>
+  	Observar que se establece la ruta en donde Jenkins tiene instalada la versión de Maven.
+  	</para>
+  	
+	<para xml:lang="es">Con el <emphasis>Text-finder Plugin</emphasis> se busca la cadena
+	<emphasis>BUILD FAILURE</emphasis>
+	y en el caso de encontrarla se marca el build como inestable.</para>
+  	
+  	<para xml:lang="es">Se avisa por correo de ejecuciones erróneas al responsable técnico del proyecto 
+  	y a las personas que hayan producido el error. Para ello, debe estar configurado en el sistema
+  	de build continuo el servidor de correo saliente a mail.disid.com y el sufijo de email por defecto
+  	a @disid.com.</para>
+  	
+  	<para xml:lang="es">Es necesario tener instalados los plugins <emphasis>Run Condition Plugin</emphasis>
+  	y <emphasis>Text-finder Plugin</emphasis>.</para>
+  </section>  
+  
+  <section>
+  	<title xml:lang="es">Actualización del mirror de código fuente en github</title>
+
+  	<para xml:lang="es">Servidor Jenkins: http://dailybuild.disid.com:8081/</para>
+  	
+  	<para xml:lang="es">En el servidor será necesario tener configurado desde la consola:</para>
+  	
+	<para xml:lang="es">Establecer las configuraciones globales de acceso al repositorio de git:
+	<command>
+	git config --global user.email "mmartinez@disid.com"
+	git config --global user.name "marsanm2"
+	git config --global credential.helper 'cache'
+	</command>
+	</para>
+	
+	<para xml:lang="es">Copiar en /var/lib/jenkins/.ssh/ las claves de acceso a GIT:
+	<command>
+	total 24
+	drwx------  2 jenkins nogroup 4096 abr 18 19:03 .
+	drwxr-xr-x 20 jenkins adm     4096 abr 19 09:23 ..
+	-rw-------  1 jenkins nogroup  401 abr 18 19:02 authorized_keys
+	-rwx------  1 jenkins nogroup 1766 abr 18 17:48 id_rsa
+	-rwx------  1 jenkins nogroup  401 abr 18 17:53 id_rsa.pub
+	-rw-r--r--  1 jenkins nogroup  884 abr 18 17:37 known_hosts
+	</command>
+	</para>
+
+  	<para xml:lang="es">No se configurará ningún origen de código fuente configurado
+  	ya que se obtendrá mediante la línea de comandos.</para>
+  	
+  	<para xml:lang="es">La tarea de prueba se ejecuta todas las noches a la 3am.</para>
+  	
+  	<para xml:lang="es">Se ejecuta el siguiente código:
+	<command>#Primera ejecución de descarga de SVN, subida a Github e inicio del agente SSH para el recordatorio de clave
+	#Realizada accediendo directamente a la línea de comandos con el usuario jenkins
+	#cd ~/jobs/gvnix-github-mirror-repository/workspace/
+	#apt-get install git-svn
+	#git svn clone http://scmcit.gva.es/svn/gvnix/trunk/code gvnix.git
+	#cd gvnix.git
+	#git remote add origin git@github.com:DISID/gvnix.git
+	#git push origin master
+	#rm ~/etc/ssh/ssh-agent-socket;
+	#eval `ssh-agent -s -a ~/etc/ssh/ssh-agent-socket`;
+	#ssh-add;
+
+	# Ejecuciones sucesivas de descarga de SVN, subida a Github y usando la clave almacenada
+	SSH_AGENT_PID=`ps -fC ssh-agent |grep 'etc/ssh/ssh-agent-socket' |sed -r 's/^\S+\s+(\S+).*$/\1/'`;
+	export SSH_AGENT_PID;
+	SSH_AUTH_SOCK=~/etc/ssh/ssh-agent-socket;
+	export SSH_AUTH_SOCK;
+	cd gvnix.git
+	git svn rebase
+	git push origin master
+	</command>
+  	</para>
+  	
+	<para xml:lang="es">Con el <emphasis>Text-finder Plugin</emphasis> se busca la cadena
+	<emphasis>BUILD FAILURE</emphasis>
 	y en el caso de encontrarla se marca el build como inestable.</para>
   	
   	<para xml:lang="es">Se avisa por correo de ejecuciones erróneas al responsable técnico del proyecto 
