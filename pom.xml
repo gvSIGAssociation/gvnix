@@ -972,6 +972,18 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.7</version>
+        <dependencies>
+            <dependency>
+                <groupId>ant-contrib</groupId>
+                <artifactId>ant-contrib</artifactId>
+                <version>20020829</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant-apache-regexp</artifactId>
+                <version>1.7.1</version>
+            </dependency>
+        </dependencies>
         <executions>
           <execution>
 			<!-- copies the JARs we have built locally (eg bootstrap JAR) that noone else depends on into the target/all -->
@@ -1012,22 +1024,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-          <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.7</version>
-          <dependencies>
-              <dependency>
-                  <groupId>ant-contrib</groupId>
-                  <artifactId>ant-contrib</artifactId>
-                  <version>20020829</version>
-              </dependency>
-              <dependency>
-                  <groupId>org.apache.ant</groupId>
-                  <artifactId>ant-apache-regexp</artifactId>
-                  <version>1.7.1</version>
-              </dependency>
-          </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
