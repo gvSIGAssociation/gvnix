@@ -30,4 +30,6 @@
   <xi:include href="apendice-comandos_addon-dynamic_config.xml" />
 
   <xi:include href="apendice-comandos_addon-web-mvc-binding.xml" />
+
+  <xi:include href="apendice-comandos_addon-web-mvc-datatables.xml" />
 </chapter>

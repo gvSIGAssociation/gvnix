@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_addon-web-mvc-datatables"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+         
+  <title xml:lang="es">Comandos del add-on Web MVC Datatables</title>
+
+  <para xml:lang="es">Para una descripción detallada de las características
+  del add-on consultar la documentación del <link linkend="addon-web-mvc-datatables">
+  add-on Web MVC Datatables</link>.</para>
+  
+  <table>
+    <title xml:lang="es">Comandos del add-on Web MVC Datatables</title>
+
+    <tgroup cols="2">
+      <colspec colwidth="145" />
+      <colspec colwidth="300" />
+      <thead>
+        <row>
+          <entry xml:lang="es" align="center">Comando</entry>
+
+          <entry xml:lang="es" align="center">Descripción</entry>
+        </row>
+      </thead>
+
+      <tbody>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-setup">web
+          mvc datatables setup</link></entry>
+
+          <entry xml:lang="es">Instala los artefactos y dependencias requeridas para el 
+          funcionamiento del add-on.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-update-tags">web
+          mvc datatables update tags</link></entry>
+
+          <entry xml:lang="es">Actualiza los artefactos, ya instalados en el add-on, por los
+          actuales.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add">web
+          mvc datatables add</link></entry>
+
+          <entry xml:lang="es">Añade el uso de datatables al controlador especificado.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-all">web
+          mvc datatables all</link></entry>
+
+          <entry xml:lang="es">Añade el uso de Datatables a todos los controladores de la aplicación.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <section xml:id="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-setup">
+    <title>web mvc datatables setup</title>
+
+	<para xml:lang="es">Instala todos los artefactos necesario para que el add-on funcione.</para>
+  
+    <para xml:lang="es">Los cambios en el proyecto son:<variablelist>
+        <varlistentry>
+          <term>webapp/styles/datatables</term>
+
+          <listitem>
+            <para xml:lang="es">Css usadas por el widget.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>webapp/images/datatables/</term>
+
+          <listitem>
+            <para xml:lang="es">Imágenes usadas por el widget.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>webapp/scripts/datatables</term>
+
+          <listitem>
+            <para xml:lang="es">JavaScript usado por el widget.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>webapp/scripts/datatables/i18n</term>
+
+          <listitem>
+            <para xml:lang="es">Cadenas de internacionalización usadas por el widget.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>webapp/WEB-INF/tags/datatables</term>
+
+          <listitem>
+            <para xml:lang="es">Tagx que adaptan los parámetros de los tags estándar a los
+            de Dandelion-DataTables.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>src/main/resources/datatables.properties</term>
+
+          <listitem>
+            <para xml:lang="es">Fichero con opciones de configuración de Dandelion-DataTables.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>webapp/WEB-INF/tags/util/load-scripts.tagx</term>
+
+          <listitem>
+            <para xml:lang="es">Añade la carga de ficheros js y css a la páginas.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>webapp/WEB-INF/web.xml</term>
+
+          <listitem>
+            <para xml:lang="es">Registra configuración necesaria para el uso de
+            Dandelion-DataTables.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>webapp/WEB-INF/spring/webmvc-config.xml</term>
+
+          <listitem>
+            <para xml:lang="es">Registra configuración necesaria para el uso de
+            Dandelion-DataTables.</para>
+          </listitem>
+        </varlistentry>
+
+      </variablelist></para>
+  </section>
+  <section xml:id="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-update-tags">
+    <title>web mvc datatables update tags</title>
+
+	<para xml:lang="es">Actualiza todos los artefactos necesario para que el add-on funcione.
+	Este comando es útil cuando se actualiza la versión del add-on y se desea utilizar los
+	cambios en los tagx u otros artefactos de la nueva versión.</para>
+	
+	<para xml:lang="es"><emphasis>Advertencia:</emphasis>Al ejecutar este comando, 
+	<emphasis>los artefactos del proyecto serán reescritos</emphasis>. Cualquier
+	cambio sobre los originales se perderá. Por lo tanto, es conveniente disponer
+	de una <emphasis>copia de seguridad o un sistema de control de versiones</emphasis>
+	para revisar las diferencias entre los artefactos anteriores y la actualización.</para>
+  
+  </section>
+  <section xml:id="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add">
+    <title>web mvc datatables add</title>
+
+	<para xml:lang="es">Añade el uso de Datatables al controlador especificado.</para>
+  
+    <para xml:lang="es">Sus parámetros son:<variablelist>
+        <varlistentry>
+          <term>--type</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>[Clase Java] [Autocompletado]</emphasis></para>
+
+            <para xml:lang="es">Nombre de la clase Java controladora a la que se
+            aplicará los cambios.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--ajax</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>[Opcional] [Booleano] [Autocompletado]</emphasis></para>
+
+            <para xml:lang="es">Establece el modo de datos a AJAX (por defecto) o a DOM (cuando es <emphasis>false</emphasis>).</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
+  <section xml:id="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-all">
+    <title>web mvc datatables all</title>
+
+	<para xml:lang="es">Añade el uso de Datatables a todos los controladores de la aplicación.</para>
+  
+    <para xml:lang="es">Sus parámetros son:<variablelist>
+        <varlistentry>
+          <term>--ajax</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>[Opcional] [Booleano] [Autocompletado]</emphasis></para>
+
+            <para xml:lang="es">Establece el modo de datos a AJAX (por defecto) o a DOM (cuando es <emphasis>false</emphasis>).</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
+</section>

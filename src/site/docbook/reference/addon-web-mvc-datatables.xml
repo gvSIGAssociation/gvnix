@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-web-mvc-datatables" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Add-on Web MVC Datatables</title>
+
+  <para>Uso del componente Datatables</para>
+
+  <section xml:id="addon-web-mvc-datatables_descripcion">
+    <title>Descripción</title>
+
+    <para xml:lang="es">Este Add-on reemplaza el widget de lista
+    de las vistas de las entidades para usar el plugin de 
+    <link xlink:href="http://jquery.com/">jQuery</link> <link
+    xlink:href="http://datatables.net/">Datatables</link>.
+    Para ello, se usa una adaptación de la librería de tag JSP 
+    <link xlink:href="http://dandelion.github.io/datatables">
+    Dandelion-DataTables</link> que es integrada en la aplicación.</para>
+
+    <para xml:lang="es">Las principales características de este widget son:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term xml:lang="es">Ordenación de datos por uno o más campos.</term>
+
+        <listitem>
+          <para xml:lang="es">La tabla permite al usuario final ordenar los datos,
+          por una o más columnas, y en el sentido que el desee. Las columnas disponibles
+          para la ordenación y su sentido son configurables en la página.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term xml:lang="es">Filtrados por columnas y búsquedas globales</term>
+
+        <listitem>
+          <para xml:lang="es">Soporta filtrar los datos mostrados por columna,
+          además de hacer búsquedas de texto sobre los resultados de los filtros.
+          La configuración de que filtros están disponibles para el usuario
+          se pueden configurar en la página.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term xml:lang="es">Paginación de datos ajustable</term>
+
+        <listitem>
+          <para xml:lang="es">Los datos, filtrados o sin filtrar, se paginan
+          sin necesidad de refrescar la página. El tamaño de la página puede ser
+          seleccionado por el usuario final.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term xml:lang="es">Acceso a los datos en la misma página o
+        por petición por AJAX</term>
+
+        <listitem>
+          <para xml:lang="es">Los datos que alimentan la tabla pueden
+          estar integrados en la página o usar peticiones AJAX para
+          ir solicitándolos a medida que el usuario los requiera.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term xml:lang="es">Soporta múltiples plugins y es extensible</term>
+
+        <listitem>
+          <para xml:lang="es">Soporta múltiples plugins como 
+          <emphasis>ColReorder</emphasis> (permite al usuario reordenar las
+          columnas), <emphasis>FixedHeader</emphasis> (que mantiene las
+          cabeceras de las columnas visibles cuando se desciende por
+          páginas largas), etc.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term xml:lang="es">Registro de Callbacks en distintos eventos</term>
+
+        <listitem>
+          <para xml:lang="es">Soporta registrar funciones JavaScript 
+          a ejecutar por el widged cuando: termina la inicialización, 
+          al crear una línea, al pintar el píe de tabla, etc...</para>
+        </listitem>
+      </varlistentry>
+
+    </variablelist>
+  </section>
+
+  <section xml:id="addon-web-mvc-datatables_instalacion">
+    <title xml:lang="es">Instalación del soporte para Datatables</title>
+
+    <para xml:lang="es">Para poder utilizar este widged en nuestras vistas
+    es necesario instalar el soporte en nuestra aplicación. Para ello, es
+    necesario ejecutar en primer lugar el comando <command><link
+    linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-setup">web
+    mvc datatables setup</link></command>.</para>
+    
+	<programlisting>roo-gvNIX> <command>web mvc datatables setup</command>
+
+Created SRC_MAIN_WEBAPP/images/datatables
+4fd6412 Created SRC_MAIN_WEBAPP/images/datatables/back_disabled.png
+e834dda Created SRC_MAIN_WEBAPP/images/datatables/back_enabled.png
+d0cea86 Created SRC_MAIN_WEBAPP/images/datatables/back_enabled_hover.png
+c30deed Created SRC_MAIN_WEBAPP/images/datatables/forward_disabled.png
+63bbb33 Created SRC_MAIN_WEBAPP/images/datatables/forward_enabled.png
+b8dfb55 Created SRC_MAIN_WEBAPP/images/datatables/forward_enabled_hover.png
+3e9262d Created SRC_MAIN_WEBAPP/images/datatables/page_excel.png
+0cd7923 Created SRC_MAIN_WEBAPP/images/datatables/page_white_acrobat.png
+efcd01b Created SRC_MAIN_WEBAPP/images/datatables/page_white_text.png
+fdadf7f Created SRC_MAIN_WEBAPP/images/datatables/sort_asc.png
+cf127aa Created SRC_MAIN_WEBAPP/images/datatables/sort_asc_disabled.png
+cb35461 Created SRC_MAIN_WEBAPP/images/datatables/sort_both.png
+79bc8ee Created SRC_MAIN_WEBAPP/images/datatables/sort_desc.png
+7bc8827 Created SRC_MAIN_WEBAPP/images/datatables/sort_desc_disabled.png
+Created SRC_MAIN_WEBAPP/scripts/datatables
+Created SRC_MAIN_WEBAPP/scripts/datatables/i18n
+Created SRC_MAIN_WEBAPP/styles/datatables
+Created SRC_MAIN_WEBAPP/WEB-INF/tags/datatables
+0538fd2 Updated SRC_MAIN_WEBAPP/WEB-INF/tags/util/load-scripts.tagx
+f86e0d3 Updated SRC_MAIN_WEBAPP/WEB-INF/spring/webmvc-config.xml
+66d3740 Updated SRC_MAIN_WEBAPP/WEB-INF/web.xml
+49ce50b Updated ROOT/pom.xml [added repository https://gvnix.googlecode.com/svn/repo; added dependency org.gvnix:org.gvnix.addon.datatables:X.Y.Z; added dependency org.gvnix:org.gvnix.datatables.tags:X.Y.Z]
+6bc211d Created SRC_MAIN_WEBAPP/scripts/datatables/dataTables.custom.api.functions.js
+8b6babf Created SRC_MAIN_WEBAPP/scripts/datatables/jquery-min.js
+89eadfb Created SRC_MAIN_WEBAPP/scripts/datatables/jquery.dataTables.js
+dee4d88 Created SRC_MAIN_WEBAPP/scripts/datatables/jquery.dataTables.min.js
+49a6d13 Created SRC_MAIN_WEBAPP/scripts/datatables/jquery.js
+63168eb Created SRC_MAIN_WEBAPP/scripts/datatables/README.txt
+65969a9 Created SRC_MAIN_WEBAPP/scripts/datatables/i18n/README.txt
+132cfcd Created SRC_MAIN_WEBAPP/scripts/datatables/i18n/labels_ca.txt
+350ea3a Created SRC_MAIN_WEBAPP/scripts/datatables/i18n/labels_de.txt
+1a677b1 Created SRC_MAIN_WEBAPP/scripts/datatables/i18n/labels_en.txt
+db404f8 Created SRC_MAIN_WEBAPP/scripts/datatables/i18n/labels_es.txt
+c8078bf Created SRC_MAIN_WEBAPP/scripts/datatables/i18n/labels_fr.txt
+df54ce3 Created SRC_MAIN_WEBAPP/styles/datatables/gvnix.dataTables.css
+414cfe7 Created SRC_MAIN_WEBAPP/styles/datatables/jquery.dataTables.css
+5455c2c Created SRC_MAIN_WEBAPP/styles/datatables/jquery.dataTables_themeroller.css
+ee1f588 Created SRC_MAIN_WEBAPP/WEB-INF/tags/datatables/column.tagx
+35c6fc2 Created SRC_MAIN_WEBAPP/WEB-INF/tags/datatables/list.tagx
+6ae2baa Created SRC_MAIN_WEBAPP/WEB-INF/tags/datatables/table.tagx
+d9042b3 Created ROOT/src/main/resources/datatables.properties
+
+Updated ROOT/pom.xml [added property 'gvnix.version' = 'X.Y.Z']</programlisting>
+    
+    <para>Este comando añadirá los siguientes elementos:</para>
+
+    <orderedlist>
+      <listitem>
+        <para xml:lang="es">Imágenes y hojas de estilo utilizadas por el widget.
+        Estos ficheros se instalan en <filename>webapp/images/datatables</filename> y
+        <filename>webapp/styles/datatables</filename> respectivamente.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Los archivos javaScript de jQuery y el jQuery.datatables (
+        tanto en su versión optimizada como estándar) en el directorio 
+        <filename>webapp/scripts/datatables</filename>.
+        Para más información de estos ficheros, consultar el fichero <filename>README.txt</filename></para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Los ficheros de internacionalización usados en el widget. 
+        Se pueden encontrar en el directorio 
+        <filename>webapp/scripts/datatables/i18n</filename>. Para más información consultar
+        el fichero <filename>README.txt</filename></para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es"><emphasis>Tagx</emphasis> necesarios utilizados en las páginas
+        para el pintado del widged, almacenados en
+        <filename>WEB-INF/tags/datatables</filename>.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Un fichero de propiedades para diversos aspectos de configuración
+        en <filename>src/main/resources/datatables.properties</filename>.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Actualiza el fichero <filename>WEB-INF/tags/util/load-scripts.tagx</filename>
+        para que las páginas puedan localizar los recursos de hojas de estilo y javaScript 
+        requeridos.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Algunos ajustes en el fichero 
+        <filename>WEB-INF/web.xml</filename> y <filename>WEB-INF/spring/webmvc-config.xml</filename>
+        requeridos para el correcto funcionamiento.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">La dependencia a este add-on y a la librería de tag 
+        adaptada. Esta última tiene como dependencias las dependencias a 
+        las librerías de <link xlink:href="http://dandelion.github.io/datatables">
+        Dandelion-DataTables</link>.</para>
+      </listitem>
+
+    </orderedlist>
+
+    <para xml:lang="es">Para más información sobre el comando ver
+    <command><link
+    linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-setup">web
+    mvc datatables setup</link></command> en el <link
+    linkend="apendice-comandos_addon-web-mvc-datatables">apéndice de comandos de este
+    add-on</link>.</para>
+  </section>
+
+  <section>
+    <title xml:lang="es">Usar datatables en la vista "list" de un controlador.</title>
+
+    <para xml:lang="es">Para poder utilizar el widged de datatables en el listado
+    de un controlador de entidad es necesario ejecutar el comando <link
+    linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add">web mvc datatables add</link>.</para>
+
+    <para xml:lang="es">Este comando añadide la anotación <classname>@GvNIXDatatables</classname> 
+    al controller para generar los métodos necesario para gestionar las peticiones que
+    realiza el widget.</para>
+
+    <para xml:lang="es">Además, actualiza la página <filename>list.jspx</filename> para
+    cambiar las rutas a los tagx utilizados para pintar la tabla a los instalados por
+    el add-on en el directorio <filename>WEB-INF/tags/datatables</filename>.</para>
+
+    <para xml:lang="es">Este add-on incluye, además, incluye el comando <link
+    linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-all">web mvc datatables all</link>
+    que aplica los cambios a todos los controllers de la aplicación.</para>
+    
+    <para xml:lang="es">Para mas información sobre los comandos ver el <link
+    linkend="apendice-comandos_addon-web-mvc-datatables">apéndice de comandos de este
+    add-on</link>.</para>
+  </section>
+  
+  <section>
+    <title xml:lang="es">Ajustar la configuración del datatables de una vista.</title>
+
+    <para xml:lang="es">Los tags creados para este add-on, que se pueden
+    encontrar en <filename>WEB-INF/tags/datatables</filename>, son compatibles
+    con los tags estándar que se incluyen por defecto, incorporando además las
+    opciones que ofrece la librería de <link 
+    xlink:href="http://dandelion.github.io/datatables"> Dandelion-DataTables</link>.</para>
+
+    <para xml:lang="es">Las opciones disponibles para los tags se pueden consultar
+    en la declaración de los propios ficheros de tags, o en <link 
+    xlink:href="http://dandelion.github.io/datatables/ref/jsp/"> la página de 
+    referencia de Dandelion-DataTables</link>.</para>
+
+    <para xml:lang="es">Para personalizar los ajustes de alguna vista, modificar
+    el fichero <filename>list.jspx</filename> correspondiente tal y como se
+    realiza con los tags estándar.</para>
+    </section>
+
+  <section>
+    <title xml:lang="es">Cambiar el modo de datos de Datatables.</title>
+
+    <para xml:lang="es">Para proveer de datos al widget, actualmente, existen
+    dos métodos.</para>
+
+    <orderedlist>
+      <listitem>
+        <para xml:lang="es"><emphasis>DOM</emphasis> o la carga de datos
+        incrustados en la misma página. Una vez cargados los datos, el
+        widged se encarga de paginarlos, ordenarlos y filtrarlos en base
+        a través de javaScript en la propia página.</para>
+      </listitem>
+      <listitem>
+        <para xml:lang="es"><emphasis>AJAX</emphasis> el widged hace
+        peticiones <link xlink:href="http://es.wikipedia.org/wiki/AJAX">
+        AJAX</link> al servidor para obtener los datos en base a la
+        paginación, orden y filtro. Luego los muestra repintando
+        la tabla a través de javaScript en la propia página.</para>
+      </listitem>
+    </orderedlist>
+   
+    <para xml:lang="es">La opción por defecto que instala el add-on
+      es la de AJAX, ya que es más escalable para volúmenes de datos grandes.
+      </para>
+      
+    <para xml:lang="es">Para cambiar el modo de datos en un controlador
+      determinado, solo es necesario modificar el atributo <emphasis>ajax</emphasis>
+      de la anotación <classname>GvNIXDatatables</classname>. gvNIX actualizará
+      el controlador para que el modo sea accesible tanto en el mismo (para los métodos
+      de peticiones) como en la página.
+      </para>
+  </section>
+  
+
+  <section xml:id="addon-web-mvc-datatables_futuras-versiones">
+    <title xml:lang="es">Futuras versiones</title>
+
+    <para xml:lang="es">Esta es la primera versión, con el soporte
+    mas básico para las listas. Pero la previsión es extender sus
+    funcionalidad para soportar entre otros:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">Mostrado de detalle del registro.</para>
+      </listitem>
+      
+      <listitem>
+        <para xml:lang="es">Edición <emphasis>en linea</emphasis> de
+        los datos, desde la misma tabla.</para>
+      </listitem>
+      <listitem>
+        <para xml:lang="es">Exportaciones de datos en modo AJAX.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+  
+</chapter>

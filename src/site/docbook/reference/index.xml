@@ -207,6 +207,8 @@
     <xi:include href="addon-web-mvc-binding.xml"/>
     
     <xi:include href="addon-flex.xml"/>
+    
+    <xi:include href="addon-web-mvc-datatables.xml"/>
   </part>
 
   <part>
