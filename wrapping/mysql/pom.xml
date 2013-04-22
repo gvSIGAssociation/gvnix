@@ -36,8 +36,8 @@
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
-  <version>${depVersion}</version>
+  <artifactId>org.gvnix.wrapping.mysql.mysql-connector-java</artifactId>
+  <version>5.1.23</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - MySQL JDBC4 driver</name>
   <description>MySQL JDBC driver. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
@@ -50,7 +50,7 @@
     <pkgGroupId>mysql</pkgGroupId>
     <pkgArtifactId>mysql-connector-java</pkgArtifactId>
     <pkgVersion>5.1.23</pkgVersion>
-    <depVersion>5.1.23</depVersion>
+    <depVersion>${project.version}</depVersion>
     <pkgVendor>Oracle</pkgVendor>
     <pkgDocUrl>http://dev.mysql.com/doc/refman/5.6/en/connector-j.html</pkgDocUrl>
     <pkgLicense>http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</pkgLicense>

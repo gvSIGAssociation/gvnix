@@ -36,8 +36,8 @@
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
-  <version>${pkgVersion}</version>
+  <artifactId>org.gvnix.wrapping.org.aspectj.aspectj</artifactId>
+  <version>1.6.11</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - AspectJ</name>
   <description>AspectJ Bundle. This OSGi bundle wraps ${pkgRtArtifactId} and ${pkgWeaverArtifactId} ${pkgVersion} jar files.</description>
@@ -51,7 +51,7 @@
     <pkgArtifactId>aspectj</pkgArtifactId>
     <pkgRtArtifactId>aspectjrt</pkgRtArtifactId>
     <pkgWeaverArtifactId>aspectjweaver</pkgWeaverArtifactId>
-    <pkgVersion>1.6.11</pkgVersion>
+    <pkgVersion>${project.version}</pkgVersion>
     <pkgVendor>Eclipse</pkgVendor>
     <pkgDocUrl>http://www.eclipse.org/aspectj/docs.php</pkgDocUrl>
     <pkgLicense>http://www.eclipse.org/legal/epl-v10.html</pkgLicense>

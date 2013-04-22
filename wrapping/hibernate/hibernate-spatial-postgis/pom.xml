@@ -36,8 +36,8 @@
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
-  <version>${pkgVersion}</version>
+  <artifactId>org.gvnix.wrapping.org.hibernatespatial.hibernate-spatial-postgis</artifactId>
+  <version>1.1</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - Hibernate Fragment - Hibernate Spatial</name>
   <description>Hibernate Spatial Bundle Fragment. This OSGi fragment wraps Hibernate Spatial dialect provider for PostGIS.</description>
@@ -49,7 +49,7 @@
   <properties>
     <pkgGroupId>org.hibernatespatial</pkgGroupId>
     <pkgArtifactId>hibernate-spatial-postgis</pkgArtifactId>
-    <pkgVersion>1.1</pkgVersion>
+    <pkgVersion>${project.version}</pkgVersion>
     <pkgVendor>Geovise</pkgVendor>
     <pkgDocUrl>http://www.hibernatespatial.org/tutorial</pkgDocUrl>
     <pkgLicense>http://www.hibernatespatial.org/license.html</pkgLicense>

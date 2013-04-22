@@ -36,8 +36,8 @@
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
-  <version>${pkgVersion}</version>
+  <artifactId>org.gvnix.wrapping.org.hibernate.hibernate-validator</artifactId>
+  <version>4.2.0.Final</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - Hibernate Validator</name>
   <description>Hibernate Validator Bundle. This OSGi bundle wraps Hibernate Validator ${pkgVersion} jar files.</description>
@@ -49,7 +49,7 @@
   <properties>
     <pkgGroupId>org.hibernate</pkgGroupId>
     <pkgArtifactId>hibernate-validator</pkgArtifactId>
-    <pkgVersion>4.2.0.Final</pkgVersion>
+    <pkgVersion>${project.version}</pkgVersion>
     <pkgVendor>JBoss</pkgVendor>
     <pkgDocUrl>http://www.hibernate.org/docs</pkgDocUrl>
     <pkgLicense>http://www.hibernate.org/license</pkgLicense>

@@ -35,7 +35,7 @@
     <version>1.0.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
+  <artifactId>org.gvnix.wrapping.servicemix.features</artifactId>
   <packaging>pom</packaging>
 
   <name>gvNIX - OSGi - Karaf Features</name>
@@ -81,6 +81,7 @@
         <!-- Produces files to attach to the project for install and deploy -->
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.7</version>
         <executions>
           <execution>
             <id>attach-artifacts</id>

@@ -36,8 +36,8 @@
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
-  <version>${pkgVersion}</version>
+  <artifactId>org.gvnix.wrapping.javassist.javassist</artifactId>
+  <version>3.12.1.GA</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - Javassist</name>
   <description>JAVA programming ASSISTant. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
@@ -49,7 +49,7 @@
   <properties>
     <pkgGroupId>javassist</pkgGroupId>
     <pkgArtifactId>javassist</pkgArtifactId>
-    <pkgVersion>3.12.1.GA</pkgVersion>
+    <pkgVersion>${project.version}</pkgVersion>
     <pkgVendor>JBoss</pkgVendor>
     <pkgDocUrl>http://www.jboss.org/docs</pkgDocUrl>
     <pkgLicense>http://www.jboss.org/license</pkgLicense>

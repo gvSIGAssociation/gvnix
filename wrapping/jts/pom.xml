@@ -36,8 +36,8 @@
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
-  <version>${pkgVersion}</version>
+  <artifactId>org.gvnix.wrapping.com.vividsolutions.jts</artifactId>
+  <version>1.12</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - JTS Topology Suite</name>
   <description>JTS Topology Suite. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
@@ -49,7 +49,7 @@
   <properties>
     <pkgGroupId>com.vividsolutions</pkgGroupId>
     <pkgArtifactId>jts</pkgArtifactId>
-    <pkgVersion>1.12</pkgVersion>
+    <pkgVersion>${project.version}</pkgVersion>
     <pkgVendor>Vivid Solutions Inc.</pkgVendor>
     <pkgDocUrl>http://www.vividsolutions.com/jts/JTSHome.htm</pkgDocUrl>
     <pkgLicense>http://www.gnu.org/copyleft/lesser.html</pkgLicense>

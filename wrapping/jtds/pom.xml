@@ -36,8 +36,8 @@
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
-  <version>${depVersion}</version>
+  <artifactId>org.gvnix.wrapping.net.sourceforge.jtds.jtds</artifactId>
+  <version>1.2.4</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - jTDS (Open Source Microsoft SQL Server/Sybase ASE driver) JDBC 3.0 driver</name>
   <description>jTDS JDBC driver (Open Source Microsoft SQL Server/Sybase ASE driver). This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
@@ -50,7 +50,7 @@
     <pkgGroupId>net.sourceforge.jtds</pkgGroupId>
     <pkgArtifactId>jtds</pkgArtifactId>
     <pkgVersion>1.2.4</pkgVersion>
-    <depVersion>1.2.4</depVersion>
+    <depVersion>${project.version}</depVersion>
     <pkgVendor>net.sourceforge.jtds</pkgVendor>
     <pkgDocUrl>http://jtds.sourceforge.net/</pkgDocUrl>
     <pkgLicense>http://jtds.sourceforge.net/license.html</pkgLicense>

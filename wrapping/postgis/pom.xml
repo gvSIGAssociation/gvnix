@@ -36,8 +36,8 @@
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
-  <version>${pkgVersion}</version>
+  <artifactId>org.gvnix.wrapping.org.postgis.postgis-jdbc</artifactId>
+  <version>1.5.3</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - PostgreSQL Fragment - PostGIS JDBC driver</name>
   <description>PostGIS JDBC driver Fragment. This OSGi fragment adds spatial database extension for PostgreSQL.</description>
@@ -49,7 +49,7 @@
   <properties>
     <pkgGroupId>org.postgis</pkgGroupId>
     <pkgArtifactId>postgis-jdbc</pkgArtifactId>
-    <pkgVersion>1.5.3</pkgVersion>
+    <pkgVersion>${project.version}</pkgVersion>
     <pkgVendor>Refractions Research</pkgVendor>
     <pkgDocUrl>http://www.postgis.org/documentation/</pkgDocUrl>
     <pkgLicense>http://www.opensource.org/licenses/gpl-2.0.php</pkgLicense>

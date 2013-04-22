@@ -36,8 +36,8 @@
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
-  <version>${pkgVersion}</version>
+  <artifactId>org.gvnix.wrapping.com.oracle.ojdbc6</artifactId>
+  <version>11.2.0.3</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - Oracle 11.2 JDBC driver</name>
   <description>Oracle 11.2 JDBC driver classes for use with JDK1.4 and JDK1.5, driverclass:oracle.jdbc.OracleDriver. This bundle wraps the standard Maven artifact: ${pkgArtifactId}-${pkgVersion}.</description>
@@ -49,7 +49,7 @@
   <properties>
     <pkgGroupId>com.oracle</pkgGroupId>
     <pkgArtifactId>ojdbc6</pkgArtifactId>
-    <pkgVersion>11.2.0.3</pkgVersion>
+    <pkgVersion>${project.version}</pkgVersion>
     <pkgVendor>Oracle Corporation</pkgVendor>
     <pkgDocUrl>http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/index.html</pkgDocUrl>
     <pkgLicense>http://www.oracle.com/technology/software/htdocs/distlic.html</pkgLicense>

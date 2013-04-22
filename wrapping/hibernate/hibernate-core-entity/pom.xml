@@ -36,8 +36,8 @@
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
-  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
-  <version>${pkgVersion}</version>
+  <artifactId>org.gvnix.wrapping.org.hibernate.hibernate</artifactId>
+  <version>3.6.7.Final</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - Hibernate</name>
   <description>Hibernate Bundle. This OSGi bundle wraps ${pkgCoreArtifactId} and ${pkgEntityArtifactId} ${pkgVersion} jar files.</description>
@@ -51,7 +51,7 @@
     <pkgArtifactId>hibernate</pkgArtifactId>
     <pkgCoreArtifactId>hibernate-core</pkgCoreArtifactId>
     <pkgEntityArtifactId>hibernate-entitymanager</pkgEntityArtifactId>
-    <pkgVersion>3.6.7.Final</pkgVersion>
+    <pkgVersion>${project.version}</pkgVersion>
     <pkgVendor>JBoss</pkgVendor>
     <pkgDocUrl>http://www.hibernate.org/docs</pkgDocUrl>
     <pkgLicense>http://www.hibernate.org/license</pkgLicense>
