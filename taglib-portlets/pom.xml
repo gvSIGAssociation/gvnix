@@ -32,7 +32,7 @@
     <artifactId>org.gvnix.root</artifactId>
     <version>1.0.2-SNAPSHOT</version>
   </parent>
-  <artifactId>org.gvnix.portlets.tags</artifactId>
+  <artifactId>org.gvnix.web.portlet.tags</artifactId>
   <name>gvNIX - Portlets JSP Tag library</name>
   <organization>
     <name>Generalitat Valenciana</name>

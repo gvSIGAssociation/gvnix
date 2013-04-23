@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
  */
-package org.gvnix.portlets.tags;
+package org.gvnix.web.portlet.tags;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,8 +26,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.portlet.BaseURL;
+import javax.portlet.MimeResponse;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletResponse;
@@ -81,18 +81,17 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
     protected List<String> removedParametersList = new ArrayList<String>();
 
     /**
-     * Prefix that delimites where the context starts as part of value attribute
+     * Prefix that delimites where the type starts as part of value attribute
      * "{"
      */
     public static final String TYPE_DELIMITER_PREFIX = "{";
 
     /**
-     * Suffix that delimites where the context ends as part of value attribute
-     * "}"
+     * Suffix that delimites where the type ends as part of value attribute "}"
      */
     public static final String TYPE_DELIMITER_SUFFIX = "}";
 
-    /** Value separator for context and URL value ":" */
+    /** Value separator for type and URL value ":" */
     public static final String VALUE_SEPARATOR = ":";
 
     /** Value separator for URL value and query string "?" */
@@ -103,16 +102,16 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
      * <p/>
      * Can optionally prepend a {@link #TYPE_DELIMITER_PREFIX} and append a
      * {@link #TYPE_DELIMITER_SUFFIX} concatenated with {@link #VALUE_SEPARATOR}
-     * to set the URL target context; for example {@code " ACTION}:/owners"}
+     * to set the URL type; for example {@code '&#123;ACTION&#125;:/owners'}
      * <p/>
-     * Note if you set the context both in value attribute and context attribute
+     * Note if you set the type both in value attribute and tag type attribute
      * you won't know which will be used.
      * 
      * @param value URL to build
      */
     public void setValue(String value) {
         if (value != null && value.startsWith(TYPE_DELIMITER_PREFIX)) {
-            setContext(extractContext(value));
+            setType(extractType(value));
         }
         if (value != null && value.contains(QUERY_SEPARATOR)) {
             setQueryString(extractQueryString(value));
@@ -130,6 +129,13 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
     }
 
     /**
+     * Sets the application context path.
+     */
+    public void setContext(String context) {
+        this.context = context;
+    }
+
+    /**
      * Sets the type of the URL: RENDER, ACTION, RESOURCE, STATIC
      * <p/>
      * RENDER, ACTION and RESOURCE are Portlet URLs whereas STATIC allows static
@@ -137,15 +143,14 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
      * provides a convenient way to serve static resources from locations other
      * than the Portlet.
      */
-    public void setContext(String context) {
-        this.context = context;
-        if ("ACTION".equalsIgnoreCase(context)) {
+    public void setType(String type) {
+        if ("ACTION".equalsIgnoreCase(type)) {
             this.type = UrlType.ACTION;
         }
-        else if ("RESOURCE".equalsIgnoreCase(context)) {
+        else if ("RESOURCE".equalsIgnoreCase(type)) {
             this.type = UrlType.RESOURCE;
         }
-        else if ("STATIC".equalsIgnoreCase(context)) {
+        else if ("STATIC".equalsIgnoreCase(type)) {
             this.type = UrlType.STATIC;
         }
         else {
@@ -249,16 +254,9 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
         String urlString = null;
 
         if (this.requestAttributes instanceof PortletRequestAttributes) {
-            // PortletRequestAttributes portletReqAttr =
-            // (PortletRequestAttributes) this.requestAttributes;
 
-            // for JSR 286 Tags the default value is true
-            this.htmlEscape = Boolean.TRUE;
-
-            /*
-             * The key used to bind the <code>PortletResponse</code> to the
-             * underlying <code>HttpServletRequest</code>.
-             */
+            // The key used to bind the <code>PortletResponse</code> to the
+            // underlying <code>HttpServletRequest</code>.
             PortletResponse portletResponse = (PortletResponse) this.requestAttributes
                     .getAttribute(Constants.PORTLET_RESPONSE,
                             RequestAttributes.SCOPE_REQUEST);
@@ -270,26 +268,21 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
                 // TODO: Set window state
 
                 if (this.type == UrlType.ACTION) {
-                    addParameter("javax.portlet.action", this.value);
-                    if (portletResponse instanceof RenderResponse) {
-                        portletURL = ((RenderResponse) portletResponse)
+                    if (portletResponse instanceof RenderResponse
+                            || portletResponse instanceof ResourceResponse) {
+                        portletURL = ((MimeResponse) portletResponse)
                                 .createActionURL();
-                    }
-                    else if (portletResponse instanceof ResourceResponse) {
-                        portletURL = ((ResourceResponse) portletResponse)
-                                .createActionURL();
+                        portletURL.setParameter("javax.portlet.action",
+                                this.value);
                     }
                     else {
                         throw new IllegalArgumentException();
                     }
                 }
                 else if (this.type == UrlType.RESOURCE) {
-                    if (portletResponse instanceof RenderResponse) {
-                        portletURL = ((RenderResponse) portletResponse)
-                                .createResourceURL();
-                    }
-                    else if (portletResponse instanceof ResourceResponse) {
-                        portletURL = ((ResourceResponse) portletResponse)
+                    if (portletResponse instanceof RenderResponse
+                            || portletResponse instanceof ResourceResponse) {
+                        portletURL = ((MimeResponse) portletResponse)
                                 .createResourceURL();
                     }
                     else {
@@ -297,8 +290,16 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
                     }
                 }
                 else {
-                    addParameter("gvnix.portlet.render", this.value);
-                    portletURL = createPortletUrl(portletResponse);
+                    if (portletResponse instanceof RenderResponse
+                            || portletResponse instanceof ResourceResponse) {
+                        portletURL = ((MimeResponse) portletResponse)
+                                .createRenderURL();
+                        portletURL.setParameter("gvnix.portlet.render",
+                                this.value);
+                    }
+                    else {
+                        throw new IllegalArgumentException();
+                    }
                 }
 
                 // STATIC won't create a portlet URL it creates an encoded
@@ -348,24 +349,6 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
         }
 
         return urlString;
-    }
-
-    /**
-     * Creates a render PortletURL
-     * 
-     * @param portletResponse PortletResponse
-     * @return PortletURL
-     */
-    protected PortletURL createPortletUrl(PortletResponse portletResponse) {
-
-        if (portletResponse instanceof RenderResponse) {
-            return ((RenderResponse) portletResponse).createRenderURL();
-        }
-        else if (portletResponse instanceof ResourceResponse) {
-            return ((ResourceResponse) portletResponse).createRenderURL();
-        }
-
-        throw new IllegalArgumentException();
     }
 
     /**
@@ -430,12 +413,12 @@ public class RooUrlTag extends TagSupport implements TryCatchFinally {
     }
 
     /**
-     * Extract the context from the given URL value.
+     * Extract the type from the given URL value.
      * 
-     * @param value the URL value; for example {@code " ACTION}:/owners"}
-     * @return the extracted context; for example {@code "ACTION"}
+     * @param value the URL value; for example {@code ' ACTION}:/owners'}
+     * @return the extracted type; for example {@code "ACTION"}
      */
-    protected String extractContext(String value) {
+    protected String extractType(String value) {
         int start = value.indexOf(TYPE_DELIMITER_PREFIX);
 
         // There is no prefix in given value, return null
