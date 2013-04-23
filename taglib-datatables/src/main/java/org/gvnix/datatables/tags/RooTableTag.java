@@ -17,9 +17,7 @@
  */
 package org.gvnix.datatables.tags;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
@@ -30,9 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.dandelion.datatables.core.constants.ExportConstants;
-import com.github.dandelion.datatables.core.export.ExportConf;
-import com.github.dandelion.datatables.core.export.ExportType;
 import com.github.dandelion.datatables.jsp.tag.AbstractTableTag;
 import com.github.dandelion.datatables.jsp.tag.TableTag;
 
@@ -46,7 +41,7 @@ import com.github.dandelion.datatables.jsp.tag.TableTag;
 public class RooTableTag extends TableTag {
 
     // Logger
-    private static Logger LOGGER = LoggerFactory.getLogger(RooTableTag.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RooTableTag.class);
 
     /**
 	 * 
@@ -109,27 +104,6 @@ public class RooTableTag extends TableTag {
         return null;
     }
 
-    private void configureExport(ExportType exportType) {
-
-        // Export URL build
-        String url = getTable().getCurrentUrl() + "?"
-                + ExportConstants.DDL_DT_REQUESTPARAM_EXPORT_TYPE + "="
-                + exportType.getUrlParameter() + "&"
-                + ExportConstants.DDL_DT_REQUESTPARAM_EXPORT_ID + "="
-                + getTable().getId();
-
-        ExportConf conf = new ExportConf(exportType, url);
-
-        // Other fields
-        conf.setFileName("export");
-        StringBuffer cssClass = new StringBuffer("icon export_")
-                .append(exportType.toString().toLowerCase());
-        conf.setCssClass(cssClass);
-        conf.setAutoSize(true);
-
-        getTable().getExportConfMap().put(exportType, conf);
-    }
-
     private boolean doRender() {
         return Boolean.TRUE.equals(render) || render == null;
     }
@@ -164,24 +138,6 @@ public class RooTableTag extends TableTag {
         }
 
         int value = super.doStartTag();
-
-        // Configure export
-        if (StringUtils.isNotBlank(getExport())) {
-            List<String> selectedExport = Arrays.asList(StringUtils.split(
-                    getExport(), ','));
-            ExportType exportType;
-            for (String type : selectedExport) {
-                try {
-                    exportType = ExportType.valueOf(type);
-                }
-                catch (Exception e) {
-                    LOGGER.debug("Unknow export type '".concat(type).concat(
-                            "'."));
-                    continue;
-                }
-                configureExport(exportType);
-            }
-        }
 
         return value;
     }

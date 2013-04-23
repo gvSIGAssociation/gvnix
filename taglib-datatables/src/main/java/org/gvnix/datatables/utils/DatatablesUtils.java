@@ -166,7 +166,8 @@ public class DatatablesUtils {
         CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
         EntityType<T> entity = entityManager.getMetamodel().entity(entityClass);
 
-        boolean isPaged = datatablesCriterias.getDisplaySize() > 0;
+        boolean isPaged = datatablesCriterias.getDisplaySize() != null
+                && datatablesCriterias.getDisplaySize() > 0;
 
         Root<T> from = query.from(entityClass);
 
@@ -373,7 +374,7 @@ public class DatatablesUtils {
             String likeString, CriteriaBuilder builder,
             Attribute<? super T, ?> field) {
         return builder.like(builder.lower(from.<String> get(field.getName())),
-                "%".concat(likeString).concat("%"));
+                "%".concat(likeString.toLowerCase()).concat("%"));
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

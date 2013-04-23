@@ -152,6 +152,9 @@ public class RooColumnTag extends ColumnTag {
         // </c:if>
         // <c:out value="${colTxt}" />
 
+        if (StringUtils.isBlank(property)) {
+            return "";
+        }
         TableTag parent = (TableTag) getParent();
 
         ExpressionParser parser = new SpelExpressionParser();
@@ -162,7 +165,7 @@ public class RooColumnTag extends ColumnTag {
         Object value = exp.getValue(context);
         String result = "";
 
-        if (StringUtils.isNotBlank(property) && value != null) {
+        if (value != null) {
 
             if (Date.class.isAssignableFrom(value.getClass())) {
                 result = dateTimePattern.format(value);
@@ -187,9 +190,12 @@ public class RooColumnTag extends ColumnTag {
                 // JavaScriptUtils.javaScriptEscape(result) : result);
             }
 
-            if (maxLength >= 0 && result.length() > maxLength) {
-                result = result.substring(0, maxLength);
-            }
+        }
+        else {
+            result = super.getColumnContent();
+        }
+        if (maxLength >= 0 && result.length() > maxLength) {
+            result = result.substring(0, maxLength);
         }
 
         return result;

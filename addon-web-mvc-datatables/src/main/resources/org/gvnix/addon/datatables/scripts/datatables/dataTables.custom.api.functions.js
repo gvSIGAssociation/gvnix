@@ -4,7 +4,8 @@
  * @param tableId
  */
 function datatables_init_custom_api_functions(tableId){
-	var $table = $('#'+tableId).datatable();
+	var tableObj = $('#'+tableId);
+	var $table = tableObj.dataTable();
 	
 	// Enable filtering delay
 	$table.fnSetFilteringDelay(500);

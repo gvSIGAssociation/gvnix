@@ -80,22 +80,24 @@ a.icon {
 }
 
 a.export_pdf {
-  background: url("../images/page_white_acrobat.png") no-repeat scroll center center transparent;
+  background: url("../../images/datatables/page_white_acrobat.png") no-repeat scroll center center transparent;
 }
 
 a.export_xls {
-  background: url("../images/page_excel.png") no-repeat scroll center center transparent;
+  background: url("../../images/datatables/page_excel.png") no-repeat scroll center center transparent;
 }
 
 a.export_csv {
-  background: url("../images/page_white_text.png") no-repeat scroll center center transparent;
+  background: url("../../images/datatables/page_white_text.png") no-repeat scroll center center transparent;
 }
 
 /* TABLE FOOT */
 
-/* A bit of padding between the table info and the table. */
+/* A bit of padding between the table info and the table. 
+ Fixed size to avoid pagination goes down when filter is applied*/
 div.dataTables_info {
   padding-top: 4px;
+  with: 250px;
 }
 
 /* A bit of padding between the pagination and the table. */

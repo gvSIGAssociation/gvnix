@@ -17,7 +17,7 @@
   <jsp:directive.attribute name="defaultValue" type="java.lang.String" required="false" rtexprvalue="true" description="Default value if the property's value is null (Default : empty string)" />
   <jsp:directive.attribute name="sortable" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable sorting on column. (Default : true)" />
   <jsp:directive.attribute name="sortInit" type="java.lang.String" required="false" rtexprvalue="true" description="(asc|desc) If sortable is enabled, set the default sorting direction (Default : asc)" />
-  <jsp:directive.attribute name="sortDirection" type="java.lang.String" required="false" rtexprvalue="true" description="((asc|desc)[,(asc|desc)[...]])If sortable is enabled, allow to control the sorting direction(s) (default 'asc,dec') (related to asSorting js-datatables columnDef)" />
+  <jsp:directive.attribute name="sortDirection" type="java.lang.String" required="false" rtexprvalue="true" description="((asc|desc)[,(asc|desc)[...]])If sortable is enabled, allow to control the sorting direction(s) (default 'asc,desc') (related to asSorting js-datatables columnDef)" />
   <jsp:directive.attribute name="filterable" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable filtering on column. (Default : true)" />
   <jsp:directive.attribute name="searchable" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable filtering on column. (Default : true)" />
   <jsp:directive.attribute name="filterType" type="java.lang.String" required="false" rtexprvalue="true" description="(SELECT|INPUT) If filterable is enabled, you can choose the filter type between 'SELECT' and 'INPUT', adding either select box or input field in the table's footer (Default : INPUT)" />
@@ -28,7 +28,8 @@
   <jsp:directive.attribute name="cssClass" type="java.lang.String" required="false" rtexprvalue="true" description="CSS class applied on header cell (th HTML tag)" />
   <jsp:directive.attribute name="cssCellClass" type="java.lang.String" required="false" rtexprvalue="true" description="CSS class applied on every table cell (td HTML tag)" />
   <jsp:directive.attribute name="display" type="java.lang.String" required="false" rtexprvalue="true" description="(ALL[,HTML|,XML|,CSV]) Comma-separated list of string which indicates in which view(s) the column's body will be displayed. (Default : ALL)" />
-  <jsp:directive.attribute name="renderFunction" type="java.lang.String" required="false" rtexprvalue="true" description="Name of an external Javascript function that will be used to render the column (AJAX)" />
+  <jsp:directive.attribute name="renderFunction" type="java.lang.String" required="false" rtexprvalue="true" description="Name of an external Javascript function that will be used to render the column (AJAX only)" />
+  <jsp:directive.attribute name="format" type="java.lang.String" required="false" rtexprvalue="true" description="A MessageFormat pattern that will be used to format the property. (DOM only)" />
   
   
   <!-- Default values -->
@@ -53,7 +54,7 @@
   	<c:set var="sortInit" value="asc"/>
   </c:if>
   <c:if test="${empty sortDirection}">
-  	<c:set var="sortDirection" value="asc,dec" />
+  	<c:set var="sortDirection" value="asc,desc" />
   </c:if>
   <c:if test="${empty filterType}">
   	<c:set var="filterType" value="INPUT" />
@@ -88,6 +89,7 @@
   		cssCellClass="${cssCellClass}"
   		display="${display}"
   		renderFunction="${renderFunction}"
+  		format="${format}"
   		/>
 
 </jsp:root>

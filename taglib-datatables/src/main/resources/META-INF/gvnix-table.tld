@@ -223,6 +223,16 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
+         <description>Allows you to override the default function which obtains the data from the server ($.getJSON) so something more suitable for your application</description>
+          <name>serverData</name>
+          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <description>Allows you to send extra information to the server when using AJAX source</description>
+          <name>serverParams</name>
+          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
          <description>Enable pipelining data for paging when server-side
             processing is enabled</description>
          <name>pipelining</name>
@@ -301,6 +311,11 @@
          <name>cssStripes</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      <attribute>
+         <description>Number of rows to display on a single page when using pagination.</description>
+         <name>displayLength</name>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
 
       <!-- ====================================== -->
       <!-- Extra features -->
@@ -341,6 +356,18 @@
             (default : 300px)</description>
          <name>scrollY</name>
          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <description> (true|false) When vertical (y) scrolling is enabled, 
+         	DataTables will force the height of the table's viewport to the 
+         	given height at all times (useful for layout). However, this can 
+         	look odd when filtering data down to a small data set, and 
+         	the footer is left "floating" further down. This parameter 
+         	(when enabled) will cause DataTables to collapse the table's 
+         	viewport down when the result set will fit within the given 
+         	Y height. (default : false)</description>
+          <name>scrollCollapse</name>
+          <rtexprvalue>true</rtexprvalue>
       </attribute>
 
       <!-- ColReorder -->
@@ -409,15 +436,45 @@
    <!-- ====================================== -->
    <!-- Extra features -->
    <!-- ====================================== -->
+   <tag>
+       <description>Allows to fill an HTML caption tag in the table.</description>
+       <name>caption</name>
+       <tag-class>org.gvnix.datatables.tags.RooCaptionTag</tag-class>
+       <body-content>JSP</body-content>
+       <attribute>
+          <description>"title" attribute of the HTML caption tag.</description>
+          <name>title</name>
+          <rtexprvalue>true</rtexprvalue>
+       </attribute>
+       <attribute>
+           <description>(required) DOM id of the HTML table.</description>
+           <name>id</name>
+           <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <description>CSS style applied on the HTML table. (HTML style
+            attribute)</description>
+          <name>cssStyle</name>
+          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <description>CSS class(es) applied on the HTML table. (HTML
+            class attribute)</description>
+          <name>cssClass</name>
+          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
    <!--tag>
-      <name>columnHead</name>
-      <tag-class>com.github.dandelion.datatables.jsp.tag.ColumnHeadTag</tag-class>
-      <body-content>JSP</body-content>
+       <description>Allows to fill a column header with more complex
+           content than a usual title.</description>
+       <name>columnHead</name>
+       <tag-class>com.github.dandelion.datatables.jsp.tag.ColumnHeadTag</tag-class>
+       <body-content>JSP</body-content>
       <attribute>
           <description>Unique arbitrary id of the column, used in
               relation to the column tag.</description>
-         <name>uid</name>
-         <rtexprvalue>true</rtexprvalue>
+          <name>uid</name>
+          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag-->
    <tag>
@@ -539,8 +596,13 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
-         <description>Name of an external Javascript function that will be used to render the column (AJAX)</description>
+         <description>Name of an external Javascript function that will be used to render the column (AJAX only)</description>
          <name>renderFunction</name>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <description>A MessageFormat pattern that will be used to format the property. (DOM only)</description>
+         <name>format</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>      
       
@@ -693,6 +755,7 @@
          <description>(XML|CSV) Type of export (Default : XML,CSV)</description>
          <name>type</name>
          <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
          <description>Name of the file containing exported data
@@ -709,10 +772,12 @@
       <attribute>
          <description>CSS style applied to the HTML link</description>
          <name>cssStyle</name>
+         <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
          <description>CSS class applied to the HTML link</description>
          <name>cssClass</name>
+         <rtexprvalue>true</rtexprvalue>
       </attribute>
       <!-- <attribute> <name>area</name> <description>(list|current) Indicates 
          how much data should be exported. Choose list for the full list or current 

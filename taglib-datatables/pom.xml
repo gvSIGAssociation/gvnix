@@ -110,7 +110,7 @@
         </dependency>    
   </dependencies>
   <properties>
-        <dandelion-datatables.version>0.8.10</dandelion-datatables.version>
+        <dandelion-datatables.version>0.8.11</dandelion-datatables.version>
         <jackson.version>1.9.12</jackson.version>
   </properties>
   <build>

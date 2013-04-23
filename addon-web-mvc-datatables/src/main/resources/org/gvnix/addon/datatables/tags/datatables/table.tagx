@@ -1,4 +1,4 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:datatables="http://www.gvnix.org/gvnix-datatables" version="2.0">
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:table="urn:jsptagdir:/WEB-INF/tags/datatables" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:datatables="http://www.gvnix.org/gvnix-datatables" version="2.0">
   <jsp:directive.tag import="java.util.ArrayList" />
   <jsp:output omit-xml-declaration="yes" />
 
@@ -52,6 +52,8 @@
 
   <jsp:directive.attribute name="processing" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable or disable the display of a 'processing' indicator when the table is being processed (e.g. a sort). This is particularly useful for tables with large amounts of data where it can take a noticeable amount of time to sort the entries. (Default : false, see http://datatables.net/ref#bProcessing)" />
   <jsp:directive.attribute name="serverSide" type="java.lang.Boolean" rtexprvalue="true" required="false" description="Configure DataTables to use server-side processing" />
+  <jsp:directive.attribute name="serverData" type="java.lang.String" rtexprvalue="true" required="false" description="Allows you to override the default function which obtains the data from the server ($.getJSON) so something more suitable for your application" />
+  <jsp:directive.attribute name="serverParams" type="java.lang.String" rtexprvalue="true" required="false" description="Allows you to send extra information to the server when using AJAX source" />
   <jsp:directive.attribute name="pipelining" type="java.lang.Boolean" rtexprvalue="true" required="false" description="Enable pipelining data for paging when server-side processing is enabled" />
   <jsp:directive.attribute name="pipeSize" type="java.lang.Integer" rtexprvalue="true" required="false" description="Pipe size used when pipelining is enabled, ie times that the user can page before a request must be made of the server. (Default : 5)" />
   <jsp:directive.attribute name="stateSave" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable state saving.  When enabled a cookie will be used to save table display information such as pagination information, display length, filtering and sorting. As such when the end user reloads the page the display display will match what thy had previously set up. (Default : false, see http://datatables.net/ref#bStateSave)" />
@@ -63,6 +65,7 @@
   <jsp:directive.attribute name="themeOption" type="java.lang.String" rtexprvalue="true" required="false" description="Name of an option to activate in relation to the current activated theme." />
   <jsp:directive.attribute name="lengthMenu" type="java.lang.String" rtexprvalue="true" required="false" description="Specify the entries in the length drop down menu that DataTables show when pagination is enabled." />
   <jsp:directive.attribute name="cssStripes" type="java.lang.String" rtexprvalue="true" required="false" description="Comma-separated list of CSS classes that should be applied to displayed rows. This array may be of any length, and DataTables will apply each class sequentially, looping when required." />
+  <jsp:directive.attribute name="displayLength" type="java.lang.Integer" rtexprvalue="true" required="false" description="Number of rows to display on a single page when using pagination." />
 
   <!-- ====================================== -->
   <!-- Extra features -->
@@ -76,6 +79,7 @@
   <!-- Scroller -->
   <jsp:directive.attribute name="scroller" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the DataTables Scroller plugin. (Default : false) (See : http://datatables.net/extras/scroller/)" />
   <jsp:directive.attribute name="scrollY" type="java.lang.String" rtexprvalue="true" required="false" description="Table's height to display in scrolling mode.  (default : 300px)" />
+  <jsp:directive.attribute name="scrollCollapse" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) When vertical (y) scrolling is enabled, DataTables will force the height of the table's viewport to the given height at all times (useful for layout). However, this can look odd when filtering data down to a small data set, and the footer is left 'floating' further down. This parameter (when enabled) will cause DataTables to collapse the table's viewport down when the result set will fit within the given Y height. (default : false)" />
 
   <!-- ColReorder -->
   <jsp:directive.attribute name="colReorder" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the DataTables ColReorder plugin. (Default : false) (See : http://datatables.net/extras/colreorder/)" />
@@ -87,12 +91,6 @@
   
   <!-- init custom api functions -->
   <c:set var="initCustionFunctionsCallbackId" value="${id}_init_custom_callbk"/>
-  <script type="text/javascript">
-        /* init custom api functions for this table */
-	    function ${initCustionFunctionsCallbackId}() {
-	    	datatables_init_custom_api_functions('${id}');
-	    }
-  </script>
   
   <!-- typeIdFieldName -->
   <c:if test="${empty typeIdFieldName}">
@@ -112,6 +110,11 @@
   </c:if>
   <c:if test="${empty deferRender}">
   	<c:set var="deferRender" value="false"/>
+  </c:if>
+  
+  <!-- displayLength -->
+  <c:if test="${empty displayLength }">
+  	<c:set var="displayLength" value="10"/>
   </c:if>
   
   <c:choose>
@@ -138,9 +141,17 @@
   <c:if test="${empty pipeSize}">
   	<c:set var="pipeSize" value="5"/>
   </c:if>
-  <c:if test="${empty export}">
-  	<c:set var="export" value="CSV,XLS,PDF"/>
-  </c:if>
+  <!-- export supported on DOM -->
+  <c:choose>
+	  <c:when test="${serverSide}"> 
+	  	<c:set var="export" value=""/>
+	  </c:when>
+	  <c:otherwise> 
+		  <c:if test="${empty export}">
+		  	<c:set var="export" value="CSV,XLS,PDF"/>
+		  </c:if>
+	  </c:otherwise>
+  </c:choose>
   <c:if test="${empty exportLinks}">
   	<c:set var="exportLinks" value="top_middle"/>
   </c:if>
@@ -207,7 +218,7 @@
                + '  <img alt="${create_label}" class="image" src="${create_image_url}" title="${create_label}" />'
                + '</a>'
                + '</div>';
-               $('#${id}_info').after(result);
+               $('#${id}_info').before(result);
 	    }
     </script>
   </c:if>
@@ -308,6 +319,8 @@
 
       processing="${empty processing or processing}"
       serverSide="${serverSide}"
+      serverData="${serverData}"
+      serverParams="${serverParams}"
       pipelining="${pipelining}"
       pipeSize="${pipeSize}"
       stateSave="${empty stateSave or stateSave}"
@@ -319,6 +332,7 @@
       themeOption="${themeOption}"
       lengthMenu="${lengthMenu}"
       cssStripes="${cssStripes}"
+      displayLength="${displayLength}"
 
       fixedHeader="${fixedHeader}"
       fixedPosition="${fixedPosition}"
@@ -326,6 +340,7 @@
 
       scroller="${scroller}"
       scrollY="${scrollY}"
+      scrollCollapse="${scrollCollapse}"
 
       colReorder="${colReorder}"
     >
@@ -336,11 +351,11 @@
         <c:choose>
           <c:when test="${serverSide}">
             <!-- AJAX cell render -->
-			<datatables:column id="${showColumnId}" title=" " property=""  cssCellClass="utilbox" sortable="false" renderFunction="${showColumnId}" cssStyle="${actionHeaderCssStyle}"  filterable="false"/>
+			<table:action-column id="${showColumnId}" cssCellClass="utilbox" renderFunction="${showColumnId}" cssStyle="${actionHeaderCssStyle}"/>
           </c:when>
 		  <c:otherwise>
 			  <!-- DOM cell render -->
-			  <datatables:column id="${showColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" cssStyle="${actionHeaderCssStyle}"  filterable="false">
+			  <table:action-column id="${showColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
 	            <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
                   <spring:url value="${path}/${itemId}" var="show_form_url" />
                   <spring:url value="/resources/images/show.png" var="show_image_url" />
@@ -348,7 +363,7 @@
                   <a href="${show_form_url}" alt="${fn:escapeXml(show_label)}" title="${fn:escapeXml(show_label)}">
                     <img alt="${fn:escapeXml(show_label)}" class="image" src="${show_image_url}" title="${fn:escapeXml(show_label)}" />
                   </a>
-		     </datatables:column>
+		     </table:action-column>
 		   </c:otherwise>
          </c:choose>
      
@@ -357,11 +372,11 @@
            <c:choose>
 			  <c:when test="${serverSide}">
 			    <!-- AJAX cell render -->
-			    <datatables:column id="${updateColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" renderFunction="${updateColumnId}" cssStyle="${actionHeaderCssStyle}"  filterable="false"/>
+			    <table:action-column id="${updateColumnId}" cssCellClass="utilbox" renderFunction="${updateColumnId}" cssStyle="${actionHeaderCssStyle}"/>
 			  </c:when>
 			  <c:otherwise>
 			    <!-- DOM cell render -->
-			    <datatables:column id="${updateColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" cssStyle="${actionHeaderCssStyle}"  filterable="false">
+			    <table:action-column id="${updateColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}">
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
 	              <spring:url value="${path}/${itemId}" var="update_form_url">
 	                <spring:param name="form" />
@@ -371,7 +386,7 @@
 	              <a href="${update_form_url}" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}">
 	                <img alt="${fn:escapeXml(update_label)}" class="image" src="${update_image_url}" title="${fn:escapeXml(update_label)}" />
 	              </a>				  
-			    </datatables:column>
+			    </table:action-column>
 			  </c:otherwise>
             </c:choose>
           </c:if>
@@ -381,11 +396,11 @@
            <c:choose>
 			  <c:when test="${serverSide}">
 			    <!-- AJAX cell render -->
-			    <datatables:column id="${removeColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" renderFunction="${removeColumnId}" cssStyle="${actionHeaderCssStyle}"  filterable="false"/>
+			    <table:action-column id="${removeColumnId}" cssCellClass="utilbox" renderFunction="${removeColumnId}" cssStyle="${actionHeaderCssStyle}"/>
 			  </c:when>
 			  <c:otherwise>
 			    <!-- DOM cell render -->
-			    <datatables:column id="${removeColumnId}" title=" " property="" cssCellClass="utilbox" sortable="false" cssStyle="${actionHeaderCssStyle}"  filterable="false">
+			    <table:action-column id="${removeColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}">
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
                   <spring:url value="${path}/${itemId}" var="delete_form_url" />
                   <spring:url value="/resources/images/delete.png" var="delete_image_url" />
@@ -398,17 +413,29 @@
                     </c:set>
                     <input alt="${fn:escapeXml(delete_label)}" class="image" src="${delete_image_url}" title="${fn:escapeXml(delete_label)}" type="image" value="${fn:escapeXml(delete_label)}" onclick="return confirm('${delete_confirm_msg}');" />
                   </form:form>			  
-			    </datatables:column>
+			    </table:action-column>
 			  </c:otherwise>
             </c:choose>
           </c:if>
      
+     <!-- configure some export formats -->
+     <c:forTokens items="${export}" delims="," var="export_format">
+     	<c:set var="export_format_lower" value="${fn:toLowerCase(export_format)}"/>
+     	<datatables:export type="${export_format_lower}" includeHeader="true" 
+     		fileName="${typeName}" cssClass="icon export_${export_format_lower}" label="${export_format_lower}"/>
+     </c:forTokens>
+     
      <!--  callback to initialize custom api functions -->
      <datatables:callback type="init" function="${initCustionFunctionsCallbackId}" />
-     
-     <!-- callback to include create button at widget foot -->
-     <c:if test="${create}">
-       <datatables:callback type="init" function="${createButtonCallbackId}" />
-     </c:if>
   </datatables:table>
+  
+    <script type="text/javascript">
+        /* init custom api functions for this table */
+	    function ${initCustionFunctionsCallbackId}() {
+	    	datatables_init_custom_api_functions('${id}');
+	        <c:if test="${create}">
+	        ${createButtonCallbackId}();
+	      </c:if>
+	    }
+  </script>
 </jsp:root>
