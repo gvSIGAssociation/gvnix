@@ -37,7 +37,7 @@
 
   <!-- Ver sistema de nominación en ../README.rst -->
   <artifactId>org.gvnix.wrapping.postgresql.postgresql</artifactId>
-  <version>9.1-902.jdbc4</version>
+  <version>9.1-901.jdbc4</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - PostgreSQL JDBC4 driver</name>
   <description>PostgreSQL JDBC driver. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
@@ -49,7 +49,7 @@
   <properties>
     <pkgGroupId>postgresql</pkgGroupId>
     <pkgArtifactId>postgresql</pkgArtifactId>
-    <pkgVersion>9.1.902.jdbc4</pkgVersion><!-- Bundle plugin change -901 to .0 for Bundle-Version, so change -901 to .901 -->
+    <pkgVersion>9.1.901.jdbc4</pkgVersion><!-- Bundle plugin change -901 to .0 for Bundle-Version, so change -901 to .901 -->
     <depVersion>${project.version}</depVersion>
     <pkgVendor>PostgreSQL Global Development Group</pkgVendor>
     <pkgDocUrl>http://jdbc.postgresql.org/documentation/docs.html</pkgDocUrl>
