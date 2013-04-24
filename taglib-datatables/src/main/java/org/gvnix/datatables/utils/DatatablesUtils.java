@@ -173,46 +173,58 @@ public class DatatablesUtils {
 
         Predicate filterCondition = null;
         Predicate searchCondition = null;
-        // compute filters
-        if (datatablesCriterias.hasOneFilteredColumn()) {
-            // filters columns
-            List<Predicate> condition = new ArrayList<Predicate>();
-            for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
-                if (column.isFiltered()) {
-                    Predicate fieldlike = getFindCondition(entity, from,
-                            column.getName(), column.getSearch(), builder);
-                    if (fieldlike != null) {
-                        condition.add(fieldlike);
+
+        try {
+            // compute filters
+            if (datatablesCriterias.hasOneFilteredColumn()) {
+                // filters columns
+                List<Predicate> condition = new ArrayList<Predicate>();
+                for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
+                    if (column.isFilterable()
+                            && StringUtils.isNotBlank(column.getSearch())) {
+                        Predicate fieldlike = getFindCondition(entity, from,
+                                column.getName(), column.getSearch(), builder,
+                                true);
+                        if (fieldlike != null) {
+                            condition.add(fieldlike);
+                        }
                     }
                 }
-            }
-            // for filter use and condition
-            if (!condition.isEmpty()) {
-                filterCondition = builder.and(condition
-                        .toArray(new Predicate[] {}));
+                // for filter use "and" operator
+                if (!condition.isEmpty()) {
+                    filterCondition = builder.and(condition
+                            .toArray(new Predicate[] {}));
+                }
+
             }
 
+            // Compute search
+            String toSearch = datatablesCriterias.getSearch();
+            if (StringUtils.isNotBlank(toSearch)
+                    && datatablesCriterias.hasOneFilterableColumn()) {
+                // Search by filterable columns
+                List<Predicate> condition = new ArrayList<Predicate>();
+                for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
+                    if (column.isFilterable()) {
+                        Predicate fieldlike = getFindCondition(entity, from,
+                                column.getName(), toSearch, builder, false);
+                        if (fieldlike != null) {
+                            condition.add(fieldlike);
+                        }
+                    }
+                }
+                // for search use "or" operator
+                if (!condition.isEmpty()) {
+                    searchCondition = builder.or(condition
+                            .toArray(new Predicate[] {}));
+                }
+
+            }
         }
-        else if (StringUtils.isNotBlank(datatablesCriterias.getSearch())
-                && datatablesCriterias.hasOneFilterableColumn()) {
-            // Search by filterable columns
-            List<Predicate> condition = new ArrayList<Predicate>();
-            for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
-                if (column.isFilterable()) {
-                    Predicate fieldlike = getFindCondition(entity, from,
-                            column.getName(), datatablesCriterias.getSearch(),
-                            builder);
-                    if (fieldlike != null) {
-                        condition.add(fieldlike);
-                    }
-                }
-            }
-            // for search use or condition
-            if (!condition.isEmpty()) {
-                searchCondition = builder.or(condition
-                        .toArray(new Predicate[] {}));
-            }
-
+        catch (EmptyResultException e) {
+            return new FindResult<T>(new ArrayList<T>(0), 0, isPaged,
+                    (long) datatablesCriterias.getDisplayStart(),
+                    datatablesCriterias.getDisplaySize());
         }
 
         // join filter and search conditions
@@ -304,13 +316,16 @@ public class DatatablesUtils {
      * @param fieldName
      * @param stringExpression
      * @param builder
+     * @param force require an expression (if not applicable return a
+     *            {@code false} expression
      * @return condition or null if (field not found || field type not supported
      *         || stringExpression not applicable)
+     * @throws EmptyResultException
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate getFindCondition(EntityType<T> entity,
             Root<T> from, String fieldName, String stringExpression,
-            CriteriaBuilder builder) {
+            CriteriaBuilder builder, boolean force) throws EmptyResultException {
         Attribute<? super T, ?> field = null;
         try {
             field = entity.getAttribute(fieldName);
@@ -331,7 +346,7 @@ public class DatatablesUtils {
         }
         else if (Boolean.class == type || boolean.class == type) {
             return getBooleanFindCondition(from, stringExpression, builder,
-                    field);
+                    field, force);
         }
         else if (Number.class.isAssignableFrom(type)
                 || NUMBER_PRIMITIVES.contains(type)) {
@@ -340,6 +355,9 @@ public class DatatablesUtils {
                         builder, field, false);
             }
             else {
+                if (force) {
+                    throw new EmptyResultException();
+                }
                 return null;
             }
         }
@@ -350,7 +368,7 @@ public class DatatablesUtils {
         }
         else if (type.isEnum()) {
             return getEnumFindCondition(from, stringExpression, builder, field,
-                    (Class<? extends Enum>) type);
+                    (Class<? extends Enum>) type, force);
         }
 
         // TODO manage other types
@@ -367,7 +385,6 @@ public class DatatablesUtils {
      * @param from
      * @param likeString
      * @param builder
-     * @param field
      * @return
      */
     private static <T> Predicate getStringFindCondition(Root<T> from,
@@ -377,10 +394,27 @@ public class DatatablesUtils {
                 "%".concat(likeString.toLowerCase()).concat("%"));
     }
 
+    /**
+     * Return find condition for {@code entity.fieldName} enum type field base
+     * on {@code likeString} expression. This method suppose {@code likeString}
+     * is a plain string. Uses an IN operator by every matching enum constant.
+     * Enum constant is compare by {@code name} attribute an {@code toString}
+     * method.
+     * 
+     * @param from
+     * @param stringToSearch
+     * @param builder
+     * @param field
+     * @param enumClass
+     * @param force expression else throws a {@link EmptyResultException}
+     * @return
+     * @throws EmptyResultException
+     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private static <T> Predicate getEnumFindCondition(Root<T> from,
             String stringToSearch, CriteriaBuilder builder,
-            Attribute<? super T, ?> field, Class<? extends Enum> enumClass) {
+            Attribute<? super T, ?> field, Class<? extends Enum> enumClass,
+            boolean force) throws EmptyResultException {
 
         // TODO i18n of enum name
 
@@ -417,7 +451,10 @@ public class DatatablesUtils {
             }
         }
         if (matching.isEmpty()) {
-            // no matching constants: no condition
+            // no matching constants
+            if (force) {
+                throw new EmptyResultException();
+            }
             return null;
         }
 
@@ -458,12 +495,15 @@ public class DatatablesUtils {
      * @param booleanExpression
      * @param builder
      * @param field
+     * @param force to generate expression else throws EmptyResultException
      * @return
+     * @throws EmptyResultException
      * @see BooleanUtils#toBooleanObject(String)
      */
     private static <T> Predicate getBooleanFindCondition(Root<T> from,
             String booleanExpression, CriteriaBuilder builder,
-            Attribute<? super T, ?> field) {
+            Attribute<? super T, ?> field, boolean force)
+            throws EmptyResultException {
 
         if (StringUtils.isBlank(booleanExpression)) {
             return null;
@@ -480,6 +520,9 @@ public class DatatablesUtils {
             value = BooleanUtils.toBooleanObject(booleanExpression);
         }
         if (value == null) {
+            if (force) {
+                throw new EmptyResultException();
+            }
             return null;
         }
         else {
@@ -489,4 +532,20 @@ public class DatatablesUtils {
         }
     }
 
+    /**
+     * This exception is used by
+     * {@link DatatablesUtils#getFindCondition(EntityType, Root, String, String, CriteriaBuilder, boolean)}
+     * to notify there is a condition that makes the query return none register. <br>
+     * So, there is no point in continue evaluating or execute the query.
+     * 
+     * @author jmvivo
+     */
+    private static class EmptyResultException extends Exception {
+
+        /**
+		 * 
+		 */
+        private static final long serialVersionUID = -2092608552005392751L;
+
+    }
 }

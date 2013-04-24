@@ -83,6 +83,10 @@
 
   <!-- ColReorder -->
   <jsp:directive.attribute name="colReorder" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the DataTables ColReorder plugin. (Default : false) (See : http://datatables.net/extras/colreorder/)" />
+  
+  <!-- Filtering options -->
+  <jsp:directive.attribute name="filterOnReturn" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Wait until Intro key is pressed to perform a search or filtering. (Default : false)" />
+  <jsp:directive.attribute name="filteringDelay" type="java.lang.Integer" rtexprvalue="true" required="false" description="Milisecons to wait from last key-press event to perform a search or filtering. (Default: 500)" />
 
 
   <!-- ====================== -->
@@ -99,7 +103,7 @@
   
   <!-- actionHeaderCssStyle -->
   <c:if test="${empty actionHeaderCssStyle}">
-      <c:set var="actionHeaderCssStyle" value="color: #ffffff;background: #ffffff;padding: 2px;" />
+      <c:set var="actionHeaderCssStyle" value="color: #ffffff;background: #ffffff;padding: 2px; width : 0px" />
   </c:if>
     
   <!-- Type Name -->  
@@ -134,6 +138,10 @@
 	  	<c:set var="serverSide" value="false"/>
 	  </c:otherwise>
   </c:choose>
+  
+  <c:if test="${serverSide and empty serverData }">
+    <c:set var="serverData" value="doAjaxRequestByPost"/>
+  </c:if>
   
   <c:if test="${empty paginationType}">
   	<c:set var="paginationType" value="full_numbers"/>
@@ -351,7 +359,7 @@
         <c:choose>
           <c:when test="${serverSide}">
             <!-- AJAX cell render -->
-			<table:action-column id="${showColumnId}" cssCellClass="utilbox" renderFunction="${showColumnId}" cssStyle="${actionHeaderCssStyle}"/>
+			<table:action-column id="${showColumnId}" cssClass="utilbox" cssCellClass="utilbox" renderFunction="${showColumnId}" cssStyle="${actionHeaderCssStyle}"/>
           </c:when>
 		  <c:otherwise>
 			  <!-- DOM cell render -->
@@ -432,7 +440,7 @@
     <script type="text/javascript">
         /* init custom api functions for this table */
 	    function ${initCustionFunctionsCallbackId}() {
-	    	datatables_init_custom_api_functions('${id}');
+	    	datatables_init_custom_api_functions('${id}',{'filterOnReturn': '${filterOnReturn}', 'filteringDelay' : '${filteringDelay}'} );
 	        <c:if test="${create}">
 	        ${createButtonCallbackId}();
 	      </c:if>

@@ -57,6 +57,10 @@ table.dataTable thead th {
   color: #666666;
 }
 
+table.dataTable td {
+	padding: 3px
+}
+
 /* Change the datatable footer to look like the header,
    And remove padding, which is too much if there are
    filtering input fields. */

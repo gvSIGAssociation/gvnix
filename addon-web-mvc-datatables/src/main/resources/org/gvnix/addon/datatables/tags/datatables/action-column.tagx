@@ -47,6 +47,7 @@
   		filterable="false"
   		searchable="fale"
   		cssStyle="${cssStyle}"
+  		cssClass="${cssClass}"
   		cssCellStyle="${cssCellStyle}"
   		cssCellClass="${cssCellClass}"
   		display="${display}"

@@ -3,17 +3,56 @@
  * 
  * @param tableId
  */
-function datatables_init_custom_api_functions(tableId){
+function datatables_init_custom_api_functions(tableId,options){
 	var tableObj = $('#'+tableId);
 	var $table = tableObj.dataTable();
 	
-	// Enable filtering delay
-	$table.fnSetFilteringDelay(500);
-	
-	// Enable filter on return
-	// $table.fnFilterOnReturn();
+	if (options.filterOnReturn){
+		// Enable filter on return
+		$table.fnFilterOnReturn();
+	} else {
+		// Enable filtering delay
+		if (options.filteringDelay) {
+			try {
+				$table.fnSetFilteringDelay(Number.parseInt(options.filteringDelay));
+			} catch (e) {
+				log("Error parsing filteringDelay option (using default): " +e);
+				$table.fnSetFilteringDelay(500);
+			}
+		} else {
+			$table.fnSetFilteringDelay(500);
+		}
+	}
 }
 
+/**
+ * Perform datatables AJAX request using POST method
+ * 
+ * @param sSource
+ * @param aoData
+ * @param fnCallback
+ * @param oSettings
+ */
+function doAjaxRequestByPost ( sSource, aoData, fnCallback, oSettings ) {
+    oSettings.jqXHR = $.ajax( {
+        "dataType": 'json',
+        "type": "POST",
+        "url": sSource,
+        "data": aoData,
+        "success": fnCallback
+    });
+}
+
+/**
+ * Try to show a message on browser JS console
+ */
+function log(message){
+	try {
+		console.log(message);
+	} catch (e) {
+		// Can't do anything
+	}
+}
 
 /**
  * 

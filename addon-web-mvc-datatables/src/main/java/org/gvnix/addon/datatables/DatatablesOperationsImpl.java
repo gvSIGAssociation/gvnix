@@ -526,7 +526,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                     "js_jquery_datatables_custom_api_url");
             jqueryDtCustomJsUrl
                     .setAttribute("value",
-                            "/resources/scripts/datatables/dataTables.custom.api.functions.js");
+                            "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.js");
             root.appendChild(jqueryDtCustomJsUrl);
             modified = true;
         }
