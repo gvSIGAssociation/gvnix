@@ -17,7 +17,7 @@
         backwards compatible with the standard tag.  Enhancements include support 
         for URL template parameters.</description>
         <name>url</name>
-        <tag-class>org.gvnix.portlets.tags.RooUrlTag</tag-class>
+        <tag-class>org.gvnix.web.portlet.tags.RooUrlTag</tag-class>
         <body-content>JSP</body-content>
         <attribute>
             <description>The URL to build.  This value can include template place holders 
@@ -77,7 +77,7 @@
     <description>Parameter tag based on the JSTL c:param tag.  The sole purpose is to
     support params inside the spring:url tag.</description>
     <name>param</name>
-    <tag-class>org.gvnix.portlets.tags.RooParamTag</tag-class>
+    <tag-class>org.gvnix.web.portlet.tags.RooParamTag</tag-class>
     <body-content>JSP</body-content>
     <attribute>
       <description>The name of the parameter.</description>
