@@ -41,7 +41,8 @@ import com.github.dandelion.datatables.jsp.tag.TableTag;
 public class RooTableTag extends TableTag {
 
     // Logger
-    private static final Logger LOGGER = LoggerFactory.getLogger(RooTableTag.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(RooTableTag.class);
 
     /**
 	 * 

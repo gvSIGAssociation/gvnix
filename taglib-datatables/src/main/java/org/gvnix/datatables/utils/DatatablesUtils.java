@@ -393,15 +393,26 @@ public class DatatablesUtils {
         // locate enums matching by name
         Set matching = new HashSet();
 
-        String enumValueName;
+        Enum<?> enumValue;
+        String enumStr;
 
         for (Field enumField : enumClass.getDeclaredFields()) {
             if (enumField.isEnumConstant()) {
-                enumValueName = enumField.getName();
+                enumStr = enumField.getName();
+                enumValue = Enum.valueOf(enumClass, enumStr);
+
                 // Check enum name contains string to search
-                if (enumValueName.toLowerCase().contains(stringToSearch)) {
+                if (enumStr.toLowerCase().contains(stringToSearch)) {
                     // Add to matching enum
-                    matching.add(Enum.valueOf(enumClass, enumValueName));
+                    matching.add(enumValue);
+                    continue;
+                }
+
+                // Check using toString
+                enumStr = enumValue.toString();
+                if (enumStr.toLowerCase().contains(stringToSearch)) {
+                    // Add to matching enum
+                    matching.add(enumValue);
                 }
             }
         }
