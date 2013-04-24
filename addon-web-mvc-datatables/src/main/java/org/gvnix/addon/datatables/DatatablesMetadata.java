@@ -405,7 +405,7 @@ public class DatatablesMetadata extends
 
         // return "pets/list";
         bodyBuilder.appendFormalLine(String.format("return \"%s/list\";",
-                StringUtils.uncapitalize(entityPlural)));
+                entityPlural.toLowerCase()));
 
     }
 
