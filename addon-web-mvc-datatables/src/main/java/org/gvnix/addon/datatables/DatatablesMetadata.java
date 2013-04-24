@@ -398,8 +398,8 @@ public class DatatablesMetadata extends
 
         // uiModel.addAttribute("pets",pets);
         bodyBuilder.appendFormalLine(String.format(
-                "%s.addAttribute(\"%2$s\",%2$s);", UI_MODEL.getSymbolName(),
-                listVarName));
+                "%s.addAttribute(\"%s\",%s);", UI_MODEL.getSymbolName(),
+                entityPlural.toLowerCase(), listVarName));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 

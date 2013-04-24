@@ -213,12 +213,12 @@
 	<script type="text/javascript">
         function ${createButtonCallbackId}(oSettings, json) {
         	var result =
-               '<div class="gvnix_dataTables_createItem">'
+               '<div class="gvnix_dataTables_createItem" style="float:left;margin-left:10px;">'
                +'<a href="${urlPath}?form" alt="${create_label}" title="${create_label}">'
                + '  <img alt="${create_label}" class="image" src="${create_image_url}" title="${create_label}" />'
                + '</a>'
                + '</div>';
-               $('#${id}_info').before(result);
+               $('#${id}_filter').before(result);
 	    }
     </script>
   </c:if>
