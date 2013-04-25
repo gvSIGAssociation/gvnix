@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -32,6 +33,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Attribute;
@@ -51,6 +53,9 @@ import com.github.dandelion.datatables.core.ajax.DatatablesCriterias;
  * @author gvNIX team
  */
 public class DatatablesUtils {
+
+    private static final Logger LOOGER = Logger.getLogger(DatatablesUtils.class
+            .getCanonicalName());
 
     /**
      * Pojo which contains
@@ -252,11 +257,27 @@ public class DatatablesUtils {
                 if (column.getSortDirection() == null) {
                     continue;
                 }
-                else if (column.getSortDirection() == SortDirection.ASC) {
-                    orderList.add(builder.asc(from.get(column.getName())));
+                Path<Object> col;
+                try {
+                    col = from.get(column.getName());
+                }
+                catch (Exception e) {
+                    col = null;
+                }
+                if (col == null) {
+                    // column not found in entity (could be a transient):
+                    // ignore this column
+                    LOOGER.finer("Ignoring column '"
+                            .concat(column.getName())
+                            .concat("': not found in entity (could be a transient?)"));
+                    continue;
+                }
+
+                if (column.getSortDirection() == SortDirection.ASC) {
+                    orderList.add(builder.asc(col));
                 }
                 else {
-                    orderList.add(builder.desc(from.get(column.getName())));
+                    orderList.add(builder.desc(col));
                 }
             }
             if (!orderList.isEmpty()) {
@@ -331,7 +352,10 @@ public class DatatablesUtils {
             field = entity.getAttribute(fieldName);
         }
         catch (IllegalArgumentException e) {
-            // field not found
+            // field not found in entity (could be a transient):
+            // ignore this field
+            LOOGER.finer("Ignoring column '".concat(fieldName).concat(
+                    "': not found in entity (could be a transient?)"));
             return null;
         }
         if (field == null) {
