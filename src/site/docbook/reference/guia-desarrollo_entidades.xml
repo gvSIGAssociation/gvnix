@@ -1662,8 +1662,70 @@ public class LineItemPK {
       </para>
       
       </para>
-      
-      <para xml:lang="es"></para>
+
+	    <section>
+	      <title xml:lang="es" xml:id="guia-desarrollo_gestion-entidades_ingenieria_inversa-vistas-tests">
+	      Tests de la ingeniería inversa de vistas</title>
+	
+	      <para xml:lang="es">En las vistas que no realizamos push-in e identificamos un 
+	      elemento como clave primaria hay que realizar los siguientes cambios si deseamos
+	      mantenerlos ejecutándose con éxito.
+	      Como ejemplo pondremos VaumAplusuPerfiles.</para>
+
+	      <para xml:lang="es">
+		      <variablelist>
+		        <varlistentry>
+			        <term>Realizar push-in</term>
+			        <listitem>
+			        <para xml:lang="es">
+			        Realizar push-in de todos los métodos: persist, remove, los finder y count.
+			        </para>
+			        </listitem>
+		        </varlistentry>
+		        <varlistentry>
+			        <term>Modificar count y persist</term>
+			        <listitem>
+			        <para xml:lang="es">
+			        Al count y persist le eliminaremos la siguiente línea, que es la primera que tiene en código:
+			        Assert.assertNotNull("Data on demand for 'VaumAplusuPerfiles' failed to initialize correctly", dod.getRandomVaumAplusuPerfiles()); 
+			        Esto no afecta a la comprobación de si el count funciona correctamente.
+			        </para>
+			        </listitem>
+		        </varlistentry>
+		        <varlistentry>
+			        <term>Modificar finder un resultado</term>
+			        <listitem>
+			        <para xml:lang="es">
+			        Al finder de un objeto de la entidad en concreto (testFindVaumAplusuPerfiles) lo que haremos será insertar un objeto que sabemos que todos los valores no son null utilizando dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE); y posteriormente buscaremos dicho elemento: 
+			        Sustituimos VaumAplusuPerfiles obj = dod.getRandomVaumAplusuPerfiles();
+			        por VaumAplusuPerfiles obj = dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE); obj.persist();
+			        </para>
+			        </listitem>
+		        </varlistentry>
+		        <varlistentry>
+			        <term>Modificar finder de múltiples resultados</term>
+			        <listitem>
+			        <para xml:lang="es">
+			        Al finder All y ...Entries tendremos que eliminar las líneas assertNotNull situadas al principio del método y justo debajo de obtener el listado.
+			        Assert.assertNotNull("Data on demand for 'VaumAplusuPerfiles' failed to initialize correctly", dod.getRandomVaumAplusuPerfiles());
+			        Assert.assertNotNull("Find all method for 'VaumAplusuPerfiles' illegally returned null", result);
+			        </para>
+			        </listitem>
+		        </varlistentry>
+		        <varlistentry>
+			        <term></term>
+			        <listitem>
+			        <para xml:lang="es">
+			        Al remove le sustetuiremos VaumAplusuPerfiles obj = dod.getRandomVaumAplusuPerfiles();
+			        por VaumAplusuPerfiles obj = dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE); 
+			        obj.persist();
+			        </para>
+			        </listitem>
+		        </varlistentry>
+		      </variablelist>
+	      </para>
+
+	    </section>
     </section>
 
   </section>
