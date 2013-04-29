@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -39,6 +40,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -46,6 +48,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.github.dandelion.datatables.core.ajax.ColumnDef;
 import com.github.dandelion.datatables.core.ajax.ColumnDef.SortDirection;
 import com.github.dandelion.datatables.core.ajax.DatatablesCriterias;
+
+import flexjson.JSONSerializer;
 
 /**
  * Datatables utility functions
@@ -56,6 +60,9 @@ public class DatatablesUtils {
 
     private static final Logger LOOGER = Logger.getLogger(DatatablesUtils.class
             .getCanonicalName());
+
+    private static final JSONSerializer PK_SERIALIZER = new JSONSerializer()
+            .exclude("*.class");
 
     /**
      * Pojo which contains
@@ -131,6 +138,11 @@ public class DatatablesUtils {
             return pageSize;
         }
 
+    }
+
+    public static final String encodeCompositePK(Map<String, Object> pkValues) {
+        return Base64.encodeBase64String(PK_SERIALIZER.serialize(pkValues)
+                .getBytes());
     }
 
     public static final Set<Class<?>> NUMBER_PRIMITIVES = new HashSet<Class<?>>(
@@ -562,7 +574,7 @@ public class DatatablesUtils {
      * to notify there is a condition that makes the query return none register. <br>
      * So, there is no point in continue evaluating or execute the query.
      * 
-     * @author jmvivo
+     * @author gvNIX team
      */
     private static class EmptyResultException extends Exception {
 

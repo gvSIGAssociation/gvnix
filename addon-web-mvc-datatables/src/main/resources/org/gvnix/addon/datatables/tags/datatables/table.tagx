@@ -160,6 +160,11 @@
 		  </c:if>
 	  </c:otherwise>
   </c:choose>
+  
+  <c:if test="${(not serverSide) and (empty rowIdBase)}">
+    <!-- set row id based on entity id attribute -->
+  	<c:set var="rowIdBase" value="${typeIdFieldName}"/>
+  </c:if>
   <c:if test="${empty exportLinks}">
   	<c:set var="exportLinks" value="top_middle"/>
   </c:if>

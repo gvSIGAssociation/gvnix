@@ -17,6 +17,7 @@
  */
 package org.gvnix.datatables.tags;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import javax.servlet.jsp.JspException;
@@ -24,9 +25,18 @@ import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.github.dandelion.datatables.jsp.tag.AbstractTableTag;
 import com.github.dandelion.datatables.jsp.tag.TableTag;
@@ -50,6 +60,8 @@ public class RooTableTag extends TableTag {
     private static final long serialVersionUID = 8646911296425084063L;
 
     public static final String TABLE_TAG_VARIABLE = "__datatables_table_tag_instance__";
+
+    private SpringContextHelper helper = new SpringContextHelper();
 
     /** The identifier field name for the type (defaults to 'id'). */
     private String typeIdFieldName = "id";
@@ -79,6 +91,13 @@ public class RooTableTag extends TableTag {
      * View path. Used for compute default AJAX request url
      */
     private String path;
+
+    /**
+     * ConversionService bean name in the Spring application context. It is used
+     * to convert the property value to String. (default
+     * 'applicationConversionService').
+     */
+    private String conversionServiceId = "applicationConversionService";
 
     /**
      * Locates container {@link AbstractTableTag} from any {@link TagSupport} of
@@ -165,6 +184,96 @@ public class RooTableTag extends TableTag {
         return super.doAfterBody();
     }
 
+    /**
+     * Return the row id using prefix, base and suffix. Prefix and sufix are
+     * just prepended and appended strings. Base is extracted from the current
+     * iterated object. <br>
+     * Override {@link AbstractTableTag#getRowId()} to allow evaluate baseRowId
+     * using spring evaluator (as do {@link RooColumnTag#getColumnContent()}
+     * 
+     * @return return the row id using prefix, base and suffix.
+     * @throws JspException is the rowIdBase doesn't have a corresponding
+     *             property accessor method.
+     */
+    protected String getRowId() throws JspException {
+
+        StringBuilder rowId = new StringBuilder();
+
+        if (StringUtils.isNotBlank(this.rowIdPrefix)) {
+            rowId.append(this.rowIdPrefix);
+        }
+
+        if (StringUtils.isNotBlank(this.rowIdBase)) {
+            Object propertyValue = getIdContent();
+            rowId.append(propertyValue != null ? propertyValue : "");
+        }
+
+        if (StringUtils.isNotBlank(this.rowIdSufix)) {
+            rowId.append(this.rowIdSufix);
+        }
+
+        return rowId.toString();
+    }
+
+    /**
+     * Gets Id content
+     * 
+     * @return
+     * @throws JspException
+     */
+    protected String getIdContent() throws JspException {
+        ExpressionParser parser = new SpelExpressionParser();
+        Expression exp = parser.parseExpression(this.rowIdBase);
+        EvaluationContext context = new StandardEvaluationContext(currentObject);
+
+        Object value = exp.getValue(context);
+        String result = "";
+
+        if (value == null) {
+            // Use AbstractTablaTag standard behavior
+            try {
+                value = PropertyUtils.getNestedProperty(this.currentObject,
+                        this.rowIdBase);
+
+            }
+            catch (IllegalAccessException e) {
+                LOGGER.error(
+                        "Unable to get the value for the given rowIdBase {}",
+                        this.rowIdBase);
+                throw new JspException(e);
+            }
+            catch (InvocationTargetException e) {
+                LOGGER.error(
+                        "Unable to get the value for the given rowIdBase {}",
+                        this.rowIdBase);
+                throw new JspException(e);
+            }
+            catch (NoSuchMethodException e) {
+                LOGGER.error(
+                        "Unable to get the value for the given rowIdBase {}",
+                        this.rowIdBase);
+                throw new JspException(e);
+            }
+        }
+
+        if (value != null) {
+        	// TODO manage exceptions to log it
+            ConversionService conversionService = (ConversionService) helper
+                    .getBean(this.pageContext, getConversionServiceId());
+            if (conversionService != null
+                    && conversionService.canConvert(value.getClass(),
+                            String.class)) {
+                result = conversionService.convert(value, String.class);
+            }
+            else {
+                result = ObjectUtils.getDisplayString(value);
+            }
+            result = HtmlUtils.htmlEscape(result);
+        }
+
+        return result;
+    }
+
     public String getPath() {
         return path;
     }
@@ -219,6 +328,14 @@ public class RooTableTag extends TableTag {
 
     public void setZ(String z) {
         this.z = z;
+    }
+
+    public String getConversionServiceId() {
+        return conversionServiceId;
+    }
+
+    public void setConversionServiceId(String conversionServiceId) {
+        this.conversionServiceId = conversionServiceId;
     }
 
 }

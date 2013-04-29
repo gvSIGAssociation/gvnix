@@ -27,6 +27,8 @@ import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
@@ -51,6 +53,9 @@ public class RooColumnTag extends ColumnTag {
 	 * 
 	 */
     private static final long serialVersionUID = -7713119991577135048L;
+
+    // Logger
+    private static Logger logger = LoggerFactory.getLogger(RooColumnTag.class);
 
     /** Max displayed text length (default '-1'). Unlimited if negative. */
     private Integer maxLength = Integer.valueOf(-1);
@@ -151,6 +156,8 @@ public class RooColumnTag extends ColumnTag {
         // var="colTxt" />
         // </c:if>
         // <c:out value="${colTxt}" />
+
+        // TODO log problem resolving column content
 
         if (StringUtils.isBlank(property)) {
             return "";

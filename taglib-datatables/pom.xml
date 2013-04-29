@@ -107,7 +107,13 @@
 		  <groupId>joda-time</groupId>
 		  <artifactId>joda-time</artifactId>
 		  <version>1.6</version>
-        </dependency>    
+        </dependency>
+        <!-- felxon -->
+        <dependency>
+            <groupId>net.sf.flexjson</groupId>
+            <artifactId>flexjson</artifactId>
+            <version>2.1</version>
+        </dependency>
   </dependencies>
   <properties>
         <dandelion-datatables.version>0.8.11</dandelion-datatables.version>

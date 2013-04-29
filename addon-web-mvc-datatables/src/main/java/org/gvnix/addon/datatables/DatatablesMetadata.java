@@ -49,7 +49,6 @@ import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
-import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
 import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
@@ -96,11 +95,17 @@ public class DatatablesMetadata extends
     private static final JavaType MAP_STRING_STRING = new JavaType(
             MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, JavaType.STRING));
+    private static final JavaType MAP_STRING_OBJECT = new JavaType(
+            MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, JavaType.OBJECT));
 
     private static final JavaType HASH_MAP = new JavaType(HashMap.class);
     private static final JavaType HASHMAP_STRING_STRING = new JavaType(
             HASH_MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, JavaType.STRING));
+    private static final JavaType HASHMAP_STRING_OBJECT = new JavaType(
+            HASH_MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, JavaType.OBJECT));
     /**
      * List<Map<String,String>>
      */
@@ -461,7 +466,6 @@ public class DatatablesMetadata extends
         AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
 
-        final List<StringAttributeValue> requestParams = new ArrayList<StringAttributeValue>();
         // @RequestMapping(produces = "text/html")
         methodAnnotation.addStringAttribute("produces", "text/html");
 
@@ -689,18 +693,22 @@ public class DatatablesMetadata extends
                 getFinalTypeName(RENDER_FOR_DATATABLES_RETURN_IMP),
                 ITEM_LIST_PARAM_NAME.getSymbolName()));
 
-        bodyBuilder.appendFormalLine("// Prepare required fields");
-        // Set<String> fields = new HashSet<String>();
+        bodyBuilder.appendFormalLine("// Prepare primaryKey fields");
+        // Set<String> pkFields = new HashSet<String>();
         bodyBuilder
-                .appendFormalLine(String.format("%s fields = new %s();",
+                .appendFormalLine(String.format("%s pkFields = new %s();",
                         getFinalTypeName(SET_STRING),
                         getFinalTypeName(HASHSET_STRING)));
-
-        bodyBuilder.appendFormalLine("// Add primaryKey fields");
         for (FieldMetadata field : identifierProperties) {
-            bodyBuilder.appendFormalLine("fields.add(\"".concat(
+            bodyBuilder.appendFormalLine("pkFields.add(\"".concat(
                     field.getFieldName().getSymbolName()).concat("\");"));
         }
+
+        bodyBuilder.appendFormalLine("// Prepare required fields");
+        // Set<String> fields = new HashSet<String>();
+        bodyBuilder.appendFormalLine(String.format(
+                "%s fields = new %s(pkFields);", getFinalTypeName(SET_STRING),
+                getFinalTypeName(HASHSET_STRING)));
 
         bodyBuilder.appendFormalLine("// Add fields from request");
         // for (ColumnDef colum : criterias.getColumnDefs()){
@@ -734,6 +742,12 @@ public class DatatablesMetadata extends
         // Map<String, String> rendered = null;
         bodyBuilder.appendFormalLine(String.format("%s rendered = null;",
                 getFinalTypeName(MAP_STRING_STRING)));
+        // Map<String, Object> pkValues = new
+        // HashMap<String,Object>(pkFields.size());
+        bodyBuilder.appendFormalLine(String.format(
+                "%s pkValues = new %s(pkFields.size());",
+                getFinalTypeName(MAP_STRING_OBJECT),
+                getFinalTypeName(HASHMAP_STRING_OBJECT)));
         String itemVar = StringUtils.uncapitalize(entity.getSimpleTypeName());
         // for (Pet pet : pets) {
         bodyBuilder.appendFormalLine(String.format("for (%s %s : %s) {",
@@ -744,6 +758,8 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine(String.format(
                 "rendered = new %s(fields.size());",
                 getFinalTypeName(HASHMAP_STRING_STRING)));
+        // pkValues.clear();
+        bodyBuilder.appendFormalLine("pkValues.clear();");
         String itemVarBean = itemVar.concat("Bean");
         // BeanWrapper petBean = new BeanWrapperImpl(pet);
         bodyBuilder
@@ -875,8 +891,52 @@ public class DatatablesMetadata extends
 
         // rendered.put(fieldName, valueStr);
         bodyBuilder.appendFormalLine("rendered.put(fieldName, valueStr);");
+        // if (pkFields.contains(fieldName)) {
+        bodyBuilder.appendFormalLine("if (pkFields.contains(fieldName)) {");
+        bodyBuilder.indent();
+        // if (pkFields.size() == 1) {
+        bodyBuilder.appendFormalLine("if (pkFields.size() == 1) {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("// for single pk value use string representation");
+        // pkValues.put(fieldName, valueStr);
+        bodyBuilder.appendFormalLine("pkValues.put(fieldName, valueStr);");
+        bodyBuilder.indentRemove();
+        // } else {
+        bodyBuilder.appendFormalLine("} else {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("pkValues.put(fieldName, value);");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        // }
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("// compute DT_RowId");
+        // if (pkFields.size() == 1) {
+        bodyBuilder.appendFormalLine("if (pkFields.size() > 1) {");
+        bodyBuilder.indent();
+        // rendered.put("DT_RowId",DatatablesUtils.encodeCompositePK(pkValues));
+        bodyBuilder.appendFormalLine(String.format(
+                "rendered.put(\"DT_RowId\",%s.encodeCompositePK(pkValues));",
+                getFinalTypeName(DATATABLES_UTILS)));
+        bodyBuilder.indentRemove();
+        // } else {
+        bodyBuilder.appendFormalLine("} else {");
+        bodyBuilder.indent();
+        // rendered.put("DT_RowId",
+        // (String)pkValues.values().iterator().next());
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("rendered.put(\"DT_RowId\", (String)pkValues.values().iterator().next());",
+                                getFinalTypeName(DATATABLES_UTILS)));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
         bodyBuilder.appendFormalLine("result.add(rendered);");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
