@@ -1,0 +1,3 @@
+script --file clinic.roo
+web mvc datatables setup
+web mvc datatables all

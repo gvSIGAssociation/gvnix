@@ -155,6 +155,40 @@
 	echo configuration end
 
 ##
+## gvNIX datatables add-on
+##
+	
+	## datatables
+	echo datatables start
+	mkdir datatables
+	cd datatables
+	$1/gvnix.sh script --file $2/code/addon-web-mvc-datatables/src/main/resources/datatables.roo --lineNumbers true
+	mkdir target
+    # Get datatable list pages
+	wget --retry-connrefused -O target/pets.html http://localhost:8080/petclinic/pets &
+	wget --retry-connrefused -O target/owners.html http://localhost:8080/petclinic/owners &
+	wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits &
+	wget --retry-connrefused -O target/vets.html http://localhost:8080/petclinic/vets &
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	cd ..
+	echo datatables end
+
+	## datatables-test.roo
+	echo datatables-test.roo start
+	mkdir datatables-test.roo
+	cd datatables-test.roo
+	$1/gvnix.sh script --file $2/code/addon-web-mvc-datatables/src/test/resources/datatables-test.roo.roo --lineNumbers true
+	mkdir target
+    # Get datatable list pages
+	wget --retry-connrefused -O target/pets.html http://localhost:8080/petclinic/pets &
+	wget --retry-connrefused -O target/owners.html http://localhost:8080/petclinic/owners &
+	wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits &
+	wget --retry-connrefused -O target/vets.html http://localhost:8080/petclinic/vets &
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	cd ..
+	echo datatables-test.roo end
+
+##
 ## gvNIX dialog add-on
 ##
 	

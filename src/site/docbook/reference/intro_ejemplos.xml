@@ -230,6 +230,16 @@ project ...
         de datos.</para>
       </listitem>
     </varlistentry>
+    
+    <varlistentry>
+      <term>datatables.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo aplicando datatables
+        en todas las pantallas de listado del proyecto.</para>
+      </listitem>
+    </varlistentry>
+    
   </variablelist>
 
   <para>La mayoría de esto ejemplos utilizan bases de datos en memoria por lo

@@ -1,0 +1,14 @@
+
+script --file clinic.roo
+
+web mvc datatables setup
+
+web mvc datatables update tags
+
+web mvc datatables add --type ~.web.OwnerController
+web mvc datatables add --type ~.web.VetController --ajax false
+web mvc datatables add --type ~.web.VisitController --ajax true
+
+web mvc datatables all
+
+web mvc datatables update tags
