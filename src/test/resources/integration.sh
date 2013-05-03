@@ -134,10 +134,6 @@
 	wget --retry-connrefused -O target/loginredirect.html http://localhost:8080/petclinic/pets
 	wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login?lang=es
 	wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login?lang=en
-	# Invalid log in
-	wget --retry-connrefused -O target/logininvalid.html http://localhost:8080/petclinic/resources/j_spring_security_check --post-data 'j_username=error&j_password=error'
-	# Get logout URL
-	wget --retry-connrefused -O target/logout.html http://localhost:8080/petclinic/resources/j_spring_security_logout
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
