@@ -177,7 +177,7 @@
 	echo datatables-test.roo start
 	mkdir datatables-test.roo
 	cd datatables-test.roo
-	$1/gvnix.sh script --file $2/code/addon-web-mvc-datatables/src/test/resources/datatables-test.roo.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/code/addon-web-mvc-datatables/src/test/resources/datatables-test.roo --lineNumbers true
 	mkdir target
     # Get datatable list pages
 	wget --retry-connrefused -O target/pets.html http://localhost:8080/petclinic/pets &
