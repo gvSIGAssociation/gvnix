@@ -20,17 +20,25 @@ package org.gvnix.addon.datatables;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.OperationUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
+import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
+import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
@@ -108,6 +116,16 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * Reference to MenuOperations
      */
     @Reference private MenuOperations menuOperations;
+
+    /**
+     * Reference to I18nSupport
+     */
+    @Reference private I18nSupport i18nSupport;
+
+    /**
+     * Reference to PropFileOperations
+     */
+    @Reference private PropFileOperations propFileOperations;
 
     /**
      * Update dependencies if is needed
@@ -330,6 +348,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         // Copy properties file
         copyPropertiesFile();
 
+        // Add required i18n keys
+        addI18nKeys();
+
         // Add all js to
         // WEB-INF/tags/util/load-scripts.tagx
         addJSToLoadScriptsTag();
@@ -463,6 +484,64 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 projectOperations.getFocusedModuleName());
     }
 
+    private boolean addJSToTag(Document docTagx, Element root, String varName,
+            String location) {
+        boolean modified = false;
+
+        // add url resolution
+        modified = addUrlToTag(docTagx, root, varName, location);
+
+        // Add script
+        Element scriptElement = XmlUtils.findFirstElement(
+                String.format("script[@src='${%s}']", varName), root);
+        if (scriptElement == null) {
+            scriptElement = docTagx.createElement("script");
+            scriptElement.setAttribute("src", "${".concat(varName).concat("}"));
+            scriptElement.setAttribute("type", "text/javascript");
+            scriptElement.appendChild(docTagx
+                    .createComment("required for FF3 and Opera"));
+            root.appendChild(scriptElement);
+            modified = true;
+        }
+        return modified;
+    }
+
+    private boolean addCssToTag(Document docTagx, Element root, String varName,
+            String location) {
+        boolean modified = false;
+
+        // add url resolution
+        modified = addUrlToTag(docTagx, root, varName, location);
+
+        // Add link
+        Element cssElement = XmlUtils.findFirstElement(
+                String.format("link[@href='${%s}']", varName), root);
+        if (cssElement == null) {
+            cssElement = docTagx.createElement("link");
+            cssElement.setAttribute("rel", "stylesheet");
+            cssElement.setAttribute("type", "text/css");
+            cssElement.setAttribute("media", "screen");
+            cssElement.setAttribute("href", "${".concat(varName).concat("}"));
+            root.appendChild(cssElement);
+            modified = true;
+        }
+        return modified;
+    }
+
+    private boolean addUrlToTag(Document docTagx, Element root, String varName,
+            String location) {
+        Element urlElement = XmlUtils.findFirstElement(
+                "url[@var='".concat(varName) + "']", root);
+        if (urlElement == null) {
+            urlElement = docTagx.createElement("spring:url");
+            urlElement.setAttribute("var", varName);
+            urlElement.setAttribute("value", location);
+            root.appendChild(urlElement);
+            return true;
+        }
+        return false;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -495,129 +574,36 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
         /* Add url resolutions missing */
 
-        // Add jquery.js url resolution
-        Element jqueryJsUrl = XmlUtils.findFirstElement(
-                "url[@var='js_jquery_url']", root);
-        if (jqueryJsUrl == null) {
-            jqueryJsUrl = docTagx.createElement("spring:url");
-            jqueryJsUrl.setAttribute("var", "js_jquery_url");
-            jqueryJsUrl.setAttribute("value",
-                    "/resources/scripts/datatables/jquery-min.js");
-            root.appendChild(jqueryJsUrl);
-            modified = true;
-        }
-        // Add jquery.datatables.js url resolution
-        Element jqueryDtJsUrl = XmlUtils.findFirstElement(
-                "url[@var='js_jquery_datatables_url']", root);
-        if (jqueryDtJsUrl == null) {
-            jqueryDtJsUrl = docTagx.createElement("spring:url");
-            jqueryDtJsUrl.setAttribute("var", "js_jquery_datatables_url");
-            jqueryDtJsUrl.setAttribute("value",
-                    "/resources/scripts/datatables/jquery.dataTables.min.js");
-            root.appendChild(jqueryDtJsUrl);
-            modified = true;
-        }
-        // Add dataTables.custom.api.functions.js url resolution
-        Element jqueryDtCustomJsUrl = XmlUtils.findFirstElement(
-                "url[@var='js_jquery_datatables_custom_api_url']", root);
-        if (jqueryDtCustomJsUrl == null) {
-            jqueryDtCustomJsUrl = docTagx.createElement("spring:url");
-            jqueryDtCustomJsUrl.setAttribute("var",
-                    "js_jquery_datatables_custom_api_url");
-            jqueryDtCustomJsUrl
-                    .setAttribute("value",
-                            "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.js");
-            root.appendChild(jqueryDtCustomJsUrl);
-            modified = true;
-        }
         // Add jquery.datatables.css url resolution
-        Element jqueryDtCssUrl = XmlUtils.findFirstElement(
-                "url[@var='css_jquery_datatables_url']", root);
-        if (jqueryDtCssUrl == null) {
-            jqueryDtCssUrl = docTagx.createElement("spring:url");
-            jqueryDtCssUrl.setAttribute("var", "css_jquery_datatables_url");
-            jqueryDtCssUrl.setAttribute("value",
-                    "/resources/styles/datatables/jquery.dataTables.css");
-            root.appendChild(jqueryDtCssUrl);
-            modified = true;
-        }
+        modified = addCssToTag(docTagx, root, "css_jquery_datatables_url",
+                "/resources/styles/datatables/jquery.dataTables.css")
+                || modified;
+
         // Add gvnix.dataTables.css url resolution
-        Element gvnixCssUrl = XmlUtils.findFirstElement(
-                "url[@var='css_gvnix_datatables_url']", root);
-        if (gvnixCssUrl == null) {
-            gvnixCssUrl = docTagx.createElement("spring:url");
-            gvnixCssUrl.setAttribute("var", "css_gvnix_datatables_url");
-            gvnixCssUrl.setAttribute("value",
-                    "/resources/styles/datatables/gvnix.dataTables.css");
-            root.appendChild(gvnixCssUrl);
-            modified = true;
-        }
+        modified = addCssToTag(docTagx, root, "css_gvnix_datatables_url",
+                "/resources/styles/datatables/gvnix.dataTables.css")
+                || modified;
 
-        /* Declare css */
-        // Add jquery.datatables.css
-        Element jqueryCss = XmlUtils.findFirstElement(
-                "link[@href='${css_jquery_datatables_url}']", root);
-        if (jqueryCss == null) {
-            jqueryCss = docTagx.createElement("link");
-            jqueryCss.setAttribute("rel", "stylesheet");
-            jqueryCss.setAttribute("type", "text/css");
-            jqueryCss.setAttribute("media", "screen");
-            jqueryCss.setAttribute("href", "${css_jquery_datatables_url}");
-            root.appendChild(jqueryCss);
-            modified = true;
-        }
-
-        // Add gvnix.dataTables.css
-        Element gvnixCss = XmlUtils.findFirstElement(
-                "link[@href='${css_gvnix_datatables_url}']", root);
-        if (gvnixCss == null) {
-            gvnixCss = docTagx.createElement("link");
-            gvnixCss.setAttribute("rel", "stylesheet");
-            gvnixCss.setAttribute("type", "text/css");
-            gvnixCss.setAttribute("media", "screen");
-            gvnixCss.setAttribute("href", "${css_gvnix_datatables_url}");
-            root.appendChild(gvnixCss);
-            modified = true;
-        }
-
-        /* Declare js */
         // Add jquery.js
-        Element jqueryJs = XmlUtils.findFirstElement(
-                "script[@src='${js_jquery_url}']", root);
-        if (jqueryJs == null) {
-            jqueryJs = docTagx.createElement("script");
-            jqueryJs.setAttribute("src", "${js_jquery_url}");
-            jqueryJs.setAttribute("type", "text/javascript");
-            jqueryJs.appendChild(docTagx
-                    .createComment("required for FF3 and Opera"));
-            root.appendChild(jqueryJs);
-            modified = true;
-        }
+        modified = addJSToTag(docTagx, root, "js_jquery_url",
+                "/resources/scripts/datatables/jquery-min.js") || modified;
+
         // Add jquery.datatables.js
-        Element jqueryDtJs = XmlUtils.findFirstElement(
-                "script[@src='${js_jquery_datatables_url}']", root);
-        if (jqueryDtJs == null) {
-            jqueryDtJs = docTagx.createElement("script");
-            jqueryDtJs.setAttribute("src", "${js_jquery_datatables_url}");
-            jqueryDtJs.setAttribute("type", "text/javascript");
-            jqueryDtJs.appendChild(docTagx
-                    .createComment("required for FF3 and Opera"));
-            root.appendChild(jqueryDtJs);
-            modified = true;
-        }
-        // Add dataTables.custom.api.functions.js
-        Element jqueryDtCustomJs = XmlUtils.findFirstElement(
-                "script[@src='${js_jquery_datatables_custom_api_url}']", root);
-        if (jqueryDtCustomJs == null) {
-            jqueryDtCustomJs = docTagx.createElement("script");
-            jqueryDtCustomJs.setAttribute("src",
-                    "${js_jquery_datatables_custom_api_url}");
-            jqueryDtCustomJs.setAttribute("type", "text/javascript");
-            jqueryDtCustomJs.appendChild(docTagx
-                    .createComment("required for FF3 and Opera"));
-            root.appendChild(jqueryDtCustomJs);
-            modified = true;
-        }
+        modified = addJSToTag(docTagx, root, "js_jquery_datatables_url",
+                "/resources/scripts/datatables/jquery.dataTables.min.js")
+                || modified;
+
+        // Add jquery.dataTables.ext.gvnix.selection.js
+        modified = addJSToTag(docTagx, root,
+                "js_jquery_datatables_selection_url",
+                "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.selection.js")
+                || modified;
+
+        // Add jquery.dataTables.ext.gvnix.js
+        modified = addJSToTag(docTagx, root,
+                "js_jquery_datatables_custom_api_url",
+                "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.js")
+                || modified;
 
         if (modified) {
             XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
@@ -868,5 +854,37 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         copyDirectoryContents("resources/*.properties",
                 pathResolver.getIdentifier(resouresPath, "/"), true);
 
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.gvnix.addon.datatables.DatatablesOperations#addI18nKeys()
+     */
+    @Override
+    public void addI18nKeys() {
+        // Check if Valencian_Catalan language is supported and add properties
+        // if so
+        Set<I18n> supportedLanguages = i18nSupport.getSupportedLanguages();
+        for (I18n i18n : supportedLanguages) {
+            if (i18n.getLocale().equals(new Locale("ca"))) {
+                MessageBundleUtils.installI18nMessages(
+                        new ValencianCatalanLanguage(), projectOperations,
+                        fileManager);
+                MessageBundleUtils.addPropertiesToMessageBundle("ca",
+                        getClass(), propFileOperations, projectOperations,
+                        fileManager);
+                break;
+            }
+        }
+        // Add properties to Spanish messageBundle
+        MessageBundleUtils.installI18nMessages(new SpanishLanguage(),
+                projectOperations, fileManager);
+        MessageBundleUtils.addPropertiesToMessageBundle("es", getClass(),
+                propFileOperations, projectOperations, fileManager);
+
+        // Add properties to default messageBundle
+        MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
+                propFileOperations, projectOperations, fileManager);
     }
 }

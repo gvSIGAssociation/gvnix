@@ -101,10 +101,30 @@ a.export_csv {
  Fixed size to avoid pagination goes down when filter is applied*/
 div.dataTables_info {
   padding-top: 4px;
-  with: 250px;
+  padding-bottom: 4px;
+  max-width: 250px;
 }
 
 /* A bit of padding between the pagination and the table. */
 div.dataTables_paginate {
   padding-top: 4px;
+}
+
+
+/* Selection */
+
+
+table.dataTable tr.even.row_selected td {
+	background-color: #ffff7c;
+}
+
+table.dataTable tr.odd.row_selected td {
+	background-color: #ffff00;
+}
+
+a.selection_all {
+	background: url("../../images/datatables/book_add.png") no-repeat scroll center center transparent;
+}
+a.selection_none {
+	background: url("../../images/datatables/book_delete.png") no-repeat scroll center center transparent;
 }

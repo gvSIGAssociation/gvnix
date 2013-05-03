@@ -19,6 +19,15 @@
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
   <jsp:directive.attribute name="actionHeaderCssStyle" type="java.lang.String" required="false" description="Custom css-style for action columns header" />
   
+  <!-- selection -->
+  <jsp:directive.attribute name="selection" type="java.lang.Boolean" required="false" description="Enable selection" />
+  <jsp:directive.attribute name="selectionMultiRow" type="java.lang.Boolean" required="false" description="Enable selection on multiple rows" />
+  <jsp:directive.attribute name="selectionByCheck" type="java.lang.Boolean" required="false" description="Use checkbox to select" />
+  <jsp:directive.attribute name="selectionCheckCssClass" type="java.lang.String" required="false" description="Css class for selection checkbox" />
+  <jsp:directive.attribute name="selectionSelectedCssClass" type="java.lang.String" required="false" description="Css class for selected rows" />
+  <jsp:directive.attribute name="selectionNotSelectedCssClass" type="java.lang.String" required="false" description="Css class for not-selected rows" />
+  <jsp:directive.attribute name="selectionInfoLabel" type="java.lang.String" required="false" description="Label to use for selection information (default 'datatables_selection_info')" />
+  
 
   <!-- ====================================== -->
   <!-- ====================================== -->
@@ -225,13 +234,13 @@
     <spring:url value="/resources/images/add.png" var="create_image_url" />
 	<script type="text/javascript">
         function ${createButtonCallbackId}(oSettings, json) {
-        	var result =
+           var result =
                '<div class="gvnix_dataTables_createItem" style="float:left;margin-left:10px;">'
                +'<a href="${urlPath}?form" alt="${create_label}" title="${create_label}">'
                + '  <img alt="${create_label}" class="image" src="${create_image_url}" title="${create_label}" />'
                + '</a>'
                + '</div>';
-               $('#${id}_filter').before(result);
+           $('#${id}_filter').before(result);
 	    }
     </script>
   </c:if>
@@ -297,6 +306,47 @@
 	     </script>
      </c:if>
   </c:if>
+  
+  <!-- selection -->
+  <c:choose>
+    <c:when test="${selection}">
+      <c:if test="${empty selectionMultiRow}">
+      	<c:set var="selectionMultiRow" value="false"/>
+      </c:if>
+      <c:set var="selection_none_link" value="true"/>
+      <spring:message var="selection_none_msg" code="selection_none" htmlEscape="false" javaScriptEscape="true"/>
+      <c:if test="${selectionMultiRow}">
+       <c:set var="selection_all_link" value="true"/>
+       <spring:message var="selection_all_msg" code="selection_all" htmlEscape="false" javaScriptEscape="true"/>
+      </c:if>
+      <c:if test="${empty selectionInfoLabel}">
+      	<c:set var="selectionInfoLabel" value="datatables_selection_info"/>
+      </c:if>
+      <spring:message code="${selectionInfoLabel}" htmlEscape="false" var="selection_info_msg"/>
+      <c:if test="${selectionByCheck}">
+        <form id="${selectionCheckColumnId}_form" name="${selectionCheckColumnId}_form">
+        </form>
+        <c:if test="${empty selectionCheckCssClass}">
+      		<c:set var="selectionCheckCssClass" value="check_select_row"/>
+      	</c:if>
+    	<c:set var="selectionCheckColumnId" value="${id}_select_col"/>
+    	<c:if test="${serverSide}">
+    		<script type="text/javascript">
+	        function ${selectionCheckColumnId}(data, type, full) {
+	        	var result =
+	                '<input type="checkbox" class="${selectionCheckCssClass}" form="${selectionCheckColumnId}_form"/>';
+	                
+                return result;
+		    }
+	     	</script>
+    	</c:if>
+ 	  </c:if>
+    </c:when>
+    <c:otherwise>
+    	<!-- if no selection no selection by check -->
+    	<c:set var="selectionByCheck" value="false"/>
+    </c:otherwise>
+  </c:choose>
     
   <datatables:table
 		id="${id}"
@@ -357,7 +407,23 @@
 
       colReorder="${colReorder}"
     >
-  
+    	
+    	<!-- Check box -->
+    	<c:if test="${selectionByCheck}">
+    	  <c:choose>
+            <c:when test="${serverSide}">
+		      <table:action-column id="${selectionCheckColumnId}" cssClass="utilbox" cssCellClass="utilbox" renderFunction="${selectionCheckColumnId}" cssStyle="${actionHeaderCssStyle}"/>
+            </c:when>
+		    <c:otherwise>
+			  <!-- DOM cell render -->
+			  <table:action-column id="${selectionCheckColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
+			  	<input type="checkbox" class="${selectionCheckClass}" form="${selectionCheckColumnId}_form"/>
+			  </table:action-column>
+		    </c:otherwise>
+		  </c:choose>
+		</c:if>
+		
+		<!-- data columns will be inserted here -->  
         <jsp:doBody />
         
         <!-- Go-show-view (of current row) column --> 
@@ -443,12 +509,51 @@
   </datatables:table>
   
     <script type="text/javascript">
+		
+		<c:if test="${selection_none_link}">
+		/** selection support functions **/
+		function ${id}_selectNone(){
+			$('#${id}').dataTable().fnSelection().fnSelectNone();
+		};
+		var ${id}_selectionTools_str = '<div class="gvnix_datatables_selection_box" style="float:left;margin-left:10px;">';
+		${id}_selectionTools_str += '<a href="javascript:${id}_selectNone();" class="icon selection_none">${selection_none_msg}</a>';
+		<c:if test="${selection_all_link}">
+		function ${id}_selectAll(){
+			$('#${id}').dataTable().fnSelection().fnSelectAll();
+		};
+		${id}_selectionTools_str += '<a href="javascript:${id}_selectAll();" class="icon selection_all">${selection_all_msg}</a>';
+		</c:if>
+		${id}_selectionTools_str += '</div>'
+		</c:if>
+		
         /* init custom api functions for this table */
 	    function ${initCustionFunctionsCallbackId}() {
-	    	datatables_init_custom_api_functions('${id}',{'filterOnReturn': '${filterOnReturn}', 'filteringDelay' : '${filteringDelay}'} );
+	    	datatables_init_custom_api_functions('${id}',
+	    		{
+	    		'filterOnReturn': '${filterOnReturn}', 
+	    		'filteringDelay' : '${filteringDelay}'
+	    		<c:if test="${selection}">
+	    		,
+	    		'selection': { 
+	    			'multiRow': ${selectionMultiRow},
+	    			'checkColumnClass': '${selectionCheckCssClass}',
+	    			'infoMessage': '${selection_info_msg}',
+	    			<c:if test="${not empty selectionSelectedCssClass}">
+	    			'classForSelectedRow': '${selectionSelectedCssClass}',
+	    			</c:if>
+	    			<c:if test="${not empty selectionNotSelectedCssClass}">
+	    			'classForNotSelectedRow': '${selectionNotSelectedCssClass}',
+	    			</c:if>
+	    			'debug': false}
+	    		</c:if>
+	    		});
+	    	
+	    	<c:if test="${selection_none_link}">
+	    	$('#${id}_filter').before(${id}_selectionTools_str);
+	    	</c:if>
 	        <c:if test="${create}">
 	        ${createButtonCallbackId}();
-	      </c:if>
+	        </c:if>
 	    }
   </script>
 </jsp:root>

@@ -110,4 +110,9 @@ public interface DatatablesOperations {
      * Copy base datatables.properties file to resources folder
      */
     void copyPropertiesFile();
+
+    /**
+     * Add required i18n keys
+     */
+    void addI18nKeys();
 }

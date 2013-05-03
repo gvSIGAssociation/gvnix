@@ -71,7 +71,11 @@
       <artifactId>org.gvnix.support</artifactId>
       <version>${gvnix.version}</version>
     </dependency>
-    
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.web.i18n.roo.addon</artifactId>
+      <version>${gvnix.version}</version>
+    </dependency>
   </dependencies>
   
   <!-- DiSiD: Add google code distribution management -->
@@ -132,6 +136,8 @@
         <filtering>false</filtering>
         <excludes>
           <exclude>**/addon/*/configuration.xml</exclude>
+          <!-- JS plugins version  -->
+          <exclude>**/addon/*/*.gvnix.*.js</exclude>
         </excludes>
       </resource>
       <resource>
@@ -139,6 +145,8 @@
         <filtering>true</filtering>
         <includes>
           <include>**/addon/*/configuration.xml</include>
+          <!-- JS plugins version -->
+          <include>**/addon/*/*.gvnix.*.js</include>
         </includes>
       </resource>
     </resources>
