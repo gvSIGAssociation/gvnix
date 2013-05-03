@@ -66,7 +66,7 @@
   	Consultar dicho script para conocer mas detalles sobre este requerimiento.</para> 
 
 	<para xml:lang="es">Con el <emphasis>Text-finder Plugin</emphasis> se busca la cadena
-	<emphasis>BUILD FAILURE|Script execution aborted|ERROR 404: Not Found|ERROR 400: Bad Request</emphasis>
+	<emphasis>BUILD FAILURE|Script execution aborted|ERROR 404: Not Found|ERROR 400: Bad Request|ERROR 405: Method Not Allowed</emphasis>
 	y en el caso de encontrarla se marca el build como inestable.</para>
   	
   	<para xml:lang="es">Se avisa por correo de ejecuciones erróneas al responsable técnico del proyecto 
