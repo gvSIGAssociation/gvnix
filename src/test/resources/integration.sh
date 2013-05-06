@@ -173,10 +173,10 @@
 	cd ..
 	echo datatables end
 
-	## datatables-test.roo
-	echo datatables-test.roo start
-	mkdir datatables-test.roo
-	cd datatables-test.roo
+	## datatables-test
+	echo datatables-test start
+	mkdir datatables-test
+	cd datatables-test
 	$1/gvnix.sh script --file $2/code/addon-web-mvc-datatables/src/test/resources/datatables-test.roo --lineNumbers true
 	mkdir target
     # Get datatable list pages
@@ -186,7 +186,23 @@
 	wget --retry-connrefused -O target/vets.html http://localhost:8080/petclinic/vets &
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
-	echo datatables-test.roo end
+	echo datatables-test end
+
+	## datatables-pkc
+	echo datatables-pkc start
+	mkdir datatables-pkc
+	cd datatables-pkc
+	$1/gvnix.sh script --file $2/code/addon-web-mvc-datatables/src/test/resources/datatables-pkc.roo --lineNumbers true
+	mvn test tomcat:run &
+	mkdir target
+    # Get datatable list pages
+	wget --retry-connrefused -O target/cars.html http://localhost:8080/displayRelationsTable/cars
+	wget --retry-connrefused -O target/people.html http://localhost:8080/displayRelationsTable/people
+	wget --retry-connrefused -O target/horses.html http://localhost:8080/displayRelationsTable/horses
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo datatables-pkc end
 
 ##
 ## gvNIX dialog add-on
