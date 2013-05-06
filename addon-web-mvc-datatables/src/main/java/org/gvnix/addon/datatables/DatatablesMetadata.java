@@ -684,6 +684,7 @@ public class DatatablesMetadata extends
                 "%1$s logger = %1$s.getLogger(getClass().getName());",
                 getFinalTypeName(LOGGER_TYPE)));
 
+        bodyBuilder.appendFormalLine("");
         bodyBuilder.appendFormalLine("// Prepare result var");
         // List<Map<String, String>> result = new
         // ArrayList<Map<String,String>>(pets.size());
@@ -693,23 +694,25 @@ public class DatatablesMetadata extends
                 getFinalTypeName(RENDER_FOR_DATATABLES_RETURN_IMP),
                 ITEM_LIST_PARAM_NAME.getSymbolName()));
 
+        // Roo use only one filed as pk
+        // (if it's composite use a embeddedPk)
         bodyBuilder.appendFormalLine("// Prepare primaryKey fields");
-        // Set<String> pkFields = new HashSet<String>();
-        bodyBuilder
-                .appendFormalLine(String.format("%s pkFields = new %s();",
-                        getFinalTypeName(SET_STRING),
-                        getFinalTypeName(HASHSET_STRING)));
-        for (FieldMetadata field : identifierProperties) {
-            bodyBuilder.appendFormalLine("pkFields.add(\"".concat(
-                    field.getFieldName().getSymbolName()).concat("\");"));
-        }
+        // String pkFieldName = "id";
+        bodyBuilder.appendFormalLine(String.format("%s pkFieldName = \"%s\";",
+                getFinalTypeName(JavaType.STRING), identifierProperties.get(0)
+                        .getFieldName().getSymbolName()));
 
+        bodyBuilder.appendFormalLine("");
         bodyBuilder.appendFormalLine("// Prepare required fields");
         // Set<String> fields = new HashSet<String>();
-        bodyBuilder.appendFormalLine(String.format(
-                "%s fields = new %s(pkFields);", getFinalTypeName(SET_STRING),
-                getFinalTypeName(HASHSET_STRING)));
+        bodyBuilder
+                .appendFormalLine(String.format("%s fields = new %s();",
+                        getFinalTypeName(SET_STRING),
+                        getFinalTypeName(HASHSET_STRING)));
+        // fields.add( pkFieldName );
+        bodyBuilder.appendFormalLine("fields.add(pkFieldName);");
 
+        bodyBuilder.appendFormalLine("");
         bodyBuilder.appendFormalLine("// Add fields from request");
         // for (ColumnDef colum : criterias.getColumnDefs()){
         bodyBuilder.appendFormalLine(String.format(
@@ -722,6 +725,7 @@ public class DatatablesMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
+        bodyBuilder.appendFormalLine("");
         bodyBuilder.appendFormalLine("// Date formaters");
         // DateFormat defaultFormat = SimpleDateFormat.getDateInstance();
         bodyBuilder.appendFormalLine(String.format(
@@ -738,16 +742,11 @@ public class DatatablesMetadata extends
                             UI_MODEL.getSymbolName()));
         }
 
+        bodyBuilder.appendFormalLine("");
         bodyBuilder.appendFormalLine("// Load result");
         // Map<String, String> rendered = null;
         bodyBuilder.appendFormalLine(String.format("%s rendered = null;",
                 getFinalTypeName(MAP_STRING_STRING)));
-        // Map<String, Object> pkValues = new
-        // HashMap<String,Object>(pkFields.size());
-        bodyBuilder.appendFormalLine(String.format(
-                "%s pkValues = new %s(pkFields.size());",
-                getFinalTypeName(MAP_STRING_OBJECT),
-                getFinalTypeName(HASHMAP_STRING_OBJECT)));
         String itemVar = StringUtils.uncapitalize(entity.getSimpleTypeName());
         // for (Pet pet : pets) {
         bodyBuilder.appendFormalLine(String.format("for (%s %s : %s) {",
@@ -758,8 +757,6 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine(String.format(
                 "rendered = new %s(fields.size());",
                 getFinalTypeName(HASHMAP_STRING_STRING)));
-        // pkValues.clear();
-        bodyBuilder.appendFormalLine("pkValues.clear();");
         String itemVarBean = itemVar.concat("Bean");
         // BeanWrapper petBean = new BeanWrapperImpl(pet);
         bodyBuilder
@@ -773,6 +770,7 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("for (String fieldName : fields) {");
         bodyBuilder.indent();
 
+        bodyBuilder.append("");
         // check if property exists (trace it else)
         bodyBuilder
                 .appendFormalLine("// check if property exists (trace it else)");
@@ -877,6 +875,8 @@ public class DatatablesMetadata extends
         // } catch (Exception e) {
         bodyBuilder.appendFormalLine("} catch (Exception e) {");
         bodyBuilder.indent();
+
+        bodyBuilder.append("");
         // debug getting value problem
         bodyBuilder.appendFormalLine("// debug getting value problem");
         // logger.log(Level.FINE,"Error getting value '".concat(fieldName).concat("'"),e);
@@ -891,49 +891,28 @@ public class DatatablesMetadata extends
 
         // rendered.put(fieldName, valueStr);
         bodyBuilder.appendFormalLine("rendered.put(fieldName, valueStr);");
-        // if (pkFields.contains(fieldName)) {
-        bodyBuilder.appendFormalLine("if (pkFields.contains(fieldName)) {");
-        bodyBuilder.indent();
-        // if (pkFields.size() == 1) {
-        bodyBuilder.appendFormalLine("if (pkFields.size() == 1) {");
-        bodyBuilder.indent();
+
+        bodyBuilder.appendFormalLine("");
+        bodyBuilder.appendFormalLine("// Set PK value as DT_RowId");
         bodyBuilder
-                .appendFormalLine("// for single pk value use string representation");
-        // pkValues.put(fieldName, valueStr);
-        bodyBuilder.appendFormalLine("pkValues.put(fieldName, valueStr);");
-        bodyBuilder.indentRemove();
-        // } else {
-        bodyBuilder.appendFormalLine("} else {");
+                .appendFormalLine("// Note when entity has composite PK Roo generates the need");
+        bodyBuilder
+                .appendFormalLine("// convert method and adds it to ConversionService, so");
+        bodyBuilder
+                .appendFormalLine("// when processed field is the PK the valueStr is the ");
+        bodyBuilder
+                .appendFormalLine("// composite PK instance marshalled to JSON notation and");
+        bodyBuilder.appendFormalLine("// Base64 encoded");
+        // if (pkFieldName.equalsIgnoreCase(fieldName)) {
+        bodyBuilder
+                .appendFormalLine("if (pkFieldName.equalsIgnoreCase(fieldName)) {");
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("pkValues.put(fieldName, value);");
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-        // }
+        // rendered.put(fieldName, valueStr);
+        bodyBuilder.appendFormalLine("rendered.put(\"DT_RowId\", valueStr);");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
         // }
 
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-
-        bodyBuilder.appendFormalLine("// compute DT_RowId");
-        // if (pkFields.size() == 1) {
-        bodyBuilder.appendFormalLine("if (pkFields.size() > 1) {");
-        bodyBuilder.indent();
-        // rendered.put("DT_RowId",DatatablesUtils.encodeCompositePK(pkValues));
-        bodyBuilder.appendFormalLine(String.format(
-                "rendered.put(\"DT_RowId\",%s.encodeCompositePK(pkValues));",
-                getFinalTypeName(DATATABLES_UTILS)));
-        bodyBuilder.indentRemove();
-        // } else {
-        bodyBuilder.appendFormalLine("} else {");
-        bodyBuilder.indent();
-        // rendered.put("DT_RowId",
-        // (String)pkValues.values().iterator().next());
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("rendered.put(\"DT_RowId\", (String)pkValues.values().iterator().next());",
-                                getFinalTypeName(DATATABLES_UTILS)));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
