@@ -217,7 +217,7 @@ Updated ROOT/pom.xml [added property 'gvnix.version' = 'X.Y.Z']</programlisting>
     de un controlador de entidad es necesario ejecutar el comando <link
     linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add">web mvc datatables add</link>.</para>
 
-    <para xml:lang="es">Este comando añadide la anotación <classname>@GvNIXDatatables</classname> 
+    <para xml:lang="es">Este comando añade la anotación <classname>@GvNIXDatatables</classname> 
     al controller para generar los métodos necesario para gestionar las peticiones que
     realiza el widget.</para>
 
@@ -225,7 +225,7 @@ Updated ROOT/pom.xml [added property 'gvnix.version' = 'X.Y.Z']</programlisting>
     cambiar las rutas a los tagx utilizados para pintar la tabla a los instalados por
     el add-on en el directorio <filename>WEB-INF/tags/datatables</filename>.</para>
 
-    <para xml:lang="es">Este add-on incluye, además, incluye el comando <link
+    <para xml:lang="es">Este add-on incluye, además, el comando <link
     linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-all">web mvc datatables all</link>
     que aplica los cambios a todos los controllers de la aplicación.</para>
     
