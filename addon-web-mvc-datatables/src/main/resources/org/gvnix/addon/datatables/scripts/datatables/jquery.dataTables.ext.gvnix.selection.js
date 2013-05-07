@@ -235,7 +235,10 @@ var GvNIX_Selection;
 				isSelected = this.fnIsSelected(trId);
 			}
 			var nRow = this.fnGetRowById(trId);
-			this._fnUpdateRowTr(nRow, isSelected);
+			// Check if row is loaded
+			if (nRow){
+				this._fnUpdateRowTr(nRow, isSelected);
+			}
 		},
 
 		/**
@@ -248,8 +251,14 @@ var GvNIX_Selection;
 		 */
 		"fnRedrawVisibleRows" : function() {
 
-			var dt = this._data.dt, aoData = dt.aoData, aiDisplay = dt.aiDisplay, start = dt._iDisplayStart, end = dt
-					.fnDisplayEnd();
+			var dt = this._data.dt;
+			var aoData = dt.aoData, aiDisplay = dt.aiDisplay,
+			start = 0, end = aiDisplay.length;
+			
+			if (!dt.oFeatures.bServerSide) {
+				start = dt._iDisplayStart;
+				end = dt.fnDisplayEnd();
+			}
 
 			for ( var i = start; i < end; i++) {
 				var nRow = aoData[aiDisplay[i]].nTr;
@@ -261,9 +270,14 @@ var GvNIX_Selection;
 		 * Informs how many rows are selected and visible
 		 */
 		"fnVisibleRowsSelecteds" : function() {
-			var count = 0, dt = this._data.dt;
+			var dt = this._data.dt, count = 0;
 			var aoData = dt.aoData, aiDisplay = dt.aiDisplay,
-					start = dt._iDisplayStart, end = dt.fnDisplayEnd();
+			start = 0, end = aiDisplay.length;
+			
+			if (!dt.oFeatures.bServerSide) {
+				start = dt._iDisplayStart;
+				end = dt.fnDisplayEnd();
+			}
 
 			for ( var i = start; i < end; i++) {
 				var nRow = aoData[aiDisplay[i]].nTr;
@@ -346,8 +360,7 @@ var GvNIX_Selection;
 		 * 
 		 * WARNING: not supported if bServerSide datatables is set. See fnGetSelectionInfo.
 		 * 
-		 * @returns an array of selecte id or null if all registers
-		 * are selected.
+		 * @returns an array of selecte id.
 		 */
 		"fnGetSelectedIds" : function() {
 			var _d = this._data, dt = _d.dt;
@@ -370,6 +383,32 @@ var GvNIX_Selection;
 					if (!this._fnIdInList(id)){
 						result.push(id);
 					}	
+				}
+			}
+			return result;
+		},
+		
+		/**
+		 * Gets an array of all selected ids visibles in current page
+		 * 
+		 * @returns an array of selecte id or null if all registers
+		 * are selected.
+		 */
+		"fnGetVisibleSelectedIds" : function() {
+			var _d = this._data, dt = _d.dt;
+			var aoData = dt.aoData, aiDisplay = dt.aiDisplay,
+			start = 0, end = aiDisplay.length,
+			result = [];
+			
+			if (!dt.oFeatures.bServerSide) {
+				start = dt._iDisplayStart;
+				end = dt.fnDisplayEnd();
+			}
+
+			for ( var i = start; i < end; i++) {
+				var nRow = aoData[aiDisplay[i]].nTr;
+				if (this.fnIsSelected(nRow.id)) {
+					result.push(id);
 				}
 			}
 			return result;
@@ -417,7 +456,8 @@ var GvNIX_Selection;
 					// before add, check for multi options
 					if (!s.multiRow) {
 						// check for previso selection
-						if (this.fnSelectionCount() > 1) {
+						var count = this.fnSelectionCount();
+						if (count > 1) {
 							this.fnSelectNone(redraw, false);
 						} else if (count == 1) {
 							// TODO add info param

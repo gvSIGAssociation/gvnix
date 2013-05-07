@@ -26,7 +26,7 @@
   <jsp:directive.attribute name="selectionMultiRow" type="java.lang.Boolean" required="false" description="Enable selection on multiple rows" />
   <jsp:directive.attribute name="selectionByCheck" type="java.lang.Boolean" required="false" description="Use checkbox to select" />
   <jsp:directive.attribute name="selectionCheckCssClass" type="java.lang.String" required="false" description="Css class for selection checkbox" />
-  <jsp:directive.attribute name="selectionSelectedCssClass" type="java.lang.String" required="false" description="Css class for selected rows" />
+  <jsp:directive.attribute name="selectionSelectedCssClass" type="java.lang.String" required="false" description="Css class for selected rows [default: 'row_selected']" />
   <jsp:directive.attribute name="selectionNotSelectedCssClass" type="java.lang.String" required="false" description="Css class for not-selected rows" />
   <jsp:directive.attribute name="selectionInfoLabel" type="java.lang.String" required="false" description="Label to use for selection information (default 'datatables_selection_info')" />
   
@@ -315,6 +315,9 @@
   <!-- selection -->
   <c:choose>
     <c:when test="${selection}">
+      <c:if test="${empty selectionSelectedCssClass}">
+      	<c:set var="selectionSelectedCssClass" value="row_selected"/>
+      </c:if>
       <c:if test="${empty selectionMultiRow}">
       	<c:set var="selectionMultiRow" value="false"/>
       </c:if>
