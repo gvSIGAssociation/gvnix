@@ -95,17 +95,11 @@ public class DatatablesMetadata extends
     private static final JavaType MAP_STRING_STRING = new JavaType(
             MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, JavaType.STRING));
-    private static final JavaType MAP_STRING_OBJECT = new JavaType(
-            MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-            Arrays.asList(JavaType.STRING, JavaType.OBJECT));
 
-    private static final JavaType HASH_MAP = new JavaType(HashMap.class);
+    private static final JavaType HASHMAP = new JavaType(HashMap.class);
     private static final JavaType HASHMAP_STRING_STRING = new JavaType(
-            HASH_MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            HASHMAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, JavaType.STRING));
-    private static final JavaType HASHMAP_STRING_OBJECT = new JavaType(
-            HASH_MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-            Arrays.asList(JavaType.STRING, JavaType.OBJECT));
     /**
      * List<Map<String,String>>
      */

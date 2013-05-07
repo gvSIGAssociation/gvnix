@@ -102,6 +102,8 @@
   <!-- Prepare default values -->
   <!-- ====================== -->
   
+  <jsp:useBean id="datatables_javaScript_elements" class="java.util.HashMap" scope="request"/>
+  
   <!-- init custom api functions -->
   <c:set var="initCustionFunctionsCallbackId" value="${id}_init_custom_callbk"/>
   
@@ -207,7 +209,7 @@
 	      </spring:escapeBody>
       </c:set>
       <spring:url value="/resources/images/show.png" var="show_image_url" />
-	  <script type="text/javascript">
+      <c:set target="${datatables_javaScript_elements}" property="${showColumnId}">
 	    function ${showColumnId}(data, type, full) {
 		    var result =  
 	           '<a href="${urlPath}/'+full.${typeIdFieldName}+'" alt="${show_label}" title="${show_label}">'
@@ -216,7 +218,7 @@
 	           
 	        return result;
 		}	
-	  </script>
+	  </c:set>
   </c:if>
   
   <!-- create -->
@@ -232,7 +234,7 @@
       </spring:escapeBody>
     </c:set>
     <spring:url value="/resources/images/add.png" var="create_image_url" />
-	<script type="text/javascript">
+	<c:set target="${datatables_javaScript_elements}" property="${createButtonCallbackId}">
         function ${createButtonCallbackId}(oSettings, json) {
            var result =
                '<div class="gvnix_dataTables_createItem" style="float:left;margin-left:10px;">'
@@ -242,7 +244,7 @@
                + '</div>';
            $('#${id}_filter').before(result);
 	    }
-    </script>
+    </c:set>
   </c:if>
 
   <!-- update -->  
@@ -260,7 +262,7 @@
           </spring:escapeBody>
         </c:set>
         <spring:url value="/resources/images/update.png" var="update_image_url" />
-	    <script type="text/javascript">
+	    <c:set target="${datatables_javaScript_elements}" property="${updateColumnId}">
 	        function ${updateColumnId}(data, type, full) {
 	        	var result =
 	              '<a href="${urlPath}/'+full.${typeIdFieldName}+'?form" alt="${update_label}" title="${update_label}">'
@@ -268,7 +270,7 @@
 	               + '</a>';
 	            return result;
 		    }
-	      </script>
+	    </c:set>
       </c:if>  	
   </c:if>
   
@@ -292,7 +294,7 @@
         </c:set>        
         <spring:url value="/resources/images/delete.png" var="delete_image_url" />
         <!-- function to render cell -->
-	    <script type="text/javascript">
+	    <c:set target="${datatables_javaScript_elements}" property="${removeColumnId}">
 	        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
 	        function ${removeColumnId}(data, type, full) {
 	        	var result =
@@ -303,7 +305,7 @@
 	                
                 return result;
 		    }
-	     </script>
+	     </c:set>
      </c:if>
   </c:if>
   
@@ -331,14 +333,14 @@
       	</c:if>
     	<c:set var="selectionCheckColumnId" value="${id}_select_col"/>
     	<c:if test="${serverSide}">
-    		<script type="text/javascript">
+    		<c:set target="${datatables_javaScript_elements}" property="${selectionCheckColumnId}">
 	        function ${selectionCheckColumnId}(data, type, full) {
 	        	var result =
 	                '<input type="checkbox" class="${selectionCheckCssClass}" form="${selectionCheckColumnId}_form"/>';
 	                
                 return result;
 		    }
-	     	</script>
+	     	</c:set>
     	</c:if>
  	  </c:if>
     </c:when>
@@ -347,7 +349,13 @@
     	<c:set var="selectionByCheck" value="false"/>
     </c:otherwise>
   </c:choose>
-    
+  
+  <div id="${id}_gvnix_datatables">
+  <script type="text/javascript">
+		<c:forEach var="entry" items="${datatables_javaScript_elements}">
+		${entry.value}
+		</c:forEach>
+  </script>
   <datatables:table
 		id="${id}"
 		data="${data}"
@@ -509,7 +517,6 @@
   </datatables:table>
   
     <script type="text/javascript">
-		
 		<c:if test="${selection_none_link}">
 		/** selection support functions **/
 		function ${id}_selectNone(){
@@ -556,4 +563,5 @@
 	        </c:if>
 	    }
   </script>
+  </div>
 </jsp:root>
