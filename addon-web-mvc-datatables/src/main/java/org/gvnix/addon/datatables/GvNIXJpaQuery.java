@@ -26,9 +26,9 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation for generate information for create dynamic JPA query.<br>
- * This include information about filter and order properties to use in
- * fields which refer to other entities (one-to-many, many-to-many,
- * one-to-one and many-to-one properties).<br>
+ * This include information about filter and order properties to use in fields
+ * which refer to other entities (one-to-many, many-to-many, one-to-one and
+ * many-to-one properties).<br>
  * Entities than use this annotation must add it on entity <em>and</em> in every
  * relation-field to manage.<br>
  * Annotation applied to a non-supported field will be ignored.

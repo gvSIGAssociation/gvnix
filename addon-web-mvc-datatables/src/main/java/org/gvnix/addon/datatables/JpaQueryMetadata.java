@@ -370,9 +370,10 @@ public class JpaQueryMetadata extends
     }
 
     /**
-     * Return a new map with fields from <code>fields</code> which
-     * are relation properties.<br> Currently just discard primitives
-     * an java.lang types.
+     * Return a new map with fields from <code>fields</code> which are relation
+     * properties.<br>
+     * Currently just discard primitives an java.lang types.
+     * 
      * @param fields
      * @return
      */
@@ -403,8 +404,9 @@ public class JpaQueryMetadata extends
     private void buildGetOrderByDefinitionMethodBody(
             InvocableMemberBodyBuilder bodyBuilder,
             Map<FieldMetadata, AnnotationMetadata> fieldsToProcess) {
-        buildDefinitionMethodBody(bodyBuilder, getRelationFields(fieldsToProcess),
-                getOrderByField(), "orderBy");
+        buildDefinitionMethodBody(bodyBuilder,
+                getRelationFields(fieldsToProcess), getOrderByField(),
+                "orderBy");
     }
 
     /**
