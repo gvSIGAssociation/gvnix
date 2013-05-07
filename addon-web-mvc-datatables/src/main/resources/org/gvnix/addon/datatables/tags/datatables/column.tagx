@@ -30,6 +30,7 @@
   <jsp:directive.attribute name="display" type="java.lang.String" required="false" rtexprvalue="true" description="(ALL[,HTML|,XML|,CSV]) Comma-separated list of string which indicates in which view(s) the column's body will be displayed. (Default : ALL)" />
   <jsp:directive.attribute name="renderFunction" type="java.lang.String" required="false" rtexprvalue="true" description="Name of an external Javascript function that will be used to render the column (AJAX only)" />
   <jsp:directive.attribute name="format" type="java.lang.String" required="false" rtexprvalue="true" description="A MessageFormat pattern that will be used to format the property. (DOM only)" />
+  <jsp:directive.attribute name="visible" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable the display of the column. (Default : true)" />
   
   
   <!-- Default values -->
@@ -60,8 +61,7 @@
   	<c:set var="filterType" value="INPUT" />
   </c:if>
   <c:if test="${empty display}">
-  	<!--  <c:set var="display" value="ALL" />  XXX This must be enougth to show this column -->
-  	<c:set var="display" value="ALL,HTML,CSV,XML,XLS,XLSX,PDF,RTF,JSON" /> 
+  	<c:set var="display" value="ALL" />
   </c:if>
   
 
@@ -90,6 +90,7 @@
   		display="${display}"
   		renderFunction="${renderFunction}"
   		format="${format}"
+  		visible="${empty visible or visible}"
   		/>
 
 </jsp:root>
