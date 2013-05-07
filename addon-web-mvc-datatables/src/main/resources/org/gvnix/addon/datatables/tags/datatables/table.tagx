@@ -1,4 +1,6 @@
 <jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:table="urn:jsptagdir:/WEB-INF/tags/datatables" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:datatables="http://www.gvnix.org/gvnix-datatables" version="2.0">
+<jsp:directive.tag import="org.springframework.web.servlet.support.RequestContext"/>
+<jsp:directive.tag import="org.springframework.web.servlet.tags.RequestContextAwareTag"/>
   <jsp:directive.tag import="java.util.ArrayList" />
   <jsp:output omit-xml-declaration="yes" />
 
@@ -190,7 +192,8 @@
   	<c:set var="scrollY" value="300px"/>
   </c:if>
   <jsp:scriptlet>
-  	jspContext.setAttribute("locale", request.getLocale().getLanguage());
+  	jspContext.setAttribute("locale", ((RequestContext)jspContext
+            .getAttribute(RequestContextAwareTag.REQUEST_CONTEXT_PAGE_ATTRIBUTE)).getLocale());
   </jsp:scriptlet>
   <c:if test="${empty labels}">
   	<c:set var="labels" value="/resources/scripts/datatables/i18n/labels_${locale}.txt"/>
@@ -235,7 +238,7 @@
     </c:set>
     <spring:url value="/resources/images/add.png" var="create_image_url" />
 	<c:set target="${datatables_javaScript_elements}" property="${createButtonCallbackId}">
-        function ${createButtonCallbackId}(oSettings, json) {
+        function ${createButtonCallbackId}() {
            var result =
                '<div class="gvnix_dataTables_createItem" style="float:left;margin-left:10px;">'
                +'<a href="${urlPath}?form" alt="${create_label}" title="${create_label}">'
