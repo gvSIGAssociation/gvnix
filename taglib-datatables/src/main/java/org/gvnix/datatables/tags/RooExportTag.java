@@ -17,10 +17,8 @@
  */
 package org.gvnix.datatables.tags;
 
-import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
 
-import com.github.dandelion.datatables.jsp.tag.AbstractTableTag;
 import com.github.dandelion.datatables.jsp.tag.ExportTag;
 
 /**

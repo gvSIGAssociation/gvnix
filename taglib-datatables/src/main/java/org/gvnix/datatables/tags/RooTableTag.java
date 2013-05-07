@@ -337,5 +337,4 @@ public class RooTableTag extends TableTag {
     public void setConversionServiceId(String conversionServiceId) {
         this.conversionServiceId = conversionServiceId;
     }
-
 }

@@ -23,7 +23,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
 
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +54,7 @@ public class RooColumnTag extends ColumnTag {
     private static final long serialVersionUID = -7713119991577135048L;
 
     // Logger
+    @SuppressWarnings("unused")
     private static Logger logger = LoggerFactory.getLogger(RooColumnTag.class);
 
     /** Max displayed text length (default '-1'). Unlimited if negative. */
