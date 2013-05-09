@@ -50,6 +50,7 @@
     <module>util-datatables</module>
     <module>addon-web-mvc-datatables</module>
     <module>addon-dynamic-configuration</module>
+    <module>addon-jpa</module>
     <module>addon-web-i18n</module>
     <module>addon-web-menu</module>
     <module>addon-web-report</module>

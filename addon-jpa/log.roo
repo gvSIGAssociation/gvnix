@@ -1,0 +1,4 @@
+// Spring Roo 1.2.4.BUILD-SNAPSHOT [rev 0e876b7] log opened at 2013-05-08 12:21:56
+addon create advanced --topLevelPackage org.gvnix.addon.jpa.batch
+exit
+// Spring Roo 1.2.4.BUILD-SNAPSHOT [rev 0e876b7] log closed at 2013-05-08 12:23:42
