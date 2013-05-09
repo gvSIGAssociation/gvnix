@@ -47,6 +47,7 @@
     <!-- TODO: Modules order is important for googlecode repository upload (validate it) -->
     <module>support</module>
     <module>taglib-datatables</module>
+    <module>util-datatables</module>
     <module>addon-web-mvc-datatables</module>
     <module>addon-dynamic-configuration</module>
     <module>addon-web-i18n</module>

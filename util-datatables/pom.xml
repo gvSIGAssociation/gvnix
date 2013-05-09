@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <licenses>
+    <license>
+      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <distribution>repo</distribution>
+      <comments>
+      <![CDATA[
+      gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
+      Copyright (C) 2013 - Generalitat Valenciana
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program. If not, see <http://www.gnu.org/licenses />.
+      ]]>
+      </comments>
+    </license>
+  </licenses>
+  <parent>
+    <groupId>org.gvnix</groupId>
+    <artifactId>org.gvnix.root</artifactId>
+    <version>1.0.2-SNAPSHOT</version>
+  </parent>
+  <artifactId>org.gvnix.web.datatables</artifactId>
+  <packaging>jar</packaging>
+  <name>gvNIX - Dandelion-Datatables Utils</name>
+  <organization>
+    <name>Generalitat Valenciana</name>
+  </organization>
+  <description>Dandelion-DataTables utilities for Spring MVC based projects.</description>
+  <url>http://www.gvnix.org</url>
+
+  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
+  <properties>
+    <dandelion.version>0.8.12</dandelion.version>
+    <google.code.project.name>gvnix</google.code.project.name>
+    <gvnix.version>${project.parent.version}</gvnix.version>
+    <querydsl.version>3.1.1</querydsl.version>
+    <spring.version>3.2.0.RELEASE</spring.version>
+  </properties>
+
+  <dependencies>
+<!--
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.hibernate.javax.persistence</groupId>
+        <artifactId>hibernate-jpa-2.0-api</artifactId>
+        <version>1.0.1.Final</version>
+    </dependency>
+-->
+
+    <!-- Querydsl -->
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-core</artifactId>
+      <version>${querydsl.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.mysema.querydsl</groupId>
+          <artifactId>querydsl-codegen</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>    
+        
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-jpa</artifactId>
+      <version>${querydsl.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.mysema.querydsl</groupId>
+          <artifactId>querydsl-codegen</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- Dandelion - DataTables -->
+    <dependency>
+      <groupId>com.github.dandelion</groupId>
+      <artifactId>datatables-core</artifactId>
+      <version>${dandelion.version}</version>
+    </dependency>
+
+    <!-- Spring -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+
+  </dependencies>
+  
+  <!-- DiSiD: Add google code distribution management -->
+  <distributionManagement>
+    <repository>
+      <id>Google Code</id>
+      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
+    </repository>
+  </distributionManagement>
+
+  <build>
+  
+    <!-- DiSiD: Add webdav extension to google code  -->
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav-jackrabbit</artifactId>
+        <version>2.3</version>
+      </extension>
+    </extensions>
+
+	  <!-- DiSiD: Add build resources filtering -->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/addon/*/configuration.xml</exclude>
+          <!-- JS plugins version  -->
+          <exclude>**/addon/*/*.gvnix.*.js</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/addon/*/configuration.xml</include>
+          <!-- JS plugins version -->
+          <include>**/addon/*/*.gvnix.*.js</include>
+        </includes>
+      </resource>
+    </resources>
+
+  </build>
+  
+</project>
