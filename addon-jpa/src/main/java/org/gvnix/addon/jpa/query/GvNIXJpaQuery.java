@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
  */
-package org.gvnix.addon.datatables;
+package org.gvnix.addon.jpa.query;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;

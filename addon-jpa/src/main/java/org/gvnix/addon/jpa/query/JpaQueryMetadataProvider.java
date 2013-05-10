@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
  */
-package org.gvnix.addon.datatables;
+package org.gvnix.addon.jpa.query;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
@@ -86,7 +86,7 @@ public final class JpaQueryMetadataProvider extends AbstractItdMetadataProvider 
      * will be **_ROO_Jpafilter.aj
      */
     public String getItdUniquenessFilenameSuffix() {
-        return "Jpafilter";
+        return "GvNIXJpaQuery";
     }
 
     protected String getGovernorPhysicalTypeIdentifier(
