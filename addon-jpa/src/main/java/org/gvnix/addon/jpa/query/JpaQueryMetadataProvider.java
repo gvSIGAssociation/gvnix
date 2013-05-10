@@ -33,6 +33,7 @@ import org.springframework.roo.project.LogicalPath;
  * services needed by the metadata type. Register metadata triggers and
  * dependencies here. Also define the unique add-on ITD identifier.
  * 
+ * @author gvNIX Team
  * @since 1.1
  */
 @Component

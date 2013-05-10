@@ -33,7 +33,6 @@ import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
@@ -45,31 +44,18 @@ import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
 
 /**
- * Implementation of operations this add-on offers.
+ * Implementation of {@link JpaBatchOperations}
  * 
  * @since 1.1
  */
 @Component
-// Use these Apache Felix annotations to register your commands class in the Roo
-// container
 @Service
 public class JpaBatchOperationsImpl implements JpaBatchOperations {
 
-    /**
-     * Use ProjectOperations to install new dependencies, plugins, properties,
-     * etc into the project configuration
-     */
     @Reference private ProjectOperations projectOperations;
 
-    /**
-     * Use TypeLocationService to find types which are annotated with a given
-     * annotation in the project
-     */
     @Reference private TypeLocationService typeLocationService;
 
-    /**
-     * Use TypeManagementService to change types
-     */
     @Reference private TypeManagementService typeManagementService;
 
     @Reference private PathResolver pathResolver;
@@ -82,7 +68,8 @@ public class JpaBatchOperationsImpl implements JpaBatchOperations {
     }
 
     /**
-     * Generates a JavaType for <code>entity</code>
+     * Generates new a JavaType for batch service class based on
+     * <code>entity</code> class name.
      * 
      * @param entity
      * @param targetPackage if null uses <code>entity</code> package
@@ -141,6 +128,7 @@ public class JpaBatchOperationsImpl implements JpaBatchOperations {
                         .getPhysicalTypeCanonicalPath(declaredByMetadataId));
         Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
                 target);
+        
         // Prepare class builder
         final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                 declaredByMetadataId, modifier, target,

@@ -32,7 +32,6 @@ import org.springframework.roo.addon.jpa.activerecord.JpaCrudAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
@@ -49,11 +48,9 @@ import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
 
 /**
- * This type produces metadata for a new ITD. It uses an
- * {@link ItdTypeDetailsBuilder} provided by
- * {@link AbstractItdTypeDetailsProvidingMetadataItem} to register a field in
- * the ITD and a new method.
+ * ITD generator for {@link GvNIXJpaBatch} annotation.
  * 
+ * @author gvNIX Team
  * @since 1.1.0
  */
 public class JpaBatchMetadata extends
@@ -282,6 +279,14 @@ public class JpaBatchMetadata extends
                 "NOT IN");
     }
 
+    /**
+     * Return method to delete entity based on a
+     * list of pks of the entity 
+     * 
+     * @param methodName for generated method
+     * @param condition to use in delete-by-list operation
+     * @return
+     */
     private MethodMetadata getDeleteByIdsListMethod(JavaSymbolName methodName,
             String condition) {
         FieldMetadata identifier = identifiers.get(0);
@@ -353,8 +358,6 @@ public class JpaBatchMetadata extends
                 methodName,
                 AnnotatedJavaType.convertFromAnnotatedJavaTypes(paramTypes));
     }
-
-    // Typically, no changes are required beyond this point
 
     public String toString() {
         final ToStringBuilder builder = new ToStringBuilder(this);

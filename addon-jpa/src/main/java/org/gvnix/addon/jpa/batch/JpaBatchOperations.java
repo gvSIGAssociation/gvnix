@@ -21,9 +21,10 @@ import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 
 /**
- * Interface of operations this add-on offers. Typically used by a command type
- * or an external add-on.
+ * <code>jpa batch</code> operations. Offers a API for all supported operations
+ * for batch services for JPA Active Records entities
  * 
+ * @author gvNIX Team
  * @since 1.1
  */
 public interface JpaBatchOperations {

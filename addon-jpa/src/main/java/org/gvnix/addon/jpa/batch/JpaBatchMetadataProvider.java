@@ -42,11 +42,11 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 
 /**
- * Provides {@link JpaBatchMetadata}. This type is called by Roo to retrieve the
- * metadata for this add-on. Use this type to reference external types and
- * services needed by the metadata type. Register metadata triggers and
- * dependencies here. Also define the unique add-on ITD identifier.
+ * Provides {@link JpaBatchMetadata}. Prepares all required information to
+ * construct a new instance of {@link JpaBatchMetadata}. Also register metadata
+ * dependencies.
  * 
+ * @author gvNIX Team
  * @since 1.1
  */
 @Component
