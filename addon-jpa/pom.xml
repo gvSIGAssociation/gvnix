@@ -34,11 +34,11 @@
   </parent>
   <artifactId>org.gvnix.addon.jpa</artifactId>
   <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - JPA services</name>
+  <name>gvNIX - Spring Roo - Addon - JPA layer services</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>
-  <description>Generates services for batch modification of jpa entities</description>
+  <description>GvNIX functionalities for JPA layer</description>
   <url>http://www.gvnix.org</url>
 
   <dependencies>
@@ -69,11 +69,6 @@
     <dependency>
       <groupId>org.gvnix</groupId>
       <artifactId>org.gvnix.support</artifactId>
-      <version>${gvnix.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.web.i18n.roo.addon</artifactId>
       <version>${gvnix.version}</version>
     </dependency>
   </dependencies>
