@@ -58,6 +58,7 @@ import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlUtils;
@@ -376,6 +377,14 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             projectOperations.addRepositories(
                     projectOperations.getFocusedModuleName(),
                     Collections.singleton(new Repository(repo)));
+        }
+
+        // Install properties
+        List<Element> properties = XmlUtils.findElements(
+                "/configuration/gvnix/properties/*", configuration);
+        for (Element property : properties) {
+            projectOperations.addProperty(projectOperations
+                    .getFocusedModuleName(), new Property(property));
         }
 
         // Install dependencies

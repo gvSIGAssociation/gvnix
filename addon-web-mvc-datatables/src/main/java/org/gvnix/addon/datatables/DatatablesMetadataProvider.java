@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.jpa.query.JpaQueryMetadata;
 import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
@@ -110,6 +111,12 @@ public final class DatatablesMetadataProvider extends
         WebJpaBatchMetadata webJpaBatchMetadata = (WebJpaBatchMetadata) metadataService
                 .get(webJpaBatchMetadataId);
 
+        // Get jpa query metadata
+        String jpaQueryMetadataId = JpaQueryMetadata.createIdentifier(entity,
+                path);
+        JpaQueryMetadata jpaQueryMetadata = (JpaQueryMetadata) metadataService
+                .get(jpaQueryMetadataId);
+
         List<FieldMetadata> identifiers = persistenceMemberLocator
                 .getIdentifierFields(entity);
 
@@ -134,7 +141,7 @@ public final class DatatablesMetadataProvider extends
         return new DatatablesMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, entity,
                 identifiers, plural, entityManagerMethodName, hasDateTypes,
-                webScaffoldAspectName, webJpaBatchMetadata);
+                webScaffoldAspectName, webJpaBatchMetadata, jpaQueryMetadata);
     }
 
     /**

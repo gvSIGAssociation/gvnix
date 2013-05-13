@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.gvnix.support.ItdBuilderHelper;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
@@ -88,10 +89,10 @@ public class JpaQueryMetadata extends
     private static final JavaType ARRAYS = new JavaType(Arrays.class);
 
     public static final JavaSymbolName GET_FILTERBY_DEFINITION = new JavaSymbolName(
-            "getJpaQueryFilterBy");
+            "getFilterByAssociations");
 
     public static final JavaSymbolName GET_ORDERBY_DEFINITION = new JavaSymbolName(
-            "getJpaQueryOrderBy");
+            "getOrderByAssociations");
 
     // Constants
     private static final String PROVIDES_TYPE_STRING = JpaQueryMetadata.class
@@ -134,11 +135,19 @@ public class JpaQueryMetadata extends
      */
     private FieldMetadata orderByField;
 
+    /**
+     * ITD generation helper
+     */
+    private final ItdBuilderHelper helper;
+
     public JpaQueryMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
+
+        this.helper = new ItdBuilderHelper(this,
+                builder.getImportRegistrationResolver());
 
         Map<FieldMetadata, AnnotationMetadata> fieldsToProcess = new HashMap<FieldMetadata, AnnotationMetadata>();
         // Locate field with @GvNIXJpaFilterProperty
@@ -295,9 +304,9 @@ public class JpaQueryMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, GET_FILTERBY_DEFINITION,
-                MAP_STRING_LIST_STRING, parameterTypes, parameterNames,
-                bodyBuilder);
+                getId(), Modifier.PUBLIC + Modifier.STATIC,
+                GET_FILTERBY_DEFINITION, MAP_STRING_LIST_STRING,
+                parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
 
@@ -428,21 +437,26 @@ public class JpaQueryMetadata extends
         bodyBuilder.indent();
         // Map<String, List<String>> tmp = new HashMap<String, List<String>>();
         bodyBuilder.appendFormalLine(String.format("%s tmp = new %s();",
-                getFinalTypeName(MAP_STRING_LIST_STRING),
-                getFinalTypeName(HASHMAP_STRING_LIST_STRING)));
+                helper.getFinalTypeName(MAP_STRING_LIST_STRING),
+                helper.getFinalTypeName(HASHMAP_STRING_LIST_STRING)));
         for (Entry<FieldMetadata, AnnotationMetadata> entry : fieldsToProcess
                 .entrySet()) {
-            // tmp.put("owner",
-            // Collections.unmodifiableList(
-            // Arrays.asList( new String[] {"firstName", "city"} )));
             List<String> properties = new ArrayList<String>();
-            AnnotationAttributeValue<List<StringAttributeValue>> curValue = entry
-                    .getValue().getAttribute(annotationAttribute);
+            AnnotationAttributeValue<?> curValue = entry.getValue()
+                    .getAttribute(annotationAttribute);
             if (curValue == null) {
                 continue;
             }
-            for (StringAttributeValue property : curValue.getValue()) {
-                properties.add("\"".concat(property.getValue()).concat("\""));
+            if (curValue instanceof StringAttributeValue) {
+                properties.add("\"".concat((String) curValue.getValue())
+                        .concat("\""));
+            }
+            else {
+                for (StringAttributeValue property : (List<StringAttributeValue>) curValue
+                        .getValue()) {
+                    properties.add("\"".concat(property.getValue())
+                            .concat("\""));
+                }
             }
 
             bodyBuilder
@@ -450,14 +464,14 @@ public class JpaQueryMetadata extends
                             .format("tmp.put(\"%s\", %s.unmodifiableList(%s.asList( new String[] {%s} )));",
                                     entry.getKey().getFieldName()
                                             .getSymbolName(),
-                                    getFinalTypeName(COLLECTIONS),
-                                    getFinalTypeName(ARRAYS),
+                                    helper.getFinalTypeName(COLLECTIONS),
+                                    helper.getFinalTypeName(ARRAYS),
                                     StringUtils.join(properties, ",")));
         }
         // filterByAssociations = Collections.unmodifiableMap(tmp);
         bodyBuilder.appendFormalLine(String.format(
                 "%s = %s.unmodifiableMap(tmp);", fieldName,
-                getFinalTypeName(COLLECTIONS)));
+                helper.getFinalTypeName(COLLECTIONS)));
         // }
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
@@ -486,14 +500,20 @@ public class JpaQueryMetadata extends
     }
 
     /**
-     * Gets final names to use of a type in method body after import resolver.
+     * Gets symbol name of method to get FilterBy definitions
      * 
-     * @param type
-     * @return name to use in method body
+     * @return
      */
-    private String getFinalTypeName(JavaType type) {
-        return type.getNameIncludingTypeParameters(false,
-                builder.getImportRegistrationResolver());
+    public JavaSymbolName getFilterByMethodName() {
+        return GET_FILTERBY_DEFINITION;
     }
 
+    /**
+     * Gets symbol name of method to get OrderBy definitions
+     * 
+     * @return
+     */
+    public JavaSymbolName getOrderByMethodName() {
+        return GET_ORDERBY_DEFINITION;
+    }
 }

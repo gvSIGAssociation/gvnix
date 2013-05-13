@@ -17,7 +17,23 @@
  */
 package org.gvnix.addon.datatables;
 
-import static org.gvnix.addon.datatables.DatatablesConstants.*;
+import static org.gvnix.addon.datatables.DatatablesConstants.AUTOWIRED;
+import static org.gvnix.addon.datatables.DatatablesConstants.CONVERSION_SERVICE;
+import static org.gvnix.addon.datatables.DatatablesConstants.CRITERIA_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_CRITERIA_TYPE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_PARAMS;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_RESPONSE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATA_SET_MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.GET_DATATABLES_DATA;
+import static org.gvnix.addon.datatables.DatatablesConstants.GET_DATATABLES_DATA_RETURN;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_DATATABLES;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_ROO;
+import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_AJAX_DATATABLES;
+import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_BATCH_SUPPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_METHOD;
+import static org.gvnix.addon.datatables.DatatablesConstants.SEARCH_RESULTS;
+import static org.gvnix.addon.datatables.DatatablesConstants.UI_MODEL;
 import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.SpringJavaType.MODEL;
 import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
@@ -27,13 +43,13 @@ import static org.springframework.roo.model.SpringJavaType.RESPONSE_BODY;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.gvnix.addon.jpa.query.JpaQueryMetadata;
 import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.gvnix.support.WebItdBuilderHelper;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
@@ -51,7 +67,6 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.model.JdkJavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.logging.HandlerUtils;
 
@@ -104,9 +119,10 @@ public class DatatablesMetadata extends
     private final DatatablesAnnotationValues annotationValues;
 
     /**
-     * Entity properties which compound its identifier
+     * Entity property which is its identifier (as roo only use one property,
+     * this includes the embedded pks)
      */
-    private final List<FieldMetadata> identifierProperties;
+    private final FieldMetadata entityIdentifier;
 
     /**
      * Related entity
@@ -124,14 +140,14 @@ public class DatatablesMetadata extends
     private final JavaSymbolName entityEntityManagerMethod;
 
     /**
-     * If related entity has date types
-     */
-    private final boolean entityHasDateTypes;
-
-    /**
      * Batch services metadata
      */
     private final WebJpaBatchMetadata webJpaBatchMetadata;
+
+    /**
+     * Jpa Query metadata
+     */
+    private final JpaQueryMetadata jpaQueryMetadata;
 
     /**
      * Field which holds conversionService
@@ -159,7 +175,8 @@ public class DatatablesMetadata extends
             List<FieldMetadata> identifierProperties, String entityPlural,
             JavaSymbolName entityManagerMethodName, boolean hasDateTypes,
             JavaType webScaffoldAspectName,
-            WebJpaBatchMetadata webJpaBatchMetadata) {
+            WebJpaBatchMetadata webJpaBatchMetadata,
+            JpaQueryMetadata jpaQueryMetadata) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -169,13 +186,13 @@ public class DatatablesMetadata extends
         this.helper = new WebItdBuilderHelper(this,
                 builder.getImportRegistrationResolver());
 
-        this.identifierProperties = Collections
-                .unmodifiableList(identifierProperties);
+        // Roo only uses one property
+        this.entityIdentifier = identifierProperties.get(0);
         this.entity = entity;
         this.entityPlural = entityPlural;
         this.entityEntityManagerMethod = entityManagerMethodName;
-        this.entityHasDateTypes = hasDateTypes;
         this.webJpaBatchMetadata = webJpaBatchMetadata;
+        this.jpaQueryMetadata = jpaQueryMetadata;
 
         // Adding precedence declaration
         // This aspect before webScaffold
@@ -187,7 +204,6 @@ public class DatatablesMetadata extends
         builder.addField(getHasBatchSupportField());
 
         // Adding methods definition
-        builder.addMethod(getRenderForDatatablesMethod());
         builder.addMethod(getGetDatatablesDataMethod());
         builder.addMethod(getListDatatablesRequestMethod());
         builder.addMethod(getListRooRequestMethod());
@@ -530,371 +546,76 @@ public class DatatablesMetadata extends
      */
     private void buildGetDatatablesDataMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        // List<Map<String, String>> renderedPets = new ArrayList<Map<String,
-        // String>>(0);;
-        bodyBuilder.appendFormalLine(String.format("%s rendered = new %s(0);",
-                helper.getFinalTypeName(LIST_MAP_STRING_STRING),
-                helper.getFinalTypeName(RENDER_FOR_DATATABLES_RETURN_IMP)));
+        // Prepares associations information
+        String filterByInfo = "null";
+        String orderByInfo = "null";
+        final String entityFinalName = helper.getFinalTypeName(entity);
+        if (jpaQueryMetadata != null) {
+            filterByInfo = String.format("%s.%s()", entityFinalName,
+                    jpaQueryMetadata.getFilterByMethodName().getSymbolName());
+            orderByInfo = String.format("%s.%s()", entityFinalName,
+                    jpaQueryMetadata.getOrderByMethodName().getSymbolName());
+        }
 
-        JavaType findResult = new JavaType(
-                DATATABLES_UTILS_RESULT.getFullyQualifiedTypeName(), 0,
-                DataType.TYPE, null, Arrays.asList(entity));
+        JavaType serachResult = new JavaType(
+                SEARCH_RESULTS.getFullyQualifiedTypeName(), 0, DataType.TYPE,
+                null, Arrays.asList(entity));
 
-        // FindResult<Pet> findResult =
-        // DatatablesUtils.findByCriteria(Pet.class, Pet.entityManager(),
-        // criterias);
+        // SearchResults<Pet> searchResult =
+        // DatatablesUtils.findByCriteria(Pet.class,
+        // Pet.getFilterByAssociations(), Pet.getOrderByAssociations(),
+        // Pet.entityManager(), criterias);
+
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.%s(), %s);",
+                                helper.getFinalTypeName(serachResult),
+                                helper.getFinalTypeName(DATATABLES_UTILS),
+                                entityFinalName, filterByInfo, orderByInfo,
+                                entityFinalName,
+                                entityEntityManagerMethod.getSymbolName(),
+                                CRITERIA_PARAM_NAME.getSymbolName()));
+
+        bodyBuilder.appendFormalLine("");
+        // long totalRecords = Pet.countPets();
         bodyBuilder.appendFormalLine(String.format(
-                "%s findResult = %s.findByCriteria(%s.class, %s.%s(), %s);",
-                helper.getFinalTypeName(findResult),
-                helper.getFinalTypeName(DATATABLES_UTILS),
-                helper.getFinalTypeName(entity),
-                helper.getFinalTypeName(entity),
-                entityEntityManagerMethod.getSymbolName(),
-                CRITERIA_PARAM_NAME.getSymbolName()));
-
-        JavaType objectList = new JavaType(LIST.getFullyQualifiedTypeName(), 0,
-                DataType.TYPE, null, Arrays.asList(entity));
-        // List<Pet> petList = findResult.getResult();
-        String itemListVar = StringUtils.uncapitalize(
-                entity.getSimpleTypeName()).concat("List");
-        bodyBuilder.appendFormalLine(String.format(
-                "%s %s = findResult.getResult();",
-                helper.getFinalTypeName(objectList), itemListVar));
-        // if (petList != null) {
-        bodyBuilder.appendFormalLine(String.format("if (%s != null) {",
-                itemListVar));
-        bodyBuilder.indent();
-        // rendered = renderForDatatables(petList,criterias,uiModel);
-        bodyBuilder.appendFormalLine(String.format("rendered = %s(%s,%s,%s);",
-                RENDER_FOR_DATATABLES.getSymbolName(), itemListVar,
-                CRITERIA_PARAM_NAME.getSymbolName(), UI_MODEL.getSymbolName()));
-
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
+                "long totalRecords = %s.count%s();", entityFinalName,
+                entityPlural));
 
         // long recordsFound = findResult.getTotalResultCount();
-        bodyBuilder
-                .appendFormalLine("long recordsFound = findResult.getTotalResultCount();");
-
-        JavaType dataSet = new JavaType(
-                "com.github.dandelion.datatables.core.ajax.DataSet", 0,
-                DataType.TYPE, null, Arrays.asList(MAP_STRING_STRING));
-
-        // DataSet<Map<String, String>> dataSet = new DataSet<Map<String,
-        // String>>(rendered, Pet.countPets(), recordsFound);
         bodyBuilder.appendFormalLine(String.format(
-                "%s dataSet =  new %1$s(rendered,%s.count%s(),recordsFound);",
-                helper.getFinalTypeName(dataSet),
-                helper.getFinalTypeName(entity), entityPlural));
+                "long recordsFound = searchResult.getTotalResultCount();",
+                entityFinalName, entityPlural));
 
-        // return DatatablesResponse.build(dataSet, criterias);
+        bodyBuilder.appendFormalLine("");
+        bodyBuilder.appendFormalLine("// Entity pk field name");
+
+        // String pkFieldName = "id";
+        bodyBuilder.appendFormalLine(String.format(
+                "String pkFieldName = \"%s\";", entityIdentifier.getFieldName()
+                        .getSymbolName()));
+
+        bodyBuilder.appendFormalLine("");
+        /*
+         * DataSet<Map<String, String>> dataSet =
+         * DatatablesUtils.populateDataSet(searchResult.getResult(),
+         * pkFieldName, totalRecords, recordsFound, criterias.getColumnDefs(),
+         * null, conversionService_datatables);
+         */
+
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("%s dataSet = %s.populateDataSet(searchResult.getResults(), pkFieldName, totalRecords, recordsFound, criterias.getColumnDefs(), null, %s); ",
+                                helper.getFinalTypeName(DATA_SET_MAP_STRING_STRING),
+                                helper.getFinalTypeName(DATATABLES_UTILS),
+                                getConversionServiceField().getFieldName()
+                                        .getSymbolName()));
+
+        // return DatatablesResponse.build(dataSet,criterias);
         bodyBuilder.appendFormalLine(String.format(
                 "return %s.build(dataSet,%s);",
                 helper.getFinalTypeName(DATATABLES_RESPONSE),
                 CRITERIA_PARAM_NAME.getSymbolName()));
-    }
-
-    /**
-     * Returns <code>renderForDatatables</code> method
-     * 
-     * @return
-     */
-    private MethodMetadata getRenderForDatatablesMethod() {
-        // Define method parameter types
-        JavaType objectList = new JavaType(LIST.getFullyQualifiedTypeName(), 0,
-                DataType.TYPE, null, Arrays.asList(entity));
-        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
-                .convertFromJavaTypes(objectList, DATATABLES_CRITERIA_TYPE,
-                        MODEL);
-
-        // Check if a method with the same signature already exists in the
-        // target type
-        final MethodMetadata method = methodExists(RENDER_FOR_DATATABLES,
-                parameterTypes);
-        if (method != null) {
-            // If it already exists, just return the method and omit its
-            // generation via the ITD
-            return method;
-        }
-
-        // Define method annotations (none in this case)
-        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
-
-        // Define method throws types (none in this case)
-        List<JavaType> throwsTypes = new ArrayList<JavaType>();
-
-        // Define method parameter names
-        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-        parameterNames.add(ITEM_LIST_PARAM_NAME);
-        parameterNames.add(CRITERIA_PARAM_NAME);
-        parameterNames.add(UI_MODEL);
-
-        // Create the method body
-        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildRenderForDatatablesMethodBody(bodyBuilder);
-
-        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
-        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, RENDER_FOR_DATATABLES,
-                RENDER_FOR_DATATABLES_RETURN, parameterTypes, parameterNames,
-                bodyBuilder);
-        methodBuilder.setAnnotations(annotations);
-        methodBuilder.setThrowsTypes(throwsTypes);
-
-        return methodBuilder.build(); // Build and return a MethodMetadata
-                                      // instance
-    }
-
-    /**
-     * Build method body for <code>renderForDatatables</code> method
-     * 
-     * @param bodyBuilder
-     */
-    private void buildRenderForDatatablesMethodBody(
-            InvocableMemberBodyBuilder bodyBuilder) {
-        // Get logger to trace data load problems
-        // Logger logger = Logger.getLogger(getClass().getName());
-        bodyBuilder.appendFormalLine(String.format(
-                "%1$s logger = %1$s.getLogger(getClass().getName());",
-                helper.getFinalTypeName(LOGGER_TYPE)));
-
-        bodyBuilder.appendFormalLine("");
-        bodyBuilder.appendFormalLine("// Prepare result var");
-        // List<Map<String, String>> result = new
-        // ArrayList<Map<String,String>>(pets.size());
-        bodyBuilder.appendFormalLine(String.format(
-                "%s result = new %s(%s.size());",
-                helper.getFinalTypeName(RENDER_FOR_DATATABLES_RETURN),
-                helper.getFinalTypeName(RENDER_FOR_DATATABLES_RETURN_IMP),
-                ITEM_LIST_PARAM_NAME.getSymbolName()));
-
-        // Roo use only one filed as pk
-        // (if it's composite use a embeddedPk)
-        bodyBuilder.appendFormalLine("// Prepare primaryKey fields");
-        // String pkFieldName = "id";
-        bodyBuilder.appendFormalLine(String.format("%s pkFieldName = \"%s\";",
-                helper.getFinalTypeName(JavaType.STRING), identifierProperties
-                        .get(0).getFieldName().getSymbolName()));
-
-        bodyBuilder.appendFormalLine("");
-        bodyBuilder.appendFormalLine("// Prepare required fields");
-        // Set<String> fields = new HashSet<String>();
-        bodyBuilder.appendFormalLine(String.format("%s fields = new %s();",
-                helper.getFinalTypeName(SET_STRING),
-                helper.getFinalTypeName(HASHSET_STRING)));
-        // fields.add( pkFieldName );
-        bodyBuilder.appendFormalLine("fields.add(pkFieldName);");
-
-        bodyBuilder.appendFormalLine("");
-        bodyBuilder.appendFormalLine("// Add fields from request");
-        // for (ColumnDef colum : criterias.getColumnDefs()){
-        bodyBuilder.appendFormalLine(String.format(
-                "for (%s colum : %s.getColumnDefs()){",
-                helper.getFinalTypeName(DATATABLES_COLUMNDEF),
-                CRITERIA_PARAM_NAME.getSymbolName()));
-        bodyBuilder.indent();
-        // fields.add(colum.getName());
-        bodyBuilder.appendFormalLine("fields.add(colum.getName());");
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-
-        bodyBuilder.appendFormalLine("");
-        bodyBuilder.appendFormalLine("// Date formaters");
-        // DateFormat defaultFormat = SimpleDateFormat.getDateInstance();
-        bodyBuilder.appendFormalLine(String.format(
-                "%s defaultFormat = %s.getDateInstance();",
-                helper.getFinalTypeName(DATE_FORMAT),
-                helper.getFinalTypeName(SIMPLE_DATE_FORMAT)));
-
-        // If entity has date attributes use addDateTimeFormatPatterns method
-        // to initialize formatters
-        if (entityHasDateTypes) {
-            bodyBuilder
-                    .appendFormalLine(String.format(
-                            "addDateTimeFormatPatterns(%s);",
-                            UI_MODEL.getSymbolName()));
-        }
-
-        bodyBuilder.appendFormalLine("");
-        bodyBuilder.appendFormalLine("// Load result");
-        // Map<String, String> rendered = null;
-        bodyBuilder.appendFormalLine(String.format("%s rendered = null;",
-                helper.getFinalTypeName(MAP_STRING_STRING)));
-        String itemVar = StringUtils.uncapitalize(entity.getSimpleTypeName());
-        // for (Pet pet : pets) {
-        bodyBuilder.appendFormalLine(String.format("for (%s %s : %s) {",
-                helper.getFinalTypeName(entity), itemVar,
-                ITEM_LIST_PARAM_NAME.getSymbolName()));
-        bodyBuilder.indent();
-        // rendered = new HashMap<String, String>(fields.size());
-        bodyBuilder.appendFormalLine(String.format(
-                "rendered = new %s(fields.size());",
-                helper.getFinalTypeName(HASHMAP_STRING_STRING)));
-        String itemVarBean = itemVar.concat("Bean");
-        // BeanWrapper petBean = new BeanWrapperImpl(pet);
-        bodyBuilder
-                .appendFormalLine(String.format("%s %s = new %s(%s);", helper
-                        .getFinalTypeName(new JavaType(
-                                "org.springframework.beans.BeanWrapper")),
-                        itemVarBean, helper.getFinalTypeName(new JavaType(
-                                "org.springframework.beans.BeanWrapperImpl")),
-                        itemVar));
-        // for (String fieldName : fields){
-        bodyBuilder.appendFormalLine("for (String fieldName : fields) {");
-        bodyBuilder.indent();
-
-        bodyBuilder.append("");
-        // check if property exists (trace it else)
-        bodyBuilder
-                .appendFormalLine("// check if property exists (trace it else)");
-        // if (!petBean.isReadableProperty(fieldName)){
-        bodyBuilder.appendFormalLine(String.format(
-                "if (!%s.isReadableProperty(fieldName)) {", itemVarBean));
-        bodyBuilder.indent();
-        // logger.finer("Property '".concat(fieldName).concat("' not found in bean."));
-        bodyBuilder
-                .appendFormalLine("logger.finer(\"Property '\".concat(fieldName).concat(\"' not found in bean.\"));");
-        // continue;
-        bodyBuilder.appendFormalLine("continue;");
-        bodyBuilder.indentRemove();
-        // }
-        bodyBuilder.appendFormalLine("}");
-
-        // Object value = null;
-        bodyBuilder.appendFormalLine("Object value = null;");
-
-        // String valueStr = null;
-        bodyBuilder.appendFormalLine("String valueStr = null;");
-
-        // try {
-        bodyBuilder.appendFormalLine("try {");
-        bodyBuilder.indent();
-
-        // value = petBean.getPropertyValue(fieldName);
-        bodyBuilder.appendFormalLine(String.format(
-                "value = %s.getPropertyValue(fieldName);", itemVarBean));
-
-        String conversionService = getConversionServiceField().getFieldName()
-                .getSymbolName();
-
-        // if (Calencar.class.isAssignableFrom(value.getClass())) {
-        bodyBuilder.appendFormalLine(String.format(
-                "if (%s.class.isAssignableFrom(value.getClass())) {",
-                helper.getFinalTypeName(JdkJavaType.CALENDAR)));
-        bodyBuilder.indent();
-        // value = ((Calendar) value).getTime();
-        bodyBuilder.appendFormalLine(String.format(
-                "value = ((%s) value).getTime();",
-                helper.getFinalTypeName(JdkJavaType.CALENDAR)));
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-
-        // if (Date.class.isAssignableFrom(value.getClass())) {
-        bodyBuilder.appendFormalLine(String.format(
-                "if (%s.class.isAssignableFrom(value.getClass())) {",
-                helper.getFinalTypeName(JdkJavaType.DATE)));
-        bodyBuilder.indent();
-        if (entityHasDateTypes) {
-            // String pattern = (String)
-            // uiModel.asMap().get("pet_".concat(fieldName.toLowerCase()).concat("_date_format"));
-            bodyBuilder
-                    .appendFormalLine(String
-                            .format("String pattern = (String) uiModel.asMap().get(\"%s_\".concat(fieldName.toLowerCase()).concat(\"_date_format\"));",
-                                    StringUtils.uncapitalize(entity
-                                            .getSimpleTypeName())));
-            // DateFormat format = StringUtils.isBlank(pattern) ? defaultFormat
-            // : new SimpleDateFormat(pattern);
-            bodyBuilder
-                    .appendFormalLine(String
-                            .format("%s format = %s.isBlank(pattern) ? defaultFormat : new %s(pattern);",
-                                    helper.getFinalTypeName(DATE_FORMAT),
-                                    helper.getFinalTypeName(STRING_UTILS),
-                                    helper.getFinalTypeName(SIMPLE_DATE_FORMAT),
-                                    StringUtils.uncapitalize(entity
-                                            .getSimpleTypeName())));
-            // valueStr = format.format(value);
-            bodyBuilder.appendFormalLine("valueStr = format.format(value);");
-        }
-        else {
-            // valueStr = defaultFormat.format(value);
-            bodyBuilder
-                    .appendFormalLine("valueStr = defaultFormat.format(value);");
-        }
-
-        bodyBuilder.indentRemove();
-        // } else if (conversionService.canConvert(value.getClass(),
-        // String.class)) {
-        bodyBuilder.appendFormalLine(String.format(
-                "} else if (%s.canConvert(value.getClass(), String.class)) {",
-                conversionService));
-        bodyBuilder.indent();
-        // valueStr = conversionService.convert(value, String.class);
-        bodyBuilder.appendFormalLine(String.format(
-                "valueStr = %s.convert(value, String.class);",
-                conversionService));
-        bodyBuilder.indentRemove();
-        // } else {
-        bodyBuilder.appendFormalLine("} else {");
-        bodyBuilder.indent();
-        JavaType objectUtil = new JavaType(
-                "org.springframework.util.ObjectUtils");
-        // valueStr = ObjectUtils.getDisplayString(value);
-        bodyBuilder.appendFormalLine(String.format(
-                "valueStr = %s.getDisplayString(value);",
-                helper.getFinalTypeName(objectUtil)));
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-        bodyBuilder.indentRemove();
-        // } catch (Exception e) {
-        bodyBuilder.appendFormalLine("} catch (Exception e) {");
-        bodyBuilder.indent();
-
-        bodyBuilder.append("");
-        // debug getting value problem
-        bodyBuilder.appendFormalLine("// debug getting value problem");
-        // logger.log(Level.FINE,"Error getting value '".concat(fieldName).concat("'"),e);
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("logger.log(%s.FINE,\"Error getting value '\".concat(fieldName).concat(\"'\"),e);",
-                                helper.getFinalTypeName(LOGGER_LEVEL)));
-
-        // } (end catch)
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-
-        // rendered.put(fieldName, valueStr);
-        bodyBuilder.appendFormalLine("rendered.put(fieldName, valueStr);");
-
-        bodyBuilder.appendFormalLine("");
-        bodyBuilder.appendFormalLine("// Set PK value as DT_RowId");
-        bodyBuilder
-                .appendFormalLine("// Note when entity has composite PK Roo generates the need");
-        bodyBuilder
-                .appendFormalLine("// convert method and adds it to ConversionService, so");
-        bodyBuilder
-                .appendFormalLine("// when processed field is the PK the valueStr is the ");
-        bodyBuilder
-                .appendFormalLine("// composite PK instance marshalled to JSON notation and");
-        bodyBuilder.appendFormalLine("// Base64 encoded");
-        // if (pkFieldName.equalsIgnoreCase(fieldName)) {
-        bodyBuilder
-                .appendFormalLine("if (pkFieldName.equalsIgnoreCase(fieldName)) {");
-        bodyBuilder.indent();
-        // rendered.put(fieldName, valueStr);
-        bodyBuilder.appendFormalLine("rendered.put(\"DT_RowId\", valueStr);");
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-        // }
-
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-
-        bodyBuilder.appendFormalLine("result.add(rendered);");
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-        bodyBuilder.appendFormalLine("return result;");
-
-        bodyBuilder.reset();
     }
 
     /**

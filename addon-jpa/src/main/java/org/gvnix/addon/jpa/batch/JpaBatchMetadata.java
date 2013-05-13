@@ -22,9 +22,9 @@ import static org.springframework.roo.model.JdkJavaType.LIST;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
@@ -94,11 +94,11 @@ public class JpaBatchMetadata extends
     }
 
     private final JpaBatchAnnotationValues annotationValues;
-    private final List<FieldMetadata> identifiers;
-    private final JpaActiveRecordMetadata entityActiveRecordMetadata;
+    private final JpaActiveRecordMetadata activeRecordMetadata;
     private final JavaType entity;
     private final FieldMetadata entityIdentifier;
     private final JavaType listOfIdentifiersType;
+    private final String entityName;
 
     public JpaBatchMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -112,12 +112,19 @@ public class JpaBatchMetadata extends
 
         this.annotationValues = annotationValues;
 
+        // Get refereed entity
         this.entity = annotationValues.entity;
 
-        this.identifiers = Collections.unmodifiableList(identifiers);
+        // Roo only use one field for pk
         this.entityIdentifier = identifiers.iterator().next();
 
-        this.entityActiveRecordMetadata = entityActiveRecordMetadata;
+        // Store jpa ActiveRecord info
+        this.activeRecordMetadata = entityActiveRecordMetadata;
+
+        // Get entity name to use for jpql
+        this.entityName = StringUtils.isBlank(this.activeRecordMetadata
+                .getEntityName()) ? entity.getSimpleTypeName()
+                : this.activeRecordMetadata.getEntityName();
 
         this.listOfIdentifiersType = new JavaType(
                 LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
@@ -260,7 +267,7 @@ public class JpaBatchMetadata extends
         bodyBuilder
                 .appendFormalLine(String
                         .format("return entityManager().createQuery(\"DELETE FROM %s\").executeUpdate();",
-                                entity.getSimpleTypeName()));
+                                entityName));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -336,10 +343,12 @@ public class JpaBatchMetadata extends
         bodyBuilder
                 .appendFormalLine(String
                         .format("%s query = entityManager().createQuery(\"DELETE FROM %s as %s WHERE %s.%s %s :idList\");",
-                                getFinalTypeName(JpaJavaType.QUERY), entity
-                                        .getSimpleTypeName(), aliasName,
-                                aliasName, entityIdentifier.getFieldName()
-                                        .getSymbolName(), condition));
+                                getFinalTypeName(JpaJavaType.QUERY),
+                                entityName,
+                                aliasName,
+                                aliasName,
+                                entityIdentifier.getFieldName().getSymbolName(),
+                                condition));
 
         // query.setParameter("list", ids);
         bodyBuilder.appendFormalLine(String.format(
@@ -395,10 +404,6 @@ public class JpaBatchMetadata extends
      */
     public JpaBatchAnnotationValues getAnnotationValues() {
         return annotationValues;
-    }
-
-    public List<FieldMetadata> getIdentifiers() {
-        return identifiers;
     }
 
     public FieldMetadata getEntityIdentifier() {

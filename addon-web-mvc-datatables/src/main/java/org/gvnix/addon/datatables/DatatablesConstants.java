@@ -98,10 +98,10 @@ public class DatatablesConstants {
             Arrays.asList(JavaType.STRING));
 
     static final JavaType DATATABLES_UTILS = new JavaType(
-            "org.gvnix.datatables.utils.DatatablesUtils");
+            "org.gvnix.web.datatables.util.DatatablesUtils");
 
-    static final JavaType DATATABLES_UTILS_RESULT = new JavaType(
-            "org.gvnix.datatables.utils.DatatablesUtils.FindResult");
+    static final JavaType SEARCH_RESULTS = new JavaType(
+            "org.gvnix.web.datatables.query.SearchResults");
 
     static final JavaType STRING_UTILS = new JavaType(
             "org.apache.commons.lang3.StringUtils");
@@ -128,4 +128,12 @@ public class DatatablesConstants {
     static final JavaSymbolName UI_MODEL = new JavaSymbolName("uiModel");
     static final JavaSymbolName POPULATE_BATCH_SUPPORT = new JavaSymbolName(
             "populateDatatablesHasBatchSupport");
+
+    static final JavaType DATA_SET = new JavaType(
+            "com.github.dandelion.datatables.core.ajax.DataSet");
+
+    static final JavaType DATA_SET_MAP_STRING_STRING = new JavaType(
+            DATA_SET.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(MAP_STRING_STRING));
+
 }
