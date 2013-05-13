@@ -128,7 +128,7 @@ public class JpaBatchOperationsImpl implements JpaBatchOperations {
                         .getPhysicalTypeCanonicalPath(declaredByMetadataId));
         Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
                 target);
-        
+
         // Prepare class builder
         final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                 declaredByMetadataId, modifier, target,

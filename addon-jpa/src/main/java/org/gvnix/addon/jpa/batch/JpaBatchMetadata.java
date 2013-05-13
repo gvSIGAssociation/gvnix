@@ -56,6 +56,12 @@ import org.springframework.roo.project.LogicalPath;
 public class JpaBatchMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    public static final JavaSymbolName DELETE_ALL = new JavaSymbolName(
+            "deleteAll");
+    public static final JavaSymbolName DELETE_NOT_IN = new JavaSymbolName(
+            "deleteNoIn");
+    public static final JavaSymbolName DELETE_IN = new JavaSymbolName(
+            "deleteIn");
     // Constants
     private static final String PROVIDES_TYPE_STRING = JpaBatchMetadata.class
             .getName();
@@ -91,6 +97,8 @@ public class JpaBatchMetadata extends
     private final List<FieldMetadata> identifiers;
     private final JpaActiveRecordMetadata entityActiveRecordMetadata;
     private final JavaType entity;
+    private final FieldMetadata entityIdentifier;
+    private final JavaType listOfIdentifiersType;
 
     public JpaBatchMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -107,8 +115,13 @@ public class JpaBatchMetadata extends
         this.entity = annotationValues.entity;
 
         this.identifiers = Collections.unmodifiableList(identifiers);
+        this.entityIdentifier = identifiers.iterator().next();
 
         this.entityActiveRecordMetadata = entityActiveRecordMetadata;
+
+        this.listOfIdentifiersType = new JavaType(
+                LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+                Arrays.asList(entityIdentifier.getFieldType()));
 
         builder.addMethod(getGetEntityMethod());
         builder.addMethod(getEntityManagerMethod());
@@ -218,7 +231,7 @@ public class JpaBatchMetadata extends
      */
     private MethodMetadata getDeleteAllMethod() {
         // method name
-        JavaSymbolName methodName = new JavaSymbolName("deleteAll");
+        JavaSymbolName methodName = DELETE_ALL;
 
         // Check if a method exist in type
         final MethodMetadata method = methodExists(methodName,
@@ -266,7 +279,7 @@ public class JpaBatchMetadata extends
      * @return
      */
     private MethodMetadata getDeleteInMethod() {
-        return getDeleteByIdsListMethod(new JavaSymbolName("deleteIn"), "IN");
+        return getDeleteByIdsListMethod(DELETE_IN, "IN");
     }
 
     /**
@@ -275,13 +288,11 @@ public class JpaBatchMetadata extends
      * @return
      */
     private MethodMetadata getDeleteNotInMethod() {
-        return getDeleteByIdsListMethod(new JavaSymbolName("deleteNoIn"),
-                "NOT IN");
+        return getDeleteByIdsListMethod(DELETE_NOT_IN, "NOT IN");
     }
 
     /**
-     * Return method to delete entity based on a
-     * list of pks of the entity 
+     * Return method to delete entity based on a list of pks of the entity
      * 
      * @param methodName for generated method
      * @param condition to use in delete-by-list operation
@@ -289,14 +300,11 @@ public class JpaBatchMetadata extends
      */
     private MethodMetadata getDeleteByIdsListMethod(JavaSymbolName methodName,
             String condition) {
-        FieldMetadata identifier = identifiers.get(0);
 
         // Define paramters types
-        JavaType pkListType = new JavaType(LIST.getFullyQualifiedTypeName(), 0,
-                DataType.TYPE, null, Arrays.asList(identifier.getFieldType()));
 
         List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
-                .convertFromJavaTypes(pkListType);
+                .convertFromJavaTypes(listOfIdentifiersType);
 
         // Check if a method exist in type
         final MethodMetadata method = methodExists(methodName, parameterTypes);
@@ -330,7 +338,7 @@ public class JpaBatchMetadata extends
                         .format("%s query = entityManager().createQuery(\"DELETE FROM %s as %s WHERE %s.%s %s :idList\");",
                                 getFinalTypeName(JpaJavaType.QUERY), entity
                                         .getSimpleTypeName(), aliasName,
-                                aliasName, identifier.getFieldName()
+                                aliasName, entityIdentifier.getFieldName()
                                         .getSymbolName(), condition));
 
         // query.setParameter("list", ids);
@@ -387,6 +395,30 @@ public class JpaBatchMetadata extends
      */
     public JpaBatchAnnotationValues getAnnotationValues() {
         return annotationValues;
+    }
+
+    public List<FieldMetadata> getIdentifiers() {
+        return identifiers;
+    }
+
+    public FieldMetadata getEntityIdentifier() {
+        return entityIdentifier;
+    }
+
+    public JavaSymbolName getDeleteAllMethodName() {
+        return DELETE_ALL;
+    }
+
+    public JavaSymbolName getDeleteInMethodName() {
+        return DELETE_IN;
+    }
+
+    public JavaSymbolName getDeleteNotInMethodName() {
+        return DELETE_NOT_IN;
+    }
+
+    public JavaType getListOfIdentifiersType() {
+        return listOfIdentifiersType;
     }
 
     /**

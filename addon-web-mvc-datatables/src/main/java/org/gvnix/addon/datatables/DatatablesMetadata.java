@@ -17,28 +17,53 @@
  */
 package org.gvnix.addon.datatables;
 
-import static org.springframework.roo.model.JdkJavaType.ARRAY_LIST;
-import static org.springframework.roo.model.JdkJavaType.HASH_SET;
+import static org.gvnix.addon.datatables.DatatablesConstants.AUTOWIRED;
+import static org.gvnix.addon.datatables.DatatablesConstants.CONVERSION_SERVICE;
+import static org.gvnix.addon.datatables.DatatablesConstants.CRITERIA_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_COLUMNDEF;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_CRITERIA_TYPE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_PARAMS;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_RESPONSE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_UTILS_RESULT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATE_FORMAT;
+import static org.gvnix.addon.datatables.DatatablesConstants.GET_DATATABLES_DATA;
+import static org.gvnix.addon.datatables.DatatablesConstants.GET_DATATABLES_DATA_RETURN;
+import static org.gvnix.addon.datatables.DatatablesConstants.HASHMAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.HASHSET_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.ITEM_LIST_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_DATATABLES;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_ROO;
+import static org.gvnix.addon.datatables.DatatablesConstants.LOGGER_LEVEL;
+import static org.gvnix.addon.datatables.DatatablesConstants.LOGGER_TYPE;
+import static org.gvnix.addon.datatables.DatatablesConstants.MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_AJAX_DATATABLES;
+import static org.gvnix.addon.datatables.DatatablesConstants.RENDER_FOR_DATATABLES;
+import static org.gvnix.addon.datatables.DatatablesConstants.RENDER_FOR_DATATABLES_RETURN;
+import static org.gvnix.addon.datatables.DatatablesConstants.RENDER_FOR_DATATABLES_RETURN_IMP;
+import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_METHOD;
+import static org.gvnix.addon.datatables.DatatablesConstants.SET_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.SIMPLE_DATE_FORMAT;
+import static org.gvnix.addon.datatables.DatatablesConstants.STRING_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.UI_MODEL;
 import static org.springframework.roo.model.JdkJavaType.LIST;
-import static org.springframework.roo.model.JdkJavaType.MAP;
-import static org.springframework.roo.model.JdkJavaType.SET;
 import static org.springframework.roo.model.SpringJavaType.MODEL;
 import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
 import static org.springframework.roo.model.SpringJavaType.REQUEST_MAPPING;
-import static org.springframework.roo.model.SpringJavaType.REQUEST_PARAM;
 import static org.springframework.roo.model.SpringJavaType.RESPONSE_BODY;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.gvnix.support.WebItdBuilderHelper;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
@@ -47,10 +72,7 @@ import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
-import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
-import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
@@ -72,98 +94,6 @@ public class DatatablesMetadata extends
 
     private static final Logger LOGGER = HandlerUtils
             .getLogger(DatatablesMetadata.class);
-
-    private static final JavaType REQUEST_METHOD = new JavaType(
-            "org.springframework.web.bind.annotation.RequestMethod");
-
-    private static final JavaType CONVERSION_SERVICE = new JavaType(
-            "org.springframework.core.convert.ConversionService");
-
-    private static final JavaType AUTOWIRED = new JavaType(
-            "org.springframework.beans.factory.annotation.Autowired");
-
-    private static final JavaType DATATABLES_PARAMS = new JavaType(
-            "com.github.dandelion.datatables.extras.spring3.ajax.DatatablesParams");
-
-    private static final JavaType LOGGER_TYPE = new JavaType(
-            "java.util.logging.Logger");
-
-    private static final JavaType LOGGER_LEVEL = new JavaType(
-            "java.util.logging.Level");
-
-    // Method and field generation constants
-    private static final JavaType MAP_STRING_STRING = new JavaType(
-            MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-            Arrays.asList(JavaType.STRING, JavaType.STRING));
-
-    private static final JavaType HASHMAP = new JavaType(HashMap.class);
-    private static final JavaType HASHMAP_STRING_STRING = new JavaType(
-            HASHMAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-            Arrays.asList(JavaType.STRING, JavaType.STRING));
-    /**
-     * List<Map<String,String>>
-     */
-    private static final JavaType LIST_MAP_STRING_STRING = new JavaType(
-            LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-            Arrays.asList(MAP_STRING_STRING));
-    private static final JavaType RENDER_FOR_DATATABLES_RETURN = LIST_MAP_STRING_STRING;
-
-    /**
-     * ArrayList<Map<String,String>>
-     */
-    private static final JavaType RENDER_FOR_DATATABLES_RETURN_IMP = new JavaType(
-            ARRAY_LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-            Arrays.asList(MAP_STRING_STRING));
-
-    private static final JavaType DATATABLES_COLUMNDEF = new JavaType(
-            "com.github.dandelion.datatables.core.ajax.ColumnDef");
-
-    private static final JavaType DATATABLES_RESPONSE = new JavaType(
-            "com.github.dandelion.datatables.core.ajax.DatatablesResponse");
-    /**
-     * DatatablesResponse<Map<String,String>>
-     */
-    private static final JavaType GET_DATATABLES_DATA_RETURN = new JavaType(
-            DATATABLES_RESPONSE.getFullyQualifiedTypeName(), 0, DataType.TYPE,
-            null, Arrays.asList(MAP_STRING_STRING));
-
-    private static final JavaType SET_STRING = new JavaType(
-            SET.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-            Arrays.asList(JavaType.STRING));
-    private static final JavaType HASHSET_STRING = new JavaType(
-            HASH_SET.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-            Arrays.asList(JavaType.STRING));
-
-    private static final JavaType DATATABLES_UTILS = new JavaType(
-            "org.gvnix.datatables.utils.DatatablesUtils");
-
-    private static final JavaType DATATABLES_UTILS_RESULT = new JavaType(
-            "org.gvnix.datatables.utils.DatatablesUtils.FindResult");
-
-    private static final JavaType STRING_UTILS = new JavaType(
-            "org.apache.commons.lang3.StringUtils");
-
-    private static final JavaType DATE_FORMAT = new JavaType(
-            "java.text.DateFormat");
-    private static final JavaType SIMPLE_DATE_FORMAT = new JavaType(
-            "java.text.SimpleDateFormat");
-
-    private static final JavaSymbolName CRITERIA_PARAM_NAME = new JavaSymbolName(
-            "criterias");
-    private static final JavaSymbolName ITEM_LIST_PARAM_NAME = new JavaSymbolName(
-            "itemList");
-    private static final JavaType DATATABLES_CRITERIA_TYPE = new JavaType(
-            "com.github.dandelion.datatables.core.ajax.DatatablesCriterias");
-    private static final JavaSymbolName RENDER_FOR_DATATABLES = new JavaSymbolName(
-            "renderForDatatables");
-    private static final JavaSymbolName GET_DATATABLES_DATA = new JavaSymbolName(
-            "getDatatablesData");
-    private static final JavaSymbolName LIST_DATATABLES = new JavaSymbolName(
-            "listDatatables");
-    private static final JavaSymbolName LIST_ROO = new JavaSymbolName("list");
-    private static final JavaSymbolName POPULATE_AJAX_DATATABLES = new JavaSymbolName(
-            "populateDatatablesUseAjax");
-    private static final JavaSymbolName UI_MODEL = new JavaSymbolName("uiModel");
 
     // Constants
     private static final String PROVIDES_TYPE_STRING = DatatablesMetadata.class
@@ -236,6 +166,11 @@ public class DatatablesMetadata extends
      */
     private FieldMetadata dataMode;
 
+    /**
+     * Itd builder herlper
+     */
+    private WebItdBuilderHelper helper;
+
     public DatatablesMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             DatatablesAnnotationValues annotationValues, JavaType entity,
@@ -247,6 +182,10 @@ public class DatatablesMetadata extends
                 + identifier + "' does not appear to be a valid");
 
         this.annotationValues = annotationValues;
+
+        this.helper = new WebItdBuilderHelper(this,
+                builder.getImportRegistrationResolver());
+
         this.identifierProperties = Collections
                 .unmodifiableList(identifierProperties);
         this.entity = entity;
@@ -392,8 +331,8 @@ public class DatatablesMetadata extends
         bodyBuilder
                 .appendFormalLine("// Get all data to put it on pageContext");
         bodyBuilder.appendFormalLine(String.format("%s %s = %s.findAll%s();",
-                getFinalTypeName(objectList), listVarName,
-                getFinalTypeName(entity), entityPlural));
+                helper.getFinalTypeName(objectList), listVarName,
+                helper.getFinalTypeName(entity), entityPlural));
 
         // uiModel.addAttribute("pets",pets);
         bodyBuilder.appendFormalLine(String.format(
@@ -422,27 +361,10 @@ public class DatatablesMetadata extends
         // Model uiModel) {
 
         // Define method parameter types
-        final List<AnnotationAttributeValue<?>> firstResultAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-        firstResultAttributes.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "page"));
-        firstResultAttributes.add(new BooleanAttributeValue(new JavaSymbolName(
-                "required"), false));
-        final AnnotationMetadataBuilder firstResultAnnotation = new AnnotationMetadataBuilder(
-                REQUEST_PARAM, firstResultAttributes);
-
-        final List<AnnotationAttributeValue<?>> maxResultsAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-        maxResultsAttributes.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "size"));
-        maxResultsAttributes.add(new BooleanAttributeValue(new JavaSymbolName(
-                "required"), false));
-        final AnnotationMetadataBuilder maxResultAnnotation = new AnnotationMetadataBuilder(
-                REQUEST_PARAM, maxResultsAttributes);
-
-        final List<AnnotatedJavaType> parameterTypes = Arrays.asList(
-                new AnnotatedJavaType(JavaType.INT_OBJECT,
-                        firstResultAnnotation.build()), new AnnotatedJavaType(
-                        JavaType.INT_OBJECT, maxResultAnnotation.build()),
-                new AnnotatedJavaType(MODEL));
+        final List<AnnotatedJavaType> parameterTypes = Arrays.asList(helper
+                .createRequestParam(JavaType.INT_OBJECT, "page", false, null),
+                helper.createRequestParam(JavaType.INT_OBJECT, "size", false,
+                        null), new AnnotatedJavaType(MODEL));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -456,16 +378,9 @@ public class DatatablesMetadata extends
         // Define method annotations
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
 
-        // @RequestMapping
-        AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
-        methodAnnotation.setAnnotationType(REQUEST_MAPPING);
-
         // @RequestMapping(produces = "text/html")
-        methodAnnotation.addStringAttribute("produces", "text/html");
-
-        annotations.add(methodAnnotation);
-
-        //
+        annotations.add(helper.getRequestMappingAnnotation(null, null, null,
+                "text/html", null, null));
 
         // Define method throws types (none in this case)
         List<JavaType> throwsTypes = new ArrayList<JavaType>();
@@ -559,8 +474,8 @@ public class DatatablesMetadata extends
         // List<Map<String, String>> renderedPets = new ArrayList<Map<String,
         // String>>(0);;
         bodyBuilder.appendFormalLine(String.format("%s rendered = new %s(0);",
-                getFinalTypeName(LIST_MAP_STRING_STRING),
-                getFinalTypeName(RENDER_FOR_DATATABLES_RETURN_IMP)));
+                helper.getFinalTypeName(LIST_MAP_STRING_STRING),
+                helper.getFinalTypeName(RENDER_FOR_DATATABLES_RETURN_IMP)));
 
         JavaType findResult = new JavaType(
                 DATATABLES_UTILS_RESULT.getFullyQualifiedTypeName(), 0,
@@ -571,9 +486,10 @@ public class DatatablesMetadata extends
         // criterias);
         bodyBuilder.appendFormalLine(String.format(
                 "%s findResult = %s.findByCriteria(%s.class, %s.%s(), %s);",
-                getFinalTypeName(findResult),
-                getFinalTypeName(DATATABLES_UTILS), getFinalTypeName(entity),
-                getFinalTypeName(entity),
+                helper.getFinalTypeName(findResult),
+                helper.getFinalTypeName(DATATABLES_UTILS),
+                helper.getFinalTypeName(entity),
+                helper.getFinalTypeName(entity),
                 entityEntityManagerMethod.getSymbolName(),
                 CRITERIA_PARAM_NAME.getSymbolName()));
 
@@ -584,7 +500,7 @@ public class DatatablesMetadata extends
                 entity.getSimpleTypeName()).concat("List");
         bodyBuilder.appendFormalLine(String.format(
                 "%s %s = findResult.getResult();",
-                getFinalTypeName(objectList), itemListVar));
+                helper.getFinalTypeName(objectList), itemListVar));
         // if (petList != null) {
         bodyBuilder.appendFormalLine(String.format("if (%s != null) {",
                 itemListVar));
@@ -609,13 +525,13 @@ public class DatatablesMetadata extends
         // String>>(rendered, Pet.countPets(), recordsFound);
         bodyBuilder.appendFormalLine(String.format(
                 "%s dataSet =  new %1$s(rendered,%s.count%s(),recordsFound);",
-                getFinalTypeName(dataSet), getFinalTypeName(entity),
-                entityPlural));
+                helper.getFinalTypeName(dataSet),
+                helper.getFinalTypeName(entity), entityPlural));
 
         // return DatatablesResponse.build(dataSet, criterias);
         bodyBuilder.appendFormalLine(String.format(
                 "return %s.build(dataSet,%s);",
-                getFinalTypeName(DATATABLES_RESPONSE),
+                helper.getFinalTypeName(DATATABLES_RESPONSE),
                 CRITERIA_PARAM_NAME.getSymbolName()));
     }
 
@@ -676,7 +592,7 @@ public class DatatablesMetadata extends
         // Logger logger = Logger.getLogger(getClass().getName());
         bodyBuilder.appendFormalLine(String.format(
                 "%1$s logger = %1$s.getLogger(getClass().getName());",
-                getFinalTypeName(LOGGER_TYPE)));
+                helper.getFinalTypeName(LOGGER_TYPE)));
 
         bodyBuilder.appendFormalLine("");
         bodyBuilder.appendFormalLine("// Prepare result var");
@@ -684,8 +600,8 @@ public class DatatablesMetadata extends
         // ArrayList<Map<String,String>>(pets.size());
         bodyBuilder.appendFormalLine(String.format(
                 "%s result = new %s(%s.size());",
-                getFinalTypeName(RENDER_FOR_DATATABLES_RETURN),
-                getFinalTypeName(RENDER_FOR_DATATABLES_RETURN_IMP),
+                helper.getFinalTypeName(RENDER_FOR_DATATABLES_RETURN),
+                helper.getFinalTypeName(RENDER_FOR_DATATABLES_RETURN_IMP),
                 ITEM_LIST_PARAM_NAME.getSymbolName()));
 
         // Roo use only one filed as pk
@@ -693,16 +609,15 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("// Prepare primaryKey fields");
         // String pkFieldName = "id";
         bodyBuilder.appendFormalLine(String.format("%s pkFieldName = \"%s\";",
-                getFinalTypeName(JavaType.STRING), identifierProperties.get(0)
-                        .getFieldName().getSymbolName()));
+                helper.getFinalTypeName(JavaType.STRING), identifierProperties
+                        .get(0).getFieldName().getSymbolName()));
 
         bodyBuilder.appendFormalLine("");
         bodyBuilder.appendFormalLine("// Prepare required fields");
         // Set<String> fields = new HashSet<String>();
-        bodyBuilder
-                .appendFormalLine(String.format("%s fields = new %s();",
-                        getFinalTypeName(SET_STRING),
-                        getFinalTypeName(HASHSET_STRING)));
+        bodyBuilder.appendFormalLine(String.format("%s fields = new %s();",
+                helper.getFinalTypeName(SET_STRING),
+                helper.getFinalTypeName(HASHSET_STRING)));
         // fields.add( pkFieldName );
         bodyBuilder.appendFormalLine("fields.add(pkFieldName);");
 
@@ -711,7 +626,7 @@ public class DatatablesMetadata extends
         // for (ColumnDef colum : criterias.getColumnDefs()){
         bodyBuilder.appendFormalLine(String.format(
                 "for (%s colum : %s.getColumnDefs()){",
-                getFinalTypeName(DATATABLES_COLUMNDEF),
+                helper.getFinalTypeName(DATATABLES_COLUMNDEF),
                 CRITERIA_PARAM_NAME.getSymbolName()));
         bodyBuilder.indent();
         // fields.add(colum.getName());
@@ -724,8 +639,8 @@ public class DatatablesMetadata extends
         // DateFormat defaultFormat = SimpleDateFormat.getDateInstance();
         bodyBuilder.appendFormalLine(String.format(
                 "%s defaultFormat = %s.getDateInstance();",
-                getFinalTypeName(DATE_FORMAT),
-                getFinalTypeName(SIMPLE_DATE_FORMAT)));
+                helper.getFinalTypeName(DATE_FORMAT),
+                helper.getFinalTypeName(SIMPLE_DATE_FORMAT)));
 
         // If entity has date attributes use addDateTimeFormatPatterns method
         // to initialize formatters
@@ -740,24 +655,24 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("// Load result");
         // Map<String, String> rendered = null;
         bodyBuilder.appendFormalLine(String.format("%s rendered = null;",
-                getFinalTypeName(MAP_STRING_STRING)));
+                helper.getFinalTypeName(MAP_STRING_STRING)));
         String itemVar = StringUtils.uncapitalize(entity.getSimpleTypeName());
         // for (Pet pet : pets) {
         bodyBuilder.appendFormalLine(String.format("for (%s %s : %s) {",
-                getFinalTypeName(entity), itemVar,
+                helper.getFinalTypeName(entity), itemVar,
                 ITEM_LIST_PARAM_NAME.getSymbolName()));
         bodyBuilder.indent();
         // rendered = new HashMap<String, String>(fields.size());
         bodyBuilder.appendFormalLine(String.format(
                 "rendered = new %s(fields.size());",
-                getFinalTypeName(HASHMAP_STRING_STRING)));
+                helper.getFinalTypeName(HASHMAP_STRING_STRING)));
         String itemVarBean = itemVar.concat("Bean");
         // BeanWrapper petBean = new BeanWrapperImpl(pet);
         bodyBuilder
-                .appendFormalLine(String.format("%s %s = new %s(%s);",
-                        getFinalTypeName(new JavaType(
+                .appendFormalLine(String.format("%s %s = new %s(%s);", helper
+                        .getFinalTypeName(new JavaType(
                                 "org.springframework.beans.BeanWrapper")),
-                        itemVarBean, getFinalTypeName(new JavaType(
+                        itemVarBean, helper.getFinalTypeName(new JavaType(
                                 "org.springframework.beans.BeanWrapperImpl")),
                         itemVar));
         // for (String fieldName : fields){
@@ -801,19 +716,19 @@ public class DatatablesMetadata extends
         // if (Calencar.class.isAssignableFrom(value.getClass())) {
         bodyBuilder.appendFormalLine(String.format(
                 "if (%s.class.isAssignableFrom(value.getClass())) {",
-                getFinalTypeName(JdkJavaType.CALENDAR)));
+                helper.getFinalTypeName(JdkJavaType.CALENDAR)));
         bodyBuilder.indent();
         // value = ((Calendar) value).getTime();
         bodyBuilder.appendFormalLine(String.format(
                 "value = ((%s) value).getTime();",
-                getFinalTypeName(JdkJavaType.CALENDAR)));
+                helper.getFinalTypeName(JdkJavaType.CALENDAR)));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
         // if (Date.class.isAssignableFrom(value.getClass())) {
         bodyBuilder.appendFormalLine(String.format(
                 "if (%s.class.isAssignableFrom(value.getClass())) {",
-                getFinalTypeName(JdkJavaType.DATE)));
+                helper.getFinalTypeName(JdkJavaType.DATE)));
         bodyBuilder.indent();
         if (entityHasDateTypes) {
             // String pattern = (String)
@@ -828,9 +743,9 @@ public class DatatablesMetadata extends
             bodyBuilder
                     .appendFormalLine(String
                             .format("%s format = %s.isBlank(pattern) ? defaultFormat : new %s(pattern);",
-                                    getFinalTypeName(DATE_FORMAT),
-                                    getFinalTypeName(STRING_UTILS),
-                                    getFinalTypeName(SIMPLE_DATE_FORMAT),
+                                    helper.getFinalTypeName(DATE_FORMAT),
+                                    helper.getFinalTypeName(STRING_UTILS),
+                                    helper.getFinalTypeName(SIMPLE_DATE_FORMAT),
                                     StringUtils.uncapitalize(entity
                                             .getSimpleTypeName())));
             // valueStr = format.format(value);
@@ -862,7 +777,7 @@ public class DatatablesMetadata extends
         // valueStr = ObjectUtils.getDisplayString(value);
         bodyBuilder.appendFormalLine(String.format(
                 "valueStr = %s.getDisplayString(value);",
-                getFinalTypeName(objectUtil)));
+                helper.getFinalTypeName(objectUtil)));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
         bodyBuilder.indentRemove();
@@ -877,7 +792,7 @@ public class DatatablesMetadata extends
         bodyBuilder
                 .appendFormalLine(String
                         .format("logger.log(%s.FINE,\"Error getting value '\".concat(fieldName).concat(\"'\"),e);",
-                                getFinalTypeName(LOGGER_LEVEL)));
+                                helper.getFinalTypeName(LOGGER_LEVEL)));
 
         // } (end catch)
         bodyBuilder.indentRemove();
@@ -916,17 +831,6 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("return result;");
 
         bodyBuilder.reset();
-    }
-
-    /**
-     * Gets final names to use of a type in method body after import resolver.
-     * 
-     * @param type
-     * @return name to use in method body
-     */
-    private String getFinalTypeName(JavaType type) {
-        return type.getNameIncludingTypeParameters(false,
-                builder.getImportRegistrationResolver());
     }
 
     /**

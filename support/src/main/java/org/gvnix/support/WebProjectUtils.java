@@ -19,8 +19,6 @@
 package org.gvnix.support;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
@@ -28,9 +26,6 @@ import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  * Utils for web projects.
