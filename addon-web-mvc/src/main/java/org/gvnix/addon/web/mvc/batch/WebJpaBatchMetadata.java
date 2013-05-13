@@ -25,8 +25,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.gvnix.addon.jpa.batch.GvNIXJpaBatch;
 import org.gvnix.addon.jpa.batch.JpaBatchMetadata;
 import org.gvnix.support.WebItdBuilderHelper;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
@@ -118,7 +120,8 @@ public class WebJpaBatchMetadata extends
     public WebJpaBatchMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             WebJpaBatchAnnotationValues annotationValues,
-            JpaBatchMetadata jpaBatchMetadata) {
+            JpaBatchMetadata jpaBatchMetadata,
+            WebScaffoldAnnotationValues webScaffoldMetadataValue) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -129,11 +132,31 @@ public class WebJpaBatchMetadata extends
 
         this.service = annotationValues.getService();
 
+        Validate.notNull(service, String.format(
+                "Missing service value required for %s in %s",
+                WebJpaBatchAnnotationValues.WEB_JPA_BATCH_ANNOTATION
+                        .getFullyQualifiedTypeName(),
+                governorPhysicalTypeMetadata.getType()
+                        .getFullyQualifiedTypeName()));
+
         this.jpaBatchMetadata = jpaBatchMetadata;
 
         listOfIdentifiersType = jpaBatchMetadata.getListOfIdentifiersType();
 
         this.entity = jpaBatchMetadata.getEntity();
+
+        Validate.notNull(this.entity, String.format(
+                "Missing entity value for %s in %s",
+                GvNIXJpaBatch.class.getCanonicalName(),
+                service.getFullyQualifiedTypeName()));
+
+        Validate.isTrue(
+                this.entity.equals(webScaffoldMetadataValue
+                        .getFormBackingObject()),
+                String.format(
+                        "Service batch entity and Controller formBackingObject no match in %s",
+                        governorPhysicalTypeMetadata.getType()
+                                .getFullyQualifiedTypeName()));
 
         builder.addField(getLoggerField());
         builder.addField(getServiceField());

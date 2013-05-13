@@ -24,6 +24,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.jpa.batch.JpaBatchMetadata;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -104,6 +105,9 @@ public final class WebJpaBatchMetadataProvider extends
         LogicalPath path = WebJpaBatchMetadata
                 .getPath(metadataIdentificationString);
 
+        WebScaffoldAnnotationValues webScaffoldMetadataValue = new WebScaffoldAnnotationValues(
+                governorPhysicalTypeMetadata);
+
         String serviceMetadataKey = JpaBatchMetadata.createIdentifier(service,
                 path);
         // register downstream dependency (service --> jpaBatch)
@@ -116,7 +120,7 @@ public final class WebJpaBatchMetadataProvider extends
         // TODO get more data
         return new WebJpaBatchMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, annotationValues,
-                serviceMetadata);
+                serviceMetadata, webScaffoldMetadataValue);
     }
 
     /**
