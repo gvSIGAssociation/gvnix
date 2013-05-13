@@ -19,7 +19,7 @@
 /* Global scope for GvNIX_Selection */
 var GvNIX_Selection;
 
-(function($, window, document) {
+(function(jQuery, window, document) {
 
 	GvNIX_Selection = function(oSettings, oOpts) {
 		/* Santiy check that we are a new instance */
@@ -93,7 +93,7 @@ var GvNIX_Selection;
 			 * @type string
 			 * @default null
 			 */
-			"infoMessage" : null,
+			"infoMessage" : null
 
 		};
 
@@ -159,6 +159,20 @@ var GvNIX_Selection;
 			 * @default false
 			 */
 			"selectedAll" : false,
+			
+			/**
+			 * Callback for selection change notification.
+			 * 
+			 * Selection change notification receives:
+			 * <code>selectionSuppor</code> (GvNIX_Selection) instance which fires the event
+			 * <code>action</code> (string) one of ['select','deselect','all','none']
+			 * <code>id</code> (string) id affected by action (null for 'none','all')
+			 * 
+			 * @property selectionChangeCallbacks
+			 * @type jQuery.Callbacks
+			 * @default jQuery.Callbacks("unique")
+			 */
+			"selectionChangeCallbacks" : jQuery.Callbacks("unique")
 		};
 
 		/***********************************************************************
@@ -365,7 +379,7 @@ var GvNIX_Selection;
 		"fnGetSelectedIds" : function() {
 			var _d = this._data, dt = _d.dt;
 			if (dt.oFeatures.bServerSide) {
-				log("fnGetSelectedIds: method not supported in bServerSide datatable mode");
+				this.log("fnGetSelectedIds: method not supported in bServerSide datatable mode");
 				throw "fnGetSelectedIds: method not supported in bServerSide datatable mode";
 			}
 			var aoData = dt.aoData, result = [];
@@ -460,7 +474,6 @@ var GvNIX_Selection;
 						if (count > 1) {
 							this.fnSelectNone(redraw, false);
 						} else if (count == 1) {
-							// TODO add info param
 							this.fnDeselect(_d.idList[0], redraw);
 						}
 					}
@@ -483,9 +496,12 @@ var GvNIX_Selection;
 					changed = true;
 				}
 			}
-			if (redraw === undefined || redraw) {
-				this.fnRedrawRow(trId, true);
-				this._fnUpdateInfo();
+			if (changed) {
+				if (redraw === undefined || redraw) {
+					this.fnRedrawRow(trId, true);
+					this._fnUpdateInfo();
+				}
+				_d.selectionChangeCallbacks.fireWith(this,[this,'select',trId]);
 			}
 			return changed;
 		},
@@ -510,6 +526,7 @@ var GvNIX_Selection;
 					this.fnRedrawRow(trId);
 					this._fnUpdateInfo();
 				}
+				_d.selectionChangeCallbacks.fireWith(this,[this,'deselect',trId]);
 				return true;
 			}
 			var changed = false;
@@ -519,8 +536,10 @@ var GvNIX_Selection;
 				if (!_d.idListSelected) {
 					// add to "not-selected" list
 					_d.idList.push(trId);
+					changed = true;
 				}
 				if (this.fnSelectionCount() == 0){
+					// reset flag and list 
 					_d.idList = [];
 					_d.idListSelected = true;
 				}
@@ -529,11 +548,15 @@ var GvNIX_Selection;
 				if (_d.idListSelected) {
 					// remove from "selected" referred list
 					_d.idList.splice(index, 1);
+					changed = true;
 				}
 			}
-			if (redraw === undefined || redraw) {
-				this.fnRedrawRow(trId);
-				this._fnUpdateInfo();
+			if (changed) {
+				if (redraw === undefined || redraw) {
+					this.fnRedrawRow(trId);
+					this._fnUpdateInfo();
+				}
+				_d.selectionChangeCallbacks.fireWith(this,[this,'deselect',trId]);
 			}
 			return changed;
 		},
@@ -557,6 +580,7 @@ var GvNIX_Selection;
 				this.fnRedrawVisibleRows();
 				this._fnUpdateInfo();
 			}
+			_d.selectionChangeCallbacks.fireWith(this,[this,'all',null]);
 			return true;
 		},
 
@@ -585,8 +609,37 @@ var GvNIX_Selection;
 					this._fnUpdateInfo();
 				}
 			}
+			_d.selectionChangeCallbacks.fireWith(this,[this,'none',null]);
 			return true;
 		},
+		
+		/**
+		 * Add a selectionChange callback
+		 * 
+		 * Selection change notification receives:
+		 * <code>selectionSuppor</code> (GvNIX_Selection) instance which fires the event
+		 * <code>action</code> (string) one of ['select','deselect','all','none']
+		 * <code>id</code> (string) id affected by action (null for 'none','all')
+		 * 
+		 * @param callback
+		 *            function to register
+		 */
+		"fnAddSelectionChangeCallback" : function(callback) {
+			var _d = this._data;
+			_d.selectionChangeCallbacks.add(callback);
+		},
+		
+		/**
+		 * Remove a selectionChange callback function
+		 * 
+		 * @param callback
+		 *            function to remove
+		 */
+		"fnRemoveSelectionChangeCallback" : function(callback) {
+			var _d = this._data;
+			_d.selectionChangeCallbacks.remove(callback);
+		},
+		
 
 		/***********************************************************************
 		 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -712,7 +765,7 @@ var GvNIX_Selection;
 				checkValue = s.checkColumnClass ? false : null;
 			}
 			if (s.debug) {
-				log("_fnUpdateRowTr: id=" + nRow.id + " +" + classToAdd + " -"
+				this.log("_fnUpdateRowTr: id=" + nRow.id + " +" + classToAdd + " -"
 						+ classToRemove + " check:" + checkValue);
 			}
 			// update row values
@@ -795,6 +848,17 @@ var GvNIX_Selection;
 				}
 				if (iSettings.debug !== undefined) {
 					s.debug = iSettings.debug;
+					if (s.debug){
+						// Regsiter a selectionChange calback to log the event fire
+						_d.selectionChangeCallbacks.add(
+								function (selection,action,id){
+									selection.log("selectionChange: [" + action + "]" + 
+											(id ? "id: '" +id + "'" : ""));
+								});
+					}
+				}
+				if (typeof iSettings.selectionChange == "object"){
+					_d.selectionChangeCallbacks.add(iSettings.selectionChange);
 				}
 			}
 
