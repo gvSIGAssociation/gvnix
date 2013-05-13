@@ -17,36 +17,7 @@
  */
 package org.gvnix.addon.datatables;
 
-import static org.gvnix.addon.datatables.DatatablesConstants.AUTOWIRED;
-import static org.gvnix.addon.datatables.DatatablesConstants.CONVERSION_SERVICE;
-import static org.gvnix.addon.datatables.DatatablesConstants.CRITERIA_PARAM_NAME;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_COLUMNDEF;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_CRITERIA_TYPE;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_PARAMS;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_RESPONSE;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_UTILS;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_UTILS_RESULT;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATE_FORMAT;
-import static org.gvnix.addon.datatables.DatatablesConstants.GET_DATATABLES_DATA;
-import static org.gvnix.addon.datatables.DatatablesConstants.GET_DATATABLES_DATA_RETURN;
-import static org.gvnix.addon.datatables.DatatablesConstants.HASHMAP_STRING_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.HASHSET_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.ITEM_LIST_PARAM_NAME;
-import static org.gvnix.addon.datatables.DatatablesConstants.LIST_DATATABLES;
-import static org.gvnix.addon.datatables.DatatablesConstants.LIST_MAP_STRING_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.LIST_ROO;
-import static org.gvnix.addon.datatables.DatatablesConstants.LOGGER_LEVEL;
-import static org.gvnix.addon.datatables.DatatablesConstants.LOGGER_TYPE;
-import static org.gvnix.addon.datatables.DatatablesConstants.MAP_STRING_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_AJAX_DATATABLES;
-import static org.gvnix.addon.datatables.DatatablesConstants.RENDER_FOR_DATATABLES;
-import static org.gvnix.addon.datatables.DatatablesConstants.RENDER_FOR_DATATABLES_RETURN;
-import static org.gvnix.addon.datatables.DatatablesConstants.RENDER_FOR_DATATABLES_RETURN_IMP;
-import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_METHOD;
-import static org.gvnix.addon.datatables.DatatablesConstants.SET_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.SIMPLE_DATE_FORMAT;
-import static org.gvnix.addon.datatables.DatatablesConstants.STRING_UTILS;
-import static org.gvnix.addon.datatables.DatatablesConstants.UI_MODEL;
+import static org.gvnix.addon.datatables.DatatablesConstants.*;
 import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.SpringJavaType.MODEL;
 import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
@@ -63,6 +34,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.gvnix.support.WebItdBuilderHelper;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -157,6 +129,11 @@ public class DatatablesMetadata extends
     private final boolean entityHasDateTypes;
 
     /**
+     * Batch services metadata
+     */
+    private final WebJpaBatchMetadata webJpaBatchMetadata;
+
+    /**
      * Field which holds conversionService
      */
     private FieldMetadata conversionService;
@@ -171,12 +148,18 @@ public class DatatablesMetadata extends
      */
     private WebItdBuilderHelper helper;
 
+    /**
+     * Field which if batch support is available
+     */
+    private FieldMetadata batchSupport;
+
     public DatatablesMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             DatatablesAnnotationValues annotationValues, JavaType entity,
             List<FieldMetadata> identifierProperties, String entityPlural,
             JavaSymbolName entityManagerMethodName, boolean hasDateTypes,
-            JavaType webScaffoldAspectName) {
+            JavaType webScaffoldAspectName,
+            WebJpaBatchMetadata webJpaBatchMetadata) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -192,6 +175,7 @@ public class DatatablesMetadata extends
         this.entityPlural = entityPlural;
         this.entityEntityManagerMethod = entityManagerMethodName;
         this.entityHasDateTypes = hasDateTypes;
+        this.webJpaBatchMetadata = webJpaBatchMetadata;
 
         // Adding precedence declaration
         // This aspect before webScaffold
@@ -200,6 +184,7 @@ public class DatatablesMetadata extends
         // Adding field definition
         builder.addField(getConversionServiceField());
         builder.addField(getUseAjaxField());
+        builder.addField(getHasBatchSupportField());
 
         // Adding methods definition
         builder.addMethod(getRenderForDatatablesMethod());
@@ -207,11 +192,68 @@ public class DatatablesMetadata extends
         builder.addMethod(getListDatatablesRequestMethod());
         builder.addMethod(getListRooRequestMethod());
         builder.addMethod(getPopulateAJAXDatatablesMethod());
+        builder.addMethod(getPopulateHasBatchSupportMethod());
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
     }
 
+    /**
+     * Gets <code>populateDatatablesHasBatchSupport</code> method
+     * 
+     * @return
+     */
+    private MethodMetadata getPopulateHasBatchSupportMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(POPULATE_BATCH_SUPPORT,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        AnnotationMetadataBuilder annotation = new AnnotationMetadataBuilder(
+                MODEL_ATTRIBUTE);
+        annotation.addStringAttribute("value", "datatablesHasBatchSupport");
+        // @ModelAttribute
+        annotations.add(annotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine(String.format("return %s;",
+                getHasBatchSupportField().getFieldName().getSymbolName()));
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, POPULATE_BATCH_SUPPORT,
+                JavaType.BOOLEAN_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>populateAJAXDatatables</code> method
+     * 
+     * @return
+     */
     private MethodMetadata getPopulateAJAXDatatablesMethod() {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
@@ -243,7 +285,8 @@ public class DatatablesMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildPopulateAjaxDatatablesMethod(bodyBuilder);
+        bodyBuilder.appendFormalLine(String.format("return %s;",
+                getUseAjaxField().getFieldName().getSymbolName()));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -257,15 +300,11 @@ public class DatatablesMetadata extends
                                       // instance
     }
 
-    private void buildPopulateAjaxDatatablesMethod(
-            InvocableMemberBodyBuilder bodyBuilder) {
-
-        // return datatablesUseAjax;
-        bodyBuilder.appendFormalLine(String.format("return %s;",
-                getUseAjaxField().getFieldName().getSymbolName()));
-
-    }
-
+    /**
+     * Returns <code>listDatatablesRequest</code> method
+     * 
+     * @return
+     */
     private MethodMetadata getListDatatablesRequestMethod() {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
@@ -318,6 +357,11 @@ public class DatatablesMetadata extends
         // instance
     }
 
+    /**
+     * Build method body for <code>listDatatablesRequest</code> method
+     * 
+     * @param bodyBuilder
+     */
     private void buildListDatatablesRequesMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
 
@@ -392,7 +436,7 @@ public class DatatablesMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildListRooRequesMethodBody(bodyBuilder);
+        buildListRooRequestMethodBody(bodyBuilder);
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -405,7 +449,12 @@ public class DatatablesMetadata extends
                                       // instance
     }
 
-    private void buildListRooRequesMethodBody(
+    /**
+     * Build method body for <code>listRooRequest</code> method
+     * 
+     * @param bodyBuilder
+     */
+    private void buildListRooRequestMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
 
         bodyBuilder
@@ -416,6 +465,11 @@ public class DatatablesMetadata extends
                 LIST_DATATABLES.getSymbolName(), UI_MODEL.getSymbolName()));
     }
 
+    /**
+     * Returns <code>getDatatablesData</code> method
+     * 
+     * @return
+     */
     private MethodMetadata getGetDatatablesDataMethod() {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
@@ -469,6 +523,11 @@ public class DatatablesMetadata extends
                                       // instance
     }
 
+    /**
+     * Build method body for <code>getDatatablesData</code> method
+     * 
+     * @param bodyBuilder
+     */
     private void buildGetDatatablesDataMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
         // List<Map<String, String>> renderedPets = new ArrayList<Map<String,
@@ -535,6 +594,11 @@ public class DatatablesMetadata extends
                 CRITERIA_PARAM_NAME.getSymbolName()));
     }
 
+    /**
+     * Returns <code>renderForDatatables</code> method
+     * 
+     * @return
+     */
     private MethodMetadata getRenderForDatatablesMethod() {
         // Define method parameter types
         JavaType objectList = new JavaType(LIST.getFullyQualifiedTypeName(), 0,
@@ -582,7 +646,7 @@ public class DatatablesMetadata extends
     }
 
     /**
-     * Creates the renderForDatatables method body
+     * Build method body for <code>renderForDatatables</code> method
      * 
      * @param bodyBuilder
      */
@@ -893,6 +957,64 @@ public class DatatablesMetadata extends
             }
         }
         return dataMode;
+    }
+
+    /**
+     * Create metadata for field which informs that batch services available.
+     * 
+     * @return a FieldMetadata object
+     */
+    public FieldMetadata getHasBatchSupportField() {
+        if (batchSupport == null) {
+            JavaSymbolName curName = new JavaSymbolName(
+                    "datatablesHasBatchSupport");
+            String initializer = String.format("%s",
+                    String.valueOf(webJpaBatchMetadata != null));
+
+            // Check if field exist
+            FieldMetadata currentField = governorTypeDetails
+                    .getDeclaredField(curName);
+            if (currentField != null) {
+                if (!currentField.getFieldType().equals(
+                        JavaType.BOOLEAN_PRIMITIVE)) {
+                    // No compatible field: look for new name
+                    currentField = null;
+                    JavaSymbolName newName = curName;
+                    int i = 1;
+                    while (governorTypeDetails.getDeclaredField(newName) != null) {
+                        newName = new JavaSymbolName(curName.getSymbolName()
+                                .concat(StringUtils.repeat('_', i)));
+                        i++;
+                    }
+                    curName = newName;
+                }
+            }
+            if (currentField != null) {
+                // check initializer value
+                if (StringUtils.equalsIgnoreCase(initializer.trim(),
+                        currentField.getFieldInitializer().trim())) {
+                    batchSupport = currentField;
+                }
+                else {
+                    // Show a warning
+                    LOGGER.warning(String
+                            .format("%s.%s is erroneous", getId(), currentField
+                                    .getFieldName().getReadableSymbolName()));
+                }
+            }
+            else {
+                // create field
+                // Using the FieldMetadataBuilder to create the field
+                // definition.
+                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                        getId(), Modifier.PUBLIC, curName, // Field
+                        JavaType.BOOLEAN_PRIMITIVE, initializer); // Field type
+                batchSupport = fieldBuilder.build(); // Build and return a
+                // FieldMetadata
+                // instance
+            }
+        }
+        return batchSupport;
     }
 
     /**

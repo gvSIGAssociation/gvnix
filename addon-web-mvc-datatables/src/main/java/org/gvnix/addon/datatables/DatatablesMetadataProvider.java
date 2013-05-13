@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
@@ -91,6 +92,7 @@ public final class DatatablesMetadataProvider extends
         final DatatablesAnnotationValues annotationValues = new DatatablesAnnotationValues(
                 governorPhysicalTypeMetadata);
 
+        // Get webScaffoldMetadata
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
                 javaType, path);
         WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
@@ -98,8 +100,15 @@ public final class DatatablesMetadataProvider extends
 
         JavaType webScaffoldAspectName = webScaffoldMetadata.getAspectName();
 
+        // Get formBackingObject
         JavaType entity = webScaffoldMetadata.getAnnotationValues()
                 .getFormBackingObject();
+
+        // Get batch service (if any)
+        String webJpaBatchMetadataId = WebJpaBatchMetadata.createIdentifier(
+                javaType, path);
+        WebJpaBatchMetadata webJpaBatchMetadata = (WebJpaBatchMetadata) metadataService
+                .get(webJpaBatchMetadataId);
 
         List<FieldMetadata> identifiers = persistenceMemberLocator
                 .getIdentifierFields(entity);
@@ -108,6 +117,7 @@ public final class DatatablesMetadataProvider extends
                 path);
         JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
                 .get(JpaMetadataId);
+
         String plural = jpaMetadata.getPlural();
 
         JavaSymbolName entityManagerMethodName = jpaMetadata
@@ -124,7 +134,7 @@ public final class DatatablesMetadataProvider extends
         return new DatatablesMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, entity,
                 identifiers, plural, entityManagerMethodName, hasDateTypes,
-                webScaffoldAspectName);
+                webScaffoldAspectName, webJpaBatchMetadata);
     }
 
     /**

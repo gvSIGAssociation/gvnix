@@ -22,7 +22,7 @@
   <jsp:directive.attribute name="actionHeaderCssStyle" type="java.lang.String" required="false" description="Custom css-style for action columns header" />
   
   <!-- selection -->
-  <jsp:directive.attribute name="selection" type="java.lang.Boolean" required="false" description="Enable selection" />
+  <jsp:directive.attribute name="selection" type="java.lang.Boolean" required="false" description="Enable selection (default: true)" />
   <jsp:directive.attribute name="selectionMultiRow" type="java.lang.Boolean" required="false" description="Enable selection on multiple rows" />
   <jsp:directive.attribute name="selectionByCheck" type="java.lang.Boolean" required="false" description="Use checkbox to select" />
   <jsp:directive.attribute name="selectionCheckCssClass" type="java.lang.String" required="false" description="Css class for selection checkbox" />
@@ -104,7 +104,9 @@
   <!-- Prepare default values -->
   <!-- ====================== -->
   
-  <jsp:useBean id="datatables_javaScript_elements" class="java.util.HashMap" scope="request"/>
+  <jsp:useBean id="datatables_javaScript_elements_before" class="java.util.HashMap" scope="request"/>
+  <jsp:useBean id="datatables_javaScript_elements_after" class="java.util.HashMap" scope="request"/>
+  <jsp:useBean id="datatables_javaScript_elements_init" class="java.util.HashMap" scope="request"/>
   
   <!-- init custom api functions -->
   <c:set var="initCustionFunctionsCallbackId" value="${id}_init_custom_callbk"/>
@@ -200,6 +202,69 @@
   </c:if>
   
   <spring:url value="${path}" var="urlPath" />
+
+  <!-- selection -->
+  <c:choose>
+    <c:when test="${empty selection or selection}">
+      <c:set var="selection" value="true"/>
+      <c:if test="${empty selectionSelectedCssClass}">
+      	<c:set var="selectionSelectedCssClass" value="row_selected"/>
+      </c:if>
+      <c:if test="${empty selectionMultiRow}">
+      	<c:set var="selectionMultiRow" value="false"/>
+      </c:if>
+
+      <spring:message var="selection_none_msg" code="selection_none" htmlEscape="false" javaScriptEscape="true"/>
+      <c:if test="${selectionMultiRow}">
+       <c:set var="selection_all_link" value="true"/>
+       <spring:message var="selection_all_msg" code="selection_all" htmlEscape="false" javaScriptEscape="true"/>
+      </c:if>
+      <c:if test="${empty selectionInfoLabel}">
+      	<c:set var="selectionInfoLabel" value="datatables_selection_info"/>
+      </c:if>
+      <spring:message code="${selectionInfoLabel}" htmlEscape="false" var="selection_info_msg"/>
+      <c:if test="${selectionByCheck}">
+        <form id="${selectionCheckColumnId}_form" name="${selectionCheckColumnId}_form">
+        </form>
+        <c:if test="${empty selectionCheckCssClass}">
+      		<c:set var="selectionCheckCssClass" value="check_select_row"/>
+      	</c:if>
+    	<c:set var="selectionCheckColumnId" value="${id}_select_col"/>
+    	<c:if test="${serverSide}">
+    		<c:set target="${datatables_javaScript_elements_before}" property="${selectionCheckColumnId}">
+	        function ${selectionCheckColumnId}(data, type, full) {
+	        	var result =
+	                '<input type="checkbox" class="${selectionCheckCssClass}" form="${selectionCheckColumnId}_form"/>';
+	                
+                return result;
+		    }
+	     	</c:set>
+    	</c:if>
+ 	  </c:if>
+	  <c:set target="${datatables_javaScript_elements_after}" property="selection_tools">
+        /** selection support functions **/
+		function ${id}_selectNone(){
+			$('#${id}').dataTable().fnSelection().fnSelectNone();
+		};
+		var ${id}_selectionTools_str = '<div class="gvnix_datatables_selection_box" style="float:left;margin-left:10px;">';
+		${id}_selectionTools_str += '<a href="javascript:${id}_selectNone();" class="icon selection_none">${selection_none_msg}</a>';
+		<c:if test="${selection_all_link}">
+		function ${id}_selectAll(){
+			$('#${id}').dataTable().fnSelection().fnSelectAll();
+		};
+		${id}_selectionTools_str += '<a href="javascript:${id}_selectAll();" class="icon selection_all">${selection_all_msg}</a>';
+		</c:if>
+		${id}_selectionTools_str += '</div>'
+      </c:set>
+      <c:set target="${datatables_javaScript_elements_init}" property="selection_tools">
+        $('#${id}_filter').before(${id}_selectionTools_str);
+      </c:set>
+    </c:when>
+    <c:otherwise>
+    	<!-- if no selection no selection by check -->
+    	<c:set var="selectionByCheck" value="false"/>
+    </c:otherwise>
+  </c:choose>
   
   
   <!-- show -->
@@ -212,7 +277,7 @@
 	      </spring:escapeBody>
       </c:set>
       <spring:url value="/resources/images/show.png" var="show_image_url" />
-      <c:set target="${datatables_javaScript_elements}" property="${showColumnId}">
+      <c:set target="${datatables_javaScript_elements_before}" property="${showColumnId}">
 	    function ${showColumnId}(data, type, full) {
 		    var result =  
 	           '<a href="${urlPath}/'+full.${typeIdFieldName}+'" alt="${show_label}" title="${show_label}">'
@@ -237,7 +302,7 @@
       </spring:escapeBody>
     </c:set>
     <spring:url value="/resources/images/add.png" var="create_image_url" />
-	<c:set target="${datatables_javaScript_elements}" property="${createButtonCallbackId}">
+	<c:set target="${datatables_javaScript_elements_before}" property="${createButtonCallbackId}">
         function ${createButtonCallbackId}() {
            var result =
                '<div class="gvnix_dataTables_createItem" style="float:left;margin-left:10px;">'
@@ -247,6 +312,9 @@
                + '</div>';
            $('#${id}_filter').before(result);
 	    }
+    </c:set>
+    <c:set target="${datatables_javaScript_elements_init}" property="${createButtonCallbackId}">
+    ${createButtonCallbackId}();
     </c:set>
   </c:if>
 
@@ -265,7 +333,7 @@
           </spring:escapeBody>
         </c:set>
         <spring:url value="/resources/images/update.png" var="update_image_url" />
-	    <c:set target="${datatables_javaScript_elements}" property="${updateColumnId}">
+	    <c:set target="${datatables_javaScript_elements_before}" property="${updateColumnId}">
 	        function ${updateColumnId}(data, type, full) {
 	        	var result =
 	              '<a href="${urlPath}/'+full.${typeIdFieldName}+'?form" alt="${update_label}" title="${update_label}">'
@@ -284,7 +352,7 @@
   
   <c:if test="${delete}">
   	<c:set var="removeColumnId" value="${id}_remove_col"/>
-  	<c:if test="${serverSide}">
+  	<c:if test="${serverSide or selectionMultiRow}">
   	    <c:set var="delete_label">
 	      <spring:escapeBody javaScriptEscape="true">  	  
             <spring:message arguments="${typeName}" code="entity_delete"/>
@@ -294,71 +362,130 @@
           <spring:escapeBody javaScriptEscape="true">
              <spring:message code="entity_delete_confirm" />
           </spring:escapeBody>
-        </c:set>        
+        </c:set>
         <spring:url value="/resources/images/delete.png" var="delete_image_url" />
-        <!-- function to render cell -->
-	    <c:set target="${datatables_javaScript_elements}" property="${removeColumnId}">
-	        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
-	        function ${removeColumnId}(data, type, full) {
-	        	var result =
-	                '<form action="${urlPath}/'+full.${typeIdFieldName}+'" method="post">'
-	                + '  <input type="hidden" value="DELETE" name="_method"/>'
-	                + '  <input alt="${delete_label}" class="image" src="${delete_image_url}" title="${delete_label}" type="image" value="${delete_label}" onclick="return confirm(${removeColumnId}_confirmation);" />'
-	                + '</form>';
-	                
-                return result;
-		    }
-	     </c:set>
+        <c:choose>
+        <c:when test="${selectionMultiRow and datatablesHasBatchSupport}">
+	        <c:set var="delete_multirow_confirm_msg">
+	          <spring:escapeBody javaScriptEscape="true" htmlEscape="false">
+	             <spring:message code="entity_delete_multirow_confirm" />
+	          </spring:escapeBody>
+	        </c:set>
+	        <c:set var="delete_ok_msg">
+	          <spring:escapeBody javaScriptEscape="true">
+	             <spring:message code="entity_deleted" />
+	          </spring:escapeBody>
+	        </c:set>
+	        <c:set var="delete_none_msg">
+	          <spring:escapeBody javaScriptEscape="true">
+	             <spring:message code="entity_deleted_none" />
+	          </spring:escapeBody>
+	        </c:set>
+	        <c:set var="delete_error_msg">
+	          <spring:escapeBody javaScriptEscape="true">
+	             <spring:message code="entity_deleted_error" />
+	          </spring:escapeBody>
+	        </c:set>
+        	<!-- function for link -->
+		    <c:set target="${datatables_javaScript_elements_before}" property="${removeColumnId}">
+		    
+		        var ${removeColumnId}_delete_error = "${delete_error_msg}";
+		        var ${removeColumnId}_deleted = "${delete_ok_msg}";
+		        var ${removeColumnId}_deleted_none = "${delete_none_msg}";
+		        var ${removeColumnId}_multiconfirmation = "${delete_multirow_confirm_msg}";
+		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
+		        function ${removeColumnId}() {
+		        	var $table = $('#${id}').dataTable(); 
+		        	var $selection = $table.fnSelection();
+		        	var selCount = $selection.fnSelectionCount();
+		        	if ( selCount > 1) {
+			        	if (!confirm(${removeColumnId}_multiconfirmation + ' ' + selCount)){
+			        		return;
+			        	}
+		        	} else if (selCount == 1){
+			        	if (!confirm(${removeColumnId}_confirmation)){
+			        		return;
+			        	}
+		        	} else {
+		        		alert("Select records to remove");
+		        		return;
+		        	} 
+		        	
+		        	$.post(
+					  '${urlPath}/deleteselection',
+					  $selection.fnGetSelectionInfo(),
+					  function (data) {
+		        			log('delete OK: ' + data);
+					  		var count = parseInt(data);
+					  		if (count > 0){
+			        			alert(${removeColumnId}_deleted + ' ' + data);
+		        			} else {
+			        			alert(${removeColumnId}_deleted_none);
+		        			}
+		        			<c:choose>
+		        			<c:when test="${serverSide}">
+		        			$table.fnDraw();
+		        			</c:when>
+		        			<c:otherwise>
+	        				// TODO optimize it (remove lines instead reload page)
+	        				location.reload();
+	        				</c:otherwise>
+	        				</c:choose>
+	        				$selection.fnSelectNone();
+		        		}
+					  ).fail( function (data) {
+		        			log('delete ERROR: ' + data.status + ' ' + data.statusText + '-' + data.responseText);
+		        			if (!data || !data.responseText) {
+		        				alert(${removeColumnId}_delete_error);
+		        			} else if (typeof data.responseText) {
+		        			    try {
+		        			    	var responseObj = jQuery.parseJSON(data.responseText);
+		        					alert(${removeColumnId}_delete_error + ': ' + (responseObj.localizedMessage ? responseObj.localizedMessage : responseObj.message));
+		        				} catch (e) {
+		        					alert(${removeColumnId}_delete_error + ': ' + data.responseText);
+		        				}
+		        			}
+		        		});
+		        }
+		    	function ${removeColumnId}_div() {
+           			var result =
+               			'<div class="gvnix_dataTables_deleteItem" style="float:left;margin-left:10px;">'
+               			+'<a id="${removeColumnId}" href="#" alt="${delete_label}" title="${delete_label}">'
+               			+ '  <img alt="${delete_label}" class="image" src="${delete_image_url}" title="${delete_label}" />'
+               			+ '</a>'
+               			+ '</div>';
+           			$('#${id}_filter').before(result);
+           			$('#${removeColumnId}').on('click', ${removeColumnId});
+	    		}
+		     </c:set>
+		     <c:set target="${datatables_javaScript_elements_init}" property="${removeColumnId}">
+		     	${removeColumnId}_div();
+		     </c:set>
+		     
+        </c:when>
+        <c:otherwise>
+	        <!-- function to render cell -->
+		    <c:set target="${datatables_javaScript_elements_before}" property="${removeColumnId}">
+		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
+		        function ${removeColumnId}(data, type, full) {
+		        	var result =
+		                '<form action="${urlPath}/'+full.${typeIdFieldName}+'" method="post">'
+		                + '  <input type="hidden" value="DELETE" name="_method"/>'
+		                + '  <input alt="${delete_label}" class="image" src="${delete_image_url}" title="${delete_label}" type="image" value="${delete_label}" onclick="return confirm(${removeColumnId}_confirmation);" />'
+		                + '</form>';
+		                
+	                return result;
+			    }
+		     </c:set>
+	     </c:otherwise>
+	     </c:choose>
      </c:if>
   </c:if>
   
-  <!-- selection -->
-  <c:choose>
-    <c:when test="${selection}">
-      <c:if test="${empty selectionSelectedCssClass}">
-      	<c:set var="selectionSelectedCssClass" value="row_selected"/>
-      </c:if>
-      <c:if test="${empty selectionMultiRow}">
-      	<c:set var="selectionMultiRow" value="false"/>
-      </c:if>
-      <c:set var="selection_none_link" value="true"/>
-      <spring:message var="selection_none_msg" code="selection_none" htmlEscape="false" javaScriptEscape="true"/>
-      <c:if test="${selectionMultiRow}">
-       <c:set var="selection_all_link" value="true"/>
-       <spring:message var="selection_all_msg" code="selection_all" htmlEscape="false" javaScriptEscape="true"/>
-      </c:if>
-      <c:if test="${empty selectionInfoLabel}">
-      	<c:set var="selectionInfoLabel" value="datatables_selection_info"/>
-      </c:if>
-      <spring:message code="${selectionInfoLabel}" htmlEscape="false" var="selection_info_msg"/>
-      <c:if test="${selectionByCheck}">
-        <form id="${selectionCheckColumnId}_form" name="${selectionCheckColumnId}_form">
-        </form>
-        <c:if test="${empty selectionCheckCssClass}">
-      		<c:set var="selectionCheckCssClass" value="check_select_row"/>
-      	</c:if>
-    	<c:set var="selectionCheckColumnId" value="${id}_select_col"/>
-    	<c:if test="${serverSide}">
-    		<c:set target="${datatables_javaScript_elements}" property="${selectionCheckColumnId}">
-	        function ${selectionCheckColumnId}(data, type, full) {
-	        	var result =
-	                '<input type="checkbox" class="${selectionCheckCssClass}" form="${selectionCheckColumnId}_form"/>';
-	                
-                return result;
-		    }
-	     	</c:set>
-    	</c:if>
- 	  </c:if>
-    </c:when>
-    <c:otherwise>
-    	<!-- if no selection no selection by check -->
-    	<c:set var="selectionByCheck" value="false"/>
-    </c:otherwise>
-  </c:choose>
   
   <div id="${id}_gvnix_datatables">
   <script type="text/javascript">
-		<c:forEach var="entry" items="${datatables_javaScript_elements}">
+		<c:forEach var="entry" items="${datatables_javaScript_elements_before}">
 		${entry.value}
 		</c:forEach>
   </script>
@@ -488,8 +615,10 @@
          <c:if test="${delete}">
            <c:choose>
 			  <c:when test="${serverSide}">
-			    <!-- AJAX cell render -->
-			    <table:action-column id="${removeColumnId}" cssCellClass="utilbox" renderFunction="${removeColumnId}" cssStyle="${actionHeaderCssStyle}"/>
+			  	<c:if test="${not (selectionMultiRow and datatablesHasBatchSupport)}">
+				    <!-- AJAX cell render -->
+				    <table:action-column id="${removeColumnId}" cssCellClass="utilbox" renderFunction="${removeColumnId}" cssStyle="${actionHeaderCssStyle}"/>
+				</c:if>
 			  </c:when>
 			  <c:otherwise>
 			    <!-- DOM cell render -->
@@ -523,22 +652,10 @@
   </datatables:table>
   
     <script type="text/javascript">
-		<c:if test="${selection_none_link}">
-		/** selection support functions **/
-		function ${id}_selectNone(){
-			$('#${id}').dataTable().fnSelection().fnSelectNone();
-		};
-		var ${id}_selectionTools_str = '<div class="gvnix_datatables_selection_box" style="float:left;margin-left:10px;">';
-		${id}_selectionTools_str += '<a href="javascript:${id}_selectNone();" class="icon selection_none">${selection_none_msg}</a>';
-		<c:if test="${selection_all_link}">
-		function ${id}_selectAll(){
-			$('#${id}').dataTable().fnSelection().fnSelectAll();
-		};
-		${id}_selectionTools_str += '<a href="javascript:${id}_selectAll();" class="icon selection_all">${selection_all_msg}</a>';
-		</c:if>
-		${id}_selectionTools_str += '</div>'
-		</c:if>
-		
+	<c:forEach var="entry" items="${datatables_javaScript_elements_after}">
+	${entry.value}
+	</c:forEach>
+
         /* init custom api functions for this table */
 	    function ${initCustionFunctionsCallbackId}() {
 	    	datatables_init_custom_api_functions('${id}',
@@ -564,9 +681,10 @@
 	    	<c:if test="${selection_none_link}">
 	    	$('#${id}_filter').before(${id}_selectionTools_str);
 	    	</c:if>
-	        <c:if test="${create}">
-	        ${createButtonCallbackId}();
-	        </c:if>
+	    	
+			<c:forEach var="entry" items="${datatables_javaScript_elements_init}">
+			${entry.value}
+			</c:forEach>
 	    }
   </script>
   </div>

@@ -126,4 +126,6 @@ public class DatatablesConstants {
     static final JavaSymbolName POPULATE_AJAX_DATATABLES = new JavaSymbolName(
             "populateDatatablesUseAjax");
     static final JavaSymbolName UI_MODEL = new JavaSymbolName("uiModel");
+    static final JavaSymbolName POPULATE_BATCH_SUPPORT = new JavaSymbolName(
+            "populateDatatablesHasBatchSupport");
 }

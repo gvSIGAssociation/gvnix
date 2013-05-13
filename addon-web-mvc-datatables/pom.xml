@@ -81,6 +81,11 @@
       <artifactId>org.gvnix.addon.jpa</artifactId>
       <version>${gvnix.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.addon.web.mvc</artifactId>
+      <version>${gvnix.version}</version>
+    </dependency>
   </dependencies>
   
   <!-- DiSiD: Add google code distribution management -->

@@ -737,6 +737,11 @@ var GvNIX_Selection;
 		 *            (node)
 		 */
 		"_fnBindClickEvent" : function(nRow) {
+			
+			if (!nRow){
+				// nothing to do
+				return;
+			}
 
 			var that = this, s = this.s;
 
