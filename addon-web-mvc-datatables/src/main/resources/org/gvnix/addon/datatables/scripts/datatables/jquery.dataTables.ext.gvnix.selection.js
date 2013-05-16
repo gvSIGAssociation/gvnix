@@ -193,8 +193,8 @@ var GvNIX_Selection;
 		/* Constructor logic */
 		this._fnConstruct(oOpts);
 		
-		GvNIX_Selection._aInstances.push( this );
-
+		GvNIX_Selection._fnAddInstance( this );
+		
 		return this;
 	};
 
@@ -626,6 +626,9 @@ var GvNIX_Selection;
 		 */
 		"fnAddSelectionChangeCallback" : function(callback) {
 			var _d = this._data;
+			if (this.s.debug) {
+				this.log("fnAddSelectionChangeCallback: " + (callback.name ? callback.name : callback ));
+			}
 			_d.selectionChangeCallbacks.add(callback);
 		},
 		
@@ -637,6 +640,9 @@ var GvNIX_Selection;
 		 */
 		"fnRemoveSelectionChangeCallback" : function(callback) {
 			var _d = this._data;
+			if (this.s.debug) {
+				this.log("fnRemoveSelectionChangeCallback: " + (callback.name ? callback.name : callback ));
+			}
 			_d.selectionChangeCallbacks.remove(callback);
 		},
 		
@@ -744,7 +750,7 @@ var GvNIX_Selection;
 		 */
 		"_fnUpdateRowTr" : function(nRow, selected) {
 			var s = this.s;
-			var classToAdd = null, classToRemve = null, checkValue = null;
+			var classToAdd = null, classToRemove = null, checkValue = null;
 
 			// prepare values
 			if (selected) {
@@ -902,10 +908,54 @@ var GvNIX_Selection;
 	 */
 	GvNIX_Selection._aInstances = [];
 	
+	/**
+	 * Store selection callbacks which are not registed yet in instances
+	 * (usually because not initialiced yet).
+	 * When the refered instance is register on _aInstances
+	 * the related callback will be added.
+	 */
+	GvNIX_Selection._aSelectionCallbacksPendingToRegister = [];
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * Static methods
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+	/**
+	 * Store new GvNIX_Selection instance.
+	 * Also register pending callback.
+	 *  @method  _fnAddInstance
+	 *  @static
+	 */
+	GvNIX_Selection._fnAddInstance = function ( instance )
+	{
+		GvNIX_Selection._aInstances.push(instance);
+		// Register pending callback
+		var nodeId = instance._data.dt.nTable.id;
+		var register = GvNIX_Selection._aSelectionCallbacksPendingToRegister;
+		
+		var regInfo;
+		// Check if there is a pending register
+		for ( var i=0, iLen=register.length ; i<iLen ; i++ ) {
+			regInfo = register[i];
+			
+			// If table id match
+			if (regInfo.id == nodeId)
+			{
+				// register all callback
+				var callbacks = regInfo.callbacks;
+				while (callbacks.length > 0){
+					instance.fnAddSelectionChangeCallback(callbacks.pop());
+				}
+				
+				// remove pending callback register for this id
+				register.splice(i, 1);
+				// All done
+				return;
+			}
+		}
+	};
+
+	
 	/**
 	 * Get the instance for a table node (or id if a string is given)
 	 *  @method  fnGetInstance
@@ -919,7 +969,7 @@ var GvNIX_Selection;
 			node = $("#"+node);
 		}
 		
-		if (node.dataTable === undefined){
+		if ($.fn.DataTable.fnIsDataTable( node )){
 			throw "Datatable not found: "+ node;
 		}
 		var dt = node.dataTable();
@@ -933,6 +983,58 @@ var GvNIX_Selection;
 		}
 		return null;
 	};
+	
+	/**
+	 * Register a SelectionChange Callback on table node (or id if a string is given). This
+	 * works including when datatable is not ready. In this case, this will store the function
+	 * and register it when selection support is initialized for related datatable.
+	 * 
+	 *  @method  fnGetInstance
+	 *  @returns {Object} ID of table OR table node, for which we want the GvNIX_Seletion instance
+	 *  @static
+	 */
+	GvNIX_Selection.fnAddSelectionChangeCallback = function (node, callback )
+	{
+		var nodeId;
+		if ( typeof node != 'object' )
+		{
+			nodeId = node;
+			node = $("#"+node);
+		} else {
+			nodeId = node.id;
+		}
+		
+					
+		if (jQuery.fn.DataTable.fnIsDataTable( node )){
+			// found node
+			var dt = node.dataTable();
+			
+			for ( var i=0, iLen=GvNIX_Selection._aInstances.length ; i<iLen ; i++ )
+			{
+				if ( GvNIX_Selection._aInstances[i]._data.dt == dt )
+				{
+					// found datatable: register callback in datatable
+					GvNIX_Selection._aInstances[i].fnAddSelectionChangeCallback(callback);
+					return true;
+				}
+			}
+		}
+		// Store in pending to assing
+		var register = GvNIX_Selection._aSelectionCallbacksPendingToRegister;
+		
+		// Check if there is a pending register
+		for ( var i=0, iLen=register.length ; i<iLen ; i++ ) {
+			if (register[i].id == nodeId)
+			{
+				register[i].callbacks.push(callback);
+				return false;
+			}
+		}
+		// nothing registered yet. create a new register
+		register.push({'id' : nodeId, 'callbacks' : [callback]});
+		return false;
+	};
+	
 	
 	
 	/**

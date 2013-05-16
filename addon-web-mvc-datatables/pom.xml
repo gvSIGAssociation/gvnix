@@ -147,7 +147,7 @@
         <excludes>
           <exclude>**/addon/*/configuration.xml</exclude>
           <!-- JS plugins version  -->
-          <exclude>**/addon/*/*.gvnix.*.js</exclude>
+          <exclude>**/addon/**/*.gvnix.*.js</exclude>
         </excludes>
       </resource>
       <resource>
@@ -156,7 +156,7 @@
         <includes>
           <include>**/addon/*/configuration.xml</include>
           <!-- JS plugins version -->
-          <include>**/addon/*/*.gvnix.*.js</include>
+          <include>**/addon/**/*.gvnix.*.js</include>
         </includes>
       </resource>
     </resources>
