@@ -28,7 +28,7 @@ import org.springframework.roo.project.Feature;
 public interface JpaOperations extends Feature {
 
     /**
-     * Feature name. Use to know if gvNIX MVC has been setup in this project
+     * Feature name. Use to know if gvNIX JPA has been setup in this project
      */
     public static final String FEATURE_NAME_GVNIX_JPA = "gvnix-jpa";
 
