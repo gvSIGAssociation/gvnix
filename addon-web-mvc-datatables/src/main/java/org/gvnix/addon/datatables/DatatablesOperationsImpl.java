@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
- * 2013 Generalitat Valenciana
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.addon.datatables;
 
@@ -53,6 +53,7 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.FeatureNames;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
@@ -60,6 +61,7 @@ import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
+import org.springframework.roo.project.maven.Pom;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -96,37 +98,44 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     /**
      * Reference to ProjectOperations
      */
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
     /**
      * Reference to TypeLocationService
      */
-    @Reference private TypeLocationService typeLocationService;
+    @Reference
+    private TypeLocationService typeLocationService;
 
     /**
      * Reference to TypeManagementService
      */
-    @Reference private TypeManagementService typeManagementService;
+    @Reference
+    private TypeManagementService typeManagementService;
 
     /**
      * Reference to MetadataService
      */
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
     /**
      * Reference to MenuOperations
      */
-    @Reference private MenuOperations menuOperations;
+    @Reference
+    private MenuOperations menuOperations;
 
     /**
      * Reference to I18nSupport
      */
-    @Reference private I18nSupport i18nSupport;
+    @Reference
+    private I18nSupport i18nSupport;
 
     /**
      * Reference to PropFileOperations
      */
-    @Reference private PropFileOperations propFileOperations;
+    @Reference
+    private PropFileOperations propFileOperations;
 
     /**
      * Update dependencies if is needed
@@ -145,7 +154,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     /** {@inheritDoc} */
     public boolean isAddAvailable() {
         return projectOperations
-                .isFeatureInstalledInFocusedModule(DatatablesFeature.NAME);
+                .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_DATATABLES);
     }
 
     /** {@inheritDoc} */
@@ -153,7 +162,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         return projectOperations
                 .isFeatureInstalledInFocusedModule(FeatureNames.MVC)
                 && !projectOperations
-                        .isFeatureInstalledInFocusedModule(DatatablesFeature.NAME);
+                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_DATATABLES);
     }
 
     /** {@inheritDoc} */
@@ -895,5 +904,34 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         // Add properties to default messageBundle
         MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
                 propFileOperations, projectOperations, fileManager);
+    }
+
+    /**
+     * Gets the feature name managed by this operations class.
+     * 
+     * @return feature name
+     */
+    public String getName() {
+        return FEATURE_NAME_GVNIX_DATATABLES;
+    }
+
+    /**
+     * Returns true if the given feature is installed in current project.
+     * 
+     * @param moduleName feature name to check in current project
+     * @return true if given feature name is installed, otherwise returns false
+     */
+    public boolean isInstalledInModule(final String moduleName) {
+        final Pom pom = projectOperations.getPomFromModuleName(moduleName);
+        if (pom == null) {
+            return false;
+        }
+        // Look for datatables taglib dependency
+        for (final Dependency dependency : pom.getDependencies()) {
+            if ("org.gvnix.datatables.tags".equals(dependency.getArtifactId())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
