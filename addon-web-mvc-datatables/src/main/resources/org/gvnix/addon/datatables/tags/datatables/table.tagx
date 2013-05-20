@@ -560,7 +560,9 @@
 		    <c:otherwise>
 			  <!-- DOM cell render -->
 			  <table:action-column id="${selectionCheckColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
+			  	<c:if test="${not empty item }">
 			  	<input type="checkbox" class="${selectionCheckClass}" form="${selectionCheckColumnId}_form"/>
+			  	</c:if>
 			  </table:action-column>
 		    </c:otherwise>
 		  </c:choose>
@@ -578,6 +580,7 @@
 		  <c:otherwise>
 			  <!-- DOM cell render -->
 			  <table:action-column id="${showColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
+			  <c:if test="${not empty item }">
 	            <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
                   <spring:url value="${path}/${itemId}" var="show_form_url" />
                   <spring:url value="/resources/images/show.png" var="show_image_url" />
@@ -585,6 +588,7 @@
                   <a href="${show_form_url}" alt="${fn:escapeXml(show_label)}" title="${fn:escapeXml(show_label)}">
                     <img alt="${fn:escapeXml(show_label)}" class="image" src="${show_image_url}" title="${fn:escapeXml(show_label)}" />
                   </a>
+		     </c:if>
 		     </table:action-column>
 		   </c:otherwise>
          </c:choose>
@@ -599,6 +603,7 @@
 			  <c:otherwise>
 			    <!-- DOM cell render -->
 			    <table:action-column id="${updateColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}">
+			    <c:if test="${not empty item }">
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
 	              <spring:url value="${path}/${itemId}" var="update_form_url">
 	                <spring:param name="form" />
@@ -608,6 +613,7 @@
 	              <a href="${update_form_url}" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}">
 	                <img alt="${fn:escapeXml(update_label)}" class="image" src="${update_image_url}" title="${fn:escapeXml(update_label)}" />
 	              </a>				  
+			    </c:if>
 			    </table:action-column>
 			  </c:otherwise>
             </c:choose>
@@ -625,6 +631,7 @@
 			  <c:otherwise>
 			    <!-- DOM cell render -->
 			    <table:action-column id="${removeColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}">
+			    <c:if test="${not empty item }">
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
                   <spring:url value="${path}/${itemId}" var="delete_form_url" />
                   <spring:url value="/resources/images/delete.png" var="delete_image_url" />
@@ -637,6 +644,7 @@
                     </c:set>
                     <input alt="${fn:escapeXml(delete_label)}" class="image" src="${delete_image_url}" title="${fn:escapeXml(delete_label)}" type="image" value="${fn:escapeXml(delete_label)}" onclick="return confirm('${delete_confirm_msg}');" />
                   </form:form>			  
+			    </c:if>
 			    </table:action-column>
 			  </c:otherwise>
             </c:choose>
