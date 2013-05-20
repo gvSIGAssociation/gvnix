@@ -775,7 +775,7 @@ var GvNIX_Selection;
 						+ classToRemove + " check:" + checkValue);
 			}
 			// update row values
-			var $nRow = $(nRow);
+			var $nRow = jQuery(nRow);
 			if (classToAdd) {
 				$nRow.addClass(classToAdd);
 			}
@@ -783,7 +783,7 @@ var GvNIX_Selection;
 				$nRow.removeClass(classToRemove);
 			}
 			if (checkValue != null) {
-				var checkbox = $("input." + s.checkColumnClass + ":checkbox",
+				var checkbox = jQuery("input." + s.checkColumnClass + ":checkbox",
 						nRow);
 				checkbox.prop('checked', checkValue);
 			}
@@ -810,10 +810,10 @@ var GvNIX_Selection;
 			}
 			if (s.checkColumnClass) {
 				// bind checkbox
-				var checkbox = $("input." + s.checkColumnClass + ":checkbox",
+				var checkbox = jQuery("input." + s.checkColumnClass + ":checkbox",
 						nRow);
 				checkbox.on('change', function() {
-					var id = $(this).closest('tr').prop('id');
+					var id = jQuery(this).closest('tr').prop('id');
 					if (this.checked) {
 						that.fnSelect(id);
 					} else {
@@ -823,7 +823,7 @@ var GvNIX_Selection;
 
 			} else {
 				// bind row click
-				$(nRow).on('click', function() {
+				jQuery(nRow).on('click', function() {
 					that.fnToggleSelect(this.id);
 				});
 			}
@@ -966,7 +966,7 @@ var GvNIX_Selection;
 	{
 		if ( typeof node != 'object' )
 		{
-			node = $("#"+node);
+			node = jQuery("#"+node);
 		}
 		
 		if ($.fn.DataTable.fnIsDataTable( node )){
@@ -999,7 +999,7 @@ var GvNIX_Selection;
 		if ( typeof node != 'object' )
 		{
 			nodeId = node;
-			node = $("#"+node);
+			node = jQuery("#"+node);
 		} else {
 			nodeId = node.id;
 		}

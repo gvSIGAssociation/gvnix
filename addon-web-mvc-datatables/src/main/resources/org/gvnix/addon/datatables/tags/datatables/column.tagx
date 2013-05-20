@@ -31,6 +31,7 @@
   <jsp:directive.attribute name="renderFunction" type="java.lang.String" required="false" rtexprvalue="true" description="Name of an external Javascript function that will be used to render the column (AJAX only)" />
   <jsp:directive.attribute name="format" type="java.lang.String" required="false" rtexprvalue="true" description="A MessageFormat pattern that will be used to format the property. (DOM only)" />
   <jsp:directive.attribute name="visible" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable the display of the column. (Default : true)" />
+  <jsp:directive.attribute name="selector" type="java.lang.String" required="false" rtexprvalue="true" description="jQuery selector used to populate a placeholder with a filtering widget." />
   
   
   <!-- Default values -->
@@ -91,6 +92,7 @@
   		renderFunction="${renderFunction}"
   		format="${format}"
   		visible="${empty visible or visible}"
+  		selector="${selector}"
   		/>
 
 </jsp:root>

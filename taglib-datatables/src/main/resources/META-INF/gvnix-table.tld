@@ -206,6 +206,11 @@
       </attribute>
 
       <attribute>
+         <description>Allows you to specify exactly where in the DOM you want DataTables to inject the various controls it adds to the page (for example you might want the pagination controls at the top of the table). DIV elements (with or without a custom class) can also be added to aid styling.</description>
+         <name>dom</name>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
          <description>(true|false) Enable or disable the display of a
             'processing' indicator when the table is being processed
             (e.g. a sort). This is particularly useful for tables
@@ -616,7 +621,12 @@
          <description>A MessageFormat pattern that will be used to format the property. (DOM only)</description>
          <name>format</name>
          <rtexprvalue>true</rtexprvalue>
-      </attribute>      
+      </attribute>
+      <attribute>
+         <description>jQuery selector used to populate a placeholder with a filtering widget.</description>
+         <name>selector</name>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
       
        <!-- ====================================== -->
        <!-- Roo attributes -->
@@ -808,6 +818,11 @@
             auto-sized or not (only for XLS export)
             (Default : true)</description>
          <name>autoSize</name>
+      </attribute>
+      <attribute>
+         <description>TODO</description>
+         <name>url</name>
+         <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
    

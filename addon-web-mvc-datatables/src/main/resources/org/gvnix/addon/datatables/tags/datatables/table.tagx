@@ -49,6 +49,7 @@
   <jsp:directive.attribute name="rowIdSufix" type="java.lang.String" rtexprvalue="true" required="false" description="String which is appended to the rowIdBase attribute, in order to build row id. (HTML id attribute)" />
   <jsp:directive.attribute name="labels" type="java.lang.String" rtexprvalue="true" required="false" description="Base URL of an AJAX loaded file which contains all the labels used in tables. (See : http://www.datatables.net/release-datatables/examples/advanced_init/language_file.html)" />
   <jsp:directive.attribute name="deferRender" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Defer the creation of the table elements for each row until they are needed for a draw.  (Default : false, see http://datatables.net/ref#bDeferRender)" />
+  <jsp:directive.attribute name="dom" type="java.lang.String" rtexprvalue="true" required="false" description="Allows you to specify exactly where in the DOM you want DataTables to inject the various controls it adds to the page (for example you might want the pagination controls at the top of the table). DIV elements (with or without a custom class) can also be added to aid styling." />
 
   <!-- ====================================== -->
   <!-- Basic features -->
@@ -492,7 +493,7 @@
   <datatables:table
 		id="${id}"
 		data="${data}"
-		path="${path}"
+		path="${urlPath}"
 		typeIdFieldName="${typeIdFieldName}"
 		create="${create}"
 		update="${update}"
@@ -512,6 +513,7 @@
       rowIdSufix="${rowIdSufix}"
       labels="${labels}"
       deferRender="${deferRender}"
+      dom="${dom}"
 
       info="${empty info or info}"
       paginate="${empty paginate or paginate}"

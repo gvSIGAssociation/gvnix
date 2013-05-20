@@ -43,7 +43,7 @@
 
   <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
   <properties>
-    <dandelion.version>0.8.12</dandelion.version>
+    <dandelion.version>0.8.14</dandelion.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <querydsl.version>3.1.1</querydsl.version>
