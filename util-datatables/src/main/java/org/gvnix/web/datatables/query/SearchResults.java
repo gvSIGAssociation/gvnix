@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
- * 2013 Generalitat Valenciana
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.web.datatables.query;
 
@@ -30,11 +30,11 @@ public class SearchResults<T> {
     /**
      * Create a bundle of query results.
      * 
-     * @param result
-     * @param totalResultCount
-     * @param isPagedResult
-     * @param startItem
-     * @param pageSize
+     * @param result the entities found
+     * @param totalResultCount amount of entities found
+     * @param isPagedResult true if results are in given page
+     * @param startItem page starts at this item index
+     * @param pageSize amount of entities in this page
      */
     public SearchResults(List<T> result, long totalResultCount,
             boolean isPagedResult, long startItem, long pageSize) {
@@ -57,35 +57,35 @@ public class SearchResults<T> {
     private final long pageSize;
 
     /**
-     * @return item result list
+     * @return list of entities found
      */
     public List<T> getResults() {
         return results;
     }
 
     /**
-     * @return total result of criteria
+     * @return amount of entities found
      */
     public long getTotalResultCount() {
         return totalResultCount;
     }
 
     /**
-     * @return if {@link #getResult()} is paged
+     * @return true if entities found are in given page
      */
     public boolean isPagedResult() {
         return isPagedResult;
     }
 
     /**
-     * @return start item index of {@link #getResult()}
+     * @return page starts at this item index
      */
     public long getStartItem() {
         return startItem;
     }
 
     /**
-     * @return the page size required
+     * @return amount of entities in this page
      */
     public long getPageSize() {
         return pageSize;
