@@ -63,7 +63,6 @@
   <jsp:directive.attribute name="autoWidth" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable automatic column width calculation. (Default : true, see http://datatables.net/ref#bAutoWidth)" />
 
   <jsp:directive.attribute name="processing" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable or disable the display of a 'processing' indicator when the table is being processed (e.g. a sort). This is particularly useful for tables with large amounts of data where it can take a noticeable amount of time to sort the entries. (Default : false, see http://datatables.net/ref#bProcessing)" />
-  <jsp:directive.attribute name="serverSide" type="java.lang.Boolean" rtexprvalue="true" required="false" description="Configure DataTables to use server-side processing" />
   <jsp:directive.attribute name="serverData" type="java.lang.String" rtexprvalue="true" required="false" description="Allows you to override the default function which obtains the data from the server ($.getJSON) so something more suitable for your application" />
   <jsp:directive.attribute name="serverParams" type="java.lang.String" rtexprvalue="true" required="false" description="Allows you to send extra information to the server when using AJAX source" />
   <jsp:directive.attribute name="pipelining" type="java.lang.Boolean" rtexprvalue="true" required="false" description="Enable pipelining data for paging when server-side processing is enabled" />
@@ -137,23 +136,13 @@
   	<c:set var="displayLength" value="10"/>
   </c:if>
   
-  <c:choose>
-	  <c:when test="${empty data}">
-		  <c:if test="${empty serverSide}">
-		    <c:choose>
-			    <c:when test="${empty datatablesUseAjax}">
-			  	  <c:set var="serverSide" value="true"/>
-			  	</c:when>
-			  	<c:otherwise>
-			  		<c:set var="serverSide" value="${datatablesUseAjax}"/>
-			  	</c:otherwise>
-		  	</c:choose>
-		  </c:if>
-	  </c:when>
-	  <c:otherwise>
-	  	<c:set var="serverSide" value="false"/>
-	  </c:otherwise>
-  </c:choose>
+  <!-- Require 'datatablesUseAjax' defined in context -->
+  <c:set var="serverSide" value="${datatablesUseAjax}"/>
+  <jsp:scriptlet>
+    if (jspContext.getAttribute("serverSide") == null){
+        throw new IllegalArgumentException("Missing context value for 'datatablesUseAjax'");
+    }
+  </jsp:scriptlet>
   
   <c:if test="${serverSide and empty serverData }">
     <c:set var="serverData" value="doAjaxRequestByPost"/>

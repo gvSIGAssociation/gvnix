@@ -156,19 +156,9 @@ public class DatatablesMetadata extends
     private FieldMetadata conversionService;
 
     /**
-     * Field which holds current data mode
-     */
-    private FieldMetadata dataMode;
-
-    /**
      * Itd builder herlper
      */
     private WebItdBuilderHelper helper;
-
-    /**
-     * Field which if batch support is available
-     */
-    private FieldMetadata batchSupport;
 
     private final WebScaffoldAnnotationValues webScaffoldAnnotationValues;
 
@@ -205,15 +195,17 @@ public class DatatablesMetadata extends
 
         // Adding field definition
         builder.addField(getConversionServiceField());
-        builder.addField(getUseAjaxField());
-        builder.addField(getHasBatchSupportField());
 
         // Adding methods definition
-        builder.addMethod(getGetDatatablesDataMethod());
         builder.addMethod(getListDatatablesRequestMethod());
+        builder.addMethod(getPopulateHasBatchSupportMethod());
         builder.addMethod(getListRooRequestMethod());
         builder.addMethod(getPopulateAJAXDatatablesMethod());
-        builder.addMethod(getPopulateHasBatchSupportMethod());
+
+        // Add AJAX mode required methods
+        if (isAjax()) {
+            builder.addMethod(getGetDatatablesDataMethod());
+        }
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
@@ -256,7 +248,7 @@ public class DatatablesMetadata extends
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         bodyBuilder.appendFormalLine(String.format("return %s;",
-                getHasBatchSupportField().getFieldName().getSymbolName()));
+                hasJpaBatchSupport()));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -306,8 +298,7 @@ public class DatatablesMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine(String.format("return %s;",
-                getUseAjaxField().getFieldName().getSymbolName()));
+        bodyBuilder.appendFormalLine(String.format("return %s;", isAjax()));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -365,7 +356,12 @@ public class DatatablesMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildListDatatablesRequesMethodBody(bodyBuilder);
+        if (isAjax()) {
+            buildListDatatablesRequesMethodAjaxBody(bodyBuilder);
+        }
+        else {
+            buildListDatatablesRequesMethodDomBody(bodyBuilder);
+        }
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -379,20 +375,18 @@ public class DatatablesMetadata extends
     }
 
     /**
-     * Build method body for <code>listDatatablesRequest</code> method
+     * Build method body for <code>listDatatablesRequest</code> method for DOM
+     * mode
      * 
      * @param bodyBuilder
      */
-    private void buildListDatatablesRequesMethodBody(
+    private void buildListDatatablesRequesMethodDomBody(
             InvocableMemberBodyBuilder bodyBuilder) {
 
         JavaType objectList = new JavaType(LIST.getFullyQualifiedTypeName(), 0,
                 DataType.TYPE, null, Arrays.asList(entity));
         String listVarName = StringUtils.uncapitalize(entityPlural);
 
-        bodyBuilder.appendFormalLine(String.format("if (!%s) {",
-                getUseAjaxField().getFieldName().getSymbolName()));
-        bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("// Get all data to put it on pageContext");
         bodyBuilder.appendFormalLine(String.format("%s %s = %s.findAll%s();",
@@ -403,8 +397,21 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine(String.format(
                 "%s.addAttribute(\"%s\",%s);", UI_MODEL.getSymbolName(),
                 entityPlural.toLowerCase(), listVarName));
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
+
+        // return "pets/list";
+        bodyBuilder.appendFormalLine(String.format("return \"%s/list\";",
+                entityPlural.toLowerCase()));
+
+    }
+
+    /**
+     * Build method body for <code>listDatatablesRequest</code> method for AJAX
+     * mode
+     * 
+     * @param bodyBuilder
+     */
+    private void buildListDatatablesRequesMethodAjaxBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
 
         // return "pets/list";
         bodyBuilder.appendFormalLine(String.format("return \"%s/list\";",
@@ -628,126 +635,6 @@ public class DatatablesMetadata extends
      * 
      * @return a FieldMetadata object
      */
-    public FieldMetadata getUseAjaxField() {
-        if (dataMode == null) {
-            JavaSymbolName curName = new JavaSymbolName("datatablesUseAjax");
-            String initializer = String.format("%s",
-                    String.valueOf(annotationValues.isAjax()));
-
-            // Check if field exist
-            FieldMetadata currentField = governorTypeDetails
-                    .getDeclaredField(curName);
-            if (currentField != null) {
-                if (!currentField.getFieldType().equals(
-                        JavaType.BOOLEAN_PRIMITIVE)) {
-                    // No compatible field: look for new name
-                    currentField = null;
-                    JavaSymbolName newName = curName;
-                    int i = 1;
-                    while (governorTypeDetails.getDeclaredField(newName) != null) {
-                        newName = new JavaSymbolName(curName.getSymbolName()
-                                .concat(StringUtils.repeat('_', i)));
-                        i++;
-                    }
-                    curName = newName;
-                }
-            }
-            if (currentField != null) {
-                // check initializer value
-                if (StringUtils.equalsIgnoreCase(initializer.trim(),
-                        currentField.getFieldInitializer().trim())) {
-                    dataMode = currentField;
-                }
-                else {
-                    // Show a warning
-                    LOGGER.warning(String.format(
-                            "%s.%s has a different value than %s.ajax",
-                            getId(), currentField.getFieldName()
-                                    .getReadableSymbolName(),
-                            GvNIXDatatables.class.getSimpleName()));
-                }
-            }
-            else {
-                // create field
-                List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
-                        0);
-                // Using the FieldMetadataBuilder to create the field
-                // definition.
-                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
-                        getId(), Modifier.PUBLIC, annotations, curName, // Field
-                        JavaType.BOOLEAN_PRIMITIVE); // Field type
-                fieldBuilder.setFieldInitializer(initializer);
-                dataMode = fieldBuilder.build(); // Build and return a
-                // FieldMetadata
-                // instance
-            }
-        }
-        return dataMode;
-    }
-
-    /**
-     * Create metadata for field which informs that batch services available.
-     * 
-     * @return a FieldMetadata object
-     */
-    public FieldMetadata getHasBatchSupportField() {
-        if (batchSupport == null) {
-            JavaSymbolName curName = new JavaSymbolName(
-                    "datatablesHasBatchSupport");
-            String initializer = String.format("%s",
-                    String.valueOf(webJpaBatchMetadata != null));
-
-            // Check if field exist
-            FieldMetadata currentField = governorTypeDetails
-                    .getDeclaredField(curName);
-            if (currentField != null) {
-                if (!currentField.getFieldType().equals(
-                        JavaType.BOOLEAN_PRIMITIVE)) {
-                    // No compatible field: look for new name
-                    currentField = null;
-                    JavaSymbolName newName = curName;
-                    int i = 1;
-                    while (governorTypeDetails.getDeclaredField(newName) != null) {
-                        newName = new JavaSymbolName(curName.getSymbolName()
-                                .concat(StringUtils.repeat('_', i)));
-                        i++;
-                    }
-                    curName = newName;
-                }
-            }
-            if (currentField != null) {
-                // check initializer value
-                if (StringUtils.equalsIgnoreCase(initializer.trim(),
-                        currentField.getFieldInitializer().trim())) {
-                    batchSupport = currentField;
-                }
-                else {
-                    // Show a warning
-                    LOGGER.warning(String
-                            .format("%s.%s is erroneous", getId(), currentField
-                                    .getFieldName().getReadableSymbolName()));
-                }
-            }
-            else {
-                // create field
-                // Using the FieldMetadataBuilder to create the field
-                // definition.
-                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
-                        getId(), Modifier.PUBLIC, curName, // Field
-                        JavaType.BOOLEAN_PRIMITIVE, initializer); // Field type
-                batchSupport = fieldBuilder.build(); // Build and return a
-                // FieldMetadata
-                // instance
-            }
-        }
-        return batchSupport;
-    }
-
-    /**
-     * Create metadata for auto-wired convertionService field.
-     * 
-     * @return a FieldMetadata object
-     */
     public FieldMetadata getConversionServiceField() {
         if (conversionService == null) {
             JavaSymbolName curName = new JavaSymbolName(
@@ -824,5 +711,13 @@ public class DatatablesMetadata extends
 
     public WebScaffoldAnnotationValues getWebScaffoldAnnotationValues() {
         return webScaffoldAnnotationValues;
+    }
+
+    public boolean isAjax() {
+        return annotationValues.isAjax();
+    }
+
+    public boolean hasJpaBatchSupport() {
+        return webJpaBatchMetadata != null;
     }
 }
