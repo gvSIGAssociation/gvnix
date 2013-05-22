@@ -17,6 +17,7 @@
  */
 package org.gvnix.addon.datatables;
 
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Feature;
 
@@ -81,18 +82,27 @@ public interface DatatablesOperations extends Feature {
     void updateTags();
 
     /**
-     * Updates de list.jspx page of target controller to use datatables
-     * component
+     * Updates all jspx pages of target controller to use datatables component
      * 
      * @param controller
      */
-    void updateControllerListJsp(JavaType controller);
+    void updateControllerJspPages(JavaType controller);
+
+    /**
+     * Updates all jspx pages of target controller to use datatables component
+     * 
+     * @param controller
+     * @param webScaffoldAnnotationValues
+     */
+    void updateControllerJspPages(JavaType controller,
+            WebScaffoldAnnotationValues webScaffoldAnnotationValues);
 
     /**
      * Remove <code>page</code> and <code>size</code> parameters from list menu
      * link for target controller
      * 
      * @param controller
+     * @deprecated
      */
     void updateListMenuUrl(JavaType controller);
 
@@ -122,4 +132,5 @@ public interface DatatablesOperations extends Feature {
      * Add required i18n keys
      */
     void addI18nKeys();
+
 }

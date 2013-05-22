@@ -29,6 +29,7 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -101,9 +102,10 @@ public final class DatatablesMetadataProvider extends
 
         JavaType webScaffoldAspectName = webScaffoldMetadata.getAspectName();
 
+        WebScaffoldAnnotationValues webScaffoldAnnotationValues = webScaffoldMetadata
+                .getAnnotationValues();
         // Get formBackingObject
-        JavaType entity = webScaffoldMetadata.getAnnotationValues()
-                .getFormBackingObject();
+        JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
 
         // Get batch service (if any)
         String webJpaBatchMetadataId = WebJpaBatchMetadata.createIdentifier(
@@ -141,7 +143,8 @@ public final class DatatablesMetadataProvider extends
         return new DatatablesMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, entity,
                 identifiers, plural, entityManagerMethodName, hasDateTypes,
-                webScaffoldAspectName, webJpaBatchMetadata, jpaQueryMetadata);
+                webScaffoldAspectName, webJpaBatchMetadata, jpaQueryMetadata,
+                webScaffoldAnnotationValues);
     }
 
     /**

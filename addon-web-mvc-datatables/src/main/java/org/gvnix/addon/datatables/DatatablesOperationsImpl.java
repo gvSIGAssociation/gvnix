@@ -36,6 +36,7 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
@@ -213,9 +214,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                     .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
                             .build());
 
-            doUpdateControllerListJsp(javaType, controllerAnnotation);
-
-            doUpdateListMenuUrl(javaType, controllerAnnotation);
+            // doUpdateListMenuUrl(javaType, controllerAnnotation);
         }
     }
 
@@ -226,7 +225,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * org.gvnix.roo.addon.datatables.DatatablesOperations#updateControllerListJsp
      * (org.springframework.roo.model.JavaType)
      */
-    public void updateControllerListJsp(JavaType controller) {
+    public void updateControllerJspPages(JavaType controller) {
         Validate.notNull(controller, "Controller required");
 
         // Obtain ClassOrInterfaceTypeDetails for this java type
@@ -237,7 +236,8 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 .getAnnotationOfType(existing.getAnnotations(),
                         SCAFFOLD_ANNOTATION);
 
-        doUpdateControllerListJsp(controller, controllerAnnotation);
+        updateControllerJspPages(controller,
+                getControllerPath(controllerAnnotation));
     }
 
     private ClassOrInterfaceTypeDetails getControllerDetails(JavaType controller) {
@@ -252,10 +252,23 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * Updates de list.jspx page of target controller to use datatables
      * component.
      */
-    private void doUpdateControllerListJsp(JavaType controller,
-            AnnotationMetadata controllerAnnotation) {
+    public void updateControllerJspPages(JavaType controller,
+            WebScaffoldAnnotationValues controllerAnnotationValues) {
+        Validate.notNull(controllerAnnotationValues,
+                "controller annotation values required");
+
+        updateControllerJspPages(controller,
+                controllerAnnotationValues.getPath());
+    }
+
+    /**
+     * Updates de list.jspx page of target controller to use datatables
+     * component.
+     */
+    private void updateControllerJspPages(JavaType controller,
+            String controllerPath) {
+
         // locate list.jspx application path from @RooWebScaffold path value
-        String controllerPath = getControllerPath(controllerAnnotation);
         Validate.notBlank(controllerPath,
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + controller.getSimpleTypeName() + "'");
@@ -443,6 +456,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * org.gvnix.addon.datatables.DatatablesOperations#cleanListMenuUrl(org.
      * springframework.roo.model.JavaType)
      */
+    @Deprecated
     public void updateListMenuUrl(JavaType controller) {
 
         Validate.notNull(controller, "Controller required");
@@ -465,6 +479,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * 
      * @param controllerDetails
      * @param controllerAnnotation
+     * @deprecated
      */
     public void doUpdateListMenuUrl(JavaType controller,
             AnnotationMetadata controllerAnnotation) {

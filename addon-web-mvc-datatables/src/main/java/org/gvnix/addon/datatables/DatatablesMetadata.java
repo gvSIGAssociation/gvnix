@@ -52,6 +52,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.addon.jpa.query.JpaQueryMetadata;
 import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.gvnix.support.WebItdBuilderHelper;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
@@ -169,6 +170,8 @@ public class DatatablesMetadata extends
      */
     private FieldMetadata batchSupport;
 
+    private final WebScaffoldAnnotationValues webScaffoldAnnotationValues;
+
     public DatatablesMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             DatatablesAnnotationValues annotationValues, JavaType entity,
@@ -176,7 +179,8 @@ public class DatatablesMetadata extends
             JavaSymbolName entityManagerMethodName, boolean hasDateTypes,
             JavaType webScaffoldAspectName,
             WebJpaBatchMetadata webJpaBatchMetadata,
-            JpaQueryMetadata jpaQueryMetadata) {
+            JpaQueryMetadata jpaQueryMetadata,
+            WebScaffoldAnnotationValues webScaffoldAnnotationValues) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -193,6 +197,7 @@ public class DatatablesMetadata extends
         this.entityEntityManagerMethod = entityManagerMethodName;
         this.webJpaBatchMetadata = webJpaBatchMetadata;
         this.jpaQueryMetadata = jpaQueryMetadata;
+        this.webScaffoldAnnotationValues = webScaffoldAnnotationValues;
 
         // Adding precedence declaration
         // This aspect before webScaffold
@@ -815,5 +820,9 @@ public class DatatablesMetadata extends
 
     public DatatablesAnnotationValues getAnnotationValues() {
         return annotationValues;
+    }
+
+    public WebScaffoldAnnotationValues getWebScaffoldAnnotationValues() {
+        return webScaffoldAnnotationValues;
     }
 }
