@@ -34,8 +34,7 @@ public class DatatablesAnnotationValues extends AbstractAnnotationValues {
     public static final JavaType DATATABLES_ANNOTATION = new JavaType(
             GvNIXDatatables.class);
 
-    @AutoPopulate
-    private boolean ajax = true;
+    @AutoPopulate private boolean ajax = true;
 
     public DatatablesAnnotationValues(
             final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {
