@@ -36,10 +36,10 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.SpringJavaType;
 
 /**
- * Helper which provides utilities for a Web MVC Controllers ITD generator (Metadata)
+ * Helper which provides utilities for a Web MVC Controllers ITD generator
+ * (Metadata)
  * 
  * @author gvNIX Team
- *
  */
 public class WebItdBuilderHelper extends ItdBuilderHelper {
 

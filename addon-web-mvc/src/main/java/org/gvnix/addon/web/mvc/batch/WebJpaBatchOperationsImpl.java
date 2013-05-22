@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
- * Copyright (C) 2013 Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
+ * 2013 Generalitat Valenciana
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.addon.web.mvc.batch;
 
@@ -61,14 +61,11 @@ public class WebJpaBatchOperationsImpl implements WebJpaBatchOperations {
     private static final List<JavaType> JPA_BATCH_SERVICE_ANNOTATIONS = Arrays
             .asList(JPA_BATCH_ANNOTATION, SpringJavaType.SERVICE);
 
-    @Reference
-    private ProjectOperations projectOperations;
+    @Reference private ProjectOperations projectOperations;
 
-    @Reference
-    private TypeLocationService typeLocationService;
+    @Reference private TypeLocationService typeLocationService;
 
-    @Reference
-    private TypeManagementService typeManagementService;
+    @Reference private TypeManagementService typeManagementService;
 
     /** {@inheritDoc} */
     public boolean isCommandAvailable() {
@@ -116,7 +113,7 @@ public class WebJpaBatchOperationsImpl implements WebJpaBatchOperations {
      * 
      * @param entity
      * @param jpaBatchServices list of class annotated with
-     *        {@link #JPA_BATCH_SERVICE_ANNOTATIONS}
+     *            {@link #JPA_BATCH_SERVICE_ANNOTATIONS}
      * @return
      */
     private JavaType findJpaServiceForEntity(JavaType entity,

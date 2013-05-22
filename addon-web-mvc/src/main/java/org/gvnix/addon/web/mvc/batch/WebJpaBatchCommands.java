@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
- * Copyright (C) 2013 Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
+ * 2013 Generalitat Valenciana
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.addon.web.mvc.batch;
 
@@ -40,8 +40,7 @@ public class WebJpaBatchCommands implements CommandMarker {
      * Get a reference to the WebJpaBatchOperations from the underlying OSGi
      * container
      */
-    @Reference
-    private WebJpaBatchOperations operations;
+    @Reference private WebJpaBatchOperations operations;
 
     /**
      * Informs if <code>web mvc batch</code> commands are available
@@ -59,8 +58,8 @@ public class WebJpaBatchCommands implements CommandMarker {
      * 
      * @param controller Target Web MVC controller to add support
      * @param service (optional) Spring service (annotated wid GvNIXJpaBatch) to
-     *        use for batch operations. If no specified uses controller's
-     *        formBacking object service."
+     *            use for batch operations. If no specified uses controller's
+     *            formBacking object service."
      */
     @CliCommand(value = "web mvc batch add", help = "Adds support to JPA batch operation in a controller")
     public void create(

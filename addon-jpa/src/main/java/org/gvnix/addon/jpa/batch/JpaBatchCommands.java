@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
- * Copyright (C) 2013 Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
+ * 2013 Generalitat Valenciana
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.addon.jpa.batch;
 
@@ -41,8 +41,7 @@ public class JpaBatchCommands implements CommandMarker {
      * Get a reference to the JpaBatchOperations from the underlying OSGi
      * container
      */
-    @Reference
-    private JpaBatchOperations operations;
+    @Reference private JpaBatchOperations operations;
 
     /**
      * Informs if <code>jpa batch</code> commands are available
@@ -61,8 +60,8 @@ public class JpaBatchCommands implements CommandMarker {
      * 
      * @param entity a JPA Active Record Entity
      * @param target (optional) the java type to be created. If not set, class
-     *        will be create in the same package of managed entity and a name
-     *        based on entity name
+     *            will be create in the same package of managed entity and a
+     *            name based on entity name
      */
     @CliCommand(value = "jpa batch create", help = "Creates a Spring @Service class with methods for batch modification of a JPA Active Record entity")
     public void create(
@@ -76,7 +75,7 @@ public class JpaBatchCommands implements CommandMarker {
      * JPA Active Record entity in application
      * 
      * @param targetPackage package for created classes. If not set, classes
-     *        will be create in the same package of managed entity
+     *            will be create in the same package of managed entity
      */
     @CliCommand(value = "jpa batch all", help = "Creates a Spring @Service class with methods for batch modification every JPA Active Record entity in application")
     public void all(

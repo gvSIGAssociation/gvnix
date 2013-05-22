@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
- * Copyright (C) 2013 Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
+ * 2013 Generalitat Valenciana
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.web.datatables.util;
 
@@ -53,10 +53,10 @@ public class QuerydslUtils {
      * Utility for constructing where clause expressions.
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *            {@code Pet}, {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
+     *            {@code name} in {@code Pet} entity, {@code firstName} in
+     *            {@code Pet.owner} entity.
      * @param fieldType Property value {@code Class}
      * @param searchStr the value to find, may be null
      * @return Predicate
@@ -134,10 +134,10 @@ public class QuerydslUtils {
      * Like operation is case insensitive.
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *            {@code Pet}, {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
+     *            {@code name} in {@code Pet} entity, {@code firstName} in
+     *            {@code Pet.owner} entity.
      * @param searchStr the value to find, may be null
      * @return BooleanExpression
      */
@@ -164,10 +164,10 @@ public class QuerydslUtils {
      * Like operation is case sensitive.
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *            {@code Pet}, {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
+     *            {@code weight} in {@code Pet} entity, {@code age} in
+     *            {@code Pet.owner} entity.
      * @param searchStr the value to find, may be null
      * @return PredicateOperation
      */
@@ -196,10 +196,10 @@ public class QuerydslUtils {
      * Like operation is case sensitive.
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *            {@code Pet}, {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
+     *            {@code weight} in {@code Pet} entity, {@code age} in
+     *            {@code Pet.owner} entity.
      * @param searchStr the value to find, may be null
      * @return PredicateOperation
      */
@@ -226,10 +226,10 @@ public class QuerydslUtils {
      * Like operation is case insensitive.
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *            {@code Pet}, {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
+     *            {@code weight} in {@code Pet} entity, {@code age} in
+     *            {@code Pet.owner} entity.
      * @param searchStr the value to find, may be null
      * @param enumClass Enumeration type. Needed to enumeration values
      * @return BooleanExpression
@@ -293,12 +293,12 @@ public class QuerydslUtils {
      * Expr: {@code entityPath.fieldName eq (TRUE | FALSE)}
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *            {@code Pet}, {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
+     *            {@code weight} in {@code Pet} entity, {@code age} in
+     *            {@code Pet.owner} entity.
      * @param searchStr the boolean value to find, may be null. Supported string
-     *        are: si, yes, true, on, no, false, off
+     *            are: si, yes, true, on, no, false, off
      * @return BooleanExpression
      */
     public static <T> BooleanExpression createBooleanExpression(
@@ -331,12 +331,12 @@ public class QuerydslUtils {
      * Create an order-by-element in a Query instance
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *            {@code Pet}, {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
+     *            {@code weight} in {@code Pet} entity, {@code age} in
+     *            {@code Pet.owner} entity.
      * @param fieldType Property value {@code Class}. Must implements
-     *        {@link Comparable}
+     *            {@link Comparable}
      * @param order ascending or descending order
      * @return
      */

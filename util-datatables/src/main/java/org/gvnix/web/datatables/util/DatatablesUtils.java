@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
- * Copyright (C) 2013 Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
+ * 2013 Generalitat Valenciana
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.web.datatables.util;
 
@@ -86,11 +86,11 @@ public class DatatablesUtils {
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations for each related entity to join contain as
-     *        key the name of the association and as value the List of related
-     *        entity fields to filter by
+     *            key the name of the association and as value the List of
+     *            related entity fields to filter by
      * @param orderByAssociations for each related entity to order contain as
-     *        key the name of the association and as value the List of related
-     *        entity fields to order by
+     *            key the name of the association and as value the List of
+     *            related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @return
@@ -110,11 +110,11 @@ public class DatatablesUtils {
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations for each related entity to join contain as
-     *        key the name of the association and as value the List of related
-     *        entity fields to filter by
+     *            key the name of the association and as value the List of
+     *            related entity fields to filter by
      * @param orderByAssociations for each related entity to order contain as
-     *        key the name of the association and as value the List of related
-     *        entity fields to order by
+     *            key the name of the association and as value the List of
+     *            related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param distinct use distinct query
@@ -482,10 +482,10 @@ public class DatatablesUtils {
      * @param totalDisplayRecords Amount of records found
      * @param columns {@link ColumnDef} list
      * @param datePatterns Patterns to convert Date fields to String. The Map
-     *        contains one pattern for each entity Date field keyed by field
-     *        name. For Roo compatibility the key could follow the pattern
-     *        {@code lower_case( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
-     *        too
+     *            contains one pattern for each entity Date field keyed by field
+     *            name. For Roo compatibility the key could follow the pattern
+     *            {@code lower_case( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
+     *            too
      * @param conversionService
      * @return
      */

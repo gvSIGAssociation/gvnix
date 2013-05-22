@@ -31,7 +31,6 @@ import org.springframework.roo.model.JavaType;
  * Helper which provides utilities for a ITD generator (Metadata)
  * 
  * @author gvNIX Team
- *
  */
 public class ItdBuilderHelper {
 
@@ -42,7 +41,8 @@ public class ItdBuilderHelper {
      * Constructor
      * 
      * @param metadata
-     * @param importResolver (usually to get use <code>builder.getImportRegistrationResolver()</code>)
+     * @param importResolver (usually to get use
+     *            <code>builder.getImportRegistrationResolver()</code>)
      */
     public ItdBuilderHelper(
             AbstractItdTypeDetailsProvidingMetadataItem metadata,
