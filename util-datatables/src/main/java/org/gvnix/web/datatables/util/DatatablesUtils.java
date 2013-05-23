@@ -472,7 +472,7 @@ public class DatatablesUtils {
 
         // Predicate for base query
         BooleanBuilder basePredicate = QuerydslUtils.createPredicateByAnd(
-                entityClass, baseSearchValuesMap);
+                entity, baseSearchValuesMap);
 
         // query projection to count all entities without paging
         baseQuery.where(basePredicate);

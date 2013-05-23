@@ -55,7 +55,13 @@ public class QuerydslUtils {
     /**
      * Creates a WHERE clause by the intersection of the given search-arguments
      * 
-     * @param entityClass Entity
+     * @param entity Entity {@link PathBuilder}. It represents the entity for
+     *        class generation and alias-usage for path generation.
+     *        <p/>
+     *        Example: To retrieve a {@code Customer} with the first name 'Bob'
+     *        entity must be a {@link PathBuilder} created for {@code Customer}
+     *        class and searchArgs must contain the entry
+     *        {@code 'firstName':'Bob'}
      * @param searchArgs Search arguments to be used to create the WHERE clause.
      *        It can contain {@code _operator_} entries for each field that want
      *        to use its own operator. By default {@code EQUALS} operator is
@@ -66,8 +72,8 @@ public class QuerydslUtils {
      *        comparison
      * @return the WHERE clause
      */
-    public static <T> BooleanBuilder createPredicateByAnd(Class<T> entityClass,
-            Map<String, Object> searchArgs) {
+    public static <T> BooleanBuilder createPredicateByAnd(
+            PathBuilder<T> entity, Map<String, Object> searchArgs) {
 
         // Using BooleanBuilder, a cascading builder for
         // Predicate expressions
@@ -76,16 +82,13 @@ public class QuerydslUtils {
             return predicate;
         }
 
-        PathBuilder<T> entityPath = new PathBuilder<T>(entityClass,
-                "baseEntity");
-
         // Build the predicate
         if (searchArgs != null && !searchArgs.isEmpty()) {
             for (Entry<String, Object> entry : searchArgs.entrySet()) {
                 // TODO: use the operator
                 // searchArgs can contain "_operator_" entries for each field
-                predicate.and(createObjectExpression(entityPath,
-                        entry.getKey(), entry.getValue()));
+                predicate.and(createObjectExpression(entity, entry.getKey(),
+                        entry.getValue()));
             }
         }
         return predicate;
