@@ -17,6 +17,7 @@
  */
 package org.gvnix.addon.datatables;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
@@ -35,6 +36,7 @@ public class DatatablesAnnotationValues extends AbstractAnnotationValues {
             GvNIXDatatables.class);
 
     @AutoPopulate private boolean ajax = true;
+    @AutoPopulate private String mode = null;
 
     public DatatablesAnnotationValues(
             final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {
@@ -53,7 +55,24 @@ public class DatatablesAnnotationValues extends AbstractAnnotationValues {
         AutoPopulationUtils.populate(this, annotationMetadata);
     }
 
+    /**
+     * @return use AJAX data mode
+     */
     public boolean isAjax() {
         return ajax;
+    }
+
+    /**
+     * @return use standard visualization mode
+     */
+    public boolean isStandardMode() {
+        return StringUtils.isBlank(mode);
+    }
+
+    /**
+     * @return page to render inside table cell
+     */
+    public String getMode() {
+        return mode;
     }
 }

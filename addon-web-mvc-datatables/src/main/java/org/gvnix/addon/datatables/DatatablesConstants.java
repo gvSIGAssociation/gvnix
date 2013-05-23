@@ -23,8 +23,12 @@ import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.JdkJavaType.MAP;
 import static org.springframework.roo.model.JdkJavaType.SET;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
@@ -74,7 +78,7 @@ public class DatatablesConstants {
     /**
      * ArrayList<Map<String,String>>
      */
-    static final JavaType RENDER_FOR_DATATABLES_RETURN_IMP = new JavaType(
+    static final JavaType ARRAYLIST_MAP_STRING_STRING = new JavaType(
             ARRAY_LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(MAP_STRING_STRING));
 
@@ -126,6 +130,8 @@ public class DatatablesConstants {
     static final JavaSymbolName UI_MODEL = new JavaSymbolName("uiModel");
     static final JavaSymbolName POPULATE_DATATABLES_CONFIG = new JavaSymbolName(
             "populateDatatablesConfig");
+    static final JavaSymbolName POPULATE_ITEM_FOR_RENDER = new JavaSymbolName(
+            "populateItemForRender");
 
     static final JavaType DATA_SET = new JavaType(
             "com.github.dandelion.datatables.core.ajax.DataSet");
@@ -134,4 +140,27 @@ public class DatatablesConstants {
             DATA_SET.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(MAP_STRING_STRING));
 
+    static final JavaType HTTP_SERVLET_REQUEST = new JavaType(
+            "javax.servlet.http.HttpServletRequest");
+    static final JavaType HTTP_SERVLET_RESPONSE = new JavaType(
+            "javax.servlet.http.HttpServletResponse");
+    static final JavaType HTTP_SERVLET_RESPONSE_WRAPPER = new JavaType(
+            "javax.servlet.http.HttpServletResponseWrapper");
+    static final JavaType REQUEST_DISPATCHER = new JavaType(
+            "javax.servlet.RequestDispatcher");
+    static final JavaType SERVLET_EXCEPTION = new JavaType(
+            "javax.servlet.ServletException");
+
+    static final JavaSymbolName REQUEST_PARAM_NAME = new JavaSymbolName(
+            "request");
+    static final JavaSymbolName RESPONSE_PARAM_NAME = new JavaSymbolName(
+            "response");
+
+    static final JavaType STRING_WRITER = new JavaType(StringWriter.class);
+    static final JavaType PRINT_WRITER = new JavaType(PrintWriter.class);
+    static final JavaType IO_EXCEPTION = new JavaType(IOException.class);
+
+    static final JavaType JODA_DATETIME_FORMAT = new JavaType(
+            "org.joda.time.format.DateTimeFormat");
+    static final JavaType LOCALE = new JavaType(Locale.class);
 }

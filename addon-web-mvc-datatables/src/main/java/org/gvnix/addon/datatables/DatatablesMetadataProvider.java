@@ -138,11 +138,10 @@ public final class DatatablesMetadataProvider extends
         final Map<JavaSymbolName, DateTimeFormatDetails> datePatterns = webMetadataService
                 .getDatePatterns(entity, entityMemberDetails,
                         metadataIdentificationString);
-        boolean hasDateTypes = !datePatterns.isEmpty();
 
         return new DatatablesMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, entity,
-                identifiers, plural, entityManagerMethodName, hasDateTypes,
+                identifiers, plural, entityManagerMethodName, datePatterns,
                 webScaffoldAspectName, webJpaBatchMetadata, jpaQueryMetadata,
                 webScaffoldAnnotationValues);
     }

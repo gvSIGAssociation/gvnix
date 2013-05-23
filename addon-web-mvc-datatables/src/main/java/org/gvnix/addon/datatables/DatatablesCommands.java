@@ -78,8 +78,9 @@ public class DatatablesCommands implements CommandMarker {
     @CliCommand(value = "web mvc datatables add", help = "Use datatable component for a controller list view")
     public void add(
             @CliOption(key = "type", mandatory = true, help = "The controller to apply this component to") JavaType target,
-            @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "Datatables will use AJAX request to get data data or not") boolean ajax) {
-        operations.annotateController(target, ajax);
+            @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "Datatables will use AJAX request to get data data or not") boolean ajax,
+            @CliOption(key = "mode", mandatory = false, unspecifiedDefaultValue = GvNIXDatatables.TABLE, help = "visualization mode: if empty (default) shows a table, otherwise create one-row-per-page, one-cell-per-row datatable which cell content is the render of requiered page. (example: \"show\" renders the show view for every item ") String mode) {
+        operations.annotateController(target, ajax, mode);
     }
 
     /**

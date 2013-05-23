@@ -33,8 +33,25 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface GvNIXDatatables {
 
+    String TABLE = "";
+    String SHOW = "show";
+
     /**
      * Defines how datatables gets data (default AJAX)
      */
     boolean ajax() default true;
+
+    /**
+     * Specified table view mode:
+     * <ul>
+     * <li>If <code>null</code> or empty datatables show a standard list</li>
+     * <li>Otherwise, datatables will show just-one cell per row and one row per
+     * page with specified page (this value) rendered inside of it</li>
+     * </ul>
+     * <br>
+     * Example: <code>show</code> Will display datatables one-row-page one-cell
+     * datatables and cell contents will be the <code>show.jspx</code> of
+     * current entity rendered with item information
+     */
+    String mode() default TABLE;
 }

@@ -28,6 +28,8 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +38,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.addon.jpa.query.JpaQueryMetadata;
 import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.gvnix.support.WebItdBuilderHelper;
+import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -52,6 +56,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.logging.HandlerUtils;
 
@@ -115,9 +120,19 @@ public class DatatablesMetadata extends
     private final JavaType entity;
 
     /**
+     * Entity name to use in var names
+     */
+    private final String entityName;
+
+    /**
      * Related entity plural
      */
     private final String entityPlural;
+
+    /**
+     * If related entity has date properties
+     */
+    private final Map<JavaSymbolName, DateTimeFormatDetails> entityDatePatterns;
 
     /**
      * Method name to get entity manager from entity class
@@ -150,7 +165,8 @@ public class DatatablesMetadata extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             DatatablesAnnotationValues annotationValues, JavaType entity,
             List<FieldMetadata> identifierProperties, String entityPlural,
-            JavaSymbolName entityManagerMethodName, boolean hasDateTypes,
+            JavaSymbolName entityManagerMethodName,
+            Map<JavaSymbolName, DateTimeFormatDetails> datePatterns,
             JavaType webScaffoldAspectName,
             WebJpaBatchMetadata webJpaBatchMetadata,
             JpaQueryMetadata jpaQueryMetadata,
@@ -167,8 +183,11 @@ public class DatatablesMetadata extends
         // Roo only uses one property
         this.entityIdentifier = identifierProperties.get(0);
         this.entity = entity;
+        this.entityName = JavaSymbolName.getReservedWordSafeName(entity)
+                .getSymbolName();
         this.entityPlural = entityPlural;
         this.entityEntityManagerMethod = entityManagerMethodName;
+        this.entityDatePatterns = datePatterns;
         this.webJpaBatchMetadata = webJpaBatchMetadata;
         this.jpaQueryMetadata = jpaQueryMetadata;
         this.webScaffoldAnnotationValues = webScaffoldAnnotationValues;
@@ -187,7 +206,21 @@ public class DatatablesMetadata extends
 
         // Add AJAX mode required methods
         if (isAjax()) {
-            builder.addMethod(getGetDatatablesDataMethod());
+            if (isStantardMode()) {
+                builder.addMethod(getGetDatatablesDataMethod());
+            }
+            else {
+                builder.addMethod(getPopulateItemForRenderMethod());
+                builder.addMethod(getGetDatatablesDataMethodRenderMode());
+            }
+        }
+        else if (!isStantardMode()) {
+            // Non-Standard view mode requires AJAX data mode
+            throw new IllegalArgumentException(aspectName
+                    .getFullyQualifiedTypeName()
+                    .concat(".@GvNIXDatatables: 'mode = ")
+                    .concat(annotationValues.getMode())
+                    .concat("' requires 'ajax = true'"));
         }
 
         // Create a representation of the desired output ITD
@@ -195,7 +228,7 @@ public class DatatablesMetadata extends
     }
 
     /**
-     * Gets <code>populateDatatablesHasBatchSupport</code> method
+     * Gets <code>populateDatatablesConfig</code> method
      * 
      * @return
      */
@@ -236,10 +269,93 @@ public class DatatablesMetadata extends
                 hasJpaBatchSupport()));
         bodyBuilder.appendFormalLine(String.format(
                 "uiModel.addAttribute(\"datatablesUseAjax\",%s);", isAjax()));
+        bodyBuilder.appendFormalLine(String.format(
+                "uiModel.addAttribute(\"datatablesNotStandardMode\",%s);",
+                !isStantardMode()));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, POPULATE_DATATABLES_CONFIG,
+                JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>populateDatatablesConfig</code> method
+     * 
+     * @return
+     */
+    private MethodMetadata getPopulateItemForRenderMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(HTTP_SERVLET_REQUEST, entity);
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(POPULATE_ITEM_FOR_RENDER,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(REQUEST_PARAM_NAME);
+        parameterNames.add(new JavaSymbolName(entityName));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine(String.format(
+                "%s.setAttribute(\"%s\", %s);",
+                REQUEST_PARAM_NAME.getSymbolName(), entityName, entityName
+
+        ));
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("%s.setAttribute(\"itemId\", %s.convert(%s.get%s(),String.class));",
+                                REQUEST_PARAM_NAME.getSymbolName(),
+                                getConversionServiceField().getFieldName()
+                                        .getSymbolName(), entityName,
+                                StringUtils.capitalize(entityIdentifier
+                                        .getFieldName().getSymbolName())));
+
+        // Add data patterns
+        if (!entityDatePatterns.isEmpty()) {
+            bodyBuilder
+                    .appendFormalLine(String.format(
+                            "%s locale = %s.getLocale();",
+                            helper.getFinalTypeName(LOCALE),
+                            helper.getFinalTypeName(SpringJavaType.LOCALE_CONTEXT_HOLDER)));
+            for (Entry<JavaSymbolName, DateTimeFormatDetails> entry : entityDatePatterns
+                    .entrySet()) {
+                bodyBuilder
+                        .appendFormalLine(String
+                                .format("%s.setAttribute(\"%s_%s_date_format\", %s.patternForStyle(\"%s\",locale));",
+                                        REQUEST_PARAM_NAME.getSymbolName(),
+                                        entityName,
+                                        entry.getKey().getSymbolName()
+                                                .toLowerCase(),
+                                        helper.getFinalTypeName(JODA_DATETIME_FORMAT),
+                                        entry.getValue().style));
+            }
+        }
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, POPULATE_ITEM_FOR_RENDER,
                 JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
                 bodyBuilder);
         methodBuilder.setAnnotations(annotations);
@@ -489,6 +605,247 @@ public class DatatablesMetadata extends
     }
 
     /**
+     * Returns <code>getDatatablesData</code> method for render-a-view
+     * visualization mode
+     * 
+     * @return
+     */
+    private MethodMetadata getGetDatatablesDataMethodRenderMode() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        parameterTypes.add(new AnnotatedJavaType(DATATABLES_CRITERIA_TYPE,
+                new AnnotationMetadataBuilder(DATATABLES_PARAMS).build()));
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(HTTP_SERVLET_REQUEST));
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(HTTP_SERVLET_RESPONSE));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(GET_DATATABLES_DATA,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
+        methodAnnotation.setAnnotationType(REQUEST_MAPPING);
+        methodAnnotation.addStringAttribute("headers",
+                "Accept=application/json");
+        methodAnnotation.addStringAttribute("value", "/datatables/ajax");
+        methodAnnotation.addStringAttribute("produces", "application/json");
+        annotations.add(methodAnnotation);
+        annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+        throwsTypes.add(SERVLET_EXCEPTION);
+        throwsTypes.add(IO_EXCEPTION);
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(CRITERIA_PARAM_NAME);
+        parameterNames.add(REQUEST_PARAM_NAME);
+        parameterNames.add(RESPONSE_PARAM_NAME);
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetDatatablesDataMethodBodyRenderMode(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, GET_DATATABLES_DATA,
+                GET_DATATABLES_DATA_RETURN, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    /**
+     * Build method body for <code>getDatatablesData</code> method for
+     * render-a-view visualization mode
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetDatatablesDataMethodBodyRenderMode(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        // Prepares associations information
+        String filterByInfo = "null";
+        String orderByInfo = "null";
+        final String entityTypeName = helper.getFinalTypeName(entity);
+        if (jpaQueryMetadata != null) {
+            filterByInfo = String.format("%s.%s()", entityTypeName,
+                    jpaQueryMetadata.getFilterByMethodName().getSymbolName());
+            orderByInfo = String.format("%s.%s()", entityTypeName,
+                    jpaQueryMetadata.getOrderByMethodName().getSymbolName());
+        }
+
+        JavaType serachResult = new JavaType(
+                SEARCH_RESULTS.getFullyQualifiedTypeName(), 0, DataType.TYPE,
+                null, Arrays.asList(entity));
+
+        // SearchResults<Pet> searchResult =
+        // DatatablesUtils.findByCriteria(Pet.class,
+        // Pet.getFilterByAssociations(), Pet.getOrderByAssociations(),
+        // Pet.entityManager(), criterias);
+
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.%s(), %s);",
+                                helper.getFinalTypeName(serachResult),
+                                helper.getFinalTypeName(DATATABLES_UTILS),
+                                entityTypeName, filterByInfo, orderByInfo,
+                                entityTypeName,
+                                entityEntityManagerMethod.getSymbolName(),
+                                CRITERIA_PARAM_NAME.getSymbolName()));
+
+        bodyBuilder.appendFormalLine("");
+        bodyBuilder.appendFormalLine("// Get datatables required counts");
+        // long totalRecords = Pet.countPets();
+        bodyBuilder.appendFormalLine(String.format(
+                "long totalRecords = %s.count%s();", entityTypeName,
+                entityPlural));
+        // long recordsFound = findResult.getTotalResultCount();
+        bodyBuilder
+                .appendFormalLine("long recordsFound = searchResult.getTotalResultCount();");
+
+        bodyBuilder.appendFormalLine("");
+        bodyBuilder.appendFormalLine("// Prepare rows");
+        JavaType entityListType = new JavaType(
+                LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+                Arrays.asList(entity));
+        String entityListVar = StringUtils.uncapitalize(entityPlural);
+        /*
+         * List<Pets> pets = searchResult.getResults();
+         */
+        bodyBuilder.appendFormalLine(String.format(
+                "%s %s = searchResult.getResults();",
+                helper.getFinalTypeName(entityListType), entityListVar));
+        /*
+         * List<Map<String, String>> rows = new ArrayList<Map<String,
+         * String>>();
+         */
+        bodyBuilder.appendFormalLine(String.format(
+                "%s rows = new %s(%s.size());",
+                helper.getFinalTypeName(LIST_MAP_STRING_STRING),
+                helper.getFinalTypeName(ARRAYLIST_MAP_STRING_STRING),
+                entityListVar));
+        bodyBuilder.appendFormalLine(String.format(
+                "String controllerPath = \"%s\";",
+                webScaffoldAnnotationValues.getPath()));
+        bodyBuilder.appendFormalLine(String.format(
+                "String pageToUse = \"%s\";", annotationValues.getMode()));
+        bodyBuilder
+                .appendFormalLine("String renderUrl = String.format(\"/WEB-INF/views/%s/%s.jspx\", controllerPath, pageToUse);");
+
+        bodyBuilder.appendFormalLine("");
+        bodyBuilder.appendFormalLine("// For every element");
+        // for (Pet pet : owners) {
+        bodyBuilder.appendFormalLine(String.format("for (%s %s: %s) {",
+                entityTypeName, entityName, entityListVar));
+        bodyBuilder.indent();
+
+        // Map<String, String> row = new HashMap<String, String>();
+        bodyBuilder.appendFormalLine(String.format("%s row = new %s();",
+                helper.getFinalTypeName(MAP_STRING_STRING),
+                helper.getFinalTypeName(HASHMAP_STRING_STRING)));
+        // final StringWriter buffer = new StringWriter();
+        bodyBuilder.appendFormalLine(String.format(
+                "final %s buffer = new %s();",
+                helper.getFinalTypeName(STRING_WRITER),
+                helper.getFinalTypeName(STRING_WRITER)));
+
+        // TODO Check it can get dispatcher outside of for
+        bodyBuilder.appendFormalLine("// Call JSP to render current entity");
+        // RequestDispatcher dispatcher =
+        // request.getRequestDispatcher("/WEB-INF/views/owners/show.jspx");
+        bodyBuilder.appendFormalLine(String.format(
+                "%s dispatcher = %s.getRequestDispatcher(renderUrl);",
+                helper.getFinalTypeName(REQUEST_DISPATCHER),
+                REQUEST_PARAM_NAME.getSymbolName()));
+        bodyBuilder.appendFormalLine("");
+
+        // populateItemForRender(request, pet);
+        bodyBuilder.appendFormalLine(String.format(
+                "populateItemForRender(%s, %s);",
+                REQUEST_PARAM_NAME.getSymbolName(), entityName));
+        // dispatcher.include(request, new HttpServletResponseWrapper(response)
+        // {
+        bodyBuilder.appendFormalLine(String.format(
+                "dispatcher.include(%s, new %s(%s) {",
+                REQUEST_PARAM_NAME.getSymbolName(),
+                helper.getFinalTypeName(HTTP_SERVLET_RESPONSE_WRAPPER),
+                RESPONSE_PARAM_NAME.getSymbolName()));
+        bodyBuilder.indent();
+        // private PrintWriter writer = new PrintWriter(buffer);
+        bodyBuilder.appendFormalLine(String.format(
+                "private %s writer = new %s(buffer);",
+                helper.getFinalTypeName(PRINT_WRITER),
+                helper.getFinalTypeName(PRINT_WRITER)));
+        // @Override
+        bodyBuilder.appendFormalLine("@Override");
+        // public PrintWriter getWriter() throws IOException {
+        bodyBuilder.appendFormalLine(String.format(
+                "public %s getWriter() throws %s {",
+                helper.getFinalTypeName(PRINT_WRITER),
+                helper.getFinalTypeName(IO_EXCEPTION)));
+        bodyBuilder.indent();
+        // return writer;
+        bodyBuilder.appendFormalLine("return writer;");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("});");
+
+        bodyBuilder.appendFormalLine("");
+
+        // String render = buffer.toString();
+        bodyBuilder.appendFormalLine("String render = buffer.toString();");
+
+        // row.put("DT_RowId",
+        // conversionService_datatables.convert(owner.getId(), String.class));
+        bodyBuilder.appendFormalLine(String.format(
+                "row.put(\"DT_RowId\", %s.convert(%s.get%s(), String.class));",
+                getConversionServiceField().getFieldName().getSymbolName(),
+                entityName, StringUtils.capitalize(entityIdentifier
+                        .getFieldName().getSymbolName())));
+        // row.put(Integer.toString(rowIdx), showOwner);
+        bodyBuilder.appendFormalLine("row.put(\"0\", render);");
+
+        bodyBuilder.appendFormalLine("");
+        bodyBuilder.appendFormalLine("rows.add(row);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("");
+
+        /*
+         * DataSet<Map<String, String>> dataSet = new DataSet<Map<String,
+         * String>>(rows, totalRecords, recordsFound);
+         */
+        bodyBuilder.appendFormalLine(String.format(
+                "%s dataSet = new %s(rows, totalRecords, recordsFound); ",
+                helper.getFinalTypeName(DATA_SET_MAP_STRING_STRING),
+                helper.getFinalTypeName(DATA_SET_MAP_STRING_STRING)));
+
+        // return DatatablesResponse.build(dataSet,criterias);
+        bodyBuilder.appendFormalLine(String.format(
+                "return %s.build(dataSet,%s);",
+                helper.getFinalTypeName(DATATABLES_RESPONSE),
+                CRITERIA_PARAM_NAME.getSymbolName()));
+    }
+
+    /**
      * Build method body for <code>getDatatablesData</code> method
      * 
      * @param bodyBuilder
@@ -638,23 +995,45 @@ public class DatatablesMetadata extends
         return builder.toString();
     }
 
+    /**
+     * @return related JPA entity
+     */
     public JavaType getEntity() {
         return entity;
     }
 
+    /**
+     * @return {@link GvNIXDatatables} annotation values
+     */
     public DatatablesAnnotationValues getAnnotationValues() {
         return annotationValues;
     }
 
+    /**
+     * @return {@link RooWebScaffold} annotation values
+     */
     public WebScaffoldAnnotationValues getWebScaffoldAnnotationValues() {
         return webScaffoldAnnotationValues;
     }
 
+    /**
+     * @return controllers use AJAX data mode or not (DOM)
+     */
     public boolean isAjax() {
         return annotationValues.isAjax();
     }
 
+    /**
+     * @return informs if controllers has JPA-Batch-operations support available
+     */
     public boolean hasJpaBatchSupport() {
         return webJpaBatchMetadata != null;
+    }
+
+    /**
+     * @return datatables shows a standard list or use render-a-view mode
+     */
+    public boolean isStantardMode() {
+        return annotationValues.isStandardMode();
     }
 }

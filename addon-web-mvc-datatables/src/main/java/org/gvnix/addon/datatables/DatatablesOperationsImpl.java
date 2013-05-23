@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -166,6 +167,11 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
     /** {@inheritDoc} */
     public void annotateController(JavaType javaType, boolean ajax) {
+        annotateController(javaType, ajax, "");
+    }
+
+    /** {@inheritDoc} */
+    public void annotateController(JavaType javaType, boolean ajax, String mode) {
         Validate.notNull(javaType, "Controller required");
 
         ClassOrInterfaceTypeDetails existing = getControllerDetails(javaType);
@@ -204,6 +210,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                     DATATABLES_ANNOTATION);
 
             annotationBuilder.addBooleanAttribute("ajax", ajax);
+            if (StringUtils.isNotBlank(mode)) {
+                annotationBuilder.addStringAttribute("mode", mode);
+            }
 
             // Add annotation to target type
             classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder

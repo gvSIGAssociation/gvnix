@@ -29,7 +29,7 @@
   <jsp:directive.attribute name="selectionSelectedCssClass" type="java.lang.String" required="false" description="Css class for selected rows [default: 'row_selected']" />
   <jsp:directive.attribute name="selectionNotSelectedCssClass" type="java.lang.String" required="false" description="Css class for not-selected rows" />
   <jsp:directive.attribute name="selectionInfoLabel" type="java.lang.String" required="false" description="Label to use for selection information (default 'datatables_selection_info')" />
-  
+
 
   <!-- ====================================== -->
   <!-- ====================================== -->
@@ -107,10 +107,7 @@
   <jsp:useBean id="datatables_javaScript_elements_before" class="java.util.HashMap" scope="request"/>
   <jsp:useBean id="datatables_javaScript_elements_after" class="java.util.HashMap" scope="request"/>
   <jsp:useBean id="datatables_javaScript_elements_init" class="java.util.HashMap" scope="request"/>
-  
-  <!-- init custom api functions -->
-  <c:set var="initCustionFunctionsCallbackId" value="${id}_init_custom_callbk"/>
-  
+    
   <!-- typeIdFieldName -->
   <c:if test="${empty typeIdFieldName}">
       <c:set var="typeIdFieldName" value="id" />
@@ -193,6 +190,52 @@
   
   <spring:url value="${path}" var="urlPath" />
 
+  <c:choose>
+    <c:when test="${datatablesNotStandardMode}">
+     <!-- 
+     ******* Register views configuration ******
+     -->
+
+    <c:set var="columnId" value="${id}"/>
+    <!-- Change the Id value to avoid problem of restore a configuration from
+    cookies which can override this options (per ex. displayLenght) -->
+    <c:set var="id" value="${id}__RegisterView"/>
+    
+    
+  	<c:set var="displayLength" value="1"/>
+  	<c:set var="paginate" value="true"/>
+  	<c:set var="paginationType" value="full_numbers"/>
+  	<c:set var="lengthChange" value="false"/>
+  	<c:set var="filter" value="false"/>
+  	<c:set var="export" value=""/>
+  	<c:set var="cssClass" value="registerTable"/>
+  	<c:set var="pipelining" value="false"/>
+	<jsp:scriptlet>
+	if (!((Boolean)jspContext.getAttribute("serverSide")).booleanValue()){
+		throw new IllegalArgumentException("DOM mode unsupported for Register view mode");
+	}
+	</jsp:scriptlet>
+
+    <c:set target="${datatables_javaScript_elements_before}" property="evalScripts">
+        /*
+         * Wrap DIV around TD content.
+         * jQuery wrap will cause all script elements in the TD contents 
+         * will automatically be evaluated.
+         */
+        function evalScripts( oSettings ) { 
+          if ( typeof oTable_${id} != 'undefined' ) {
+              oTable_${id}.$('td').each(function(i) {
+                  $(this).wrapInner($('<div></div>'));
+              });
+          }
+        }
+    </c:set>
+   </c:when>
+
+  <c:otherwise>
+  <!-- 
+  *******	Tabular views configuration ******
+   -->
   <!-- selection -->
   <c:choose>
     <c:when test="${empty selection or selection}">
@@ -473,12 +516,23 @@
   </c:if>
   
   
+  <!-- 
+  *******	End Tabular view configuration **********
+   -->
+  </c:otherwise>
+  </c:choose>
+  
+    <!-- init custom api functions -->
+  <c:set var="initCustionFunctionsCallbackId" value="${id}_init_custom_callbk"/>
+  
   <div id="${id}_gvnix_datatables">
+  <c:if test="${not empty datatables_javaScript_elements_before}">
   <script type="text/javascript">
 		<c:forEach var="entry" items="${datatables_javaScript_elements_before}">
 		${entry.value}
 		</c:forEach>
   </script>
+  </c:if>
   <datatables:table
 		id="${id}"
 		data="${data}"
@@ -539,7 +593,17 @@
 
       colReorder="${colReorder}"
     >
-    	
+    	<c:choose>
+    	<c:when test="${datatablesNotStandardMode}">
+    		<!-- Cell to replace by data -->
+			<datatables:column id="${columnId}" searchable="false" property="${rowIdBase}"
+				filterable="false" sortable="false"></datatables:column>
+
+           <!--  callback to initialize custom api functions -->
+           <datatables:callback type="draw" function="evalScripts" />
+
+    	</c:when>
+    	<c:otherwise>
     	<!-- Check box -->
     	<c:if test="${selectionByCheck}">
     	  <c:choose>
@@ -648,6 +712,8 @@
      
      <!--  callback to initialize custom api functions -->
      <datatables:callback type="init" function="${initCustionFunctionsCallbackId}" />
+     </c:otherwise>
+     </c:choose>
   </datatables:table>
   
     <script type="text/javascript">
