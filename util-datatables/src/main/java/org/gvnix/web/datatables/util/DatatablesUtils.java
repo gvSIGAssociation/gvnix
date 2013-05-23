@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
- * 2013 Generalitat Valenciana
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program. If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.web.datatables.util;
 
@@ -77,7 +77,7 @@ public class DatatablesUtils {
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
             EntityManager entityManager, DatatablesCriterias datatablesCriterias) {
         return findByCriteria(entityClass, null, null, entityManager,
-                datatablesCriterias, false);
+                datatablesCriterias, null, false);
     }
 
     /**
@@ -85,22 +85,44 @@ public class DatatablesUtils {
      * information for filter, sort and paginate result.
      * 
      * @param entityClass entity to use in search
-     * @param filterByAssociations for each related entity to join contain as
-     *            key the name of the association and as value the List of
-     *            related entity fields to filter by
-     * @param orderByAssociations for each related entity to order contain as
-     *            key the name of the association and as value the List of
-     *            related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
+     * @param baseSearchValuesMap (optional) base filter values
+     * @return
+     */
+    public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            Map<String, Object> baseSearchValuesMap) {
+        return findByCriteria(entityClass, null, null, entityManager,
+                datatablesCriterias, baseSearchValuesMap, false);
+    }
+
+    /**
+     * Execute a select query on entityClass using {@code DatatablesCriterias}
+     * information for filter, sort and paginate result.
+     * 
+     * @param entityClass entity to use in search
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param baseSearchValuesMap (optional) base filter values
      * @return
      */
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
             Map<String, List<String>> filterByAssociations,
             Map<String, List<String>> orderByAssociations,
-            EntityManager entityManager, DatatablesCriterias datatablesCriterias) {
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            Map<String, Object> baseSearchValuesMap) {
         return findByCriteria(entityClass, filterByAssociations,
-                orderByAssociations, entityManager, datatablesCriterias, false);
+                orderByAssociations, entityManager, datatablesCriterias,
+                baseSearchValuesMap, false);
     }
 
     /**
@@ -109,14 +131,15 @@ public class DatatablesUtils {
      * construction of type-safe SQL-like queries.
      * 
      * @param entityClass entity to use in search
-     * @param filterByAssociations for each related entity to join contain as
-     *            key the name of the association and as value the List of
-     *            related entity fields to filter by
-     * @param orderByAssociations for each related entity to order contain as
-     *            key the name of the association and as value the List of
-     *            related entity fields to order by
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
+     * @param baseSearchValuesMap (optional) base filter values
      * @param distinct use distinct query
      * @return
      */
@@ -126,7 +149,8 @@ public class DatatablesUtils {
             Map<String, List<String>> filterByAssociations,
             Map<String, List<String>> orderByAssociations,
             EntityManager entityManager,
-            DatatablesCriterias datatablesCriterias, boolean distinct)
+            DatatablesCriterias datatablesCriterias,
+            Map<String, Object> baseSearchValuesMap, boolean distinct)
             throws IllegalArgumentException {
 
         // Check arguments aren't null
@@ -153,10 +177,17 @@ public class DatatablesUtils {
         // Query DSL builder
         PathBuilder<T> entity = new PathBuilder<T>(entityClass, "entity");
 
-        // ----- Create query -----
+        // ----- Create queries -----
 
+        // query will take in account datatables search, order and paging
+        // criterias
         JPAQuery query = new JPAQuery(entityManager);
         query = query.from(entity);
+
+        // baseQuery will use base search values only in order to count
+        // all for success paging
+        JPAQuery baseQuery = new JPAQuery(entityManager);
+        baseQuery = baseQuery.from(entity);
 
         // ----- Entity associations for Query JOINs, ORDER BY, ... -----
 
@@ -205,6 +236,7 @@ public class DatatablesUtils {
         BooleanBuilder filtersByTablePredicate = new BooleanBuilder();
 
         try {
+
             // Build the filters by column expression
             if (datatablesCriterias.hasOneFilteredColumn()) {
 
@@ -340,7 +372,7 @@ public class DatatablesUtils {
             SearchResults<T> searchResults = new SearchResults<T>(
                     new ArrayList<T>(0), 0, isPaged, new Long(
                             datatablesCriterias.getDisplayStart()), new Long(
-                            datatablesCriterias.getDisplaySize()));
+                            datatablesCriterias.getDisplaySize()), 0);
             return searchResults;
         }
 
@@ -438,9 +470,18 @@ public class DatatablesUtils {
             query = query.distinct();
         }
 
-        // query projection to be used to get the results and to count all rows
-        query = query.where(filtersByColumnPredicate
-                .and(filtersByTablePredicate.getValue()));
+        // Predicate for base query
+        BooleanBuilder basePredicate = QuerydslUtils.createPredicateByAnd(
+                entityClass, baseSearchValuesMap);
+
+        // query projection to count all entities without paging
+        baseQuery.where(basePredicate);
+
+        // query projection to be used to get the results and to count filtered
+        // results
+        query = query.where(basePredicate.and(
+                filtersByColumnPredicate.getValue()).and(
+                filtersByTablePredicate.getValue()));
 
         // List ordered and paginated results. An empty list is returned for no
         // results.
@@ -451,7 +492,8 @@ public class DatatablesUtils {
                                         .size()])).restrict(queryModifiers)
                 .list(entity);
 
-        // Calculate the total amount of rows. When results are paginated we
+        // Calculate the total amount of rows taking in account datatables
+        // search and paging criterias. When results are paginated we
         // must execute a count query, otherwise the size of matched rows List
         // is the total amount of rows
         long totalResultCount;
@@ -462,9 +504,12 @@ public class DatatablesUtils {
             totalResultCount = elements.size();
         }
 
+        // Calculate the total amount of entities including base filters only
+        long totalBaseCount = baseQuery.count();
+
         // Create a new SearchResults instance
         SearchResults<T> searchResults = new SearchResults<T>(elements,
-                totalResultCount, isPaged, offset, limit);
+                totalResultCount, isPaged, offset, limit, totalBaseCount);
 
         return searchResults;
     }
@@ -482,10 +527,10 @@ public class DatatablesUtils {
      * @param totalDisplayRecords Amount of records found
      * @param columns {@link ColumnDef} list
      * @param datePatterns Patterns to convert Date fields to String. The Map
-     *            contains one pattern for each entity Date field keyed by field
-     *            name. For Roo compatibility the key could follow the pattern
-     *            {@code lower_case( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
-     *            too
+     *        contains one pattern for each entity Date field keyed by field
+     *        name. For Roo compatibility the key could follow the pattern
+     *        {@code lower_case( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
+     *        too
      * @param conversionService
      * @return
      */
