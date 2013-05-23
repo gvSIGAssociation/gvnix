@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -827,11 +828,11 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         List<Theme> themes = new ArrayList<Theme>();
 
         // find themes in bundles and local repository
-        Set<URI> uris = findThemeDescriptors();
+        Set<URL> urls = findThemeDescriptors();
 
-        for (URI uri : uris) {
+        for (URL url : urls) {
             // load the theme
-            Theme theme = Theme.parseTheme(uri);
+            Theme theme = Theme.parseTheme(url);
             theme.setAvailable(true);
             themes.add(theme);
         }
@@ -859,11 +860,11 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         Theme active = getActiveTheme();
 
         // 2nd iterate over project themes
-        Set<URI> uris = findFileThemeDescriptors(getThemesPath());
+        Set<URL> urls = findFileThemeDescriptors(getThemesPath());
 
-        for (URI uri : uris) {
+        for (URL url : urls) {
             // load the theme
-            Theme theme = Theme.parseTheme(uri);
+            Theme theme = Theme.parseTheme(url);
             theme.setInstalled(true);
 
             // if this installed theme is the active theme, just set it as
@@ -999,39 +1000,27 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * 
      * @return UIRs to available theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Set<URI> findThemeDescriptors() {
+    private Set<URL> findThemeDescriptors() {
 
         // URLs to repository theme descriptors
-        Set<URI> uris = findFileThemeDescriptors(getThemesRepositoryPath());
+        Set<URL> urls = findFileThemeDescriptors(getThemesRepositoryPath());
 
         // URLs to theme descriptors in OSGi bundles
-        uris.addAll(findBundleThemeDescriptors());
+        urls.addAll(findBundleThemeDescriptors());
 
-        return uris;
+        return urls;
     }
 
     /**
      * Find theme descriptors in OSGi bundles.
      * 
-     * @return URIs to theme descriptors "WEB-INF/views/theme.xml"
+     * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Collection<URI> findBundleThemeDescriptors() {
+    private Collection<URL> findBundleThemeDescriptors() {
 
         // URLs to theme descriptors in OSGi bundles
-        Collection<URL> urls = OSGiUtils.findEntriesByPattern(
-                context.getBundleContext(), "/**/WEB-INF/views/theme.xml");
-        Set<URI> uris = new HashSet<URI>(urls.size());
-
-        // Transform to uri so make easy to compare
-        for (URL url : urls) {
-            try {
-                uris.add(url.toURI());
-            }
-            catch (URISyntaxException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-        return uris;
+        return OSGiUtils.findEntriesByPattern(context.getBundleContext(),
+                "/**/WEB-INF/views/theme.xml");
     }
 
     /**
@@ -1041,21 +1030,21 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * 
      * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Set<URI> findFileThemeDescriptors(File path) {
-        Set<URI> uris = new HashSet<URI>();
+    private Set<URL> findFileThemeDescriptors(File path) {
+        Set<URL> urls = new HashSet<URL>();
 
         // find themes in the local theme repository (if it exists)
         if (path == null) {
             // there isn't a local theme repository, return theme descriptors in
             // bundles
-            return uris;
+            return urls;
         }
 
         // get the list of theme dirs in the repository
         File[] themeDirs = path.listFiles();
         if (themeDirs == null) {
             // if null there isn't any installed theme : return empty set
-            return uris;
+            return urls;
         }
 
         // iterate over the set of theme directories in the repository
@@ -1063,10 +1052,15 @@ public class ThemeOperationsImpl extends AbstractOperations implements
             File descriptor = new File(themeDir.getAbsolutePath(),
                     WEB_INF_THEME_FILE);
             if (themeDir.isDirectory() && descriptor.exists()) {
-                uris.add(descriptor.toURI());
+                try {
+                    urls.add(new URL(descriptor.getAbsolutePath()));
+                }
+                catch (MalformedURLException e) {
+                    throw new IllegalStateException(e);
+                }
             }
         }
-        return uris;
+        return urls;
     }
 
     /**
