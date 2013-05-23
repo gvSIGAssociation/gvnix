@@ -123,11 +123,9 @@ public class DatatablesConstants {
     static final JavaSymbolName LIST_DATATABLES = new JavaSymbolName(
             "listDatatables");
     static final JavaSymbolName LIST_ROO = new JavaSymbolName("list");
-    static final JavaSymbolName POPULATE_AJAX_DATATABLES = new JavaSymbolName(
-            "populateDatatablesUseAjax");
     static final JavaSymbolName UI_MODEL = new JavaSymbolName("uiModel");
-    static final JavaSymbolName POPULATE_BATCH_SUPPORT = new JavaSymbolName(
-            "populateDatatablesHasBatchSupport");
+    static final JavaSymbolName POPULATE_DATATABLES_CONFIG = new JavaSymbolName(
+            "populateDatatablesConfig");
 
     static final JavaType DATA_SET = new JavaType(
             "com.github.dandelion.datatables.core.ajax.DataSet");

@@ -17,23 +17,7 @@
  */
 package org.gvnix.addon.datatables;
 
-import static org.gvnix.addon.datatables.DatatablesConstants.AUTOWIRED;
-import static org.gvnix.addon.datatables.DatatablesConstants.CONVERSION_SERVICE;
-import static org.gvnix.addon.datatables.DatatablesConstants.CRITERIA_PARAM_NAME;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_CRITERIA_TYPE;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_PARAMS;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_RESPONSE;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_UTILS;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATA_SET_MAP_STRING_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.GET_DATATABLES_DATA;
-import static org.gvnix.addon.datatables.DatatablesConstants.GET_DATATABLES_DATA_RETURN;
-import static org.gvnix.addon.datatables.DatatablesConstants.LIST_DATATABLES;
-import static org.gvnix.addon.datatables.DatatablesConstants.LIST_ROO;
-import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_AJAX_DATATABLES;
-import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_BATCH_SUPPORT;
-import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_METHOD;
-import static org.gvnix.addon.datatables.DatatablesConstants.SEARCH_RESULTS;
-import static org.gvnix.addon.datatables.DatatablesConstants.UI_MODEL;
+import static org.gvnix.addon.datatables.DatatablesConstants.*;
 import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.SpringJavaType.MODEL;
 import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
@@ -198,9 +182,8 @@ public class DatatablesMetadata extends
 
         // Adding methods definition
         builder.addMethod(getListDatatablesRequestMethod());
-        builder.addMethod(getPopulateHasBatchSupportMethod());
+        builder.addMethod(getPopulateDatatablesConfig());
         builder.addMethod(getListRooRequestMethod());
-        builder.addMethod(getPopulateAJAXDatatablesMethod());
 
         // Add AJAX mode required methods
         if (isAjax()) {
@@ -216,13 +199,14 @@ public class DatatablesMetadata extends
      * 
      * @return
      */
-    private MethodMetadata getPopulateHasBatchSupportMethod() {
+    private MethodMetadata getPopulateDatatablesConfig() {
         // Define method parameter types
-        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(MODEL);
 
         // Check if a method with the same signature already exists in the
         // target type
-        final MethodMetadata method = methodExists(POPULATE_BATCH_SUPPORT,
+        final MethodMetadata method = methodExists(POPULATE_DATATABLES_CONFIG,
                 parameterTypes);
         if (method != null) {
             // If it already exists, just return the method and omit its
@@ -235,7 +219,6 @@ public class DatatablesMetadata extends
 
         AnnotationMetadataBuilder annotation = new AnnotationMetadataBuilder(
                 MODEL_ATTRIBUTE);
-        annotation.addStringAttribute("value", "datatablesHasBatchSupport");
         // @ModelAttribute
         annotations.add(annotation);
 
@@ -244,72 +227,26 @@ public class DatatablesMetadata extends
 
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(UI_MODEL);
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine(String.format("return %s;",
+        bodyBuilder.appendFormalLine(String.format(
+                "uiModel.addAttribute(\"datatablesHasBatchSupport\", %s);",
                 hasJpaBatchSupport()));
+        bodyBuilder.appendFormalLine(String.format(
+                "uiModel.addAttribute(\"datatablesUseAjax\",%s);", isAjax()));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, POPULATE_BATCH_SUPPORT,
-                JavaType.BOOLEAN_PRIMITIVE, parameterTypes, parameterNames,
+                getId(), Modifier.PUBLIC, POPULATE_DATATABLES_CONFIG,
+                JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
                 bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
 
         return methodBuilder.build(); // Build and return a MethodMetadata
         // instance
-    }
-
-    /**
-     * Gets <code>populateAJAXDatatables</code> method
-     * 
-     * @return
-     */
-    private MethodMetadata getPopulateAJAXDatatablesMethod() {
-        // Define method parameter types
-        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
-
-        // Check if a method with the same signature already exists in the
-        // target type
-        final MethodMetadata method = methodExists(POPULATE_AJAX_DATATABLES,
-                parameterTypes);
-        if (method != null) {
-            // If it already exists, just return the method and omit its
-            // generation via the ITD
-            return method;
-        }
-
-        // Define method annotations
-        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
-
-        AnnotationMetadataBuilder annotation = new AnnotationMetadataBuilder(
-                MODEL_ATTRIBUTE);
-        annotation.addStringAttribute("value", "datatablesUseAjax");
-        // @ModelAttribute
-        annotations.add(annotation);
-
-        // Define method throws types (none in this case)
-        List<JavaType> throwsTypes = new ArrayList<JavaType>();
-
-        // Define method parameter names
-        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-
-        // Create the method body
-        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine(String.format("return %s;", isAjax()));
-
-        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
-        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, POPULATE_AJAX_DATATABLES,
-                JavaType.BOOLEAN_PRIMITIVE, parameterTypes, parameterNames,
-                bodyBuilder);
-        methodBuilder.setAnnotations(annotations);
-        methodBuilder.setThrowsTypes(throwsTypes);
-
-        return methodBuilder.build(); // Build and return a MethodMetadata
-                                      // instance
     }
 
     /**
