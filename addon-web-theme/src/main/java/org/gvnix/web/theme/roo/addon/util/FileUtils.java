@@ -19,7 +19,9 @@
 package org.gvnix.web.theme.roo.addon.util;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,7 +42,40 @@ public abstract class FileUtils {
      * @param directory the directory to search in
      * @return the set of files found
      */
-    public static Set<URI> findFiles(File directory) {
+    public static Set<URL> findFilesURL(File directory) {
+
+        // Set of File URLs
+        Set<URL> urls = new HashSet<URL>();
+
+        File[] found = directory.listFiles();
+        if (found != null) {
+            for (int i = 0; i < found.length; i++) {
+                // recursive call if found is a directory
+                if (found[i].isDirectory()) {
+                    Set<URL> children = findFilesURL(found[i]);
+                    urls.addAll(children);
+                }
+                // if found is file add to Set
+                else {
+                    try {
+                        urls.add(new URL(found[i].getAbsolutePath()));
+                    }
+                    catch (MalformedURLException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            }
+        }
+        return urls;
+    }
+
+    /**
+     * Finds files within a given directory and its subdirectories.
+     * 
+     * @param directory the directory to search in
+     * @return the set of files found
+     */
+    public static Set<URI> findFilesURI(File directory) {
 
         // Set of File URLs
         Set<URI> uris = new HashSet<URI>();
@@ -50,7 +85,7 @@ public abstract class FileUtils {
             for (int i = 0; i < found.length; i++) {
                 // recursive call if found is a directory
                 if (found[i].isDirectory()) {
-                    Set<URI> children = findFiles(found[i]);
+                    Set<URI> children = findFilesURI(found[i]);
                     uris.addAll(children);
                 }
                 // if found is file add to Set

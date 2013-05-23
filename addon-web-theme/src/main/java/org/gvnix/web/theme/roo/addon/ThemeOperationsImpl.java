@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.xml.transform.Transformer;
 
@@ -67,7 +66,6 @@ import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.osgi.OSGiUtils;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
@@ -127,10 +125,6 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     private static final String VAR_ATTRIBUTE = "var";
 
     private static final String VALUE_ATTRIBUTE = "value";
-
-    /** Logger */
-    private static final Logger logger = HandlerUtils
-            .getLogger(ThemeOperationsImpl.class);
 
     /**
      * MetadataService offers access to Roo's metadata model, use it to retrieve
@@ -231,7 +225,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                                 .concat(id).concat("'"));
 
                 // copy overwriting installed themes
-                copyRecursively(sourceURI, destination, true);
+                copyRecursivelyURL(sourceURI, destination, true);
 
                 // not needed to continue the iteration
                 break;
@@ -279,7 +273,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         Set<I18n> languages = getInstalledI18n();
 
         // copy theme from project installation dir to src/main/webapp
-        copyRecursively(source.getRootURI(), destination, true);
+        copyRecursivelyURI(source.getRootURI(), destination, true);
 
         // install application.css in styles folder
         installApplicationStyle();
@@ -860,11 +854,11 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         Theme active = getActiveTheme();
 
         // 2nd iterate over project themes
-        Set<URL> urls = findFileThemeDescriptors(getThemesPath());
+        Set<URI> uris = findFileThemeDescriptorsURIs(getThemesPath());
 
-        for (URL url : urls) {
+        for (URI uri : uris) {
             // load the theme
-            Theme theme = Theme.parseTheme(url);
+            Theme theme = Theme.parseTheme(uri);
             theme.setInstalled(true);
 
             // if this installed theme is the active theme, just set it as
@@ -1003,7 +997,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     private Set<URL> findThemeDescriptors() {
 
         // URLs to repository theme descriptors
-        Set<URL> urls = findFileThemeDescriptors(getThemesRepositoryPath());
+        Set<URL> urls = findFileThemeDescriptorsURLs(getThemesRepositoryPath());
 
         // URLs to theme descriptors in OSGi bundles
         urls.addAll(findBundleThemeDescriptors());
@@ -1030,7 +1024,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * 
      * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Set<URL> findFileThemeDescriptors(File path) {
+    private Set<URL> findFileThemeDescriptorsURLs(File path) {
         Set<URL> urls = new HashSet<URL>();
 
         // find themes in the local theme repository (if it exists)
@@ -1061,6 +1055,41 @@ public class ThemeOperationsImpl extends AbstractOperations implements
             }
         }
         return urls;
+    }
+
+    /**
+     * Find theme descriptors in the given path. Use this utility to find themes
+     * in the local repository or themes installed in the project, just give the
+     * search path.
+     * 
+     * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
+     */
+    private Set<URI> findFileThemeDescriptorsURIs(File path) {
+        Set<URI> uris = new HashSet<URI>();
+
+        // find themes in the local theme repository (if it exists)
+        if (path == null) {
+            // there isn't a local theme repository, return theme descriptors in
+            // bundles
+            return uris;
+        }
+
+        // get the list of theme dirs in the repository
+        File[] themeDirs = path.listFiles();
+        if (themeDirs == null) {
+            // if null there isn't any installed theme : return empty set
+            return uris;
+        }
+
+        // iterate over the set of theme directories in the repository
+        for (File themeDir : themeDirs) {
+            File descriptor = new File(themeDir.getAbsolutePath(),
+                    WEB_INF_THEME_FILE);
+            if (themeDir.isDirectory() && descriptor.exists()) {
+                uris.add(descriptor.toURI());
+            }
+        }
+        return uris;
     }
 
     /**
@@ -1130,7 +1159,127 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * @see JspOperationsImpl#copyDirectoryContents(String, String)
      */
     @SuppressWarnings("unchecked")
-    private void copyRecursively(URI sourceDirectory, File targetDirectory,
+    private void copyRecursivelyURL(URI sourceDirectory, File targetDirectory,
+            boolean overwrite) {
+        Validate.notNull(sourceDirectory, "Source URI required");
+        Validate.notNull(targetDirectory, "Target directory required");
+
+        // if source and target are the same dir, do nothing
+        if (targetDirectory.toURI().equals(sourceDirectory)) {
+            return;
+        }
+
+        if (!targetDirectory.exists()) {
+            fileManager.createDirectory(targetDirectory.getAbsolutePath());
+        }
+
+        // Set of resource URLs to be copied to target dir
+        Set<URL> urls = new HashSet<URL>();
+
+        // if source URI schema is file:// , source files are in a local
+        // repository
+        if ("file".equals(sourceDirectory.getScheme())) {
+            urls = FileUtils.findFilesURL(new File(sourceDirectory));
+        }
+
+        // if source URI schema is bundle:// , we can access to that bundle
+        // (note the authority contains the bundle ID) and copy Theme
+        // artefacts. URI example
+        // bundle://8.0:0/org/gvnix/web/theme/roo/addon/themes/theme-cit/
+        else if ("bundle".equals(sourceDirectory.getScheme())) {
+            String uriAuthority = sourceDirectory.getAuthority();
+            long bundleId = Long.parseLong(uriAuthority.substring(0,
+                    uriAuthority.indexOf(".")));
+
+            // iterate over bundle entries in the given URI path and add them
+            // to URLs to be copied to target dir
+            Enumeration<URL> entries = context.getBundleContext()
+                    .getBundle(bundleId)
+                    .findEntries(sourceDirectory.getPath(), "*.*", true);
+            while (entries.hasMoreElements()) {
+                urls.add(entries.nextElement());
+            }
+        }
+        // it shouldn't occur
+        else {
+            throw new IllegalArgumentException(
+                    "Could not determine schema for resources for source dir '"
+                            .concat(sourceDirectory.toString()).concat("'"));
+        }
+
+        Validate.notNull(
+                urls,
+                "No resources found to copy in '".concat(
+                        sourceDirectory.toString()).concat("'"));
+
+        // iterate over Theme resources and copy them with same dir layout
+        for (URL url : urls) {
+            // Remove source directory prefix from absolute url: relative file
+            // path
+            String filePath = url.toString().substring(
+                    sourceDirectory.toString().length());
+            if (isVersionControlSystemFile(filePath)) {
+                // nothing to do if the URL is of a file from a Version Control
+                // System
+                continue;
+            }
+            File targetFile = new File(targetDirectory, filePath);
+
+            try {
+                // only copy files and if target file doesn't exist or overwrite
+                // flag is true
+                if (!targetFile.exists()) {
+
+                    // create file using FileManager to fire creation events
+                    InputStream inputStream = null;
+                    OutputStream outputStream = null;
+                    try {
+                        inputStream = url.openStream();
+                        outputStream = fileManager.createFile(
+                                targetFile.getAbsolutePath()).getOutputStream();
+                        IOUtils.copy(inputStream, outputStream);
+                    }
+                    finally {
+                        IOUtils.closeQuietly(inputStream);
+                        IOUtils.closeQuietly(outputStream);
+                    }
+                }
+                // if file exists and overwrite is true, update the file
+                else if (overwrite) {
+                    InputStream inputStream = null;
+                    OutputStream outputStream = null;
+                    try {
+                        inputStream = url.openStream();
+                        outputStream = fileManager.updateFile(
+                                targetFile.getAbsolutePath()).getOutputStream();
+                        IOUtils.copy(inputStream, outputStream);
+                    }
+                    finally {
+                        IOUtils.closeQuietly(inputStream);
+                        IOUtils.closeQuietly(outputStream);
+                    }
+                }
+            }
+            catch (IOException e) {
+                throw new IllegalStateException(
+                        "Encountered an error during copying of resources for MVC Theme addon.",
+                        e);
+            }
+        }
+    }
+
+    /**
+     * This method will copy the contents of a bundle to a local directory if
+     * the resource does not already exist in the target directory
+     * 
+     * @param sourceDirectory source directory. URI syntax:
+     *            [scheme:][//authority][path][?query][#fragment]
+     * @param targetDirectory target directory
+     * @param overwrite if true copy to target dir overwriting destination file
+     * @see JspOperationsImpl#copyDirectoryContents(String, String)
+     */
+    @SuppressWarnings("unchecked")
+    private void copyRecursivelyURI(URI sourceDirectory, File targetDirectory,
             boolean overwrite) {
         Validate.notNull(sourceDirectory, "Source URI required");
         Validate.notNull(targetDirectory, "Target directory required");
@@ -1150,7 +1299,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         // if source URI schema is file:// , source files are in a local
         // repository
         if ("file".equals(sourceDirectory.getScheme())) {
-            uris = FileUtils.findFiles(new File(sourceDirectory));
+            uris = FileUtils.findFilesURI(new File(sourceDirectory));
         }
 
         // if source URI schema is bundle:// , we can access to that bundle
