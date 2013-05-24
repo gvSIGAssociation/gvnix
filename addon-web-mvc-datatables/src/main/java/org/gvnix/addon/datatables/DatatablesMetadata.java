@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +55,6 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.logging.HandlerUtils;
 
@@ -69,7 +67,7 @@ import org.springframework.roo.support.logging.HandlerUtils;
 public class DatatablesMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
-    private static final Logger LOGGER = HandlerUtils
+    @SuppressWarnings("unused") private static final Logger LOGGER = HandlerUtils
             .getLogger(DatatablesMetadata.class);
 
     // Constants
@@ -318,40 +316,7 @@ public class DatatablesMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine(String.format(
-                "%s.setAttribute(\"%s\", %s);",
-                REQUEST_PARAM_NAME.getSymbolName(), entityName, entityName
-
-        ));
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("%s.setAttribute(\"itemId\", %s.convert(%s.get%s(),String.class));",
-                                REQUEST_PARAM_NAME.getSymbolName(),
-                                getConversionServiceField().getFieldName()
-                                        .getSymbolName(), entityName,
-                                StringUtils.capitalize(entityIdentifier
-                                        .getFieldName().getSymbolName())));
-
-        // Add data patterns
-        if (!entityDatePatterns.isEmpty()) {
-            bodyBuilder
-                    .appendFormalLine(String.format(
-                            "%s locale = %s.getLocale();",
-                            helper.getFinalTypeName(LOCALE),
-                            helper.getFinalTypeName(SpringJavaType.LOCALE_CONTEXT_HOLDER)));
-            for (Entry<JavaSymbolName, DateTimeFormatDetails> entry : entityDatePatterns
-                    .entrySet()) {
-                bodyBuilder
-                        .appendFormalLine(String
-                                .format("%s.setAttribute(\"%s_%s_date_format\", %s.patternForStyle(\"%s\",locale));",
-                                        REQUEST_PARAM_NAME.getSymbolName(),
-                                        entityName,
-                                        entry.getKey().getSymbolName()
-                                                .toLowerCase(),
-                                        helper.getFinalTypeName(JODA_DATETIME_FORMAT),
-                                        entry.getValue().style));
-            }
-        }
+        buildPopulateItemForRenderMethodBody(bodyBuilder);
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -363,6 +328,63 @@ public class DatatablesMetadata extends
 
         return methodBuilder.build(); // Build and return a MethodMetadata
         // instance
+    }
+
+    /**
+     * Gets <code>populateDatatablesConfig</code> method body
+     * 
+     * @param bodyBuilder
+     */
+    private void buildPopulateItemForRenderMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        // Model uiModel = new ExtendedModelMap();
+        bodyBuilder.appendFormalLine(String.format("%s uiModel = new %s();",
+                MODEL, EXTENDED_MODEL_MAP));
+        bodyBuilder.appendFormalLine("");
+
+        // request.setAttribute("pet", pet);
+        bodyBuilder.appendFormalLine(String.format(
+                "%s.setAttribute(\"%s\", %s);",
+                REQUEST_PARAM_NAME.getSymbolName(), entityName, entityName
+
+        ));
+        // request.setAttribute("itemId",
+        // conversion_service.convert(pet.getId(), String.class);
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("%s.setAttribute(\"itemId\", %s.convert(%s.get%s(),String.class));",
+                                REQUEST_PARAM_NAME.getSymbolName(),
+                                getConversionServiceField().getFieldName()
+                                        .getSymbolName(), entityName,
+                                StringUtils.capitalize(entityIdentifier
+                                        .getFieldName().getSymbolName())));
+
+        bodyBuilder.appendFormalLine("");
+        // Add data patterns
+        if (!entityDatePatterns.isEmpty()) {
+            // addDateTimeFormatPatterns(uiModel);
+            bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
+            bodyBuilder.appendFormalLine("");
+        }
+
+        // Load uiModel attributes into request
+        bodyBuilder.appendFormalLine("// Load uiModel attributes into request");
+        // Map<String,Object> modelMap = uiModel.asMap();
+        bodyBuilder.appendFormalLine(String.format(
+                "%s modelMap = uiModel.asMap();",
+                helper.getFinalTypeName(MAP_STRING_OBJECT)));
+        // for (Entry<String,Object> entry : uiModel.asMap().entrySet()){
+        bodyBuilder.appendFormalLine(String.format(
+                "for (%s key : modelMap.keySet()){",
+                helper.getFinalTypeName(JavaType.STRING)));
+        bodyBuilder.indent();
+
+        // request.setAttribute(entry.getKey(), entry.getValue());
+        bodyBuilder
+                .appendFormalLine("request.setAttribute(key, modelMap.get(key));");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
     }
 
     /**
@@ -677,45 +699,8 @@ public class DatatablesMetadata extends
      */
     private void buildGetDatatablesDataMethodBodyRenderMode(
             InvocableMemberBodyBuilder bodyBuilder) {
-        // Prepares associations information
-        String filterByInfo = "null";
-        String orderByInfo = "null";
-        final String entityTypeName = helper.getFinalTypeName(entity);
-        if (jpaQueryMetadata != null) {
-            filterByInfo = String.format("%s.%s()", entityTypeName,
-                    jpaQueryMetadata.getFilterByMethodName().getSymbolName());
-            orderByInfo = String.format("%s.%s()", entityTypeName,
-                    jpaQueryMetadata.getOrderByMethodName().getSymbolName());
-        }
-
-        JavaType serachResult = new JavaType(
-                SEARCH_RESULTS.getFullyQualifiedTypeName(), 0, DataType.TYPE,
-                null, Arrays.asList(entity));
-
-        // SearchResults<Pet> searchResult =
-        // DatatablesUtils.findByCriteria(Pet.class,
-        // Pet.getFilterByAssociations(), Pet.getOrderByAssociations(),
-        // Pet.entityManager(), criterias);
-
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.%s(), %s);",
-                                helper.getFinalTypeName(serachResult),
-                                helper.getFinalTypeName(DATATABLES_UTILS),
-                                entityTypeName, filterByInfo, orderByInfo,
-                                entityTypeName,
-                                entityEntityManagerMethod.getSymbolName(),
-                                CRITERIA_PARAM_NAME.getSymbolName()));
-
-        bodyBuilder.appendFormalLine("");
-        bodyBuilder.appendFormalLine("// Get datatables required counts");
-        // long totalRecords = Pet.countPets();
-        bodyBuilder.appendFormalLine(String.format(
-                "long totalRecords = %s.count%s();", entityTypeName,
-                entityPlural));
-        // long recordsFound = findResult.getTotalResultCount();
-        bodyBuilder
-                .appendFormalLine("long recordsFound = searchResult.getTotalResultCount();");
+        // Build call to FindByCriteria
+        final String entityTypeName = buildFindByCriteriaCall(bodyBuilder);
 
         bodyBuilder.appendFormalLine("");
         bodyBuilder.appendFormalLine("// Prepare rows");
@@ -811,6 +796,7 @@ public class DatatablesMetadata extends
         // String render = buffer.toString();
         bodyBuilder.appendFormalLine("String render = buffer.toString();");
 
+        bodyBuilder.appendFormalLine("// Load row id)");
         // row.put("DT_RowId",
         // conversionService_datatables.convert(owner.getId(), String.class));
         bodyBuilder.appendFormalLine(String.format(
@@ -818,6 +804,8 @@ public class DatatablesMetadata extends
                 getConversionServiceField().getFieldName().getSymbolName(),
                 entityName, StringUtils.capitalize(entityIdentifier
                         .getFieldName().getSymbolName())));
+        bodyBuilder
+                .appendFormalLine("// Put rendered content into first column (uses column index)");
         // row.put(Integer.toString(rowIdx), showOwner);
         bodyBuilder.appendFormalLine("row.put(\"0\", render);");
 
@@ -846,52 +834,80 @@ public class DatatablesMetadata extends
     }
 
     /**
-     * Build method body for <code>getDatatablesData</code> method
-     * 
      * @param bodyBuilder
+     * @return
      */
-    private void buildGetDatatablesDataMethodBody(
+    private String buildFindByCriteriaCall(
             InvocableMemberBodyBuilder bodyBuilder) {
-        // Prepares associations information
-        String filterByInfo = "null";
-        String orderByInfo = "null";
-        final String entityFinalName = helper.getFinalTypeName(entity);
-        if (jpaQueryMetadata != null) {
-            filterByInfo = String.format("%s.%s()", entityFinalName,
-                    jpaQueryMetadata.getFilterByMethodName().getSymbolName());
-            orderByInfo = String.format("%s.%s()", entityFinalName,
-                    jpaQueryMetadata.getOrderByMethodName().getSymbolName());
-        }
-
+        final String entityTypeName = helper.getFinalTypeName(entity);
         JavaType serachResult = new JavaType(
                 SEARCH_RESULTS.getFullyQualifiedTypeName(), 0, DataType.TYPE,
                 null, Arrays.asList(entity));
 
-        // SearchResults<Pet> searchResult =
-        // DatatablesUtils.findByCriteria(Pet.class,
-        // Pet.getFilterByAssociations(), Pet.getOrderByAssociations(),
-        // Pet.entityManager(), criterias);
+        if (jpaQueryMetadata != null) {
+            String filterByInfo = String.format("%s.%s()", entityTypeName,
+                    jpaQueryMetadata.getFilterByMethodName().getSymbolName());
+            String orderByInfo = String.format("%s.%s()", entityTypeName,
+                    jpaQueryMetadata.getOrderByMethodName().getSymbolName());
 
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.%s(), %s);",
-                                helper.getFinalTypeName(serachResult),
-                                helper.getFinalTypeName(DATATABLES_UTILS),
-                                entityFinalName, filterByInfo, orderByInfo,
-                                entityFinalName,
-                                entityEntityManagerMethod.getSymbolName(),
-                                CRITERIA_PARAM_NAME.getSymbolName()));
+            // SearchResults<Pet> searchResult =
+            // DatatablesUtils.findByCriteria(Pet.class,
+            // Pet.getFilterByAssociations(), Pet.getOrderByAssociations(),
+            // Pet.entityManager(), criterias);
+
+            bodyBuilder
+                    .appendFormalLine(String
+                            .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.%s(), %s);",
+                                    helper.getFinalTypeName(serachResult),
+                                    helper.getFinalTypeName(DATATABLES_UTILS),
+                                    entityTypeName, filterByInfo, orderByInfo,
+                                    entityTypeName,
+                                    entityEntityManagerMethod.getSymbolName(),
+                                    CRITERIA_PARAM_NAME.getSymbolName()));
+
+        }
+        else {
+
+            // SearchResults<Pet> searchResult =
+            // DatatablesUtils.findByCriteria(Pet.class,
+            // Pet.getFilterByAssociations(), Pet.getOrderByAssociations(),
+            // Pet.entityManager(), criterias);
+
+            bodyBuilder
+                    .appendFormalLine(String
+                            .format("%s searchResult = %s.findByCriteria(%s.class, %s.%s(), %s);",
+                                    helper.getFinalTypeName(serachResult),
+                                    helper.getFinalTypeName(DATATABLES_UTILS),
+                                    entityTypeName, entityTypeName,
+                                    entityEntityManagerMethod.getSymbolName(),
+                                    CRITERIA_PARAM_NAME.getSymbolName()));
+
+        }
 
         bodyBuilder.appendFormalLine("");
-        // long totalRecords = Pet.countPets();
-        bodyBuilder.appendFormalLine(String.format(
-                "long totalRecords = %s.count%s();", entityFinalName,
-                entityPlural));
+        bodyBuilder.appendFormalLine("// Get datatables required counts");
+        // long totalRecords = searchResult.getTotalCount();
+        bodyBuilder
+                .appendFormalLine("long totalRecords = searchResult.getTotalCount();");
+        // long recordsFound = findResult.getResultsCount();
+        bodyBuilder
+                .appendFormalLine("long recordsFound = searchResult.getResultsCount();");
+        return entityTypeName;
+    }
 
-        // long recordsFound = findResult.getTotalResultCount();
-        bodyBuilder.appendFormalLine(String.format(
-                "long recordsFound = searchResult.getTotalResultCount();",
-                entityFinalName, entityPlural));
+    /**
+     * Build method body for <code>getDatatablesData</code> method
+     * 
+     * @param bodyBuilder
+     */
+    /**
+     * @param bodyBuilder
+     */
+    private void buildGetDatatablesDataMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+
+        // Build call to FindByCriteria
+        buildFindByCriteriaCall(bodyBuilder);
 
         bodyBuilder.appendFormalLine("");
         bodyBuilder.appendFormalLine("// Entity pk field name");

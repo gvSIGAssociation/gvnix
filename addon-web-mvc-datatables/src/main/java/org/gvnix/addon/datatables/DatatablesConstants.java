@@ -63,6 +63,10 @@ public class DatatablesConstants {
             MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, JavaType.STRING));
 
+    static final JavaType MAP_STRING_OBJECT = new JavaType(
+            MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, JavaType.OBJECT));
+
     static final JavaType HASHMAP = new JavaType(HashMap.class);
     static final JavaType HASHMAP_STRING_STRING = new JavaType(
             HASHMAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
@@ -150,6 +154,9 @@ public class DatatablesConstants {
             "javax.servlet.RequestDispatcher");
     static final JavaType SERVLET_EXCEPTION = new JavaType(
             "javax.servlet.ServletException");
+
+    static final JavaType EXTENDED_MODEL_MAP = new JavaType(
+            "org.springframework.ui.ExtendedModelMap");
 
     static final JavaSymbolName REQUEST_PARAM_NAME = new JavaSymbolName(
             "request");
