@@ -471,8 +471,13 @@ public class DatatablesUtils {
         }
 
         // Predicate for base query
-        BooleanBuilder basePredicate = QuerydslUtils.createPredicateByAnd(
+        BooleanBuilder basePredicate;
+        if (baseSearchValuesMap != null) {
+            basePredicate = QuerydslUtils.createPredicateByAnd(
                 entity, baseSearchValuesMap);
+        } else {
+            basePredicate = new BooleanBuilder();
+        }
 
         // query projection to count all entities without paging
         baseQuery.where(basePredicate);
