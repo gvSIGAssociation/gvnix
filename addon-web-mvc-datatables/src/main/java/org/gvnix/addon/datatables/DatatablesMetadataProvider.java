@@ -17,23 +17,37 @@
  */
 package org.gvnix.addon.datatables;
 
+import java.beans.Introspector;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.jpa.query.JpaQueryMetadata;
 import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.finder.DynamicFinderServices;
+import org.springframework.roo.addon.finder.FinderMetadata;
+import org.springframework.roo.addon.finder.QueryHolder;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
+import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
+import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataServiceImpl;
+import org.springframework.roo.addon.web.mvc.controller.finder.WebFinderMetadata;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.FieldMetadataBuilder;
+import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.scanner.MemberDetails;
@@ -53,6 +67,8 @@ public final class DatatablesMetadataProvider extends
         AbstractItdMetadataProvider {
 
     @Reference private WebMetadataService webMetadataService;
+
+    @Reference private DynamicFinderServices dynamicFinderServices;
 
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
@@ -139,11 +155,108 @@ public final class DatatablesMetadataProvider extends
                 .getDatePatterns(entity, entityMemberDetails,
                         metadataIdentificationString);
 
+        // Identify if controller is annotated with @RooWebFinders
+        Map<FinderMetadataDetails, QueryHolder> findersRegistered = null;
+        String webFinderMetadataId = WebFinderMetadata.createIdentifier(
+                javaType, path);
+        WebFinderMetadata webFinderMetadata = (WebFinderMetadata) metadataService
+                .get(webFinderMetadataId);
+        if (webFinderMetadata != null) {
+
+            // Locate finders details
+            findersRegistered = getFindersRegisterd(entity, path,
+                    entityMemberDetails, plural, jpaMetadata.getEntityName());
+
+        }
+
         return new DatatablesMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, entity,
                 identifiers, plural, entityManagerMethodName, datePatterns,
                 webScaffoldAspectName, webJpaBatchMetadata, jpaQueryMetadata,
-                webScaffoldAnnotationValues);
+                webScaffoldAnnotationValues, findersRegistered);
+    }
+
+    /**
+     * Locates All {@link FinderMetadataDetails} and its related
+     * {@link QueryHolder} for every declared dynamic finder <br>
+     * <br>
+     * <em>Note:</em> This method is similar to
+     * {@link WebMetadataServiceImpl#getDynamicFinderMethodsAndFields(JavaType, MemberDetails, String)}
+     * but without register dependency (this dependency produces NPE in
+     * {@link #getMetadata(String, JavaType, PhysicalTypeMetadata, String)} when
+     * it tries to get JPA information)
+     * 
+     * @param entity
+     * @param path
+     * @param entityMemberDetails
+     * @param plural
+     * @param entityName
+     * @return
+     * @see WebMetadataServiceImpl#getDynamicFinderMethodsAndFields(JavaType,
+     *      MemberDetails, String)
+     */
+    public Map<FinderMetadataDetails, QueryHolder> getFindersRegisterd(
+            JavaType entity, LogicalPath path,
+            MemberDetails entityMemberDetails, String plural, String entityName) {
+
+        // Get finder metadata
+        final String finderMetadataKey = FinderMetadata.createIdentifier(
+                entity, path);
+        final FinderMetadata finderMetadata = (FinderMetadata) metadataService
+                .get(finderMetadataKey);
+        if (finderMetadata == null) {
+            return null;
+        }
+
+        QueryHolder queryHolder;
+        FinderMetadataDetails details;
+
+        Map<FinderMetadataDetails, QueryHolder> findersRegistered = new HashMap<FinderMetadataDetails, QueryHolder>();
+        // Iterate over
+        for (final MethodMetadata method : finderMetadata
+                .getAllDynamicFinders()) {
+            final List<JavaSymbolName> parameterNames = method
+                    .getParameterNames();
+            final List<JavaType> parameterTypes = AnnotatedJavaType
+                    .convertFromAnnotatedJavaTypes(method.getParameterTypes());
+            final List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
+            for (int i = 0; i < parameterTypes.size(); i++) {
+                JavaSymbolName fieldName = null;
+                if (parameterNames.get(i).getSymbolName().startsWith("max")
+                        || parameterNames.get(i).getSymbolName()
+                                .startsWith("min")) {
+                    fieldName = new JavaSymbolName(
+                            Introspector.decapitalize(StringUtils
+                                    .capitalize(parameterNames.get(i)
+                                            .getSymbolName().substring(3))));
+                }
+                else {
+                    fieldName = parameterNames.get(i);
+                }
+                final FieldMetadata field = BeanInfoUtils
+                        .getFieldForPropertyName(entityMemberDetails, fieldName);
+                if (field != null) {
+                    final FieldMetadataBuilder fieldMd = new FieldMetadataBuilder(
+                            field);
+                    fieldMd.setFieldName(parameterNames.get(i));
+                    fields.add(fieldMd.build());
+                }
+            }
+
+            details = new FinderMetadataDetails(method.getMethodName()
+                    .getSymbolName(), method, fields);
+
+            // locate QueryHolder instances. This objects contain
+            // information about a roo finder (parameters names and types
+            // and a "token" list with of find definition
+
+            queryHolder = dynamicFinderServices.getQueryHolder(
+                    entityMemberDetails, method.getMethodName(), plural,
+                    entityName);
+            findersRegistered.put(details, queryHolder);
+
+        }
+        return findersRegistered;
     }
 
     /**

@@ -19,8 +19,11 @@ package org.gvnix.addon.datatables;
 
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -34,10 +37,11 @@ import org.gvnix.support.OperationUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.finder.QueryHolder;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
+import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
@@ -227,28 +231,6 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.gvnix.roo.addon.datatables.DatatablesOperations#updateControllerListJsp
-     * (org.springframework.roo.model.JavaType)
-     */
-    public void updateControllerJspPages(JavaType controller) {
-        Validate.notNull(controller, "Controller required");
-
-        // Obtain ClassOrInterfaceTypeDetails for this java type
-        ClassOrInterfaceTypeDetails existing = getControllerDetails(controller);
-
-        // Get controller annotation
-        final AnnotationMetadata controllerAnnotation = MemberFindingUtils
-                .getAnnotationOfType(existing.getAnnotations(),
-                        SCAFFOLD_ANNOTATION);
-
-        updateControllerJspPages(controller,
-                getControllerPath(controllerAnnotation));
-    }
-
     private ClassOrInterfaceTypeDetails getControllerDetails(JavaType controller) {
         ClassOrInterfaceTypeDetails existing = typeLocationService
                 .getTypeDetails(controller);
@@ -262,28 +244,78 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * component.
      */
     public void updateControllerJspPages(JavaType controller,
-            WebScaffoldAnnotationValues controllerAnnotationValues) {
-        Validate.notNull(controllerAnnotationValues,
-                "controller annotation values required");
+            DatatablesMetadata datatablesMetadata) {
+        Validate.notNull(datatablesMetadata, "Datatables metadata required");
 
-        updateControllerJspPages(controller,
-                controllerAnnotationValues.getPath());
+        String controllerPath = datatablesMetadata
+                .getWebScaffoldAnnotationValues().getPath();
+        updateListJspx(controller, controllerPath);
+        Map<FinderMetadataDetails, QueryHolder> finders = datatablesMetadata
+                .getFindersRegistered();
+        if (finders != null && !finders.isEmpty()) {
+            updateFindersJspx(controller, controllerPath, finders);
+        }
     }
 
     /**
-     * Updates de list.jspx page of target controller to use datatables
+     * Updates all find*.jspx pages of target controller to use datatables
      * component.
+     * 
+     * @param controller
+     * @param finders
      */
-    private void updateControllerJspPages(JavaType controller,
-            String controllerPath) {
-
-        // locate list.jspx application path from @RooWebScaffold path value
+    private void updateFindersJspx(JavaType controller, String controllerPath,
+            Map<FinderMetadataDetails, QueryHolder> finders) {
         Validate.notBlank(controllerPath,
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + controller.getSimpleTypeName() + "'");
         Validate.isTrue(controllerPath != null && !controllerPath.isEmpty(),
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + controller.getSimpleTypeName() + "'");
+
+        Map<String, String> uriMap = new HashMap<String, String>(2);
+        uriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/datatables");
+
+        for (FinderMetadataDetails finder : finders.keySet()) {
+            updateTagxUriInJspx(controllerPath, finder.getFinderName(), uriMap);
+        }
+
+    }
+
+    /**
+     * Updates the list.jspx page of target controller to use datatables
+     * component.
+     * 
+     * @param controller
+     * @param controllerPath
+     */
+    private void updateListJspx(JavaType controller, String controllerPath) {
+        Validate.notBlank(controllerPath,
+                "Path is not specified in the @RooWebScaffold annotation for '"
+                        + controller.getSimpleTypeName() + "'");
+        Validate.isTrue(controllerPath != null && !controllerPath.isEmpty(),
+                "Path is not specified in the @RooWebScaffold annotation for '"
+                        + controller.getSimpleTypeName() + "'");
+
+        Map<String, String> uriMap = new HashMap<String, String>(2);
+
+        uriMap.put("xmlns:table", "urn:jsptagdir:/WEB-INF/tags/datatables");
+        uriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/datatables");
+
+        updateTagxUriInJspx(controllerPath, "list", uriMap);
+
+    }
+
+    /**
+     * Update tagx namespaces on a jspx
+     * 
+     * @param controllerPath {@link RooWebScaffold#path()} value
+     * @param jspxName (by example: "show", "list", "update")
+     * @param uriMap where key attribute name (ex "xmlns:page") and the value
+     *            the new uri (ex: "urn:jsptagdir:/WEB-INF/tags/datatables")
+     */
+    private void updateTagxUriInJspx(String controllerPath, String jspxName,
+            Map<String, String> uriMap) {
         if (!controllerPath.startsWith("/")) {
             controllerPath = "/".concat(controllerPath);
         }
@@ -291,7 +323,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         // Get list.jspx file path
         PathResolver pathResolver = projectOperations.getPathResolver();
         String docJspx = pathResolver.getIdentifier(getWebappPath(),
-                "WEB-INF/views" + controllerPath + "/list.jspx");
+                "WEB-INF/views" + controllerPath + "/" + jspxName + ".jspx");
 
         // Parse list.jspx document
         Document docJspXml = loadXmlDocument(docJspx);
@@ -304,13 +336,10 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         Element docRoot = docJspXml.getDocumentElement();
         Element divMain = XmlUtils.findFirstElement("/div", docRoot);
 
-        // Update table tag namespace
-        divMain.setAttribute("xmlns:table",
-                "urn:jsptagdir:/WEB-INF/tags/datatables");
-
-        // Update page tag namespace
-        divMain.setAttribute("xmlns:page",
-                "urn:jsptagdir:/WEB-INF/tags/datatables");
+        // Update namespace
+        for (Entry<String, String> entry : uriMap.entrySet()) {
+            divMain.setAttribute(entry.getKey(), entry.getValue());
+        }
 
         // Update list.jspx file
         DomUtils.removeTextNodes(docJspXml);

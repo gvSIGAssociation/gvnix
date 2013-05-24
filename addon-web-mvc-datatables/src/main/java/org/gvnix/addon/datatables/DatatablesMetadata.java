@@ -27,6 +27,7 @@ import static org.springframework.roo.model.SpringJavaType.RESPONSE_BODY;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -37,7 +38,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.addon.jpa.query.JpaQueryMetadata;
 import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.gvnix.support.WebItdBuilderHelper;
+import org.springframework.roo.addon.finder.QueryHolder;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
+import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
@@ -159,6 +162,11 @@ public class DatatablesMetadata extends
 
     private final WebScaffoldAnnotationValues webScaffoldAnnotationValues;
 
+    /**
+     * Information about finders
+     */
+    private final Map<FinderMetadataDetails, QueryHolder> findersRegistered;
+
     public DatatablesMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             DatatablesAnnotationValues annotationValues, JavaType entity,
@@ -168,7 +176,8 @@ public class DatatablesMetadata extends
             JavaType webScaffoldAspectName,
             WebJpaBatchMetadata webJpaBatchMetadata,
             JpaQueryMetadata jpaQueryMetadata,
-            WebScaffoldAnnotationValues webScaffoldAnnotationValues) {
+            WebScaffoldAnnotationValues webScaffoldAnnotationValues,
+            Map<FinderMetadataDetails, QueryHolder> findersRegistered) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -189,6 +198,14 @@ public class DatatablesMetadata extends
         this.webJpaBatchMetadata = webJpaBatchMetadata;
         this.jpaQueryMetadata = jpaQueryMetadata;
         this.webScaffoldAnnotationValues = webScaffoldAnnotationValues;
+
+        if (findersRegistered != null) {
+            this.findersRegistered = Collections
+                    .unmodifiableMap(findersRegistered);
+        }
+        else {
+            this.findersRegistered = null;
+        }
 
         // Adding precedence declaration
         // This aspect before webScaffold
@@ -1051,5 +1068,12 @@ public class DatatablesMetadata extends
      */
     public boolean isStantardMode() {
         return annotationValues.isStandardMode();
+    }
+
+    /**
+     * @return information about dynamic finder registered on the controller
+     */
+    public Map<FinderMetadataDetails, QueryHolder> getFindersRegistered() {
+        return findersRegistered;
     }
 }

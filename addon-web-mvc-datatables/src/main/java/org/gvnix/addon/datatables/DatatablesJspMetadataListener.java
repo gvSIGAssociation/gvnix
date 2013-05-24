@@ -89,8 +89,7 @@ public class DatatablesJspMetadataListener implements MetadataProvider,
         }
 
         // Call to operations for update pages
-        operations.updateControllerJspPages(controller,
-                datatablesMetadata.getWebScaffoldAnnotationValues());
+        operations.updateControllerJspPages(controller, datatablesMetadata);
 
         return new DatatablesJspMetadata(datatablesJspMetadataId,
                 datatablesMetadata);
