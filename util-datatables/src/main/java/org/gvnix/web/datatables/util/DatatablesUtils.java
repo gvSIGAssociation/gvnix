@@ -77,7 +77,7 @@ public class DatatablesUtils {
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
             EntityManager entityManager, DatatablesCriterias datatablesCriterias) {
         return findByCriteria(entityClass, null, null, entityManager,
-                datatablesCriterias, null, false);
+                datatablesCriterias, (BooleanBuilder) null, false);
     }
 
     /**
@@ -143,7 +143,6 @@ public class DatatablesUtils {
      * @param distinct use distinct query
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
             Class<T> entityClass,
             Map<String, List<String>> filterByAssociations,
@@ -153,8 +152,124 @@ public class DatatablesUtils {
             Map<String, Object> baseSearchValuesMap, boolean distinct)
             throws IllegalArgumentException {
 
-        // Check arguments aren't null
         Assert.notNull(entityClass);
+
+        // Query DSL builder
+        PathBuilder<T> entity = new PathBuilder<T>(entityClass, "entity");
+
+        // Predicate for base query
+        BooleanBuilder basePredicate;
+        if (baseSearchValuesMap != null) {
+            basePredicate = QuerydslUtils.createPredicateByAnd(entity,
+                    baseSearchValuesMap);
+        }
+        else {
+            basePredicate = new BooleanBuilder();
+        }
+
+        return findByCriteria(entityClass, filterByAssociations,
+                orderByAssociations, entityManager, datatablesCriterias,
+                basePredicate, distinct);
+    }
+
+    /**
+     * Execute a select query on entityClass using <a
+     * href="http://www.querydsl.com/">Querydsl</a> which enables the
+     * construction of type-safe SQL-like queries.
+     * 
+     * @param entityClass entity to use in search
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param basePredicate (optional) base filter conditions
+     * @param distinct use distinct query
+     * @return
+     */
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            Class<T> entityClass,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            BooleanBuilder basePredicate, boolean distinct)
+            throws IllegalArgumentException {
+
+        Assert.notNull(entityClass);
+
+        // Query DSL builder
+        PathBuilder<T> entity = new PathBuilder<T>(entityClass, "entity");
+
+        return findByCriteria(entity, filterByAssociations,
+                orderByAssociations, entityManager, datatablesCriterias,
+                basePredicate, distinct);
+    }
+
+    /**
+     * Execute a select query on entityClass using <a
+     * href="http://www.querydsl.com/">Querydsl</a> which enables the
+     * construction of type-safe SQL-like queries.
+     * 
+     * @param entity builder for entity to use in search. Represents the entity
+     *        and gives access to its properties for query purposes
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param basePredicate (optional) base filter conditions
+     * @param distinct use distinct query
+     * @return
+     */
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            PathBuilder<T> entity,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            BooleanBuilder basePredicate) throws IllegalArgumentException {
+        return findByCriteria(entity, filterByAssociations,
+                orderByAssociations, entityManager, datatablesCriterias,
+                basePredicate, false);
+    }
+
+    /**
+     * Execute a select query on entityClass using <a
+     * href="http://www.querydsl.com/">Querydsl</a> which enables the
+     * construction of type-safe SQL-like queries.
+     * 
+     * @param entity builder for entity to use in search. Represents the entity
+     *        and gives access to its properties for query purposes
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param basePredicate (optional) base filter conditions
+     * @param distinct use distinct query
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            PathBuilder<T> entity,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            BooleanBuilder basePredicate, boolean distinct)
+            throws IllegalArgumentException {
+
+        // Check arguments aren't null
         Assert.notNull(entityManager);
         Assert.notNull(datatablesCriterias);
 
@@ -173,9 +288,6 @@ public class DatatablesUtils {
         // true if the search must take in account all columns
         boolean findInAllColumns = StringUtils.isNotEmpty(datatablesCriterias
                 .getSearch()) && datatablesCriterias.hasOneFilterableColumn();
-
-        // Query DSL builder
-        PathBuilder<T> entity = new PathBuilder<T>(entityClass, "entity");
 
         // ----- Create queries -----
 
@@ -254,9 +366,9 @@ public class DatatablesUtils {
 
                         // Entity field name and type
                         String fieldName = column.getName();
-                        Class<?> fieldType = BeanUtils.findPropertyType(
-                                fieldName,
-                                ArrayUtils.<Class<?>> toArray(entityClass));
+                        Class<?> fieldType = BeanUtils
+                                .findPropertyType(fieldName, ArrayUtils
+                                        .<Class<?>> toArray(entity.getType()));
 
                         // On column search, connect where clauses together by
                         // AND
@@ -325,9 +437,9 @@ public class DatatablesUtils {
 
                         // Entity field name and type
                         String fieldName = column.getName();
-                        Class<?> fieldType = BeanUtils.findPropertyType(
-                                fieldName,
-                                ArrayUtils.<Class<?>> toArray(entityClass));
+                        Class<?> fieldType = BeanUtils
+                                .findPropertyType(fieldName, ArrayUtils
+                                        .<Class<?>> toArray(entity.getType()));
 
                         // Find in all columns means we want to find given
                         // value in at least one entity property, so we must
@@ -404,7 +516,8 @@ public class DatatablesUtils {
                 // interface
                 String fieldName = column.getName();
                 Class<E> fieldType = (Class<E>) BeanUtils.findPropertyType(
-                        fieldName, ArrayUtils.<Class<?>> toArray(entityClass));
+                        fieldName,
+                        ArrayUtils.<Class<?>> toArray(entity.getType()));
 
                 List<String> attributes = orderByAssociations.get(fieldName);
                 try {
@@ -471,11 +584,7 @@ public class DatatablesUtils {
         }
 
         // Predicate for base query
-        BooleanBuilder basePredicate;
-        if (baseSearchValuesMap != null) {
-            basePredicate = QuerydslUtils.createPredicateByAnd(
-                entity, baseSearchValuesMap);
-        } else {
+        if (basePredicate == null) {
             basePredicate = new BooleanBuilder();
         }
 
