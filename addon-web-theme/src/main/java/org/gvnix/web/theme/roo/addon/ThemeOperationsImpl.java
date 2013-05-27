@@ -1022,6 +1022,10 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * in the local repository or themes installed in the project, just give the
      * search path.
      * 
+     * TODO Duplicated code
+     * When finding bundle use URL and when finding local files use URI
+     * Avoid error "unknown protocol: bundle" on commands
+     * 
      * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
     private Set<URL> findFileThemeDescriptorsURLs(File path) {
@@ -1061,6 +1065,10 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * Find theme descriptors in the given path. Use this utility to find themes
      * in the local repository or themes installed in the project, just give the
      * search path.
+     * 
+     * TODO Duplicated code
+     * When finding bundle use URL and when finding local files use URI
+     * Avoid error "unknown protocol: bundle" on commands
      * 
      * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
@@ -1151,6 +1159,10 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     /**
      * This method will copy the contents of a bundle to a local directory if
      * the resource does not already exist in the target directory
+     * 
+     * TODO Duplicated code
+     * When finding bundle use URL and when finding local files use URI
+     * Avoid error "unknown protocol: bundle" on commands
      * 
      * @param sourceDirectory source directory. URI syntax:
      *            [scheme:][//authority][path][?query][#fragment]
@@ -1271,6 +1283,10 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     /**
      * This method will copy the contents of a bundle to a local directory if
      * the resource does not already exist in the target directory
+     * 
+     * TODO Duplicated code
+     * When finding bundle use URL and when finding local files use URI
+     * Avoid error "unknown protocol: bundle" on commands
      * 
      * @param sourceDirectory source directory. URI syntax:
      *            [scheme:][//authority][path][?query][#fragment]
