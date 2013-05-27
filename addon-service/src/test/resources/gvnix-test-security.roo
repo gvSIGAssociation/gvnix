@@ -5,7 +5,6 @@ field boolean --fieldName isSpaniard --class ~.domain.ValidaDniRequest --notNull
 web mvc setup
 web mvc all --package ~.web
 selenium test --controller ~.web.ValidaDniRequestController
-// Disabled temporally because access is not allowed (public IP validation)
-//remote service import ws --class ~.services.ServiciosMapProxy1 --wsdl https://sleipnir2.accv.es:8448/accv_map_gateway/services/ServiciosMap?wsdl
+remote service import ws --class ~.services.ServiciosMapProxy1 --wsdl https://sleipnir2.accv.es:8448/accv_map_gateway/services/ServiciosMap?wsdl
 # Get random file (.bash_history by example) as certificate only to check command valid generation
 remote service security ws --class ~.services.ServiciosMapProxy1 --certificate ~/.bash_history --password myPass --alias profile_name
