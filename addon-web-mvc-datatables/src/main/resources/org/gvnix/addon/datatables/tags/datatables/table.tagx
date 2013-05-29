@@ -196,7 +196,7 @@
   </c:if>
   <jsp:scriptlet>
   	jspContext.setAttribute("locale", ((RequestContext)jspContext
-            .getAttribute(RequestContextAwareTag.REQUEST_CONTEXT_PAGE_ATTRIBUTE)).getLocale());
+            .getAttribute(RequestContextAwareTag.REQUEST_CONTEXT_PAGE_ATTRIBUTE)).getLocale().getLanguage());
   </jsp:scriptlet>
   <c:if test="${empty labels}">
   	<c:set var="labels" value="/resources/scripts/datatables/i18n/labels_${locale}.txt"/>
