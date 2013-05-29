@@ -17,23 +17,24 @@
  */
 package org.gvnix.addon.datatables;
 
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.OperationUtils;
+import org.gvnix.support.WebProjectUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
@@ -67,7 +68,6 @@ import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.project.maven.Pom;
-import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -276,7 +276,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         uriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/datatables");
 
         for (FinderMetadataDetails finder : finders.keySet()) {
-            updateTagxUriInJspx(controllerPath, finder.getFinderName(), uriMap);
+            WebProjectUtils.updateTagxUriInJspx(controllerPath,
+                    finder.getFinderName(), uriMap, projectOperations,
+                    fileManager);
         }
 
     }
@@ -301,49 +303,8 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         uriMap.put("xmlns:table", "urn:jsptagdir:/WEB-INF/tags/datatables");
         uriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/datatables");
 
-        updateTagxUriInJspx(controllerPath, "list", uriMap);
-
-    }
-
-    /**
-     * Update tagx namespaces on a jspx
-     * 
-     * @param controllerPath {@link RooWebScaffold#path()} value
-     * @param jspxName (by example: "show", "list", "update")
-     * @param uriMap where key attribute name (ex "xmlns:page") and the value
-     *            the new uri (ex: "urn:jsptagdir:/WEB-INF/tags/datatables")
-     */
-    private void updateTagxUriInJspx(String controllerPath, String jspxName,
-            Map<String, String> uriMap) {
-        if (!controllerPath.startsWith("/")) {
-            controllerPath = "/".concat(controllerPath);
-        }
-
-        // Get list.jspx file path
-        PathResolver pathResolver = projectOperations.getPathResolver();
-        String docJspx = pathResolver.getIdentifier(getWebappPath(),
-                "WEB-INF/views" + controllerPath + "/" + jspxName + ".jspx");
-
-        // Parse list.jspx document
-        Document docJspXml = loadXmlDocument(docJspx);
-        if (docJspXml == null) {
-            // file not found: do nothing
-            return;
-        }
-
-        // Get main div
-        Element docRoot = docJspXml.getDocumentElement();
-        Element divMain = XmlUtils.findFirstElement("/div", docRoot);
-
-        // Update namespace
-        for (Entry<String, String> entry : uriMap.entrySet()) {
-            divMain.setAttribute(entry.getKey(), entry.getValue());
-        }
-
-        // Update list.jspx file
-        DomUtils.removeTextNodes(docJspXml);
-        fileManager.createOrUpdateTextFileIfRequired(docJspx,
-                XmlUtils.nodeToString(docJspXml), true);
+        WebProjectUtils.updateTagxUriInJspx(controllerPath, "list", uriMap,
+                projectOperations, fileManager);
     }
 
     /**
@@ -547,64 +508,6 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 projectOperations.getFocusedModuleName());
     }
 
-    private boolean addJSToTag(Document docTagx, Element root, String varName,
-            String location) {
-        boolean modified = false;
-
-        // add url resolution
-        modified = addUrlToTag(docTagx, root, varName, location);
-
-        // Add script
-        Element scriptElement = XmlUtils.findFirstElement(
-                String.format("script[@src='${%s}']", varName), root);
-        if (scriptElement == null) {
-            scriptElement = docTagx.createElement("script");
-            scriptElement.setAttribute("src", "${".concat(varName).concat("}"));
-            scriptElement.setAttribute("type", "text/javascript");
-            scriptElement.appendChild(docTagx
-                    .createComment("required for FF3 and Opera"));
-            root.appendChild(scriptElement);
-            modified = true;
-        }
-        return modified;
-    }
-
-    private boolean addCssToTag(Document docTagx, Element root, String varName,
-            String location) {
-        boolean modified = false;
-
-        // add url resolution
-        modified = addUrlToTag(docTagx, root, varName, location);
-
-        // Add link
-        Element cssElement = XmlUtils.findFirstElement(
-                String.format("link[@href='${%s}']", varName), root);
-        if (cssElement == null) {
-            cssElement = docTagx.createElement("link");
-            cssElement.setAttribute("rel", "stylesheet");
-            cssElement.setAttribute("type", "text/css");
-            cssElement.setAttribute("media", "screen");
-            cssElement.setAttribute("href", "${".concat(varName).concat("}"));
-            root.appendChild(cssElement);
-            modified = true;
-        }
-        return modified;
-    }
-
-    private boolean addUrlToTag(Document docTagx, Element root, String varName,
-            String location) {
-        Element urlElement = XmlUtils.findFirstElement(
-                "url[@var='".concat(varName) + "']", root);
-        if (urlElement == null) {
-            urlElement = docTagx.createElement("spring:url");
-            urlElement.setAttribute("var", varName);
-            urlElement.setAttribute("value", location);
-            root.appendChild(urlElement);
-            return true;
-        }
-        return false;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -613,96 +516,40 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      */
     public void addJSToLoadScriptsTag() {
 
-        // Parse load-script.tagx
-        PathResolver pathResolver = projectOperations.getPathResolver();
-        String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
-                "WEB-INF/tags/util/load-scripts.tagx");
-        Validate.isTrue(fileManager.exists(docTagxPath),
-                "load-script.tagx not found: ".concat(docTagxPath));
-
-        MutableFile docTagxMutableFile = null;
-        Document docTagx;
-
-        try {
-            docTagxMutableFile = fileManager.updateFile(docTagxPath);
-            docTagx = XmlUtils.getDocumentBuilder().parse(
-                    docTagxMutableFile.getInputStream());
-        }
-        catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        Element root = docTagx.getDocumentElement();
-
-        boolean modified = false;
-
-        /* Add url resolutions missing */
+        List<Pair<String, String>> cssList = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> jsList = new ArrayList<Pair<String, String>>();
 
         // Add jquery.datatables.css url resolution
-        modified = addCssToTag(docTagx, root, "css_jquery_datatables_url",
-                "/resources/styles/datatables/jquery.dataTables.css")
-                || modified;
+        cssList.add(new ImmutablePair<String, String>(
+                "css_jquery_datatables_url",
+                "/resources/styles/datatables/jquery.dataTables.css"));
 
         // Add gvnix.dataTables.css url resolution
-        modified = addCssToTag(docTagx, root, "css_gvnix_datatables_url",
-                "/resources/styles/datatables/gvnix.dataTables.css")
-                || modified;
+        cssList.add(new ImmutablePair<String, String>(
+                "css_gvnix_datatables_url",
+                "/resources/styles/datatables/gvnix.dataTables.css"));
 
         // Add jquery.js
-        modified = addJSToTag(docTagx, root, "js_jquery_url",
-                "/resources/scripts/datatables/jquery-min.js") || modified;
+        jsList.add(new ImmutablePair<String, String>("js_jquery_url",
+                "/resources/scripts/datatables/jquery-min.js"));
 
         // Add jquery.datatables.js
-        modified = addJSToTag(docTagx, root, "js_jquery_datatables_url",
-                "/resources/scripts/datatables/jquery.dataTables.min.js")
-                || modified;
+        jsList.add(new ImmutablePair<String, String>(
+                "js_jquery_datatables_url",
+                "/resources/scripts/datatables/jquery.dataTables.min.js"));
 
         // Add jquery.dataTables.ext.gvnix.selection.js
-        modified = addJSToTag(docTagx, root,
+        jsList.add(new ImmutablePair<String, String>(
                 "js_jquery_datatables_selection_url",
-                "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.selection.js")
-                || modified;
+                "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.selection.js"));
 
         // Add jquery.dataTables.ext.gvnix.js
-        modified = addJSToTag(docTagx, root,
+        jsList.add(new ImmutablePair<String, String>(
                 "js_jquery_datatables_custom_api_url",
-                "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.js")
-                || modified;
+                "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.js"));
 
-        if (modified) {
-            XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
-        }
-    }
-
-    /**
-     * Load a XML {@link Document} from its file identifier
-     * 
-     * @param docFileIdentifier
-     * @return document or null if file not found
-     */
-    private Document loadXmlDocument(String docFileIdentifier) {
-        if (!fileManager.exists(docFileIdentifier)) {
-            // document doesn't exist, so nothing to do
-            return null;
-        }
-
-        // Parse document
-        Document docJspXml;
-        InputStream docJspxIs = null;
-        try {
-            docJspxIs = fileManager.getInputStream(docFileIdentifier);
-
-            try {
-                docJspXml = XmlUtils.getDocumentBuilder().parse(docJspxIs);
-            }
-            catch (Exception ex) {
-                throw new IllegalStateException(
-                        "Could not open ".concat(docFileIdentifier), ex);
-            }
-        }
-        finally {
-            IOUtils.closeQuietly(docJspxIs);
-        }
-        return docJspXml;
+        WebProjectUtils.addJsAndCssToLoadScriptsTag(cssList, jsList,
+                projectOperations, fileManager);
     }
 
     /*
