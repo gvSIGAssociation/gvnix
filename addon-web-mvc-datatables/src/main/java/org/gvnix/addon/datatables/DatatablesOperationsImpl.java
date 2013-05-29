@@ -37,7 +37,6 @@ import org.gvnix.support.OperationUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.finder.QueryHolder;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
@@ -250,7 +249,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         String controllerPath = datatablesMetadata
                 .getWebScaffoldAnnotationValues().getPath();
         updateListJspx(controller, controllerPath);
-        Map<FinderMetadataDetails, QueryHolder> finders = datatablesMetadata
+        Map<FinderMetadataDetails, QueryHolderTokens> finders = datatablesMetadata
                 .getFindersRegistered();
         if (finders != null && !finders.isEmpty()) {
             updateFindersJspx(controller, controllerPath, finders);
@@ -265,7 +264,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * @param finders
      */
     private void updateFindersJspx(JavaType controller, String controllerPath,
-            Map<FinderMetadataDetails, QueryHolder> finders) {
+            Map<FinderMetadataDetails, QueryHolderTokens> finders) {
         Validate.notBlank(controllerPath,
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + controller.getSimpleTypeName() + "'");

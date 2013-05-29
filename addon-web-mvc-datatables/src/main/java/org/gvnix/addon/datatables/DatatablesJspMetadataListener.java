@@ -22,6 +22,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.web.mvc.controller.finder.WebFinderMetadata;
+import org.springframework.roo.addon.web.mvc.jsp.JspMetadata;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.metadata.MetadataItem;
@@ -114,8 +115,29 @@ public class DatatablesJspMetadataListener implements MetadataProvider,
                         .getPath(upstreamDependency);
                 downstreamDependency = DatatablesJspMetadata.createIdentifier(
                         controller, path);
+
+                // register dependency with JPS Metadata
+                String jspMetadataId = JspMetadata.createIdentifier(controller,
+                        path);
+                metadataDependencyRegistry.registerDependency(jspMetadataId,
+                        downstreamDependency);
+
             }
             else if (WebFinderMetadata.isValid(upstreamDependency)) {
+                final JavaType controller = WebFinderMetadata
+                        .getJavaType(upstreamDependency);
+                final LogicalPath path = WebFinderMetadata
+                        .getPath(upstreamDependency);
+                downstreamDependency = DatatablesJspMetadata.createIdentifier(
+                        controller, path);
+
+                // register dependency with JPS Metadata
+                String jspMetadataId = JspMetadata.createIdentifier(controller,
+                        path);
+                metadataDependencyRegistry.registerDependency(jspMetadataId,
+                        downstreamDependency);
+            }
+            else if (JspMetadata.isValid(upstreamDependency)) {
                 final JavaType controller = WebFinderMetadata
                         .getJavaType(upstreamDependency);
                 final LogicalPath path = WebFinderMetadata

@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -71,12 +73,20 @@ public class DatatablesConstants {
     static final JavaType HASHMAP_STRING_STRING = new JavaType(
             HASHMAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, JavaType.STRING));
+    static final JavaType HASHMAP_STRING_OBJECT = new JavaType(
+            HASHMAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, JavaType.OBJECT));
     /**
      * List<Map<String,String>>
      */
     static final JavaType LIST_MAP_STRING_STRING = new JavaType(
             LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(MAP_STRING_STRING));
+
+    static final JavaType LIST_STRING = new JavaType(
+            LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING));
+
     static final JavaType RENDER_FOR_DATATABLES_RETURN = LIST_MAP_STRING_STRING;
 
     /**
@@ -86,6 +96,10 @@ public class DatatablesConstants {
             ARRAY_LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(MAP_STRING_STRING));
 
+    static final JavaType ARRAYLIST_STRING = new JavaType(
+            ARRAY_LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING));
+
     static final JavaType DATATABLES_COLUMNDEF = new JavaType(
             "com.github.dandelion.datatables.core.ajax.ColumnDef");
 
@@ -94,7 +108,7 @@ public class DatatablesConstants {
     /**
      * DatatablesResponse<Map<String,String>>
      */
-    static final JavaType GET_DATATABLES_DATA_RETURN = new JavaType(
+    static final JavaType FIND_ALL_RETURN = new JavaType(
             DATATABLES_RESPONSE.getFullyQualifiedTypeName(), 0, DataType.TYPE,
             null, Arrays.asList(MAP_STRING_STRING));
 
@@ -104,6 +118,8 @@ public class DatatablesConstants {
     static final JavaType HASHSET_STRING = new JavaType(
             HASH_SET.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING));
+
+    static final JavaType COLLECTIONS = new JavaType(Collections.class);
 
     static final JavaType DATATABLES_UTILS = new JavaType(
             "org.gvnix.web.datatables.util.DatatablesUtils");
@@ -126,14 +142,16 @@ public class DatatablesConstants {
             "com.github.dandelion.datatables.core.ajax.DatatablesCriterias");
     static final JavaSymbolName RENDER_FOR_DATATABLES = new JavaSymbolName(
             "renderForDatatables");
-    static final JavaSymbolName GET_DATATABLES_DATA = new JavaSymbolName(
-            "getDatatablesData");
     static final JavaSymbolName LIST_DATATABLES = new JavaSymbolName(
             "listDatatables");
     static final JavaSymbolName LIST_ROO = new JavaSymbolName("list");
     static final JavaSymbolName UI_MODEL = new JavaSymbolName("uiModel");
     static final JavaSymbolName POPULATE_DATATABLES_CONFIG = new JavaSymbolName(
             "populateDatatablesConfig");
+    static final JavaSymbolName POPULATE_PARAMETERS_MAP = new JavaSymbolName(
+            "populateParametersMap");
+    static final JavaSymbolName GET_PROPERTY_MAP = new JavaSymbolName(
+            "getPropertyMap");
     static final JavaSymbolName POPULATE_ITEM_FOR_RENDER = new JavaSymbolName(
             "populateItemForRender");
 
@@ -170,4 +188,24 @@ public class DatatablesConstants {
     static final JavaType JODA_DATETIME_FORMAT = new JavaType(
             "org.joda.time.format.DateTimeFormat");
     static final JavaType LOCALE = new JavaType(Locale.class);
+
+    static final JavaType QDSL_BOOLEAN_BUILDER = new JavaType(
+            "com.mysema.query.BooleanBuilder");
+    static final JavaType QDSL_PATH_BUILDER = new JavaType(
+            "com.mysema.query.types.path.PathBuilder");
+    static final JavaType QDSL_JPA_QUERY = new JavaType(
+            "com.mysema.query.jpa.impl.JPAQuery");
+
+    static final JavaType ENUMERAITON = new JavaType(Enumeration.class);
+    static final JavaType ENUMERATION_STRING = new JavaType(
+            ENUMERAITON.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(MAP_STRING_STRING));
+
+    static final JavaType COLLECTION_UTILS = new JavaType(
+            "org.apache.commons.collections.CollectionUtils");
+
+    static final JavaType BEAN_WRAPPER = new JavaType(
+            "org.springframework.beans.BeanWrapper");
+    static final JavaType BEAN_WRAPPER_IMP = new JavaType(
+            "org.springframework.beans.BeanWrapperImpl");
 }

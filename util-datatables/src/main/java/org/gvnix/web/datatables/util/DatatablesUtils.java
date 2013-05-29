@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
- * Copyright (C) 2013 Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
+ * 2013 Generalitat Valenciana
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.web.datatables.util;
 
@@ -104,11 +104,35 @@ public class DatatablesUtils {
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations (optional) for each related entity to join
-     *        contain as key the name of the association and as value the List
-     *        of related entity fields to filter by
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *        contain as key the name of the association and as value the List
-     *        of related entity fields to order by
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @return
+     */
+    public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager, DatatablesCriterias datatablesCriterias) {
+        return findByCriteria(entityClass, filterByAssociations,
+                orderByAssociations, entityManager, datatablesCriterias,
+                (Map<String, Object>) null, false);
+    }
+
+    /**
+     * Execute a select query on entityClass using {@code DatatablesCriterias}
+     * information for filter, sort and paginate result.
+     * 
+     * @param entityClass entity to use in search
+     * @param filterByAssociations (optional) for each related entity to join
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param baseSearchValuesMap (optional) base filter values
@@ -132,11 +156,11 @@ public class DatatablesUtils {
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations (optional) for each related entity to join
-     *        contain as key the name of the association and as value the List
-     *        of related entity fields to filter by
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *        contain as key the name of the association and as value the List
-     *        of related entity fields to order by
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param baseSearchValuesMap (optional) base filter values
@@ -179,11 +203,11 @@ public class DatatablesUtils {
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations (optional) for each related entity to join
-     *        contain as key the name of the association and as value the List
-     *        of related entity fields to filter by
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *        contain as key the name of the association and as value the List
-     *        of related entity fields to order by
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
@@ -215,13 +239,13 @@ public class DatatablesUtils {
      * construction of type-safe SQL-like queries.
      * 
      * @param entity builder for entity to use in search. Represents the entity
-     *        and gives access to its properties for query purposes
+     *            and gives access to its properties for query purposes
      * @param filterByAssociations (optional) for each related entity to join
-     *        contain as key the name of the association and as value the List
-     *        of related entity fields to filter by
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *        contain as key the name of the association and as value the List
-     *        of related entity fields to order by
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
@@ -246,13 +270,34 @@ public class DatatablesUtils {
      * construction of type-safe SQL-like queries.
      * 
      * @param entity builder for entity to use in search. Represents the entity
-     *        and gives access to its properties for query purposes
+     *            and gives access to its properties for query purposes
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param basePredicate (optional) base filter conditions
+     * @param distinct use distinct query
+     * @return
+     */
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            PathBuilder<T> entity, EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            BooleanBuilder basePredicate) throws IllegalArgumentException {
+        return findByCriteria(entity, null, null, entityManager,
+                datatablesCriterias, basePredicate, false);
+    }
+
+    /**
+     * Execute a select query on entityClass using <a
+     * href="http://www.querydsl.com/">Querydsl</a> which enables the
+     * construction of type-safe SQL-like queries.
+     * 
+     * @param entity builder for entity to use in search. Represents the entity
+     *            and gives access to its properties for query purposes
      * @param filterByAssociations (optional) for each related entity to join
-     *        contain as key the name of the association and as value the List
-     *        of related entity fields to filter by
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *        contain as key the name of the association and as value the List
-     *        of related entity fields to order by
+     *            contain as key the name of the association and as value the
+     *            List of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
@@ -641,10 +686,10 @@ public class DatatablesUtils {
      * @param totalDisplayRecords Amount of records found
      * @param columns {@link ColumnDef} list
      * @param datePatterns Patterns to convert Date fields to String. The Map
-     *        contains one pattern for each entity Date field keyed by field
-     *        name. For Roo compatibility the key could follow the pattern
-     *        {@code lower_case( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
-     *        too
+     *            contains one pattern for each entity Date field keyed by field
+     *            name. For Roo compatibility the key could follow the pattern
+     *            {@code lower_case( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
+     *            too
      * @param conversionService
      * @return
      */

@@ -18,21 +18,31 @@
 package org.gvnix.addon.datatables;
 
 import java.beans.Introspector;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.jpa.query.JpaQueryMetadata;
 import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.finder.DynamicFinderServices;
+import org.springframework.roo.addon.finder.DynamicFinderServicesImpl;
+import org.springframework.roo.addon.finder.FieldToken;
+import org.springframework.roo.addon.finder.FinderFieldTokenMissingException;
 import org.springframework.roo.addon.finder.FinderMetadata;
+import org.springframework.roo.addon.finder.InvalidFinderException;
 import org.springframework.roo.addon.finder.QueryHolder;
+import org.springframework.roo.addon.finder.ReservedToken;
+import org.springframework.roo.addon.finder.ReservedTokenHolder;
+import org.springframework.roo.addon.finder.Token;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
@@ -46,6 +56,7 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
+import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
@@ -67,8 +78,6 @@ public final class DatatablesMetadataProvider extends
         AbstractItdMetadataProvider {
 
     @Reference private WebMetadataService webMetadataService;
-
-    @Reference private DynamicFinderServices dynamicFinderServices;
 
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
@@ -115,6 +124,9 @@ public final class DatatablesMetadataProvider extends
                 javaType, path);
         WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
                 .get(webScaffoldMetadataId);
+        // register dependency to Roo Web Scaffold
+        metadataDependencyRegistry.registerDependency(webScaffoldMetadataId,
+                metadataIdentificationString);
 
         JavaType webScaffoldAspectName = webScaffoldMetadata.getAspectName();
 
@@ -129,19 +141,29 @@ public final class DatatablesMetadataProvider extends
         WebJpaBatchMetadata webJpaBatchMetadata = (WebJpaBatchMetadata) metadataService
                 .get(webJpaBatchMetadataId);
 
+        String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
+                path);
+        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
+                .get(jpaMetadataId);
+        if (jpaMetadata == null) {
+            // Unsupported type (by now)
+            return null;
+        }
+        // register dependency to JPA Actuve record
+        metadataDependencyRegistry.registerDependency(jpaMetadataId,
+                metadataIdentificationString);
+
         // Get jpa query metadata
         String jpaQueryMetadataId = JpaQueryMetadata.createIdentifier(entity,
                 path);
         JpaQueryMetadata jpaQueryMetadata = (JpaQueryMetadata) metadataService
                 .get(jpaQueryMetadataId);
+        // register dependency to JPA Query
+        metadataDependencyRegistry.registerDependency(jpaQueryMetadataId,
+                metadataIdentificationString);
 
         List<FieldMetadata> identifiers = persistenceMemberLocator
                 .getIdentifierFields(entity);
-
-        String JpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
-                path);
-        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
-                .get(JpaMetadataId);
 
         String plural = jpaMetadata.getPlural();
 
@@ -156,11 +178,15 @@ public final class DatatablesMetadataProvider extends
                         metadataIdentificationString);
 
         // Identify if controller is annotated with @RooWebFinders
-        Map<FinderMetadataDetails, QueryHolder> findersRegistered = null;
+        Map<FinderMetadataDetails, QueryHolderTokens> findersRegistered = null;
         String webFinderMetadataId = WebFinderMetadata.createIdentifier(
                 javaType, path);
         WebFinderMetadata webFinderMetadata = (WebFinderMetadata) metadataService
                 .get(webFinderMetadataId);
+        // register dependency to Roo Web finder
+        metadataDependencyRegistry.registerDependency(webFinderMetadataId,
+                metadataIdentificationString);
+
         if (webFinderMetadata != null) {
 
             // Locate finders details
@@ -195,7 +221,7 @@ public final class DatatablesMetadataProvider extends
      * @see WebMetadataServiceImpl#getDynamicFinderMethodsAndFields(JavaType,
      *      MemberDetails, String)
      */
-    public Map<FinderMetadataDetails, QueryHolder> getFindersRegisterd(
+    private Map<FinderMetadataDetails, QueryHolderTokens> getFindersRegisterd(
             JavaType entity, LogicalPath path,
             MemberDetails entityMemberDetails, String plural, String entityName) {
 
@@ -208,10 +234,10 @@ public final class DatatablesMetadataProvider extends
             return null;
         }
 
-        QueryHolder queryHolder;
+        QueryHolderTokens queryHolder;
         FinderMetadataDetails details;
 
-        Map<FinderMetadataDetails, QueryHolder> findersRegistered = new HashMap<FinderMetadataDetails, QueryHolder>();
+        Map<FinderMetadataDetails, QueryHolderTokens> findersRegistered = new HashMap<FinderMetadataDetails, QueryHolderTokens>();
         // Iterate over
         for (final MethodMetadata method : finderMetadata
                 .getAllDynamicFinders()) {
@@ -250,9 +276,8 @@ public final class DatatablesMetadataProvider extends
             // information about a roo finder (parameters names and types
             // and a "token" list with of find definition
 
-            queryHolder = dynamicFinderServices.getQueryHolder(
-                    entityMemberDetails, method.getMethodName(), plural,
-                    entityName);
+            queryHolder = getQueryHolder(entityMemberDetails,
+                    method.getMethodName(), plural, entityName);
             findersRegistered.put(details, queryHolder);
 
         }
@@ -282,5 +307,244 @@ public final class DatatablesMetadataProvider extends
 
     public String getProvidesType() {
         return DatatablesMetadata.getMetadataIdentiferType();
+    }
+
+    /***************************************************/
+    /** Methods cloned from DynamicFinderServicesImpl **/
+    /***************************************************/
+
+    /**
+     * @see DynamicFinderServicesImpl#getQueryHolder(MemberDetails,
+     *      JavaSymbolName, String, String)
+     */
+    public QueryHolderTokens getQueryHolder(final MemberDetails memberDetails,
+            final JavaSymbolName finderName, final String plural,
+            final String entityName) {
+        Validate.notNull(memberDetails, "Member details required");
+        Validate.notNull(finderName, "Finder name required");
+        Validate.notBlank(plural, "Plural required");
+
+        List<Token> tokens;
+        try {
+            tokens = tokenize(memberDetails, finderName, plural);
+        }
+        catch (final FinderFieldTokenMissingException e) {
+            return null;
+        }
+        catch (final InvalidFinderException e) {
+            return null;
+        }
+
+        final String simpleTypeName = getConcreteJavaType(memberDetails)
+                .getSimpleTypeName();
+        // final String jpaQuery = getJpaQuery(tokens, simpleTypeName,
+        // finderName,
+        // plural, entityName);
+        final List<JavaType> parameterTypes = getParameterTypes(tokens,
+                finderName, plural);
+        final List<JavaSymbolName> parameterNames = getParameterNames(tokens,
+                finderName, plural);
+        return new QueryHolderTokens("", parameterTypes, parameterNames, tokens);
+    }
+
+    /**
+     * @see DynamicFinderServicesImpl#getConcreteJavaType
+     */
+    private JavaType getConcreteJavaType(final MemberDetails memberDetails) {
+        Validate.notNull(memberDetails, "Member details required");
+        JavaType javaType = null;
+        for (final MemberHoldingTypeDetails memberHoldingTypeDetails : memberDetails
+                .getDetails()) {
+            if (Modifier.isAbstract(memberHoldingTypeDetails.getModifier())) {
+                continue;
+            }
+            javaType = memberHoldingTypeDetails.getName();
+        }
+        return javaType;
+    }
+
+    /**
+     * @see DynamicFinderServicesImpl#tokenize
+     */
+    private List<Token> tokenize(final MemberDetails memberDetails,
+            final JavaSymbolName finderName, final String plural) {
+        final String simpleTypeName = getConcreteJavaType(memberDetails)
+                .getSimpleTypeName();
+        String finder = finderName.getSymbolName();
+
+        // Just in case it starts with findBy we can remove it here
+        final String findBy = "find" + plural + "By";
+        if (finder.startsWith(findBy)) {
+            finder = finder.substring(findBy.length());
+        }
+
+        // If finder still contains the findBy sequence it is most likely a
+        // wrong finder (ie someone pasted the finder string accidentally twice
+        if (finder.contains(findBy)) {
+            throw new InvalidFinderException("Dynamic finder definition for '"
+                    + finderName.getSymbolName() + "' in " + simpleTypeName
+                    + ".java is invalid");
+        }
+
+        final SortedSet<FieldToken> fieldTokens = new TreeSet<FieldToken>();
+        for (final MethodMetadata method : getLocatedMutators(memberDetails)) {
+            final FieldMetadata field = BeanInfoUtils.getFieldForPropertyName(
+                    memberDetails, method.getParameterNames().get(0));
+
+            // If we did find a field matching the first parameter name of the
+            // mutator method we can add it to the finder ITD
+            if (field != null) {
+                fieldTokens.add(new FieldToken(field));
+            }
+        }
+
+        final List<Token> tokens = new ArrayList<Token>();
+
+        while (finder.length() > 0) {
+            final Token token = getFirstToken(fieldTokens, finder,
+                    finderName.getSymbolName(), simpleTypeName);
+            if (token != null) {
+                if (token instanceof FieldToken
+                        || token instanceof ReservedToken) {
+                    tokens.add(token);
+                }
+                finder = finder.substring(token.getValue().length());
+            }
+        }
+
+        return tokens;
+    }
+
+    /**
+     * @see DynamicFinderServicesImpl#getLocatedMutators
+     */
+    private List<MethodMetadata> getLocatedMutators(
+            final MemberDetails memberDetails) {
+        final List<MethodMetadata> locatedMutators = new ArrayList<MethodMetadata>();
+        for (final MethodMetadata method : memberDetails.getMethods()) {
+            if (isMethodOfInterest(method)) {
+                locatedMutators.add(method);
+            }
+        }
+        return locatedMutators;
+    }
+
+    /**
+     * @see DynamicFinderServicesImpl#getFirstToken
+     */
+    private Token getFirstToken(final SortedSet<FieldToken> fieldTokens,
+            final String finder, final String originalFinder,
+            final String simpleTypeName) {
+        for (final FieldToken fieldToken : fieldTokens) {
+            if (finder.startsWith(fieldToken.getValue())) {
+                return fieldToken;
+            }
+        }
+        for (final ReservedToken reservedToken : ReservedTokenHolder.ALL_TOKENS) {
+            if (finder.startsWith(reservedToken.getValue())) {
+                return reservedToken;
+            }
+        }
+        if (finder.length() > 0) {
+            // TODO: Make this a FinderFieldTokenMissingException instead, to
+            // make it easier to detect this
+            throw new FinderFieldTokenMissingException(
+                    "Dynamic finder is unable to match '" + finder
+                            + "' token of '" + originalFinder
+                            + "' finder definition in " + simpleTypeName
+                            + ".java");
+        }
+
+        return null; // Finder does not start with reserved or field token
+    }
+
+    /**
+     * @see DynamicFinderServicesImpl#isMethodOfInterest
+     */
+    private boolean isMethodOfInterest(final MethodMetadata method) {
+        return method.getMethodName().getSymbolName().startsWith("set")
+                && method.getModifier() == Modifier.PUBLIC;
+    }
+
+    /**
+     * @see DynamicFinderServicesImpl#getParameterTypes
+     */
+    private List<JavaType> getParameterTypes(final List<Token> tokens,
+            final JavaSymbolName finderName, final String plural) {
+        final List<JavaType> parameterTypes = new ArrayList<JavaType>();
+
+        for (int i = 0; i < tokens.size(); i++) {
+            final Token token = tokens.get(i);
+            if (token instanceof FieldToken) {
+                parameterTypes.add(((FieldToken) token).getField()
+                        .getFieldType());
+            }
+            else {
+                if ("Between".equals(token.getValue())) {
+                    final Token field = tokens.get(i - 1);
+                    if (field instanceof FieldToken) {
+                        parameterTypes.add(parameterTypes.get(parameterTypes
+                                .size() - 1));
+                    }
+                }
+                else if ("IsNull".equals(token.getValue())
+                        || "IsNotNull".equals(token.getValue())) {
+                    final Token field = tokens.get(i - 1);
+                    if (field instanceof FieldToken) {
+                        parameterTypes.remove(parameterTypes.size() - 1);
+                    }
+                }
+            }
+        }
+        return parameterTypes;
+    }
+
+    /**
+     * @see DynamicFinderServicesImpl#getParameterNames
+     */
+    private List<JavaSymbolName> getParameterNames(final List<Token> tokens,
+            final JavaSymbolName finderName, final String plural) {
+        final List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        for (int i = 0; i < tokens.size(); i++) {
+            final Token token = tokens.get(i);
+            if (token instanceof FieldToken) {
+                final String fieldName = ((FieldToken) token).getField()
+                        .getFieldName().getSymbolName();
+                parameterNames.add(new JavaSymbolName(fieldName));
+            }
+            else {
+                if ("Between".equals(token.getValue())) {
+                    final Token field = tokens.get(i - 1);
+                    if (field instanceof FieldToken) {
+                        final JavaSymbolName fieldName = parameterNames
+                                .get(parameterNames.size() - 1);
+                        // Remove the last field token
+                        parameterNames.remove(parameterNames.size() - 1);
+
+                        // Replace by a min and a max value
+                        parameterNames
+                                .add(new JavaSymbolName(
+                                        "min"
+                                                + fieldName
+                                                        .getSymbolNameCapitalisedFirstLetter()));
+                        parameterNames
+                                .add(new JavaSymbolName(
+                                        "max"
+                                                + fieldName
+                                                        .getSymbolNameCapitalisedFirstLetter()));
+                    }
+                }
+                else if ("IsNull".equals(token.getValue())
+                        || "IsNotNull".equals(token.getValue())) {
+                    final Token field = tokens.get(i - 1);
+                    if (field instanceof FieldToken) {
+                        parameterNames.remove(parameterNames.size() - 1);
+                    }
+                }
+            }
+        }
+
+        return parameterNames;
     }
 }

@@ -144,7 +144,21 @@
   <c:if test="${serverSide and empty serverData }">
     <c:set var="serverData" value="doAjaxRequestByPost"/>
   </c:if>
-  
+  <c:if test="${serverSide and empty serverParams}">
+    <c:if test="${not empty baseFilter}">
+		<c:set target="${datatables_javaScript_elements_before}" property="getExtraParams">
+			function getExtraParams( aoData ) {
+			    <c:forEach items="${baseFilter}" var="entry"> 
+			    aoData.push( {"name": "${entry.key}", "value" : "${entry.value}"});
+			    </c:forEach> 
+			}
+		</c:set>
+		<c:set var="serverParams" value="getExtraParams"/>
+    </c:if> 
+  </c:if>
+  <c:if test="${serverSide}">
+	<c:remove var="data"/>
+  </c:if>
   <c:if test="${empty paginationType}">
   	<c:set var="paginationType" value="full_numbers"/>
   </c:if>
