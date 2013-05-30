@@ -31,7 +31,7 @@ public class MetadataUtils {
 
     /**
      * Returns an instance of {@link MutableClassOrInterfaceTypeDetails} of the
-     * given JavaType 
+     * given JavaType
      * <p/>
      * TODO Delete this method and replace occurences with
      * typeLocationService.getTypeDetails(type)
