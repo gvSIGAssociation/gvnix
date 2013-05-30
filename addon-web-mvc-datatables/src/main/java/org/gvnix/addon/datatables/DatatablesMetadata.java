@@ -73,7 +73,8 @@ import org.springframework.roo.support.logging.HandlerUtils;
 public class DatatablesMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
-    @SuppressWarnings("unused") private static final Logger LOGGER = HandlerUtils
+    @SuppressWarnings("unused")
+    private static final Logger LOGGER = HandlerUtils
             .getLogger(DatatablesMetadata.class);
 
     // Constants
@@ -304,9 +305,14 @@ public class DatatablesMetadata extends
      * @return
      */
     private MethodMetadata getRenderItemsMethod() {
+
+        JavaType entitySearchResult = new JavaType(
+                SEARCH_RESULTS.getFullyQualifiedTypeName(), 0, DataType.TYPE,
+                null, Arrays.asList(entity));
+
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
-                .convertFromJavaTypes(SEARCH_RESULTS, HTTP_SERVLET_REQUEST,
+                .convertFromJavaTypes(entitySearchResult, HTTP_SERVLET_REQUEST,
                         HTTP_SERVLET_RESPONSE);
 
         // Check if a method with the same signature already exists in the
