@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
- * 2013 Generalitat Valenciana
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program. If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.addon.web.mvc;
 
@@ -35,22 +35,29 @@ import org.w3c.dom.Element;
 
 /**
  * Implementation of operations this add-on offers.
+ * <p/>
+ * {@link Component} and {@link Service} Apache Felix annotations are used to
+ * register your commands class in the Roo container
  * 
  * @since 1.1
  */
-// Use these Apache Felix annotations to register your commands class in the Roo
-// container
 @Component
 @Service
 public class MvcOperationsImpl implements MvcOperations {
 
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * Setup is available if Spring MVC is installed and gvNIX MVC dependencies
+     * have not been installed yet.
+     */
     public boolean isSetupAvailable() {
-        // Check if JPA is installed
         return projectOperations
                 .isFeatureInstalledInFocusedModule(FeatureNames.MVC)
                 && !projectOperations
@@ -88,7 +95,7 @@ public class MvcOperationsImpl implements MvcOperations {
     }
 
     /**
-     * Returns true if the given feature is installed in current project.
+     * Returns true if gvNIX Web MVC dependency is installed in current project.
      * 
      * @param moduleName feature name to check in current project
      * @return true if given feature name is installed, otherwise returns false
@@ -98,6 +105,7 @@ public class MvcOperationsImpl implements MvcOperations {
         if (pom == null) {
             return false;
         }
+
         // Look for gvnix web mvc dependency
         for (final Dependency dependency : pom.getDependencies()) {
             if ("org.gvnix.addon.web.mvc".equals(dependency.getArtifactId())) {

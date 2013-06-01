@@ -44,7 +44,8 @@ public class MvcCommands implements CommandMarker { // All command types must
     /**
      * Get a reference to the MvcOperations from the underlying OSGi container
      */
-    @Reference private MvcOperations operations;
+    @Reference
+    private MvcOperations operations;
 
     /**
      * Informs if web mvc gvnix setup is avalilable

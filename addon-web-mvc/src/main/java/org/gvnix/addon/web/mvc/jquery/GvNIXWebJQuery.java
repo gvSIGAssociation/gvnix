@@ -15,32 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
-package org.gvnix.addon.web.mvc;
+package org.gvnix.addon.web.mvc.jquery;
 
-import org.springframework.roo.project.Feature;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Interface of operations this add-on offers. Typically used by a command type
- * or an external add-on.
+ * Annotation for Web MVC Controllers which views uses JQuery.
  * 
+ * @author gvNIX Team
  * @since 1.1
  */
-public interface MvcOperations extends Feature {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.SOURCE)
+public @interface GvNIXWebJQuery {
 
-    /**
-     * Feature name. Use to know if gvNIX MVC has been setup in this project
-     */
-    public static final String FEATURE_NAME_GVNIX_MVC = "gvnix-mvc";
-
-    /**
-     * Indicate setup should be available
-     * 
-     * @return true if it should be available, otherwise false
-     */
-    boolean isSetupAvailable();
-
-    /**
-     * Enable JPA gvnix utilities on project
-     */
-    void setup();
 }
