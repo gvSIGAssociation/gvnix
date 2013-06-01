@@ -1,25 +1,26 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
- * 2013 Generalitat Valenciana
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program. If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.addon.web.mvc.batch;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.web.mvc.MvcOperations;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
@@ -40,7 +41,25 @@ public class WebJpaBatchCommands implements CommandMarker {
      * Get a reference to the WebJpaBatchOperations from the underlying OSGi
      * container
      */
-    @Reference private WebJpaBatchOperations operations;
+    @Reference
+    private WebJpaBatchOperations operations;
+
+    /**
+     * Get a reference to the MvcOperations from the underlying OSGi container
+     */
+    @Reference
+    private MvcOperations mvcOperations;
+
+    /**
+     * Informs if <code>web mvc batch setup</code> command is available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator({ "web mvc batch setup" })
+    public boolean isSetupAvailable() {
+        return operations.isSetupAvailable();
+    }
 
     /**
      * Informs if <code>web mvc batch</code> commands are available
@@ -54,12 +73,22 @@ public class WebJpaBatchCommands implements CommandMarker {
     }
 
     /**
+     * Command to enable web mvc batch utilities on project
+     * 
+     * @param type
+     */
+    @CliCommand(value = "web mvc batch setup", help = "Enables gvNIX Web MVC Batch utilities on project")
+    public void setup() {
+        mvcOperations.setup();
+    }
+
+    /**
      * Adds {@link GvNIXWebJpaBatch} annotation to a Controller
      * 
      * @param controller Target Web MVC controller to add support
      * @param service (optional) Spring service (annotated wid GvNIXJpaBatch) to
-     *            use for batch operations. If no specified uses controller's
-     *            formBacking object service."
+     *        use for batch operations. If no specified uses controller's
+     *        formBacking object service."
      */
     @CliCommand(value = "web mvc batch add", help = "Adds support to JPA batch operation in a controller")
     public void create(
