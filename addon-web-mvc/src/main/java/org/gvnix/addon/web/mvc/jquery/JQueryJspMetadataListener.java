@@ -127,20 +127,11 @@ public class JQueryJspMetadataListener implements MetadataProvider,
         final String jqueryMetadataKey = JQueryMetadata.createIdentifier(
                 controller, JQueryJspMetadata.getPath(jqueryJspMetadataId));
 
-        // Get the metadata, or null if the ID was valid but the metadata is
+        // Get the meta-data means the given Java type has the specified
+        // meta-data, otherwise the ID was valid but the metadata is
         // not currently available
         final JQueryMetadata jqueryMetadata = (JQueryMetadata) metadataService
                 .get(jqueryMetadataKey);
-
-        // Create a WebFinderMetadata ID for same Java type than the Java type
-        // included in jqueryJspMetadataId
-        final String finderMetadataKey = WebFinderMetadata.createIdentifier(
-                controller, JQueryJspMetadata.getPath(jqueryJspMetadataId));
-
-        // Get the metadata, or null if the ID was valid but the metadata is
-        // not currently available
-        final WebFinderMetadata finderMetadata = (WebFinderMetadata) metadataService
-                .get(finderMetadataKey);
 
         // If we created a valid JQueryMetada, given meta-data ID refers to
         // JQueryMetadata and we must update related artifacts
@@ -149,6 +140,22 @@ public class JQueryJspMetadataListener implements MetadataProvider,
             // Call to operations for update pages
             operations.updateCrudJsp(controller, jqueryMetadata);
         }
+        // JQueryMetadata is required, that is, if given Java type hasn't
+        // it there is nothing to do, neither in CRUD jspx nor finder jspx
+        else {
+            return null;
+        }
+
+        // Create a WebFinderMetadata ID for same Java type than the Java type
+        // included in jqueryJspMetadataId
+        final String finderMetadataKey = WebFinderMetadata.createIdentifier(
+                controller, JQueryJspMetadata.getPath(jqueryJspMetadataId));
+
+        // Get the meta-data means the given Java type has the specified
+        // meta-data, otherwise the ID was valid but the metadata is
+        // not currently available
+        final WebFinderMetadata finderMetadata = (WebFinderMetadata) metadataService
+                .get(finderMetadataKey);
 
         // Moreover, if we created a valid WebFinderMetadata, given meta-data
         // ID refers to WebFinderMetadata and we must update the finders
