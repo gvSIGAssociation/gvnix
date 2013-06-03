@@ -491,6 +491,8 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         copyDirectoryContents("scripts/jquery/skins/lightgray/*.css",
                 pathResolver.getIdentifier(webappPath,
                         "/scripts/jquery/skins/lightgray"), true);
+        copyDirectoryContents("scripts/jquery/README.txt",
+                pathResolver.getIdentifier(webappPath, "/scripts/jquery"), true);
         OperationUtils.updateDirectoryContents(
                 "scripts/jquery/skins/lightgray/fonts/*.*", pathResolver
                         .getIdentifier(webappPath,
