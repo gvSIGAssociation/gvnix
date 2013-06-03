@@ -32,6 +32,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.web.mvc.jquery.JQueryOperations;
 import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.OperationUtils;
 import org.gvnix.support.WebProjectUtils;
@@ -166,6 +167,8 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     public boolean isSetupAvailable() {
         return projectOperations
                 .isFeatureInstalledInFocusedModule(FeatureNames.MVC)
+                && projectOperations
+                        .isFeatureInstalledInFocusedModule(JQueryOperations.FEATURE_NAME_GVNIX_JQUERY)
                 && !projectOperations
                         .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_DATATABLES);
     }
@@ -535,10 +538,6 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         cssList.add(new ImmutablePair<String, String>(
                 "css_gvnix_datatables_url",
                 "/resources/styles/datatables/gvnix.dataTables.css"));
-
-        // Add jquery.js
-        jsList.add(new ImmutablePair<String, String>("js_jquery_url",
-                "/resources/scripts/datatables/jquery-min.js"));
 
         // Add jquery.datatables.js
         jsList.add(new ImmutablePair<String, String>(

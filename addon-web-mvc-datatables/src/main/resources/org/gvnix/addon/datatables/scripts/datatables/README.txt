@@ -1,14 +1,5 @@
 Those are javascript files from the following projects:
 
-JQuery
--------
-
-* Version: 1.8.3
-* jquery.js: uncompressend version
-* jquery-min.js: minified version
-* License: MIT License (http://jquery.org/license/)
-* Downloaded from: http://jquery.com/download/
-
 Datatables
 ----------
 
@@ -20,7 +11,6 @@ Datatables
     or a BSD (3-point) license (http://datatables.net/license_bsd)
 * Downloaded from: http://datatables.net/download/
 
-
 Datatables Custom API functions
 --------------------------------
 
@@ -28,7 +18,6 @@ Custom API functions (from http://datatables.net/plug-ins/api).
 Use 'datatables_init_custom_api_functions' function to load desired functions
 by default.
  
-
 NOTE
 -----
 
