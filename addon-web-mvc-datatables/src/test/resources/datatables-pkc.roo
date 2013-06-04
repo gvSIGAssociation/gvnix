@@ -45,6 +45,7 @@ field set --fieldName cars --type ~.domain.Car --cardinality ONE_TO_MANY --mappe
 web mvc setup
 web mvc all --package ~.web
 
+web mvc jquery setup
 web mvc datatables setup
 
 web mvc datatables all

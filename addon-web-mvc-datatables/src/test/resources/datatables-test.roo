@@ -1,6 +1,7 @@
 
 script --file clinic.roo
 
+web mvc jquery setup
 web mvc datatables setup
 
 web mvc datatables update tags
