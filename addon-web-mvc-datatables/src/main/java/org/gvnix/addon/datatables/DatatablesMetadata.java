@@ -1272,9 +1272,11 @@ public class DatatablesMetadata extends
      * This properties are:
      * <ul>
      * <li><em>datatablesHasBatchSupport</em> informs if there is batch entity
-     * operations support on controller (used for multy-row delete operation)</li>
-     * <li><em>datatablesUseAjax</em> informs datatbles data mode (<em>true</em>
-     * : AJAX <em>false</em> DOM)</li>
+     * operations support on controller (used for multi-row delete operation)</li>
+     * <li><em>datatablesUseAjax</em> informs datatables data mode (
+     * <em>true</em> : AJAX <em>false</em> DOM)</li>
+     * <li><em>finderNameParam</em> sets the name of parameter that will contain
+     * the {@code finderName} (only for AJAX mode)</li>
      * <li><em>datatablesNotStandardMode</em> informs render mode (<em>true</em>
      * : standar datatable view <em>false</em> single-item-page,
      * one-cell-per-item, render-jspx datatable mode)</li>
@@ -1322,6 +1324,10 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine(String.format(
                 "uiModel.addAttribute(\"datatablesNotStandardMode\",%s);",
                 !isStantardMode()));
+        if (isAjax()) {
+            bodyBuilder
+                    .appendFormalLine("uiModel.addAttribute(\"finderNameParam\",\"ajax_find\");");
+        }
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(

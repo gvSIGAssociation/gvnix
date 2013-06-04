@@ -41,7 +41,6 @@ import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
-import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
@@ -195,7 +194,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                         SCAFFOLD_ANNOTATION);
 
         Validate.isTrue(controllerAnnotation != null,
-                "Operation only supported for controllers");
+                "Operation for @RooWebScaffold annotated controllers only.");
 
         final boolean isDatatablesAnnotated = MemberFindingUtils
                 .getAnnotationOfType(existing.getAnnotations(),
@@ -210,7 +209,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 entity.getAnnotations(), JPA_ACTIVE_RECORD_ANNOTATION) != null;
 
         Validate.isTrue(isActiveRecord,
-                "This commando only supports JPA active record controller");
+                "This command only supports JPA active record controller");
 
         // TODO support JPA repositories
 
@@ -259,38 +258,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         String controllerPath = datatablesMetadata
                 .getWebScaffoldAnnotationValues().getPath();
         updateListJspx(controller, controllerPath);
-        Map<FinderMetadataDetails, QueryHolderTokens> finders = datatablesMetadata
-                .getFindersRegistered();
-        if (finders != null && !finders.isEmpty()) {
-            updateFindersJspx(controller, controllerPath, finders);
-        }
-    }
 
-    /**
-     * Updates all find*.jspx pages of target controller to use datatables
-     * component.
-     * 
-     * @param controller
-     * @param finders
-     */
-    private void updateFindersJspx(JavaType controller, String controllerPath,
-            Map<FinderMetadataDetails, QueryHolderTokens> finders) {
-        Validate.notBlank(controllerPath,
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        + controller.getSimpleTypeName() + "'");
-        Validate.isTrue(controllerPath != null && !controllerPath.isEmpty(),
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        + controller.getSimpleTypeName() + "'");
-
-        Map<String, String> uriMap = new HashMap<String, String>(2);
-        uriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/datatables");
-
-        for (FinderMetadataDetails finder : finders.keySet()) {
-            WebProjectUtils.updateTagxUriInJspx(controllerPath,
-                    finder.getFinderName(), uriMap, projectOperations,
-                    fileManager);
-        }
-
+        // Note there is no need to update finder jspx because this add-on
+        // uses "finderNameParam" feature provided by JQuery MVC add-on
     }
 
     /**

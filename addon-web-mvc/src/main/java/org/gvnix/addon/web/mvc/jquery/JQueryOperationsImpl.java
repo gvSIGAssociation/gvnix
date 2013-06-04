@@ -173,7 +173,17 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         Collections.addAll(pageList, "dataAccessFailure", "resourceNotFound",
                 "uncaughtException", "index");
 
-        // tagx namespaces to update
+        // 3rd party add-ons could customize default Roo tags as gvNIX does,
+        // to avoid to overwrite them with jQuery namespaces we will update
+        // default Roo namespaces only
+        Map<String, String> rooUriMap = new HashMap<String, String>();
+        rooUriMap.put("xmlns:field", "urn:jsptagdir:/WEB-INF/tags/form/fields");
+        rooUriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put("xmlns:table", "urn:jsptagdir:/WEB-INF/tags/form/fields");
+        rooUriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util");
+
+        // new jQuery namespaces
         Map<String, String> uriMap = new HashMap<String, String>();
         uriMap.put("xmlns:field",
                 "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
@@ -186,8 +196,8 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         // do the update
         for (String jspxName : pageList) {
             WebProjectUtils.updateTagxUriInJspx(
-                    "WEB-INF/views/".concat(jspxName).concat(".jspx"), uriMap,
-                    projectOperations, fileManager);
+                    "WEB-INF/views/".concat(jspxName).concat(".jspx"),
+                    rooUriMap, uriMap, projectOperations, fileManager);
         }
     }
 
@@ -217,7 +227,17 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         List<String> pageList = new ArrayList<String>();
         Collections.addAll(pageList, "create", "list", "show", "update");
 
-        // tagx namespaces to update
+        // 3rd party add-ons could customize default Roo tags as gvNIX does,
+        // to avoid to overwrite them with jQuery namespaces we will update
+        // default Roo namespaces only
+        Map<String, String> rooUriMap = new HashMap<String, String>();
+        rooUriMap.put("xmlns:field", "urn:jsptagdir:/WEB-INF/tags/form/fields");
+        rooUriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put("xmlns:table", "urn:jsptagdir:/WEB-INF/tags/form/fields");
+        rooUriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util");
+
+        // new jQuery namespaces
         Map<String, String> uriMap = new HashMap<String, String>();
         uriMap.put("xmlns:field",
                 "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
@@ -230,7 +250,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         // do the update
         for (String jspxName : pageList) {
             WebProjectUtils.updateTagxUriInJspx(controllerPath, jspxName,
-                    uriMap, projectOperations, fileManager);
+                    rooUriMap, uriMap, projectOperations, fileManager);
         }
     }
 
@@ -246,9 +266,6 @@ public class JQueryOperationsImpl extends AbstractOperations implements
 
         WebScaffoldAnnotationValues annotationValues = finderMetadata
                 .getAnnotationValues();
-        JavaType formBackingType = annotationValues.getFormBackingObject();
-        MemberDetails memberDetails = webMetadataService
-                .getMemberDetails(formBackingType);
 
         // Get view path for success file access in "WEB-INF/views/"
         String controllerPath = annotationValues.getPath();
@@ -258,6 +275,11 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         Validate.isTrue(controllerPath != null && !controllerPath.isEmpty(),
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         .concat(controller.getSimpleTypeName()).concat("'"));
+
+        // Get Java type details
+        JavaType formBackingType = annotationValues.getFormBackingObject();
+        MemberDetails memberDetails = webMetadataService
+                .getMemberDetails(formBackingType);
 
         // This controller is annotated with @RooWebFinder
         final Set<FinderMetadataDetails> finderMethodsDetails = webMetadataService
@@ -269,7 +291,17 @@ public class JQueryOperationsImpl extends AbstractOperations implements
             return;
         }
 
-        // tagx namespaces to update
+        // 3rd party add-ons could customize default Roo tags as gvNIX does,
+        // to avoid to overwrite them with jQuery namespaces we will update
+        // default Roo namespaces only
+        Map<String, String> rooUriMap = new HashMap<String, String>();
+        rooUriMap.put("xmlns:field", "urn:jsptagdir:/WEB-INF/tags/form/fields");
+        rooUriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put("xmlns:table", "urn:jsptagdir:/WEB-INF/tags/form/fields");
+        rooUriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util");
+
+        // new jQuery namespaces
         Map<String, String> uriMap = new HashMap<String, String>();
         uriMap.put("xmlns:field",
                 "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
@@ -285,8 +317,8 @@ public class JQueryOperationsImpl extends AbstractOperations implements
                     .getMethodName().getSymbolName();
             WebProjectUtils.updateTagxUriInJspx(
                     "WEB-INF/views/".concat(controllerPath).concat("/")
-                            .concat(finderName).concat(".jspx"), uriMap,
-                    projectOperations, fileManager);
+                            .concat(finderName).concat(".jspx"), rooUriMap,
+                    uriMap, projectOperations, fileManager);
         }
     }
 

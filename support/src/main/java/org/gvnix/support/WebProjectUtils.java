@@ -19,11 +19,13 @@ package org.gvnix.support;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
@@ -113,21 +115,18 @@ public class WebProjectUtils {
                 fileManager);
     }
 
-    // TODO: hasServlet method
-    // public static boolean hasServlet(final Document webXml, final String
-    // className) {
-    // if (XmlUtils.findFirstElement(
-    // "/web-app/servlet[servlet-class='".concat(className).concat("']"),
-    // webXml.getElementRoot()) != null) {
-    // return true;
-    // }
-    // }
-
     /**
-     * Update tagx namespaces on a jspx
+     * Replaces all namespaces occurrences in given {@relativePath} file with
+     * namespaces occurrences contained in {@code newUriMap}.
+     * <p/>
+     * A namespace in given {@relativePath} file will be replaced by a namespace
+     * in {@code newUriMap} if namespace name is in {@relativePath} file
+     * <p/>
+     * Only tagx namespaces found in uriMap will be updated, uriMap keys that
+     * don't match any tagx namespace will be ignored.
      * 
-     * @param controller
-     * @param jspxName (by example: "show", "list", "update")
+     * @param controllerPath {@link RooWebScaffold#path()} value
+     * @param jspxName view name, for example: "show", "list", "update"
      * @param uriMap where key attribute name (ex "xmlns:page") and the value
      *        the new uri (ex: "urn:jsptagdir:/WEB-INF/tags/datatables")
      * @param projectOperations
@@ -153,29 +152,106 @@ public class WebProjectUtils {
     }
 
     /**
-     * Update tagx namespaces on a jspx
+     * Replaces all namespaces occurrences in given {@relativePath} file with
+     * namespaces occurrences contained in {@code newUriMap}.
+     * <p/>
+     * A namespace in given {@relativePath} file will be replaced by a namespace
+     * in {@code newUriMap} if namespace name is in {@relativePath} file
+     * <p/>
+     * Only tagx namespaces found in uriMap will be updated, uriMap keys that
+     * don't match any tagx namespace will be ignored.
      * 
      * @param controllerPath {@link RooWebScaffold#path()} value
-     * @param jspxName (by example: "show", "list", "update")
-     * @param uriMap where key attribute name (ex "xmlns:page") and the value
-     *        the new uri (ex: "urn:jsptagdir:/WEB-INF/tags/datatables")
+     * @param jspxName view name, for example: "show", "list", "update"
+     * @param newUriMap Keys are namespace names (ex: "xmlns:page") and values
+     *        are the new namespace URI (ex:
+     *        "urn:jsptagdir:/WEB-INF/tags/datatables")
      * @param projectOperations
      * @param fileManager
      */
     public static void updateTagxUriInJspx(String controllerPath,
-            String jspxName, Map<String, String> uriMap,
+            String jspxName, Map<String, String> newUriMap,
             ProjectOperations projectOperations, FileManager fileManager) {
-        if (!controllerPath.startsWith("/")) {
-            controllerPath = "/".concat(controllerPath);
+        updateTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
+                .concat(jspxName).concat(".jspx"), (Map<String, String>) null,
+                newUriMap, projectOperations, fileManager);
+    }
+
+    /**
+     * Replaces all namespaces occurrences in given {@relativePath} file with
+     * namespaces occurrences contained in {@code newUriMap}.
+     * <p/>
+     * A namespace in given {@relativePath} file will be replaced by a namespace
+     * in {@code newUriMap} if namespace name is in {@relativePath} file
+     * <p/>
+     * Only tagx namespaces found in uriMap will be updated, uriMap keys that
+     * don't match any tagx namespace will be ignored.
+     * 
+     * @param controllerPath {@link RooWebScaffold#path()} value
+     * @param jspxName view name, for example: "show", "list", "update"
+     * @param oldUriMap (optional) Keys are namespace names (ex: "xmlns:page")
+     *        and values are the old namespace URI (ex:
+     *        "urn:jsptagdir:/WEB-INF/tags/form") that must match with the
+     *        namespace URI in the XML
+     * @param newUriMap Keys are namespace names (ex: "xmlns:page") and values
+     *        are the new namespace URI (ex:
+     *        "urn:jsptagdir:/WEB-INF/tags/datatables")
+     * @param projectOperations
+     * @param fileManager
+     */
+    public static void updateTagxUriInJspx(String controllerPath,
+            String jspxName, Map<String, String> oldUriMap,
+            Map<String, String> newUriMap, ProjectOperations projectOperations,
+            FileManager fileManager) {
+        updateTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
+                .concat(jspxName).concat(".jspx"), oldUriMap, newUriMap,
+                projectOperations, fileManager);
+    }
+
+    /**
+     * Replaces all namespaces occurrences contained in {@code oldUriMap} in
+     * given {@relativePath} file with namespaces occurrences contained in
+     * {@code newUriMap}.
+     * <p/>
+     * A namespace in given {@relativePath} file will be replaced by a namespace
+     * in {@code newUriMap} when one of the conditions below is true:
+     * <p/>
+     * <strong>A.</strong> Namespace name is in {@code oldUriMap}, as is in
+     * {@code newUriMap} and as is in {@relativePath} file and old namespace
+     * (value in {@code oldUriMap}) match with namespace in jspx.
+     * <p/>
+     * <strong>B.</strong> Namespace name is not in {@code oldUriMap} and
+     * namespace name is in {@relativePath} file
+     * 
+     * @param relativePath XML file to update. The path must be relative to
+     *        {@code src/main/webapp} (cannot be null, but may be empty if
+     *        referring to the path itself)
+     * @param oldUriMap (optional) Keys are namespace names (ex: "xmlns:page")
+     *        and values are the old namespace URI (ex:
+     *        "urn:jsptagdir:/WEB-INF/tags/form") that must match with the
+     *        namespace URI in the XML
+     * @param newUriMap Keys are namespace names (ex: "xmlns:page") and values
+     *        are the new namespace URI (ex:
+     *        "urn:jsptagdir:/WEB-INF/tags/datatables")
+     * @param projectOperations
+     * @param fileManager
+     */
+    public static void updateTagxUriInJspx(String relativePath,
+            Map<String, String> oldUriMap, Map<String, String> newUriMap,
+            ProjectOperations projectOperations, FileManager fileManager) {
+
+        // If null, create default oldUriMap causing jspx will be updated with
+        // all URIs in newUriMap
+        if (oldUriMap == null) {
+            oldUriMap = new HashMap<String, String>();
         }
 
-        // Get list.jspx file path
+        // Get jspx file path
         PathResolver pathResolver = projectOperations.getPathResolver();
         String docJspx = pathResolver.getIdentifier(
-                getWebappPath(projectOperations), "WEB-INF/views"
-                        + controllerPath + "/" + jspxName + ".jspx");
+                getWebappPath(projectOperations), relativePath);
 
-        // Parse list.jspx document
+        // Parse XML document
         Document docJspXml = loadXmlDocument(docJspx, fileManager);
         if (docJspXml == null) {
             // file not found: do nothing
@@ -185,16 +261,41 @@ public class WebProjectUtils {
         // Get main div
         Element docRoot = docJspXml.getDocumentElement();
         Element divMain = XmlUtils.findFirstElement("/div", docRoot);
+        boolean modified = false;
 
-        // Update namespace
-        for (Entry<String, String> entry : uriMap.entrySet()) {
-            divMain.setAttribute(entry.getKey(), entry.getValue());
+        // Update namespace URIs
+        for (Entry<String, String> newUriEntry : newUriMap.entrySet()) {
+            String nsName = newUriEntry.getKey();
+            String nsUri = newUriEntry.getValue();
+
+            // Namespace name is in oldUriMap, as is in and as is in given file
+            // and old namespace (value in oldUriMap) match with namespace in
+            // jspx
+            if (oldUriMap.containsKey(nsName) && divMain.hasAttribute(nsName)) {
+                String oldNsUri = oldUriMap.get(nsName);
+                String currentUri = divMain.getAttribute(nsName);
+
+                if (StringUtils.isEmpty(oldNsUri)
+                        || oldNsUri.equalsIgnoreCase(currentUri)) {
+                    divMain.setAttribute(nsName, nsUri);
+                    modified = true;
+                }
+            }
+
+            // Namespace name is not in oldUriMap and namespace name is in
+            // given file
+            if (!oldUriMap.containsKey(nsName) && divMain.hasAttribute(nsName)) {
+                divMain.setAttribute(nsName, nsUri);
+                modified = true;
+            }
         }
 
-        // Update list.jspx file
-        DomUtils.removeTextNodes(docJspXml);
-        fileManager.createOrUpdateTextFileIfRequired(docJspx,
-                XmlUtils.nodeToString(docJspXml), true);
+        // If modified, update the jspx file
+        if (modified) {
+            DomUtils.removeTextNodes(docJspXml);
+            fileManager.createOrUpdateTextFileIfRequired(docJspx,
+                    XmlUtils.nodeToString(docJspXml), true);
+        }
     }
 
     /**
@@ -205,19 +306,21 @@ public class WebProjectUtils {
      */
     public static Document loadXmlDocument(String docFileIdentifier,
             FileManager fileManager) {
+
+        Validate.notNull(fileManager, "FileManager cannot be null");
         if (!fileManager.exists(docFileIdentifier)) {
             // document doesn't exist, so nothing to do
             return null;
         }
 
         // Parse document
-        Document docJspXml;
-        InputStream docJspxIs = null;
+        Document docXml;
+        InputStream docIs = null;
         try {
-            docJspxIs = fileManager.getInputStream(docFileIdentifier);
+            docIs = fileManager.getInputStream(docFileIdentifier);
 
             try {
-                docJspXml = XmlUtils.getDocumentBuilder().parse(docJspxIs);
+                docXml = XmlUtils.getDocumentBuilder().parse(docIs);
             }
             catch (Exception ex) {
                 throw new IllegalStateException(
@@ -225,13 +328,13 @@ public class WebProjectUtils {
             }
         }
         finally {
-            IOUtils.closeQuietly(docJspxIs);
+            IOUtils.closeQuietly(docIs);
         }
-        return docJspXml;
+        return docXml;
     }
 
     /**
-     * Gets the src/mian/webapp logicalPath
+     * Gets the {@code src/main/webapp} logicalPath
      * 
      * @param projectOperations
      * @return
@@ -294,10 +397,10 @@ public class WebProjectUtils {
      * found append this tag.
      * <p/>
      * 
-     * @param docTagx
-     * @param root
-     * @param varName
-     * @param location
+     * @param docTagx {@code .tagx} file document
+     * @param root XML root node
+     * @param varName name of variable to hold url
+     * @param location URL
      * @return if document has changed
      */
     public static boolean addUrlToTag(Document docTagx, Element root,
@@ -320,8 +423,8 @@ public class WebProjectUtils {
      * This first append a "spring:url" (if not exists) and then add the "link"
      * tag (if not exists)
      * 
-     * @param docTagx loadScript.tagx document
-     * @param root root node
+     * @param docTagx {@code .tagx} file document
+     * @param root XML root node
      * @param varName name of variable to hold js url
      * @param location js location
      * @return document has changed
@@ -384,12 +487,13 @@ public class WebProjectUtils {
 
         boolean modified = false;
 
-        /* Add css */
+        // Add css
         for (Pair<String, String> css : cssList) {
             modified = addCssToTag(docTagx, root, css.getLeft(), css.getRight())
                     || modified;
         }
-        /* Add js */
+
+        // Add js
         for (Pair<String, String> js : jsList) {
             modified = addJSToTag(docTagx, root, js.getLeft(), js.getRight())
                     || modified;
@@ -398,5 +502,85 @@ public class WebProjectUtils {
         if (modified) {
             XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
         }
+    }
+
+    /**
+     * Add variable to contain request Locale in string format.
+     * <p/>
+     * 
+     * <pre>
+     * {@code
+     * <c:set var="VAR_NAME"> 
+     *   <!-- Get the user local from the page context (it was set by 
+     *        Spring MVC's locale resolver) --> 
+     *   <c:set var="jqlocale">${pageContext.response.locale}</c:set> 
+     *   <c:if test="${fn:length(jqlocale) eq 2}"> 
+     *     <c:out value="${jqlocale}" /> 
+     *   </c:if>
+     *   <c:if test="${fn:length(jqlocale) gt 2}"> 
+     *     <c:out value="${fn:substringBefore(jqlocale, '_')}" default="en" /> 
+     *   </c:if>
+     *   <c:if test="${fn:length(jqlocale) lt 2}"> 
+     *     <c:out value="en" /> 
+     *   </c:if>
+     * </c:set>
+     * }
+     * </pre>
+     * 
+     * @param docTagx {@code .tagx} file document
+     * @param root XML root node
+     * @param varName name of variable to create, see {@code VAR_NAME} in
+     *        example above
+     */
+    public static boolean addLocaleVarToTag(Document docTagx, Element root,
+            String varName) {
+
+        // Add locale var
+        Element varElement = XmlUtils.findFirstElement(
+                String.format("c:set[@var='${%s}']", varName), root);
+        if (varElement == null) {
+            varElement = docTagx.createElement("c:set");
+            varElement.setAttribute("var", varName);
+            varElement
+                    .appendChild(docTagx
+                            .createComment(" Get the user local from the page context (it was set by Spring MVC's locale resolver) "));
+
+            Element pElement = docTagx.createElement("c:set");
+            pElement.setAttribute("var", "jqlocale");
+            pElement.appendChild(docTagx
+                    .createTextNode("${pageContext.response.locale}"));
+            varElement.appendChild(pElement);
+
+            Element ifElement = docTagx.createElement("c:if");
+            ifElement.setAttribute("test", "${fn:length(jqlocale) eq 2}");
+
+            Element outElement = docTagx.createElement("c:out");
+            outElement.setAttribute("value", "${jqlocale}");
+            ifElement.appendChild(outElement);
+            varElement.appendChild(ifElement);
+
+            ifElement = docTagx.createElement("c:if");
+            ifElement.setAttribute("test", "${fn:length(jqlocale) gt 2}");
+
+            outElement = docTagx.createElement("c:out");
+            outElement.setAttribute("value",
+                    "${fn:substringBefore(jqlocale, '_')}");
+            outElement.setAttribute("default", "en");
+            ifElement.appendChild(outElement);
+            varElement.appendChild(ifElement);
+
+            ifElement = docTagx.createElement("c:if");
+            ifElement.setAttribute("test", "${fn:length(jqlocale) lt 2}");
+
+            outElement = docTagx.createElement("c:out");
+            outElement.setAttribute("value", "en");
+            ifElement.appendChild(outElement);
+            varElement.appendChild(ifElement);
+
+            root.appendChild(varElement);
+
+            return true;
+        }
+        return false;
     }
 }
