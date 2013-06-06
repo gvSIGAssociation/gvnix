@@ -127,8 +127,10 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     private String itdFileContents = null;
 
     // From annotation
-    @AutoPopulate private final String fieldName = "occChekcsum";
-    @AutoPopulate private final String digestMethod = "md5";
+    @AutoPopulate
+    private final String fieldName = "occChekcsum";
+    @AutoPopulate
+    private final String digestMethod = "md5";
 
     public OCCChecksumMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -460,6 +462,9 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         // Get realted object PK accesor
         final MethodMetadata idAccesor = persistenceMemberLocator
                 .getIdentifierAccessor(propertyType);
+        
+        // #9561: Avoid NullPointerException in strange cases
+        if (idAccesor == null) return StringUtils.EMPTY;
 
         final JavaType reltatedObjecIdType = idAccesor.getReturnType();
 
