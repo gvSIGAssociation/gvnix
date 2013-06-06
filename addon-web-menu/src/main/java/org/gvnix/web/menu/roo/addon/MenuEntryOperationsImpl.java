@@ -88,17 +88,20 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
     /**
      * Use FileManager to modify the underlying disk storage.
      */
-    @Reference private FileManager fileManager;
+    @Reference
+    private FileManager fileManager;
 
     /**
      * Use for property file configuration operations.
      */
-    @Reference private PropFileOperations propFileOperations;
+    @Reference
+    private PropFileOperations propFileOperations;
 
     /** menu.jspx file path */
     private String menuFile;
@@ -873,9 +876,9 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * refactored to utility class.
      * 
      * @param targetFilename File to create. Note this method will create the
-     *            file by locating a file template with the same name as target
-     *            file but prefixing "-template" to file extension. For example,
-     *            given {@code Menu.java} will locate {@code Menu-template.java}
+     *        file by locating a file template with the same name as target file
+     *        but prefixing "-template" to file extension. For example, given
+     *        {@code Menu.java} will locate {@code Menu-template.java}
      */
     private void installIfNeeded(String targetFilename, String targetPackage) {
 
@@ -932,9 +935,9 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * target file path and relative source path.
      * 
      * @param relativePath path relative to {@link Path.SRC_MAIN_WEBAPP} of
-     *            target file
+     *        target file
      * @param resourceName path relative to classpath of file to be copied
-     *            (cannot be null)
+     *        (cannot be null)
      * @param toReplace
      * @param containsStrings
      */

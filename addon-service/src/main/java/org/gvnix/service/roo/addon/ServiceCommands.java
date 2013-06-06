@@ -59,13 +59,20 @@ import org.apache.commons.lang3.StringUtils;
 @Service
 public class ServiceCommands implements CommandMarker {
 
-    @Reference private ServiceOperations serviceOperations;
-    @Reference private WSExportOperations wSExportOperations;
-    @Reference private WSImportOperations wSImportOperations;
-    @Reference private WSExportWsdlOperations wSExportWsdlOperations;
-    @Reference private MetadataService metadataService;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private FileManager fileManager;
+    @Reference
+    private ServiceOperations serviceOperations;
+    @Reference
+    private WSExportOperations wSExportOperations;
+    @Reference
+    private WSImportOperations wSImportOperations;
+    @Reference
+    private WSExportWsdlOperations wSExportWsdlOperations;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private FileManager fileManager;
 
     @CliAvailabilityIndicator({ "remote service class",
             "remote service operation" })

@@ -49,7 +49,8 @@ import org.springframework.roo.shell.CommandMarker;
 @Service
 public class OCCChecksumCommands implements CommandMarker {
 
-    @Reference private OCCChecksumOperations operations;
+    @Reference
+    private OCCChecksumOperations operations;
 
     @CliAvailabilityIndicator({ "occ checksum set", "occ checksum all" })
     public boolean isOCCChecksumAvailable() {

@@ -40,8 +40,10 @@ import org.springframework.roo.shell.CommandMarker;
 @Service
 public class WebModalDialogCommands implements CommandMarker {
 
-    @Reference private WebModalDialogOperations modalDialogOperations;
-    @Reference private WebExceptionHandlerOperations exceptionOperations;
+    @Reference
+    private WebModalDialogOperations modalDialogOperations;
+    @Reference
+    private WebExceptionHandlerOperations exceptionOperations;
 
     @CliAvailabilityIndicator("web mvc dialog setup")
     public boolean isSetupGvNIXModalDialogAvailable() {

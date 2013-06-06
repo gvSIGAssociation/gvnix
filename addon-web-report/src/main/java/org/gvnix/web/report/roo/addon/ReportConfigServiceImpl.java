@@ -67,9 +67,12 @@ public class ReportConfigServiceImpl implements ReportConfigService {
 
     private static final String JASPER_VIEWS_XML = "WEB-INF/spring/jasper-views.xml";
 
-    @Reference private FileManager fileManager;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private MetadataService metadataService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private MetadataService metadataService;
 
     private ComponentContext context;
 

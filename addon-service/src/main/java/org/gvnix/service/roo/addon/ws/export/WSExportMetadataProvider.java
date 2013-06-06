@@ -71,10 +71,14 @@ import org.apache.commons.lang3.StringUtils;
 @Service
 public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
-    @Reference private WSExportValidationService wSExportValidationService;
-    @Reference private WSConfigService wSConfigService;
-    @Reference private AnnotationsService annotationsService;
-    @Reference private JavaParserService javaParserService;
+    @Reference
+    private WSExportValidationService wSExportValidationService;
+    @Reference
+    private WSConfigService wSConfigService;
+    @Reference
+    private AnnotationsService annotationsService;
+    @Reference
+    private JavaParserService javaParserService;
 
     private static Logger logger = Logger
             .getLogger(WSExportMetadataProvider.class.getName());

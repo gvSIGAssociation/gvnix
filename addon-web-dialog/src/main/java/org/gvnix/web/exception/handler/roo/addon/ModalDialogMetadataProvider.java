@@ -64,8 +64,10 @@ public final class ModalDialogMetadataProvider extends
     private static final JavaType MODAL_DIALOGS = new JavaType(
             GvNIXModalDialogs.class.getName());
 
-    @Reference private PathResolver pathResolver;
-    @Reference private WebModalDialogOperations webModalDialogOperations;
+    @Reference
+    private PathResolver pathResolver;
+    @Reference
+    private WebModalDialogOperations webModalDialogOperations;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -73,7 +75,7 @@ public final class ModalDialogMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -92,7 +94,7 @@ public final class ModalDialogMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
         metadataDependencyRegistry.deregisterDependency(

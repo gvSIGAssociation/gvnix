@@ -50,9 +50,11 @@ public class WebScreenCommands implements CommandMarker {
     private Logger log = Logger.getLogger(getClass().getName());
 
     /** Get a reference to the operations from the underlying OSGi container */
-    @Reference private WebScreenOperations operations;
+    @Reference
+    private WebScreenOperations operations;
 
-    @Reference private SeleniumServices seleniumServices;
+    @Reference
+    private SeleniumServices seleniumServices;
 
     /**
      * Informs if <code>web mvc pattern setup</code> command are available

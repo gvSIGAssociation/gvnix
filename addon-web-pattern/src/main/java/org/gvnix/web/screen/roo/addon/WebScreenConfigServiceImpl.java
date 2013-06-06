@@ -47,9 +47,12 @@ import org.w3c.dom.Element;
 @Service
 public class WebScreenConfigServiceImpl implements WebScreenConfigService {
 
-    @Reference private FileManager fileManager;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private MetadataService metadataService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private MetadataService metadataService;
 
     /** webmvc-config.xml path */
     private String springMvcConfigFile;

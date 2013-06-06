@@ -74,7 +74,7 @@ public interface JavaParserService {
      * @param method Method name.
      * @param annotationMetadataUpdateList Annotations to set to method.
      * @param annotationWebParamMetadataList Annotations for each input
-     *            parameter.
+     *        parameter.
      */
     public void updateMethodAnnotations(JavaType className,
             JavaSymbolName method,

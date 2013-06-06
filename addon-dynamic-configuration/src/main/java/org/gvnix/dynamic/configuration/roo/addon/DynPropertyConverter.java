@@ -51,8 +51,10 @@ public class DynPropertyConverter implements Converter<DynProperty> {
     private static final Logger logger = HandlerUtils
             .getLogger(DynPropertyConverter.class);
 
-    @Reference private Services services;
-    @Reference private Configurations configurations;
+    @Reference
+    private Services services;
+    @Reference
+    private Configurations configurations;
 
     /**
      * {@inheritDoc}

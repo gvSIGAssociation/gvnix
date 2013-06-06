@@ -161,7 +161,7 @@ public class ModalDialogMetadata extends
      * Returns the list of method parameter types.
      * 
      * @param addParamsParameter if true will define
-     *            <code>HashMap&lt;String, Object&gt; params</code> parameter
+     *        <code>HashMap&lt;String, Object&gt; params</code> parameter
      * @return
      */
     private List<AnnotatedJavaType> getMethodParamTypes(
@@ -194,7 +194,7 @@ public class ModalDialogMetadata extends
      * Returns the list of method parameter names.
      * 
      * @param addParamsParameter if true will define <code>params</code>
-     *            parameter
+     *        parameter
      * @return
      */
     private List<JavaSymbolName> getMethodParamNames(boolean addParamsParameter) {
@@ -214,8 +214,8 @@ public class ModalDialogMetadata extends
      * Session methods
      * 
      * @param customModalDialogJspxName if informed will use
-     *            <code>Dialog(DialogType dialogType, String page, String title, String description, HashMap&lt;String, Object&gt; params)</code>
-     *            constructor
+     *        <code>Dialog(DialogType dialogType, String page, String title, String description, HashMap&lt;String, Object&gt; params)</code>
+     *        constructor
      * @return
      */
     private InvocableMemberBodyBuilder getMethodBodyBuilder(

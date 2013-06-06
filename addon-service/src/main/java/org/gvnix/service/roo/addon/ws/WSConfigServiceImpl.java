@@ -76,12 +76,18 @@ import org.w3c.dom.Node;
 @Service
 public class WSConfigServiceImpl implements WSConfigService {
 
-    @Reference private MetadataService metadataService;
-    @Reference private FileManager fileManager;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private SecurityService securityService;
-    @Reference private AnnotationsService annotationsService;
-    @Reference private MavenOperations mavenOperations;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private SecurityService securityService;
+    @Reference
+    private AnnotationsService annotationsService;
+    @Reference
+    private MavenOperations mavenOperations;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
 
@@ -537,7 +543,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * 
      * @param className to export.
      * @param annotationMetadata values from web service class to set in
-     *            configuration file.
+     *        configuration file.
      * @return true if annotation from className has to be updated because of
      *         changes in package or class name.
      */

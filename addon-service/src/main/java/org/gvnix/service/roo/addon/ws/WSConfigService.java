@@ -96,7 +96,7 @@ public interface WSConfigService {
      * 
      * @param className to be published as Web Service.
      * @param annotationMetadata with all necessary values to define a Web
-     *            Service.
+     *        Service.
      * @return true if class annotation must be updated (Class name or package
      *         has been changed).
      */

@@ -80,8 +80,8 @@ public interface MenuEntryOperations {
      * Create or update menu web layer artefacts.
      * 
      * @param classesPackage Web layer artefacts contains references to Java
-     *            classes in this package (used to create import declarations in
-     *            artefacts)
+     *        classes in this package (used to create import declarations in
+     *        artefacts)
      */
     void createWebArtefacts(String classesPackage);
 
@@ -226,7 +226,7 @@ public interface MenuEntryOperations {
      * By default shows all menu entry Ids plus target URLs.
      * 
      * @param pageId root node of subtree to be shown. If null, show complete
-     *            menu tree
+     *        menu tree
      * @param label show label values
      * @param message show message values
      * @param roles show roles values

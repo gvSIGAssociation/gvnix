@@ -40,7 +40,7 @@ public interface WebExceptionHandlerOperations {
      * @param exceptionName Exception Name to Handle.
      * @param exceptionTitle Title of the Exception to show in the view
      * @param exceptionDescription Description of the Exception to show in the
-     *            view
+     *        view
      * @param exceptionLanguage Language to set the message.
      */
     public void addNewHandledException(String exceptionName,
@@ -60,7 +60,7 @@ public interface WebExceptionHandlerOperations {
      * @param exceptionName Exception Name to Handle.
      * @param exceptionTitle Title of the Exception to show in the view
      * @param exceptionDescription Description of the Exception to show in the
-     *            view
+     *        view
      * @param exceptionLanguage Language to set the message.
      */
     public void languageExceptionHandled(String exceptionName,

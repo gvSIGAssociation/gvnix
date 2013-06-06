@@ -66,7 +66,8 @@ public class MenuEntryCommands implements CommandMarker { // all command types
     /**
      * Use MenuEntryOperations to execute operations
      */
-    @Reference private MenuEntryOperations operations;
+    @Reference
+    private MenuEntryOperations operations;
 
     /**
      * Automatic {@code menu setup} command hiding in situations when the

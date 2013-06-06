@@ -41,7 +41,8 @@ import org.springframework.roo.shell.MethodTarget;
 @Service
 public class DynConfigurationConverter implements Converter<DynConfiguration> {
 
-    @Reference private Operations operations;
+    @Reference
+    private Operations operations;
 
     /**
      * {@inheritDoc}

@@ -130,18 +130,21 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * MetadataService offers access to Roo's metadata model, use it to retrieve
      * any available metadate by its MID
      */
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
     /**
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
     /**
      * Use PropFileOperations for property file configuration operations.
      */
-    @Reference private PropFileOperations propFileOperations;
+    @Reference
+    private PropFileOperations propFileOperations;
 
     /** Themes installation path */
     private File themesPath = null;
@@ -1022,9 +1025,8 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * in the local repository or themes installed in the project, just give the
      * search path.
      * 
-     * TODO Duplicated code
-     * When finding bundle use URL and when finding local files use URI
-     * Avoid error "unknown protocol: bundle" on commands
+     * TODO Duplicated code When finding bundle use URL and when finding local
+     * files use URI Avoid error "unknown protocol: bundle" on commands
      * 
      * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
@@ -1066,9 +1068,8 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * in the local repository or themes installed in the project, just give the
      * search path.
      * 
-     * TODO Duplicated code
-     * When finding bundle use URL and when finding local files use URI
-     * Avoid error "unknown protocol: bundle" on commands
+     * TODO Duplicated code When finding bundle use URL and when finding local
+     * files use URI Avoid error "unknown protocol: bundle" on commands
      * 
      * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
@@ -1160,12 +1161,11 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * This method will copy the contents of a bundle to a local directory if
      * the resource does not already exist in the target directory
      * 
-     * TODO Duplicated code
-     * When finding bundle use URL and when finding local files use URI
-     * Avoid error "unknown protocol: bundle" on commands
+     * TODO Duplicated code When finding bundle use URL and when finding local
+     * files use URI Avoid error "unknown protocol: bundle" on commands
      * 
      * @param sourceDirectory source directory. URI syntax:
-     *            [scheme:][//authority][path][?query][#fragment]
+     *        [scheme:][//authority][path][?query][#fragment]
      * @param targetDirectory target directory
      * @param overwrite if true copy to target dir overwriting destination file
      * @see JspOperationsImpl#copyDirectoryContents(String, String)
@@ -1284,12 +1284,11 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * This method will copy the contents of a bundle to a local directory if
      * the resource does not already exist in the target directory
      * 
-     * TODO Duplicated code
-     * When finding bundle use URL and when finding local files use URI
-     * Avoid error "unknown protocol: bundle" on commands
+     * TODO Duplicated code When finding bundle use URL and when finding local
+     * files use URI Avoid error "unknown protocol: bundle" on commands
      * 
      * @param sourceDirectory source directory. URI syntax:
-     *            [scheme:][//authority][path][?query][#fragment]
+     *        [scheme:][//authority][path][?query][#fragment]
      * @param targetDirectory target directory
      * @param overwrite if true copy to target dir overwriting destination file
      * @see JspOperationsImpl#copyDirectoryContents(String, String)

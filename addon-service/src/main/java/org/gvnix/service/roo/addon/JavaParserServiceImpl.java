@@ -69,13 +69,20 @@ import org.springframework.roo.project.ProjectOperations;
 @Service
 public class JavaParserServiceImpl implements JavaParserService {
 
-    @Reference private MetadataService metadataService;
-    @Reference private TypeManagementService typeManagementService;
-    @Reference private FileManager fileManager;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private TypeLocationService typeLocationService;
-    @Reference protected MemberDetailsScanner memberDetailsScanner;
-    @Reference protected TypeParsingService typeParsingService;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private TypeManagementService typeManagementService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private TypeLocationService typeLocationService;
+    @Reference
+    protected MemberDetailsScanner memberDetailsScanner;
+    @Reference
+    protected TypeParsingService typeParsingService;
 
     /**
      * {@inheritDoc}

@@ -59,17 +59,28 @@ import org.springframework.roo.project.ProjectOperations;
 public class RelatedPatternJspMetadataListener extends
         AbstractPatternJspMetadataListener {
 
-    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference private MetadataService metadataService;
-    @Reference private WebMetadataService webMetadataService;
-    @Reference private FileManager fileManager;
-    @Reference private TilesOperations tilesOperations;
-    @Reference private MenuOperations menuOperations;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private PropFileOperations propFileOperations;
-    @Reference WebScreenOperations webScreenOperations;
-    @Reference private PathResolver pathResolver;
-    @Reference private TypeLocationService typeLocationService;
+    @Reference
+    private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private WebMetadataService webMetadataService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private TilesOperations tilesOperations;
+    @Reference
+    private MenuOperations menuOperations;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private PropFileOperations propFileOperations;
+    @Reference
+    WebScreenOperations webScreenOperations;
+    @Reference
+    private PathResolver pathResolver;
+    @Reference
+    private TypeLocationService typeLocationService;
     private final Map<JavaType, String> formBackingObjectTypesToLocalMids = new HashMap<JavaType, String>();
 
     protected void activate(ComponentContext context) {

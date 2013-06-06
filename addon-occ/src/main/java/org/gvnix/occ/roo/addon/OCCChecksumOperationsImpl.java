@@ -68,12 +68,18 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
     private static final Logger logger = HandlerUtils
             .getLogger(OCCChecksumOperationsImpl.class);
 
-    @Reference private MetadataService metadataService;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private JpaOperations entityOperations;
-    @Reference private TypeLocationService typeLocationService;
-    @Reference private PersistenceMemberLocator persistenceMemberLocator;
-    @Reference private TypeManagementService typeManagementService;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private JpaOperations entityOperations;
+    @Reference
+    private TypeLocationService typeLocationService;
+    @Reference
+    private PersistenceMemberLocator persistenceMemberLocator;
+    @Reference
+    private TypeManagementService typeManagementService;
 
     protected void activate(ComponentContext context) {
 

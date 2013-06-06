@@ -39,7 +39,7 @@ public interface WSExportValidationService {
      * </p>
      * 
      * @param method Add annotation to method return and parameter types in
-     *            project
+     *        project
      */
     public void addGvNixXmlElementToTypes(MethodMetadata method);
 

@@ -76,13 +76,19 @@ public class WSImportOperationsImpl implements WSImportOperations {
     private static Logger LOGGER = Logger.getLogger(WSImportOperations.class
             .getName());
 
-    @Reference private FileManager fileManager;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private JavaParserService javaParserService;
-    @Reference private AnnotationsService annotationsService;
-    @Reference private TypeLocationService typeLocationService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private JavaParserService javaParserService;
+    @Reference
+    private AnnotationsService annotationsService;
+    @Reference
+    private TypeLocationService typeLocationService;
 
-    @Reference private SecurityService securityService;
+    @Reference
+    private SecurityService securityService;
 
     /**
      * {@inheritDoc}

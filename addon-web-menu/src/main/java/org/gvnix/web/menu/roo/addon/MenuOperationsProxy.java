@@ -79,7 +79,8 @@ public class MenuOperationsProxy implements MenuOperations {
      * Property to identify this service in {@link FilterMenuOperationsHook} and
      * {@link MenuOperationsProxy}
      */
-    @Property(boolValue = true) public static final String GVNIX_PROXY_COMPONENT = "gvNIXProxyComponent";
+    @Property(boolValue = true)
+    public static final String GVNIX_PROXY_COMPONENT = "gvNIXProxyComponent";
 
     /**
      * gvNIX {@link MenuOperations} implementation

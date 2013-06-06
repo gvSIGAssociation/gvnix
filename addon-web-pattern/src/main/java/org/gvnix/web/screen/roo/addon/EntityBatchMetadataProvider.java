@@ -51,12 +51,15 @@ public final class EntityBatchMetadataProvider extends
     private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(
             GvNIXEntityBatch.class.getName());
 
-    @Reference ProjectOperations projectOperations;
+    @Reference
+    ProjectOperations projectOperations;
 
-    @Reference PropFileOperations propFileOperations;
+    @Reference
+    PropFileOperations propFileOperations;
 
     /* For project setup */
-    @Reference WebScreenConfigService config;
+    @Reference
+    WebScreenConfigService config;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -64,7 +67,7 @@ public final class EntityBatchMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -79,7 +82,7 @@ public final class EntityBatchMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
         metadataDependencyRegistry.deregisterDependency(

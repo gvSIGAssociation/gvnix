@@ -44,11 +44,14 @@ public class FlexCommands implements CommandMarker {
 
     private static Logger logger = HandlerUtils.getLogger(FlexCommands.class);
 
-    @Reference private FlexOperations operations;
+    @Reference
+    private FlexOperations operations;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
     @CliAvailabilityIndicator({ "flex setup" })
     public boolean isFlexAvailable() {

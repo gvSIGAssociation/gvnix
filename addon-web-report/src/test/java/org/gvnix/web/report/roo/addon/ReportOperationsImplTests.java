@@ -18,8 +18,10 @@ import org.springframework.roo.project.ProjectOperations;
 
 public class ReportOperationsImplTests {
     private static final String WEB_MVC_CONFIG = "/org/gvnix/web/report/roo/addon/src/test/resources/webmvc-config.xml";
-    @Mock private FileManager fileManager;
-    @Mock private ProjectOperations projectOperations;
+    @Mock
+    private FileManager fileManager;
+    @Mock
+    private ProjectOperations projectOperations;
 
     @Before
     public void setUp() {

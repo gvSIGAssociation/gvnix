@@ -78,9 +78,12 @@ public final class RelatedPatternMetadataProvider extends
     private static final Logger LOGGER = HandlerUtils
             .getLogger(RelatedPatternMetadataProvider.class);
 
-    @Reference private ProjectOperations projectOperations;
-    @Reference private WebMetadataService webMetadataService;
-    @Reference private PatternService patternService;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private WebMetadataService webMetadataService;
+    @Reference
+    private PatternService patternService;
 
     private final Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
     private final Map<String, JavaType> webScaffoldMidToEntityMap = new LinkedHashMap<String, JavaType>();
@@ -91,7 +94,7 @@ public final class RelatedPatternMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     @Override
     protected void activate(ComponentContext context) {
@@ -113,7 +116,7 @@ public final class RelatedPatternMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     @Override
     protected void deactivate(ComponentContext context) {

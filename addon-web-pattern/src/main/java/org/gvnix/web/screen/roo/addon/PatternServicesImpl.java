@@ -63,9 +63,12 @@ import org.springframework.roo.project.Path;
 @Service
 public class PatternServicesImpl implements PatternService {
 
-    @Reference private MetadataService metadataService;
-    @Reference private MemberDetailsScanner memberDetailsScanner;
-    @Reference private TypeLocationService typeLocationService;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private MemberDetailsScanner memberDetailsScanner;
+    @Reference
+    private TypeLocationService typeLocationService;
 
     /** {@inheritDoc} */
     public boolean existsMasterPatternDefined(String patternName) {

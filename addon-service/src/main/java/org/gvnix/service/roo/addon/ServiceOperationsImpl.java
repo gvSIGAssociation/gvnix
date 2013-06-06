@@ -43,7 +43,8 @@ import org.springframework.roo.model.JavaType;
 @Service
 public class ServiceOperationsImpl implements ServiceOperations {
 
-    @Reference private JavaParserService javaParserService;
+    @Reference
+    private JavaParserService javaParserService;
 
     /**
      * {@inheritDoc}

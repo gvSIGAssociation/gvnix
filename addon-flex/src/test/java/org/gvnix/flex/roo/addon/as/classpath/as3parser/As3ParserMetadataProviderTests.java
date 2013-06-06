@@ -81,13 +81,17 @@ public class As3ParserMetadataProviderTests {
 
     private TestFileManager fileManager;
 
-    @Mock private MetadataService metadataService;
+    @Mock
+    private MetadataService metadataService;
 
-    @Mock private MetadataDependencyRegistry registry;
+    @Mock
+    private MetadataDependencyRegistry registry;
 
-    @Mock private ProcessManager processManager;
+    @Mock
+    private ProcessManager processManager;
 
-    @Mock private PathResolver pathResolver;
+    @Mock
+    private PathResolver pathResolver;
 
     private String metadataId;
 

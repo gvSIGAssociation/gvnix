@@ -48,17 +48,23 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
     private static final Logger logger = HandlerUtils
             .getLogger(ReportMetadataProvider.class);
 
-    @Reference protected TypeLocationService typeLocationService;
+    @Reference
+    protected TypeLocationService typeLocationService;
 
-    @Reference protected WebScaffoldMetadataProvider webScaffoldMetadataProvider;
+    @Reference
+    protected WebScaffoldMetadataProvider webScaffoldMetadataProvider;
 
-    @Reference protected ProjectOperations projectOperations;
+    @Reference
+    protected ProjectOperations projectOperations;
 
-    @Reference protected PropFileOperations propFileOperations;
+    @Reference
+    protected PropFileOperations propFileOperations;
 
-    @Reference protected WebMetadataService webMetadataService;
+    @Reference
+    protected WebMetadataService webMetadataService;
 
-    @Reference protected ReportConfigService reportConfigService;
+    @Reference
+    protected ReportConfigService reportConfigService;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -66,7 +72,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -83,7 +89,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
         metadataDependencyRegistry.deregisterDependency(

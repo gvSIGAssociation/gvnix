@@ -83,7 +83,7 @@ public interface WSExportWsdlConfigService {
      * </p>
      * 
      * @param directoryToMonitoring directory to look up for CXF Web Service
-     *            generated java files.
+     *        generated java files.
      */
     public void monitorFolder(String directoryToMonitoring);
 

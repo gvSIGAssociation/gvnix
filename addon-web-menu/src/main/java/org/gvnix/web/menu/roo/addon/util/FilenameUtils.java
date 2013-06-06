@@ -169,7 +169,7 @@ public abstract class FilenameUtils {
      * running on.
      * 
      * @param filename the filename to find the last path separator in, null
-     *            returns -1
+     *        returns -1
      * @return the index of the last separator character, or -1 if there is no
      *         such character
      */
@@ -194,7 +194,7 @@ public abstract class FilenameUtils {
      * running on.
      * 
      * @param filename the filename to find the last path separator in, null
-     *            returns -1
+     *        returns -1
      * @return the index of the last separator character, or -1 if there is no
      *         such character
      */

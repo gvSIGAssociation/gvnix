@@ -76,16 +76,22 @@ public class OCCChecksumMetadataProvider implements
     // From AbstractItdMetadataProvider
     private boolean dependsOnGovernorTypeDetailAvailability = true;
     private boolean dependsOnGovernorBeingAClass = true;
-    @Reference protected MetadataService metadataService;
-    @Reference protected MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference protected FileManager fileManager;
+    @Reference
+    protected MetadataService metadataService;
+    @Reference
+    protected MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    protected FileManager fileManager;
 
     // DiSiD: Used to get the type members
-    @Reference protected MemberDetailsScanner memberDetailsScanner;
+    @Reference
+    protected MemberDetailsScanner memberDetailsScanner;
 
-    @Reference protected PersistenceMemberLocator persistenceMemberLocator;
+    @Reference
+    protected PersistenceMemberLocator persistenceMemberLocator;
 
-    @Reference protected TypeManagementService typeManagementService;
+    @Reference
+    protected TypeManagementService typeManagementService;
 
     /**
      * The annotations which, if present on a class or interface, will cause
@@ -261,7 +267,7 @@ public class OCCChecksumMetadataProvider implements
      * registration.
      * 
      * @param javaType the type-level annotation to detect that will cause
-     *            metadata creation (required)
+     *        metadata creation (required)
      */
     public void addMetadataTrigger(JavaType javaType) {
         Validate.notNull(javaType,
@@ -495,7 +501,7 @@ public class OCCChecksumMetadataProvider implements
      * governor type details are available.
      * 
      * @param dependsOnGovernorTypeDetailAvailability true means governor type
-     *            details must be available
+     *        details must be available
      */
     public void setDependsOnGovernorTypeDetailAvailability(
             boolean dependsOnGovernorTypeDetailAvailability) {
@@ -509,7 +515,7 @@ public class OCCChecksumMetadataProvider implements
      * true to ensure this can be relied upon.
      * 
      * @param dependsOnGovernorBeingAClass true means governor type detail must
-     *            represent a class
+     *        represent a class
      */
     public void setDependsOnGovernorBeingAClass(
             boolean dependsOnGovernorBeingAClass) {

@@ -62,11 +62,11 @@ public interface WSImportOperations {
      * </p>
      * 
      * @param importedServiceClassName class with the imported service to apply
-     *            signature
+     *        signature
      * @param certificate <code>.p12</code> file to use to sign requests
      * @param password for <code>.p12</code> file
      * @param alias of the certificate from certificate file to use for sing
-     *            request
+     *        request
      */
     public void addSignatureAnnotation(JavaType importedServiceClassName,
             File certificate, String password, String alias);

@@ -20,7 +20,8 @@ import org.springframework.roo.shell.CommandMarker;
 @Component
 @Service
 public class TypicalsecurityCommands implements CommandMarker {
-    @Reference private TypicalsecurityOperations operations;
+    @Reference
+    private TypicalsecurityOperations operations;
 
     @CliAvailabilityIndicator({ "typicalsecurity setup", "typicalsecurity add" })
     public boolean isPropertyAvailable() {

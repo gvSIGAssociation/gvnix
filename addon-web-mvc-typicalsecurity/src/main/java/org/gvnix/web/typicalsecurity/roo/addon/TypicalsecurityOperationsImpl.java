@@ -45,10 +45,14 @@ import org.w3c.dom.Element;
 @Component
 @Service
 public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations {
-    @Reference private FileManager fileManager;
-    @Reference private PathResolver pathResolver;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private Shell shell;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private PathResolver pathResolver;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private Shell shell;
 
     /*
      * Not available since Roo 1.1.2 (See ROO-2066)

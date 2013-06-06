@@ -38,7 +38,8 @@ import org.springframework.roo.shell.CommandMarker;
 @Service
 public class WebExceptionHandlerCommands implements CommandMarker {
 
-    @Reference private WebExceptionHandlerOperations exceptionOperations;
+    @Reference
+    private WebExceptionHandlerOperations exceptionOperations;
 
     @CliAvailabilityIndicator("web mvc dialog exception list")
     public boolean isListExceptionHandlerAvailable() {

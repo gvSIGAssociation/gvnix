@@ -75,7 +75,7 @@ public abstract class XmlUtils {
      * 
      * @param element
      * @param name The name of the child tag to match on. The special value "*"
-     *            matches all tags.
+     *        matches all tags.
      * @return
      */
     public static boolean hasChildNodes(Element element, String name) {

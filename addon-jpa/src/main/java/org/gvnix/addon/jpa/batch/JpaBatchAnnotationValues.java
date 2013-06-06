@@ -34,7 +34,8 @@ public class JpaBatchAnnotationValues extends AbstractAnnotationValues {
     public static final JavaType JPA_BATCH_ANNOTATION = new JavaType(
             GvNIXJpaBatch.class);
 
-    @AutoPopulate JavaType entity;
+    @AutoPopulate
+    JavaType entity;
 
     public JpaBatchAnnotationValues(
             final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {

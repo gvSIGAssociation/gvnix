@@ -44,7 +44,8 @@ public class JpaCommands implements CommandMarker { // All command types must
     /**
      * Get a reference to the JpaOperations from the underlying OSGi container
      */
-    @Reference private JpaOperations operations;
+    @Reference
+    private JpaOperations operations;
 
     /**
      * Informs if jpa gvnix setup is avalilable

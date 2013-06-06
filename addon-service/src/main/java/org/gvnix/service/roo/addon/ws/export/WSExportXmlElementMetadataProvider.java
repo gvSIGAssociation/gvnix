@@ -60,8 +60,10 @@ import org.springframework.roo.project.LogicalPath;
 public class WSExportXmlElementMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference private WSConfigService wSConfigService;
-    @Reference private JavaParserService javaParserService;
+    @Reference
+    private WSConfigService wSConfigService;
+    @Reference
+    private JavaParserService javaParserService;
 
     protected void activate(ComponentContext context) {
 

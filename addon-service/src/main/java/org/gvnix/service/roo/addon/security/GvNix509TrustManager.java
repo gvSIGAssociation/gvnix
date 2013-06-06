@@ -179,7 +179,7 @@ public class GvNix509TrustManager implements X509TrustManager {
      * @param pass
      * @return
      * @throws Exception will be a IOExecption if the given password is a wrong
-     *             one
+     *         one
      */
     public static KeyStore loadKeyStore(File keystore, char[] pass)
             throws Exception {

@@ -30,13 +30,17 @@ public class FlexProjectMetadataProvider implements MetadataProvider,
 
     // private static final String FLEX_GROUP = "org.springframework.flex";
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference private FileManager fileManager;
+    @Reference
+    private FileManager fileManager;
 
-    @Reference private PathResolver pathResolver;
+    @Reference
+    private PathResolver pathResolver;
 
     private String flexServicesConfigIndentifier;
 

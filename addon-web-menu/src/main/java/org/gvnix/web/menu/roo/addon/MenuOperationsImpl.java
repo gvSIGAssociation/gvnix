@@ -63,13 +63,16 @@ public class MenuOperationsImpl implements MenuOperations {
      * Property to identify this service in {@link FilterMenuOperationsHook} and
      * {@link MenuOperationsProxy}
      */
-    @Property(boolValue = true) public static final String GVNIX_COMPONENT = "gvNIXComponent";
+    @Property(boolValue = true)
+    public static final String GVNIX_COMPONENT = "gvNIXComponent";
 
     /**
      * Use AddonOperations delegate to operations this add-on offers
      */
-    @Reference private MenuEntryOperations operations;
-    @Reference private XmlRoundTripFileManager xmlFileManager;
+    @Reference
+    private MenuEntryOperations operations;
+    @Reference
+    private XmlRoundTripFileManager xmlFileManager;
 
     /**
      * Waits until all required references are available
@@ -152,7 +155,7 @@ public class MenuOperationsImpl implements MenuOperations {
      * @param menuCategoryName the identifier for the menu category (required)
      * @param menuItemName the menu item identifier (required)
      * @param idPrefix the prefix to be used for this menu item (optional,
-     *            MenuOperations.DEFAULT_MENU_ITEM_PREFIX is default)
+     *        MenuOperations.DEFAULT_MENU_ITEM_PREFIX is default)
      */
     public void cleanUpMenuItem(JavaSymbolName menuCategoryName,
             JavaSymbolName menuItemName, String idPrefix,

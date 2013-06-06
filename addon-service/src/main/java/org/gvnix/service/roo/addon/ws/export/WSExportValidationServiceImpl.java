@@ -71,13 +71,20 @@ import org.apache.commons.lang3.StringUtils;
 @Service
 public class WSExportValidationServiceImpl implements WSExportValidationService {
 
-    @Reference private ProjectOperations projectOperations;
-    @Reference private FileManager fileManager;
-    @Reference private MetadataService metadataService;
-    @Reference private WSConfigService wSConfigService;
-    @Reference private AnnotationsService annotationsService;
-    @Reference private TypeLocationService typeLocationService;
-    @Reference private JavaParserService javaParserService;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private WSConfigService wSConfigService;
+    @Reference
+    private AnnotationsService annotationsService;
+    @Reference
+    private TypeLocationService typeLocationService;
+    @Reference
+    private JavaParserService javaParserService;
 
     /**
      * {@inheritDoc}

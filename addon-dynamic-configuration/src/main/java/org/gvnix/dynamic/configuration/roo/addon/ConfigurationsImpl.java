@@ -77,8 +77,10 @@ public class ConfigurationsImpl implements Configurations {
     private static final String BASE_CONFIGURATION_XPATH = "/"
             + DYNAMIC_CONFIGURATION_ELEMENT_NAME + "/" + BASE_ELEMENT_NAME;
 
-    @Reference private PathResolver pathResolver;
-    @Reference private FileManager fileManager;
+    @Reference
+    private PathResolver pathResolver;
+    @Reference
+    private FileManager fileManager;
 
     /**
      * {@inheritDoc}

@@ -49,8 +49,10 @@ public class PomManagerImpl implements PomManager {
 
     private static final String RESOURCES_PATH = "src/main/resources";
 
-    @Reference ProjectOperations projectOperations;
-    @Reference FileManager fileManager;
+    @Reference
+    ProjectOperations projectOperations;
+    @Reference
+    FileManager fileManager;
 
     /**
      * {@inheritDoc}

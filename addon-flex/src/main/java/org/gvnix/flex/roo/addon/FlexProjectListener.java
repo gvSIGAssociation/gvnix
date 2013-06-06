@@ -54,15 +54,20 @@ public class FlexProjectListener implements MetadataNotificationListener {
     // TODO - Is there a better way to achieve the monitoring of the necessary
     // Flex directories?
 
-    @Reference private FilenameResolver filenameResolver;
+    @Reference
+    private FilenameResolver filenameResolver;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference private UndoManager undoManager;
+    @Reference
+    private UndoManager undoManager;
 
-    @Reference private NotifiableFileMonitorService fileMonitorService;
+    @Reference
+    private NotifiableFileMonitorService fileMonitorService;
 
     private boolean pathsRegistered = false;
 

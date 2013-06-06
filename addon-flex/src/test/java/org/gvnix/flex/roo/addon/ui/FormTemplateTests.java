@@ -55,7 +55,8 @@ public class FormTemplateTests {
 
     private static final Log log = LogFactory.getLog(FormTemplateTests.class);
 
-    @Mock private FlexScaffoldMetadata flexScaffoldMetadata;
+    @Mock
+    private FlexScaffoldMetadata flexScaffoldMetadata;
 
     private StringTemplateGroup templateGroup = new StringTemplateGroup(
             "viewTemplateTestsGroup");

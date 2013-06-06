@@ -84,7 +84,8 @@ public class WSImportMetadata extends
     private final SecurityService securityService;
 
     // From annotation
-    @AutoPopulate private String wsdlLocation;
+    @AutoPopulate
+    private String wsdlLocation;
 
     public WSImportMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,

@@ -59,7 +59,7 @@ public class StringTrimmerBinderMetadata extends
      * This method registers the StringTrimmerEditor
      * 
      * @param emptyAsNull if true the editor registered will convert empty
-     *            Strings to <code>null</code>
+     *        Strings to <code>null</code>
      */
     private MethodMetadata getInitStringTrimmerBinderMethod(boolean emptyAsNull) {
         // Specify the desired method name

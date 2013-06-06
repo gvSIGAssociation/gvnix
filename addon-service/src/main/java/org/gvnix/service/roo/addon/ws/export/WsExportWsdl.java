@@ -81,9 +81,9 @@ public interface WsExportWsdl {
      * service.
      * 
      * @param classOrInterfaceDeclaration to retrieve values from @WebFault
-     *            annotations and convert to {@link GvNIXWebFault} values.
+     *        annotations and convert to {@link GvNIXWebFault} values.
      * @param exceptionType to retrieve faultBean attribute value
-     *            {@link GvNIXWebFault}.
+     *        {@link GvNIXWebFault}.
      * @return {@link GvNIXWebFault} to define in class.
      */
     public AnnotationMetadata getGvNIXWebFaultAnnotation(

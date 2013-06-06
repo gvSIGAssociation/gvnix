@@ -44,9 +44,11 @@ import org.w3c.dom.Element;
 @Service
 public class JpaOperationsImpl implements JpaOperations {
 
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
     /** {@inheritDoc} */
     public boolean isSetupAvailable() {

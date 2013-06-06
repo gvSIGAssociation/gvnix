@@ -93,17 +93,23 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
 
     private static final String ALIAS_ATTR = "alias";
 
-    @Reference private PathResolver pathResolver;
+    @Reference
+    private PathResolver pathResolver;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference private ASMutablePhysicalTypeMetadataProvider asPhysicalTypeProvider;
+    @Reference
+    private ASMutablePhysicalTypeMetadataProvider asPhysicalTypeProvider;
 
-    @Reference protected MemberDetailsScanner memberDetailsScanner;
+    @Reference
+    protected MemberDetailsScanner memberDetailsScanner;
 
-    @Reference protected TypeManagementService typeManagementService;
+    @Reference
+    protected TypeManagementService typeManagementService;
 
     protected void activate(ComponentContext context) {
         this.metadataDependencyRegistry.registerDependency(

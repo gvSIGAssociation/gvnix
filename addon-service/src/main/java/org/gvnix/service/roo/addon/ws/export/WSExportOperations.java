@@ -79,7 +79,7 @@ public interface WSExportOperations {
      * @param javaType Class to export a method.
      * @param methodName Method to export.
      * @param operationName Name of the method to be showed as a Web Service
-     *            operation.
+     *        operation.
      * @param resultName Method result name.
      * @param resultNamespace Namespace of the result type.
      * @param responseWrapperName Name to define the Response Wrapper Object.
@@ -104,7 +104,7 @@ public interface WSExportOperations {
      * </p>
      * 
      * @param serviceClass class to search available methods to export as web
-     *            service operations.
+     *        service operations.
      */
     public String getAvailableServiceOperationsToExport(JavaType serviceClass);
 

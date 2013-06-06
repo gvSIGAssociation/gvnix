@@ -50,12 +50,14 @@ public class MenuEntryFileEventListener implements FileEventListener {
     /**
      * Use addon operations to delegate operations
      */
-    @Reference private MenuEntryOperations operations;
+    @Reference
+    private MenuEntryOperations operations;
 
     /**
      * Use FileManager to modify the underlying disk storage
      */
-    @Reference private FileManager fileManager;
+    @Reference
+    private FileManager fileManager;
 
     /*
      * (non-Javadoc)

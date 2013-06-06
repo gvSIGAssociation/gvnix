@@ -105,15 +105,20 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private static Logger logger = Logger
             .getLogger(CitSecurityOperationsImpl.class.getName());
 
-    @Reference private FileManager fileManager;
+    @Reference
+    private FileManager fileManager;
 
-    @Reference private PathResolver pathResolver;
+    @Reference
+    private PathResolver pathResolver;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
-    @Reference private SecurityOperations securityOperations;
+    @Reference
+    private SecurityOperations securityOperations;
 
     /**
      * Get java package of cit security classes into destination project.
@@ -539,13 +544,13 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      * </ul>
      * 
      * @param sourceFolder path relativo a esta clase para buscar el template,
-     *            si es null usa la la ruta de la clase actual
+     *        si es null usa la la ruta de la clase actual
      * @param targetFilename nombre del fichero final
      * @param targetPackage paquete donde se generará el fichero (admite '~'
-     *            como comodín del paquete base)
+     *        como comodín del paquete base)
      * @param projectMetadata metadatos del proyecto
      * @param parameters valores adicionales a reemplazar (puede ser
-     *            <code>null</code> si no se necesita)
+     *        <code>null</code> si no se necesita)
      * @param override especifica si sobreescribir el archivo si ya existe
      * @param isTest especifica si la clase es de test o del fuente
      */

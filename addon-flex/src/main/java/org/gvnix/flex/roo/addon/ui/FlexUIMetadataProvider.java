@@ -88,21 +88,29 @@ import org.w3c.dom.Element;
 public class FlexUIMetadataProvider implements MetadataProvider,
         MetadataNotificationListener {
 
-    @Reference private PathResolver pathResolver;
+    @Reference
+    private PathResolver pathResolver;
 
-    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference private FileManager fileManager;
+    @Reference
+    private FileManager fileManager;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private ASMutablePhysicalTypeMetadataProvider asPhysicalTypeProvider;
+    @Reference
+    private ASMutablePhysicalTypeMetadataProvider asPhysicalTypeProvider;
 
-    @Reference private FlexOperations flexOperations;
+    @Reference
+    private FlexOperations flexOperations;
 
-    @Reference private MemberDetailsScanner memberDetailsScanner;
+    @Reference
+    private MemberDetailsScanner memberDetailsScanner;
 
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
     private StringTemplateGroup templateGroup;
 

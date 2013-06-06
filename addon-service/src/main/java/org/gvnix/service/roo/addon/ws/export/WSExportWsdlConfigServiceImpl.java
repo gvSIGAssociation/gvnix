@@ -119,13 +119,20 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     static final String xmlEnum = "XmlEnum";
     static final String webFault = "WebFault";
 
-    @Reference private WSConfigService wSConfigService;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private NotifiableFileMonitorService fileMonitorService;
-    @Reference private SecurityService securityService;
-    @Reference private WsExportWsdl wsExportWsdl;
-    @Reference private FileManager fileManager;
-    @Reference private JavaParserService javaParserService;
+    @Reference
+    private WSConfigService wSConfigService;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private NotifiableFileMonitorService fileMonitorService;
+    @Reference
+    private SecurityService securityService;
+    @Reference
+    private WsExportWsdl wsExportWsdl;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private JavaParserService javaParserService;
 
     protected static Logger logger = Logger
             .getLogger(WSExportWsdlConfigService.class.getName());
@@ -970,10 +977,10 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
      * service.
      * 
      * @param classOrInterfaceDeclaration to retrieve values from @WebService
-     *            annotations and convert to {@link GvNIXWebService} values.
+     *        annotations and convert to {@link GvNIXWebService} values.
      * @param implementedInterface Web Service interface.
      * @param javaType to retrieve mandatory Annotation attributed with its
-     *            values.
+     *        values.
      * @return {@link GvNIXWebService} to define in class.
      */
     private AnnotationMetadata getGvNIXWebServiceAnnotation(

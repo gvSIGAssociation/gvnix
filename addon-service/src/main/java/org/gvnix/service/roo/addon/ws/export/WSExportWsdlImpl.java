@@ -114,7 +114,8 @@ public class WSExportWsdlImpl implements WsExportWsdl {
     protected static Logger logger = Logger.getLogger(WSExportWsdlImpl.class
             .getName());
 
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
     /**
      * {@inheritDoc}
@@ -385,7 +386,7 @@ public class WSExportWsdlImpl implements WsExportWsdl {
      * 
      * @param methodMetadata
      * @param defaultNamespace from Web Service to set where is not defined in
-     *            annotations.
+     *        annotations.
      * @return {@link MethodMetadata} with GvNIX Annotations.
      */
     protected MethodMetadata getGvNIXWebMethodMetadata(
@@ -448,7 +449,7 @@ public class WSExportWsdlImpl implements WsExportWsdl {
      * 
      * @param methodMetadata to check Web Services annotations.
      * @param defaultNamespace from Web Service to set where is not defined in
-     *            annotations.
+     *        annotations.
      * @return {@link GvNIXWebMethod} with Attributes.
      */
     private AnnotationMetadata getGvNIXWebMethodAnnotation(
@@ -711,7 +712,7 @@ public class WSExportWsdlImpl implements WsExportWsdl {
      * 
      * @param methodMetadata to check for Web Services annotations.
      * @param defaultNamespace from Web Service to set where is not defined in
-     *            annotations.
+     *        annotations.
      * @return {@link List} of {@link AnnotatedJavaType} for each input method
      *         parameter.
      */

@@ -193,7 +193,7 @@ public class RooTableTag extends TableTag {
      * 
      * @return return the row id using prefix, base and suffix.
      * @throws JspException is the rowIdBase doesn't have a corresponding
-     *             property accessor method.
+     *         property accessor method.
      */
     protected String getRowId() throws JspException {
 

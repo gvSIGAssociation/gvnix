@@ -45,12 +45,18 @@ import org.w3c.dom.Element;
 @Service
 public class OperationsImpl implements Operations {
 
-    @Reference private MetadataService metadataService;
-    @Reference private Services services;
-    @Reference private Configurations configurations;
-    @Reference ProjectOperations projectOperations;
-    @Reference FileManager fileManager;
-    @Reference PomManager pomManager;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private Services services;
+    @Reference
+    private Configurations configurations;
+    @Reference
+    ProjectOperations projectOperations;
+    @Reference
+    FileManager fileManager;
+    @Reference
+    PomManager pomManager;
 
     public boolean isProjectAvailable() {
 

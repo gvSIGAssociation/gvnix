@@ -40,7 +40,8 @@ public final class StringTrimmerBinderMetadataProvider extends
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -48,7 +49,7 @@ public final class StringTrimmerBinderMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -63,7 +64,7 @@ public final class StringTrimmerBinderMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
         metadataDependencyRegistry.deregisterDependency(

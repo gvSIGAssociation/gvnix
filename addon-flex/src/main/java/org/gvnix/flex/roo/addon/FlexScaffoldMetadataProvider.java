@@ -43,7 +43,8 @@ import org.springframework.roo.project.Path;
 @Service
 public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
 
-    @Reference private WebMetadataService webMetadataService;
+    @Reference
+    private WebMetadataService webMetadataService;
 
     protected void activate(ComponentContext context) {
         this.metadataDependencyRegistry.registerDependency(

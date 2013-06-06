@@ -38,7 +38,8 @@ import org.springframework.roo.shell.CommandMarker;
 @Service
 public class CitSecurityCommands implements CommandMarker {
 
-    @Reference private CitSecurityOperations citSecurityOperations;
+    @Reference
+    private CitSecurityOperations citSecurityOperations;
 
     @CliAvailabilityIndicator("cit security setup")
     public boolean isSetupAvailable() {

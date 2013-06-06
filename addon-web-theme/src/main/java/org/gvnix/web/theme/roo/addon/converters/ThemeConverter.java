@@ -50,7 +50,8 @@ public class ThemeConverter implements Converter<Theme> {
     /**
      * Use PageOperations to execute operations
      */
-    @Reference private ThemeOperations operations;
+    @Reference
+    private ThemeOperations operations;
 
     /**
      * Check if given type can be converted by this Converter

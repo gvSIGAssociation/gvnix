@@ -59,11 +59,14 @@ import org.w3c.dom.Element;
 @Service
 public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
-    @Reference private WSConfigService wSConfigService;
+    @Reference
+    private WSConfigService wSConfigService;
 
-    @Reference private SecurityService securityService;
+    @Reference
+    private SecurityService securityService;
 
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
     protected void activate(ComponentContext context) {
 

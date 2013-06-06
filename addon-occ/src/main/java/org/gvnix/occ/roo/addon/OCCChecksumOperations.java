@@ -64,8 +64,8 @@ public interface OCCChecksumOperations {
      * 
      * @param fieldName
      * @param digestMethod <i>based on
-     *            {@link org.springframework.roo.addon.web.mvc.controller.ControllerOperations#generateAll(org.springframework.roo.model.JavaPackage)}
-     *            </i>
+     *        {@link org.springframework.roo.addon.web.mvc.controller.ControllerOperations#generateAll(org.springframework.roo.model.JavaPackage)}
+     *        </i>
      */
     public void addOccAll(String fieldName, String digestMethod);
 

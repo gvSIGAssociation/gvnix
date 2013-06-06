@@ -82,13 +82,20 @@ public class WebExceptionHandlerOperationsImpl implements
     private static Logger LOGGER = HandlerUtils
             .getLogger(WebModalDialogOperationsImpl.class);
 
-    @Reference private ProjectOperations projectOperations;
-    @Reference private TilesOperations tilesOperations;
-    @Reference private FileManager fileManager;
-    @Reference private MetadataService metadataService;
-    @Reference private PathResolver pathResolver;
-    @Reference private PropFileOperations propFileOperations;
-    @Reference private I18nSupport i18nSupport;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private TilesOperations tilesOperations;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private PathResolver pathResolver;
+    @Reference
+    private PropFileOperations propFileOperations;
+    @Reference
+    private I18nSupport i18nSupport;
 
     /*
      * (non-Javadoc)

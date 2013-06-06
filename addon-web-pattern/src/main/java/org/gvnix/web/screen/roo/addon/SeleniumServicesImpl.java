@@ -92,14 +92,22 @@ public class SeleniumServicesImpl implements SeleniumServices {
      * MetadataService offers access to Roo's metadata model, use it to retrieve
      * any available metadata by its MID
      */
-    @Reference private MetadataService metadataService;
-    @Reference private ProjectOperations projectOperations;
-    @Reference PropFileOperations propFileOperations;
-    @Reference protected FileManager fileManager;
-    @Reference private MemberDetailsScanner memberDetailsScanner;
-    @Reference private WebMetadataService webMetadataService;
-    @Reference private MenuOperations menuOperations;
-    @Reference private PatternService patternService;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    PropFileOperations propFileOperations;
+    @Reference
+    protected FileManager fileManager;
+    @Reference
+    private MemberDetailsScanner memberDetailsScanner;
+    @Reference
+    private WebMetadataService webMetadataService;
+    @Reference
+    private MenuOperations menuOperations;
+    @Reference
+    private PatternService patternService;
 
     private static Logger logger = Logger.getLogger(SeleniumServicesImpl.class
             .getName());

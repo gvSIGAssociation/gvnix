@@ -52,8 +52,10 @@ import org.apache.commons.lang3.StringUtils;
 public class WSExportExceptionMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference private WSConfigService wSConfigService;
-    @Reference private WSExportValidationService wSExportValidationService;
+    @Reference
+    private WSConfigService wSConfigService;
+    @Reference
+    private WSExportValidationService wSExportValidationService;
 
     protected void activate(ComponentContext context) {
         // Ensure we're notified of all metadata related to physical Java types,

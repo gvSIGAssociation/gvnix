@@ -122,17 +122,16 @@ public class SpringContextHelper {
      * 
      * @param pageContext of the current request.
      * @param requiredType type the bean must match; can be an interface or
-     *            superclass. {@code null} is disallowed.
-     *            <p>
-     *            This method goes into {@link ListableBeanFactory} by-type
-     *            lookup territory but may also be translated into a
-     *            conventional by-name lookup based on the name of the given
-     *            type. For more extensive retrieval operations across sets of
-     *            beans, use {@link ListableBeanFactory} and/or
-     *            {@link BeanFactoryUtils}.
+     *        superclass. {@code null} is disallowed.
+     *        <p>
+     *        This method goes into {@link ListableBeanFactory} by-type lookup
+     *        territory but may also be translated into a conventional by-name
+     *        lookup based on the name of the given type. For more extensive
+     *        retrieval operations across sets of beans, use
+     *        {@link ListableBeanFactory} and/or {@link BeanFactoryUtils}.
      * @return an instance of the single bean matching the required type
      * @throws NoSuchBeanDefinitionException if there is not exactly one
-     *             matching bean found
+     *         matching bean found
      * @see BeanFactory#getBean(Class)
      */
     public <T> T getBean(PageContext pageContext, Class<T> requiredType)
@@ -157,7 +156,7 @@ public class SpringContextHelper {
      * @param name the name of the bean to retrieve
      * @return an instance of the bean
      * @throws NoSuchBeanDefinitionException if there is no bean definition with
-     *             the specified name
+     *         the specified name
      * @throws BeansException if the bean could not be obtained
      */
     public Object getBean(PageContext pageContext, String name)

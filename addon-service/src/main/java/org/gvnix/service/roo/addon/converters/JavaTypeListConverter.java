@@ -54,9 +54,12 @@ import org.springframework.roo.shell.MethodTarget;
 @Service
 public class JavaTypeListConverter implements Converter<JavaTypeList> {
 
-    @Reference private MetadataService metadataService;
-    @Reference private FileManager fileManager;
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private ProjectOperations projectOperations;
 
     /*
      * (non-Javadoc)
@@ -144,7 +147,7 @@ public class JavaTypeListConverter implements Converter<JavaTypeList> {
      * @param optionContext Option context to evaluate.
      * @param completeExistingDataList String separated comma list of JavaType.
      * @param tmpExistingData The last JavaType from console Input to auto
-     *            complete.
+     *        complete.
      */
     private void completeJavaSpecificPaths(List<Completion> completions,
             String existingData, String optionContext,

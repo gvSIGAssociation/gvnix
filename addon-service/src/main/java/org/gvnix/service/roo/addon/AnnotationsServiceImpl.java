@@ -36,11 +36,16 @@ import org.w3c.dom.Element;
 @Service
 public class AnnotationsServiceImpl implements AnnotationsService {
 
-    @Reference private ProjectOperations projectOperations;
-    @Reference private JavaParserService javaParserService;
-    @Reference private MetadataService metadataService;
-    @Reference private TypeLocationService typeLocationService;
-    @Reference private TypeManagementService typeManagementService;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private JavaParserService javaParserService;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private TypeLocationService typeLocationService;
+    @Reference
+    private TypeManagementService typeManagementService;
 
     private static Logger logger = Logger.getLogger(AnnotationsService.class
             .getName());

@@ -73,11 +73,16 @@ import org.springframework.roo.project.ProjectOperations;
 public final class PatternMetadataProvider extends
         AbstractPatternMetadataProvider {
 
-    @Reference WebScaffoldMetadataProvider webScaffoldMetadataProvider;
-    @Reference ProjectOperations projectOperations;
-    @Reference PropFileOperations propFileOperations;
-    @Reference WebMetadataService webMetadataService;
-    @Reference PatternService patternService;
+    @Reference
+    WebScaffoldMetadataProvider webScaffoldMetadataProvider;
+    @Reference
+    ProjectOperations projectOperations;
+    @Reference
+    PropFileOperations propFileOperations;
+    @Reference
+    WebMetadataService webMetadataService;
+    @Reference
+    PatternService patternService;
 
     private final Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
     private final Map<String, JavaType> webScaffoldMidToEntityMap = new LinkedHashMap<String, JavaType>();
@@ -88,7 +93,7 @@ public final class PatternMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     @Override
     protected void activate(ComponentContext context) {
@@ -110,7 +115,7 @@ public final class PatternMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     @Override
     protected void deactivate(ComponentContext context) {

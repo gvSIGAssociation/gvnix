@@ -58,7 +58,8 @@ public class ThemeCommands implements CommandMarker { // all command types must
     /**
      * Use ThemeOperations to install and manage themes
      */
-    @Reference private ThemeOperations operations;
+    @Reference
+    private ThemeOperations operations;
 
     /**
      * Hide install command if the project hasn't been created or there aren't

@@ -44,7 +44,8 @@ public class WebBinderCommands implements CommandMarker {
      * Get a reference to the WebBinderOperations from the underlying OSGi
      * container
      */
-    @Reference private WebBinderOperations webBinderOperations;
+    @Reference
+    private WebBinderOperations webBinderOperations;
 
     /**
      * Check if stringTrimmer command is available

@@ -75,13 +75,20 @@ public final class ReportJspMetadataListener implements MetadataProvider,
     // private static final Logger logger =
     // HandlerUtils.getLogger(ReportJspMetadataListener.class);
 
-    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference private MetadataService metadataService;
-    @Reference private FileManager fileManager;
-    @Reference private TilesOperations tilesOperations;
-    @Reference private MenuOperations menuOperations;
-    @Reference private PathResolver pathResolver;
-    @Reference private PropFileOperations propFileOperations;
+    @Reference
+    private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private TilesOperations tilesOperations;
+    @Reference
+    private MenuOperations menuOperations;
+    @Reference
+    private PathResolver pathResolver;
+    @Reference
+    private PropFileOperations propFileOperations;
 
     private WebScaffoldMetadata webScaffoldMetadata;
     private JpaActiveRecordMetadata entityMetadata;

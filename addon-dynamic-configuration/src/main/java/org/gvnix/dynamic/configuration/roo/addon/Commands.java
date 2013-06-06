@@ -48,7 +48,8 @@ public class Commands implements CommandMarker {
 
     private static Logger logger = Logger.getLogger(Commands.class.getName());
 
-    @Reference private Operations operations;
+    @Reference
+    private Operations operations;
 
     @CliAvailabilityIndicator("configuration create")
     public boolean isCreate() {

@@ -47,7 +47,8 @@ import org.w3c.dom.Element;
 @Service
 public class MenuEntryConverter implements Converter<MenuEntry> {
 
-    @Reference private MenuEntryOperations operations;
+    @Reference
+    private MenuEntryOperations operations;
 
     /**
      * Check if given type can be converted by this Converter

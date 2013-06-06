@@ -49,23 +49,28 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
      * MetadataService offers access to Roo's metadata model, use it to retrieve
      * any available metadata by its MID
      */
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
     /**
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
     /**
      * Use TypeLocationService to find types which are annotated with a given
      * annotation in the project
      */
-    @Reference private TypeLocationService typeLocationService;
+    @Reference
+    private TypeLocationService typeLocationService;
 
-    @Reference private FileManager fileManager;
+    @Reference
+    private FileManager fileManager;
 
-    @Reference private TypeManagementService typeManagementService;
+    @Reference
+    private TypeManagementService typeManagementService;
 
     /** {@inheritDoc} */
     public boolean isStringTrimmerAvailable() {

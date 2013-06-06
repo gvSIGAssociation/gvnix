@@ -55,9 +55,11 @@ public class ReportCommands implements CommandMarker { // All command types must
      * Get a reference to the ReportOperations from the underlying OSGi
      * container
      */
-    @Reference private ReportOperations operations;
+    @Reference
+    private ReportOperations operations;
 
-    @Reference private ReportConfigService reportConfigService;
+    @Reference
+    private ReportConfigService reportConfigService;
 
     /**
      * This method is optional. It allows automatic command hiding in situations

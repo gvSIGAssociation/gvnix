@@ -52,13 +52,17 @@ import org.springframework.roo.project.ProjectOperations;
 @Service
 public class JpaBatchOperationsImpl implements JpaBatchOperations {
 
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
-    @Reference private TypeLocationService typeLocationService;
+    @Reference
+    private TypeLocationService typeLocationService;
 
-    @Reference private TypeManagementService typeManagementService;
+    @Reference
+    private TypeManagementService typeManagementService;
 
-    @Reference private PathResolver pathResolver;
+    @Reference
+    private PathResolver pathResolver;
 
     /** {@inheritDoc} */
     public boolean isCommandAvailable() {

@@ -59,7 +59,7 @@ public class MenuEntry {
      * Menu entry constructor
      * 
      * @param id Menu entry id. It cannot have white spaces, as utility white
-     *            spaces will be changed to underscores
+     *        spaces will be changed to underscores
      */
     public MenuEntry(String id) {
         this.id = StringUtils.underscoreAllWhitespace(id);

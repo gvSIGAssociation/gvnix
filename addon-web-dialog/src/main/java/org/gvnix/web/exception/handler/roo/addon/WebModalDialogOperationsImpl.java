@@ -104,15 +104,24 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
     private static Logger LOGGER = HandlerUtils
             .getLogger(WebModalDialogOperationsImpl.class);
 
-    @Reference private ProjectOperations projectOperations;
-    @Reference private FileManager fileManager;
-    @Reference private MetadataService metadataService;
-    @Reference private TypeLocationService typeLocationService;
-    @Reference private PathResolver pathResolver;
-    @Reference private WebExceptionHandlerOperations exceptionOperations;
-    @Reference private I18nSupport i18nSupport;
-    @Reference private PropFileOperations propFileOperations;
-    @Reference private TypeManagementService typeManagementService;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private TypeLocationService typeLocationService;
+    @Reference
+    private PathResolver pathResolver;
+    @Reference
+    private WebExceptionHandlerOperations exceptionOperations;
+    @Reference
+    private I18nSupport i18nSupport;
+    @Reference
+    private PropFileOperations propFileOperations;
+    @Reference
+    private TypeManagementService typeManagementService;
 
     private ComponentContext context;
 

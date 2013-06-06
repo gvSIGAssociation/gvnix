@@ -72,22 +72,27 @@ public class ReportOperationsImpl implements ReportOperations {
      * MetadataService offers access to Roo's metadata model, use it to retrieve
      * any available metadata by its MID
      */
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private TypeLocationService typeLocationService;
+    @Reference
+    private TypeLocationService typeLocationService;
 
     /**
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
     /**
      * ReportConfigService offers some methods for configuration purposes
      */
-    @Reference ReportConfigService reportConfigService;
+    @Reference
+    ReportConfigService reportConfigService;
 
-    @Reference TypeManagementService typeManagementService;
+    @Reference
+    TypeManagementService typeManagementService;
 
     /** {@inheritDoc} */
     public boolean isCommandAvailable() {

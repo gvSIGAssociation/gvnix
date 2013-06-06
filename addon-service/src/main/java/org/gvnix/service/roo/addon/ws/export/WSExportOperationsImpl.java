@@ -74,15 +74,24 @@ public class WSExportOperationsImpl implements WSExportOperations {
     private static Logger logger = Logger.getLogger(WSExportOperations.class
             .getName());
 
-    @Reference private FileManager fileManager;
-    @Reference private MetadataService metadataService;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private WSConfigService wSConfigService;
-    @Reference private JavaParserService javaParserService;
-    @Reference private AnnotationsService annotationsService;
-    @Reference private WSExportValidationService wSExportValidationService;
-    @Reference private TypeLocationService typeLocationService;
-    @Reference private MemberDetailsScanner memberDetailsScanner;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private WSConfigService wSConfigService;
+    @Reference
+    private JavaParserService javaParserService;
+    @Reference
+    private AnnotationsService annotationsService;
+    @Reference
+    private WSExportValidationService wSExportValidationService;
+    @Reference
+    private TypeLocationService typeLocationService;
+    @Reference
+    private MemberDetailsScanner memberDetailsScanner;
 
     /**
      * {@inheritDoc}
@@ -304,7 +313,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * @param javaType Java type to export a method.
      * @param method Method to export.
      * @param operationName Name of the method to be showed as a Web Service
-     *            operation.
+     *        operation.
      * @param resultName Method result name.
      * @param returnType JavaType class to return.
      * @param resultNamespace Result type Namespace.
@@ -363,7 +372,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * @param javaType Java type to export a method.
      * @param method Method to export.
      * @param operationName Name of the method to be showed as a Web Service
-     *            operation.
+     *        operation.
      * @param requestWrapperName Name to define the Request Wrapper Object.
      * @param requestWrapperNamespace Request Wrapper Object Namespace.
      * @param targetNamespace Web Service Namespace.
@@ -424,7 +433,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * 
      * @param javaType Java type to export a method.
      * @param operationName Name of the method to be showed as a Web Service
-     *            operation.
+     *        operation.
      * @param resultName Method result name.
      * @param returnType JavaType class to return.
      * @param resultNamespace Result type Namespace.
@@ -475,7 +484,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * 
      * @param javaType Java type to export a method.
      * @param operationName Name of the method to be showed as a Web Service
-     *            operation.
+     *        operation.
      * @param resultName Method result name.
      * @param returnType JavaType class to return.
      * @param resultNamespace Result type Namespace.

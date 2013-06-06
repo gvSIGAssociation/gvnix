@@ -144,21 +144,29 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
      * MetadataService offers access to Roo's metadata model, use it to retrieve
      * any available metadata by its MID
      */
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private TypeLocationService typeLocationService;
+    @Reference
+    private TypeLocationService typeLocationService;
 
-    @Reference private PatternService patternService;
+    @Reference
+    private PatternService patternService;
 
-    @Reference private WebScreenConfigService configService;
+    @Reference
+    private WebScreenConfigService configService;
 
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
-    @Reference PropFileOperations propFileOperations;
+    @Reference
+    PropFileOperations propFileOperations;
 
-    @Reference private I18nSupport i18nSupport;
+    @Reference
+    private I18nSupport i18nSupport;
 
-    @Reference private TypeManagementService typeManagementService;
+    @Reference
+    private TypeManagementService typeManagementService;
 
     /** {@inheritDoc} */
     public boolean isPatternCommandAvailable() {

@@ -89,21 +89,29 @@ public class FlexOperationsImpl implements FlexOperations {
     private static final String TEMPLATE_PATH = FlexOperationsImpl.class
             .getPackage().getName().replace(".", "/");
 
-    @Reference private FileManager fileManager;
+    @Reference
+    private FileManager fileManager;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private ProjectOperations projectOperations;
+    @Reference
+    private ProjectOperations projectOperations;
 
-    @Reference private WebMvcOperations webMvcOperations;
+    @Reference
+    private WebMvcOperations webMvcOperations;
 
-    @Reference private PathResolver pathResolver;
+    @Reference
+    private PathResolver pathResolver;
 
-    @Reference private MetadataDependencyRegistry dependencyRegistry;
+    @Reference
+    private MetadataDependencyRegistry dependencyRegistry;
 
-    @Reference private TypeLocationService typeLocationService;
+    @Reference
+    private TypeLocationService typeLocationService;
 
-    @Reference private TypeManagementService typeManagementService;
+    @Reference
+    private TypeManagementService typeManagementService;
 
     private ComponentContext context;
 

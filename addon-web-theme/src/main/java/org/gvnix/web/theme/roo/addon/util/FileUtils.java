@@ -39,9 +39,8 @@ public abstract class FileUtils {
     /**
      * Finds files within a given directory and its subdirectories.
      * 
-     * TODO Duplicated code
-     * When finding bundle use URL and when finding local files use URI
-     * Avoid error "unknown protocol: bundle" on commands
+     * TODO Duplicated code When finding bundle use URL and when finding local
+     * files use URI Avoid error "unknown protocol: bundle" on commands
      * 
      * @param directory the directory to search in
      * @return the set of files found
@@ -76,9 +75,8 @@ public abstract class FileUtils {
     /**
      * Finds files within a given directory and its subdirectories.
      * 
-     * TODO Duplicated code
-     * When finding bundle use URL and when finding local files use URI
-     * Avoid error "unknown protocol: bundle" on commands
+     * TODO Duplicated code When finding bundle use URL and when finding local
+     * files use URI Avoid error "unknown protocol: bundle" on commands
      * 
      * @param directory the directory to search in
      * @return the set of files found

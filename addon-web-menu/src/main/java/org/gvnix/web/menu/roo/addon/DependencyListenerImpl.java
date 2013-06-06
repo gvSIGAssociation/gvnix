@@ -45,12 +45,14 @@ public class DependencyListenerImpl implements MetadataNotificationListener {
     private static final Logger LOGGER = HandlerUtils
             .getLogger(DependencyListenerImpl.class);
 
-    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    private MetadataDependencyRegistry metadataDependencyRegistry;
 
     /**
      * Use PageOperations to execute operations
      */
-    @Reference private MenuEntryOperations operations;
+    @Reference
+    private MenuEntryOperations operations;
 
     private Boolean hasSpringSecurity = null;
 

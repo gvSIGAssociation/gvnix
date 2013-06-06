@@ -80,7 +80,7 @@ public interface WebScreenOperations {
      * @param controllerClass The controller to apply the pattern to
      * @param name Identification to use for this pattern
      * @param field One-to-many field to apply the pattern to. It must exists in
-     *            controler's entity
+     *        controler's entity
      * @param pattern The pattern to apply
      * @return Pattern added
      */

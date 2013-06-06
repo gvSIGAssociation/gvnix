@@ -46,13 +46,17 @@ public class As3ParserClassMetadataValidParsingTests {
 
     FileManager fileManager = new DefaultFileManager();
 
-    @Mock MetadataService metadataService;
+    @Mock
+    MetadataService metadataService;
 
-    @Mock ASPhysicalTypeMetadataProvider provider;
+    @Mock
+    ASPhysicalTypeMetadataProvider provider;
 
-    @Mock ProcessManager processManager;
+    @Mock
+    ProcessManager processManager;
 
-    @Mock FileDetails fileDetails;
+    @Mock
+    FileDetails fileDetails;
 
     private String metadataId;
 

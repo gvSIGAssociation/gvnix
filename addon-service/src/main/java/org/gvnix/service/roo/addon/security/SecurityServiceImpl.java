@@ -93,9 +93,12 @@ public class SecurityServiceImpl implements SecurityService {
     private static Logger LOGGER = Logger.getLogger(SecurityServiceImpl.class
             .getName());
 
-    @Reference private FileManager fileManager;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private AnnotationsService annotationsService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private AnnotationsService annotationsService;
 
     /**
      * {@inheritDoc}

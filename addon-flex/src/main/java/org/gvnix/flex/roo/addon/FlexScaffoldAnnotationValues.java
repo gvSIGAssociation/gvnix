@@ -29,7 +29,8 @@ import org.springframework.roo.model.JavaType;
  */
 public class FlexScaffoldAnnotationValues extends AbstractAnnotationValues {
 
-    @AutoPopulate JavaType entity = null;
+    @AutoPopulate
+    JavaType entity = null;
 
     public FlexScaffoldAnnotationValues(
             PhysicalTypeMetadata governorPhysicalTypeMetadata) {

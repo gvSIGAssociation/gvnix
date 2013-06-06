@@ -36,7 +36,8 @@ import org.springframework.roo.model.JavaType;
 @Service
 public class WSExportWsdlOperationsImpl implements WSExportWsdlOperations {
 
-    @Reference private WSExportWsdlConfigService wSExportWsdlConfigService;
+    @Reference
+    private WSExportWsdlConfigService wSExportWsdlConfigService;
 
     private static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
 

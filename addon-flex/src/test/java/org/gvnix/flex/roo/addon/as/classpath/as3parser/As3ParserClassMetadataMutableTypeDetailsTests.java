@@ -74,15 +74,20 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 
     private TestFileManager fileManager;
 
-    @Mock private MetadataService metadataService;
+    @Mock
+    private MetadataService metadataService;
 
-    @Mock private MetadataDependencyRegistry registry;
+    @Mock
+    private MetadataDependencyRegistry registry;
 
-    @Mock private ProcessManager processManager;
+    @Mock
+    private ProcessManager processManager;
 
-    @Mock private MutableFile updateFile;
+    @Mock
+    private MutableFile updateFile;
 
-    @Mock private PathResolver pathResolver;
+    @Mock
+    private PathResolver pathResolver;
 
     private String metadataId;
 

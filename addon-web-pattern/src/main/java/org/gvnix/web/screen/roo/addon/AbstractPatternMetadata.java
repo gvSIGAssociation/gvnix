@@ -1559,7 +1559,7 @@ public abstract class AbstractPatternMetadata extends
      * <code>@RequestMapping(params = { "form", "gvnixpattern=AplicacionListados2", "gvnixreference" }, method = RequestMethod.GET)</code>
      * 
      * @param patternName Pattern name to match on request mapping with
-     *            "gvnixpattern" attribute name.
+     *        "gvnixpattern" attribute name.
      * @return
      */
     protected AnnotationMetadataBuilder getRequestMapping(String patternName,

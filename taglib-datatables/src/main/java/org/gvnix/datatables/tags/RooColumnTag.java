@@ -54,8 +54,8 @@ public class RooColumnTag extends ColumnTag {
     private static final long serialVersionUID = -7713119991577135048L;
 
     // Logger
-    @SuppressWarnings("unused") private static Logger logger = LoggerFactory
-            .getLogger(RooColumnTag.class);
+    @SuppressWarnings("unused")
+    private static Logger logger = LoggerFactory.getLogger(RooColumnTag.class);
 
     /** Max displayed text length (default '-1'). Unlimited if negative. */
     private Integer maxLength = Integer.valueOf(-1);

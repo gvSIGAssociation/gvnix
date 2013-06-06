@@ -104,11 +104,11 @@ public class DatatablesUtils {
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations (optional) for each related entity to join
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to filter by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to order by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @return
@@ -128,11 +128,11 @@ public class DatatablesUtils {
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations (optional) for each related entity to join
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to filter by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to order by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param baseSearchValuesMap (optional) base filter values
@@ -156,11 +156,11 @@ public class DatatablesUtils {
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations (optional) for each related entity to join
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to filter by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to order by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param baseSearchValuesMap (optional) base filter values
@@ -203,11 +203,11 @@ public class DatatablesUtils {
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations (optional) for each related entity to join
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to filter by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to order by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
@@ -239,13 +239,13 @@ public class DatatablesUtils {
      * construction of type-safe SQL-like queries.
      * 
      * @param entity builder for entity to use in search. Represents the entity
-     *            and gives access to its properties for query purposes
+     *        and gives access to its properties for query purposes
      * @param filterByAssociations (optional) for each related entity to join
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to filter by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to order by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
@@ -270,7 +270,7 @@ public class DatatablesUtils {
      * construction of type-safe SQL-like queries.
      * 
      * @param entity builder for entity to use in search. Represents the entity
-     *            and gives access to its properties for query purposes
+     *        and gives access to its properties for query purposes
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
@@ -291,13 +291,13 @@ public class DatatablesUtils {
      * construction of type-safe SQL-like queries.
      * 
      * @param entity builder for entity to use in search. Represents the entity
-     *            and gives access to its properties for query purposes
+     *        and gives access to its properties for query purposes
      * @param filterByAssociations (optional) for each related entity to join
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to filter by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
      * @param orderByAssociations (optional) for each related entity to order
-     *            contain as key the name of the association and as value the
-     *            List of related entity fields to order by
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
@@ -686,10 +686,10 @@ public class DatatablesUtils {
      * @param totalDisplayRecords Amount of records found
      * @param columns {@link ColumnDef} list
      * @param datePatterns Patterns to convert Date fields to String. The Map
-     *            contains one pattern for each entity Date field keyed by field
-     *            name. For Roo compatibility the key could follow the pattern
-     *            {@code lower_case( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
-     *            too
+     *        contains one pattern for each entity Date field keyed by field
+     *        name. For Roo compatibility the key could follow the pattern
+     *        {@code lower_case( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
+     *        too
      * @param conversionService
      * @return
      */

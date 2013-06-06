@@ -185,7 +185,7 @@ public class WSExportMetadata extends
      * already exists.
      * 
      * @param annotationMetadata to check if exists SOAPBinding parameter type
-     *            value defined.
+     *        value defined.
      * @return the annotation is already exists or will be created, or null if
      *         it will not be created (required)
      */

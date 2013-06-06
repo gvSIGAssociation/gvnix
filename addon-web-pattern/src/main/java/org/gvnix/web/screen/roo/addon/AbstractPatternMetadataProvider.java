@@ -76,7 +76,7 @@ public abstract class AbstractPatternMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     protected abstract void activate(ComponentContext context);
 
@@ -86,7 +86,7 @@ public abstract class AbstractPatternMetadataProvider extends
      * command)
      * 
      * @param context the component context can be used to get access to the
-     *            OSGi container (ie find out if certain bundles are active)
+     *        OSGi container (ie find out if certain bundles are active)
      */
     protected abstract void deactivate(ComponentContext context);
 

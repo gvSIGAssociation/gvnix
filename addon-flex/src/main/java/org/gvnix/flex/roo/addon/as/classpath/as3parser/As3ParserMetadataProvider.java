@@ -53,19 +53,23 @@ import org.springframework.roo.project.PathResolver;
 public class As3ParserMetadataProvider implements
         ASMutablePhysicalTypeMetadataProvider, FileEventListener {
 
-    @Reference private FileManager fileManager;
+    @Reference
+    private FileManager fileManager;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference private PathResolver pathResolver; // TODO - Is this the correct
-                                                  // way to get the
-                                                  // FlexPathResolver, or should
-                                                  // we
-                                                  // look it up the way
-                                                  // JavaParserMetadataProvider
-                                                  // does
+    @Reference
+    private PathResolver pathResolver; // TODO - Is this the correct
+                                       // way to get the
+                                       // FlexPathResolver, or should
+                                       // we
+                                       // look it up the way
+                                       // JavaParserMetadataProvider
+                                       // does
 
     protected void activate(ComponentContext context) {
     }
