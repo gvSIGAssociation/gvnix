@@ -462,9 +462,10 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         // Get realted object PK accesor
         final MethodMetadata idAccesor = persistenceMemberLocator
                 .getIdentifierAccessor(propertyType);
-        
+
         // #9561: Avoid NullPointerException in strange cases
-        if (idAccesor == null) return StringUtils.EMPTY;
+        if (idAccesor == null)
+            return StringUtils.EMPTY;
 
         final JavaType reltatedObjecIdType = idAccesor.getReturnType();
 
