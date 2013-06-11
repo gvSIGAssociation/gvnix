@@ -68,8 +68,7 @@ public class MessageBundleUtils {
                 .getIdentifier(webappPath, "");
 
         // Install message bundle
-        String messageBundle = targetDirectory
-                .concat("WEB-INF/i18n/messages_")
+        String messageBundle = targetDirectory.concat("WEB-INF/i18n/messages_")
                 .concat(i18n.getLocale().getLanguage()).concat(".properties");
 
         // Special case for English locale (default)
