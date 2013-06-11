@@ -18,14 +18,7 @@
     </c:if>
     <spring:message arguments="${labelPlural}" code="entity_list_all" var="title_msg" htmlEscape="false" />
     <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
-      <c:choose>
-        <c:when test="${not empty items}">
-          <jsp:doBody />
-        </c:when>
-        <c:otherwise>
-          <spring:message arguments="${label}" code="entity_not_found" />
-        </c:otherwise>
-      </c:choose>
+        <jsp:doBody />
     </util:panel>
   </c:if>
 </jsp:root>

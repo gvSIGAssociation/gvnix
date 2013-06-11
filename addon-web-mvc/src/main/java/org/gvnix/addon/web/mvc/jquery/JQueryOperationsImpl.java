@@ -171,7 +171,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         // List of pages to update
         List<String> pageList = new ArrayList<String>();
         Collections.addAll(pageList, "dataAccessFailure", "resourceNotFound",
-                "uncaughtException", "index");
+                "uncaughtException", "index", "login");
 
         // 3rd party add-ons could customize default Roo tags as gvNIX does,
         // to avoid to overwrite them with jQuery namespaces we will update

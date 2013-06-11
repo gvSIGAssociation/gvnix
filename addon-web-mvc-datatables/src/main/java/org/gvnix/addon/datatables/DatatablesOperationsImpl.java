@@ -275,10 +275,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + controller.getSimpleTypeName() + "'");
 
-        Map<String, String> uriMap = new HashMap<String, String>(2);
+        Map<String, String> uriMap = new HashMap<String, String>(1);
 
         uriMap.put("xmlns:table", "urn:jsptagdir:/WEB-INF/tags/datatables");
-        uriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/datatables");
 
         WebProjectUtils.updateTagxUriInJspx(controllerPath, "list", uriMap,
                 projectOperations, fileManager);
