@@ -62,18 +62,20 @@ public class MessageBundleUtils {
             logger.warning("could not parse language choice");
             return;
         }
-
+        LogicalPath webappPath = WebProjectUtils
+                .getWebappPath(projectOperations);
         String targetDirectory = projectOperations.getPathResolver()
-                .getIdentifier(
-                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "");
+                .getIdentifier(webappPath, "");
 
         // Install message bundle
-        String messageBundle = targetDirectory + "/WEB-INF/i18n/messages_"
-                + i18n.getLocale().getLanguage() + ".properties";
+        String messageBundle = targetDirectory
+                .concat("WEB-INF/i18n/messages_")
+                .concat(i18n.getLocale().getLanguage()).concat(".properties");
+
         // Special case for English locale (default)
         if (i18n.getLocale().equals(Locale.ENGLISH)) {
             messageBundle = targetDirectory
-                    + "/WEB-INF/i18n/messages.properties";
+                    .concat("WEB-INF/i18n/messages.properties");
         }
         if (!fileManager.exists(messageBundle)) {
             OutputStream outputStream = null;
@@ -87,7 +89,7 @@ public class MessageBundleUtils {
             catch (IOException e) {
 
                 throw new IllegalStateException(
-                        "Encountered an error during copying of message bundle MVC JSP addon.",
+                        "Error during copying of message bundle MVC JSP addon",
                         e);
             }
             finally {
@@ -99,12 +101,12 @@ public class MessageBundleUtils {
     }
 
     /**
-     * Adds I18n properties to the specified message bundle file. The file is
-     * given by the language parameter.
-     * <p>
+     * Copy properties associated with the given class to the message bundle of
+     * given language.
+     * <p/>
      * Note that properties to add are taken from messages[_xx].properties files
      * and added to messages[_xx].properties in the destination project.
-     * <p>
+     * <p/>
      * <strong>This method doesn't check if messages[_xx].properties file exist
      * in the add-on invoking it</strong>
      * 
@@ -120,44 +122,43 @@ public class MessageBundleUtils {
             Class invokingClass, PropFileOperations propFileOperations,
             ProjectOperations projectOperations, FileManager fileManager) {
         Properties properties = new Properties();
-        String propertiesFolderPath = "/".concat(
+        LogicalPath webappPath = WebProjectUtils
+                .getWebappPath(projectOperations);
+
+        String sourcePropertyFile = "/".concat(
                 invokingClass.getPackage().getName()).replace('.', '/');
+
         // Take "en" as default language
-        String messageBundleRelativeFilePath = "/WEB-INF/i18n/messages.properties";
-        String messageBundle = projectOperations.getPathResolver()
-                .getIdentifier(
-                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                        messageBundleRelativeFilePath);
+        String targetFilePath = "/WEB-INF/i18n/messages.properties";
+        String targetFile = projectOperations.getPathResolver().getIdentifier(
+                webappPath, targetFilePath);
+
         try {
             if (language == "en") {
-                propertiesFolderPath = propertiesFolderPath
+                sourcePropertyFile = sourcePropertyFile
                         .concat("/messages.properties");
                 properties.load(invokingClass
-                        .getResourceAsStream(propertiesFolderPath));
+                        .getResourceAsStream(sourcePropertyFile));
             }
             else {
-                messageBundleRelativeFilePath = "/WEB-INF/i18n/messages_"
-                        .concat(language).concat(".properties");
-                messageBundle = projectOperations.getPathResolver()
-                        .getIdentifier(
-                                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP,
-                                        ""), messageBundleRelativeFilePath);
+                targetFilePath = "/WEB-INF/i18n/messages_".concat(language)
+                        .concat(".properties");
+                targetFile = projectOperations.getPathResolver().getIdentifier(
+                        webappPath, targetFilePath);
 
-                propertiesFolderPath = propertiesFolderPath.concat("/messages_"
-                        + language + ".properties");
+                sourcePropertyFile = sourcePropertyFile.concat("/messages_"
+                        .concat(language).concat(".properties"));
                 properties.load(invokingClass
-                        .getResourceAsStream(propertiesFolderPath));
+                        .getResourceAsStream(sourcePropertyFile));
             }
 
-            if (fileManager.exists(messageBundle)) {
-                propFileOperations.addProperties(
-                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                        messageBundleRelativeFilePath,
+            if (fileManager.exists(targetFile)) {
+                propFileOperations.addProperties(webappPath, targetFilePath,
                         new HashMap<String, String>((Map) properties), true,
                         true);
             }
             else {
-                logger.warning(messageBundle
+                logger.warning(targetFile
                         .concat(" file doesn't exist in project."));
             }
         }

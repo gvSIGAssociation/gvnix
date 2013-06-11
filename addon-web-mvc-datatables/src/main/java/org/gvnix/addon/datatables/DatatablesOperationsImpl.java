@@ -79,9 +79,6 @@ import org.w3c.dom.Node;
  * @author gvNIX Team
  * @since 1.1
  */
-/**
- * @author jmvivo
- */
 @Component
 @Service
 public class DatatablesOperationsImpl extends AbstractOperations implements
@@ -388,15 +385,11 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 projectOperations, depens);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.gvnix.addon.datatables.DatatablesOperations#updateTags()
-     */
     @Override
     public void updateTags() {
         PathResolver pathResolver = projectOperations.getPathResolver();
-        LogicalPath webappPath = getWebappPath();
+        LogicalPath webappPath = WebProjectUtils
+                .getWebappPath(projectOperations);
 
         // images
         OperationUtils.updateDirectoryContents("images/datatables/*.*",
@@ -427,13 +420,6 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                         "/WEB-INF/tags/datatables"), true);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.gvnix.addon.datatables.DatatablesOperations#cleanListMenuUrl(org.
-     * springframework.roo.model.JavaType)
-     */
     @Deprecated
     public void updateListMenuUrl(JavaType controller) {
 
@@ -483,17 +469,6 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 MenuOperations.DEFAULT_MENU_ITEM_PREFIX, webappPath);
     }
 
-    private LogicalPath getWebappPath() {
-        return LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP,
-                projectOperations.getFocusedModuleName());
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.gvnix.addon.datatables.DatatablesOperations#addJSToLoadScriptTag()
-     */
     public void addJSToLoadScriptsTag() {
 
         List<Pair<String, String>> cssList = new ArrayList<Pair<String, String>>();
@@ -528,17 +503,12 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 projectOperations, fileManager);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.gvnix.addon.datatables.DatatablesOperations#updateWebMvcConfigFile()
-     */
     @Override
     public void updateWebMvcConfigFile() {
+        LogicalPath webappPath = WebProjectUtils
+                .getWebappPath(projectOperations);
         String webMvcXmlPath = projectOperations.getPathResolver()
-                .getIdentifier(getWebappPath(),
-                        "WEB-INF/spring/webmvc-config.xml");
+                .getIdentifier(webappPath, "WEB-INF/spring/webmvc-config.xml");
         Validate.isTrue(fileManager.exists(webMvcXmlPath),
                 "webmvc-config.xml not found");
 
@@ -606,16 +576,12 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.gvnix.addon.datatables.DatatablesOperations#updateWebXmlFile()
-     */
     @Override
     public void updateWebXmlFile() {
+        LogicalPath webappPath = WebProjectUtils
+                .getWebappPath(projectOperations);
         String webXmlPath = projectOperations.getPathResolver().getIdentifier(
-                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/web.xml");
+                webappPath, "WEB-INF/web.xml");
         Validate.isTrue(fileManager.exists(webXmlPath), "web.xml not found");
 
         MutableFile webXmlMutableFile = null;
@@ -724,11 +690,6 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.gvnix.addon.datatables.DatatablesOperations#copyPropertiesFile()
-     */
     @Override
     public void copyPropertiesFile() {
         PathResolver pathResolver = projectOperations.getPathResolver();
@@ -742,11 +703,6 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.gvnix.addon.datatables.DatatablesOperations#addI18nKeys()
-     */
     @Override
     public void addI18nKeys() {
         // Check if Valencian_Catalan language is supported and add properties
@@ -763,6 +719,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 break;
             }
         }
+
         // Add properties to Spanish messageBundle
         MessageBundleUtils.installI18nMessages(new SpanishLanguage(),
                 projectOperations, fileManager);

@@ -33,6 +33,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.jpa.query.JpaQueryMetadata;
 import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
+import org.gvnix.support.PhysicalTypeUtils;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.finder.DynamicFinderServicesImpl;
 import org.springframework.roo.addon.finder.FieldToken;
@@ -53,7 +54,9 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnno
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.customdata.CustomDataKeys;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
@@ -133,8 +136,11 @@ public final class DatatablesMetadataProvider extends
 
         WebScaffoldAnnotationValues webScaffoldAnnotationValues = webScaffoldMetadata
                 .getAnnotationValues();
-        // Get formBackingObject
+
+        // Get formBackingObject and its logical path
         JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
+        LogicalPath entityPath = PhysicalTypeUtils.getPath(entity,
+                typeLocationService);
 
         // Get batch service (if any)
         String webJpaBatchMetadataId = WebJpaBatchMetadata.createIdentifier(
@@ -143,14 +149,16 @@ public final class DatatablesMetadataProvider extends
                 .get(webJpaBatchMetadataId);
 
         String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
-                path);
+                entityPath);
         JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
                 .get(jpaMetadataId);
+
         if (jpaMetadata == null) {
             // Unsupported type (by now)
             return null;
         }
-        // register dependency to JPA Actuve record
+
+        // register dependency to JPA Active record
         metadataDependencyRegistry.registerDependency(jpaMetadataId,
                 metadataIdentificationString);
 
