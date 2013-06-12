@@ -59,26 +59,28 @@ public final class JQueryMetadataProvider extends AbstractItdMetadataProvider {
      */
     protected void activate(ComponentContext context) {
 
-        // Registrar este Provider como generador relacionado con el type
-        // que proporciona
-        // Cuando ocurre un cambio en una clase java se invoca el método
-        // notify() del AbstractProvider registrado como upstream que invoca
-        // el método get() (vía
-        // metadataService.evictAndGet(downstreamDependency);)
-        // del downstream que realizará la generación del .aj
+        // Register this Provider as type generator, in particular for
+        // provided type (see getProvidesType() method)
+        // When a change occur in provided type, Roo calls 
+        // {@link AbstractItdMetadataProvider#notify()} method, given as
+        // upstream parameter the meta-data identifier of notifier and 
+        // as downstream parameter the meta-data identifier of the target
+        // that will take the actions as response to that type change, i.e.
+        // generate the ITD file (.aj)
         metadataDependencyRegistry.registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
 
-        // Si no se registra al menos una anotación, el provider no generará
-        // ningún .aj. Generará los .aj para aquellas clases anotadas con
-        // la anotación pasada como parámetro
+        // At least one annotation must be registered, otherwise the Provider
+        // won't generate any ITD (.aj)
+        // Only ITD (.aj) for Java types annotated with this annotation will
+        // be generated
         addMetadataTrigger(new JavaType(GvNIXWebJQuery.class.getName()));
 
-        // TODO: Los eventos recibidos por registrar registerDependency()
-        // entran por notify()
-        // Los eventos disparados/recibidos por el trigger entran directamente
-        // en el {@link #get(String)} para crear el metadato
+        // The handler for stream dependencies ( registerDependency() method )
+        // register is Provider#notify() method
+        // Whereas the handler for meta-data triggers ( addMetadataTrigger() 
+        // method ) is Provider#get() of Provider#getMetadata() method
     }
 
     /**

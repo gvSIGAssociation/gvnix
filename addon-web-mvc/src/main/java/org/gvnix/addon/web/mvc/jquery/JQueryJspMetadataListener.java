@@ -187,19 +187,23 @@ public class JQueryJspMetadataListener implements MetadataProvider,
 
         if (MetadataIdentificationUtils
                 .isIdentifyingClass(downstreamDependency)) {
-            // A physical Java type has changed, and determine what the
-            // corresponding local metadata identification string would have
-            // been
+
+            // If source meta-data identification (requester/notifier) is
+            // JQueryMetadata
             if (JQueryMetadata.isValid(upstreamDependency)) {
                 final JavaType controller = JQueryMetadata
                         .getJavaType(upstreamDependency);
                 final LogicalPath path = JQueryMetadata
                         .getPath(upstreamDependency);
-                // TODO Construir el identificador específico del downstream
-                // para la clase indicada en el upstream
+
+                // Create the target meta-data identification that will
+                // receive the notification
                 downstreamDependency = JQueryJspMetadata.createIdentifier(
                         controller, path);
             }
+
+            // If source meta-data identification (requester/notifier) is
+            // WebFinderMetadata
             else if (WebFinderMetadata.isValid(upstreamDependency)) {
                 final JavaType controller = WebFinderMetadata
                         .getJavaType(upstreamDependency);
@@ -209,7 +213,7 @@ public class JQueryJspMetadataListener implements MetadataProvider,
                         controller, path);
             }
             else {
-                // not or register dependency: nothing to do
+                // dependency not handled: nothing to do
                 return;
             }
 
@@ -222,9 +226,13 @@ public class JQueryJspMetadataListener implements MetadataProvider,
                 return;
             }
 
-            // TODO: Automáticamente registra/cache el nuevo ID generado
-            // asociado al upstream, de tal forma que sucesivas invocaciones
-            // la condición del if anterior será true
+            // Notify to target meta-data identification, simply call
+            // of the meta-data Provider. In this case the downstream is  
+            // JQueryJspMetadata then  
+            // {@link JQueryJspMetadataListener#get(String)} will be called
+            // Note that evictAndGet method register downstreamDependency below
+            // related to current upstreamDependency automatically, so next
+            // method executions the if condition above will be true
             metadataService.evictAndGet(downstreamDependency);
         }
     }

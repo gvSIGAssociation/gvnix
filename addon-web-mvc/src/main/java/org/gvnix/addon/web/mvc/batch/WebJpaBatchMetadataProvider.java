@@ -165,12 +165,13 @@ public final class WebJpaBatchMetadataProvider extends
 
     /**
      * If the given governor is a layer component (service, repository, etc.)
-     * that manages an service for which we maintain web scaffold metadata,
-     * returns the ID of that metadata, otherwise returns <code>null</code>.
+     * that manages an service for which we maintain web scaffold met-adata,
+     * returns the ID of that meta-data, otherwise returns <code>null</code>.
+     * <p/>
      * TODO doesn't handle the case where the governor is a component that
      * manages multiple entities, as it always returns the MID for the first
-     * service found (in annotation order) for which we provide web metadata. We
-     * would need to enhance
+     * service found (in annotation order) for which we provide web meta-data.
+     * We would need to enhance
      * {@link AbstractMemberDiscoveringItdMetadataProvider#getLocalMidToRequest}
      * to return a list of MIDs, rather than only one.
      * 
@@ -184,12 +185,10 @@ public final class WebJpaBatchMetadataProvider extends
             for (final JavaType type : governorTypeDetails.getLayerEntities()) {
                 final String localMid = entityToBatchMidMap.get(type);
                 if (localMid != null) {
-                    /*
-                     * The ITD's governor is a layer component that manages an
-                     * service for which we maintain web scaffold metadata =>
-                     * refresh that MD in case a layer has appeared or gone
-                     * away.
-                     */
+                     // The ITD's governor is a layer component that manages an
+                     // service for which we maintain web scaffold metadata =>
+                     // refresh that MD in case a layer has appeared or gone
+                     // away.
                     return localMid;
                 }
             }
