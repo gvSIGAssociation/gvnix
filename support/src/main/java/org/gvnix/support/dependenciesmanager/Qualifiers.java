@@ -31,7 +31,8 @@ public enum Qualifiers {
 
     RELEASE("RELEASE"), EMPTY(""), SNAPSHOT("SNAPSHOT");
 
-    private String qualifier;
+    @SuppressWarnings("unused")
+	private String qualifier;
 
     private Qualifiers(String qualifier) {
         this.qualifier = qualifier;
