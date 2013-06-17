@@ -61,9 +61,9 @@ public final class JQueryMetadataProvider extends AbstractItdMetadataProvider {
 
         // Register this Provider as type generator, in particular for
         // provided type (see getProvidesType() method)
-        // When a change occur in provided type, Roo calls 
+        // When a change occur in provided type, Roo calls
         // {@link AbstractItdMetadataProvider#notify()} method, given as
-        // upstream parameter the meta-data identifier of notifier and 
+        // upstream parameter the meta-data identifier of notifier and
         // as downstream parameter the meta-data identifier of the target
         // that will take the actions as response to that type change, i.e.
         // generate the ITD file (.aj)
@@ -79,7 +79,7 @@ public final class JQueryMetadataProvider extends AbstractItdMetadataProvider {
 
         // The handler for stream dependencies ( registerDependency() method )
         // register is Provider#notify() method
-        // Whereas the handler for meta-data triggers ( addMetadataTrigger() 
+        // Whereas the handler for meta-data triggers ( addMetadataTrigger()
         // method ) is Provider#get() of Provider#getMetadata() method
     }
 

@@ -185,10 +185,10 @@ public final class WebJpaBatchMetadataProvider extends
             for (final JavaType type : governorTypeDetails.getLayerEntities()) {
                 final String localMid = entityToBatchMidMap.get(type);
                 if (localMid != null) {
-                     // The ITD's governor is a layer component that manages an
-                     // service for which we maintain web scaffold metadata =>
-                     // refresh that MD in case a layer has appeared or gone
-                     // away.
+                    // The ITD's governor is a layer component that manages an
+                    // service for which we maintain web scaffold metadata =>
+                    // refresh that MD in case a layer has appeared or gone
+                    // away.
                     return localMid;
                 }
             }

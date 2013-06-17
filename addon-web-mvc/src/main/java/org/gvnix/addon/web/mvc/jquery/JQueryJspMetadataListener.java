@@ -227,8 +227,8 @@ public class JQueryJspMetadataListener implements MetadataProvider,
             }
 
             // Notify to target meta-data identification, simply call
-            // of the meta-data Provider. In this case the downstream is  
-            // JQueryJspMetadata then  
+            // of the meta-data Provider. In this case the downstream is
+            // JQueryJspMetadata then
             // {@link JQueryJspMetadataListener#get(String)} will be called
             // Note that evictAndGet method register downstreamDependency below
             // related to current upstreamDependency automatically, so next
