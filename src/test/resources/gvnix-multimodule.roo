@@ -1,0 +1,28 @@
+script --file multimodule.roo
+//occ checksum all
+module focus --moduleName ui/mvc
+theme list
+theme install --id cit
+//theme set --id cit
+web mvc install language --code ca
+//menu setup
+//menu tree
+//web mvc dialog setup
+//web mvc dialog exception add --exception java.lang.Exception --title "Ha ocurrido un error" --description "Se ha producido un error deconocido" --language es
+//web mvc dialog add --class ~.web.PetController --name petdialog
+//web mvc binding stringTrimmer
+//web mvc pattern setup
+//web mvc pattern master --class ~.web.OwnerController --type register --name owner_pets
+//web mvc pattern detail --class ~.web.OwnerController --type tabular --name owner_pets --field pets
+//web report setup
+//web report add --controller ~.web.VisitController --reportName visits_report
+//menu entry add --label my_test
+//remote service class --class ~.services.Clase
+//remote service operation --name checkString --service ~.services.Clase
+//remote service define ws --class ~.services.Clase
+//remote service operation --name returnString --service ~.services.Clase --return java.lang.String --exceptions java.lang.Exception
+//remote service export operation --class ~.services.Clase --method returnString --resultName resultado
+//remote service import ws --class ~.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
+//configuration create --name test
+//configuration property add --name hibernate.hbm2ddl.auto
+//configuration export

@@ -173,6 +173,21 @@
 	cd ..
 	echo datatables end
 
+	## datatables-multimodule
+	echo datatables-multimodule start
+	mkdir datatables-multimodule
+	cd datatables-multimodule
+	$1/gvnix.sh script --file $2/code/addon-web-mvc-datatables/src/test/resources/datatables-multimodule.roo --lineNumbers true
+	mkdir target
+    # Get datatable list pages
+	wget --retry-connrefused -O target/pets.html http://localhost:8080/petclinic/pets &
+	wget --retry-connrefused -O target/owners.html http://localhost:8080/petclinic/owners &
+	wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits &
+	wget --retry-connrefused -O target/vets.html http://localhost:8080/petclinic/vets &
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	cd ..
+	echo datatables-multimodule end
+
 	## datatables-test
 	echo datatables-test start
 	mkdir datatables-test
@@ -646,6 +661,23 @@
 	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo script end
+	
+	## gvnix-multimodule
+##  echo gvnix-multimodule start
+##  mkdir gvnix-multimodule
+##  cd gvnix-multimodule
+##  $1/gvnix.sh script --file $2/code/src/main/resources/gvnix-multimodule.roo --lineNumbers true
+##  # Request the home URL
+##  wget --retry-connrefused -O target/home.html http://localhost:8080/petclinic/ &
+##  # Get home a non home pages in ca language
+##  wget --retry-connrefused -O target/homeca.html http://localhost:8080/petclinic/?lang=ca &
+##  wget --retry-connrefused -O target/petsca.html http://localhost:8080/petclinic/pets?lang=ca &
+##  # Get services summary page and available WSDLs
+##  wget --retry-connrefused -O target/services.html http://localhost:8080/petclinic/services/ &
+##  wget --retry-connrefused -O target/clase.wsdl http://localhost:8080/petclinic/services/Clase?wsdl &
+##  mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+##  cd ..
+##  echo gvnix-multimodule end
 	
 	## tiendavirtual
 	echo tiendavirtual start
