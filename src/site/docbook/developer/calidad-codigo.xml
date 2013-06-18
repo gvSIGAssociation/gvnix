@@ -172,7 +172,7 @@
       </listitem>
       
       <listitem>
-      	<para></para>
+      	<para>Precauciones a tener en cuenta en el código fuente de los proyectos generados para mejorar la puntuación de SONAR:</para>
         <itemizedlist>
       		<listitem>
       			<para>Algunos if que no usan llaves</para>
@@ -203,7 +203,7 @@
     y como ejecutarlo sobre un proyecto generado por gvNIX o sobre el propio framework. No se
     describen la instalación del servido y su gestión.</para>
     
-    <section xml:lang="es">
+    <section xml:id="calidad-codigo_lanzar-proceso-comprobacion-settings"  xml:lang="es">
        <title xml:lang="es">Configuración del entorno para lanzar el análisis de Sonar</title>
 
        <para>Para que el plugin de maven sea capaz de conectarse al servidor de Sonar es necesario
@@ -294,6 +294,56 @@
       para instalar, configurar y usar este plugin se encuentra en 
       <link xlink:href="http://docs.codehaus.org/display/SONAR/Using+Sonar+in+Eclipse">
           documentación de sonar</link> al respecto</para>
+    </section>
+    
+    <section xml:lang="es">
+      <title xml:lang="es">Establecer el perfil para la aplicación</title>
+      
+      <para>Una vez analizado un proyecto por primera vez es posible
+      establecer el perfil de reglas que se deben aplicar al proyecto.
+      Para ello es necesario seguir los siguiente pasos:
+        <itemizedlist>
+      		<listitem>
+      			<para>Entrar en http://hq02.disid.com:9000</para>
+				<para>Logarse como Administrador</para>
+				<para>Seleccionar el proyecto desde el menú Proyectos</para>
+				<para>Seleccionar en el menú Configuración del proyecto
+				(debajo del input buscar, en la parte derecha)
+				y seleccionar Perfiles de calidad</para>
+				<para>Seleccionar el perfil a usar para Java</para>
+	  </para>
+    </section>
+
+    <section xml:lang="es">
+      <title xml:lang="es">Exportar/importar perfiles de calidad</title>
+      
+      <para>Es posible exportar e importar los perfiles de calidad.</para>
+      
+      <para>Exportar:
+        <itemizedlist>
+      		<listitem>
+      			<para>Entrar en http://hq02.disid.com:9000</para>
+				<para>Entrar en el menú Configuración de sonar (en la parte derecha de la barra superior, a la izquierda del input buscar).</para>
+				<para>Seleccionar Perfiles de calidad</para>
+				<para>Seleccionar el perfil a exportar</para>
+				<para>Pulsar sobre pestaña Enlaces permanentes</para>
+				<para>Descargar el fichero del link Todas las reglas</para>
+	  </para>
+
+      <para>Importar:
+        <itemizedlist>
+      		<listitem>
+      			<para>Entrar en http://hq02.disid.com:9000</para>
+				<para>Logarse como Administrador</para>
+				<para>Entrar en el menú Configuración de sonar (en la parte derecha de la barra superior, a la izquierda del input buscar).</para>
+				<para>Seleccionar Perfiles de calidad</para>
+				<para>Pulsar sobre Restaurar perfil (en la parte derecha arriba)</para>
+				<para>Seleccionar el archivo de la exportación.</para>
+				<para>Pulsar Restaurar</para>
+	  </para>
+	  
+	  <para>El fichero de reglas utilizado en eXcentia se puede encontrar en
+	  http://scmcit.gva.es/svn/gvnix/trunk/doc/general/sonar/export-excentia-sonar.xml</para>
     </section>
 
   </section>

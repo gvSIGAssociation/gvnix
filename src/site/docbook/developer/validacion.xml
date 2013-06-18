@@ -208,5 +208,44 @@
   	<para xml:lang="es">Es necesario tener instalados los plugins <emphasis>Run Condition Plugin</emphasis>
   	y <emphasis>Text-finder Plugin</emphasis>.</para>
   </section>  
-  
+
+  <section>
+  	<title xml:lang="es">Calidad de código con SONAR</title>
+
+  	<para xml:lang="es">Servidor Jenkins: http://dailybuild.disid.com:8081/</para>
+  	<para xml:lang="es">Servidor Sonar: http://http://hq02.disid.com:9000/</para>
+  	
+	<para xml:lang="es">Configurar el servidor Jenkins tal y como se indica en <link
+	linkend="calidad-codigo_lanzar-proceso-comprobacion-settings">
+	Configuración del entorno para lanzar el análisis de Sonar</link>.</para>
+
+  	<para xml:lang="es">También será necesario disponer desde Jenkins del siguiente software instalado:
+  	Maven 3.0.X (mayor revisión) y Java 1.6.X (mayor revisión).</para> 
+  	
+  	<para xml:lang="es">Se descarga el código de http://scmcit.gva.es/svn/gvnix/trunk/code
+  	haciendo una descarga limpia del código (delete and checkout) para ejecutar el análisis con la
+  	última versión de código disponible y sin posibles cambios locales. La fecha y hora del
+  	servidor debe ser correcta para asegurar que las descargas de código sean correctas.</para>
+  	
+  	<para xml:lang="es">La tarea de análisis se ejecuta todos los días a las 5am.</para>
+  	
+  	<para xml:lang="es">Se ejecuta el siguiente comando maven a partir del código fuente
+  	para compilar, empaquetar e instalar:
+	<command>clean install -Dgpg.skip=true</command>
+  	</para>
+  	
+  	<para xml:lang="es">Se ejecuta el siguiente comando maven a partir del código fuente
+  	para ejecutar el análisis:
+  	<command>sonar:sonar -Dgpg.skip=true</command>
+  	</para>
+  	
+  	<para xml:lang="es">Una vez finalice el análisis se puede consultar el resultado en
+  	http://hq02.disid.com:9000</para>
+  	
+  	<para xml:lang="es">Se avisa por correo de ejecuciones erróneas al responsable técnico del proyecto 
+  	y a las personas que hayan producido el error. Para ello, debe estar configurado en el sistema
+  	de build continuo el servidor de correo saliente a mail.disid.com y el sufijo de email por defecto
+  	a @disid.com.</para>
+  </section>  
+
 </chapter>
