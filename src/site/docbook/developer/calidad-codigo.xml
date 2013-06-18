@@ -149,6 +149,43 @@
       		<emphasis>en vez de</emphasis> <literal>Map.keySet</literal></para>
       	<para>El coste de iteración es el mismo y se obtiene la clave y el valor a la vez.</para>
       </listitem>
+      
+      <listitem>
+      	<para>Precauciones a tener en cuenta en el código fuente del framework para mejorar la puntuación de SONAR:</para>
+        <itemizedlist>
+      		<listitem>
+      			<para>Ver si es posible evitar el uso de Set<ULR> en addon de temas (puede ser un grave problema de rendimiento)</para>
+      		</listitem>
+      		<listitem>
+      			<para>Evitar catch vacios: Ver la posibilidad de log o usar apache commons para cerrar conexiones.</para>
+      		</listitem>
+      		<listitem>
+      			<para>Arreglar algunos new XXXException(... sin el throw</para>
+      		</listitem>
+      		<listitem>
+      			<para>Algunas comprobaciones de is null.</para>
+      		</listitem>
+      		<listitem>
+      			<para>Limpiar algunas variable no usadas.</para>
+      		</listitem>
+    	</itemizedlist>  	
+      </listitem>
+      
+      <listitem>
+      	<para></para>
+        <itemizedlist>
+      		<listitem>
+      			<para>Algunos if que no usan llaves</para>
+      		</listitem>
+      		<listitem>
+      			<para>Añadir la generación de los test para las entidades</para>
+      		</listitem>
+      		<listitem>
+      			<para>Parece que en algún sitio del los aj (creo que en el equals) hay alguna comprobación de null que se podría mejorar.</para>
+      		</listitem>
+    	</itemizedlist>  	
+      </listitem>
+      
     </itemizedlist>
   </section>
   
