@@ -234,6 +234,12 @@ public class PatternServicesImpl implements PatternService {
         ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
                 .getTypeDetails(controller);
 
+        // The Java source type exists ?
+        if (controllerDetails == null) {
+            throw new IllegalArgumentException("Cannot locate source for '"
+                    + controller.getFullyQualifiedTypeName() + "'");
+        }
+
         // Test if has the @RooWebScaffold
         Validate.notNull(
                 MemberFindingUtils.getAnnotationOfType(
