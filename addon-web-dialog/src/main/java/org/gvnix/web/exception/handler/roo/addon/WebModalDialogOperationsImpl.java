@@ -44,6 +44,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.OperationUtils;
+import org.gvnix.support.WebProjectUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
@@ -138,7 +139,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
     public boolean isProjectAvailable() {
         return OperationUtils.isProjectAvailable(metadataService,
                 projectOperations)
-                && OperationUtils.isSpringMvcProject(metadataService,
+                && WebProjectUtils.isSpringMvcProject(metadataService,
                         fileManager, projectOperations);
     }
 
@@ -276,7 +277,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         setupMavenDependency();
 
         // install Dialog Bean
-        OperationUtils.installWebDialogClass(
+        WebProjectUtils.installWebDialogClass(
                 getControllerFullyQualifiedPackage().concat(".dialog"),
                 pathResolver, fileManager);
 
@@ -620,9 +621,6 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/layouts/default.jspx");
 
-        // TODO: Check if it's necessary to add message-box in home-default.jspx
-        // layout (when exists)
-
         if (!fileManager.exists(defaultJspx)) {
             // layouts/default.jspx doesn't exist, so nothing to do
             return;
@@ -740,9 +738,6 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/layouts/default.jspx");
 
-        // TODO: Check if it's necessary to add message-box in home-default.jspx
-        // layout (when exists)
-
         if (!fileManager.exists(defaultJspx)) {
             // layouts/default.jspx doesn't exist, so nothing to do
             return false;
@@ -761,9 +756,15 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
         Element lsHtml = defaultJspxXml.getDocumentElement();
 
-        // Check if dialog:message-box is of type modal
         String dialogNS = lsHtml.getAttribute("xmlns:dialog");
-        if (dialogNS.equals("urn:jsptagdir:/WEB-INF/tags/dialog/modal")) {
+        if (dialogNS.isEmpty()) {
+            // If no namespace, perhaps default.jspx overwrite by theme:
+            // then update it another time
+            addMessageBoxInLayout();
+            return true;
+        }
+        else if (dialogNS.equals("urn:jsptagdir:/WEB-INF/tags/dialog/modal")) {
+            // Check if dialog:message-box is of type modal
             return true;
         }
 

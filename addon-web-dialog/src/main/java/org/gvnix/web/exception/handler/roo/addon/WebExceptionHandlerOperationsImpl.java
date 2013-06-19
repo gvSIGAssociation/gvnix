@@ -40,6 +40,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.OperationUtils;
+import org.gvnix.support.WebProjectUtils;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
@@ -1089,7 +1090,7 @@ public class WebExceptionHandlerOperationsImpl implements
     public boolean isProjectAvailable() {
         return OperationUtils.isProjectAvailable(metadataService,
                 projectOperations)
-                && OperationUtils.isSpringMvcProject(metadataService,
+                && WebProjectUtils.isSpringMvcProject(metadataService,
                         fileManager, projectOperations);
     }
 

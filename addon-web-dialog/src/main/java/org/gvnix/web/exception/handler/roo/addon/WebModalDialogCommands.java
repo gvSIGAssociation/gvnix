@@ -49,7 +49,6 @@ public class WebModalDialogCommands implements CommandMarker {
     public boolean isSetupGvNIXModalDialogAvailable() {
         return modalDialogOperations.isProjectAvailable()
                 && exceptionOperations.isExceptionMappingAvailable();
-        // && !modalDialogOperations.isMessageBoxOfTypeModal();
     }
 
     @CliCommand(value = "web mvc dialog setup", help = "Setup support for Modal Dialogs in current project.")
