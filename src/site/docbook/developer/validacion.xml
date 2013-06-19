@@ -213,7 +213,7 @@
   	<title xml:lang="es">Calidad de código con SONAR</title>
 
   	<para xml:lang="es">Servidor Jenkins: http://dailybuild.disid.com:8081/</para>
-  	<para xml:lang="es">Servidor Sonar: http://http://hq02.disid.com:9000/</para>
+  	<para xml:lang="es">Servidor Sonar: http://hq02.disid.com:9000/</para>
   	
 	<para xml:lang="es">Configurar el servidor Jenkins tal y como se indica en <link
 	linkend="calidad-codigo_lanzar-proceso-comprobacion-settings">
@@ -246,6 +246,13 @@
   	y a las personas que hayan producido el error. Para ello, debe estar configurado en el sistema
   	de build continuo el servidor de correo saliente a mail.disid.com y el sufijo de email por defecto
   	a @disid.com.</para>
+  	
+  	<para xml:lang="es">También se puede crear otro job con exáctamente la misma configuración
+  	pero descargando el código de http://scmcit.gva.es/svn/aplusu/trunk para ejecutar el
+  	análisis de un proyecto generado. En este caso, la única diferencia sería utilizar
+  	el comando de compilado, empaquetado e instalación <command>clean install -P dev</command>
+  	y una hora distinta de ejecución como puede ser las 4am.</para>
+  	
   </section>  
 
 </chapter>
