@@ -154,7 +154,7 @@
       	<para>Precauciones a tener en cuenta en el código fuente del framework para mejorar la puntuación de SONAR:</para>
         <itemizedlist>
       		<listitem>
-      			<para>Ver si es posible evitar el uso de Set<ULR> en addon de temas (puede ser un grave problema de rendimiento)</para>
+      			<para>Ver si es posible evitar el uso de Set de URL en addon de temas (puede ser un grave problema de rendimiento)</para>
       		</listitem>
       		<listitem>
       			<para>Evitar catch vacios: Ver la posibilidad de log o usar apache commons para cerrar conexiones.</para>
@@ -311,6 +311,8 @@
 				(debajo del input buscar, en la parte derecha)
 				y seleccionar Perfiles de calidad</para>
 				<para>Seleccionar el perfil a usar para Java</para>
+			</listitem>
+		</itemizedlist>
 	  </para>
     </section>
 
@@ -328,6 +330,8 @@
 				<para>Seleccionar el perfil a exportar</para>
 				<para>Pulsar sobre pestaña Enlaces permanentes</para>
 				<para>Descargar el fichero del link Todas las reglas</para>
+			</listitem>
+		</itemizedlist>
 	  </para>
 
       <para>Importar:
@@ -340,6 +344,8 @@
 				<para>Pulsar sobre Restaurar perfil (en la parte derecha arriba)</para>
 				<para>Seleccionar el archivo de la exportación.</para>
 				<para>Pulsar Restaurar</para>
+			</listitem>
+		</itemizedlist>
 	  </para>
 	  
 	  <para>El fichero de reglas utilizado en eXcentia se puede encontrar en
