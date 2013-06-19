@@ -102,7 +102,6 @@
 	cd wedding
 	$1/gvnix.sh script --file wedding.roo --lineNumbers true
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
-	mvn test tomcat:run -Dmaven.tomcat.fork=true
 	cd ..
 	echo wedding end
 
