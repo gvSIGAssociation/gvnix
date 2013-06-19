@@ -11,8 +11,8 @@
 			
 		<util:load-scripts />
 		
-		<spring:message code="application_name" var="app_name"/>
-		<title><spring:message code="welcome_h3" arguments="${app_name}" /></title>
+		<spring:message code="application_name" var="app_name" htmlEscape="false"/>
+		<title><spring:message code="welcome_h3" arguments="${app_name}" htmlEscape="false"/></title>
 	</head>
 	
   	<body class="gvnix tundra spring">

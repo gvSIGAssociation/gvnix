@@ -217,8 +217,7 @@ menu tree
 
 web mvc dialog exception add --exception org.postgresql.util.PSQLException --title "PSQLException" --description "No se puede crear/actualizar el registro porque no se cumple una restricción de integridad." --language es
 
-// OJO ! ! ! ! No disponible ! ! !
-// web mvc dialog add --class ~.web.TrgpDocumentoController --name duplicarDocumento
+web mvc dialog add --class ~.web.TrgpDocumentoController --name duplicarDocumento
 
 configuration create --name pro
 configuration property value --property database.url --configuration pre --value jdbc:postgresql://localhost:5432/regproypre
