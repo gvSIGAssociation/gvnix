@@ -5,7 +5,6 @@
     documentation.
 
     Based on Spring Roo XSL FO stylesheet.
-    
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:fo="http://www.w3.org/1999/XSL/Format"
@@ -47,17 +46,17 @@
                     </fo:table-row>
                     <fo:table-row>
                         <fo:table-cell text-align="center">
+                           <!--
                             <fo:block font-family="Helvetica" font-size="12pt" padding="10mm">
-                                <xsl:text>Copyright &#xA9; 2009, 2013 </xsl:text>
+                                <xsl:text>Copyright &#xA9; 2009-2013</xsl:text>
                                 <xsl:for-each select="bookinfo/authorgroup/author">
                                     <xsl:if test="position() > 1">
                                         <xsl:text>, </xsl:text>
                                     </xsl:if>
-                                    <xsl:value-of select="firstname"/>
-                                    <xsl:text> </xsl:text>
-                                    <xsl:value-of select="surname"/>
+                                    <xsl:value-of select="personname"/>
                                 </xsl:for-each>
                             </fo:block>
+                            -->
                             <fo:block font-family="Helvetica" font-size="10pt" padding="1mm">
                                 <xsl:value-of select="bookinfo/legalnotice"/>
                             </fo:block>

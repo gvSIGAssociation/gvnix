@@ -1077,38 +1077,36 @@
           </execution>
         </executions>
       </plugin>
-      <!-- DiSiD: Keep from Roo old versions: DocBook (with thanks to Spring Batch's config!) -->
+      <!-- DiSiD: Keep from Roo deployment-support module: DocBook (with thanks to Spring Batch's config!) -->
       <plugin>
         <groupId>com.agilejava.docbkx</groupId>
         <artifactId>docbkx-maven-plugin</artifactId>
-        <version>2.0.14</version>
+        <version>2.0.8</version> <!-- 2.0.9 -->
         <executions>
           <execution>
             <id>reference-single-page</id>
             <goals>
               <goal>generate-html</goal>
-              <goal>generate-pdf</goal>
             </goals>
             <configuration>
-              <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
-              <sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
-              <admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
+              <htmlCustomization>${project.basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
+              <sourceDirectory>${project.basedir}/src/site/docbook/reference</sourceDirectory>
               <postProcess>
-                <move todir="${basedir}/target/site/reference/html-single">
-                  <fileset dir="${basedir}/target/docbkx/html">
+                <move todir="${project.build.directory}/site/reference/html-single">
+                  <fileset dir="${project.build.directory}/docbkx/html">
                     <include name="index.html" />
                   </fileset>
                 </move>
-                <copy todir="${basedir}/target/site/reference/html-single">
-                  <fileset dir="${basedir}/src/docbkx/resources">
+                <copy todir="${project.build.directory}/site/reference/html-single">
+                  <fileset dir="${project.basedir}/src/docbkx/resources">
                     <include name="**/*.css" />
                     <include name="**/*.png" />
                     <include name="**/*.gif" />
                     <include name="**/*.jpg" />
                   </fileset>
                 </copy>
-                <copy todir="${basedir}/target/site/reference/html-single">
-                  <fileset dir="${basedir}/src/site/docbook/reference">
+                <copy todir="${project.build.directory}/site/reference/html-single">
+                  <fileset dir="${project.basedir}/src/site/docbook/reference">
                     <include name="**/*.png" />
                     <include name="**/*.gif" />
                     <include name="**/*.jpg" />
@@ -1124,24 +1122,24 @@
               <goal>generate-html</goal>
             </goals>
             <configuration>
-              <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
-              <sourceDirectory>${basedir}/src/site/docbook/developer</sourceDirectory>
+              <htmlCustomization>${project.basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
+              <sourceDirectory>${project.basedir}/src/site/docbook/developer</sourceDirectory>
               <postProcess>
-                <move todir="${basedir}/target/site/developer/html-single">
-                  <fileset dir="${basedir}/target/docbkx/html">
+                <move todir="${project.build.directory}/site/developer/html-single">
+                  <fileset dir="${project.build.directory}/docbkx/html">
                     <include name="index.html" />
                   </fileset>
                 </move>
-                <copy todir="${basedir}/target/site/developer/html-single">
-                  <fileset dir="${basedir}/src/docbkx/resources">
+                <copy todir="${project.build.directory}/site/developer/html-single">
+                  <fileset dir="${project.basedir}/src/docbkx/resources">
                     <include name="**/*.css" />
                     <include name="**/*.png" />
                     <include name="**/*.gif" />
                     <include name="**/*.jpg" />
                   </fileset>
                 </copy>
-                <copy todir="${basedir}/target/site/developer/html-single">
-                  <fileset dir="${basedir}/src/site/docbook/developer">
+                <copy todir="${project.build.directory}/site/developer/html-single">
+                  <fileset dir="${project.basedir}/src/site/docbook/developer">
                     <include name="**/*.png" />
                     <include name="**/*.gif" />
                     <include name="**/*.jpg" />
@@ -1152,30 +1150,60 @@
             <phase>pre-site</phase>
           </execution>
           <execution>
+              <id>reference-single-pdf</id>
+              <goals>
+                  <goal>generate-pdf</goal>
+              </goals>
+              <configuration>
+                  <imgSrcPath>src/site/docbook/reference/</imgSrcPath>
+                  <admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
+                  <sourceDirectory>${project.basedir}/src/site/docbook/reference</sourceDirectory>
+                  <postProcess>
+                      <copy file="${project.build.directory}/docbkx/pdf/index.pdf" tofile="${project.build.directory}/site/reference/pdf/gvnix-reference-docs.pdf" failonerror="false" />
+                  </postProcess>
+              </configuration>
+              <phase>pre-site</phase>
+          </execution>
+          <execution>
+              <id>developer-single-pdf</id>
+              <goals>
+                  <goal>generate-pdf</goal>
+              </goals>
+              <configuration>
+                  <imgSrcPath>src/site/docbook/developer/</imgSrcPath>
+                  <admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
+                  <sourceDirectory>${project.basedir}/src/site/docbook/developer</sourceDirectory>
+                  <postProcess>
+                      <copy file="${project.build.directory}/docbkx/pdf/index.pdf" tofile="${project.build.directory}/site/developer/pdf/gvnix-developer-docs.pdf" failonerror="false" />
+                  </postProcess>
+              </configuration>
+              <phase>pre-site</phase>
+          </execution>
+          <execution>
             <id>reference-multi-page</id>
             <goals>
               <goal>generate-html</goal>
             </goals>
             <configuration>
               <chunkedOutput>true</chunkedOutput>
-              <sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
-              <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
+              <sourceDirectory>${project.basedir}/src/site/docbook/reference</sourceDirectory>
+              <htmlCustomization>${project.basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
               <postProcess>
-                <move todir="${basedir}/target/site/reference">
-                  <fileset dir="${basedir}/target/docbkx">
+                <move todir="${project.build.directory}/site/reference">
+                  <fileset dir="${project.build.directory}/docbkx">
                     <include name="**/*.html" />
                   </fileset>
                 </move>
-                <copy todir="${basedir}/target/site/reference/html">
-                  <fileset dir="${basedir}/src/docbkx/resources">
+                <copy todir="${project.build.directory}/site/reference/html">
+                  <fileset dir="${project.basedir}/src/docbkx/resources">
                     <include name="**/*.css" />
                     <include name="**/*.png" />
                     <include name="**/*.gif" />
                     <include name="**/*.jpg" />
                   </fileset>
                 </copy>
-                <copy todir="${basedir}/target/site/reference/html">
-                  <fileset dir="${basedir}/src/site/docbook/reference">
+                <copy todir="${project.build.directory}/site/reference/html">
+                  <fileset dir="${project.basedir}/src/site/docbook/reference">
                     <include name="**/*.png" />
                     <include name="**/*.gif" />
                     <include name="**/*.jpg" />
@@ -1192,24 +1220,24 @@
             </goals>
             <configuration>
               <chunkedOutput>true</chunkedOutput>
-              <sourceDirectory>${basedir}/src/site/docbook/developer</sourceDirectory>
-              <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
+              <sourceDirectory>${project.basedir}/src/site/docbook/developer</sourceDirectory>
+              <htmlCustomization>${project.basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
               <postProcess>
-                <move todir="${basedir}/target/site/developer">
-                  <fileset dir="${basedir}/target/docbkx">
+                <move todir="${project.build.directory}/site/developer">
+                  <fileset dir="${project.build.directory}/docbkx">
                     <include name="**/*.html" />
                   </fileset>
                 </move>
-                <copy todir="${basedir}/target/site/developer/html">
-                  <fileset dir="${basedir}/src/docbkx/resources">
+                <copy todir="${project.build.directory}/site/developer/html">
+                  <fileset dir="${project.basedir}/src/docbkx/resources">
                     <include name="**/*.css" />
                     <include name="**/*.png" />
                     <include name="**/*.gif" />
                     <include name="**/*.jpg" />
                   </fileset>
                 </copy>
-                <copy todir="${basedir}/target/site/developer/html">
-                  <fileset dir="${basedir}/src/site/docbook/developer">
+                <copy todir="${project.build.directory}/site/developer/html">
+                  <fileset dir="${project.basedir}/src/site/docbook/developer">
                     <include name="**/*.png" />
                     <include name="**/*.gif" />
                     <include name="**/*.jpg" />
@@ -1230,7 +1258,7 @@
           <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>fop</artifactId>
-            <version>0.93</version>
+            <version>1.0</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -1238,7 +1266,7 @@
           <chunkedOutput>false</chunkedOutput>
           <draftWatermarkImage />
           <htmlStylesheet>css/html.css</htmlStylesheet>
-          <foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
+          <foCustomization>${project.basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
           <xincludeSupported>true</xincludeSupported>
           <entities>
             <entity>
@@ -1336,12 +1364,19 @@
         </configuration>
       </plugin>
       
-      <!-- DiSiD: ¿From Roo old versions?: Disabled by incompatibility with site reports -->
-      <!--plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>2.0-beta-7</version>
-      </plugin-->
+      <!-- DiSiD: Keep from Roo deployment-support module -->
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.0</version>
+          <dependencies>
+              <dependency>
+                  <groupId>org.apache.maven.wagon</groupId>
+                  <artifactId>wagon-ssh</artifactId>
+                  <version>2.2</version>
+              </dependency>
+          </dependencies>
+      </plugin>
       
       <!-- DiSiD: Allow tag and branch creation on CIT repository from mvn release:* commands -->
       <plugin>

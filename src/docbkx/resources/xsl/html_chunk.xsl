@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
     This is the XSL HTML configuration file for the Spring Reference Documentation.
+    
+    Based on XSL CHUNK HTML Spring Roo stylesheet.
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:fo="http://www.w3.org/1999/XSL/Format"
@@ -70,7 +72,7 @@
     <!--###################################################
                      Headers and Footers
     ################################################### -->
-    <!-- cabeceras y pies de página -->
+    <!-- cabeceras y pies de pagina -->
     <xsl:template name="user.header.navigation">
         <div style="background-color:white;border:none;height:105px;">
             <a style="border:none;" href="http://www.cit.gva.es/" title="Generalitat Valenciana - Conselleria d'Infrestructures i Transport">
