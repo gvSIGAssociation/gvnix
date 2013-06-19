@@ -181,10 +181,10 @@
 	mvn test tomcat:run &
 	mkdir target
     # Get datatable list pages
-	wget --retry-connrefused -O target/pets.html http://localhost:8080/petclinic/pets
-	wget --retry-connrefused -O target/owners.html http://localhost:8080/petclinic/owners
-	wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits
-	wget --retry-connrefused -O target/vets.html http://localhost:8080/petclinic/vets
+	wget --retry-connrefused -O target/pets.html http://localhost:8080/mvc/pets
+	wget --retry-connrefused -O target/owners.html http://localhost:8080/mvc/owners
+	wget --retry-connrefused -O target/visits.html http://localhost:8080/mvc/visits
+	wget --retry-connrefused -O target/vets.html http://localhost:8080/mvc/vets
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -638,8 +638,6 @@
 	mkdir gvnix-sample
 	cd gvnix-sample
 	$1/gvnix.sh script --file $2/code/src/main/resources/gvnix-sample.roo --lineNumbers true
-##  Inter-type declaration conflicts with existing member, avoid it temporally
-    mvn test-compile > /dev/null
 	# Get services summary page and available WSDLs
 	wget --retry-connrefused -O target/services.html http://localhost:8080/sample/services/ &
 	wget --retry-connrefused -O target/claseservicio.wsdl http://localhost:8080/sample/services/ClaseServicio?wsdl &
@@ -688,8 +686,6 @@
 	$1/gvnix.sh script --file $2/code/src/main/resources/tiendavirtual.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
 	$1/gvnix.sh hint
-##  Inter-type declaration conflicts with existing member, avoid it temporally
-    mvn test-compile > /dev/null
 	# Request the home URL
 	wget --retry-connrefused -O target/home.html "http://localhost:8080/tiendavirtual/" &	
     # Get no entities dialog message
