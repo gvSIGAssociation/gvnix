@@ -756,15 +756,9 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
         Element lsHtml = defaultJspxXml.getDocumentElement();
 
+        // Check if dialog:message-box is of type modal
         String dialogNS = lsHtml.getAttribute("xmlns:dialog");
-        if (dialogNS.isEmpty()) {
-            // If no namespace, perhaps default.jspx overwrite by theme:
-            // then update it another time
-            addMessageBoxInLayout();
-            return true;
-        }
-        else if (dialogNS.equals("urn:jsptagdir:/WEB-INF/tags/dialog/modal")) {
-            // Check if dialog:message-box is of type modal
+        if (dialogNS.equals("urn:jsptagdir:/WEB-INF/tags/dialog/modal")) {
             return true;
         }
 
