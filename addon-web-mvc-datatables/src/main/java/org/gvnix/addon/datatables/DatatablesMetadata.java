@@ -853,8 +853,8 @@ public class DatatablesMetadata extends
         // if (request == null) {
         bodyBuilder.appendFormalLine("if (request == null) {");
         bodyBuilder.indent();
-        // params = Collections.EMPTY_MAP;
-        bodyBuilder.appendFormalLine(String.format("params = %s.EMPTY_MAP;",
+        // params = Collections.emptyMap();
+        bodyBuilder.appendFormalLine(String.format("params = %s.emptyMap();",
                 helper.getFinalTypeName(COLLECTIONS)));
         // } else {
         bodyBuilder.indentRemove();
@@ -1543,10 +1543,13 @@ public class DatatablesMetadata extends
                 .appendFormalLine("// Get data (filtered by received parameters) and put it on pageContext");
         // List<Visit> visits =
         // findByParameters(visit,request.getParameterNames());
-        bodyBuilder.appendFormalLine(String.format(
-                "%s %s = %s(%s,request.getParameterNames());",
-                helper.getFinalTypeName(entityListType), listVarName,
-                findByParametersMethodName.getSymbolName(), entityName));
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("@SuppressWarnings(\"unchecked\") %s %s = %s(%s, request != null ? request.getParameterNames() : null);",
+                                helper.getFinalTypeName(entityListType),
+                                listVarName,
+                                findByParametersMethodName.getSymbolName(),
+                                entityName));
 
         // uiModel.addAttribute("pets",pets);
         bodyBuilder.appendFormalLine(String.format(
@@ -1634,7 +1637,7 @@ public class DatatablesMetadata extends
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
         bodyBuilder
-                .appendFormalLine("// overrides the standar Roo list method and");
+                .appendFormalLine("// overrides the standard Roo list method and");
         bodyBuilder.appendFormalLine("// delegates on datatables list method");
         // return listDatatables(uiModel);
         if (isAjax()) {
