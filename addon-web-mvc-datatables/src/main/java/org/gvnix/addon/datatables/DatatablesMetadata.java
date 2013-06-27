@@ -1277,9 +1277,9 @@ public class DatatablesMetadata extends
      * <em>true</em> : AJAX <em>false</em> DOM)</li>
      * <li><em>finderNameParam</em> sets the name of parameter that will contain
      * the {@code finderName} (only for AJAX mode)</li>
-     * <li><em>datatablesNotStandardMode</em> informs render mode (<em>true</em>
-     * : standar datatable view <em>false</em> single-item-page,
-     * one-cell-per-item, render-jspx datatable mode)</li>
+     * <li><em>datatablesStandardMode</em> informs render mode (<em>true</em>
+     * for standard datatable view; <em>false</em> for single-item-page,
+     * one-cell-per-item or render-jspx datatable modes)</li>
      * </ul>
      * 
      * @return
@@ -1322,8 +1322,8 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine(String.format(
                 "uiModel.addAttribute(\"datatablesUseAjax\",%s);", isAjax()));
         bodyBuilder.appendFormalLine(String.format(
-                "uiModel.addAttribute(\"datatablesNotStandardMode\",%s);",
-                !isStantardMode()));
+                "uiModel.addAttribute(\"datatablesStandardMode\",%s);",
+                isStantardMode()));
         if (isAjax()) {
             bodyBuilder
                     .appendFormalLine("uiModel.addAttribute(\"finderNameParam\",\"ajax_find\");");
@@ -1570,24 +1570,27 @@ public class DatatablesMetadata extends
     private void buildListDatatablesRequesMethodAjaxBody(
             InvocableMemberBodyBuilder bodyBuilder) {
 
-        // Map<String, String> params = populateParameterMap(request);
+        // [Code generated] Map<String, String> params =
+        // populateParameterMap(request);
         bodyBuilder.appendFormalLine(String.format("%s params = %s(request);",
                 helper.getFinalTypeName(MAP_STRING_STRING),
                 POPULATE_PARAMETERS_MAP.getSymbolName()));
-        // if (!params.isEmpty()) {
+
+        // [Code generated] if (!params.isEmpty()) {
         bodyBuilder.appendFormalLine("if (!params.isEmpty()) {");
         bodyBuilder.indent();
-        // uiModel.addAttribute("baseFilter", params);
+
+        // [Code generated] uiModel.addAttribute("baseFilter", params);
         bodyBuilder
                 .appendFormalLine("uiModel.addAttribute(\"baseFilter\", params);");
-        // }
+
+        // [Code generated] }
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        // return "pets/list";
+        // [Code generated] return "pets/list";
         bodyBuilder.appendFormalLine(String.format("return \"%s/list\";",
                 entityPlural.toLowerCase()));
-
     }
 
     /**
