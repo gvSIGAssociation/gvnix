@@ -62,6 +62,11 @@
         <!-- DataTables -->
         <dependency>
             <groupId>com.github.dandelion</groupId>
+            <artifactId>datatables-core</artifactId>
+            <version>${dandelion-datatables.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.dandelion</groupId>
             <artifactId>datatables-jsp</artifactId>
             <version>${dandelion-datatables.version}</version>
         </dependency>
@@ -116,7 +121,8 @@
         </dependency>
   </dependencies>
   <properties>
-        <dandelion-datatables.version>0.8.14</dandelion-datatables.version>
+<!--        <dandelion-datatables.version>0.8.14</dandelion-datatables.version> -->
+        <dandelion-datatables.version>0.9.0-SNAPSHOT</dandelion-datatables.version>
         <jackson.version>1.9.12</jackson.version>
   </properties>
   <build>
