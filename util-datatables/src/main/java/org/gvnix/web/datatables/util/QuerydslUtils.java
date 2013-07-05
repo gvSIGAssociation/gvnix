@@ -25,8 +25,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -91,6 +91,39 @@ public class QuerydslUtils {
                         entry.getValue()));
             }
         }
+        return predicate;
+    }
+
+    /**
+     * Creates a WHERE clause to specify given {@code fieldName} must be equal
+     * to one element of the provided Collection.
+     * 
+     * @param entity Entity {@link PathBuilder}. It represents the entity for
+     *        class generation and alias-usage for path generation.
+     *        <p/>
+     *        Example: To retrieve a {@code Customer} with the first name 'Bob'
+     *        entity must be a {@link PathBuilder} created for {@code Customer}
+     *        class and searchArgs must contain the entry
+     *        {@code 'firstName':'Bob'}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code name} in {@code Pet} entity, {@code firstName} in
+     *        {@code Pet.owner} entity.
+     * @param values the Set of values to find the given field name, may be null
+     * @return the WHERE clause
+     */
+    public static <T, E> BooleanBuilder createPredicateByIn(
+            PathBuilder<T> entity, String fieldName, Set<E> values) {
+
+        // Using BooleanBuilder, a cascading builder for
+        // Predicate expressions
+        BooleanBuilder predicate = new BooleanBuilder();
+        if (StringUtils.isEmpty(fieldName) || values.isEmpty()) {
+            return predicate;
+        }
+
+        // Build the predicate
+        predicate.and(createCollectionExpression(entity, fieldName, values));
+
         return predicate;
     }
 
@@ -416,6 +449,29 @@ public class QuerydslUtils {
 
         BooleanExpression expression = entityPath.getBoolean(fieldName).eq(
                 value);
+        return expression;
+    }
+
+    /**
+     * Return IN expression for {@code entityPath.fieldName}.
+     * <p/>
+     * Expr: {@code entityPath.fieldName IN ( values )}
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet}, {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code name} in {@code Pet} entity, {@code firstName} in
+     *        {@code Pet.owner} entity.
+     * @param values the Set of values to find the given field name, may be null
+     * @return BooleanExpression
+     */
+    public static <T, E> BooleanExpression createCollectionExpression(
+            PathBuilder<T> entityPath, String fieldName, Set<E> values) {
+        if (StringUtils.isEmpty(fieldName) || values.isEmpty()) {
+            return null;
+        }
+
+        BooleanExpression expression = entityPath.get(fieldName).in(values);
         return expression;
     }
 

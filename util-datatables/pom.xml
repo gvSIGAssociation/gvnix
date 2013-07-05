@@ -46,7 +46,7 @@
     <dandelion.version>0.8.14</dandelion.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <gvnix.version>${project.parent.version}</gvnix.version>
-    <querydsl.version>3.1.1</querydsl.version>
+    <querydsl.version>3.2.0</querydsl.version>
     <spring.version>3.2.0.RELEASE</spring.version>
   </properties>
 
