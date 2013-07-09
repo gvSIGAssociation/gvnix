@@ -17,12 +17,12 @@
    <!-- Table -->
    <!-- ====================================== -->
    <tag>
-      <description>Generate a HTML table thanks to the awesome
-           Dandelion-DataTables.</description>      
       <name>table</name>
       <tag-class>org.gvnix.datatables.tags.RooTableTag</tag-class>
       <tei-class>com.github.dandelion.datatables.jsp.tei.TableTagExtraInfo</tei-class>
       <body-content>JSP</body-content>
+      <description>Generate a HTML table thanks to the awesome
+         DataTables jQuery plugin.</description>
       <attribute>
          <description>The identifier for this tag (do not change!)
          (required) DOM id of the HTML table.</description>
@@ -63,6 +63,12 @@
             is set to
             "fadein". (Default : "fadein")</description>
          <name>appear</name>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <description>(true|false) Allows to retrieve JSON data from any
+            domain name, regardless of XSS protection.</description>
+         <name>jsonp</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
@@ -198,6 +204,7 @@
          <rtexprvalue>true</rtexprvalue>
          <type>java.lang.Boolean</type>
       </attribute>
+
       <attribute>
          <description>Allows you to specify exactly where in the DOM you want DataTables to inject the various controls it adds to the page (for example you might want the pagination controls at the top of the table). DIV elements (with or without a custom class) can also be added to aid styling.</description>
          <name>dom</name>
@@ -314,19 +321,7 @@
          <name>displayLength</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
-      <attribute>
-         <description>Comma-separated list of custom feature's names to register in the current table</description>
-         <name>features</name>
-      </attribute>
-      <attribute>
-         <description>Comma-separated list of custom plugin's names to register in the current table</description>
-         <name>plugins</name>
-      </attribute>
-      <attribute>
-         <description>TODO</description>
-         <name>confGroup</name>
-      </attribute>
-      
+
       <!-- ====================================== -->
       <!-- Extra features -->
       <!-- ====================================== -->
@@ -377,19 +372,6 @@
          	viewport down when the result set will fit within the given 
          	Y height. (default : false)</description>
           <name>scrollCollapse</name>
-          <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-          <description>Table's width to display in scrolling mode.
-          (default : disabled)</description>
-          <name>scrollX</name>
-          <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-          <description>Use more width than it might otherwise do when 
-          x-scrolling is enabled.
-          (default : disabled)</description>
-          <name>scrollInner</name>
           <rtexprvalue>true</rtexprvalue>
       </attribute>
 
@@ -461,7 +443,6 @@
          <rtexprvalue>true</rtexprvalue>
          <type>java.lang.String</type>
       </attribute>
-      <dynamic-attributes>true</dynamic-attributes>
    </tag>
 
    <!-- ====================================== -->
@@ -715,7 +696,6 @@
          <rtexprvalue>true</rtexprvalue>
          <type>java.lang.String</type>
       </attribute>
-      <dynamic-attributes>true</dynamic-attributes>
    </tag>
 
    <!-- ====================================== -->

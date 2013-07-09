@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
- * Copyright (C) 2013 Generalitat Valenciana
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
+ * 2013 Generalitat Valenciana
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
  */
 package org.gvnix.datatables.tags;
 
@@ -38,7 +38,6 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.HtmlUtils;
 
-import com.github.dandelion.datatables.core.configuration.Configuration;
 import com.github.dandelion.datatables.jsp.tag.AbstractTableTag;
 import com.github.dandelion.datatables.jsp.tag.TableTag;
 
@@ -55,6 +54,9 @@ public class RooTableTag extends TableTag {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(RooTableTag.class);
 
+    /**
+	 * 
+	 */
     private static final long serialVersionUID = 8646911296425084063L;
 
     public static final String TABLE_TAG_VARIABLE = "__datatables_table_tag_instance__";
@@ -137,9 +139,6 @@ public class RooTableTag extends TableTag {
         // to assure it's available for columns tags
         pageContext.setAttribute(TABLE_TAG_VARIABLE, this,
                 PageContext.REQUEST_SCOPE);
-
-        Boolean serverSide = (Boolean) localConf
-                .get(Configuration.AJAX_SERVERSIDE);
 
         // Check url value
         if (serverSide != null && serverSide) {
