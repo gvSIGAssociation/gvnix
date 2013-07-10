@@ -13,8 +13,8 @@ that these instructions are for developers looking to develop gvNIX itself.
 
 If you like to try a release that has already been built, tested and 
 distributed by the core development team, we recommend that you visit gvNIX 
-download page http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo/gvnix/gvnix-documentacion/
-and read the *gvNIX Reference Guide* documentation.
+download page http://www.gvnix.org in Spanish or http://gvnix.googlecode.com
+in English and read the documentation.
 
 This document is written using the reStructuredText markup and UTF-8 charset encoding.
 
@@ -136,13 +136,11 @@ Package gvNIX
 
 * Update if necessary the Roo source code version (tag or head) into 'roo' folder with git
 
-* Update Roo version reference into gvNIX parent pom.xml (roo.version) and into gvNIX childs pom.xml (parent.version)
-
-* Update Roo version reference into gvNIX wrapping parent and childs pom.xml
+* Update Roo version reference into gvNIX parent pom.xml (roo.version)
 
 * Modify and commit the appropriate Roo and gvNIX versions (GVNIX_VERSION and ROO_VERSION) at build.sh file.
 
-* Modify and commit the appropriate gvNIX version in docbook documentacion (releaseinfo property) at src/site/docbook/reference/index.xml
+* Modify and commit the appropriate gvNIX version in docbook documentacion (releaseinfo property) at src/site/docbook/reference/index.xml and at src/site/docbook/developer/index.xml
 
 * Create the tag for the gvNIX version we want to build using the following command::
 
@@ -152,7 +150,7 @@ Package gvNIX
   Version formats:
   
    * Snapshot: X.Y.Z-SNAPSHOT
-   * Release: X.Y.Z
+   * Release: X.Y.Z-RELEASE
 
 * If all ok, clean packaging information on the trunk code directory::
 
