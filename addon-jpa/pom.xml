@@ -110,7 +110,7 @@
                 <artifactItem>
                   <groupId>org.gvnix</groupId>
                   <artifactId>org.gvnix.support</artifactId>
-                  <version>${project.version}</version>
+                  <version>${gvnix.version}</version>
                   <overWrite>false</overWrite>
                   <includes>**/*.class,**/*.java-template</includes>
                 </artifactItem>
