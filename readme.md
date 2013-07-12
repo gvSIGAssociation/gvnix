@@ -1,6 +1,5 @@
 
-======================================
- gvNIX - RAD tool for Java developers
+gvNIX - RAD tool for Java developers
 ======================================
 
 Welcome to gvNIX, Spring Roo based RAD tool for Java developers.
@@ -8,11 +7,11 @@ Welcome to gvNIX, Spring Roo based RAD tool for Java developers.
 About this doc
 ==============
 
-These instructions show you how to get started with gvNIX source tree. Note 
+These instructions show you how to get started with gvNIX source tree. Note
 that these instructions are for developers looking to develop gvNIX itself.
 
-If you like to try a release that has already been built, tested and 
-distributed by the core development team, we recommend that you visit gvNIX 
+If you like to try a release that has already been built, tested and
+distributed by the core development team, we recommend that you visit gvNIX
 download page http://www.gvnix.org in Spanish or http://gvnix.googlecode.com
 in English and read the documentation.
 
@@ -21,7 +20,7 @@ This document is written using the reStructuredText markup and UTF-8 charset enc
 Copyright (C) 2010 Conselleria d'Infraestructures i Transport - Generalitat Valenciana
 
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
-Unported License. To view a copy of this license, visit 
+Unported License. To view a copy of this license, visit
 http://creativecommons.org/licenses/by-sa/3.0/
 
 Pre-requisites
@@ -69,7 +68,7 @@ However, Roo source code can be updated to a new tag with the following commands
 
 * Ask which branch is current:	git status
 * Revert working copy changes:  git checkout .
-* Add a file/resolve conflict:  git add 
+* Add a file/resolve conflict:  git add
 * Revert index (adedd) changes: git reset
 * Update git info:				git pull
 * Update master git info:		git pull git@github.com:SpringSource/spring-roo.git master
@@ -82,11 +81,11 @@ However, Roo source code can be updated to a new tag with the following commands
 * Save in SVN:					svn commit
 
 Update gvNIX parent pom roo.version property to the new value.
-Be careful, git deleted files could be not deleted from SVN ! 
+Be careful, git deleted files could be not deleted from SVN !
 
 Other userful Git commands:
 
-* Change to master branch:		git checkout master 
+* Change to master branch:		git checkout master
 
 Run gvNIX dev
 =============
@@ -94,30 +93,30 @@ Run gvNIX dev
 #. Build Roo::
 
     bash:~/gvnix/trunk/code/roo$ mvn clean install
-    
+
    Roo is only necessary to be installed the first time.
    Only reinstall it if Roo there are changes in the source code.
 
 #. Build gvNIX::
 
     bash:~/gvnix/trunk/code$ mvn clean install
-    
+
    From now on, you will need to reinstall only each modified module instead of reinstalling all the gvNIX projects again::
-   
+
     bash:~/gvnix/trunk/code/module$ mvn clean install
 
 #. Add gvNIX ``bin`` directory to PATH::
 
     bash:~/gvnix/trunk/code$ PATH=$PWD/bin:$PATH
-    
+
    It is recommended that you add this information to your .bashrc script.
 
 #. Execute gvNIX shell in your java project::
 
     bash:~/project$ gvnix-dev
-      
+
    Or execute gvNIX shell on debug mode in your java project::
-     
+
     bash:~/project$ gvnix-dev-debug
 
 Developing within Eclipse
@@ -146,9 +145,9 @@ Package gvNIX
 
    bash:~/gvnix/trunk/code$ svn update
    bash:~/gvnix/trunk/code$ mvn release:prepare -Dtag={version}
-   
+
   Version formats:
-  
+
    * Snapshot: X.Y.Z-SNAPSHOT
    * Release: X.Y.Z-RELEASE
 
@@ -156,9 +155,9 @@ Package gvNIX
 
    bash:~/gvnix/trunk/code$ mvn release:perform
    bash:~/gvnix/trunk/code$ mvn release:clean
-   
+
   If some errors, revert the changes::
-  
+
    bash:~/gvnix/trunk/code$ mvn release:rollback
 
 * To package the binary release use the following commands::
@@ -168,25 +167,25 @@ Package gvNIX
 
   The ``-d`` option deploy to google code, can be used only by commiters.
   This requires next configuration in maven configuration file at conf/settings.xml::
-  
+
     <server>
       <id>Google Code</id>
       <username>gvnixscm@gmail.com</username>
       <password>XXXXXXXXXXX</password>
     </server>
-    
+
   Get password from redmine project wiki.
-  
+
   Check if all add-ons are published correctly at http://gvnix.googlecode.com/svn/repo/repository.xml for RooBoot.
   This will create the ZIP file ``target/gvnix-dist/gvNIX-{version}.zip``.
-  
+
 * Deploy wrappings to google code.
 
 * Test uncompress ZIP file, start it, execute some script and check in STS.
 
 * Publish into gvnix.googlecode.com the gvNIX binary zip, the gvNIX source zip and version changes summary.
 
-* Publish into www.gvnix.org the html single page reference guide. 
+* Publish into www.gvnix.org the html single page reference guide.
 
 * Update (or create if not exists) the wiki page for each add-on from add-on user guide on html format.
 
@@ -194,11 +193,9 @@ Package gvNIX
 
 * Send to communication department the final release date and version changes summary to publish on social networks:
 
-  * DiSiD blog
   * gvNIX linkedin group
   * gvNIX twit with Google Code link
-  * DiSiD twit with DiSiD blog link
-  * Facebook
+  * Facebook DISID
 
 Source code
 -----------
@@ -206,13 +203,13 @@ Source code
 * Optional, package the source code release use the following command::
 
    bash:/tmp$ svn export http://scmcit.gva.es/svn/gvnix/tags/{version}
-   
+
   Rename folder:
-  
+
    bash:/tmp$ mv {version} gvNIX-{version}-src/
 
   ZIP created folder with name ``gvNIX-{version}-src.zip``::
-  
+
    bash:/tmp$ zip -r -9 gvNIX-{version}-src.zip gvNIX-{version}-src/
 
 Branch
@@ -247,6 +244,8 @@ Contact us ?
 * https://gvnix.googlecode.com
 * http://listserv.gva.es/cgi-bin/mailman/listinfo/gvNIX_soporte
 * http://www.gvpontis.gva.es/cast/gvnix
+* If you use Twitter, you're encouraged to follow @gvnix and we appreciate youur mentions.
+
 
 Need more info ?
 ----------------
@@ -288,145 +287,4 @@ Write doc
 * Download and install XMLmind XML Editor Personal Edition ( http://www.xmlmind.com/xmleditor/download.shtml )
 * Use the previous editor to open ``src/site/docbook/developer/index.xml`` and contribute with your knowledge.
 
-Proof of concept
-================
 
-Roo example projects:
-
-* http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic
-
-ESB:
-
-* http://scmcit.gva.es/svn/gvnix-proof/trunk/servicemix-service
-
-GWT:
-
-* http://scmcit.gva.es/svn/gvnix-proof/trunk/vaadin
-* https://svn.disid.com/svn/disid/proof/gvnix/vaadin-test-project
-
-Real world projects:
-
-* http://scmcit.gva.es/svn/acuses
-* http://scmcit.gva.es/svn/sentencias
-* http://scmcit.gva.es/svn/regproy
-
-Tests:
-
-* http://scmcit.gva.es/svn/gvnix-proof/trunk/sentencias-upgrade-roo-1.1.2
-* https://svn.disid.com/svn/disid/proof/gvnix/gvnix-demo
-* https://svn.disid.com/svn/disid/proof/spring_roo/pizza-shop
-* https://svn.disid.com/svn/disid/proof/spring_roo/terceros-test
-
-Composite identifiers:
-
-* https://svn.disid.com/svn/disid/proof/spring_roo/reveng_and_compound_id
-* https://svn.disid.com/svn/disid/proof/spring_roo/compositeId
-
-TCON:
-
-* https://svn.disid.com/svn/disid/proof/spring_roo/springmvc-tcon
-
-Tomcat5:
-
-* https://svn.disid.com/svn/disid/proof/gvnix/tomcat5
-* https://svn.disid.com/svn/disid/proof/spring_roo/gvnix_tomcat5_test
-
-TODO
-====
-
-* Roo refactor at web layer commands:
-
-   web xyz install
-   web xyz scaffold --class
-   web xyz all --package
-
-  https://jira.springsource.org/browse/ROO-2297
-  
-* Declare annotation to a method param.
-  Declare annotation - augmentation/overriding and precedence.
-  
-   https://bugs.eclipse.org/bugs/show_bug.cgi?id=313026
-   https://bugs.eclipse.org/bugs/show_bug.cgi?id=321820
-
-* Cache add-on:
-
-	http://blog.springsource.com/2011/02/23/spring-3-1-m1-caching/
-	http://ehcache.org/documentation/overview.html
-	
-	http://ehcache.org/features.html
-	
-	y además se puede integrar con Spring mediante anotaciones
-	
-	http://ehcache.org/recipes/spring-annotations.html
-	
-	aunque el propio hibernate ya lo tienen más que usado.
-	
-	http://ehcache.org/documentation/hibernate.html
-	
-	Foro Roo:
-	
-	http://forum.springsource.org/showthread.php?109011-Caching-Entities-In-Roo
-
-* Criteria API:
-	
-	A raíz de este mensaje del foro: http://forum.springsource.org/showpost.php?p=351029&postcount=1
-	
-	http://docs.jboss.org/hibernate/jpamodelgen/1.0/reference/en-US/html_single/
-	
-	JPA 2 defines a new typesafe Criteria API which allows criteria queries to be constructed in a strongly-typed manner, using metamodel objects to provide type safety.
-	
-	http://stackoverflow.com/questions/3037593/how-to-generate-jpa-2-0-metamodel
-	
-	Sip, Sentencias ya utiliza el Criteria API aunque no he llegado a profundizar en el tema del typesafe.
-	
-	Ya q estamos https://jira.springsource.org/browse/ROO-2112 ... votad plis 
-
-* Sería interesante documentar cómo propone Stefan el cambio de JS, no lo vamos a hacer pero es una info que estaría bien conservar. ¿Alguna sugerencia sobre cómo añadir esta pequeña reseña de Stefan?
-
-   https://jira.springsource.org/browse/ROO-2216
-
-* Capa web con sitemesh
-
-   https://jira.springsource.org/browse/ROO-41, 
-
-* Info importante sobre atributos que empiezan por '_', no se incluyen en la generación del hash de 'z'
-
-   https://jira.springsource.org/browse/ROO-2226, 
-
-*  Soporte multipart para forms, welcome file upload.
-
-   https://jira.springsource.org/browse/ROO-2231
-
-* 1.1.3 introduced a 'web mvc update tags' command which allows the replacement of existing tagx files with an updated version if there is a difference.
-  Obviously, this means Roo will not automatically update tagx files upon version upgrades.
-
-* Currently, clients are required to create a MutableFile instance to read an XML file to convert to a DOM Document.
-  FileManager and XmlUtils will be enhanced to do the work itself reducing the need for so much code in callers.
-
-* Replace hard coded gvNIX version with var:
-
-   roo/shell/src/main/java/org/springframework/roo/shell/AbstractShell.java
-
-* Validate bin/ scripts.
-  ¿ Replace GVNIX_HOME and ROO_HOME vars with GVNIX_DEV and ROO_DEV ?
-
-* Make uniform generated "aj" file names (examples):
-
-  + OCCChecksumMetadataProvider.java:  "gvNIX_occChecksum" 
-  + WSServiceSecurityMetadataProvider.java:  "GvNIX_WebSecurity" 
-  + WSExportExceptionMetadataProvider.java:  "GvNIX_WebFault"  
-  + WSExportMetadataProvider.java: "GvNix_WebService"
-  + OCCChecksumMetadataProvider: gvNIX_occChecksum
-  + WSServiceSecurityMetadataProvider: GvNIX_WebSecurity
-  + WSExportMetadataProvider: GvNix_WebService
-  + WSExportXmlElementMetadataProvider: GvNix_XmlElement
-  + WSImportMetadataProvider: GvNix_WebServiceProxy
-  + ScreenMetadataProvider: gvNIX_related_entries
-  
-  Decidido utilizar formato GvNIX_${nombre de la anotación sin el prefijo GvNIX}
-  
-* Los proyectos gvNIX por defecto configuran DBCP, probar que funciona aunque se reinicie la BBDD
-
-* Revisar los pom.xml de los add-ons (ver que tengan la dependencias correctas y hereden las del pom padre
-
-* Analizar el uso de listas de anotaciones.
