@@ -56,12 +56,17 @@ import org.springframework.roo.project.LogicalPath;
 public class JpaBatchMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
-    public static final JavaSymbolName DELETE_ALL = new JavaSymbolName(
+    public static final JavaSymbolName DELETE_ALL_METHOD = new JavaSymbolName(
             "deleteAll");
-    public static final JavaSymbolName DELETE_NOT_IN = new JavaSymbolName(
-            "deleteNoIn");
-    public static final JavaSymbolName DELETE_IN = new JavaSymbolName(
+    public static final JavaSymbolName DELETE_NOT_IN_METHOD = new JavaSymbolName(
+            "deleteNotIn");
+    public static final JavaSymbolName DELETE_IN_METHOD = new JavaSymbolName(
             "deleteIn");
+    public static final JavaSymbolName UPDATE_METHOD = new JavaSymbolName(
+            "update");
+    public static final JavaSymbolName CREATE_METHOD = new JavaSymbolName(
+            "create");
+
     // Constants
     private static final String PROVIDES_TYPE_STRING = JpaBatchMetadata.class
             .getName();
@@ -98,7 +103,11 @@ public class JpaBatchMetadata extends
     private final JavaType entity;
     private final FieldMetadata entityIdentifier;
     private final JavaType listOfIdentifiersType;
+    private final JavaType listOfEntitiesType;
     private final String entityName;
+
+    /** Related entity plural */
+    private final String entityPlural;
 
     public JpaBatchMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -121,20 +130,26 @@ public class JpaBatchMetadata extends
         // Store jpa ActiveRecord info
         this.activeRecordMetadata = entityActiveRecordMetadata;
 
-        // Get entity name to use for jpql
+        // Get entity name
         this.entityName = StringUtils.isBlank(this.activeRecordMetadata
                 .getEntityName()) ? entity.getSimpleTypeName()
                 : this.activeRecordMetadata.getEntityName();
+        this.entityPlural = entityActiveRecordMetadata.getPlural();
 
         this.listOfIdentifiersType = new JavaType(
                 LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
                 Arrays.asList(entityIdentifier.getFieldType()));
+        this.listOfEntitiesType = new JavaType(
+                LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+                Arrays.asList(entity.getBaseType()));
 
         builder.addMethod(getGetEntityMethod());
         builder.addMethod(getEntityManagerMethod());
         builder.addMethod(getDeleteAllMethod());
         builder.addMethod(getDeleteInMethod());
         builder.addMethod(getDeleteNotInMethod());
+        builder.addMethod(getCreateMethod());
+        builder.addMethod(getUpdateMethod());
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
@@ -238,7 +253,7 @@ public class JpaBatchMetadata extends
      */
     private MethodMetadata getDeleteAllMethod() {
         // method name
-        JavaSymbolName methodName = DELETE_ALL;
+        JavaSymbolName methodName = DELETE_ALL_METHOD;
 
         // Check if a method exist in type
         final MethodMetadata method = methodExists(methodName,
@@ -286,7 +301,7 @@ public class JpaBatchMetadata extends
      * @return
      */
     private MethodMetadata getDeleteInMethod() {
-        return getDeleteByIdsListMethod(DELETE_IN, "IN");
+        return getDeleteByIdsListMethod(DELETE_IN_METHOD, "IN");
     }
 
     /**
@@ -295,20 +310,20 @@ public class JpaBatchMetadata extends
      * @return
      */
     private MethodMetadata getDeleteNotInMethod() {
-        return getDeleteByIdsListMethod(DELETE_NOT_IN, "NOT IN");
+        return getDeleteByIdsListMethod(DELETE_NOT_IN_METHOD, "NOT IN");
     }
 
     /**
      * Return method to delete entity based on a list of pks of the entity
      * 
      * @param methodName for generated method
-     * @param condition to use in delete-by-list operation
+     * @param condition use IN or NOT IN delete-by-list operation
      * @return
      */
     private MethodMetadata getDeleteByIdsListMethod(JavaSymbolName methodName,
             String condition) {
 
-        // Define paramters types
+        // Define parameters types
 
         List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
                 .convertFromJavaTypes(listOfIdentifiersType);
@@ -339,10 +354,10 @@ public class JpaBatchMetadata extends
                 .substring(0, 1);
 
         // Query query =
-        // entityManager().createQuery("DELETE FROM Pet AS p WHERE p.id IN :idList");
+        // entityManager().createQuery("DELETE FROM Pet AS p WHERE p.id IN (:idList)");
         bodyBuilder
                 .appendFormalLine(String
-                        .format("%s query = entityManager().createQuery(\"DELETE FROM %s as %s WHERE %s.%s %s :idList\");",
+                        .format("%s query = entityManager().createQuery(\"DELETE FROM %s as %s WHERE %s.%s %s (:idList)\");",
                                 getFinalTypeName(JpaJavaType.QUERY),
                                 entityName,
                                 aliasName,
@@ -374,6 +389,142 @@ public class JpaBatchMetadata extends
         return MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
                 methodName,
                 AnnotatedJavaType.convertFromAnnotatedJavaTypes(paramTypes));
+    }
+
+    /**
+     * Return method to create a list of entities
+     * 
+     * @return
+     */
+    private MethodMetadata getCreateMethod() {
+
+        // Define parameters types
+
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(listOfEntitiesType);
+
+        // Check if a method exist in type
+        final MethodMetadata method = methodExists(CREATE_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method
+            return method;
+        }
+
+        // Define method annotations (none in this case)
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(new AnnotationMetadataBuilder(
+                SpringJavaType.TRANSACTIONAL));
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names (none in this case)
+        JavaSymbolName parameterName = new JavaSymbolName(
+                entityPlural.toLowerCase());
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(parameterName);
+
+        // --- Create the method body ---
+
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        // for(Vet vet : vets) {
+        // vet.persist();
+        // }
+        bodyBuilder.appendFormalLine(String.format("for( %s %s : %s) {",
+                entityName, entityName.toLowerCase(), parameterName));
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine(String.format("%s.persist();",
+                entityName.toLowerCase()));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        JavaType returnType = JavaType.VOID_PRIMITIVE;
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, CREATE_METHOD, returnType,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    /**
+     * Return method to update a list of entities
+     * 
+     * @return
+     */
+    private MethodMetadata getUpdateMethod() {
+
+        // Define parameters types
+
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(listOfEntitiesType);
+
+        // Check if a method exist in type
+        final MethodMetadata method = methodExists(UPDATE_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method
+            return method;
+        }
+
+        // Define method annotations (none in this case)
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(new AnnotationMetadataBuilder(
+                SpringJavaType.TRANSACTIONAL));
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names (none in this case)
+        JavaSymbolName parameterName = new JavaSymbolName(
+                entityPlural.toLowerCase());
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(parameterName);
+
+        // --- Create the method body ---
+
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        List<JavaType> typeParams = new ArrayList<JavaType>();
+        typeParams.add(entity);
+
+        JavaType list = new JavaType("java.util.List", 0, DataType.TYPE, null,
+                typeParams);
+        JavaType arrayList = new JavaType("java.util.ArrayList", 0,
+                DataType.TYPE, null, typeParams);
+
+        // List<Vet> merged = new ArrayList<Vet>();
+        bodyBuilder.appendFormalLine(String.format("%s merged = new %s();",
+                getFinalTypeName(list), getFinalTypeName(arrayList)));
+
+        // for(Vet vet : vets) {
+        // merged.add( vet.merge() );
+        // }
+        // return merged;
+        bodyBuilder.appendFormalLine(String.format("for( %s %s : %s) {",
+                entityName, entityName.toLowerCase(), parameterName));
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine(String.format("merged.add( %s.merge() );",
+                entityName.toLowerCase()));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine("return merged;");
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        JavaType returnType = list;
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, UPDATE_METHOD, returnType,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
     }
 
     public String toString() {
@@ -411,15 +562,15 @@ public class JpaBatchMetadata extends
     }
 
     public JavaSymbolName getDeleteAllMethodName() {
-        return DELETE_ALL;
+        return DELETE_ALL_METHOD;
     }
 
     public JavaSymbolName getDeleteInMethodName() {
-        return DELETE_IN;
+        return DELETE_IN_METHOD;
     }
 
     public JavaSymbolName getDeleteNotInMethodName() {
-        return DELETE_NOT_IN;
+        return DELETE_NOT_IN_METHOD;
     }
 
     public JavaType getListOfIdentifiersType() {
