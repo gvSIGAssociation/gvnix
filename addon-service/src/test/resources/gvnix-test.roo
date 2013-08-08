@@ -66,7 +66,8 @@ remote service import ws --class org.gvnix.test.service.layer.project.services.C
 
 remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy07 --wsdl http://footballpool.dataaccess.eu/data/info.wso?WSDL
 
-remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy08 --wsdl http://ws2.fraudlabs.com/mailboxvalidator.asmx?wsdl
+// Temporaly disabled because java.io.IOException: Server returned HTTP response code: 403
+//remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy08 --wsdl http://ws2.fraudlabs.com/mailboxvalidator.asmx?wsdl
 
 // Disabled temporaly because currently connection timed out
 //remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy09 --wsdl http://www.thomas-bayer.com/axis2/services/BLZService?wsdl
