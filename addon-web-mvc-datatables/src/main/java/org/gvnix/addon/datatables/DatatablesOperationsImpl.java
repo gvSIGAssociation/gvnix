@@ -54,6 +54,8 @@ import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.operations.AbstractOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
@@ -234,6 +236,66 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
             // doUpdateListMenuUrl(javaType, controllerAnnotation);
         }
+    }
+
+    /** {@inheritDoc} */
+    public void annotateDetailController(JavaType javaType, String property) {
+        Validate.notNull(javaType, "Controller required");
+        Validate.notBlank(property, "Property required");
+
+        // Get java type controller
+        ClassOrInterfaceTypeDetails existing = getControllerDetails(javaType);
+
+        // Get controller datatables annotation
+        AnnotationMetadata datatablesAnnotation = MemberFindingUtils
+                .getAnnotationOfType(existing.getAnnotations(),
+                        DATATABLES_ANNOTATION);
+
+        // If no datatables annotation: user message and exit.
+        // Detail only allowed when datatables already applied into controller.
+        Validate.isTrue(
+                datatablesAnnotation != null,
+                "A detail datatables only can be added into an already datatables controller.\n"
+                        + "Please, run 'web mvc datatables add' before or select another type.");
+
+        // TODO Duplicated "detailFields" string: extract constant
+        
+        ArrayAttributeValue<StringAttributeValue> detailFieldsAttributesOld = (ArrayAttributeValue) datatablesAnnotation
+                .getAttribute("detailFields");
+
+        // Get java type controller builder
+        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                existing);
+
+        // Initialize string attributes list for detail fields
+        final List<StringAttributeValue> detailFieldsAttributes = new ArrayList<StringAttributeValue>();
+
+        // Create a string attribute for property
+        final StringAttributeValue detailFieldAttribute = new StringAttributeValue(
+                new JavaSymbolName("ignored"), property);
+        
+        // Add new and old string attributes into list 
+        detailFieldsAttributes.add(detailFieldAttribute);
+        detailFieldsAttributes.addAll(detailFieldsAttributesOld.getValue());
+
+        // Create "detailFields" attributes array from string attributes list
+        ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
+                new JavaSymbolName("detailFields"), detailFieldsAttributes);
+
+        // Get datatables annotation builder and add "detailFields"
+        AnnotationMetadataBuilder datatablesAnnotationBuilder = new AnnotationMetadataBuilder(
+                datatablesAnnotation);
+        datatablesAnnotationBuilder.addAttribute(detailFieldsArray);
+        datatablesAnnotationBuilder.build();
+
+        // Update annotation into controller
+        classOrInterfaceTypeDetailsBuilder
+                .updateTypeAnnotation(datatablesAnnotationBuilder);
+
+        // Save controller changes to disk
+        typeManagementService
+                .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
+                        .build());
     }
 
     private ClassOrInterfaceTypeDetails getControllerDetails(JavaType controller) {

@@ -54,4 +54,9 @@ public @interface GvNIXDatatables {
      * current entity rendered with item information
      */
     String mode() default TABLE;
+
+    /**
+     * @return an array of relation fields show in datatables
+     */
+    String[] detailFields() default "";
 }

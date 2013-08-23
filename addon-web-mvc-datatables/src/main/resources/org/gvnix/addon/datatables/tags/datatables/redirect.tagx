@@ -1,0 +1,16 @@
+<jsp:root xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+  <jsp:output omit-xml-declaration="yes"/>
+  
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)"/>
+  
+  <input id="datatablesRedirect" name="datatablesRedirect" type="hidden" value="${param['datatablesRedirect']}" />
+  
+  <script type="text/javascript">
+  dojo.addOnLoad(function () {
+	  var formInnerBox = dojo.byId("${fn:escapeXml(id)}_submit");
+      var redirecTextBox = dojo.byId("datatablesRedirect");
+	  dojo.place(redirecTextBox, formInnerBox, null);
+  });
+  </script>
+  
+</jsp:root>

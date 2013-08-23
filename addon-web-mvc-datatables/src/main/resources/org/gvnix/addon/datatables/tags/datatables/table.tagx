@@ -203,6 +203,17 @@
   </c:if>
   
   <spring:url value="${path}" var="urlPath" />
+  
+  <spring:url value="" var="urlParams">
+    <spring:param name="form"/>
+    <c:forEach var="paramAux" items="${param}" >
+      <spring:param name="${paramAux.key}" value="${paramAux.value}" />
+    </c:forEach>
+  </spring:url>
+  
+  <script type="text/javascript">
+    var datatablesRedirect = 'datatablesRedirect=' + encodeURIComponent(document.URL);
+  </script>
 
   <c:choose>
     <c:when test="${datatablesNotStandardMode}">
@@ -327,7 +338,7 @@
       <c:set target="${datatables_javaScript_elements_before}" property="${showColumnId}">
 	    function ${showColumnId}(data, type, full) {
 		    var result =  
-	           '<a href="${urlPath}/'+full.${typeIdFieldName}+'" alt="${show_label}" title="${show_label}">'
+	           '<a href="${urlPath}/'+full.${typeIdFieldName} + '?' + datatablesRedirect + '" alt="${show_label}" title="${show_label}">'
 	           + '  <img alt="${show_label}" class="image" src="${show_image_url}" title="${show_label}" />'
 	           + '</a>';
 	           
@@ -353,7 +364,7 @@
         function ${createButtonCallbackId}() {
            var result =
                '<div class="gvnix_dataTables_createItem" style="float:left;margin-left:10px;">'
-               +'<a href="${urlPath}?form" alt="${create_label}" title="${create_label}">'
+               +'<a href="${urlPath}${urlParams}&amp;' + datatablesRedirect + '" alt="${create_label}" title="${create_label}">'
                + '  <img alt="${create_label}" class="image" src="${create_image_url}" title="${create_label}" />'
                + '</a>'
                + '</div>';
@@ -383,7 +394,7 @@
 	    <c:set target="${datatables_javaScript_elements_before}" property="${updateColumnId}">
 	        function ${updateColumnId}(data, type, full) {
 	        	var result =
-	              '<a href="${urlPath}/'+full.${typeIdFieldName}+'?form" alt="${update_label}" title="${update_label}">'
+	              '<a href="${urlPath}/'+full.${typeIdFieldName}+'${currentParams}'+'&amp;' + datatablesRedirect + '" alt="${update_label}" title="${update_label}">'
 	               + '  <img alt="${update_label}" class="image" src="${update_image_url}" title="${update_label}" />'
 	               + '</a>';
 	            return result;
@@ -516,7 +527,7 @@
 		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
 		        function ${removeColumnId}(data, type, full) {
 		        	var result =
-		                '<form action="${urlPath}/'+full.${typeIdFieldName}+'" method="post">'
+		                '<form action="${urlPath}/'+full.${typeIdFieldName}+'?' + datatablesRedirect + '" method="post">'
 		                + '  <input type="hidden" value="DELETE" name="_method"/>'
 		                + '  <input alt="${delete_label}" class="image" src="${delete_image_url}" title="${delete_label}" type="image" value="${delete_label}" onclick="return confirm(${removeColumnId}_confirmation);" />'
 		                + '</form>';
@@ -652,7 +663,7 @@
                   <spring:url value="${path}/${itemId}" var="show_form_url" />
                   <spring:url value="/resources/images/show.png" var="show_image_url" />
                   <spring:message arguments="${typeName}" code="entity_show" var="show_label" htmlEscape="false" />
-                  <a href="${show_form_url}" alt="${fn:escapeXml(show_label)}" title="${fn:escapeXml(show_label)}">
+                  <a href="#" onclick="javascript: window.location = '${show_form_url}?' + datatablesRedirect" alt="${fn:escapeXml(show_label)}" title="${fn:escapeXml(show_label)}">
                     <img alt="${fn:escapeXml(show_label)}" class="image" src="${show_image_url}" title="${fn:escapeXml(show_label)}" />
                   </a>
 		     </c:if>
@@ -672,12 +683,10 @@
 			    <table:action-column id="${updateColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}">
 			    <c:if test="${not empty item }">
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
-	              <spring:url value="${path}/${itemId}" var="update_form_url">
-	                <spring:param name="form" />
-	              </spring:url>
+	              <spring:url value="${path}/${itemId}" var="update_form_url" />
 	              <spring:url value="/resources/images/update.png" var="update_image_url" />
 	              <spring:message arguments="${typeName}" code="entity_update" var="update_label" htmlEscape="false" />
-	              <a href="${update_form_url}" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}">
+	              <a href="#" onclick="javascript: window.location = '${update_form_url}${urlParams}&amp;' + datatablesRedirect" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}">
 	                <img alt="${fn:escapeXml(update_label)}" class="image" src="${update_image_url}" title="${fn:escapeXml(update_label)}" />
 	              </a>				  
 			    </c:if>
@@ -702,7 +711,7 @@
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
                   <spring:url value="${path}/${itemId}" var="delete_form_url" />
                   <spring:url value="/resources/images/delete.png" var="delete_image_url" />
-                  <form:form action="${delete_form_url}" method="DELETE">
+                  <form:form action="#" onsubmit="javascript: this.action = '${delete_form_url}?' + datatablesRedirect" method="DELETE">
                     <spring:message arguments="${typeName}" code="entity_delete" var="delete_label" htmlEscape="false" />
                     <c:set var="delete_confirm_msg">
                       <spring:escapeBody javaScriptEscape="true">

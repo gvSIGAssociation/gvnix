@@ -59,6 +59,14 @@ public interface DatatablesOperations extends Feature {
     void annotateController(JavaType controller, boolean ajax, String mode);
 
     /**
+     * Annotate the provided web mvc controller with {@link GvNIXDatatables}
+     * 
+     * @param controller of master datatables
+     * @param property of controller entity for detail
+     */
+    void annotateDetailController(JavaType controller, String property);
+
+    /**
      * Annotate all controllers with {@link GvNIXDatatables}
      * 
      * @param ajax
