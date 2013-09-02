@@ -66,8 +66,7 @@ public class DatatablesCommands implements CommandMarker {
      * @return true if commands are available
      */
     @CliAvailabilityIndicator({ "web mvc datatables add",
-            "web mvc datatables all",
-            "web mvc datatables detail add"})
+            "web mvc datatables all", "web mvc datatables detail add" })
     public boolean isAddAvailable() {
         return operations.isAddAvailable();
     }
@@ -96,7 +95,7 @@ public class DatatablesCommands implements CommandMarker {
             @CliOption(key = "type", mandatory = true, help = "The controller to apply this component to") JavaType target,
             @CliOption(key = "property", mandatory = true, help = "The controller entity property to show as detail") String property) {
 
-        // Validate property exists and/or auto completed parameter
+        // TODO Validate property exists and/or auto completed parameter
 
         operations.annotateDetailController(target, property);
     }

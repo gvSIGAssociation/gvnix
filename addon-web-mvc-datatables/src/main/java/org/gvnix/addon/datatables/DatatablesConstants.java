@@ -208,4 +208,8 @@ public class DatatablesConstants {
             "org.springframework.beans.BeanWrapper");
     static final JavaType BEAN_WRAPPER_IMP = new JavaType(
             "org.springframework.beans.BeanWrapperImpl");
+
+	static final String URN_TAG_DATATABLES = "urn:jsptagdir:/WEB-INF/tags/datatables";
+
+	static final String DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE = "detailFields";
 }

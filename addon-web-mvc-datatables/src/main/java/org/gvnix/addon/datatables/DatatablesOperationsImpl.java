@@ -258,10 +258,8 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 "A detail datatables only can be added into an already datatables controller.\n"
                         + "Please, run 'web mvc datatables add' before or select another type.");
 
-        // TODO Duplicated "detailFields" string: extract constant
-        
         ArrayAttributeValue<StringAttributeValue> detailFieldsAttributesOld = (ArrayAttributeValue) datatablesAnnotation
-                .getAttribute("detailFields");
+                .getAttribute(DatatablesConstants.DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE);
 
         // Get java type controller builder
         ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
@@ -273,14 +271,14 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         // Create a string attribute for property
         final StringAttributeValue detailFieldAttribute = new StringAttributeValue(
                 new JavaSymbolName("ignored"), property);
-        
-        // Add new and old string attributes into list 
+
+        // Add new and old string attributes into list
         detailFieldsAttributes.add(detailFieldAttribute);
         detailFieldsAttributes.addAll(detailFieldsAttributesOld.getValue());
 
         // Create "detailFields" attributes array from string attributes list
         ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
-                new JavaSymbolName("detailFields"), detailFieldsAttributes);
+                new JavaSymbolName(DatatablesConstants.DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE), detailFieldsAttributes);
 
         // Get datatables annotation builder and add "detailFields"
         AnnotationMetadataBuilder datatablesAnnotationBuilder = new AnnotationMetadataBuilder(
@@ -317,6 +315,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         String controllerPath = datatablesMetadata
                 .getWebScaffoldAnnotationValues().getPath();
         updateListJspx(controller, controllerPath);
+        updateCreateJspx(controller, controllerPath);
+        updateShowJspx(controller, controllerPath);
+        updateUpdateJspx(controller, controllerPath);
 
         // Note there is no need to update finder jspx because this add-on
         // uses "finderNameParam" feature provided by JQuery MVC add-on
@@ -330,6 +331,71 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * @param controllerPath
      */
     private void updateListJspx(JavaType controller, String controllerPath) {
+
+        Map<String, String> uriMap = new HashMap<String, String>(2);
+
+        uriMap.put("xmlns:table", DatatablesConstants.URN_TAG_DATATABLES);
+        uriMap.put("xmlns:page", DatatablesConstants.URN_TAG_DATATABLES);
+
+        updateJspx(controller, controllerPath, uriMap, "list");
+    }
+
+    /**
+     * Updates the create.jspx page of target controller to use detail
+     * datatables component.
+     * 
+     * @param controller
+     * @param controllerPath
+     */
+    private void updateCreateJspx(JavaType controller, String controllerPath) {
+
+        Map<String, String> uriMap = new HashMap<String, String>(1);
+
+        uriMap.put("xmlns:form", DatatablesConstants.URN_TAG_DATATABLES);
+
+        updateJspx(controller, controllerPath, uriMap, "create");
+    }
+
+    /**
+     * Updates the show.jspx page of target controller to use detail datatables
+     * component.
+     * 
+     * @param controller
+     * @param controllerPath
+     */
+    private void updateShowJspx(JavaType controller, String controllerPath) {
+
+        Map<String, String> uriMap = new HashMap<String, String>(1);
+
+        uriMap.put("xmlns:page", DatatablesConstants.URN_TAG_DATATABLES);
+
+        updateJspx(controller, controllerPath, uriMap, "show");
+    }
+
+    /**
+     * Updates the update.jspx page of target controller to use detail
+     * datatables component.
+     * 
+     * @param controller
+     * @param controllerPath
+     */
+    private void updateUpdateJspx(JavaType controller, String controllerPath) {
+
+        Map<String, String> uriMap = new HashMap<String, String>(1);
+
+        uriMap.put("xmlns:form", DatatablesConstants.URN_TAG_DATATABLES);
+
+        updateJspx(controller, controllerPath, uriMap, "update");
+    }
+
+    /**
+     * @param controller
+     * @param controllerPath
+     * @param uriMap
+     * @param jspxName
+     */
+    private void updateJspx(JavaType controller, String controllerPath,
+            Map<String, String> uriMap, String jspxName) {
         Validate.notBlank(controllerPath,
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + controller.getSimpleTypeName() + "'");
@@ -337,11 +403,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + controller.getSimpleTypeName() + "'");
 
-        Map<String, String> uriMap = new HashMap<String, String>(1);
-
-        uriMap.put("xmlns:table", "urn:jsptagdir:/WEB-INF/tags/datatables");
-
-        WebProjectUtils.updateTagxUriInJspx(controllerPath, "list", uriMap,
+        WebProjectUtils.updateTagxUriInJspx(controllerPath, jspxName, uriMap,
                 projectOperations, fileManager);
     }
 
