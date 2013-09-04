@@ -55,8 +55,11 @@ import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.comments.CommentStructure;
+import org.springframework.roo.classpath.details.comments.JavadocComment;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
+import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
@@ -123,6 +126,11 @@ public class DatatablesMetadata extends
      * Related entity
      */
     private final JavaType entity;
+
+    /**
+     * Related entity member details
+     */
+    private final MemberDetails entityMemberDetails;
 
     /**
      * Entity name to use in var names
@@ -194,6 +202,7 @@ public class DatatablesMetadata extends
     public DatatablesMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             DatatablesAnnotationValues annotationValues, JavaType entity,
+            MemberDetails entityMemberDetails,
             List<FieldMetadata> identifierProperties, String entityPlural,
             JavaSymbolName entityManagerMethodName,
             Map<JavaSymbolName, DateTimeFormatDetails> datePatterns,
@@ -214,6 +223,7 @@ public class DatatablesMetadata extends
         // Roo only uses one property
         this.entityIdentifier = identifierProperties.get(0);
         this.entity = entity;
+        this.entityMemberDetails = entityMemberDetails;
         this.entityName = JavaSymbolName.getReservedWordSafeName(entity)
                 .getSymbolName();
         this.entityPlural = entityPlural;
@@ -258,6 +268,13 @@ public class DatatablesMetadata extends
         builder.addMethod(getListRooRequestMethod());
         builder.addMethod(getPopulateParameterMapMethod());
         builder.addMethod(getGetPropertyMapMethod());
+
+        // Detail methods
+        builder.addMethod(getListDatatablesDetailMethod());
+        // TODO Implement methods
+        // builder.addMethod(getCreateDatatablesDetailMethod());
+        // builder.addMethod(getUpdateDatatablesDetailMethod());
+        // builder.addMethod(getDeleteDatatablesDetailMethod());
 
         // Add AJAX mode required methods
         if (isAjax()) {
@@ -679,6 +696,116 @@ public class DatatablesMetadata extends
     }
 
     /**
+     * Returns <code>listDatatablesDetail</code> method <br>
+     * This method is default list request handler for detail datatables
+     * controllers
+     * 
+     * @return
+     */
+    private MethodMetadata getListDatatablesDetailMethod() {
+
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(MODEL, HTTP_SERVLET_REQUEST);
+
+        // Include Item in parameters to use spring's binder to get baseFilter
+        // values
+        parameterTypes.add(new AnnotatedJavaType(entity,
+                new AnnotationMetadataBuilder(MODEL_ATTRIBUTE).build()));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(new JavaSymbolName(
+                DatatablesConstants.LIST_DATATABLES_DETAIL_METHOD_NAME),
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // @RequestMapping
+        AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
+        methodAnnotation.setAnnotationType(REQUEST_MAPPING);
+
+        // @RequestMapping(... produces = "text/html")
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML);
+
+        // @RequestMapping(... value ="/list")
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_VALUE_LIST);
+
+        annotations.add(methodAnnotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(UI_MODEL);
+        parameterNames.add(new JavaSymbolName(
+                DatatablesConstants.REQUEST_PARAMETER_NAME));
+
+        // Include Item in parameters to use spring's binder to get baseFilter
+        // values
+        parameterNames.add(new JavaSymbolName(entityName));
+
+        // Add method javadoc (not generated to disk because #10229)
+        CommentStructure comments = new CommentStructure();
+        JavadocComment javadoc = new JavadocComment(
+                "Show only the list view fragment for entity as detail datatables into a master datatables.");
+        comments.addComment(javadoc, CommentStructure.CommentLocation.BEGINNING);
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        // [Code generated]
+        bodyBuilder
+                .appendFormalLine("// Do common datatables operations: get entity list filtered by request parameters");
+
+        if (!isAjax()) {
+            // listDatatables(uiModel, request, pet);
+            bodyBuilder.appendFormalLine(LIST_DATATABLES.getSymbolName()
+                    .concat("(uiModel, request, ")
+                    .concat(entity.getSimpleTypeName().toLowerCase())
+                    .concat(");"));
+        }
+        else {
+            // listDatatables(uiModel, request);
+            bodyBuilder.appendFormalLine(LIST_DATATABLES.getSymbolName()
+                    .concat("(uiModel, request);"));
+        }
+
+        bodyBuilder
+                .appendFormalLine("// Show only the list fragment (without footer, header, menu, etc.) ");
+        // return "forward:/WEB-INF/views/pets/list.jspx";
+        bodyBuilder.appendFormalLine("return \"forward:/WEB-INF/views/".concat(
+                webScaffoldAnnotationValues.getPath()).concat("/list.jspx\";"));
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(),
+                Modifier.PUBLIC,
+                new JavaSymbolName(
+                        DatatablesConstants.LIST_DATATABLES_DETAIL_METHOD_NAME),
+                JavaType.STRING, parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+        methodBuilder.setCommentStructure(comments);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    /**
      * Build body method <code>getPropertyMap</code> method. <br>
      * This method returns a Map with bean properties which appears on a
      * Enumeration (usually from httpRequest.getParametersNames())
@@ -821,7 +948,8 @@ public class DatatablesMetadata extends
 
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-        parameterNames.add(new JavaSymbolName("request"));
+        parameterNames.add(new JavaSymbolName(
+                DatatablesConstants.REQUEST_PARAMETER_NAME));
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -980,10 +1108,16 @@ public class DatatablesMetadata extends
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
         methodAnnotation.addStringAttribute("headers",
                 "Accept=application/json");
-        methodAnnotation.addStringAttribute("value", "/datatables/ajax");
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
+                        "/datatables/ajax");
         methodAnnotation.addStringAttribute("params",
                 "ajax_find=".concat(finderNameValue));
-        methodAnnotation.addStringAttribute("produces", "application/json");
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
+                        "application/json");
         annotations.add(methodAnnotation);
         annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
 
@@ -1491,7 +1625,10 @@ public class DatatablesMetadata extends
         methodAnnotation.addEnumAttribute("method", REQUEST_METHOD, "GET");
 
         // @RequestMapping(... produces = "text/html")
-        methodAnnotation.addStringAttribute("produces", "text/html");
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML);
 
         annotations.add(methodAnnotation);
 
@@ -1501,7 +1638,8 @@ public class DatatablesMetadata extends
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(UI_MODEL);
-        parameterNames.add(new JavaSymbolName("request"));
+        parameterNames.add(new JavaSymbolName(
+                DatatablesConstants.REQUEST_PARAMETER_NAME));
 
         if (!isAjax()) {
             // In DOM mode we include Item in parameters to use
@@ -1556,9 +1694,11 @@ public class DatatablesMetadata extends
                 "%s.addAttribute(\"%s\",%s);", UI_MODEL.getSymbolName(),
                 entityPlural.toLowerCase(), listVarName));
 
+        buildListDatatablesRequestMethodDetailBody(bodyBuilder);
+
         // return "pets/list";
         bodyBuilder.appendFormalLine(String.format("return \"%s/list\";",
-                entityPlural.toLowerCase()));
+                webScaffoldAnnotationValues.getPath()));
 
     }
 
@@ -1588,9 +1728,71 @@ public class DatatablesMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
+        buildListDatatablesRequestMethodDetailBody(bodyBuilder);
+
         // [Code generated] return "pets/list";
         bodyBuilder.appendFormalLine(String.format("return \"%s/list\";",
-                entityPlural.toLowerCase()));
+                webScaffoldAnnotationValues.getPath()));
+    }
+
+    /**
+     * Build method body for <code>listDatatables</code> method for AJAX mode
+     * 
+     * @param bodyBuilder
+     */
+    private void buildListDatatablesRequestMethodDetailBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+
+        String[] fieldNames = getDetailFields();
+        if (fieldNames.length > 0) {
+
+            bodyBuilder
+                    .appendFormalLine("// Add attribute available into view with information about each detail datatables ");
+            bodyBuilder
+                    .appendFormalLine("Map<String, String> details = new HashMap<String, String>();");
+            bodyBuilder
+                    .appendFormalLine("List<Map<String, String>> detailsInfo = new ArrayList<Map<String, String>>("
+                            .concat(String.valueOf(fieldNames.length)).concat(
+                                    ");"));
+
+            List<FieldMetadata> entityFields = entityMemberDetails.getFields();
+
+            for (int i = 0; i < fieldNames.length; i++) {
+
+                String fieldName = fieldNames[i];
+
+                for (FieldMetadata entityField : entityFields) {
+
+                    if (entityField.getFieldName().getSymbolName()
+                            .equals(fieldName)) {
+
+                        // TODO Get entity path instead of field name
+                        bodyBuilder
+                                .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
+                        bodyBuilder.appendFormalLine("details.put(\"path\", \""
+                                .concat(entityField.getFieldName()
+                                        .getSymbolName()).concat("/list\");"));
+                        bodyBuilder
+                                .appendFormalLine("// Property name in detail entity with the relation to master entity");
+                        bodyBuilder
+                                .appendFormalLine("details.put(\"mappedBy\", \""
+                                        .concat(entityField
+                                                .getAnnotation(
+                                                        new JavaType(
+                                                                "javax.persistence.OneToMany"))
+                                                .getAttribute("mappedBy")
+                                                .getValue().toString()).concat(
+                                                "\");"));
+
+                        bodyBuilder
+                                .appendFormalLine("detailsInfo.add(details);");
+                    }
+                }
+
+            }
+            bodyBuilder
+                    .appendFormalLine("uiModel.addAttribute(\"detailsInfo\", detailsInfo);");
+        }
     }
 
     /**
@@ -1625,8 +1827,14 @@ public class DatatablesMetadata extends
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
 
         // @RequestMapping(produces = "text/html")
-        annotations.add(helper.getRequestMappingAnnotation(null, null, null,
-                "text/html", null, null));
+        annotations
+                .add(helper
+                        .getRequestMappingAnnotation(
+                                null,
+                                null,
+                                null,
+                                DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
+                                null, null));
 
         // Define method throws types (none in this case)
         List<JavaType> throwsTypes = new ArrayList<JavaType>();
@@ -1700,8 +1908,14 @@ public class DatatablesMetadata extends
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
         methodAnnotation.addStringAttribute("headers",
                 "Accept=application/json");
-        methodAnnotation.addStringAttribute("value", "/datatables/ajax");
-        methodAnnotation.addStringAttribute("produces", "application/json");
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
+                        "/datatables/ajax");
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
+                        "application/json");
         annotations.add(methodAnnotation);
         annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
 
@@ -1766,8 +1980,14 @@ public class DatatablesMetadata extends
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
         methodAnnotation.addStringAttribute("headers",
                 "Accept=application/json");
-        methodAnnotation.addStringAttribute("value", "/datatables/ajax");
-        methodAnnotation.addStringAttribute("produces", "application/json");
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
+                        "/datatables/ajax");
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
+                        "application/json");
         annotations.add(methodAnnotation);
         annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
 
@@ -2128,6 +2348,13 @@ public class DatatablesMetadata extends
      */
     public boolean isAjax() {
         return annotationValues.isAjax();
+    }
+
+    /**
+     * @return controller entity properties for detail datatables
+     */
+    public String[] getDetailFields() {
+        return annotationValues.getDetailFields();
     }
 
     /**

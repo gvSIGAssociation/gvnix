@@ -54,9 +54,7 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnno
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.customdata.CustomDataKeys;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
@@ -206,8 +204,9 @@ public final class DatatablesMetadataProvider extends
 
         return new DatatablesMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, entity,
-                identifiers, plural, entityManagerMethodName, datePatterns,
-                webScaffoldAspectName, webJpaBatchMetadata, jpaQueryMetadata,
+                entityMemberDetails, identifiers, plural,
+                entityManagerMethodName, datePatterns, webScaffoldAspectName,
+                webJpaBatchMetadata, jpaQueryMetadata,
                 webScaffoldAnnotationValues, findersRegistered);
     }
 
@@ -344,8 +343,8 @@ public final class DatatablesMetadataProvider extends
             return null;
         }
 
-        final String simpleTypeName = getConcreteJavaType(memberDetails)
-                .getSimpleTypeName();
+        // final String simpleTypeName = getConcreteJavaType(memberDetails)
+        // .getSimpleTypeName();
         // final String jpaQuery = getJpaQuery(tokens, simpleTypeName,
         // finderName,
         // plural, entityName);

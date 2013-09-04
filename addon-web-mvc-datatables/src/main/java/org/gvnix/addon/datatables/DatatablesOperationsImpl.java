@@ -278,7 +278,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
         // Create "detailFields" attributes array from string attributes list
         ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
-                new JavaSymbolName(DatatablesConstants.DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE), detailFieldsAttributes);
+                new JavaSymbolName(
+                        DatatablesConstants.DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE),
+                detailFieldsAttributes);
 
         // Get datatables annotation builder and add "detailFields"
         AnnotationMetadataBuilder datatablesAnnotationBuilder = new AnnotationMetadataBuilder(

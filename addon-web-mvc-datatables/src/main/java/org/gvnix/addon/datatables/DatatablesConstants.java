@@ -209,7 +209,19 @@ public class DatatablesConstants {
     static final JavaType BEAN_WRAPPER_IMP = new JavaType(
             "org.springframework.beans.BeanWrapperImpl");
 
-	static final String URN_TAG_DATATABLES = "urn:jsptagdir:/WEB-INF/tags/datatables";
+    static final String URN_TAG_DATATABLES = "urn:jsptagdir:/WEB-INF/tags/datatables";
 
-	static final String DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE = "detailFields";
+    static final String DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE = "detailFields";
+
+    static final String LIST_DATATABLES_DETAIL_METHOD_NAME = "listDatatablesDetail";
+
+    static final String REQUEST_PARAMETER_NAME = "request";
+
+    static final String REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_VALUE_LIST = "/list";
+
+    static final String REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME = "value";
+
+    static final String REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML = "text/html";
+
+    static final String REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME = "produces";
 }

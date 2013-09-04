@@ -39,6 +39,8 @@ public class DatatablesAnnotationValues extends AbstractAnnotationValues {
     private boolean ajax = true;
     @AutoPopulate
     private String mode = null;
+    @AutoPopulate
+    private String[] detailFields = {};
 
     public DatatablesAnnotationValues(
             final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {
@@ -76,5 +78,9 @@ public class DatatablesAnnotationValues extends AbstractAnnotationValues {
      */
     public String getMode() {
         return mode;
+    }
+
+    public String[] getDetailFields() {
+        return detailFields;
     }
 }
