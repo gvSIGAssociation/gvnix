@@ -271,8 +271,8 @@ public class DatatablesMetadata extends
 
         // Detail methods
         builder.addMethod(getListDatatablesDetailMethod());
+        builder.addMethod(getCreateDatatablesDetailMethod());
         // TODO Implement methods
-        // builder.addMethod(getCreateDatatablesDetailMethod());
         // builder.addMethod(getUpdateDatatablesDetailMethod());
         // builder.addMethod(getDeleteDatatablesDetailMethod());
 
@@ -800,6 +800,110 @@ public class DatatablesMetadata extends
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
         methodBuilder.setCommentStructure(comments);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    /**
+     * Returns <code>createDatatablesDetail</code> method <br>
+     * This method is default create request handler for detail datatables
+     * controllers
+     * 
+     * @return
+     */
+    private MethodMetadata getCreateDatatablesDetailMethod() {
+
+        // @RequestMapping(method = RequestMethod.POST, produces = "text/html",
+        // params = "datatablesRedirect")
+        // public String createDatatablesDetail(@RequestParam(value =
+        // "datatablesRedirect", required = true) String redirect,
+        // @Valid Pet pet, BindingResult bindingResult, Model uiModel,
+        // HttpServletRequest httpServletRequest) {
+
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        parameterTypes.add(helper.createRequestParam(JavaType.STRING,
+                "datatablesRedirect", true, null));
+        parameterTypes.add(new AnnotatedJavaType(entity,
+                new AnnotationMetadataBuilder(new JavaType(
+                        "javax.validation.Valid")).build()));
+        parameterTypes.addAll(AnnotatedJavaType.convertFromJavaTypes(
+                new JavaType("org.springframework.validation.BindingResult"),
+                MODEL, HTTP_SERVLET_REQUEST));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(new JavaSymbolName(
+                "createDatatablesDetail"), parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // @RequestMapping(method = RequestMethod.POST, produces = "text/html",
+        // params = "datatablesRedirect")
+        AnnotationMetadataBuilder requestMappingAnnotation = helper
+                .getRequestMappingAnnotation(
+                        null,
+                        null,
+                        null,
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
+                        null, null);
+        requestMappingAnnotation.addEnumAttribute("method", REQUEST_METHOD,
+                "POST");
+        requestMappingAnnotation.addStringAttribute("params",
+                "datatablesRedirect");
+        annotations.add(requestMappingAnnotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        final List<JavaSymbolName> parameterNames = Arrays.asList(
+                new JavaSymbolName("redirect"), new JavaSymbolName(entity
+                        .getSimpleTypeName().toLowerCase()),
+                new JavaSymbolName("bindingResult"), UI_MODEL,
+                new JavaSymbolName("httpServletRequest"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        bodyBuilder
+                .appendFormalLine("// Do common create operations (check errors, populate, persist, ...)");
+        // String view = create(pet, bindingResult, uiModel,
+        // httpServletRequest);
+        bodyBuilder.appendFormalLine("String view = create(".concat(
+                entity.getSimpleTypeName().toLowerCase()).concat(
+                ", bindingResult, uiModel, httpServletRequest);"));
+        // if (bindingResult.hasErrors() || StringUtils.isBlank(redirect)) {
+        // return view;
+        // }
+        bodyBuilder
+                .appendFormalLine("// If binding errors or no redirect, return common create error view (remain in create form)");
+        bodyBuilder
+                .appendFormalLine("if (bindingResult.hasErrors() || redirect == null || redirect.trim().isEmpty()) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return view;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder
+                .appendFormalLine("// If create success, redirect to given URL: master datatables");
+        // return "redirect:".concat(redirect);
+        bodyBuilder.appendFormalLine("return \"redirect:\".concat(redirect);");
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, new JavaSymbolName(
+                        "createDatatablesDetail"), JavaType.STRING,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
 
         return methodBuilder.build(); // Build and return a MethodMetadata
                                       // instance
