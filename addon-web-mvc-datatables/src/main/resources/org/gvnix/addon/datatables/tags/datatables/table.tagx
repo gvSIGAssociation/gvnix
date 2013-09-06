@@ -394,7 +394,7 @@
 	    <c:set target="${datatables_javaScript_elements_before}" property="${updateColumnId}">
 	        function ${updateColumnId}(data, type, full) {
 	        	var result =
-	              '<a href="${urlPath}/'+full.${typeIdFieldName}+'${currentParams}'+'&amp;' + datatablesRedirect + '" alt="${update_label}" title="${update_label}">'
+	              '<a href="${urlPath}/'+full.${typeIdFieldName}+'${urlParams}'+'&amp;' + datatablesRedirect + '" alt="${update_label}" title="${update_label}">'
 	               + '  <img alt="${update_label}" class="image" src="${update_image_url}" title="${update_label}" />'
 	               + '</a>';
 	            return result;

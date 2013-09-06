@@ -54,7 +54,9 @@ import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.details.comments.CommentStructure;
 import org.springframework.roo.classpath.details.comments.JavadocComment;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
@@ -272,9 +274,8 @@ public class DatatablesMetadata extends
         // Detail methods
         builder.addMethod(getListDatatablesDetailMethod());
         builder.addMethod(getCreateDatatablesDetailMethod());
-        // TODO Implement methods
-        // builder.addMethod(getUpdateDatatablesDetailMethod());
-        // builder.addMethod(getDeleteDatatablesDetailMethod());
+        builder.addMethod(getUpdateDatatablesDetailMethod());
+        builder.addMethod(getDeleteDatatablesDetailMethod());
 
         // Add AJAX mode required methods
         if (isAjax()) {
@@ -881,7 +882,8 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("String view = create(".concat(
                 entity.getSimpleTypeName().toLowerCase()).concat(
                 ", bindingResult, uiModel, httpServletRequest);"));
-        // if (bindingResult.hasErrors() || StringUtils.isBlank(redirect)) {
+        // if (bindingResult.hasErrors() || redirect == null ||
+        // redirect.trim().isEmpty()) {
         // return view;
         // }
         bodyBuilder
@@ -901,6 +903,224 @@ public class DatatablesMetadata extends
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, new JavaSymbolName(
                         "createDatatablesDetail"), JavaType.STRING,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    /**
+     * Returns <code>updateDatatablesDetail</code> method <br>
+     * This method is default update request handler for detail datatables
+     * controllers
+     * 
+     * @return
+     */
+    private MethodMetadata getUpdateDatatablesDetailMethod() {
+
+        // @RequestMapping(method = RequestMethod.PUT, produces = "text/html",
+        // params = "datatablesRedirect")
+        // public String updateDatatablesDetail(@RequestParam(value =
+        // "datatablesRedirect", required = true) String redirect,
+        // @Valid Pet pet, BindingResult bindingResult, Model uiModel,
+        // HttpServletRequest httpServletRequest) {
+
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        parameterTypes.add(helper.createRequestParam(JavaType.STRING,
+                "datatablesRedirect", true, null));
+        parameterTypes.add(new AnnotatedJavaType(entity,
+                new AnnotationMetadataBuilder(new JavaType(
+                        "javax.validation.Valid")).build()));
+        parameterTypes.addAll(AnnotatedJavaType.convertFromJavaTypes(
+                new JavaType("org.springframework.validation.BindingResult"),
+                MODEL, HTTP_SERVLET_REQUEST));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(new JavaSymbolName(
+                "updateDatatablesDetail"), parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // @RequestMapping(method = RequestMethod.PUT, produces = "text/html",
+        // params = "datatablesRedirect")
+        AnnotationMetadataBuilder requestMappingAnnotation = helper
+                .getRequestMappingAnnotation(
+                        null,
+                        null,
+                        null,
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
+                        null, null);
+        requestMappingAnnotation.addEnumAttribute("method", REQUEST_METHOD,
+                "PUT");
+        requestMappingAnnotation.addStringAttribute("params",
+                "datatablesRedirect");
+        annotations.add(requestMappingAnnotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        final List<JavaSymbolName> parameterNames = Arrays.asList(
+                new JavaSymbolName("redirect"), new JavaSymbolName(entity
+                        .getSimpleTypeName().toLowerCase()),
+                new JavaSymbolName("bindingResult"), UI_MODEL,
+                new JavaSymbolName("httpServletRequest"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        bodyBuilder
+                .appendFormalLine("// Do common update operations (check errors, populate, merge, ...)");
+        // String view = update(pet, bindingResult, uiModel,
+        // httpServletRequest);
+        bodyBuilder.appendFormalLine("String view = update(".concat(
+                entity.getSimpleTypeName().toLowerCase()).concat(
+                ", bindingResult, uiModel, httpServletRequest);"));
+        // if (bindingResult.hasErrors() || redirect == null ||
+        // redirect.trim().isEmpty()) {
+        // return view;
+        // }
+        bodyBuilder
+                .appendFormalLine("// If binding errors or no redirect, return common update error view (remain in update form)");
+        bodyBuilder
+                .appendFormalLine("if (bindingResult.hasErrors() || redirect == null || redirect.trim().isEmpty()) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return view;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder
+                .appendFormalLine("// If update success, redirect to given URL: master datatables");
+        // return "redirect:".concat(redirect);
+        bodyBuilder.appendFormalLine("return \"redirect:\".concat(redirect);");
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, new JavaSymbolName(
+                        "updateDatatablesDetail"), JavaType.STRING,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    /**
+     * Returns <code>deleteDatatablesDetail</code> method <br>
+     * This method is default delete request handler for detail datatables
+     * controllers
+     * 
+     * @return
+     */
+    private MethodMetadata getDeleteDatatablesDetailMethod() {
+
+        // @RequestMapping(value = "/{id}", method = RequestMethod.DELETE,
+        // produces = "text/html", params = "datatablesRedirect")
+        // public String deleteDatatablesDetail(@RequestParam(value =
+        // "datatablesRedirect", required = true) String redirect,
+        // @PathVariable("id") Long id, @RequestParam(value = "page", required =
+        // false) Integer page,
+        // @RequestParam(value = "size", required = false) Integer size, Model
+        // uiModel) {
+
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        parameterTypes.add(helper.createRequestParam(JavaType.STRING,
+                "datatablesRedirect", true, null));
+        final List<AnnotationAttributeValue<?>> annotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        annotationAttributes.add(new StringAttributeValue(new JavaSymbolName(
+                "value"), "id"));
+        parameterTypes
+                .add(new AnnotatedJavaType(
+                        JavaType.LONG_OBJECT,
+                        new AnnotationMetadataBuilder(
+                                new JavaType(
+                                        "org.springframework.web.bind.annotation.PathVariable"),
+                                annotationAttributes).build()));
+        parameterTypes.add(helper.createRequestParam(JavaType.INT_OBJECT,
+                "page", false, null));
+        parameterTypes.add(helper.createRequestParam(JavaType.INT_OBJECT,
+                "size", false, null));
+        parameterTypes.addAll(AnnotatedJavaType.convertFromJavaTypes(MODEL));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(new JavaSymbolName(
+                "deleteDatatablesDetail"), parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // @RequestMapping(value = "/{id}", method = RequestMethod.DELETE,
+        // produces = "text/html", params = "datatablesRedirect")
+        AnnotationMetadataBuilder requestMappingAnnotation = helper
+                .getRequestMappingAnnotation(
+                        null,
+                        null,
+                        null,
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
+                        null, null);
+        requestMappingAnnotation.addEnumAttribute("method", REQUEST_METHOD,
+                "DELETE");
+        requestMappingAnnotation.addStringAttribute("params",
+                "datatablesRedirect");
+        requestMappingAnnotation.addStringAttribute("value", "/{id}");
+        annotations.add(requestMappingAnnotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        final List<JavaSymbolName> parameterNames = Arrays.asList(
+                new JavaSymbolName("redirect"), new JavaSymbolName("id"),
+                new JavaSymbolName("page"), new JavaSymbolName("size"),
+                UI_MODEL);
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        bodyBuilder
+                .appendFormalLine("// Do common delete operations (find, remove, add pagination attributes, ...)");
+        // String view = delete(id, page, size, uiModel);
+        bodyBuilder
+                .appendFormalLine("String view = delete(id, page, size, uiModel);");
+        // if (redirect == null || redirect.trim().isEmpty()) {
+        // return view;
+        // }
+        bodyBuilder
+                .appendFormalLine("// If no redirect, return common list view");
+        bodyBuilder
+                .appendFormalLine("if (redirect == null || redirect.trim().isEmpty()) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return view;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder
+                .appendFormalLine("// Redirect to given URL: master datatables");
+        // return "redirect:".concat(redirect);
+        bodyBuilder.appendFormalLine("return \"redirect:\".concat(redirect);");
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, new JavaSymbolName(
+                        "deleteDatatablesDetail"), JavaType.STRING,
                 parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
