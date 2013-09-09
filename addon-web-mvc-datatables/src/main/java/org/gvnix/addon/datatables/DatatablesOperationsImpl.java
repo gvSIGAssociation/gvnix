@@ -257,6 +257,8 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 datatablesAnnotation != null,
                 "A detail datatables only can be added into an already datatables controller.\n"
                         + "Please, run 'web mvc datatables add' before or select another type.");
+        
+        // TODO Validate controller related with property already has datatables applied 
 
         ArrayAttributeValue<StringAttributeValue> detailFieldsAttributesOld = (ArrayAttributeValue) datatablesAnnotation
                 .getAttribute(DatatablesConstants.DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE);
@@ -270,11 +272,23 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
         // Create a string attribute for property
         final StringAttributeValue detailFieldAttribute = new StringAttributeValue(
-                new JavaSymbolName("ignored"), property);
+                new JavaSymbolName("__ARRAY_ELEMENT__"), property);
 
-        // Add new and old string attributes into list
-        detailFieldsAttributes.add(detailFieldAttribute);
-        detailFieldsAttributes.addAll(detailFieldsAttributesOld.getValue());
+        // Add old (if exists) string attributes into list
+        if (detailFieldsAttributesOld != null) {
+            detailFieldsAttributes.addAll(detailFieldsAttributesOld.getValue());
+        }
+
+        // Add new string attribute into list if not included already
+        if (detailFieldsAttributesOld == null
+                || !detailFieldsAttributesOld.getValue().contains(
+                        detailFieldAttribute)) {
+            detailFieldsAttributes.add(detailFieldAttribute);
+        }
+        else {
+            throw new IllegalArgumentException(
+                    "Property was already included in the controller.");
+        }
 
         // Create "detailFields" attributes array from string attributes list
         ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(

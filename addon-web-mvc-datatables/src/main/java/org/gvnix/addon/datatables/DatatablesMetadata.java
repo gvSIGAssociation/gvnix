@@ -55,6 +55,7 @@ import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.details.comments.CommentStructure;
@@ -1042,13 +1043,10 @@ public class DatatablesMetadata extends
         final List<AnnotationAttributeValue<?>> annotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
         annotationAttributes.add(new StringAttributeValue(new JavaSymbolName(
                 "value"), "id"));
-        parameterTypes
-                .add(new AnnotatedJavaType(
-                        JavaType.LONG_OBJECT,
-                        new AnnotationMetadataBuilder(
-                                new JavaType(
-                                        "org.springframework.web.bind.annotation.PathVariable"),
-                                annotationAttributes).build()));
+        parameterTypes.add(new AnnotatedJavaType(entityIdentifier
+                .getFieldType(), new AnnotationMetadataBuilder(new JavaType(
+                "org.springframework.web.bind.annotation.PathVariable"),
+                annotationAttributes).build()));
         parameterTypes.add(helper.createRequestParam(JavaType.INT_OBJECT,
                 "page", false, null));
         parameterTypes.add(helper.createRequestParam(JavaType.INT_OBJECT,
@@ -2090,26 +2088,32 @@ public class DatatablesMetadata extends
                     if (entityField.getFieldName().getSymbolName()
                             .equals(fieldName)) {
 
-                        // TODO Get entity path instead of field name
-                        bodyBuilder
-                                .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
-                        bodyBuilder.appendFormalLine("details.put(\"path\", \""
-                                .concat(entityField.getFieldName()
-                                        .getSymbolName()).concat("/list\");"));
-                        bodyBuilder
-                                .appendFormalLine("// Property name in detail entity with the relation to master entity");
-                        bodyBuilder
-                                .appendFormalLine("details.put(\"mappedBy\", \""
-                                        .concat(entityField
-                                                .getAnnotation(
-                                                        new JavaType(
-                                                                "javax.persistence.OneToMany"))
-                                                .getAttribute("mappedBy")
-                                                .getValue().toString()).concat(
-                                                "\");"));
+                        AnnotationMetadata entityFieldOneToManyAnnotation = entityField
+                                .getAnnotation(new JavaType(
+                                        "javax.persistence.OneToMany"));
 
-                        bodyBuilder
-                                .appendFormalLine("detailsInfo.add(details);");
+                        if (entityFieldOneToManyAnnotation != null) {
+
+                            // TODO Get entity path instead of field name
+                            bodyBuilder
+                                    .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
+                            bodyBuilder
+                                    .appendFormalLine("details.put(\"path\", \""
+                                            .concat(entityField.getFieldName()
+                                                    .getSymbolName()).concat(
+                                                    "/list\");"));
+                            bodyBuilder
+                                    .appendFormalLine("// Property name in detail entity with the relation to master entity");
+                            bodyBuilder
+                                    .appendFormalLine("details.put(\"mappedBy\", \""
+                                            .concat(entityFieldOneToManyAnnotation
+                                                    .getAttribute("mappedBy")
+                                                    .getValue().toString())
+                                            .concat("\");"));
+
+                            bodyBuilder
+                                    .appendFormalLine("detailsInfo.add(details);");
+                        }
                     }
                 }
 
