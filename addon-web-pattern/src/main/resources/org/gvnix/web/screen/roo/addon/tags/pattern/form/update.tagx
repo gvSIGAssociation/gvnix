@@ -336,7 +336,7 @@
             <td colspan="${colCounter}">
 
               <!-- gvnix pagination -->
-              <pattern:paginationadd field="${id}" relatedEntitySet="${data}" />
+              <pattern:paginationadd field="${id}" relatedEntitySet="${data}" maxPages="${maxPages}" />
 
               <!-- Add all URL params, except 'exception' to avoid repetition -->
               <spring:url value="" var="currentUrl" htmlEscape="false">

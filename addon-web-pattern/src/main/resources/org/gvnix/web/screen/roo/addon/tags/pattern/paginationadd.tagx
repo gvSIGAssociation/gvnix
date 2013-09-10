@@ -7,6 +7,7 @@
   <jsp:directive.attribute name="field" type="java.lang.String" required="true" description="The field name of the object."/>
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="relatedEntitySet" type="java.util.Collection" required="true" description="Collection of related entities."/>
+  <jsp:directive.attribute name="maxPages" type="java.lang.Integer" required="true" description="Max pages to show if pagination already calculated on controller."/>
 
   <c:if test="${empty render or render}">
 
@@ -22,6 +23,7 @@
             <!-- Use the attributes inside the scriptlet -->
             <jsp:useBean id="field" type="java.lang.String" />
             <jsp:useBean id="relatedEntitySet" type="java.util.Collection" />
+            <jsp:useBean id="maxPages" type="java.lang.Integer" />
 
             <!--
               Creates the attribute maxPages in jspContext to set the pagination.
@@ -60,15 +62,21 @@
               jspContext.setAttribute("parameterList", parameterList);
               jspContext.setAttribute("parameterValuesList", parameterValuesList);
 
-              Integer maxPages = relatedEntitySet.size() / Integer.parseInt(parameterValuesList.get(1).toString());
-              Integer lastpage = relatedEntitySet.size() % Integer.parseInt(parameterValuesList.get(1).toString());
-
+              // There is no calculated max pages on controller: calculate it and pagination on page
+              if (maxPages == null || maxPages <= 0) {
+                  maxPages = relatedEntitySet.size() / Integer.parseInt(parameterValuesList.get(1).toString());
+                  Integer lastpage = relatedEntitySet.size() % Integer.parseInt(parameterValuesList.get(1).toString());
+                  jspContext.setAttribute("maxPages", lastpage == 0 ? maxPages : maxPages + 1);
+              }
             //]]></jsp:scriptlet>
 
             <!-- If pages, show pagination -->
             <c:if test="${not empty maxPages}">
               <pattern:paginationview maxPages="${maxPages}" parameterList="${parameterList}" parameterValuesList="${parameterValuesList}"/>
             </c:if>
+            
+            <!-- Reset max pages parameter to avoid reuse it -->
+            <c:set var="maxPages" value="" scope="request"/>
 
           </c:when>
 
