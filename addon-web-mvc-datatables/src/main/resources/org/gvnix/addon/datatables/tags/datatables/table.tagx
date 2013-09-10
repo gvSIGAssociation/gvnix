@@ -216,7 +216,7 @@
   </script>
 
   <c:choose>
-    <c:when test="${datatablesNotStandardMode}">
+    <c:when test="${not datatablesStandardMode}">
      <!-- 
      ******* Register views configuration ******
      -->
@@ -619,7 +619,7 @@
       colReorder="${colReorder}"
     >
     	<c:choose>
-    	<c:when test="${datatablesNotStandardMode}">
+    	<c:when test="${not datatablesStandardMode}">
     		<!-- Cell to replace by data -->
 			<datatables:column id="${columnId}" searchable="false" property="${rowIdBase}"
 				filterable="false" sortable="false"></datatables:column>
