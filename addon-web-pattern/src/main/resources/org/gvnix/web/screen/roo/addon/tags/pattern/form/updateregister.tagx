@@ -220,9 +220,20 @@
           <!-- Calculate pagination parameters -->
           <c:set var="page" value="${id}Page" scope="request"/>
           <c:set var="pageSize" value="${id}PageSize" scope="request"/>
-          <c:set var="beginItem" value="0" scope="request"/>
-          <c:set var="endItem" value="${fn:length(data) == 0 ? 0 : fn:length(data) - 1}" scope="request"/>            
-
+          
+          <c:choose>
+	          <c:when test='${fn:length(data) le param[pageSize]}'>
+	          	<!-- The list of records provided to the page fits in the page size: no pagination or paginated on server -->
+	          	<c:set var="beginItem" value="0" scope="request"/>
+	          	<c:set var="endItem" value="${fn:length(data) == 0 ? 0 : fn:length(data) - 1}" scope="request"/>
+	          </c:when>
+	          <c:otherwise>
+	          	<!-- The list of records provided to the page not fits in the page size: pagination on page -->
+	          	<c:set var="beginItem" value="${empty param[page] or empty param[pageSize] ? 0 : param[page] * param[pageSize] - param[pageSize]}" scope="request"/>
+	          	<c:set var="endItem" value="${empty param[page] or empty param[pageSize] ? 9 : param[page] * param[pageSize] - 1}" scope="request"/>
+	          </c:otherwise>
+          </c:choose>
+          
           <!-- Create a row for each item on data collection between pagination items -->
           <c:forEach items="${data}" var="item" varStatus="pos" begin="${beginItem}" end="${endItem}">
             <tr class="${rowStylePrefix}${pos.count}">
