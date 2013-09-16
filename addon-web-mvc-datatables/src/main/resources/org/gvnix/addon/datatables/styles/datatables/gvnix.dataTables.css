@@ -128,10 +128,3 @@ a.selection_all {
 a.selection_none {
 	background: url("../../images/datatables/book_delete.png") no-repeat scroll center center transparent;
 }
-
-/* DETAIL */
-
-/* Main box to show detail datatable for N:M relation of a datatable */
-div.dataTables_detail_container {
-	overflow: visible;
-}

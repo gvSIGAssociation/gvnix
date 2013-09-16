@@ -33,37 +33,49 @@
     	<c:set value="${detailsInfo}" var="detailsInfo" />
     </c:if>
     
-    <c:if test="${empty detail or detail}">
+    <c:if test="${(empty detail or detail) and fn:length(detailsInfo) gt 0}">
+    
+    	<c:set value="${id}_detail" var="mainDatatablesId" />
+    
+    	<div id="${mainDatatablesId}"> 
+    	<ul>
+	    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="datatablesIndex">
+	    	<c:set value="${mainDatatablesId}_${datatablesIndex.index}" var="datatablesId" />
+	    	<li><a href="#${datatablesId}"><span><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${detailItem.path}" htmlEscape="false" /></span></a></li>
+		</c:forEach>
+		</ul>
     
 	    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="datatablesIndex">
 	
-	    	<c:set value="${id}_detail_${datatablesIndex.index}" var="datatablesId" />
+	    	<c:set value="${mainDatatablesId}_${datatablesIndex.index}" var="datatablesId" />
 	    
-		    <div class="dataTables_detail_container" id="${datatablesId}"/>
+		    <div id="${datatablesId}">
+		    <!-- Block to include one detail -->
+		    </div>
 		    <script type="text/javascript">
 		    
-		    	function loadDetail (trId) {
-			    	var url = '<spring:url value="${detailItem.path}" javaScriptEscape="true" />?${detailItem.mappedBy}=' + trId;
+		    	function loadDetail${datatablesId} (trId) {
+			    	var url = '<spring:url value="${detailItem.path}/list" javaScriptEscape="true" />?${detailItem.mappedBy}=' + trId;
 					$.get(url)
 					.done(function(datatablesDetailContent) {
 						var datatablesDetailContainer = $('#${datatablesId}');
 						datatablesDetailContainer.html(datatablesDetailContent);
-						$('#${datatablesId}').show();
+						$('#${mainDatatablesId}').show();
 					})
 					.fail(function(error) {
 						alert('<spring:message code="datatables_detail_get_error" text="Error getting detail datatable from server." javaScriptEscape="true" />' +
 								' (Error: ' + error.status + ', URL: ' + url + ').');
-						$('#${datatablesId}').hide();
+						$('#${mainDatatablesId}').hide();
 					});
 		    	}
 		    	
-		    	function hideDetail () {
-		    		$('#${datatablesId}').hide();
+		    	function hideDetail${datatablesId} () {
+		    		$('#${mainDatatablesId}').hide();
 		    	}
 				
 				// para registrar un callback
 				
-				function callbackFunct (selection, action, trId){
+				function callbackFunct${datatablesId} (selection, action, trId){
 					var selectCount = selection.fnVisibleRowsSelecteds();
 					// action puede ser 'all', 'none', 'select' o 'deselect'
 					// trId es el id del registro (null para 'all' y 'none')
@@ -73,9 +85,9 @@
 						if (trNode){
 							// hacer cosas
 							if (action == 'select') {
-								loadDetail(trId);
+								loadDetail${datatablesId}(trId);
 							} else {
-								hideDetail();
+								hideDetail${datatablesId}();
 							}
 						} else {
 							// el nodo 'tr' no esta accesible (modo AJAX y registro en otra pagina)
@@ -83,12 +95,28 @@
 					}
 				}
 				
+				hideDetail${datatablesId}();
+				
 		    	<c:set var="tableId" value="${fn:substring(id,1,-1) }"/>
-				GvNIX_Selection.fnAddSelectionChangeCallback("${tableId}",callbackFunct);
+				GvNIX_Selection.fnAddSelectionChangeCallback("${tableId}", callbackFunct${datatablesId});
 				
 		    </script>
 		    
 		</c:forEach>
+		
+		</div>
+		
+		<script type="text/javascript">
+			$(function() {
+				var tabs = $( "#${mainDatatablesId}" ).tabs();
+				tabs.find( ".ui-tabs-nav" ).sortable({
+					axis: "x",
+					stop: function() {
+						tabs.tabs( "refresh" );
+					}
+				});
+			});
+		</script>
     
     </c:if>
     

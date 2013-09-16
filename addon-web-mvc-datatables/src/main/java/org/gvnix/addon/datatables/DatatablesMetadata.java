@@ -2071,7 +2071,7 @@ public class DatatablesMetadata extends
             bodyBuilder
                     .appendFormalLine("// Add attribute available into view with information about each detail datatables ");
             bodyBuilder
-                    .appendFormalLine("Map<String, String> details = new HashMap<String, String>();");
+                    .appendFormalLine("Map<String, String> details;");
             bodyBuilder
                     .appendFormalLine("List<Map<String, String>> detailsInfo = new ArrayList<Map<String, String>>("
                             .concat(String.valueOf(fieldNames.length)).concat(
@@ -2093,15 +2093,17 @@ public class DatatablesMetadata extends
                                         "javax.persistence.OneToMany"));
 
                         if (entityFieldOneToManyAnnotation != null) {
+                        	
+                        	bodyBuilder.appendFormalLine("details = new HashMap<String, String>();");
 
-                            // TODO Get entity path instead of field name
+                            // TODO Get entity path
                             bodyBuilder
                                     .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
                             bodyBuilder
                                     .appendFormalLine("details.put(\"path\", \""
                                             .concat(entityField.getFieldName()
                                                     .getSymbolName()).concat(
-                                                    "/list\");"));
+                                                    "\");"));
                             bodyBuilder
                                     .appendFormalLine("// Property name in detail entity with the relation to master entity");
                             bodyBuilder

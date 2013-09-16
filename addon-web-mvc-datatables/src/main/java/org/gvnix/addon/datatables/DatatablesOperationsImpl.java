@@ -257,8 +257,8 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 datatablesAnnotation != null,
                 "A detail datatables only can be added into an already datatables controller.\n"
                         + "Please, run 'web mvc datatables add' before or select another type.");
-        
-        // TODO Validate controller related with property already has datatables applied 
+
+        // TODO Validate controller related with property already has datatables
 
         ArrayAttributeValue<StringAttributeValue> detailFieldsAttributesOld = (ArrayAttributeValue) datatablesAnnotation
                 .getAttribute(DatatablesConstants.DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE);
