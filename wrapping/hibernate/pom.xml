@@ -32,7 +32,7 @@
   <parent>
     <groupId>org.gvnix.wrapping</groupId>
     <artifactId>org.gvnix.wrapping.root</artifactId>
-    <version>1.1.0-RELEASE</version>
+    <version>1.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.gvnix.wrapping.org.hibernate.root</artifactId>
