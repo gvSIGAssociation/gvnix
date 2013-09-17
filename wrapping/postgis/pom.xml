@@ -37,7 +37,7 @@
 
   <!-- Ver sistema de nominación en ../README.rst -->
   <artifactId>org.gvnix.wrapping.org.postgis.postgis-jdbc</artifactId>
-  <version>1.5.3</version>
+  <version>1.5.8</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - PostgreSQL Fragment - PostGIS JDBC driver</name>
   <description>PostGIS JDBC driver Fragment. This OSGi fragment adds spatial database extension for PostgreSQL.</description>
