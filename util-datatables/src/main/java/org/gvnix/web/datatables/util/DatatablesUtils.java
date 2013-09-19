@@ -749,23 +749,28 @@ public class DatatablesUtils {
                 // Convert field value to string
                 try {
                     value = entityBean.getPropertyValue(fieldName);
-                    if (Calendar.class.isAssignableFrom(value.getClass())) {
-                        value = ((Calendar) value).getTime();
-                    }
-                    if (Date.class.isAssignableFrom(value.getClass())) {
-                        String pattern = getPattern(datePatterns,
-                                entityBean.getWrappedClass(), fieldName);
-                        DateFormat format = StringUtils.isEmpty(pattern) ? defaultFormat
-                                : new SimpleDateFormat(pattern);
-                        valueStr = format.format(value);
-                    }
-                    else if (conversionService.canConvert(value.getClass(),
-                            String.class)) {
-                        valueStr = conversionService.convert(value,
-                                String.class);
+                    if (value != null) {
+                        if (Calendar.class.isAssignableFrom(value.getClass())) {
+                            value = ((Calendar) value).getTime();
+                        }
+                        if (Date.class.isAssignableFrom(value.getClass())) {
+                            String pattern = getPattern(datePatterns,
+                                    entityBean.getWrappedClass(), fieldName);
+                            DateFormat format = StringUtils.isEmpty(pattern) ? defaultFormat
+                                    : new SimpleDateFormat(pattern);
+                            valueStr = format.format(value);
+                        }
+                        else if (conversionService.canConvert(value.getClass(),
+                                String.class)) {
+                            valueStr = conversionService.convert(value,
+                                    String.class);
+                        }
+                        else {
+                            valueStr = ObjectUtils.getDisplayString(value);
+                        }
                     }
                     else {
-                        valueStr = ObjectUtils.getDisplayString(value);
+                        valueStr = "";
                     }
                 }
                 catch (Exception ex) {
