@@ -2070,8 +2070,7 @@ public class DatatablesMetadata extends
 
             bodyBuilder
                     .appendFormalLine("// Add attribute available into view with information about each detail datatables ");
-            bodyBuilder
-                    .appendFormalLine("Map<String, String> details;");
+            bodyBuilder.appendFormalLine("Map<String, String> details;");
             bodyBuilder
                     .appendFormalLine("List<Map<String, String>> detailsInfo = new ArrayList<Map<String, String>>("
                             .concat(String.valueOf(fieldNames.length)).concat(
@@ -2093,8 +2092,9 @@ public class DatatablesMetadata extends
                                         "javax.persistence.OneToMany"));
 
                         if (entityFieldOneToManyAnnotation != null) {
-                        	
-                        	bodyBuilder.appendFormalLine("details = new HashMap<String, String>();");
+
+                            bodyBuilder
+                                    .appendFormalLine("details = new HashMap<String, String>();");
 
                             // TODO Get entity path
                             bodyBuilder
