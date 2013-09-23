@@ -50,7 +50,7 @@ public class JpaBatchCommands implements CommandMarker {
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
-    @CliAvailabilityIndicator({ "jpa batch create", "jpa batch all" })
+    @CliAvailabilityIndicator({ "jpa batch add", "jpa batch all" })
     public boolean isCommandAvailable() {
         return operations.isCommandAvailable();
     }
