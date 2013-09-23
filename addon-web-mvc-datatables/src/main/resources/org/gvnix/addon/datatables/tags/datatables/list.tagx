@@ -97,21 +97,25 @@
 				
 				hideDetail${datatablesId}();
 				
-		    	<c:set var="tableId" value="${fn:substring(id,1,-1) }"/>
-				GvNIX_Selection.fnAddSelectionChangeCallback("${tableId}", callbackFunct${datatablesId});
+				<c:if test="${datatablesStandardMode}">
+		    		<c:set var="tableId" value="${fn:substring(id,1,-1) }"/>
+					GvNIX_Selection.fnAddSelectionChangeCallback("${tableId}", callbackFunct${datatablesId});
+				</c:if>
 				
 		    </script>
 		    
 		</c:forEach>
 
+		<c:if test="${not datatablesStandardMode}">
 		<script type="text/javascript">
-		function rowCallback( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-			<c:forEach items="${detailsInfo}" var="detailItem" varStatus="datatablesIndex">
-	    		<c:set value="${mainDatatablesId}_${datatablesIndex.index}" var="datatablesId" />
-	    		loadDetail${datatablesId}(nRow.id);
-	    	</c:forEach>
-		}
+			function rowCallback( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+				<c:forEach items="${detailsInfo}" var="detailItem" varStatus="datatablesIndex">
+		    		<c:set value="${mainDatatablesId}_${datatablesIndex.index}" var="datatablesId" />
+		    		loadDetail${datatablesId}(nRow.id);
+		    	</c:forEach>
+			}
 		</script>
+		</c:if>
 				
 		</div>
 		

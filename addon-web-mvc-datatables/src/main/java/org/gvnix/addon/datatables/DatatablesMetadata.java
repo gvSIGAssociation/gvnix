@@ -2093,28 +2093,34 @@ public class DatatablesMetadata extends
 
                         if (entityFieldOneToManyAnnotation != null) {
 
-                            bodyBuilder
-                                    .appendFormalLine("details = new HashMap<String, String>();");
+                            String entityFieldOneToManyAnnotationMappedBy = entityFieldOneToManyAnnotation
+                                    .getAttribute("mappedBy").getValue()
+                                    .toString();
 
-                            // TODO Get entity path
-                            bodyBuilder
-                                    .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
-                            bodyBuilder
-                                    .appendFormalLine("details.put(\"path\", \""
-                                            .concat(entityField.getFieldName()
-                                                    .getSymbolName()).concat(
-                                                    "\");"));
-                            bodyBuilder
-                                    .appendFormalLine("// Property name in detail entity with the relation to master entity");
-                            bodyBuilder
-                                    .appendFormalLine("details.put(\"mappedBy\", \""
-                                            .concat(entityFieldOneToManyAnnotation
-                                                    .getAttribute("mappedBy")
-                                                    .getValue().toString())
-                                            .concat("\");"));
+                            if (entityFieldOneToManyAnnotationMappedBy != null) {
 
-                            bodyBuilder
-                                    .appendFormalLine("detailsInfo.add(details);");
+                                bodyBuilder
+                                        .appendFormalLine("details = new HashMap<String, String>();");
+
+                                // TODO Get entity path
+                                bodyBuilder
+                                        .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
+                                bodyBuilder
+                                        .appendFormalLine("details.put(\"path\", \""
+                                                .concat(entityField
+                                                        .getFieldName()
+                                                        .getSymbolName())
+                                                .concat("\");"));
+                                bodyBuilder
+                                        .appendFormalLine("// Property name in detail entity with the relation to master entity");
+                                bodyBuilder
+                                        .appendFormalLine("details.put(\"mappedBy\", \""
+                                                .concat(entityFieldOneToManyAnnotationMappedBy)
+                                                .concat("\");"));
+
+                                bodyBuilder
+                                        .appendFormalLine("detailsInfo.add(details);");
+                            }
                         }
                     }
                 }
