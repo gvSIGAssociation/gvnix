@@ -627,6 +627,9 @@
            <!--  callback to initialize custom api functions -->
            <datatables:callback type="draw" function="evalScripts" />
 
+           <!-- TODO Include it only in show mode -->
+           <datatables:callback type="row" function="rowCallback" />
+
     	</c:when>
     	<c:otherwise>
     	<!-- Check box -->

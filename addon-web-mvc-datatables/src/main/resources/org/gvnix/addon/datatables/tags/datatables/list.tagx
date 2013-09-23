@@ -103,7 +103,16 @@
 		    </script>
 		    
 		</c:forEach>
-		
+
+		<script type="text/javascript">
+		function rowCallback( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+			<c:forEach items="${detailsInfo}" var="detailItem" varStatus="datatablesIndex">
+	    		<c:set value="${mainDatatablesId}_${datatablesIndex.index}" var="datatablesId" />
+	    		loadDetail${datatablesId}(nRow.id);
+	    	</c:forEach>
+		}
+		</script>
+				
 		</div>
 		
 		<script type="text/javascript">
