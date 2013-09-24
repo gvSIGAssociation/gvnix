@@ -2,10 +2,10 @@
   <jsp:output omit-xml-declaration="yes"/>
   
   <script type="text/javascript">
-  dojo.addOnLoad(function () {
+  $(document).ready(function() {
   	<c:forEach var="paramAux" items="${param}">
-  		dojo.query("input[name=\"${paramAux.key}\"]").forEach(function(node, index, nodelist) {
-  			dojo.query("div[id$=\"_${paramAux.key}_id\"]").forEach(function(node2, index2, nodelist2) {
+  		$("input[name=\"${paramAux.key}\"]").each(function(index, node) {
+  			$("div[id$=\"_${paramAux.key}_id\"]").each(function(index2, node2) {
       			node.value = '${paramAux.value}';
       			//node2.style.visibility = "hidden";
   			});

@@ -30,10 +30,9 @@
 	  </div>
   
 	  <script type="text/javascript">
-	  dojo.addOnLoad(function () {
-		  var formInnerBox = dojo.byId("_title_${sec_id}_id_pane");
-		  var redirecTextBox = dojo.byId("${fn:escapeXml(id)}_submit");
-		  dojo.place(redirecTextBox, formInnerBox, null);
+	  $(document).ready(function() {
+		  var redirecTextBox = $("#${fn:escapeXml(id)}_submit");
+		  $("section").append(redirecTextBox);
 	  });
 	  </script>
 	  
