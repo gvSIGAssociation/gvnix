@@ -56,6 +56,8 @@ import org.springframework.roo.project.LogicalPath;
 public class WebJpaBatchMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static final JavaSymbolName BATCH_SERVICE_NAME = new JavaSymbolName(
+            "batchService");
     private static final JavaType LOGGER_TYPE = new JavaType("org.slf4j.Logger");
     private static final JavaType LOGGER_FACTORY_TYPE = new JavaType(
             "org.slf4j.LoggerFactory");
@@ -354,8 +356,7 @@ public class WebJpaBatchMetadata extends
      */
     public FieldMetadata getServiceField() {
         if (serviceFiled == null) {
-            JavaSymbolName curName = new JavaSymbolName(
-                    StringUtils.uncapitalize(service.getSimpleTypeName()));
+            JavaSymbolName curName = BATCH_SERVICE_NAME;
             // Check if field exist
             FieldMetadata currentField = governorTypeDetails
                     .getDeclaredField(curName);
