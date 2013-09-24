@@ -63,13 +63,13 @@ public class WebJpaBatchMetadata extends
     private static final JavaSymbolName ID_LIST_PARAM = new JavaSymbolName(
             "idList");
 
-    private static final JavaSymbolName ID_LIST_SELECTED_PARAM = new JavaSymbolName(
-            "idListSelected");
+    private static final JavaSymbolName DELETE_IN_PARAM = new JavaSymbolName(
+            "deleteIn");
 
     private static final JavaSymbolName ALL_PARAM = new JavaSymbolName("all");
 
-    private static final JavaSymbolName DELETE_SELECTION = new JavaSymbolName(
-            "deleteSelection");
+    private static final JavaSymbolName DELETE_METHOD = new JavaSymbolName(
+            "delete");
 
     private static final JavaType RESPONSE_ENTITY_OBJECT = new JavaType(
             SpringJavaType.RESPONSE_ENTITY.getFullyQualifiedTypeName(), 0,
@@ -160,56 +160,10 @@ public class WebJpaBatchMetadata extends
 
         builder.addField(getLoggerField());
         builder.addField(getServiceField());
-        builder.addMethod(getGetEntityBatchMethod());
-        builder.addMethod(getDeleteSelectionMethod());
+        builder.addMethod(getDeleteMethod());
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
-    }
-
-    /**
-     * Return method <code>getEntityBatch</code>
-     * 
-     * @return
-     */
-    private MethodMetadata getGetEntityBatchMethod() {
-        // method name
-        JavaSymbolName methodName = new JavaSymbolName("getEntityBatch");
-
-        // Check if a method exist in type
-        final MethodMetadata method = methodExists(methodName,
-                new ArrayList<AnnotatedJavaType>());
-        if (method != null) {
-            // If it already exists, just return the method
-            return method;
-        }
-
-        // Define method annotations (none in this case)
-        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
-
-        // Define method throws types (none in this case)
-        List<JavaType> throwsTypes = new ArrayList<JavaType>();
-
-        // Define method parameter types (none in this case)
-        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
-
-        // Define method parameter names (none in this case)
-        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-
-        // Create the method body
-        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine(String.format("return %s.getEntity();",
-                getServiceField().getFieldName().getSymbolName()));
-
-        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
-        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.CLASS,
-                parameterTypes, parameterNames, bodyBuilder);
-        methodBuilder.setAnnotations(annotations);
-        methodBuilder.setThrowsTypes(throwsTypes);
-
-        return methodBuilder.build(); // Build and return a MethodMetadata
-                                      // instance
     }
 
     /**
@@ -217,17 +171,18 @@ public class WebJpaBatchMetadata extends
      * 
      * @return
      */
-    private MethodMetadata getDeleteSelectionMethod() {
+    private MethodMetadata getDeleteMethod() {
         // method name
-        JavaSymbolName methodName = DELETE_SELECTION;
+        JavaSymbolName methodName = DELETE_METHOD;
 
         // Define method parameter types
         final List<AnnotatedJavaType> parameterTypes = Arrays.asList(helper
-                .createRequestParam(JavaType.BOOLEAN_PRIMITIVE, "all", false,
-                        null), helper.createRequestParam(
-                JavaType.BOOLEAN_OBJECT, "idListSelected", false, null), helper
-                .createRequestParam(listOfIdentifiersType, "idList[]", false,
-                        null));
+                .createRequestParam(JavaType.BOOLEAN_PRIMITIVE,
+                        ALL_PARAM.getSymbolName(), false, null), helper
+                .createRequestParam(JavaType.BOOLEAN_OBJECT,
+                        DELETE_IN_PARAM.getSymbolName(), false, null), helper
+                .createRequestParam(listOfIdentifiersType, ID_LIST_PARAM
+                        .getSymbolName().concat("[]"), false, null));
 
         // Check if a method exist in type
         final MethodMetadata method = methodExists(methodName, parameterTypes);
@@ -242,7 +197,7 @@ public class WebJpaBatchMetadata extends
 
         // @RequestMapping
         AnnotationMetadataBuilder requestMappingAnnotation = helper
-                .getRequestMappingAnnotation("/deleteselection", null, null,
+                .getRequestMappingAnnotation("/delete", null, null,
                         "application/json", null, null);
         annotations.add(requestMappingAnnotation);
 
@@ -252,7 +207,7 @@ public class WebJpaBatchMetadata extends
         // Define method parameter names (none in this case)
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(ALL_PARAM);
-        parameterNames.add(ID_LIST_SELECTED_PARAM);
+        parameterNames.add(DELETE_IN_PARAM);
         parameterNames.add(ID_LIST_PARAM);
 
         // Create the method body
@@ -326,7 +281,7 @@ public class WebJpaBatchMetadata extends
 
         // if (idListSelected) {
         builder.appendFormalLine(String.format("if (%s) {",
-                ID_LIST_SELECTED_PARAM.getSymbolName()));
+                DELETE_IN_PARAM.getSymbolName()));
         builder.indent(); // 4
 
         // count = petBatchService.deleteIn(idList);
@@ -400,7 +355,7 @@ public class WebJpaBatchMetadata extends
     public FieldMetadata getServiceField() {
         if (serviceFiled == null) {
             JavaSymbolName curName = new JavaSymbolName(
-                    service.getSimpleTypeName());
+                    StringUtils.uncapitalize(service.getSimpleTypeName()));
             // Check if field exist
             FieldMetadata currentField = governorTypeDetails
                     .getDeclaredField(curName);
