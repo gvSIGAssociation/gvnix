@@ -14,10 +14,8 @@
 
   <form:update id="${id}" modelAttribute="${modelAttribute}" path="${path}" multipart="${multipart == null ? false : multipart}" label="${label}" idField="${idField}" versionField="${versionField}" render="${render == null ? true : render}" openPane="${openPane == null ? true : openPane}" z="${z}">
   	<jsp:doBody />
+  	<datatables:redirect id="${id}" />
+  	<datatables:set-input-values-from-request />
   </form:update>
-
-  <datatables:redirect id="${id}" />
-  
-  <datatables:set-input-values-from-request />
   
 </jsp:root>

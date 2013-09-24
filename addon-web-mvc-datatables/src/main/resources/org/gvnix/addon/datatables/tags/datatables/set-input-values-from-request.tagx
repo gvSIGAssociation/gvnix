@@ -3,15 +3,17 @@
   
   <script type="text/javascript">
   $(document).ready(function() {
-  	<c:forEach var="paramAux" items="${param}">
-  		$("input[name=\"${paramAux.key}\"]").each(function(index, node) {
-  			$("div[id$=\"_${paramAux.key}_id\"]").each(function(index2, node2) {
-      			node.value = '${paramAux.value}';
-      			//node2.style.visibility = "hidden";
-  			});
-  		});
-  	</c:forEach>
+	  
+	$("#_${param['datatablesMappedProperty']}_id").each(function(index, node) {
+		node.value = "${param['datatablesMappedValue']}";
+	});
+  
+	var select = $("#_${param['datatablesMappedProperty']}_id option[value='${param['datatablesMappedValue']}']");
+	select.parent().parent().parent().hide();
   });
   </script>
+  
+  <input id="datatablesMappedProperty" name="datatablesMappedProperty" type="hidden" value="${param['datatablesMappedProperty']}" />
+  <input id="datatablesMappedValue" name="datatablesMappedValue" type="hidden" value="${param['datatablesMappedValue']}" />
 
 </jsp:root>

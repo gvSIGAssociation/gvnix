@@ -13,10 +13,8 @@
 
   <form:create id="${id}" modelAttribute="${modelAttribute}" path="${path}" compositePkField="${compositePkField}" multipart="${multipart == null ? false : multipart}" label="${label}" render="${render == null ? true : render}" openPane="${openPane == null ? true : openPane}" z="${z}">
   	<jsp:doBody />
+	<datatables:redirect id="${id}" />
+  	<datatables:set-input-values-from-request />
   </form:create>
-  
-  <datatables:redirect id="${id}" />
-  
-  <datatables:set-input-values-from-request />
   
 </jsp:root>

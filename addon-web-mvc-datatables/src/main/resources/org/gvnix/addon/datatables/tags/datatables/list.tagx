@@ -55,7 +55,7 @@
 		    <script type="text/javascript">
 		    
 		    	function loadDetail${datatablesId} (trId) {
-			    	var url = '<spring:url value="${detailItem.path}/list" javaScriptEscape="true" />?${detailItem.mappedBy}=' + trId;
+			    	var url = '<spring:url value="${detailItem.path}/list" javaScriptEscape="true" />?${detailItem.mappedBy}=' + trId + '&amp;datatablesMappedProperty=${detailItem.mappedBy}&amp;datatablesMappedValue=' + trId;
 					$.get(url)
 					.done(function(datatablesDetailContent) {
 						var datatablesDetailContainer = $('#${datatablesId}');

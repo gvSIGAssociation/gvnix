@@ -5,12 +5,4 @@
   
   <input id="datatablesRedirect" name="datatablesRedirect" type="hidden" value="${param['datatablesRedirect']}" />
   
-  <script type="text/javascript">
-  $(document).ready(function() {
-	  var formInnerBox = $("#${fn:escapeXml(id)}_submit");
-      var redirecTextBox = $("#datatablesRedirect");
-      $(formInnerBox).append(redirecTextBox);
-  });
-  </script>
-  
 </jsp:root>
