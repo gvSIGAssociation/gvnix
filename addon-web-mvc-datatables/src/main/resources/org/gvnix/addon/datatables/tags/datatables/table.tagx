@@ -468,10 +468,15 @@
 		        		alert("Select records to remove");
 		        		return;
 		        	} 
-		        	
+		        	var selectionInfo = $selection.fnGetSelectionInfo();
+		        	var deleteParams = {
+		        		'all' : selectionInfo.all,
+		        		'deleteIn': selectionInfo.idListSelected,
+		        		'idList' : selectionInfo.idList
+		        	};
 		        	$.post(
-					  '${urlPath}/deleteselection',
-					  $selection.fnGetSelectionInfo(),
+					  '${urlPath}/delete',
+					  deleteParams,
 					  function (data) {
 		        			log('delete OK: ' + data);
 					  		var count = parseInt(data);
