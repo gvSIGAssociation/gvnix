@@ -63,8 +63,10 @@
 						$('#${mainDatatablesId}').show();
 					})
 					.fail(function(error) {
-						alert('<spring:message code="datatables_detail_get_error" text="Error getting detail datatable from server." javaScriptEscape="true" />' +
-								' (Error: ' + error.status + ', URL: ' + url + ').');
+						if (error.status != 0) {
+							alert('<spring:message code="datatables_detail_get_error" text="Error getting detail datatable from server." javaScriptEscape="true" />' +
+									' (Error: ' + error.status + ', URL: ' + url + ').');
+						}
 						$('#${mainDatatablesId}').hide();
 					});
 		    	}
