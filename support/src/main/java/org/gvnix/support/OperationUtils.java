@@ -24,6 +24,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -163,9 +165,33 @@ public class OperationUtils {
      * @param pathResolver
      * @param fileManager
      */
-    protected static void installJavaClassFromTemplate(String packageFullName,
+    public static void installJavaClassFromTemplate(String packageFullName,
             String classFullName, String javaClassTemplateName,
             PathResolver pathResolver, FileManager fileManager) {
+
+        installJavaClassFromTemplate(packageFullName, classFullName,
+                javaClassTemplateName, null, pathResolver, fileManager);
+    }
+
+    /**
+     * Installs in project a Java Class based on a template.
+     * <p>
+     * Note that class template must be a resource available in this module.
+     * <p>
+     * <strong>This method only performs a replacement of the pattern ${PACKAGE}
+     * in the template</strong>
+     * 
+     * @param packageFullName
+     * @param classFullName
+     * @param javaClassTemplateName
+     * @param toReplace (optional) map of additional patterns to replace
+     * @param pathResolver
+     * @param fileManager
+     */
+    public static void installJavaClassFromTemplate(String packageFullName,
+            String classFullName, String javaClassTemplateName,
+            Map<String, String> toReplace, PathResolver pathResolver,
+            FileManager fileManager) {
 
         MutableFile mutableClass = null;
         if (!fileManager.exists(classFullName)) {
@@ -174,6 +200,7 @@ public class OperationUtils {
 
             String javaTemplate;
             try {
+                // Read template
                 javaTemplate = IOUtils
                         .toString(new InputStreamReader(template));
 
@@ -181,9 +208,18 @@ public class OperationUtils {
                 javaTemplate = StringUtils.replace(javaTemplate, "${PACKAGE}",
                         packageFullName);
 
+                // Repalce aditional keys (if any)
+                if (toReplace != null && !toReplace.isEmpty()) {
+                    for (Entry<String, String> entry : toReplace.entrySet()) {
+                        javaTemplate = StringUtils.replace(javaTemplate,
+                                entry.getKey(), entry.getValue());
+                    }
+                }
+
                 // Write final java file
                 mutableClass = fileManager.createFile(classFullName);
 
+                // Save result file
                 OutputStream outputStream = null;
                 InputStream inputStream = null;
                 try {

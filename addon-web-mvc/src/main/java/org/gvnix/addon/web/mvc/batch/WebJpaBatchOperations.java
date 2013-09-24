@@ -18,6 +18,7 @@
 package org.gvnix.addon.web.mvc.batch;
 
 import org.gvnix.addon.jpa.batch.GvNIXJpaBatch;
+import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 
 /**
@@ -60,4 +61,19 @@ public interface WebJpaBatchOperations {
      * {@link GvNIXJpaBatch}
      */
     void addAll();
+
+    /**
+     * Initializes/updates required artifacts to allow support of Web jpa batch
+     * operations
+     * 
+     * @param targetPackage
+     */
+    void setup(JavaPackage targetPackage);
+
+    /**
+     * Update java utilities classes into <em>targetPackage</em>
+     * 
+     * @param targetPackage to update/create java classes
+     */
+    void updateJavaUtilities(JavaPackage targetPackage);
 }
