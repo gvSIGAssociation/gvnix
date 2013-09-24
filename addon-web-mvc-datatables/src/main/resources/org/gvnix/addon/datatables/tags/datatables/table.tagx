@@ -647,7 +647,7 @@
 			  <!-- DOM cell render -->
 			  <table:action-column id="${selectionCheckColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
 			  	<c:if test="${not empty item }">
-			  	<input type="checkbox" class="${selectionCheckClass}" form="${selectionCheckColumnId}_form"/>
+			  	<input type="checkbox" class="${selectionCheckCssClass}" form="${selectionCheckColumnId}_form"/>
 			  	</c:if>
 			  </table:action-column>
 		    </c:otherwise>
