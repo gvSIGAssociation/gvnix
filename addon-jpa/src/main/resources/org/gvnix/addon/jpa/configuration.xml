@@ -8,6 +8,9 @@
 				<url>https://gvnix.googlecode.com/svn/repo</url>
 			</repository>
 		</repositories>
+		<properties>
+			<querydsl.version>3.1.1</querydsl.version>
+		</properties>
 	    <dependencies>
     		<dependency>
         		<groupId>org.gvnix</groupId>
@@ -16,6 +19,19 @@
 		       	<type>jar</type>
 		       	<scope>provided</scope>
       		</dependency>
+      		
+      		<!--  QueryDSL library -->
+			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-apt</artifactId>
+				<version>${querydsl.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-jpa</artifactId>
+				<version>${querydsl.version}</version>
+			</dependency>
     	</dependencies>
 	</gvnix>
 </configuration>

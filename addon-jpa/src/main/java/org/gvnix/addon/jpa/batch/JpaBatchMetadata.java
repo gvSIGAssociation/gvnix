@@ -18,6 +18,7 @@
 package org.gvnix.addon.jpa.batch;
 
 import static org.springframework.roo.model.JdkJavaType.LIST;
+import static org.springframework.roo.model.JdkJavaType.MAP;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.gvnix.support.ItdBuilderHelper;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.jpa.activerecord.JpaCrudAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
@@ -56,6 +58,10 @@ import org.springframework.roo.project.LogicalPath;
 public class JpaBatchMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static final JavaSymbolName FIND_BY_VALUES_METHOD = new JavaSymbolName(
+            "findByValues");
+    private static final JavaSymbolName DELETE_BY_VALUES_METHOD = new JavaSymbolName(
+            "deleteByValues");
     public static final JavaSymbolName DELETE_ALL_METHOD = new JavaSymbolName(
             "deleteAll");
     public static final JavaSymbolName DELETE_NOT_IN_METHOD = new JavaSymbolName(
@@ -72,6 +78,23 @@ public class JpaBatchMetadata extends
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
+
+    static final JavaType MAP_STRING_STRING = new JavaType(
+            MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, JavaType.STRING));
+
+    static final JavaType MAP_STRING_OBJECT = new JavaType(
+            MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, JavaType.OBJECT));
+
+    static final JavaType QDSL_BOOLEAN_BUILDER = new JavaType(
+            "com.mysema.query.BooleanBuilder");
+    static final JavaType QDSL_PATH_BUILDER = new JavaType(
+            "com.mysema.query.types.path.PathBuilder");
+    static final JavaType QDSL_JPA_QUERY = new JavaType(
+            "com.mysema.query.jpa.impl.JPAQuery");
+    static final JavaType QDSL_JPA_DELETE_CLAUSE = new JavaType(
+            "com.mysema.query.jpa.impl.JPADeleteClause");
 
     public static final String getMetadataIdentiferType() {
         return PROVIDES_TYPE;
@@ -106,6 +129,11 @@ public class JpaBatchMetadata extends
     private final JavaType listOfEntitiesType;
     private final String entityName;
 
+    /**
+     * Itd builder herlper
+     */
+    private ItdBuilderHelper helper;
+
     /** Related entity plural */
     private final String entityPlural;
 
@@ -120,6 +148,10 @@ public class JpaBatchMetadata extends
                 + identifier + "' does not appear to be a valid");
 
         this.annotationValues = annotationValues;
+
+        // Helper itd generation
+        this.helper = new ItdBuilderHelper(this,
+                builder.getImportRegistrationResolver());
 
         // Get refereed entity
         this.entity = annotationValues.entity;
@@ -150,9 +182,281 @@ public class JpaBatchMetadata extends
         builder.addMethod(getDeleteNotInMethod());
         builder.addMethod(getCreateMethod());
         builder.addMethod(getUpdateMethod());
+        builder.addMethod(getFindByValuesMethod());
+        builder.addMethod(getDeleteByValuesMethod());
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
+    }
+
+    /**
+     * Gets <code>deleteByValuesMethod</code> method. <br>
+     * This method performs a delete base on property values
+     * condition (value equal and concatenates conditions using "and" operator)
+     * 
+     * @return
+     */
+    private MethodMetadata getDeleteByValuesMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(MAP_STRING_OBJECT);
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(DELETE_BY_VALUES_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(new AnnotationMetadataBuilder(
+                SpringJavaType.TRANSACTIONAL));
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName("propertyValues"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildDeleteByValuesMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, DELETE_BY_VALUES_METHOD,
+                JavaType.LONG_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Builds body method for <code>deleteByValues</code> method. <br>
+     * This method performs a delete base on property values
+     * condition (value equal and concatenates conditions using "and" operator)
+     * 
+     * @param bodyBuilder
+     */
+    private void buildDeleteByValuesMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        //
+        bodyBuilder.appendFormalLine("");
+        //
+        // // if there no is a filter
+        bodyBuilder.appendFormalLine("// if there no is a filter");
+        // if (propertyValues == null || propertyValues.isEmpty()) {
+        bodyBuilder
+                .appendFormalLine("if (propertyValues == null || propertyValues.isEmpty()) {");
+        bodyBuilder.indent();
+
+        // throw new IllegalArgumentException("Missing property values");
+        bodyBuilder
+                .appendFormalLine("throw new IllegalArgumentException(\"Missing property values\");");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // // Prepare a predicate
+        bodyBuilder.appendFormalLine("// Prepare a predicate");
+        // BooleanBuilder baseFilterPredicate = new BooleanBuilder();
+        bodyBuilder.appendFormalLine(String.format(
+                "%s baseFilterPredicate = new %s();",
+                helper.getFinalTypeName(QDSL_BOOLEAN_BUILDER),
+                helper.getFinalTypeName(QDSL_BOOLEAN_BUILDER)));
+        bodyBuilder.appendFormalLine("");
+        // // Base filter. Using BooleanBuilder, a cascading builder for
+        bodyBuilder
+                .appendFormalLine("// Base filter. Using BooleanBuilder, a cascading builder for");
+        // // Predicate expressions
+        bodyBuilder.appendFormalLine("// Predicate expressions");
+        // PathBuilder<Visit> entity = new PathBuilder<Visit>(Visit.class,
+        // "entity");
+        bodyBuilder.appendFormalLine(String.format(
+                "%s<%s> entity = new %s<%s>(%s.class, \"entity\");",
+                helper.getFinalTypeName(QDSL_PATH_BUILDER),
+                helper.getFinalTypeName(entity),
+                helper.getFinalTypeName(QDSL_PATH_BUILDER),
+                helper.getFinalTypeName(entity),
+                helper.getFinalTypeName(entity)));
+
+        bodyBuilder.appendFormalLine("");
+        //
+        // // Build base filter
+        bodyBuilder.appendFormalLine("// Build base filter");
+        // for (String key : propertyMap.keySet()) {
+        bodyBuilder
+                .appendFormalLine("for (String key : propertyValues.keySet()) {");
+        bodyBuilder.indent();
+        // baseFilterPredicate.and(entity.get(key).eq(propertyMap.get(key)));
+        bodyBuilder
+                .appendFormalLine("baseFilterPredicate.and(entity.get(key).eq(propertyValues.get(key)));");
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("");
+        //
+        // // Create a query with filter
+        bodyBuilder.appendFormalLine("// Create a query with filter");
+        // JPADeleteClause delete = new
+        // JPADeleteClause(Visit.entityManager(),entity);
+        bodyBuilder.appendFormalLine(String.format(
+                "%s delete = new %s(%s.entityManager(),entity);",
+                helper.getFinalTypeName(QDSL_JPA_DELETE_CLAUSE),
+                helper.getFinalTypeName(QDSL_JPA_DELETE_CLAUSE),
+                helper.getFinalTypeName(entity)));
+        //
+        bodyBuilder.appendFormalLine("");
+        // // execute delete
+        bodyBuilder.appendFormalLine("// execute delete");
+        // return delete.where(baseFilterPredicate).execute();
+        bodyBuilder
+                .appendFormalLine("return delete.where(baseFilterPredicate).execute();");
+
+    }
+
+    /**
+     * Gets <code>findByParameters</code> method. <br>
+     * This method generates a item List based on a list of entity values.
+     * 
+     * @return
+     */
+    private MethodMetadata getFindByValuesMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(MAP_STRING_OBJECT);
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(FIND_BY_VALUES_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName("propertyValues"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildFindByValuesMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, FIND_BY_VALUES_METHOD,
+                listOfEntitiesType, parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Builds body method for <code>findByValues</code> method. <br>
+     * This method generates a item List based on a list of entity values.
+     * 
+     * @param bodyBuilder
+     */
+    private void buildFindByValuesMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        //
+        bodyBuilder.appendFormalLine("");
+        //
+        // // if there is a filter
+        bodyBuilder.appendFormalLine("// if there is a filter");
+        // if (propertyValues != null && !propertyValues.isEmpty()) {
+        bodyBuilder
+                .appendFormalLine("if (propertyValues != null && !propertyValues.isEmpty()) {");
+        bodyBuilder.indent();
+
+        // // Prepare a predicate
+        bodyBuilder.appendFormalLine("// Prepare a predicate");
+        // BooleanBuilder baseFilterPredicate = new BooleanBuilder();
+        bodyBuilder.appendFormalLine(String.format(
+                "%s baseFilterPredicate = new %s();",
+                helper.getFinalTypeName(QDSL_BOOLEAN_BUILDER),
+                helper.getFinalTypeName(QDSL_BOOLEAN_BUILDER)));
+        bodyBuilder.appendFormalLine("");
+        // // Base filter. Using BooleanBuilder, a cascading builder for
+        bodyBuilder
+                .appendFormalLine("// Base filter. Using BooleanBuilder, a cascading builder for");
+        // // Predicate expressions
+        bodyBuilder.appendFormalLine("// Predicate expressions");
+        // PathBuilder<Visit> entity = new PathBuilder<Visit>(Visit.class,
+        // "entity");
+        bodyBuilder.appendFormalLine(String.format(
+                "%s<%s> entity = new %s<%s>(%s.class, \"entity\");",
+                helper.getFinalTypeName(QDSL_PATH_BUILDER),
+                helper.getFinalTypeName(entity),
+                helper.getFinalTypeName(QDSL_PATH_BUILDER),
+                helper.getFinalTypeName(entity),
+                helper.getFinalTypeName(entity)));
+
+        bodyBuilder.appendFormalLine("");
+        //
+        // // Build base filter
+        bodyBuilder.appendFormalLine("// Build base filter");
+        // for (String key : propertyMap.keySet()) {
+        bodyBuilder
+                .appendFormalLine("for (String key : propertyValues.keySet()) {");
+        bodyBuilder.indent();
+        // baseFilterPredicate.and(entity.get(key).eq(propertyMap.get(key)));
+        bodyBuilder
+                .appendFormalLine("baseFilterPredicate.and(entity.get(key).eq(propertyValues.get(key)));");
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("");
+        //
+        // // Create a query with filter
+        bodyBuilder.appendFormalLine("// Create a query with filter");
+        // JPAQuery query = new JPAQuery(Visit.entityManager());
+        bodyBuilder.appendFormalLine(String.format(
+                "%s query = new %s(%s.entityManager());",
+                helper.getFinalTypeName(QDSL_JPA_QUERY),
+                helper.getFinalTypeName(QDSL_JPA_QUERY),
+                helper.getFinalTypeName(entity)));
+        // query = query.from(entity);
+        bodyBuilder.appendFormalLine("query = query.from(entity);");
+        //
+        bodyBuilder.appendFormalLine("");
+        // // execute query
+        bodyBuilder.appendFormalLine("// execute query");
+        // return query.where(baseFilterPredicate).list(entity);
+        bodyBuilder
+                .appendFormalLine("return query.where(baseFilterPredicate).list(entity);");
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("");
+        //
+        // // no filter: return all elements
+        bodyBuilder.appendFormalLine("// no filter: return all elements");
+        // return Visit.findAllVisits();
+        bodyBuilder.appendFormalLine(String.format("return %s.findAll%s();",
+                helper.getFinalTypeName(entity),
+                StringUtils.capitalize(entityPlural)));
     }
 
     /**
@@ -592,8 +896,18 @@ public class JpaBatchMetadata extends
                 builder.getImportRegistrationResolver());
     }
 
+    /**
+     * @return Entity name in plural
+     */
     public String getEntityPlural() {
         return entityPlural;
+    }
+
+    /**
+     * @return deleteByValue method Name
+     */
+    public JavaSymbolName getDeleteByValuesMethodName() {
+        return DELETE_BY_VALUES_METHOD;
     }
 
 }

@@ -470,6 +470,11 @@
 		        	} 
 		        	var selectionInfo = $selection.fnGetSelectionInfo();
 		        	var deleteParams = {
+					    <c:if test="${not empty baseFilter}">
+					    <c:forEach items="${baseFilter}" var="entry"> 
+					    '${entry.key}' : '${entry.value}',
+					    </c:forEach> 
+					    </c:if>		        		
 		        		'all' : selectionInfo.all,
 		        		'deleteIn': selectionInfo.idListSelected,
 		        		'idList' : selectionInfo.idList

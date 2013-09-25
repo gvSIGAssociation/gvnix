@@ -17,9 +17,14 @@
  */
 package org.gvnix.addon.web.mvc.batch;
 
+import static org.springframework.roo.model.JdkJavaType.ARRAY_LIST;
+import static org.springframework.roo.model.JdkJavaType.LIST;
+import static org.springframework.roo.model.JdkJavaType.MAP;
+
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +49,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.JdkJavaType;
 import org.springframework.roo.model.Jsr303JavaType;
 import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
@@ -91,6 +97,9 @@ public class WebJpaBatchMetadata extends
     private static final JavaSymbolName CREATE_METHOD = new JavaSymbolName(
             "create");
 
+    private static final JavaSymbolName GET_REQUEST_PROPERTY_VALUES_METHOD = new JavaSymbolName(
+            "getRequestPropertyValues");
+
     private static final JavaType RESPONSE_ENTITY_OBJECT = new JavaType(
             SpringJavaType.RESPONSE_ENTITY.getFullyQualifiedTypeName(), 0,
             DataType.TYPE, null, Arrays.asList(JavaType.OBJECT));
@@ -100,6 +109,44 @@ public class WebJpaBatchMetadata extends
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
+
+    private static final JavaType MAP_STRING_STRING = new JavaType(
+            MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, JavaType.STRING));
+
+    private static final JavaType MAP_STRING_OBJECT = new JavaType(
+            MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, JavaType.OBJECT));
+
+    private static final JavaType HASHMAP = new JavaType(HashMap.class);
+    private static final JavaType HASHMAP_STRING_STRING = new JavaType(
+            HASHMAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, JavaType.STRING));
+    private static final JavaType HASHMAP_STRING_OBJECT = new JavaType(
+            HASHMAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, JavaType.OBJECT));
+
+    private static final JavaType ITERATOR_STRING = new JavaType(
+            JdkJavaType.ITERATOR.getFullyQualifiedTypeName(), 0, DataType.TYPE,
+            null, Arrays.asList(JavaType.STRING));
+
+    private static final JavaType LIST_STRING = new JavaType(
+            LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING));
+
+    private static final JavaType ARRAYLIST_STRING = new JavaType(
+            ARRAY_LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING));
+
+    private static final JavaType COLLECTION_UTILS = new JavaType(
+            "org.apache.commons.collections.CollectionUtils");
+
+    private static final JavaType BEAN_WRAPPER = new JavaType(
+            "org.springframework.beans.BeanWrapper");
+    private static final JavaType BEAN_WRAPPER_IMP = new JavaType(
+            "org.springframework.beans.BeanWrapperImpl");
+    private static final JavaType WEB_REQUEST = new JavaType(
+            "org.springframework.web.context.request.WebRequest");
 
     public static final String getMetadataIdentiferType() {
         return PROVIDES_TYPE;
@@ -139,6 +186,7 @@ public class WebJpaBatchMetadata extends
     private FieldMetadata serviceFiled;
 
     private FieldMetadata loggerFiled;
+    private String entityName;
 
     public WebJpaBatchMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -169,6 +217,9 @@ public class WebJpaBatchMetadata extends
 
         this.entity = jpaBatchMetadata.getEntity();
 
+        this.entityName = JavaSymbolName.getReservedWordSafeName(entity)
+                .getSymbolName();
+
         listOfEntityName = new JavaSymbolName(
                 StringUtils.uncapitalize(jpaBatchMetadata.getEntityPlural()));
 
@@ -194,6 +245,7 @@ public class WebJpaBatchMetadata extends
         builder.addMethod(getDeleteMethod());
         builder.addMethod(getUpdateMethod());
         builder.addMethod(getCreateMethod());
+        builder.addMethod(getGetRequestPropertyValuesMethod());
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
@@ -215,7 +267,10 @@ public class WebJpaBatchMetadata extends
                 .createRequestParam(JavaType.BOOLEAN_OBJECT,
                         DELETE_IN_PARAM.getSymbolName(), false, null), helper
                 .createRequestParam(listOfIdentifiersType, ID_LIST_PARAM
-                        .getSymbolName().concat("[]"), false, null));
+                        .getSymbolName().concat("[]"), false, null),
+                new AnnotatedJavaType(entity, new AnnotationMetadataBuilder(
+                        SpringJavaType.MODEL_ATTRIBUTE).build()),
+                new AnnotatedJavaType(WEB_REQUEST));
 
         // Check if a method exist in type
         final MethodMetadata method = methodExists(methodName, parameterTypes);
@@ -242,6 +297,8 @@ public class WebJpaBatchMetadata extends
         parameterNames.add(ALL_PARAM);
         parameterNames.add(DELETE_IN_PARAM);
         parameterNames.add(ID_LIST_PARAM);
+        parameterNames.add(new JavaSymbolName(entityName));
+        parameterNames.add(REQUEST_NAME);
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -284,10 +341,35 @@ public class WebJpaBatchMetadata extends
                 ALL_PARAM.getSymbolName()));
         builder.indent(); // 2
 
-        // count = petBatchService.deleteAll();
+        // Map<String, Object> baseFilter =
+        // getRequestPropertyValues(visit,request.getParameterNames());
+        builder.appendFormalLine(String.format(
+                "%s baseFilter = %s(%s,%s.getParameterNames());",
+                helper.getFinalTypeName(MAP_STRING_OBJECT),
+                GET_REQUEST_PROPERTY_VALUES_METHOD.getSymbolName(), entityName,
+                REQUEST_NAME.getSymbolName()));
+        // if (baseFilter == null || baseFilter.isEmpty()){
+        builder.appendFormalLine("if (baseFilter == null || baseFilter.isEmpty()) {");
+        builder.indent(); // 3
+
+        // count = batchService.deleteAll();
         builder.appendFormalLine(String.format("count = %s.%s();",
                 getServiceField().getFieldName().getSymbolName(),
                 jpaBatchMetadata.getDeleteAllMethodName().getSymbolName()));
+
+        // } else {
+        builder.indentRemove(); // 2
+        builder.appendFormalLine("} else {");
+        builder.indent(); // 3
+
+        // count = batchService.deleteByValues(baseFilter);
+        builder.appendFormalLine(String.format("count = %s.%s(baseFilter);",
+                getServiceField().getFieldName().getSymbolName(),
+                jpaBatchMetadata.getDeleteByValuesMethodName().getSymbolName()));
+
+        // }
+        builder.indentRemove(); // 2
+        builder.appendFormalLine("}");
 
         // } else {
         builder.indentRemove(); // 1
@@ -796,5 +878,167 @@ public class WebJpaBatchMetadata extends
      */
     public WebJpaBatchAnnotationValues getAnnotationValues() {
         return annotationValues;
+    }
+
+    /**
+     * Gets <code>getRequestPropertyValues</code> method. <br>
+     * This method returns a Map with bean properties which appears on a String
+     * Iterator (usually from webRequest.getParametersNames())
+     * 
+     * @return
+     */
+    private MethodMetadata getGetRequestPropertyValuesMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(entity, ITERATOR_STRING);
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(
+                GET_REQUEST_PROPERTY_VALUES_METHOD, parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName(entityName));
+        parameterNames.add(new JavaSymbolName("propertyNames"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetRequestPropertyValuesBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, GET_REQUEST_PROPERTY_VALUES_METHOD,
+                MAP_STRING_OBJECT, parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Build body method <code>getRequestPropertyValues</code> method. <br>
+     * This method returns a Map with bean properties which appears on a String
+     * Iterator (usually from webRequest.getParametersNames())
+     * 
+     * @return
+     */
+    private void buildGetRequestPropertyValuesBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+
+        // Map<String, Object> propertyValuesMap = new HashMap<String,
+        // Object>();
+        bodyBuilder.appendFormalLine(String.format(
+                "%s propertyValuesMap = new %s();",
+                helper.getFinalTypeName(MAP_STRING_OBJECT),
+                helper.getFinalTypeName(HASHMAP_STRING_OBJECT)));
+        //
+        bodyBuilder.appendFormalLine("");
+
+        // // If no entity or properties given, return empty Map
+        bodyBuilder
+                .appendFormalLine("// If no entity or properties given, return empty Map");
+
+        // if(entity == null || propertyNames == null) {
+        bodyBuilder.appendFormalLine(String.format(
+                "if(%s == null || propertyNames == null) {", entityName));
+        bodyBuilder.indent();
+        // return propertyValuesMap;
+        bodyBuilder.appendFormalLine("return propertyValuesMap;");
+
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("");
+        // List<String> properties = new ArrayList<String>();
+        bodyBuilder.appendFormalLine(String.format("%s properties = new %s();",
+                helper.getFinalTypeName(LIST_STRING),
+                helper.getFinalTypeName(ARRAYLIST_STRING)));
+
+        // CollectionUtils.addAll(properties, propertyNames);
+        bodyBuilder.appendFormalLine(String.format(
+                "%s.addAll(properties, propertyNames);",
+                helper.getFinalTypeName(COLLECTION_UTILS)));
+
+        //
+        bodyBuilder.appendFormalLine("");
+
+        // // There must be at least one property name, otherwise return empty
+        // Map
+        bodyBuilder
+                .appendFormalLine("// There must be at least one property name, otherwise return empty Map");
+        // if(properties.isEmpty()) {
+        bodyBuilder.appendFormalLine("if (properties.isEmpty()) {");
+        bodyBuilder.indent();
+        // return propertyValuesMap;
+        bodyBuilder.appendFormalLine("return propertyValuesMap;");
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        //
+        bodyBuilder.appendFormalLine("");
+        // // Iterate over given properties to get each property value
+        bodyBuilder
+                .appendFormalLine("// Iterate over given properties to get each property value");
+        // BeanWrapper entityBean = new BeanWrapperImpl(entity);
+        bodyBuilder.appendFormalLine(String.format(
+                "%s entityBean = new %s(%s);",
+                helper.getFinalTypeName(BEAN_WRAPPER),
+                helper.getFinalTypeName(BEAN_WRAPPER_IMP), entityName));
+
+        // for (String propertyName : properties) {
+        bodyBuilder
+                .appendFormalLine("for (String propertyName : properties) {");
+        bodyBuilder.indent();
+        // if (entityBean.isReadableProperty(propertyName)) {
+        bodyBuilder
+                .appendFormalLine("if (entityBean.isReadableProperty(propertyName)) {");
+        bodyBuilder.indent();
+        // Object propertyValue = null;
+        bodyBuilder.appendFormalLine("Object propertyValue = null;");
+        // try {
+        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.indent();
+        // propertyValue = entityBean.getPropertyValue(propertyName);
+        bodyBuilder
+                .appendFormalLine("propertyValue = entityBean.getPropertyValue(propertyName);");
+        // } catch (Exception e){
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} catch (Exception e){");
+        bodyBuilder.indent();
+        // // TODO log warning
+        bodyBuilder.appendFormalLine("// TODO log warning");
+        // continue;
+        bodyBuilder.appendFormalLine("continue;");
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // propertyValuesMap.put(propertyName, propertyValue);
+        bodyBuilder
+                .appendFormalLine("propertyValuesMap.put(propertyName, propertyValue);");
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // return propertyValuesMap;
+        bodyBuilder.appendFormalLine("return propertyValuesMap;");
     }
 }
