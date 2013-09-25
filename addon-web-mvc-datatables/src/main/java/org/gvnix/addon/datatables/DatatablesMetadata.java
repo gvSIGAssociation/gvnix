@@ -2091,7 +2091,7 @@ public class DatatablesMetadata extends
                                 .getAnnotation(new JavaType(
                                         "javax.persistence.OneToMany"));
 
-                        if (entityFieldOneToManyAnnotation != null) {
+                        if (entityFieldOneToManyAnnotation != null && entityFieldOneToManyAnnotation.getAttribute("mappedBy") != null) {
 
                             String entityFieldOneToManyAnnotationMappedBy = entityFieldOneToManyAnnotation
                                     .getAttribute("mappedBy").getValue()
