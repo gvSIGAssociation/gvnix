@@ -47,10 +47,12 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.RooJavaType;
 import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.FeatureNames;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Property;
+import org.springframework.roo.project.maven.Pom;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -106,7 +108,7 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
                 && projectOperations
                         .isFeatureInstalledInFocusedModule(JpaOperations.FEATURE_NAME_GVNIX_JPA)
                 && projectOperations
-                        .isFeatureInstalledInFocusedModule(MvcOperations.FEATURE_NAME_GVNIX_MVC);
+                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_MVC_BATCH);
     }
 
     /**
@@ -124,7 +126,7 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
                 && projectOperations
                         .isFeatureInstalledInFocusedModule(JpaOperations.FEATURE_NAME_GVNIX_JPA)
                 && !projectOperations
-                        .isFeatureInstalledInFocusedModule(MvcOperations.FEATURE_NAME_GVNIX_MVC);
+                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_MVC_BATCH);
     }
 
     /** {@inheritDoc} */
@@ -358,5 +360,31 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
                     .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
                             .build());
         }
+    }
+
+    @Override
+    public String getName() {
+        return FEATURE_NAME_GVNIX_MVC_BATCH;
+    }
+
+    /**
+     * Returns true if gvNIX Web MVC dependency is installed in current project.
+     * 
+     * @param moduleName feature name to check in current project
+     * @return true if given feature name is installed, otherwise returns false
+     */
+    public boolean isInstalledInModule(final String moduleName) {
+        final Pom pom = projectOperations.getPomFromModuleName(moduleName);
+        if (pom == null) {
+            return false;
+        }
+
+        // Look for gvnix web mvc dependency
+        for (final Dependency dependency : pom.getDependencies()) {
+            if ("org.gvnix.web.json.binding".equals(dependency.getArtifactId())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

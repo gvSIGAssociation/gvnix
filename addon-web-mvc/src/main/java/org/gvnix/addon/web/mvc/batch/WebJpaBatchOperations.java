@@ -20,6 +20,7 @@ package org.gvnix.addon.web.mvc.batch;
 import org.gvnix.addon.jpa.batch.GvNIXJpaBatch;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.Feature;
 
 /**
  * <code>web mvc batch</code> operations. Offers a API for all supported
@@ -29,7 +30,12 @@ import org.springframework.roo.model.JavaType;
  * @author gvNIX Team
  * @since 1.1
  */
-public interface WebJpaBatchOperations {
+public interface WebJpaBatchOperations extends Feature {
+
+    /**
+     * Feature name. Use to know if gvNIX MVC has been setup in this project
+     */
+    public static final String FEATURE_NAME_GVNIX_MVC_BATCH = "gvnix-mvc-batch";
 
     /**
      * Indicate commands should be available
