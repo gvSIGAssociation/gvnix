@@ -1,4 +1,20 @@
-package ${PACKAGE};
+/*
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gvnix.web.json;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -217,11 +233,11 @@ public class BindingResultSerializer extends JsonSerializer<Object> {
             // Get property name
             String listPropertyName = StringUtils.substringBefore(propertyName,
                     "[");
-            
+
             // Get referred item index
             String index = StringUtils.substringBefore(
                     StringUtils.substringAfter(propertyName, "["), "]");
-            
+
             // Get item path
             String itemPath = StringUtils.substringAfter(fieldNamePath, ".");
 
@@ -272,7 +288,7 @@ public class BindingResultSerializer extends JsonSerializer<Object> {
         }
         else {
             // standard property with no children value
-            
+
             // Store error message in container
             objectErrors.put(propertyName, error.getDefaultMessage());
         }

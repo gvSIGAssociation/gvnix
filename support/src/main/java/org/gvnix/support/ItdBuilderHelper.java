@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.ImportRegistrationResolver;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -79,6 +81,27 @@ public class ItdBuilderHelper {
 
         return new ArrayAttributeValue<StringAttributeValue>(
                 new JavaSymbolName(name), stringAttributeValues);
+    }
+
+    /**
+     * Create an annotation value from Enum array
+     * 
+     * @param name
+     * @param Sy
+     * @return
+     */
+    public ArrayAttributeValue<EnumAttributeValue> toEnumAttributeValue(
+            String name, JavaType enumType, Iterable<String> enumValueNames) {
+        List<EnumAttributeValue> enumAttributeValues = new ArrayList<EnumAttributeValue>();
+        JavaSymbolName ignored = new JavaSymbolName("ignored");
+
+        for (String enumName : enumValueNames) {
+            enumAttributeValues.add(new EnumAttributeValue(ignored,
+                    new EnumDetails(enumType, new JavaSymbolName(enumName))));
+        }
+
+        return new ArrayAttributeValue<EnumAttributeValue>(new JavaSymbolName(
+                name), enumAttributeValues);
     }
 
 }

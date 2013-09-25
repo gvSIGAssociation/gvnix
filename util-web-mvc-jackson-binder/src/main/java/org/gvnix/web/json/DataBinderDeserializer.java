@@ -1,4 +1,20 @@
-package ${PACKAGE};
+/*
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gvnix.web.json;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -6,9 +22,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import org.gvnix.web.json.DataBinderMappingJackson2HttpMessageConverter.DataBinderList;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
 
@@ -20,7 +36,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerBase;
 import com.fasterxml.jackson.databind.deser.impl.ObjectIdReader;
 import com.fasterxml.jackson.databind.util.NameTransformer;
-import ${PACKAGE}.DataBinderMappingJackson2HttpMessageConverter.DataBinderList;
 
 /**
  * Jackson2 deserializer based on Spring DataBinder.
@@ -54,9 +69,9 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
     }
 
     /**
-     *  {@inheritDoc}
-     *  
-     *  Uses {@link DataBinderDeserializer}
+     * {@inheritDoc}
+     * 
+     * Uses {@link DataBinderDeserializer}
      */
     @Override
     public BeanDeserializerBase withObjectIdReader(ObjectIdReader objectIdReader) {
@@ -64,9 +79,9 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
     }
 
     /**
-     *  {@inheritDoc}
-     *  
-     *  Uses {@link DataBinderDeserializer}
+     * {@inheritDoc}
+     * 
+     * Uses {@link DataBinderDeserializer}
      */
     @Override
     public BeanDeserializerBase withIgnorableProperties(
@@ -216,12 +231,8 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
         for (; t != JsonToken.END_ARRAY; t = parser.nextToken()) {
             // Property name must include prefix this way:
             // degrees[0].description
-            Map<String, String> field = readField(
-                    parser,
-                    ctxt,
-                    t,
-                    prefix.concat("[").concat(Integer.toString(i++))
-                            .concat("]."));
+            Map<String, String> field = readField(parser, ctxt, t, prefix
+                    .concat("[").concat(Integer.toString(i++)).concat("]."));
             deserObj.putAll(field);
         }
         return deserObj;
@@ -231,15 +242,19 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
      * Deserializes JSON property into Map<String, String> format to use it in a
      * Spring {@link DataBinder}.
      * <p/>
-     * Check token's type to perform an action:<ul>
+     * Check token's type to perform an action:
+     * <ul>
      * <li>If it's a property, stores it in map</li>
-     * <li>If it's an object, calls to {@link #readObject(JsonParser, DeserializationContext, String)}</li>
-     * <li> If it's an array, calls to {@link #readArray(JsonParser, DeserializationContext, String)}</li>
+     * <li>If it's an object, calls to
+     * {@link #readObject(JsonParser, DeserializationContext, String)}</li>
+     * <li>If it's an array, calls to
+     * {@link #readArray(JsonParser, DeserializationContext, String)}</li>
      * </ul>
+     * 
      * @param parser
      * @param ctxt
      * @param token current token
-     * @param prefix property dataBinder path 
+     * @param prefix property dataBinder path
      * @return
      * @throws IOException
      * @throws JsonProcessingException
@@ -255,10 +270,10 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
         fieldName = parser.getCurrentName();
 
         // If current token contains a field name
-        if (!StringUtils.isEmpty(fieldName)) {
+        if (!isEmptyString(fieldName)) {
 
             // Append the prefix if given
-            if (StringUtils.isEmpty(prefix)) {
+            if (isEmptyString(prefix)) {
                 fieldName = parser.getCurrentName();
             }
             else {
@@ -271,7 +286,7 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
         else {
 
             // Use the prefix in recursive calls
-            if (!StringUtils.isEmpty(prefix)) {
+            if (!isEmptyString(prefix)) {
                 fieldName = prefix;
             }
         }
@@ -311,9 +326,17 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
     }
 
     /**
-     *  {@inheritDoc}
-     *
-     *  Not used
+     * @param string
+     * @return true if string is null or is empty (ignore spaces)
+     */
+    private boolean isEmptyString(String string) {
+        return string == null || string.trim().isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Not used
      */
     @Override
     public Object deserializeFromObject(JsonParser jp,
@@ -324,9 +347,9 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
     }
 
     /**
-     *  {@inheritDoc}
-     *
-     *  Not used
+     * {@inheritDoc}
+     * 
+     * Not used
      */
     @Override
     protected BeanDeserializerBase asArrayDeserializer() {
@@ -335,9 +358,9 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
     }
 
     /**
-     *  {@inheritDoc}
-     *
-     *  Not used
+     * {@inheritDoc}
+     * 
+     * Not used
      */
     @Override
     protected Object _deserializeUsingPropertyBased(JsonParser jp,
@@ -348,9 +371,9 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
     }
 
     /**
-     *  {@inheritDoc}
-     *
-     *  Not used
+     * {@inheritDoc}
+     * 
+     * Not used
      */
     @Override
     public JsonDeserializer<Object> unwrappingDeserializer(

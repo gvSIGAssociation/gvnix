@@ -1,4 +1,20 @@
-package ${PACKAGE};
+/*
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gvnix.web.json;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -24,13 +40,14 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 /**
  * Configure jackson seralizers for a bean.
  * <p/>
- * If it's possible, register a Serializer based on
- * {@link ConversionService} registered conversions.
+ * If it's possible, register a Serializer based on {@link ConversionService}
+ * registered conversions.
  * <p/>
- * If a property already has a serialized configured (normally by {@link JsonSerialize#using()})
- * this will be use.
+ * If a property already has a serialized configured (normally by
+ * {@link JsonSerialize#using()}) this will be use.
  * <p/>
- * Also, if {@link JsonSerialize#as()} is set, it tries to use this class as serialize target class.
+ * Also, if {@link JsonSerialize#as()} is set, it tries to use this class as
+ * serialize target class.
  * 
  * @author gvNIX Team
  * @since TODO: Class version

@@ -44,6 +44,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.Jsr303JavaType;
 import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
 
@@ -56,6 +57,17 @@ import org.springframework.roo.project.LogicalPath;
 public class WebJpaBatchMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static final JavaSymbolName BINDING_RESULT_NAME = new JavaSymbolName(
+            StringUtils.uncapitalize(SpringJavaType.BINDING_RESULT
+                    .getSimpleTypeName()));
+    private static final JavaSymbolName REQUEST_NAME = new JavaSymbolName(
+            "request");
+
+    private static final JavaType JSON_RESPONSE = new JavaType(
+            "org.gvnix.web.json.JsonResponse");
+
+    private static final JavaType HTTP_SERVLET_REQUEST = new JavaType(
+            "javax.servlet.http.HttpServletRequest");
     private static final JavaSymbolName BATCH_SERVICE_NAME = new JavaSymbolName(
             "batchService");
     private static final JavaType LOGGER_TYPE = new JavaType("org.slf4j.Logger");
@@ -72,6 +84,12 @@ public class WebJpaBatchMetadata extends
 
     private static final JavaSymbolName DELETE_METHOD = new JavaSymbolName(
             "delete");
+
+    private static final JavaSymbolName UPDATE_METHOD = new JavaSymbolName(
+            "update");
+
+    private static final JavaSymbolName CREATE_METHOD = new JavaSymbolName(
+            "create");
 
     private static final JavaType RESPONSE_ENTITY_OBJECT = new JavaType(
             SpringJavaType.RESPONSE_ENTITY.getFullyQualifiedTypeName(), 0,
@@ -113,6 +131,9 @@ public class WebJpaBatchMetadata extends
     private final JavaType service;
     private final JavaType entity;
     private final JavaType listOfIdentifiersType;
+    private final JavaType listOfEntityType;
+    private final JavaSymbolName listOfEntityName;
+    private final JavaType jsonResponseList;
     private final WebItdBuilderHelper helper;
 
     private FieldMetadata serviceFiled;
@@ -144,8 +165,16 @@ public class WebJpaBatchMetadata extends
         this.jpaBatchMetadata = jpaBatchMetadata;
 
         listOfIdentifiersType = jpaBatchMetadata.getListOfIdentifiersType();
+        listOfEntityType = jpaBatchMetadata.getListOfEntitiesType();
 
         this.entity = jpaBatchMetadata.getEntity();
+
+        listOfEntityName = new JavaSymbolName(
+                StringUtils.uncapitalize(jpaBatchMetadata.getEntityPlural()));
+
+        jsonResponseList = new JavaType(
+                JSON_RESPONSE.getFullyQualifiedTypeName(), 0, DataType.TYPE,
+                null, Arrays.asList(listOfEntityType));
 
         Validate.notNull(this.entity, String.format(
                 "Missing entity value for %s in %s",
@@ -163,13 +192,15 @@ public class WebJpaBatchMetadata extends
         builder.addField(getLoggerField());
         builder.addField(getServiceField());
         builder.addMethod(getDeleteMethod());
+        builder.addMethod(getUpdateMethod());
+        builder.addMethod(getCreateMethod());
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
     }
 
     /**
-     * Return method <code>deleteSelection</code>
+     * Return method <code>delete</code>
      * 
      * @return
      */
@@ -199,7 +230,7 @@ public class WebJpaBatchMetadata extends
 
         // @RequestMapping
         AnnotationMetadataBuilder requestMappingAnnotation = helper
-                .getRequestMappingAnnotation("/delete", null, null,
+                .getRequestMappingAnnotation("/delete", "POST", null,
                         "application/json", null, null);
         annotations.add(requestMappingAnnotation);
 
@@ -214,7 +245,7 @@ public class WebJpaBatchMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildDeleteSelectionMethod(bodyBuilder);
+        buildDeleteMethod(bodyBuilder);
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -228,11 +259,11 @@ public class WebJpaBatchMetadata extends
     }
 
     /**
-     * Builds deleteSelection method body
+     * Builds delete method body
      * 
      * @param builder
      */
-    private void buildDeleteSelectionMethod(InvocableMemberBodyBuilder builder) {
+    private void buildDeleteMethod(InvocableMemberBodyBuilder builder) {
         // HttpHeaders headers = new HttpHeaders();
         builder.appendFormalLine(String.format(
                 "%s headers = new HttpHeaders();",
@@ -347,6 +378,281 @@ public class WebJpaBatchMetadata extends
                 "return new %s<Object>(count, headers, %s.OK);",
                 helper.getFinalTypeName(SpringJavaType.RESPONSE_ENTITY),
                 helper.getFinalTypeName(SpringJavaType.HTTP_STATUS)));
+    }
+
+    /**
+     * Return method <code>update</code>
+     * 
+     * @return
+     */
+    private MethodMetadata getUpdateMethod() {
+        // method name
+        JavaSymbolName methodName = UPDATE_METHOD;
+
+        // Define method parameter types
+        final List<AnnotatedJavaType> parameterTypes = Arrays.asList(
+                new AnnotatedJavaType(listOfEntityType, Arrays.asList(
+                        AnnotationMetadataBuilder
+                                .getInstance(SpringJavaType.REQUEST_BODY),
+                        AnnotationMetadataBuilder
+                                .getInstance(Jsr303JavaType.VALID))),
+                AnnotatedJavaType
+                        .convertFromJavaType(SpringJavaType.BINDING_RESULT),
+                AnnotatedJavaType.convertFromJavaType(HTTP_SERVLET_REQUEST));
+
+        // Check if a method exist in type
+        final MethodMetadata method = methodExists(methodName, parameterTypes);
+
+        if (method != null) {
+            // If it already exists, just return the method
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // @RequestMapping
+        AnnotationMetadataBuilder requestMappingAnnotation = helper
+                .getRequestMappingAnnotation(null, "PUT", "application/json",
+                        "application/json", null, "Accept=application/json");
+        annotations.add(requestMappingAnnotation);
+        // @ResponseBody
+        AnnotationMetadataBuilder responseBodyAnnotation = new AnnotationMetadataBuilder();
+        responseBodyAnnotation.setAnnotationType(SpringJavaType.RESPONSE_BODY);
+        annotations.add(responseBodyAnnotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names (none in this case)
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(listOfEntityName);
+        parameterNames.add(BINDING_RESULT_NAME);
+        parameterNames.add(REQUEST_NAME);
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildUpdateMethod(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, jsonResponseList,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Builds update method body
+     * 
+     * @param builder
+     */
+    private void buildUpdateMethod(InvocableMemberBodyBuilder builder) {
+        // JsonResponse<List<Vet>> jsonResponse = new
+        // JsonResponse<List<Vet>>();
+        builder.appendFormalLine(String.format("%s jsonResponse = new %s();",
+                helper.getFinalTypeName(jsonResponseList),
+                helper.getFinalTypeName(jsonResponseList)));
+
+        // if (bindingResult.hasErrors()) {
+        builder.appendFormalLine(String.format("if (%s.hasErrors()) {",
+                BINDING_RESULT_NAME.getSymbolName()));
+
+        builder.indent();
+        // jsonResponse.setBindingResult(bindingResult);
+        builder.appendFormalLine(String.format(
+                "jsonResponse.setBindingResult(%s);",
+                BINDING_RESULT_NAME.getSymbolName()));
+        // jsonResponse.setValue(vets);
+        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
+                listOfEntityName.getSymbolName()));
+        // jsonResponse.setStatus("ERROR");
+        builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
+        // return jsonResponse
+        builder.appendFormalLine("return jsonResponse;");
+
+        // }
+        builder.indentRemove();
+        builder.appendFormalLine("}");
+
+        // try {
+        builder.appendFormalLine("try {");
+        builder.indent();
+
+        // vets = batchService.update(vets);
+        builder.appendFormalLine(String.format("%s = %s.update(%s);",
+                listOfEntityName.getSymbolName(), getServiceField()
+                        .getFieldName().getSymbolName(), listOfEntityName
+                        .getSymbolName()));
+        // }
+        builder.indentRemove();
+        builder.appendFormalLine("}");
+
+        // catch(Exception ex) {
+        builder.appendFormalLine("catch(Exception ex) {");
+        builder.indent();
+
+        // jsonResponse.setValue(vets);
+        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
+                listOfEntityName.getSymbolName()));
+        // jsonResponse.setStatus("ERROR");
+        builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
+        // jsonResponse.setExceptionMessage(ex.getLocalizedMessage());
+        builder.appendFormalLine("jsonResponse.setExceptionMessage(ex.getLocalizedMessage());");
+        // return jsonResponse
+        builder.appendFormalLine("return jsonResponse;");
+
+        // }
+        builder.indentRemove();
+        builder.appendFormalLine("}");
+
+        // jsonResponse.setValue(vets);
+        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
+                listOfEntityName.getSymbolName()));
+        // jsonResponse.setStatus("SUCCESS");
+        builder.appendFormalLine("jsonResponse.setStatus(\"SUCCESS\");");
+        // return jsonResponse
+        builder.appendFormalLine("return jsonResponse;");
+    }
+
+    /**
+     * Return method <code>create</code>
+     * 
+     * @return
+     */
+    private MethodMetadata getCreateMethod() {
+        // method name
+        JavaSymbolName methodName = CREATE_METHOD;
+
+        // Define method parameter types
+        final List<AnnotatedJavaType> parameterTypes = Arrays.asList(
+                new AnnotatedJavaType(listOfEntityType, Arrays.asList(
+                        AnnotationMetadataBuilder
+                                .getInstance(SpringJavaType.REQUEST_BODY),
+                        AnnotationMetadataBuilder
+                                .getInstance(Jsr303JavaType.VALID))),
+                AnnotatedJavaType
+                        .convertFromJavaType(SpringJavaType.BINDING_RESULT),
+                AnnotatedJavaType.convertFromJavaType(HTTP_SERVLET_REQUEST));
+
+        // Check if a method exist in type
+        final MethodMetadata method = methodExists(methodName, parameterTypes);
+
+        if (method != null) {
+            // If it already exists, just return the method
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // @RequestMapping
+        AnnotationMetadataBuilder requestMappingAnnotation = helper
+                .getRequestMappingAnnotation(null, "POST", "application/json",
+                        "application/json", null, "Accept=application/json");
+        annotations.add(requestMappingAnnotation);
+        // @ResponseBody
+        AnnotationMetadataBuilder responseBodyAnnotation = new AnnotationMetadataBuilder();
+        responseBodyAnnotation.setAnnotationType(SpringJavaType.RESPONSE_BODY);
+        annotations.add(responseBodyAnnotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names (none in this case)
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(listOfEntityName);
+        parameterNames.add(BINDING_RESULT_NAME);
+        parameterNames.add(REQUEST_NAME);
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildCreateMethod(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, jsonResponseList,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Builds create method body
+     * 
+     * @param builder
+     */
+    private void buildCreateMethod(InvocableMemberBodyBuilder builder) {
+        // JsonResponse<List<Vet>> jsonResponse = new
+        // JsonResponse<List<Vet>>();
+        builder.appendFormalLine(String.format("%s jsonResponse = new %s();",
+                helper.getFinalTypeName(jsonResponseList),
+                helper.getFinalTypeName(jsonResponseList)));
+
+        // if (bindingResult.hasErrors()) {
+        builder.appendFormalLine(String.format("if (%s.hasErrors()) {",
+                BINDING_RESULT_NAME.getSymbolName()));
+
+        builder.indent();
+        // jsonResponse.setBindingResult(bindingResult);
+        builder.appendFormalLine(String.format(
+                "jsonResponse.setBindingResult(%s);",
+                BINDING_RESULT_NAME.getSymbolName()));
+        // jsonResponse.setValue(vets);
+        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
+                listOfEntityName.getSymbolName()));
+        // jsonResponse.setStatus("ERROR");
+        builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
+        // return jsonResponse
+        builder.appendFormalLine("return jsonResponse;");
+
+        // }
+        builder.indentRemove();
+        builder.appendFormalLine("}");
+
+        // try {
+        builder.appendFormalLine("try {");
+        builder.indent();
+
+        // batchService.create(vets);
+        builder.appendFormalLine(String.format("%s.create(%s);",
+                getServiceField().getFieldName().getSymbolName(),
+                listOfEntityName.getSymbolName()));
+        // }
+        builder.indentRemove();
+        builder.appendFormalLine("}");
+
+        // catch(Exception ex) {
+        builder.appendFormalLine("catch(Exception ex) {");
+        builder.indent();
+
+        // jsonResponse.setValue(vets);
+        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
+                listOfEntityName.getSymbolName()));
+        // jsonResponse.setStatus("ERROR");
+        builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
+        // jsonResponse.setExceptionMessage(ex.getLocalizedMessage());
+        builder.appendFormalLine("jsonResponse.setExceptionMessage(ex.getLocalizedMessage());");
+        // return jsonResponse
+        builder.appendFormalLine("return jsonResponse;");
+
+        // }
+        builder.indentRemove();
+        builder.appendFormalLine("}");
+
+        // jsonResponse.setValue(vets);
+        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
+                listOfEntityName.getSymbolName()));
+        // jsonResponse.setStatus("SUCCESS");
+        builder.appendFormalLine("jsonResponse.setStatus(\"SUCCESS\");");
+        // return jsonResponse
+        builder.appendFormalLine("return jsonResponse;");
     }
 
     /**

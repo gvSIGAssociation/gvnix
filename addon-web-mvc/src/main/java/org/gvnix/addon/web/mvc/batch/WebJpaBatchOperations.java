@@ -68,12 +68,5 @@ public interface WebJpaBatchOperations {
      * 
      * @param targetPackage
      */
-    void setup(JavaPackage targetPackage);
-
-    /**
-     * Update java utilities classes into <em>targetPackage</em>
-     * 
-     * @param targetPackage to update/create java classes
-     */
-    void updateJavaUtilities(JavaPackage targetPackage);
+    void setup();
 }

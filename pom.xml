@@ -48,6 +48,7 @@
     <module>support</module>
     <module>taglib-datatables</module>
     <module>util-datatables</module>
+    <module>util-web-mvc-jackson-binder</module>
     <module>addon-jpa</module>
     <module>addon-web-mvc</module>
     <module>addon-web-mvc-datatables</module>

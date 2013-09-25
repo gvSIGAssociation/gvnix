@@ -17,16 +17,12 @@
  */
 package org.gvnix.addon.web.mvc.batch;
 
-import java.net.URL;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -35,7 +31,6 @@ import org.gvnix.addon.jpa.JpaOperations;
 import org.gvnix.addon.jpa.batch.GvNIXJpaBatch;
 import org.gvnix.addon.jpa.batch.JpaBatchAnnotationValues;
 import org.gvnix.addon.web.mvc.MvcOperations;
-import org.gvnix.support.OperationUtils;
 import org.gvnix.support.WebProjectUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
@@ -48,19 +43,14 @@ import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.operations.AbstractOperations;
 import org.springframework.roo.metadata.MetadataService;
-import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.RooJavaType;
 import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.FeatureNames;
 import org.springframework.roo.project.LogicalPath;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Property;
-import org.springframework.roo.support.osgi.OSGiUtils;
-import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -75,8 +65,8 @@ import org.w3c.dom.Element;
 public class WebJpaBatchOperationsImpl extends AbstractOperations implements
         WebJpaBatchOperations {
 
-    private static final String JACKSON2_RM_HANDLER_ADAPTER = "Jackson2RequestMappingHandlerAdapter";
-    private static final String OBJECT_MAPPER = "ConversionServiceObjectMapper";
+    private static final String JACKSON2_RM_HANDLER_ADAPTER = "org.gvnix.web.json.Jackson2RequestMappingHandlerAdapter";
+    private static final String OBJECT_MAPPER = "org.gvnix.web.json.ConversionServiceObjectMapper";
 
     private static final JavaType JPA_BATCH_ANNOTATION = new JavaType(
             GvNIXJpaBatch.class);
@@ -100,9 +90,6 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
 
     @Reference
     private TypeManagementService typeManagementService;
-
-    @Reference
-    private PathResolver pathResolver;
 
     @Reference
     private MetadataService metadataService;
@@ -141,28 +128,21 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
     }
 
     /** {@inheritDoc} */
-    public void setup(JavaPackage targetPackage) {
+    public void setup() {
         // If gvNIX MVC dependencies are not installed, install them
         if (!projectOperations
                 .isFeatureInstalledInFocusedModule(MvcOperations.FEATURE_NAME_GVNIX_MVC)) {
             mvcOperations.setup();
         }
 
-        installJackson2Dependencies();
-        updateJavaUtilities(targetPackage);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void updateJavaUtilities(JavaPackage targetPackage) {
-        installTemplates(targetPackage);
-        updateWebMvcConfig(targetPackage);
+        installDependencies();
+        updateWebMvcConfig();
     }
 
     /**
      * Install jackson 2 dependencies on project pom
      */
-    private void installJackson2Dependencies() {
+    private void installDependencies() {
         // Get add-on configuration file
         Element configuration = XmlUtils.getConfiguration(getClass());
         // Install properties
@@ -187,7 +167,7 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
      * 
      * @param targetPackage
      */
-    private void updateWebMvcConfig(JavaPackage targetPackage) {
+    private void updateWebMvcConfig() {
         LogicalPath webappPath = WebProjectUtils
                 .getWebappPath(projectOperations);
         String webMvcXmlPath = projectOperations.getPathResolver()
@@ -218,57 +198,18 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
         Element bean = webMvcXml.createElement("bean");
         bean.setAttribute("id", WEBMCV_DATABINDER_BEAN_ID);
         bean.setAttribute("p:order", "1");
-        bean.setAttribute("class", targetPackage.getFullyQualifiedPackageName()
-                .concat(".").concat(JACKSON2_RM_HANDLER_ADAPTER));
+        bean.setAttribute("class", JACKSON2_RM_HANDLER_ADAPTER);
 
         Element property = webMvcXml.createElement("property");
         property.setAttribute("name", "objectMapper");
 
         Element objectMapperBean = webMvcXml.createElement("bean");
-        objectMapperBean.setAttribute("class",
-                targetPackage.getFullyQualifiedPackageName().concat(".")
-                        .concat(OBJECT_MAPPER));
+        objectMapperBean.setAttribute("class", OBJECT_MAPPER);
         property.appendChild(objectMapperBean);
         bean.appendChild(property);
         root.appendChild(bean);
 
         XmlUtils.writeXml(webMvcXmlMutableFile.getOutputStream(), webMvcXml);
-    }
-
-    /**
-     * Installs java templates to target package
-     * 
-     * @param targetPackage
-     */
-    private void installTemplates(JavaPackage targetPackage) {
-        // Get and create target directory
-        String targetPackagePath = StringUtils.join(
-                targetPackage.getElements(), "/");
-        String targetDirectory = pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
-                targetPackagePath);
-
-        if (!targetDirectory.endsWith("/")) {
-            targetDirectory += "/";
-        }
-
-        if (!fileManager.exists(targetDirectory)) {
-            fileManager.createDirectory(targetDirectory);
-        }
-
-        String path = FileUtils.getPath(this.getClass(), "templates/*.java");
-
-        Collection<URL> urls = OSGiUtils.findEntriesByPattern(
-                context.getBundleContext(), path);
-
-        for (URL url : urls) {
-            String classFileName = FilenameUtils.concat(targetDirectory,
-                    FilenameUtils.getName(url.getPath()));
-
-            OperationUtils.installJavaClassFromTemplate(
-                    targetPackage.getFullyQualifiedPackageName(),
-                    classFileName, url.getPath(), pathResolver, fileManager);
-        }
     }
 
     /** {@inheritDoc} */

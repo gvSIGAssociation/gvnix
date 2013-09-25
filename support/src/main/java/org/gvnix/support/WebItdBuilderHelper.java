@@ -18,6 +18,7 @@
 package org.gvnix.support;
 
 import static org.springframework.roo.model.SpringJavaType.REQUEST_MAPPING;
+import static org.springframework.roo.model.SpringJavaType.REQUEST_METHOD;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,9 +115,10 @@ public class WebItdBuilderHelper extends ItdBuilderHelper {
                     Arrays.asList(consumes)));
         }
         if (method != null && method.length > 0) {
-            // @RequestMapping(... method = { "POST", ""})
-            methodAnnotation.addAttribute(toAttributeValue("method",
-                    Arrays.asList(method)));
+            // @RequestMapping(... method = { RequestMethod.POST, })
+
+            methodAnnotation.addAttribute(toEnumAttributeValue("method",
+                    REQUEST_METHOD, Arrays.asList(method)));
         }
         if (params != null && params.length > 0) {
             // @RequestMapping(... produces = { "application/json" , })
@@ -165,7 +167,8 @@ public class WebItdBuilderHelper extends ItdBuilderHelper {
         }
         if (method != null) {
             // @RequestMapping(... method = "POST")
-            methodAnnotation.addStringAttribute("method", method);
+            methodAnnotation.addEnumAttribute("method", REQUEST_METHOD,
+                    new JavaSymbolName(method));
         }
         if (params != null) {
             // @RequestMapping(... produces = "application/json")

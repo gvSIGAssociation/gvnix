@@ -577,6 +577,10 @@ public class JpaBatchMetadata extends
         return listOfIdentifiersType;
     }
 
+    public JavaType getListOfEntitiesType() {
+        return listOfEntitiesType;
+    }
+
     /**
      * Gets final names to use of a type in method body after import resolver.
      * 
@@ -586,6 +590,10 @@ public class JpaBatchMetadata extends
     private String getFinalTypeName(JavaType type) {
         return type.getNameIncludingTypeParameters(false,
                 builder.getImportRegistrationResolver());
+    }
+
+    public String getEntityPlural() {
+        return entityPlural;
     }
 
 }

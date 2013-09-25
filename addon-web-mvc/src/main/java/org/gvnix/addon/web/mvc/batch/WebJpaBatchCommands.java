@@ -20,8 +20,6 @@ package org.gvnix.addon.web.mvc.batch;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.addon.web.mvc.MvcOperations;
-import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
@@ -46,12 +44,6 @@ public class WebJpaBatchCommands implements CommandMarker {
     private WebJpaBatchOperations operations;
 
     /**
-     * Get a reference to the MvcOperations from the underlying OSGi container
-     */
-    @Reference
-    private MvcOperations mvcOperations;
-
-    /**
      * Informs if <code>web mvc batch setup</code> command is available
      * 
      * @return true (default) if the command should be visible at this stage,
@@ -68,8 +60,7 @@ public class WebJpaBatchCommands implements CommandMarker {
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
-    @CliAvailabilityIndicator({ "web mvc batch add", "web mvc batch all",
-            "web mvc batch updateUtilities" })
+    @CliAvailabilityIndicator({ "web mvc batch add", "web mvc batch all" })
     public boolean isCommandAvailable() {
         return operations.isCommandAvailable();
     }
@@ -79,21 +70,9 @@ public class WebJpaBatchCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc batch updateUtilities", help = "Update or create classes used to binding JSON request and responses. WARNING: if you use the same package set on 'web mvc batch setup' command, this action will OVERWRITE EXISITING CLASSES")
-    public void updateUtilities(
-            @CliOption(key = "package", mandatory = true, help = "package for JSON binding classes.") JavaPackage targetPackage) {
-        operations.updateJavaUtilities(targetPackage);
-    }
-
-    /**
-     * Command to enable web mvc batch utilities on project
-     * 
-     * @param type
-     */
     @CliCommand(value = "web mvc batch setup", help = "Enables gvNIX Web MVC Batch utilities on project")
-    public void setup(
-            @CliOption(key = "package", mandatory = true, help = "package for JSON binding created classes.") JavaPackage targetPackage) {
-        operations.setup(targetPackage);
+    public void setup() {
+        operations.setup();
     }
 
     /**
