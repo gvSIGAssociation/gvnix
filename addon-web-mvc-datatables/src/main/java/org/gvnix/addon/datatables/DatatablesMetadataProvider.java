@@ -207,7 +207,8 @@ public final class DatatablesMetadataProvider extends
                 entityMemberDetails, identifiers, plural,
                 entityManagerMethodName, datePatterns, webScaffoldAspectName,
                 webJpaBatchMetadata, jpaQueryMetadata,
-                webScaffoldAnnotationValues, findersRegistered);
+                webScaffoldAnnotationValues, findersRegistered,
+                webMetadataService);
     }
 
     /**

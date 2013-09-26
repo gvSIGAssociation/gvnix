@@ -44,6 +44,8 @@ import org.springframework.roo.addon.finder.ReservedToken;
 import org.springframework.roo.addon.finder.Token;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
+import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
+import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
@@ -202,6 +204,11 @@ public class DatatablesMetadata extends
      */
     private final JavaType entityListType;
 
+    /**
+     * Web metadata service to get controller information
+     */
+    private final WebMetadataService webMetadataService;
+
     public DatatablesMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             DatatablesAnnotationValues annotationValues, JavaType entity,
@@ -213,7 +220,8 @@ public class DatatablesMetadata extends
             WebJpaBatchMetadata webJpaBatchMetadata,
             JpaQueryMetadata jpaQueryMetadata,
             WebScaffoldAnnotationValues webScaffoldAnnotationValues,
-            Map<FinderMetadataDetails, QueryHolderTokens> findersRegistered) {
+            Map<FinderMetadataDetails, QueryHolderTokens> findersRegistered,
+            WebMetadataService webMetadataService) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -257,6 +265,8 @@ public class DatatablesMetadata extends
         else {
             this.findersRegistered = null;
         }
+
+        this.webMetadataService = webMetadataService;
 
         // Adding precedence declaration
         // This aspect before webScaffold
@@ -2091,7 +2101,9 @@ public class DatatablesMetadata extends
                                 .getAnnotation(new JavaType(
                                         "javax.persistence.OneToMany"));
 
-                        if (entityFieldOneToManyAnnotation != null && entityFieldOneToManyAnnotation.getAttribute("mappedBy") != null) {
+                        if (entityFieldOneToManyAnnotation != null
+                                && entityFieldOneToManyAnnotation
+                                        .getAttribute("mappedBy") != null) {
 
                             String entityFieldOneToManyAnnotationMappedBy = entityFieldOneToManyAnnotation
                                     .getAttribute("mappedBy").getValue()
@@ -2099,27 +2111,39 @@ public class DatatablesMetadata extends
 
                             if (entityFieldOneToManyAnnotationMappedBy != null) {
 
-                                bodyBuilder
-                                        .appendFormalLine("details = new HashMap<String, String>();");
+                                // Get type of list (entity): if not a list, do
+                                // nothing
+                                JavaType entityFieldBaseType = entityField
+                                        .getFieldType().getBaseType();
+                                if (entityFieldBaseType != null) {
 
-                                // TODO Get entity path
-                                bodyBuilder
-                                        .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
-                                bodyBuilder
-                                        .appendFormalLine("details.put(\"path\", \""
-                                                .concat(entityField
-                                                        .getFieldName()
-                                                        .getSymbolName())
-                                                .concat("\");"));
-                                bodyBuilder
-                                        .appendFormalLine("// Property name in detail entity with the relation to master entity");
-                                bodyBuilder
-                                        .appendFormalLine("details.put(\"mappedBy\", \""
-                                                .concat(entityFieldOneToManyAnnotationMappedBy)
-                                                .concat("\");"));
+                                    JavaTypeMetadataDetails javaTypeMetadataDetails = webMetadataService
+                                            .getJavaTypeMetadataDetails(
+                                                    entityFieldBaseType,
+                                                    entityMemberDetails,
+                                                    entityIdentifier
+                                                            .getDeclaredByMetadataId());
 
-                                bodyBuilder
-                                        .appendFormalLine("detailsInfo.add(details);");
+                                    bodyBuilder
+                                            .appendFormalLine("details = new HashMap<String, String>();");
+
+                                    bodyBuilder
+                                            .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
+                                    bodyBuilder
+                                            .appendFormalLine("details.put(\"path\", \""
+                                                    .concat(javaTypeMetadataDetails
+                                                            .getControllerPath())
+                                                    .concat("\");"));
+                                    bodyBuilder
+                                            .appendFormalLine("// Property name in detail entity with the relation to master entity");
+                                    bodyBuilder
+                                            .appendFormalLine("details.put(\"mappedBy\", \""
+                                                    .concat(entityFieldOneToManyAnnotationMappedBy)
+                                                    .concat("\");"));
+
+                                    bodyBuilder
+                                            .appendFormalLine("detailsInfo.add(details);");
+                                }
                             }
                         }
                     }
