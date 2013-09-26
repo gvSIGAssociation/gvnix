@@ -191,8 +191,8 @@ public class JpaBatchMetadata extends
 
     /**
      * Gets <code>deleteByValuesMethod</code> method. <br>
-     * This method performs a delete base on property values
-     * condition (value equal and concatenates conditions using "and" operator)
+     * This method performs a delete base on property values condition (value
+     * equal and concatenates conditions using "and" operator)
      * 
      * @return
      */
@@ -241,8 +241,8 @@ public class JpaBatchMetadata extends
 
     /**
      * Builds body method for <code>deleteByValues</code> method. <br>
-     * This method performs a delete base on property values
-     * condition (value equal and concatenates conditions using "and" operator)
+     * This method performs a delete base on property values condition (value
+     * equal and concatenates conditions using "and" operator)
      * 
      * @param bodyBuilder
      */
