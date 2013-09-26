@@ -2135,6 +2135,12 @@ public class DatatablesMetadata extends
                                                             .getControllerPath())
                                                     .concat("\");"));
                                     bodyBuilder
+                                            .appendFormalLine("details.put(\"property\", \""
+                                                    .concat(entityField
+                                                            .getFieldName()
+                                                            .getSymbolName())
+                                                    .concat("\");"));
+                                    bodyBuilder
                                             .appendFormalLine("// Property name in detail entity with the relation to master entity");
                                     bodyBuilder
                                             .appendFormalLine("details.put(\"mappedBy\", \""
