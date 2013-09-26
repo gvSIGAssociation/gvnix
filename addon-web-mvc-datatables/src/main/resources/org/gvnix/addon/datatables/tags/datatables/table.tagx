@@ -1,4 +1,4 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:table="urn:jsptagdir:/WEB-INF/tags/datatables" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:datatables="http://www.gvnix.org/gvnix-datatables" version="2.0">
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:table="urn:jsptagdir:/WEB-INF/tags/datatables" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixddt="http://www.gvnix.org/gvnix-datatables" xmlns:datatables="http://github.com/dandelion/datatables" version="2.0">
 <jsp:directive.tag import="org.springframework.web.servlet.support.RequestContext"/>
 <jsp:directive.tag import="org.springframework.web.servlet.tags.RequestContextAwareTag"/>
   <jsp:directive.tag import="java.util.ArrayList" />
@@ -40,14 +40,12 @@
 
   <jsp:directive.attribute name="url" type="java.lang.String" rtexprvalue="true"  required="false" description="Web service URL used to populate the table.  (Either data or url attribute is required)" />
   <jsp:directive.attribute name="appear" type="java.lang.String" rtexprvalue="true" required="false" description="(block|fadein[,duration]) Display mode used when the table has finished loading and must appear in the page.  A duration can be set (in milliseconds) if the display mode is set to 'fadein'. (Default : 'block')" />
-  <jsp:directive.attribute name="jsonp" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Allows to retrieve JSON data from any domain name, regardless of XSS protection." />
   <jsp:directive.attribute name="cdn" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable the DataTables source files to be loaded from the Microsoft CDN (Content Delivery Framework) preventing you from hosting the files yourself. (Default : false)" />
   <jsp:directive.attribute name="cssStyle" type="java.lang.String" rtexprvalue="true" required="false" description="CSS style applied on the HTML table. (HTML style attribute)" />
   <jsp:directive.attribute name="cssClass" type="java.lang.String" rtexprvalue="true" required="false" description="CSS class(es) applied on the HTML table. (HTML class attribute)" />
   <jsp:directive.attribute name="rowIdBase" type="java.lang.String" rtexprvalue="true" required="false" description="Useful if you want each row has a DOM id. This attribute is evaluated as a property of the current iterated bean. (Only if DOM datasource)" />
   <jsp:directive.attribute name="rowIdPrefix" type="java.lang.String" rtexprvalue="true" required="false" description="String which is prepended to the rowIdBase attribute, in order to build row id. (HTML id attribute)" />
   <jsp:directive.attribute name="rowIdSufix" type="java.lang.String" rtexprvalue="true" required="false" description="String which is appended to the rowIdBase attribute, in order to build row id. (HTML id attribute)" />
-  <jsp:directive.attribute name="labels" type="java.lang.String" rtexprvalue="true" required="false" description="Base URL of an AJAX loaded file which contains all the labels used in tables. (See : http://www.datatables.net/release-datatables/examples/advanced_init/language_file.html)" />
   <jsp:directive.attribute name="deferRender" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Defer the creation of the table elements for each row until they are needed for a draw.  (Default : false, see http://datatables.net/ref#bDeferRender)" />
   <jsp:directive.attribute name="dom" type="java.lang.String" rtexprvalue="true" required="false" description="Allows you to specify exactly where in the DOM you want DataTables to inject the various controls it adds to the page (for example you might want the pagination controls at the top of the table). DIV elements (with or without a custom class) can also be added to aid styling." />
 
@@ -57,7 +55,7 @@
   <jsp:directive.attribute name="info" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable or disable the table information display. This shows information about the data that is currently visible on the page, including information about filtered data if that action is being performed.  (Default : true, see http://datatables.net/ref#bInfo)" />
   <jsp:directive.attribute name="paginate" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable pagination.  (Default : true, see http://datatables.net/ref#bPaginate)" />
   <jsp:directive.attribute name="lengthChange" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) If paginate is enabled, allows the end user to select the size of a formatted page from a select menu (sizes are 10, 25, 50 and 100). (Default : true, see http://datatables.net/ref#bLengthChange)" />
-  <jsp:directive.attribute name="paginationType" type="java.lang.String" rtexprvalue="true" required="false" description="(two_button|full_numbers) Choice between the two different built-in pagination interaction methods ('two_button' or 'full_numbers') which present different page controls to the end user. (Default : two_button, see http://datatables.net/ref#sPaginationType)" />
+  <jsp:directive.attribute name="paginationType" type="java.lang.String" rtexprvalue="true" required="false" description="(two_button|full_numbers) Choice between the two different built-in pagination interaction methods ('two_button' or 'full_numbers') which present different page controls to the end user. Default: full_numbers (More info: http://datatables.net/ref#sPaginationType)" />
   <jsp:directive.attribute name="filter" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable filtering of data.  (Default : true, see http://datatables.net/ref#bFilter)" />
   <jsp:directive.attribute name="sort" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable sorting of all columns.  Sorting of individual columns can be disabled by the 'sortable' attribute of column tag. (Default : true, see http://datatables.net/ref#bSort)" />
   <jsp:directive.attribute name="autoWidth" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable automatic column width calculation. (Default : true, see http://datatables.net/ref#bAutoWidth)" />
@@ -77,6 +75,11 @@
   <jsp:directive.attribute name="lengthMenu" type="java.lang.String" rtexprvalue="true" required="false" description="Specify the entries in the length drop down menu that DataTables show when pagination is enabled." />
   <jsp:directive.attribute name="cssStripes" type="java.lang.String" rtexprvalue="true" required="false" description="Comma-separated list of CSS classes that should be applied to displayed rows. This array may be of any length, and DataTables will apply each class sequentially, looping when required." />
   <jsp:directive.attribute name="displayLength" type="java.lang.Integer" rtexprvalue="true" required="false" description="Number of rows to display on a single page when using pagination." />
+  <jsp:directive.attribute name="ext" type="java.lang.String" rtexprvalue="true" required="false" description="Comma-separated names of custom extensions to register in the current table." />
+  <jsp:directive.attribute name="confGroup" type="java.lang.String" rtexprvalue="true" required="false" description="Name of the configuration group to activate for the current table." />
+  <jsp:directive.attribute name="filterPlaceholder" type="java.lang.String" rtexprvalue="true" required="false" description="Placeholder used to hold the individual column filtering elements." />
+  
+  
 
   <!-- ====================================== -->
   <!-- Extra features -->
@@ -91,6 +94,8 @@
   <jsp:directive.attribute name="scroller" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the DataTables Scroller plugin. (Default : false) (See : http://datatables.net/extras/scroller/)" />
   <jsp:directive.attribute name="scrollY" type="java.lang.String" rtexprvalue="true" required="false" description="Table's height to display in scrolling mode.  (default : 300px)" />
   <jsp:directive.attribute name="scrollCollapse" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) When vertical (y) scrolling is enabled, DataTables will force the height of the table's viewport to the given height at all times (useful for layout). However, this can look odd when filtering data down to a small data set, and the footer is left 'floating' further down. This parameter (when enabled) will cause DataTables to collapse the table's viewport down when the result set will fit within the given Y height. (default : false)" />
+  <jsp:directive.attribute name="scrollX" type="java.lang.String" rtexprvalue="true" required="false" description="Table's width to display in scrolling mode. (default : '')" />
+  <jsp:directive.attribute name="scrollXInner" type="java.lang.String" rtexprvalue="true" required="false" description="se more width than it might otherwise do when x-scrolling is enabled. (default : '')"/>
 
   <!-- ColReorder -->
   <jsp:directive.attribute name="colReorder" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the DataTables ColReorder plugin. (Default : false) (See : http://datatables.net/extras/colreorder/)" />
@@ -144,7 +149,11 @@
   <c:if test="${serverSide and empty serverData }">
     <c:set var="serverData" value="doAjaxRequestByPost"/>
   </c:if>
+
+  <!-- Ignore baseFilter if serverParams is set -->
   <c:if test="${serverSide and empty serverParams}">
+
+    <!-- Create JS function to include base filters as datatable extra params -->
     <c:if test="${not empty baseFilter}">
 		<c:set target="${datatables_javaScript_elements_before}" property="getExtraParams">
 			function getExtraParams( aoData ) {
@@ -156,6 +165,9 @@
 		<c:set var="serverParams" value="getExtraParams"/>
     </c:if> 
   </c:if>
+
+  <!-- If data has values Datatables doesn't request server side values, so
+       if serverSide is set remove data var to let datatables to call server -->
   <c:if test="${serverSide}">
 	<c:remove var="data"/>
   </c:if>
@@ -165,24 +177,25 @@
   <c:if test="${empty pipeSize}">
   	<c:set var="pipeSize" value="5"/>
   </c:if>
-  <!-- export supported on DOM -->
+
+  <!-- Export buttons are rendered in DOM mode only -->
   <c:choose>
 	  <c:when test="${serverSide}"> 
 	  	<c:set var="export" value=""/>
 	  </c:when>
 	  <c:otherwise> 
 		  <c:if test="${empty export}">
-		  	<c:set var="export" value="CSV,XLS,PDF"/>
+		  	<c:set var="export" value="csv,xls,pdf"/>
 		  </c:if>
 	  </c:otherwise>
   </c:choose>
   
+  <!-- set row id based on entity id attribute -->
   <c:if test="${(not serverSide) and (empty rowIdBase)}">
-    <!-- set row id based on entity id attribute -->
   	<c:set var="rowIdBase" value="${typeIdFieldName}"/>
   </c:if>
   <c:if test="${empty exportLinks}">
-  	<c:set var="exportLinks" value="top_middle"/>
+  	<c:set var="exportLinks" value="top_right"/>
   </c:if>
   <c:if test="${empty fixedPosition}">
   	<c:set var="fixedPosition" value="top"/>
@@ -193,13 +206,6 @@
   </c:if>
   <c:if test="${empty scrollY}">
   	<c:set var="scrollY" value="300px"/>
-  </c:if>
-  <jsp:scriptlet>
-  	jspContext.setAttribute("locale", ((RequestContext)jspContext
-            .getAttribute(RequestContextAwareTag.REQUEST_CONTEXT_PAGE_ATTRIBUTE)).getLocale().getLanguage());
-  </jsp:scriptlet>
-  <c:if test="${empty labels}">
-  	<c:set var="labels" value="/resources/scripts/datatables/i18n/labels_${locale}.txt"/>
   </c:if>
   
   <spring:url value="${path}" var="urlPath" />
@@ -243,8 +249,8 @@
 
     <c:set target="${datatables_javaScript_elements_before}" property="evalScripts">
         /*
-         * Wrap DIV around TD content.
-         * jQuery wrap will cause all script elements in the TD contents 
+         * Evaluate Javascript inside TDs.
+         * By calling jQuery wrap all script elements in the TD contents 
          * will automatically be evaluated.
          */
         function evalScripts( oSettings ) { 
@@ -272,11 +278,15 @@
       	<c:set var="selectionMultiRow" value="false"/>
       </c:if>
 
-      <spring:message var="selection_none_msg" code="selection_none" htmlEscape="false" javaScriptEscape="true"/>
+                <!-- Show select all button -->
       <c:if test="${selectionMultiRow}">
        <c:set var="selection_all_link" value="true"/>
        <spring:message var="selection_all_msg" code="selection_all" htmlEscape="false" javaScriptEscape="true"/>
       </c:if>
+
+                <!-- Show select none button -->
+                <spring:message var="selection_none_msg" code="selection_none" htmlEscape="false" javaScriptEscape="true"/>
+
       <c:if test="${empty selectionInfoLabel}">
       	<c:set var="selectionInfoLabel" value="datatables_selection_info"/>
       </c:if>
@@ -289,11 +299,11 @@
       	</c:if>
     	<c:set var="selectionCheckColumnId" value="${id}_select_col"/>
     	<c:if test="${serverSide}">
+
+                        <!-- Add selection functions to the script element before Datatables element -->
     		<c:set target="${datatables_javaScript_elements_before}" property="${selectionCheckColumnId}">
 	        function ${selectionCheckColumnId}(data, type, full) {
-	        	var result =
-	                '<input type="checkbox" class="${selectionCheckCssClass}" form="${selectionCheckColumnId}_form"/>';
-	                
+                            var result = '<input type="checkbox" class="${selectionCheckCssClass}" form="${selectionCheckColumnId}_form"/>';
                 return result;
 		    }
 	     	</c:set>
@@ -345,7 +355,7 @@
 	        return result;
 		}	
 	  </c:set>
-  </c:if>
+        </c:if><!-- /serverSide -->
   
   <!-- create -->
   <c:if test="${empty create}">
@@ -452,8 +462,12 @@
 		        var ${removeColumnId}_deleted_none = "${delete_none_msg}";
 		        var ${removeColumnId}_multiconfirmation = "${delete_multirow_confirm_msg}";
 		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
+  
+                      /* ... */
 		        function ${removeColumnId}() {
 		        	var $table = $('#${id}').dataTable(); 
+  
+                          // Get the table GvNIX_Selection object
 		        	var $selection = $table.fnSelection();
 		        	var selCount = $selection.fnSelectionCount();
 		        	if ( selCount > 1) {
@@ -557,8 +571,8 @@
   </c:otherwise>
   </c:choose>
   
-    <!-- init custom api functions -->
-  <c:set var="initCustionFunctionsCallbackId" value="${id}_init_custom_callbk"/>
+    <!-- Custom datatables API functions -->
+    <c:set var="initCustomFunctionsCallbackId" value="${id}_init_custom_callbk"/>
   
   <div id="${id}_gvnix_datatables">
   <c:if test="${not empty datatables_javaScript_elements_before}">
@@ -568,7 +582,9 @@
 		</c:forEach>
   </script>
   </c:if>
-  <datatables:table
+
+    <!-- Dandelion-Datatables -->
+    <gvnixddt:table
 		id="${id}"
 		data="${data}"
 		path="${urlPath}"
@@ -582,14 +598,12 @@
       url="${url}"
       row="item"
       appear="${appear}"
-      jsonp="${jsonp}"
       cdn="${cdn}"
       cssStyle="${cssStyle}"
       cssClass="${cssClass}"
       rowIdBase="${rowIdBase}"
       rowIdPrefix="${rowIdPrefix}"
       rowIdSufix="${rowIdSufix}"
-      labels="${labels}"
       deferRender="${deferRender}"
       dom="${dom}"
 
@@ -617,6 +631,9 @@
       lengthMenu="${lengthMenu}"
       cssStripes="${cssStripes}"
       displayLength="${displayLength}"
+        ext="${ext}"
+        confGroup="${confGroup}"
+        filterPlaceholder="${filterPlaceholder}"
 
       fixedHeader="${fixedHeader}"
       fixedPosition="${fixedPosition}"
@@ -625,31 +642,40 @@
       scroller="${scroller}"
       scrollY="${scrollY}"
       scrollCollapse="${scrollCollapse}"
+        scrollX="${scrollX}"
+        scrollXInner="${scrollXInner}"
 
       colReorder="${colReorder}"
     >
     	<c:choose>
+
+            <!-- On register view mode add a datatables column only, checkbox, 
+                 row update button, etc aren't needed -->
     	<c:when test="${not datatablesStandardMode}">
     		<!-- Cell to replace by data -->
-			<datatables:column id="${columnId}" searchable="false" property="${rowIdBase}"
-				filterable="false" sortable="false"></datatables:column>
+			<gvnixddt:column id="${columnId}" searchable="false" property="${rowIdBase}"
+				filterable="false" sortable="false"></gvnixddt:column>
 
            <!--  callback to initialize custom api functions -->
            <datatables:callback type="draw" function="evalScripts" />
 
            <!-- TODO Include it only in show mode -->
            <datatables:callback type="row" function="rowCallback" />
+            </c:when>
 
-    	</c:when>
-    	<c:otherwise>
-    	<!-- Check box -->
+            <!-- On table view mode, setup columns for action buttons -->
+            <c:otherwise>
+
+                <!-- If rows are selected using checkboxes, add action column with
+                     the checkbox -->
     	<c:if test="${selectionByCheck}">
     	  <c:choose>
             <c:when test="${serverSide}">
 		      <table:action-column id="${selectionCheckColumnId}" cssClass="utilbox" cssCellClass="utilbox" renderFunction="${selectionCheckColumnId}" cssStyle="${actionHeaderCssStyle}"/>
             </c:when>
+
+                        <!-- DOM cell render -->
 		    <c:otherwise>
-			  <!-- DOM cell render -->
 			  <table:action-column id="${selectionCheckColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
 			  	<c:if test="${not empty item }">
 			  	<input type="checkbox" class="${selectionCheckCssClass}" form="${selectionCheckColumnId}_form"/>
@@ -662,14 +688,16 @@
 		<!-- data columns will be inserted here -->  
         <jsp:doBody />
         
-        <!-- Go-show-view (of current row) column --> 
+                <!-- Add action column with show row details button --> 
         <c:choose>
+
+                    <!-- AJAX cell render -->
           <c:when test="${serverSide}">
-            <!-- AJAX cell render -->
 			<table:action-column id="${showColumnId}" cssClass="utilbox" cssCellClass="utilbox" renderFunction="${showColumnId}" cssStyle="${actionHeaderCssStyle}"/>
           </c:when>
+
+                    <!-- DOM cell render -->
 		  <c:otherwise>
-			  <!-- DOM cell render -->
 			  <table:action-column id="${showColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
 			  <c:if test="${not empty item }">
 	            <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
@@ -687,12 +715,14 @@
          <!-- Go-update-view (of current row) column -->
          <c:if test="${update}">
            <c:choose>
+
+                        <!-- AJAX cell render -->
 			  <c:when test="${serverSide}">
-			    <!-- AJAX cell render -->
 			    <table:action-column id="${updateColumnId}" cssCellClass="utilbox" renderFunction="${updateColumnId}" cssStyle="${actionHeaderCssStyle}"/>
 			  </c:when>
+
+                        <!-- DOM cell render -->
 			  <c:otherwise>
-			    <!-- DOM cell render -->
 			    <table:action-column id="${updateColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}">
 			    <c:if test="${not empty item }">
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
@@ -708,17 +738,19 @@
             </c:choose>
           </c:if>
 
-         <!-- Remove current row column -->
+                <!-- Add action column with row delete button -->
          <c:if test="${delete}">
            <c:choose>
+
+                        <!-- AJAX cell render -->
 			  <c:when test="${serverSide}">
 			  	<c:if test="${not (selectionMultiRow and datatablesHasBatchSupport)}">
-				    <!-- AJAX cell render -->
 				    <table:action-column id="${removeColumnId}" cssCellClass="utilbox" renderFunction="${removeColumnId}" cssStyle="${actionHeaderCssStyle}"/>
 				</c:if>
 			  </c:when>
+
+                        <!-- DOM cell render -->
 			  <c:otherwise>
-			    <!-- DOM cell render -->
 			    <table:action-column id="${removeColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}">
 			    <c:if test="${not empty item }">
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
@@ -746,26 +778,24 @@
      		fileName="${typeName}" cssClass="icon export_${export_format_lower}" label="${export_format_lower}"/>
      </c:forTokens>
      
-     <!--  callback to initialize custom api functions -->
-     <datatables:callback type="init" function="${initCustionFunctionsCallbackId}" />
+                <!-- Set the function that initializes custom API functions -->
+                <datatables:callback type="init" function="${initCustomFunctionsCallbackId}" />
      </c:otherwise>
      </c:choose>
-  </datatables:table>
+    </gvnixddt:table>
   
     <script type="text/javascript">
 	<c:forEach var="entry" items="${datatables_javaScript_elements_after}">
 	${entry.value}
 	</c:forEach>
 
-        /* init custom api functions for this table */
-	    function ${initCustionFunctionsCallbackId}() {
-	    	datatables_init_custom_api_functions('${id}',
-	    		{
+    // Initialize custom API functions for this table
+	    function ${initCustomFunctionsCallbackId}() {
+	    	datatables_init_custom_api_functions('${id}', {
 	    		'filterOnReturn': '${filterOnReturn}', 
 	    		'filteringDelay' : '${filteringDelay}'
 	    		<c:if test="${selection}">
-	    		,
-	    		'selection': { 
+	    		, 'selection': { 
 	    			'multiRow': ${selectionMultiRow},
 	    			'checkColumnClass': '${selectionCheckCssClass}',
 	    			'infoMessage': '${selection_info_msg}',

@@ -1,19 +1,18 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
- * 2013 Generalitat Valenciana
- * 
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.gvnix.datatables.tags;
 
@@ -23,6 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,9 +48,6 @@ import com.github.dandelion.datatables.jsp.tag.TableTag;
  */
 public class RooColumnTag extends ColumnTag {
 
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = -7713119991577135048L;
 
     // Logger
@@ -98,7 +95,7 @@ public class RooColumnTag extends ColumnTag {
     }
 
     public int doStartTag() throws JspException {
-        TableTag parent = (TableTag) getParent();
+        TableTag parent = (TableTag) findAncestorWithClass(this, TableTag.class);
         if (!doRender()) {
             return SKIP_BODY;
         }
@@ -225,14 +222,6 @@ public class RooColumnTag extends ColumnTag {
         return super.doAfterBody();
     }
 
-    public String getId() {
-        return getUid(id);
-    }
-
-    public void setId(String id) {
-        setUid(id);
-    }
-
     public Integer getMaxLength() {
         return maxLength;
     }
@@ -303,11 +292,22 @@ public class RooColumnTag extends ColumnTag {
     }
 
     /**
-     * Override to avoid problems to locate TableTag when it isn't the direct
-     * parent
+     * TBC
+     * 
+     * @param tag
+     * @param pageContext
+     * @return
      */
-    @Override
     public Tag getParent() {
-        return RooTableTag.getTableTag(super.getParent(), pageContext);
+
+        // If not found so we try to find in page context. Note RooTableTag
+        // must add the reference to itself in doStartTag() method
+        Tag parent = (Tag) pageContext.getAttribute(
+                RooTableTag.TABLE_TAG_VARIABLE, PageContext.REQUEST_SCOPE);
+        if (parent != null) {
+            return parent;
+        }
+
+        return super.getParent();
     }
 }

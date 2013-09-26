@@ -17,12 +17,12 @@
    <!-- Table -->
    <!-- ====================================== -->
    <tag>
+      <description>Generate a HTML table thanks to the awesome
+           Dandelion-DataTables.</description>      
       <name>table</name>
       <tag-class>org.gvnix.datatables.tags.RooTableTag</tag-class>
       <tei-class>com.github.dandelion.datatables.jsp.tei.TableTagExtraInfo</tei-class>
       <body-content>JSP</body-content>
-      <description>Generate a HTML table thanks to the awesome
-         DataTables jQuery plugin.</description>
       <attribute>
          <description>The identifier for this tag (do not change!)
          (required) DOM id of the HTML table.</description>
@@ -63,12 +63,6 @@
             is set to
             "fadein". (Default : "fadein")</description>
          <name>appear</name>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-         <description>(true|false) Allows to retrieve JSON data from any
-            domain name, regardless of XSS protection.</description>
-         <name>jsonp</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
@@ -114,15 +108,6 @@
          <description>String which is appended to the rowIdBase
             attribute, in order to build row id. (HTML id attribute)</description>
          <name>rowIdSufix</name>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-         <description>Base URL of an AJAX loaded file which contains
-            all
-            the
-            labels used in tables. (See :
-            http://www.datatables.net/release-datatables/examples/advanced_init/language_file.html)</description>
-         <name>labels</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
@@ -204,7 +189,6 @@
          <rtexprvalue>true</rtexprvalue>
          <type>java.lang.Boolean</type>
       </attribute>
-
       <attribute>
          <description>Allows you to specify exactly where in the DOM you want DataTables to inject the various controls it adds to the page (for example you might want the pagination controls at the top of the table). DIV elements (with or without a custom class) can also be added to aid styling.</description>
          <name>dom</name>
@@ -321,7 +305,22 @@
          <name>displayLength</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
-
+      <attribute>
+         <description>Comma-separated names of custom extensions to register in the current table</description>
+         <name>ext</name>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <description>Name of the configuration group to activate for the current table.</description>
+         <name>confGroup</name>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+         <description>Placeholder used to hold the individual column filtering elements.</description>
+         <name>filterPlaceholder</name>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
       <!-- ====================================== -->
       <!-- Extra features -->
       <!-- ====================================== -->
@@ -374,6 +373,19 @@
           <name>scrollCollapse</name>
           <rtexprvalue>true</rtexprvalue>
       </attribute>
+      <attribute>
+          <description>Table's width to display in scrolling mode.
+          (default : disabled)</description>
+          <name>scrollX</name>
+          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+          <description>Use more width than it might otherwise do when 
+          x-scrolling is enabled.
+          (default : disabled)</description>
+          <name>scrollXInner</name>
+          <rtexprvalue>true</rtexprvalue>
+      </attribute>
 
       <!-- ColReorder -->
       <attribute>
@@ -383,6 +395,7 @@
          <name>colReorder</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
+      <dynamic-attributes>true</dynamic-attributes>
       
        <!-- ====================================== -->
        <!-- Roo attributes -->
@@ -443,52 +456,12 @@
          <rtexprvalue>true</rtexprvalue>
          <type>java.lang.String</type>
       </attribute>
+      <dynamic-attributes>true</dynamic-attributes>
    </tag>
 
    <!-- ====================================== -->
-   <!-- Extra features -->
+   <!-- Colum Tag -->
    <!-- ====================================== -->
-   <tag>
-       <description>Allows to fill an HTML caption tag in the table.</description>
-       <name>caption</name>
-       <tag-class>org.gvnix.datatables.tags.RooCaptionTag</tag-class>
-       <body-content>JSP</body-content>
-       <attribute>
-          <description>"title" attribute of the HTML caption tag.</description>
-          <name>title</name>
-          <rtexprvalue>true</rtexprvalue>
-       </attribute>
-       <attribute>
-           <description>(required) DOM id of the HTML table.</description>
-           <name>id</name>
-           <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-         <description>CSS style applied on the HTML table. (HTML style
-            attribute)</description>
-          <name>cssStyle</name>
-          <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-         <description>CSS class(es) applied on the HTML table. (HTML
-            class attribute)</description>
-          <name>cssClass</name>
-          <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   </tag>
-   <!--tag>
-       <description>Allows to fill a column header with more complex
-           content than a usual title.</description>
-       <name>columnHead</name>
-       <tag-class>com.github.dandelion.datatables.jsp.tag.ColumnHeadTag</tag-class>
-       <body-content>JSP</body-content>
-      <attribute>
-          <description>Unique arbitrary id of the column, used in
-              relation to the column tag.</description>
-          <name>uid</name>
-          <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   </tag-->
    <tag>
       <description>Describe a column of the HTML table.</description>
       <name>column</name>
@@ -506,6 +479,11 @@
          <description>Column title.</description>
          <name>title</name>
          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
+          <description>Resource key used to lookup the title value in the configured resource bundle</description>
+          <name>titleKey</name>
+          <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
          <description>Name of the attribute of the current object
@@ -569,18 +547,16 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
+         <description>Name of a Javascript array of string that will be used to populate a filtering drop-down list</description>
+          <name>filterValues</name>
+          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      <attribute>
          <description>If filterable is enabled and filterType is
             'INPUT', you can apply a CSS class to the input field
             with
             this attribute</description>
          <name>filterCssClass</name>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-         <description>If filterable is enabled and filterType is
-            'INPUT', fill in the input field with this attribute
-            (Default : the column's title)</description>
-         <name>filterPlaceholder</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
@@ -627,7 +603,11 @@
          <name>selector</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
-      
+      <attribute>
+         <description>Type of sorting function to apply on the column.</description>
+         <name>sortType</name>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
        <!-- ====================================== -->
        <!-- Roo attributes -->
        <!-- ====================================== -->
@@ -696,154 +676,7 @@
          <rtexprvalue>true</rtexprvalue>
          <type>java.lang.String</type>
       </attribute>
+      <dynamic-attributes>true</dynamic-attributes>
    </tag>
 
-   <!-- ====================================== -->
-   <!-- Extra file -->
-   <!-- ====================================== -->
-   <tag>
-      <description></description>
-      <name>extraFile</name>
-      <tag-class>org.gvnix.datatables.tags.RooExtraFileTag</tag-class>
-      <body-content>empty</body-content>
-      <attribute>
-         <description>Location of the file containing DataTables
-            configuration.</description>
-         <name>src</name>
-         <required>true</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-         <description>(BEFOREALL|AFTERSTARTDOCUMENTREADY|BEFORENDDOCUMENTREADY|AFTERALL)
-            Specify where the extra file must be inserted. (Default
-            :
-            BEFOREALL)</description>
-         <name>insert</name>
-      </attribute>
-   </tag>
-
-   <!-- ====================================== -->
-   <!-- Extra conf -->
-   <!-- ====================================== -->
-   <tag>
-      <description>Allow to specify the location of a file containing
-         a
-         JSON-formatted DataTables configuration to merge with the
-         generated one.</description>
-      <name>extraConf</name>
-      <tag-class>org.gvnix.datatables.tags.RooExtraConfTag</tag-class>
-      <body-content>empty</body-content>
-      <attribute>
-         <description>Location of the file containing the extra
-            DataTables configuration</description>
-         <name>src</name>
-         <required>true</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   </tag>
-
-   <!-- ====================================== -->
-   <!-- Prop -->
-   <!-- ====================================== -->
-   <tag>
-      <description>Allow to override properties normally defined in
-         the
-         Dandelion properties file.</description>
-      <name>prop</name>
-      <tag-class>org.gvnix.datatables.tags.RooPropTag</tag-class>
-      <body-content>empty</body-content>
-      <attribute>
-         <description>Property's name to override.</description>
-         <name>name</name>
-         <required>true</required>
-      </attribute>
-      <attribute>
-         <description>Property's value to override.</description>
-         <name>value</name>
-         <required>true</required>
-      </attribute>
-   </tag>
-
-   <!-- ====================================== -->
-   <!-- Export -->
-   <!-- ====================================== -->
-   <tag>
-      <description>Configure the HTML link and properties for a given
-         export type.</description>
-      <name>export</name>
-      <tag-class>org.gvnix.datatables.tags.RooExportTag</tag-class>
-      <body-content>empty</body-content>
-      <attribute>
-         <description>(XML|CSV) Type of export (Default : XML,CSV)</description>
-         <name>type</name>
-         <required>true</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-         <description>Name of the file containing exported data
-            (Default
-            : the export type uppercased)</description>
-         <name>fileName</name>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-         <description>Label of the HTML link</description>
-         <name>label</name>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-         <description>CSS style applied to the HTML link</description>
-         <name>cssStyle</name>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <attribute>
-         <description>CSS class applied to the HTML link</description>
-         <name>cssClass</name>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      <!-- <attribute> <name>area</name> <description>(list|current) Indicates 
-         how much data should be exported. Choose list for the full list or current 
-         to only export the data that is currently being shown (Default : list)</description> 
-         </attribute> -->
-      <attribute>
-         <description>(true|false) Indicated whether headers should
-            be
-            added in export or not (for compatible export)
-            (Default :
-            true)</description>
-         <name>includeHeader</name>
-      </attribute>
-      <attribute>
-         <description>(true|false) Indicates whether columns should be
-            auto-sized or not (only for XLS export)
-            (Default : true)</description>
-         <name>autoSize</name>
-      </attribute>
-      <attribute>
-         <description>TODO</description>
-         <name>url</name>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   </tag>
-   
-   <!-- ====================================== -->
-   <!-- Callback -->
-   <!-- ====================================== -->
-   <tag>
-       <description>Add a DataTables callback.</description>
-       <name>callback</name>
-       <tag-class>org.gvnix.datatables.tags.RooCallbackTag</tag-class>
-       <body-content>empty</body-content>
-      <attribute>
-          <description>Type of callback</description>
-          <name>type</name>
-          <required>true</required>
-      </attribute>
-      <attribute>
-          <description>Name of the function to execute as a callback</description>
-          <name>function</name>
-          <required>true</required>
-          <rtexprvalue>true</rtexprvalue>
-      </attribute>
-   </tag>
 </taglib>

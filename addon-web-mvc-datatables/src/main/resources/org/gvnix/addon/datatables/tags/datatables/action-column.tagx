@@ -1,4 +1,4 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:datatables="http://www.gvnix.org/gvnix-datatables" version="2.0">
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixdtt="http://www.gvnix.org/gvnix-datatables" version="2.0">
   <jsp:output omit-xml-declaration="yes" />
 
   <!-- Roo parameters -->
@@ -37,7 +37,7 @@
   	<c:set var="title" value=" "/> 
   </c:if>
   
-  <datatables:column
+  <gvnixdtt:column
   		id="${id}" 
   		render="${empty render or render}"
   		z="${z}"
@@ -55,6 +55,6 @@
   		format="${format}"
   		>
   		<jsp:doBody />
-  </datatables:column>
+  </gvnixdtt:column>
 
 </jsp:root>

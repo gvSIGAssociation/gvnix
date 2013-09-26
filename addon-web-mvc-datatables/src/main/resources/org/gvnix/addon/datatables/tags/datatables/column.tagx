@@ -1,4 +1,4 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:datatables="http://www.gvnix.org/gvnix-datatables" version="2.0">
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixddt="http://www.gvnix.org/gvnix-datatables" version="2.0">
   <jsp:output omit-xml-declaration="yes" />
 
   <!-- Roo parameters -->
@@ -21,8 +21,8 @@
   <jsp:directive.attribute name="filterable" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable filtering on column. (Default : true)" />
   <jsp:directive.attribute name="searchable" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable filtering on column. (Default : true)" />
   <jsp:directive.attribute name="filterType" type="java.lang.String" required="false" rtexprvalue="true" description="(SELECT|INPUT) If filterable is enabled, you can choose the filter type between 'SELECT' and 'INPUT', adding either select box or input field in the table's footer (Default : INPUT)" />
+  <jsp:directive.attribute name="filterValues" type="java.lang.String" required="false" rtexprvalue="true" description="Name of a Javascript array of string that will be used to populate a filtering drop-down list" />
   <jsp:directive.attribute name="filterCssClass" type="java.lang.String" required="false" rtexprvalue="true" description="If filterable is enabled and filterType is 'INPUT', you can apply a CSS class to the input field with this attribute" />
-  <jsp:directive.attribute name="filterPlaceholder" type="java.lang.String" required="false" rtexprvalue="true" description="If filterable is enabled and filterType is 'INPUT', fill in the input field with this attribute (Default : the column's title)" />
   <jsp:directive.attribute name="cssStyle" type="java.lang.String" required="false" rtexprvalue="true" description="CSS style applied on header cell (th HTML tag)" />
   <jsp:directive.attribute name="cssCellStyle" type="java.lang.String" required="false" rtexprvalue="true" description="CSS style applied on every table cell (td HTML tag)" />
   <jsp:directive.attribute name="cssClass" type="java.lang.String" required="false" rtexprvalue="true" description="CSS class applied on header cell (th HTML tag)" />
@@ -32,6 +32,7 @@
   <jsp:directive.attribute name="format" type="java.lang.String" required="false" rtexprvalue="true" description="A MessageFormat pattern that will be used to format the property. (DOM only)" />
   <jsp:directive.attribute name="visible" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable the display of the column. (Default : true)" />
   <jsp:directive.attribute name="selector" type="java.lang.String" required="false" rtexprvalue="true" description="jQuery selector used to populate a placeholder with a filtering widget." />
+  <jsp:directive.attribute name="sortType" type="java.lang.String" required="false" rtexprvalue="true" description="Type of sorting function to apply on the column." />
   
   
   <!-- Default values -->
@@ -65,8 +66,7 @@
   	<c:set var="display" value="ALL" />
   </c:if>
   
-
-  <datatables:column
+  <gvnixddt:column
   		id="${id}" 
   		property="${property}" 
   		maxLength="${empty maxLength ? 128 : maxLength}" 
@@ -74,6 +74,7 @@
   		dateTimePattern="${dateTimePattern}"
   		render="${empty render or render}"
   		z="${z}"
+        data-property="${property}" 
   		
   		title="${title}"
   		default="${defaultValue}"
@@ -83,8 +84,8 @@
   		filterable="${filterable}"
   		searchable="${empty searchable or searchable}"
   		filterType="${filterType}"
+  		filterValues="${filterValues}"
   		filterCssClass="${filterCssClass}"
-  		filterPlaceholder="${filterPlaceholder}"
   		cssStyle="${cssStyle}"
   		cssCellStyle="${cssCellStyle}"
   		cssCellClass="${cssCellClass}"
@@ -93,6 +94,7 @@
   		format="${format}"
   		visible="${empty visible or visible}"
   		selector="${selector}"
+  		sortType="${sortType}"
   		/>
 
 </jsp:root>

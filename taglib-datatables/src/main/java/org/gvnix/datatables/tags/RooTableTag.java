@@ -1,19 +1,18 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana Copyright (C)
- * 2013 Generalitat Valenciana
- * 
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program. If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.gvnix.datatables.tags;
 
@@ -22,8 +21,6 @@ import java.util.Collection;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.Tag;
-import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +35,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.HtmlUtils;
 
+import com.github.dandelion.datatables.core.configuration.Configuration;
 import com.github.dandelion.datatables.jsp.tag.AbstractTableTag;
 import com.github.dandelion.datatables.jsp.tag.TableTag;
 
@@ -54,9 +52,6 @@ public class RooTableTag extends TableTag {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(RooTableTag.class);
 
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = 8646911296425084063L;
 
     public static final String TABLE_TAG_VARIABLE = "__datatables_table_tag_instance__";
@@ -99,31 +94,6 @@ public class RooTableTag extends TableTag {
      */
     private String conversionServiceId = "applicationConversionService";
 
-    /**
-     * Locates container {@link AbstractTableTag} from any {@link TagSupport} of
-     * this package
-     * 
-     * @param tag
-     * @param pageContext
-     * @return
-     */
-    static final AbstractTableTag getTableTag(Tag tag, PageContext pageContext) {
-        // locate TableTag on hierarchy
-        Tag parent = findAncestorWithClass(tag, AbstractTableTag.class);
-        if (parent != null) {
-            return (AbstractTableTag) parent;
-        }
-
-        // not found so we try to
-        // use context variable
-        parent = (Tag) pageContext.getAttribute(TABLE_TAG_VARIABLE,
-                PageContext.REQUEST_SCOPE);
-        if (parent instanceof AbstractTableTag) {
-            return (AbstractTableTag) parent;
-        }
-        return null;
-    }
-
     private boolean doRender() {
         return Boolean.TRUE.equals(render) || render == null;
     }
@@ -139,6 +109,9 @@ public class RooTableTag extends TableTag {
         // to assure it's available for columns tags
         pageContext.setAttribute(TABLE_TAG_VARIABLE, this,
                 PageContext.REQUEST_SCOPE);
+
+        Boolean serverSide = (Boolean) stagingConf
+                .get(Configuration.AJAX_SERVERSIDE);
 
         // Check url value
         if (serverSide != null && serverSide) {
