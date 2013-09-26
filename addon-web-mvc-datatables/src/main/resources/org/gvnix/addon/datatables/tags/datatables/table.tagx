@@ -1,6 +1,7 @@
 <jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:table="urn:jsptagdir:/WEB-INF/tags/datatables" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixddt="http://www.gvnix.org/gvnix-datatables" xmlns:datatables="http://github.com/dandelion/datatables" version="2.0">
-<jsp:directive.tag import="org.springframework.web.servlet.support.RequestContext"/>
-<jsp:directive.tag import="org.springframework.web.servlet.tags.RequestContextAwareTag"/>
+  <jsp:directive.tag import="java.util.Random"/>
+  <jsp:directive.tag import="org.springframework.web.servlet.support.RequestContext"/>
+  <jsp:directive.tag import="org.springframework.web.servlet.tags.RequestContextAwareTag"/>
   <jsp:directive.tag import="java.util.ArrayList" />
   <jsp:output omit-xml-declaration="yes" />
 
@@ -125,6 +126,14 @@
     
   <!-- Type Name -->  
   <spring:message var="typeName" code="menu_item_${fn:toLowerCase(fn:split(id,'_')[fn:length(fn:split(id,'_')) - 1])}_new_label" htmlEscape="false" />
+
+  <!-- Add random value to datatables identifier to avoid collisions when multiple datatables details -->
+  <jsp:scriptlet>
+  jspContext.setAttribute("currentRandomInt", new Random(System.currentTimeMillis()).nextInt(99999));
+  </jsp:scriptlet>
+  <c:set value="${id}_${currentRandomInt}" var="id" />
+  <!-- This datatables identifier is required by list.tagx when show datatables details -->
+  <c:set value="${id}" var="parentId" scope="request" />
   
   <c:if test="${empty appear}">
   	<c:set var="appear" value="block"/>

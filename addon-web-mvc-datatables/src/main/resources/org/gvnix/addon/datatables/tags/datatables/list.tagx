@@ -15,7 +15,8 @@
   <!-- ====================================== -->
   
   <jsp:directive.attribute name="detail" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if detail datatables for N:M relations of this controller entity should be showed related for this datatables" />
-  <jsp:directive.attribute name="detailsList" type="java.util.Collection" required="false" rtexprvalue="true" description="Detail datatables references list to show for N:M relations of this controller entity related for this datatables (List&lt;Map&lt;String, String&gt;&gt; with path and mappedBy keys)" />
+  <jsp:directive.attribute name="detailsList" type="java.util.Collection" required="false" rtexprvalue="true" description="Detail datatables references list to show for N:M relations of this controller entity related for this datatables (List&lt;Map&lt;String, String&gt;&gt; with path and mappedBy keys) (by default value set in controller)" />
+  <jsp:directive.attribute name="detailParentId" type="java.lang.String" required="false" rtexprvalue="true" description="Parent datatables identifier to be connected with detail datatables: if parent row selected, load their own details (by default value set in table.tagx)" />
 
   <c:if test="${empty render or render}">
     <c:if test="${empty label}">
@@ -34,6 +35,11 @@
     	<c:set value="${detailsList}" var="detailsInfo" />
     </c:if>
     
+    <!-- Get datatable parent id from table.tagx if not set directly on tag -->
+    <c:if test="${not empty detailParentId}">
+    	<c:set value="${detailParentId}" var="parentId" />
+    </c:if>
+	
     <!-- Show detail if not manually disabled and datatables details list defined -->
     <c:if test="${(empty detail or detail) and fn:length(detailsInfo) gt 0}">
     
@@ -113,8 +119,7 @@
 					hideDetail${datatablesId}();
 					
 					<c:if test="${datatablesStandardMode}">
-			    		<c:set var="tableId" value="${fn:substring(id,1,-1) }"/>
-						GvNIX_Selection.fnAddSelectionChangeCallback("${tableId}", callbackFunct${datatablesId});
+						GvNIX_Selection.fnAddSelectionChangeCallback("${parentId}", callbackFunct${datatablesId});
 					</c:if>
 					
 			    </script>
