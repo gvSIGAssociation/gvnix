@@ -230,14 +230,26 @@ function jQueryDateFormat(pattern){
   debug("gvNIX :: jQueryDateFormat :: " + pattern);
   return pattern;
 }
+/**
+ * Show a message to user
+ * 
+ * @param title for dialog
+ * @param message to show
+ * @param targetId (optional) if set put the message as contents of targetId
+ * 		otherwise this function creates a jQueryUI dialog and show it
+ */
+function showMessage(title, message,targetId) {
+	jQuery('<div title="'+title+'">'+message+'</div>').dialog();
+}
 
 /* Application initialization
 ================================================== */
 
-!function ($) {
-
-  $(function(){
-
+function jQueryInitializeComponents(context) {
+	if (!context || context === undefined) {
+		context = document;
+	}
+	
     // Notes:
     // * About jQuery .data() vs .attr() performance : http://jsperf.com/jquery-data-vs-attr
 
@@ -245,7 +257,7 @@ function jQueryDateFormat(pattern){
     debug("gvNIX :: Navigator lang :: " + lang);
 
     // Date inputs init
-    jQuery(".datepicker").each(function( index ) {
+    jQuery(".datepicker",context).each(function( index ) {
       var $input = jQuery(this);
       var pattern = $input.attr("data-dateformat");
 
@@ -258,7 +270,7 @@ function jQueryDateFormat(pattern){
     });
 
     // TinyMCE editors init
-    jQuery(".tinymce").each(function( index ) {
+    jQuery(".tinymce",context).each(function( index ) {
       var $textarea = jQuery(this);
       $textarea.tinymce({
         changeMonth: true,
@@ -274,7 +286,7 @@ function jQueryDateFormat(pattern){
     });
 
     // Form validation init
-    jQuery("form.validate").each(function( index ) {
+    jQuery("form.validate",context).each(function( index ) {
       var $form = $(this);
 
       // see options at http://docs.jquery.com/Plugins/Validation/validate
@@ -328,7 +340,7 @@ function jQueryDateFormat(pattern){
     });
 
     // Tooltip for all input ant textarea elements. Show text in data-prompt attribute
-    jQuery("input,textarea,select").each(function( index ) {
+    jQuery("input,textarea,select",context).each(function( index ) {
       var $input = $(this);
 
       $input.tooltip({ 
@@ -336,6 +348,12 @@ function jQueryDateFormat(pattern){
       });
     });
 
+}
+
+!function ($) {
+
+  $(function(){
+	  jQueryInitializeComponents();
   });
 
 }(window.jQuery);
