@@ -2611,26 +2611,24 @@ public class DatatablesMetadata extends
      */
     public FieldMetadata getConversionServiceField() {
         if (conversionService == null) {
-            JavaSymbolName curName = new JavaSymbolName(
-                    "conversionService_datatables");
+            JavaSymbolName curName = new JavaSymbolName("conversionService");
             // Check if field exist
             FieldMetadata currentField = governorTypeDetails
                     .getDeclaredField(curName);
-            if (currentField != null) {
-                if (currentField.getAnnotation(AUTOWIRED) == null
-                        || !currentField.getFieldType().equals(
-                                CONVERSION_SERVICE)) {
-                    // No compatible field: look for new name
-                    currentField = null;
-                    JavaSymbolName newName = curName;
-                    int i = 1;
-                    while (governorTypeDetails.getDeclaredField(newName) != null) {
-                        newName = new JavaSymbolName(curName.getSymbolName()
-                                .concat(StringUtils.repeat('_', i)));
-                        i++;
-                    }
-                    curName = newName;
+            if (currentField != null && !isConversionServiceField(currentField)) {
+                // No compatible field: look for new name
+                currentField = null;
+                JavaSymbolName newName = new JavaSymbolName(
+                        "conversionService_dt");
+                currentField = governorTypeDetails.getDeclaredField(newName);
+                while (currentField != null
+                        && !isConversionServiceField(currentField)) {
+                    newName = new JavaSymbolName(newName.getSymbolName()
+                            .concat("_"));
+                    currentField = governorTypeDetails
+                            .getDeclaredField(newName);
                 }
+                curName = newName;
             }
             if (currentField != null) {
                 conversionService = currentField;
@@ -2651,6 +2649,11 @@ public class DatatablesMetadata extends
             }
         }
         return conversionService;
+    }
+
+    private boolean isConversionServiceField(FieldMetadata field) {
+        return field != null && field.getAnnotation(AUTOWIRED) != null
+                && field.getFieldType().equals(CONVERSION_SERVICE);
     }
 
     /**
