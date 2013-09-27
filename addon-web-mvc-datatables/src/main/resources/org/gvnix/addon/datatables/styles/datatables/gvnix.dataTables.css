@@ -81,6 +81,7 @@ a.icon {
   overflow: hidden;
   text-indent: 100%;
   white-space: nowrap;
+  background: none no-repeat scroll center center transparent;
 }
 
 a.export_pdf {
@@ -97,7 +98,7 @@ a.export_csv {
 
 /* TABLE FOOT */
 
-/* A bit of padding between the table info and the table. 
+/* A bit of padding between the table info and the table.
  Fixed size to avoid pagination goes down when filter is applied*/
 div.dataTables_info {
   padding-top: 4px;
@@ -122,9 +123,37 @@ table.dataTable tr.odd.row_selected td {
 	background-color: #ffff00;
 }
 
-a.selection_all {
+a.select_all {
 	background: url("../../images/datatables/book_add.png") no-repeat scroll center center transparent;
 }
-a.selection_none {
+a.select_none {
 	background: url("../../images/datatables/book_delete.png") no-repeat scroll center center transparent;
 }
+
+a.update_entity {
+	background: url("../../images/update.png") no-repeat scroll center center transparent;
+}
+a.show_entity {
+	background: url("../../images/show.png") no-repeat scroll center center transparent;
+}
+a.create_entity {
+	background: url("../../images/create.png") no-repeat scroll center center transparent;
+}
+a.submit_entity {
+	background: url("../../images/datatables/accept.png") no-repeat scroll center center transparent;
+}
+a.cancel_entity {
+	background: url("../../images/datatables/cancel.png") no-repeat scroll center center transparent;
+}
+table.dataTable tr.row_editing_error td[class*="sorting_"],
+table.dataTable tr.row_editing_error td {
+	background-color: #ffa0a0;
+}
+
+span.errors {
+	margin-left: 10px;
+}
+.gvnix_dataTables_toolbar {
+    float: left;
+}
+

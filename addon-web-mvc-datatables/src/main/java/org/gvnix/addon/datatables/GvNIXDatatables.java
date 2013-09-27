@@ -59,4 +59,9 @@ public @interface GvNIXDatatables {
      * @return an array of relation fields show in datatables
      */
     String[] detailFields() default "";
+
+    /**
+     * @return if user could edit elements in-line (inside the table)
+     */
+    boolean inlineEditing() default false;
 }

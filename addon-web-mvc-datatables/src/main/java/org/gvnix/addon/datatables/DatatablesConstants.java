@@ -1,17 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
@@ -176,6 +176,9 @@ public class DatatablesConstants {
     static final JavaType EXTENDED_MODEL_MAP = new JavaType(
             "org.springframework.ui.ExtendedModelMap");
 
+    static final JavaType BEAN_PROPERTY_BINDING_RESULT = new JavaType(
+            "org.springframework.validation.BeanPropertyBindingResult");
+
     static final JavaSymbolName REQUEST_PARAM_NAME = new JavaSymbolName(
             "request");
     static final JavaSymbolName RESPONSE_PARAM_NAME = new JavaSymbolName(
@@ -224,4 +227,19 @@ public class DatatablesConstants {
     static final String REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML = "text/html";
 
     static final String REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME = "produces";
+
+    static final JavaSymbolName UPDATE_JSON_FORMS_METHOD = new JavaSymbolName(
+            "updateJsonForms");
+
+    static final JavaSymbolName RENDER_UPDATE_FORMS_METHOD = new JavaSymbolName(
+            "renderUpdateForm");
+
+    static final JavaSymbolName IDS_PARAM_NAME = new JavaSymbolName("ids");
+
+    static final JavaType ARRAY_UTILS = new JavaType(
+            "org.apache.commons.lang3.ArrayUtils");
+
+    static final JavaType QUERYDSL_UTILS = new JavaType(
+            "org.gvnix.web.datatables.util.QuerydslUtils");
+
 }

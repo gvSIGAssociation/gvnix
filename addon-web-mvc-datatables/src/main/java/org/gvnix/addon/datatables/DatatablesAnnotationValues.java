@@ -41,6 +41,8 @@ public class DatatablesAnnotationValues extends AbstractAnnotationValues {
     private String mode = null;
     @AutoPopulate
     private String[] detailFields = {};
+    @AutoPopulate
+    private boolean inlineEditing = false;
 
     public DatatablesAnnotationValues(
             final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {
@@ -82,5 +84,12 @@ public class DatatablesAnnotationValues extends AbstractAnnotationValues {
 
     public String[] getDetailFields() {
         return detailFields;
+    }
+
+    /**
+     * @return if user could edit elements in-line (inside the table)
+     */
+    public boolean isInlineEditing() {
+        return inlineEditing;
     }
 }

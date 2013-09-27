@@ -1,17 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
@@ -80,8 +80,9 @@ public class DatatablesCommands implements CommandMarker {
     public void add(
             @CliOption(key = "type", mandatory = true, help = "The controller to apply this component to") JavaType target,
             @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "Datatables will use AJAX request to get data data or not") boolean ajax,
+            @CliOption(key = "inline", mandatory = false, unspecifiedDefaultValue = "false", help = "Allow user to modify data inside the datatable (in-line editing)") boolean inline,
             @CliOption(key = "mode", mandatory = false, unspecifiedDefaultValue = GvNIXDatatables.TABLE, help = "visualization mode: if empty (default) shows a table, otherwise create one-row-per-page, one-cell-per-row datatable which cell content is the render of requiered page. (example: \"show\" renders the show view for every item ") String mode) {
-        operations.annotateController(target, ajax, mode);
+        operations.annotateController(target, ajax, mode, inline);
     }
 
     /**

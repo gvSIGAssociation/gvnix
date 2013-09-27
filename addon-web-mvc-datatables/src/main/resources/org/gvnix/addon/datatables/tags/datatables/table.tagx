@@ -21,7 +21,7 @@
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
   <jsp:directive.attribute name="actionHeaderCssStyle" type="java.lang.String" required="false" description="Custom css-style for action columns header" />
-  
+
   <!-- selection -->
   <jsp:directive.attribute name="selection" type="java.lang.Boolean" required="false" description="Enable selection (default: true)" />
   <jsp:directive.attribute name="selectionMultiRow" type="java.lang.Boolean" required="false" description="Enable selection on multiple rows" />
@@ -31,13 +31,14 @@
   <jsp:directive.attribute name="selectionNotSelectedCssClass" type="java.lang.String" required="false" description="Css class for not-selected rows" />
   <jsp:directive.attribute name="selectionInfoLabel" type="java.lang.String" required="false" description="Label to use for selection information (default 'datatables_selection_info')" />
 
+  <!-- inline editing -->
+  <jsp:directive.attribute name="editingInfoLabel" type="java.lang.String" required="false" description="Label to use for inline-editing information (default 'datatables_editing_info')" />
 
   <!-- ====================================== -->
   <!-- ====================================== -->
   <!-- Datatables parameters -->
   <!-- ====================================== -->
   <!-- ====================================== -->
-
 
   <jsp:directive.attribute name="url" type="java.lang.String" rtexprvalue="true"  required="false" description="Web service URL used to populate the table.  (Either data or url attribute is required)" />
   <jsp:directive.attribute name="appear" type="java.lang.String" rtexprvalue="true" required="false" description="(block|fadein[,duration]) Display mode used when the table has finished loading and must appear in the page.  A duration can be set (in milliseconds) if the display mode is set to 'fadein'. (Default : 'block')" />
@@ -53,6 +54,7 @@
   <!-- ====================================== -->
   <!-- Basic features -->
   <!-- ====================================== -->
+
   <jsp:directive.attribute name="info" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable or disable the table information display. This shows information about the data that is currently visible on the page, including information about filtered data if that action is being performed.  (Default : true, see http://datatables.net/ref#bInfo)" />
   <jsp:directive.attribute name="paginate" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable pagination.  (Default : true, see http://datatables.net/ref#bPaginate)" />
   <jsp:directive.attribute name="lengthChange" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) If paginate is enabled, allows the end user to select the size of a formatted page from a select menu (sizes are 10, 25, 50 and 100). (Default : true, see http://datatables.net/ref#bLengthChange)" />
@@ -79,8 +81,8 @@
   <jsp:directive.attribute name="ext" type="java.lang.String" rtexprvalue="true" required="false" description="Comma-separated names of custom extensions to register in the current table." />
   <jsp:directive.attribute name="confGroup" type="java.lang.String" rtexprvalue="true" required="false" description="Name of the configuration group to activate for the current table." />
   <jsp:directive.attribute name="filterPlaceholder" type="java.lang.String" rtexprvalue="true" required="false" description="Placeholder used to hold the individual column filtering elements." />
-  
-  
+
+
 
   <!-- ====================================== -->
   <!-- Extra features -->
@@ -100,7 +102,7 @@
 
   <!-- ColReorder -->
   <jsp:directive.attribute name="colReorder" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the DataTables ColReorder plugin. (Default : false) (See : http://datatables.net/extras/colreorder/)" />
-  
+
   <!-- Filtering options -->
   <jsp:directive.attribute name="filterOnReturn" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Wait until Intro key is pressed to perform a search or filtering. (Default : false)" />
   <jsp:directive.attribute name="filteringDelay" type="java.lang.Integer" rtexprvalue="true" required="false" description="Milisecons to wait from last key-press event to perform a search or filtering. (Default: 500)" />
@@ -109,22 +111,22 @@
   <!-- ====================== -->
   <!-- Prepare default values -->
   <!-- ====================== -->
-  
+
   <jsp:useBean id="datatables_javaScript_elements_before" class="java.util.HashMap" scope="request"/>
   <jsp:useBean id="datatables_javaScript_elements_after" class="java.util.HashMap" scope="request"/>
   <jsp:useBean id="datatables_javaScript_elements_init" class="java.util.HashMap" scope="request"/>
-    
+
   <!-- typeIdFieldName -->
   <c:if test="${empty typeIdFieldName}">
       <c:set var="typeIdFieldName" value="id" />
   </c:if>
-  
+
   <!-- actionHeaderCssStyle -->
   <c:if test="${empty actionHeaderCssStyle}">
       <c:set var="actionHeaderCssStyle" value="color: #ffffff;background: #ffffff;padding: 2px; width : 0px" />
   </c:if>
-    
-  <!-- Type Name -->  
+
+  <!-- Type Name -->
   <spring:message var="typeName" code="menu_item_${fn:toLowerCase(fn:split(id,'_')[fn:length(fn:split(id,'_')) - 1])}_new_label" htmlEscape="false" />
 
   <!-- Add random value to datatables identifier to avoid collisions when multiple datatables details -->
@@ -134,19 +136,19 @@
   <c:set value="${id}_${currentRandomInt}" var="id" />
   <!-- This datatables identifier is required by list.tagx when show datatables details -->
   <c:set value="${id}" var="parentId" scope="request" />
-  
+
   <c:if test="${empty appear}">
   	<c:set var="appear" value="block"/>
   </c:if>
   <c:if test="${empty deferRender}">
   	<c:set var="deferRender" value="false"/>
   </c:if>
-  
+
   <!-- displayLength -->
   <c:if test="${empty displayLength }">
   	<c:set var="displayLength" value="10"/>
   </c:if>
-  
+
   <!-- Require 'datatablesUseAjax' defined in context -->
   <c:set var="serverSide" value="${datatablesUseAjax}"/>
   <jsp:scriptlet>
@@ -154,7 +156,7 @@
         throw new IllegalArgumentException("Missing context value for 'datatablesUseAjax'");
     }
   </jsp:scriptlet>
-  
+
   <c:if test="${serverSide and empty serverData }">
     <c:set var="serverData" value="doAjaxRequestByPost"/>
   </c:if>
@@ -166,13 +168,13 @@
     <c:if test="${not empty baseFilter}">
 		<c:set target="${datatables_javaScript_elements_before}" property="getExtraParams">
 			function getExtraParams( aoData ) {
-			    <c:forEach items="${baseFilter}" var="entry"> 
+			    <c:forEach items="${baseFilter}" var="entry">
 			    aoData.push( {"name": "${entry.key}", "value" : "${entry.value}"});
-			    </c:forEach> 
+			    </c:forEach>
 			}
 		</c:set>
 		<c:set var="serverParams" value="getExtraParams"/>
-    </c:if> 
+    </c:if>
   </c:if>
 
   <!-- If data has values Datatables doesn't request server side values, so
@@ -180,59 +182,87 @@
   <c:if test="${serverSide}">
 	<c:remove var="data"/>
   </c:if>
+
   <c:if test="${empty paginationType}">
   	<c:set var="paginationType" value="full_numbers"/>
   </c:if>
+
   <c:if test="${empty pipeSize}">
   	<c:set var="pipeSize" value="5"/>
   </c:if>
 
   <!-- Export buttons are rendered in DOM mode only -->
   <c:choose>
-	  <c:when test="${serverSide}"> 
+	  <c:when test="${serverSide}">
 	  	<c:set var="export" value=""/>
 	  </c:when>
-	  <c:otherwise> 
+	  <c:otherwise>
 		  <c:if test="${empty export}">
 		  	<c:set var="export" value="csv,xls,pdf"/>
 		  </c:if>
 	  </c:otherwise>
   </c:choose>
-  
+
   <!-- set row id based on entity id attribute -->
   <c:if test="${(not serverSide) and (empty rowIdBase)}">
   	<c:set var="rowIdBase" value="${typeIdFieldName}"/>
   </c:if>
+
   <c:if test="${empty exportLinks}">
   	<c:set var="exportLinks" value="top_right"/>
   </c:if>
+
   <c:if test="${empty fixedPosition}">
   	<c:set var="fixedPosition" value="top"/>
   </c:if>
-  
+
   <c:if test="${empty offsetTop}">
   	<c:set var="offsetTop" value="5"/>
   </c:if>
+
   <c:if test="${empty scrollY}">
   	<c:set var="scrollY" value="300px"/>
   </c:if>
-  
+
   <spring:url value="${path}" var="urlPath" />
-  
+
   <spring:url value="" var="urlParams">
     <spring:param name="form"/>
     <c:forEach var="paramAux" items="${param}" >
       <spring:param name="${paramAux.key}" value="${paramAux.value}" />
     </c:forEach>
   </spring:url>
-  
+
   <script type="text/javascript">
     var datatablesRedirect = 'datatablesRedirect=' + encodeURIComponent(document.URL);
   </script>
 
+  <!-- Default CRUD -->
+  <c:if test="${empty selection}">
+    <c:set var="selection" value="true"/>
+  </c:if>
+  <c:if test="${empty selectionMultiRow}">
+    <c:set var="selectionMultiRow" value="false"/>
+  </c:if>
+
+  <c:if test="${empty create}">
+      <c:set var="create" value="true"/>
+  </c:if>
+  <c:if test="${empty update}">
+      <c:set var="update" value="true"/>
+  </c:if>
+  <c:if test="${empty delete}">
+      <c:set var="delete" value="true"/>
+  </c:if>
+
+
+  <!-- ================================= -->
+  <!-- Datatables settings, handlers ... -->
+  <!-- ================================= -->
+
   <c:choose>
     <c:when test="${not datatablesStandardMode}">
-     <!-- 
+     <!--
      ******* Register views configuration ******
      -->
 
@@ -240,8 +270,8 @@
     <!-- Change the Id value to avoid problem of restore a configuration from
     cookies which can override this options (per ex. displayLenght) -->
     <c:set var="id" value="${id}__RegisterView"/>
-    
-    
+
+
   	<c:set var="displayLength" value="1"/>
   	<c:set var="paginate" value="true"/>
   	<c:set var="paginationType" value="full_numbers"/>
@@ -259,10 +289,10 @@
     <c:set target="${datatables_javaScript_elements_before}" property="evalScripts">
         /*
          * Evaluate Javascript inside TDs.
-         * By calling jQuery wrap all script elements in the TD contents 
+         * By calling jQuery wrap all script elements in the TD contents
          * will automatically be evaluated.
          */
-        function evalScripts( oSettings ) { 
+        function evalScripts( oSettings ) {
           if ( typeof oTable_${id} != 'undefined' ) {
               oTable_${id}.$('td').each(function(i) {
                   $(this).wrapInner($('<div></div>'));
@@ -273,21 +303,17 @@
    </c:when>
 
   <c:otherwise>
-  <!-- 
+  <!--
   *******	Tabular views configuration ******
    -->
   <!-- selection -->
   <c:choose>
-    <c:when test="${empty selection or selection}">
-      <c:set var="selection" value="true"/>
+    <c:when test="${selection}">
       <c:if test="${empty selectionSelectedCssClass}">
       	<c:set var="selectionSelectedCssClass" value="row_selected"/>
       </c:if>
-      <c:if test="${empty selectionMultiRow}">
-      	<c:set var="selectionMultiRow" value="false"/>
-      </c:if>
 
-                <!-- Show select all button -->
+      <!-- Show select all button -->
       <c:if test="${selectionMultiRow}">
        <c:set var="selection_all_link" value="true"/>
        <spring:message var="selection_all_msg" code="selection_all" htmlEscape="false" javaScriptEscape="true"/>
@@ -318,120 +344,157 @@
 	     	</c:set>
     	</c:if>
  	  </c:if>
-	  <c:set target="${datatables_javaScript_elements_after}" property="selection_tools">
-        /** selection support functions **/
-		function ${id}_selectNone(){
-			$('#${id}').dataTable().fnSelection().fnSelectNone();
-		};
-		var ${id}_selectionTools_str = '<div class="gvnix_datatables_selection_box" style="float:left;margin-left:10px;">';
-		${id}_selectionTools_str += '<a href="javascript:${id}_selectNone();" class="icon selection_none">${selection_none_msg}</a>';
-		<c:if test="${selection_all_link}">
-		function ${id}_selectAll(){
-			$('#${id}').dataTable().fnSelection().fnSelectAll();
-		};
-		${id}_selectionTools_str += '<a href="javascript:${id}_selectAll();" class="icon selection_all">${selection_all_msg}</a>';
+
+                <!-- Add create functions to the script element before Datatables element -->
+                <c:set target="${datatables_javaScript_elements_before}" property="selection_tools">
+                /* Select none handler */
+                function ${id}_selectNone(){
+                    $('#${id}').dataTable().fnSelection().fnSelectNone();
+                };
+                var ${id}_selectionTools_str = '<a href="javascript:${id}_selectNone();" class="icon select_none" title="${selection_none_msg}"></a>';
+
+                <c:if test="${selection_all_link}">
+                    /* Select all handler */
+                    function ${id}_selectAll(){
+                        $('#${id}').dataTable().fnSelection().fnSelectAll();
+                    };
+                    ${id}_selectionTools_str += '<a href="javascript:${id}_selectAll();" class="icon select_all" title="${selection_all_msg}"></a>';
 		</c:if>
-		${id}_selectionTools_str += '</div>'
       </c:set>
+
+                <!-- In Datatables initialization callback handler add call to
+                    functions that will initialize select options -->
       <c:set target="${datatables_javaScript_elements_init}" property="selection_tools">
-        $('#${id}_filter').before(${id}_selectionTools_str);
+                // Invoke function that adds the selection btns in gvNIX toolbar
+                $('#${id}_gvnix_toolbar').append( ${id}_selectionTools_str );
       </c:set>
-    </c:when>
+            </c:when><!-- /empty selection or selection -->
+
+            <!-- If selection is not enabled, set selectionByCheck to false -->
     <c:otherwise>
-    	<!-- if no selection no selection by check -->
     	<c:set var="selectionByCheck" value="false"/>
     </c:otherwise>
   </c:choose>
-  
-  
+
+
   <!-- show -->
   <c:set var="showColumnId" value="${id}_show_col"/>
   <c:if test="${serverSide}">
-      <!-- function to render cell -->
+
       <c:set var="show_label">
 	      <spring:escapeBody javaScriptEscape="true">
 	         <spring:message arguments="${typeName}" code="entity_show" />
 	      </spring:escapeBody>
       </c:set>
       <spring:url value="/resources/images/show.png" var="show_image_url" />
+
+            <!-- Add show functions to the script element before Datatables element -->
       <c:set target="${datatables_javaScript_elements_before}" property="${showColumnId}">
 	    function ${showColumnId}(data, type, full) {
-		    var result =  
-	           '<a href="${urlPath}/'+full.${typeIdFieldName} + '?' + datatablesRedirect + '" alt="${show_label}" title="${show_label}">'
-	           + '  <img alt="${show_label}" class="image" src="${show_image_url}" title="${show_label}" />'
+		    var result =
+	           '<a href="${urlPath}/'+full.${typeIdFieldName} + '?' + datatablesRedirect + '" alt="${show_label}" title="${show_label}" class="icon show_entity">'
 	           + '</a>';
-	           
+
 	        return result;
-		}	
+		}
 	  </c:set>
         </c:if><!-- /serverSide -->
-  
-  <!-- create -->
-  <c:if test="${empty create}">
-    <c:set var="create" value="true"/>
-  </c:if>
+
+        <!-- Setup row creation option -->
   <c:if test="${create}">
-    <c:set var="createButtonCallbackId" value="${id}_create_btn_callbk"/>
-    <!-- function to render cell -->
+            <c:set var="fnRenderCreateButton" value="${id}_render_createBtn"/>
+
     <c:set var="create_label">
-	  <spring:escapeBody javaScriptEscape="true">  	  
+	  <spring:escapeBody javaScriptEscape="true">
     	<spring:message arguments="${typeName}" code="entity_create"/>
       </spring:escapeBody>
     </c:set>
     <spring:url value="/resources/images/add.png" var="create_image_url" />
-	<c:set target="${datatables_javaScript_elements_before}" property="${createButtonCallbackId}">
-        function ${createButtonCallbackId}() {
-           var result =
-               '<div class="gvnix_dataTables_createItem" style="float:left;margin-left:10px;">'
-               +'<a href="${urlPath}${urlParams}&amp;' + datatablesRedirect + '" alt="${create_label}" title="${create_label}">'
-               + '  <img alt="${create_label}" class="image" src="${create_image_url}" title="${create_label}" />'
-               + '</a>'
-               + '</div>';
-           $('#${id}_filter').before(result);
+
+    <!-- Add create functions to the script element before Datatables element -->
+	<c:set target="${datatables_javaScript_elements_before}" property="${fnRenderCreateButton}">
+            /* Add the create button to gvNIX toolbar */
+            function ${fnRenderCreateButton}() {
+               var result =
+               '<a href="${urlPath}${urlParams}&amp;' + datatablesRedirect + '" alt="${create_label}" title="${create_label}" class="icon create_entity">'
+               + '</a>';
+                $('#${id}_gvnix_toolbar').append( result );
 	    }
     </c:set>
-    <c:set target="${datatables_javaScript_elements_init}" property="${createButtonCallbackId}">
-    ${createButtonCallbackId}();
-    </c:set>
-  </c:if>
 
-  <!-- update -->  
-  <c:if test="${empty update}">
-  	<c:set var="update" value="true"/>  	
-  </c:if>
-  
+            <!-- In Datatables initialization callback handler add call to
+                functions that will initialize create options -->
+            <c:set target="${datatables_javaScript_elements_init}" property="${fnRenderCreateButton}">
+                // Invoke function that adds the create btn in gvNIX toolbar
+                ${fnRenderCreateButton}();
+    </c:set>
+  </c:if><!-- /empty create or create -->
+
+        <!-- Setup update options -->
   <c:if test="${update}">
+
+
+            <c:set var="inlineEditing" value="false"/>
+            <c:if test="${datatablesInlineEditing}">
+                <c:set var="inlineEditing" value="true"/>
+                <c:if test="${empty editingInfoLabel}">
+                   <c:set var="editingInfoLabel" value="datatables_editing_info"/>
+                </c:if>
+                <spring:message code="${editingInfoLabel}" htmlEscape="false" var="editing_info_msg"/>
+                    <c:set var="udpate_label">
+                       <spring:escapeBody javaScriptEscape="true">
+                            <spring:message arguments="${typeName}" code="entity_update"/>
+                        </spring:escapeBody>
+                    </c:set>
+                    <spring:url value="/resources/images/update.png" var="update_image_url" />
+                    <c:set var="submit_label">
+                        <spring:escapeBody javaScriptEscape="true">
+                            <spring:message code="button_submit"/>
+                        </spring:escapeBody>
+                    </c:set>
+                    <spring:url value="/resources/images/datatables/accept.png" var="submit_image_url" />
+                    <c:set var="cancel_label">
+                        <spring:escapeBody javaScriptEscape="true">
+                            <spring:message code="button_cancel"/>
+                        </spring:escapeBody>
+                    </c:set>
+                    <spring:url value="/resources/images/datatables/cancel.png" var="cancel_image_url" />
+            </c:if>
+
   	<c:set var="updateColumnId" value="${id}_update_col"/>
   	  <c:if test="${serverSide}">
         <!-- function to render cell -->
         <c:set var="update_label">
-	      <spring:escapeBody javaScriptEscape="true">  	  
+	      <spring:escapeBody javaScriptEscape="true">
             <spring:message arguments="${typeName}" code="entity_update"/>
           </spring:escapeBody>
         </c:set>
         <spring:url value="/resources/images/update.png" var="update_image_url" />
 	    <c:set target="${datatables_javaScript_elements_before}" property="${updateColumnId}">
 	        function ${updateColumnId}(data, type, full) {
+                            <c:choose>
+                                <c:when test="${inlineEditing}">
+                                    <c:set var="hrefUpdateAction">javascript:fnEditDatatableRow(\'${id}\',\''+full.${typeIdFieldName}+'\')</c:set>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:set var="hrefUpdateAction">${urlPath}/'+full.${typeIdFieldName}+'${urlParams}'+'&amp;'+ datatablesRedirect + '</c:set>
+                                </c:otherwise>
+                            </c:choose>
 	        	var result =
-	              '<a href="${urlPath}/'+full.${typeIdFieldName}+'${urlParams}'+'&amp;' + datatablesRedirect + '" alt="${update_label}" title="${update_label}">'
-	               + '  <img alt="${update_label}" class="image" src="${update_image_url}" title="${update_label}" />'
+	              '<a href="${hrefUpdateAction}" title="${update_label}" class="icon update_entity">'
 	               + '</a>';
 	            return result;
 		    }
 	    </c:set>
-      </c:if>  	
+      </c:if>
   </c:if>
-  
-  <!-- delete -->  
-  <c:if test="${empty delete}">
-  	<c:set var="delete" value="true"/>  	
-  </c:if>
-  
+
+        <!-- Setup row delete options -->
   <c:if test="${delete}">
   	<c:set var="removeColumnId" value="${id}_remove_col"/>
   	<c:if test="${serverSide or selectionMultiRow}">
   	    <c:set var="delete_label">
-	      <spring:escapeBody javaScriptEscape="true">  	  
+	      <spring:escapeBody javaScriptEscape="true">
             <spring:message arguments="${typeName}" code="entity_delete"/>
           </spring:escapeBody>
         </c:set>
@@ -463,19 +526,20 @@
 	             <spring:message code="entity_deleted_error" />
 	          </spring:escapeBody>
 	        </c:set>
-        	<!-- function for link -->
+
+                      <!-- Add delete functions to the script element before Datatables element -->
 		    <c:set target="${datatables_javaScript_elements_before}" property="${removeColumnId}">
-		    
+
 		        var ${removeColumnId}_delete_error = "${delete_error_msg}";
 		        var ${removeColumnId}_deleted = "${delete_ok_msg}";
 		        var ${removeColumnId}_deleted_none = "${delete_none_msg}";
 		        var ${removeColumnId}_multiconfirmation = "${delete_multirow_confirm_msg}";
 		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
-  
+
                       /* ... */
 		        function ${removeColumnId}() {
-		        	var $table = $('#${id}').dataTable(); 
-  
+		        	var $table = $('#${id}').dataTable();
+
                           // Get the table GvNIX_Selection object
 		        	var $selection = $table.fnSelection();
 		        	var selCount = $selection.fnSelectionCount();
@@ -490,14 +554,14 @@
 		        	} else {
 		        		alert("Select records to remove");
 		        		return;
-		        	} 
+		        	}
 		        	var selectionInfo = $selection.fnGetSelectionInfo();
 		        	var deleteParams = {
 					    <c:if test="${not empty baseFilter}">
-					    <c:forEach items="${baseFilter}" var="entry"> 
+					    <c:forEach items="${baseFilter}" var="entry">
 					    '${entry.key}' : '${entry.value}',
-					    </c:forEach> 
-					    </c:if>		        		
+					    </c:forEach>
+					    </c:if>
 		        		'all' : selectionInfo.all,
 		        		'deleteIn': selectionInfo.idListSelected,
 		        		'idList' : selectionInfo.idList
@@ -538,24 +602,27 @@
 		        			}
 		        		});
 		        }
+
+                      /* Add the delete button to gvNIX toolbar */
 		    	function ${removeColumnId}_div() {
            			var result =
-               			'<div class="gvnix_dataTables_deleteItem" style="float:left;margin-left:10px;">'
-               			+'<a id="${removeColumnId}" href="#" alt="${delete_label}" title="${delete_label}">'
-               			+ '  <img alt="${delete_label}" class="image" src="${delete_image_url}" title="${delete_label}" />'
-               			+ '</a>'
-               			+ '</div>';
-           			$('#${id}_filter').before(result);
+                       '<a id="${removeColumnId}" href="#" alt="${delete_label}" title="${delete_label}" class="icon delete_entity">'
+                       + '</a>';
+                          $('#${id}_gvnix_toolbar').append( result );
            			$('#${removeColumnId}').on('click', ${removeColumnId});
 	    		}
 		     </c:set>
+
+                        <!-- In Datatables initialization callback handler add call to
+                            functions that will initialize delete options -->
 		     <c:set target="${datatables_javaScript_elements_init}" property="${removeColumnId}">
+                        // Invoke function that adds the delete btn in gvNIX toolbar
 		     	${removeColumnId}_div();
 		     </c:set>
-		     
+
         </c:when>
         <c:otherwise>
-	        <!-- function to render cell -->
+                        <!-- Add delete functions to the script element before Datatables element -->
 		    <c:set target="${datatables_javaScript_elements_before}" property="${removeColumnId}">
 		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
 		        function ${removeColumnId}(data, type, full) {
@@ -564,25 +631,25 @@
 		                + '  <input type="hidden" value="DELETE" name="_method"/>'
 		                + '  <input alt="${delete_label}" class="image" src="${delete_image_url}" title="${delete_label}" type="image" value="${delete_label}" onclick="return confirm(${removeColumnId}_confirmation);" />'
 		                + '</form>';
-		                
+
 	                return result;
 			    }
 		     </c:set>
 	     </c:otherwise>
 	     </c:choose>
      </c:if>
-  </c:if>
-  
-  
-  <!-- 
+  </c:if><!-- /empty delete or delete -->
+
+
+  <!--
   *******	End Tabular view configuration **********
    -->
   </c:otherwise>
   </c:choose>
-  
+
     <!-- Custom datatables API functions -->
     <c:set var="initCustomFunctionsCallbackId" value="${id}_init_custom_callbk"/>
-  
+
   <div id="${id}_gvnix_datatables">
   <c:if test="${not empty datatables_javaScript_elements_before}">
   <script type="text/javascript">
@@ -603,7 +670,7 @@
 		delete="${delete}"
 		render="${empty render or render}"
 		z="${z}"
-				
+
       url="${url}"
       row="item"
       appear="${appear}"
@@ -658,7 +725,7 @@
     >
     	<c:choose>
 
-            <!-- On register view mode add a datatables column only, checkbox, 
+            <!-- On register view mode add a datatables column only, checkbox,
                  row update button, etc aren't needed -->
     	<c:when test="${not datatablesStandardMode}">
     		<!-- Cell to replace by data -->
@@ -679,6 +746,8 @@
                      the checkbox -->
     	<c:if test="${selectionByCheck}">
     	  <c:choose>
+
+                        <!-- AJAX cell render -->
             <c:when test="${serverSide}">
 		      <table:action-column id="${selectionCheckColumnId}" cssClass="utilbox" cssCellClass="utilbox" renderFunction="${selectionCheckColumnId}" cssStyle="${actionHeaderCssStyle}"/>
             </c:when>
@@ -693,11 +762,11 @@
 		    </c:otherwise>
 		  </c:choose>
 		</c:if>
-		
-		<!-- data columns will be inserted here -->  
+
+		<!-- data columns will be inserted here -->
         <jsp:doBody />
-        
-                <!-- Add action column with show row details button --> 
+
+                <!-- Add action column with show row details button -->
         <c:choose>
 
                     <!-- AJAX cell render -->
@@ -713,16 +782,16 @@
                   <spring:url value="${path}/${itemId}" var="show_form_url" />
                   <spring:url value="/resources/images/show.png" var="show_image_url" />
                   <spring:message arguments="${typeName}" code="entity_show" var="show_label" htmlEscape="false" />
-                  <a href="#" onclick="javascript: window.location = '${show_form_url}?' + datatablesRedirect" alt="${fn:escapeXml(show_label)}" title="${fn:escapeXml(show_label)}">
-                    <img alt="${fn:escapeXml(show_label)}" class="image" src="${show_image_url}" title="${fn:escapeXml(show_label)}" />
+                  <a href="#" onclick="javascript: window.location = '${show_form_url}?' + datatablesRedirect" alt="${fn:escapeXml(show_label)}" title="${fn:escapeXml(show_label)}" class="icon show_entity">
                   </a>
 		     </c:if>
 		     </table:action-column>
 		   </c:otherwise>
          </c:choose>
-     
-         <!-- Go-update-view (of current row) column -->
-         <c:if test="${update}">
+
+                <!-- Add action column with row update button if inline
+                    editing is not enabled -->
+                <c:if test="${update and not editing}">
            <c:choose>
 
                         <!-- AJAX cell render -->
@@ -738,9 +807,17 @@
 	              <spring:url value="${path}/${itemId}" var="update_form_url" />
 	              <spring:url value="/resources/images/update.png" var="update_image_url" />
 	              <spring:message arguments="${typeName}" code="entity_update" var="update_label" htmlEscape="false" />
-	              <a href="#" onclick="javascript: window.location = '${update_form_url}${urlParams}&amp;' + datatablesRedirect" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}">
-	                <img alt="${fn:escapeXml(update_label)}" class="image" src="${update_image_url}" title="${fn:escapeXml(update_label)}" />
-	              </a>				  
+                  <c:choose>
+                      <c:when test="${inlineEditing}">
+                          <c:set var="hrefUpdateAction">javascript:fnEditDatatableRow('${id}','${itemId}')</c:set>
+                      </c:when>
+                      <c:otherwise>
+                          <c:set var="hrefUpdateAction">javascript: window.location = '${update_form_url}${urlParams}&amp;'+ datatablesRedirect</c:set>
+                      </c:otherwise>
+                  </c:choose>
+
+	              <a href="#" onclick="${hrefUpdateAction}" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}" class="icon update_entity">
+	              </a>
 			    </c:if>
 			    </table:action-column>
 			  </c:otherwise>
@@ -773,26 +850,26 @@
                       </spring:escapeBody>
                     </c:set>
                     <input alt="${fn:escapeXml(delete_label)}" class="image" src="${delete_image_url}" title="${fn:escapeXml(delete_label)}" type="image" value="${fn:escapeXml(delete_label)}" onclick="return confirm('${delete_confirm_msg}');" />
-                  </form:form>			  
+                  </form:form>
 			    </c:if>
 			    </table:action-column>
 			  </c:otherwise>
             </c:choose>
           </c:if>
-     
+
      <!-- configure some export formats -->
      <c:forTokens items="${export}" delims="," var="export_format">
      	<c:set var="export_format_lower" value="${fn:toLowerCase(export_format)}"/>
-     	<datatables:export type="${export_format_lower}" includeHeader="true" 
+     	<datatables:export type="${export_format_lower}" includeHeader="true"
      		fileName="${typeName}" cssClass="icon export_${export_format_lower}" label="${export_format_lower}"/>
      </c:forTokens>
-     
+
                 <!-- Set the function that initializes custom API functions -->
                 <datatables:callback type="init" function="${initCustomFunctionsCallbackId}" />
      </c:otherwise>
      </c:choose>
     </gvnixddt:table>
-  
+
     <script type="text/javascript">
 	<c:forEach var="entry" items="${datatables_javaScript_elements_after}">
 	${entry.value}
@@ -800,11 +877,12 @@
 
     // Initialize custom API functions for this table
 	    function ${initCustomFunctionsCallbackId}() {
-	    	datatables_init_custom_api_functions('${id}', {
-	    		'filterOnReturn': '${filterOnReturn}', 
+    	fnDatatablesExtInit('${id}', {
+	    		'filterOnReturn': '${filterOnReturn}',
 	    		'filteringDelay' : '${filteringDelay}'
 	    		<c:if test="${selection}">
-	    		, 'selection': { 
+	    		, 'selection': {
+                    'toolbarId': '${id}_gvnix_toolbar', // TODO: Create btns in .js
 	    			'multiRow': ${selectionMultiRow},
 	    			'checkColumnClass': '${selectionCheckCssClass}',
 	    			'infoMessage': '${selection_info_msg}',
@@ -816,12 +894,31 @@
 	    			</c:if>
 	    			'debug': false}
 	    		</c:if>
+            <c:if test="${inlineEditing}">
+                , 'editing' : {
+                    'toolbarId': '${id}_gvnix_toolbar',
+                    'applicationContext': '${urlPath}',
+                    'update': ${update},
+                    'updateBtnLabel': '${udpate_label}',
+                    'updateBtnClass': 'icon update_entity',
+                    'submitBtnLabel': '${submit_label}',
+                    'submitBtnClass': 'icon submit_entity',
+                    'cancelBtnLabel': '${cancel_label}',
+                    'cancelBtnClass': 'icon cancel_entity',
+                    'create': ${create},
+                    'delete': ${delete},
+                    'infoMessage': '${editing_info_msg}',
+                    'debug': true}
+            </c:if>
 	    		});
-	    	
-	    	<c:if test="${selection_none_link}">
-	    	$('#${id}_filter').before(${id}_selectionTools_str);
-	    	</c:if>
-	    	
+
+        <c:if test="${inlineEditing}">
+        // Initialize editing tools for this table
+        var $table = $('#${id}').dataTable();
+        var $editor = $table.fnEditing();
+        $editor.fnInitEditingTools();
+        </c:if>
+
 			<c:forEach var="entry" items="${datatables_javaScript_elements_init}">
 			${entry.value}
 			</c:forEach>

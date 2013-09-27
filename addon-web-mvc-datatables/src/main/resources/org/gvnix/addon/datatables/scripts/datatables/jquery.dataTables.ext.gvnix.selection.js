@@ -1,22 +1,37 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /* Global scope for GvNIX_Selection */
 var GvNIX_Selection;
 
 (function(jQuery, window, document) {
 
 	GvNIX_Selection = function(oSettings, oOpts) {
-		/* Santiy check that we are a new instance */
+
+		// Santiy check that we are a new instance
 		if (!this instanceof GvNIX_Selection) {
 			alert("Warning: GvNIX_Selection must be initialised with the keyword 'new'");
 		}
 
-		/***********************************************************************
-		 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-		 * Public class variables * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-		 */
+		// Public class variables * * * * * * * * * * * * * * * * * * * * * *
 
 		/**
-		 * @namespace Settings object which contains customisable information
-		 *            for TableTools instance
+		 * @namespace Settings object which contains custom information for
+		 *            TableTools instance
 		 */
 		this.s = {
 
@@ -80,7 +95,7 @@ var GvNIX_Selection;
 		};
 
 		/**
-		 * @namespace Settings object which contains customisable information
+		 * @namespace Settings object which contains customizable information
 		 *            for TableTools instance
 		 */
 		this._data = {
@@ -141,14 +156,16 @@ var GvNIX_Selection;
 			 * @default false
 			 */
 			"selectedAll" : false,
-			
+
 			/**
-			 * Callback for selection change notification.
+			 * Callback for selection change notification. The handler 
+			 * functions this object contains, receives following data:
 			 * 
-			 * Selection change notification receives:
-			 * <code>selectionSuppor</code> (GvNIX_Selection) instance which fires the event
-			 * <code>action</code> (string) one of ['select','deselect','all','none']
-			 * <code>id</code> (string) id affected by action (null for 'none','all')
+			 * <code>selectionSupport</code> (GvNIX_Selection) instance which
+			 * fires the event 
+			 * <code>action</code> (string) one of ['select','deselect','all','none'] 
+			 * <code>id</code> (string) ID of row affected by given action 
+			 * (null for 'none','all')
 			 * 
 			 * @property selectionChangeCallbacks
 			 * @type jQuery.Callbacks
@@ -157,10 +174,7 @@ var GvNIX_Selection;
 			"selectionChangeCallbacks" : jQuery.Callbacks("unique")
 		};
 
-		/***********************************************************************
-		 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-		 * Public class methods * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-		 */
+		// Public class methods * * * * * * * * * * * * * * * * * * * * * * *
 
 		/**
 		 * Retreieve the settings object from an instance
@@ -172,20 +186,17 @@ var GvNIX_Selection;
 			return this.s;
 		};
 
-		/* Constructor logic */
+		// Constructor logic
 		this._fnConstruct(oOpts);
-		
-		GvNIX_Selection._fnAddInstance( this );
-		
+
+		GvNIX_Selection._fnAddInstance(this);
+
 		return this;
 	};
 
 	GvNIX_Selection.prototype = {
 
-		/***********************************************************************
-		 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-		 * Public methods * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-		 */
+		// Public methods * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 		/**
 		 * Try to show a message on browser JS console
@@ -232,7 +243,7 @@ var GvNIX_Selection;
 			}
 			var nRow = this.fnGetRowById(trId);
 			// Check if row is loaded
-			if (nRow){
+			if (nRow) {
 				this._fnUpdateRowTr(nRow, isSelected);
 			}
 		},
@@ -248,9 +259,8 @@ var GvNIX_Selection;
 		"fnRedrawVisibleRows" : function() {
 
 			var dt = this._data.dt;
-			var aoData = dt.aoData, aiDisplay = dt.aiDisplay,
-			start = 0, end = aiDisplay.length;
-			
+			var aoData = dt.aoData, aiDisplay = dt.aiDisplay, start = 0, end = aiDisplay.length;
+
 			if (!dt.oFeatures.bServerSide) {
 				start = dt._iDisplayStart;
 				end = dt.fnDisplayEnd();
@@ -267,9 +277,8 @@ var GvNIX_Selection;
 		 */
 		"fnVisibleRowsSelecteds" : function() {
 			var dt = this._data.dt, count = 0;
-			var aoData = dt.aoData, aiDisplay = dt.aiDisplay,
-			start = 0, end = aiDisplay.length;
-			
+			var aoData = dt.aoData, aiDisplay = dt.aiDisplay, start = 0, end = aiDisplay.length;
+
 			if (!dt.oFeatures.bServerSide) {
 				start = dt._iDisplayStart;
 				end = dt.fnDisplayEnd();
@@ -324,7 +333,7 @@ var GvNIX_Selection;
 		/**
 		 * Get selection count
 		 * 
-		 * @returns numero of row selected
+		 * @returns number of row selected
 		 */
 		"fnSelectionCount" : function() {
 			var _d = this._data, totalRecords = _d.dt.fnRecordsTotal();
@@ -341,7 +350,7 @@ var GvNIX_Selection;
 		 * 
 		 * @returns true if there is any row selected
 		 */
-		"fnHasSeletion" : function() {
+		"fnHasSelection" : function() {
 			var _d = this._data, dt = _d.dt;
 			if (_d.selectedAll) {
 				return true;
@@ -350,18 +359,20 @@ var GvNIX_Selection;
 			return _d.idListSelected ? listLength > 0
 					: (dt.fnRecordsTotal() - listLength) > 0;
 		},
-		
+
 		/**
 		 * Gets an array of all selected ids
 		 * 
-		 * WARNING: not supported if bServerSide datatables is set. See fnGetSelectionInfo.
+		 * WARNING: not supported if bServerSide datatables is set. Use
+		 * fnGetSelectionInfo in that cases (AJAX mode).
 		 * 
-		 * @returns an array of selecte id.
+		 * @returns an array of selected id.
 		 */
 		"fnGetSelectedIds" : function() {
 			var _d = this._data, dt = _d.dt;
 			if (dt.oFeatures.bServerSide) {
-				this.log("fnGetSelectedIds: method not supported in bServerSide datatable mode");
+				this
+						.log("fnGetSelectedIds: method not supported in bServerSide datatable mode");
 				throw "fnGetSelectedIds: method not supported in bServerSide datatable mode";
 			}
 			var aoData = dt.aoData, result = [];
@@ -372,30 +383,28 @@ var GvNIX_Selection;
 				}
 			} else if (_d.idListSelected) {
 				result = _d.idList.slice();
-				
+
 			} else {
 				for ( var i = 0; i < aoData.length; i++) {
 					var id = aoData[i].nTr.id;
-					if (!this._fnIdInList(id)){
+					if (!this._fnIdInList(id)) {
 						result.push(id);
-					}	
+					}
 				}
 			}
 			return result;
 		},
-		
+
 		/**
-		 * Gets an array of all selected ids visibles in current page
+		 * Gets an array of all selected IDs of rows which is currently on
+		 * display on the page.
 		 * 
-		 * @returns an array of selecte id or null if all registers
-		 * are selected.
+		 * @returns an array of selected IDs
 		 */
-		"fnGetVisibleSelectedIds" : function() {
+		"fnGetDisplaySelectedIds" : function() {
 			var _d = this._data, dt = _d.dt;
-			var aoData = dt.aoData, aiDisplay = dt.aiDisplay,
-			start = 0, end = aiDisplay.length,
-			result = [];
-			
+			var aoData = dt.aoData, aiDisplay = dt.aiDisplay, start = 0, end = aiDisplay.length, result = [];
+
 			if (!dt.oFeatures.bServerSide) {
 				start = dt._iDisplayStart;
 				end = dt.fnDisplayEnd();
@@ -404,27 +413,37 @@ var GvNIX_Selection;
 			for ( var i = start; i < end; i++) {
 				var nRow = aoData[aiDisplay[i]].nTr;
 				if (this.fnIsSelected(nRow.id)) {
-					result.push(id);
+					result.push(nRow.id);
 				}
 			}
 			return result;
 		},
-		
+
 		/**
 		 * Return an Object with selection information:
 		 * <ul>
 		 * <li><code>idList</code>(array of objects): List of refered ide</li>
-		 * <li><code>idListSelected</code>(boolean) if true 
-		 * 		<code>idList</code> contains <em>selected</em> id, otherwise <code>idList</code> contains <em>not-selected</em> ids</li>
-		 * <li><code>all</code>(boolean): if true all elements all selected (previous values are empty)</li>
+		 * <li><code>idListSelected</code>(boolean) if true
+		 * <code>idList</code> contains <em>selected</em> id, otherwise
+		 * <code>idList</code> contains <em>not-selected</em> ids</li>
+		 * <li><code>all</code>(boolean): if true all elements all selected
+		 * (previous values are empty)</li>
 		 * </ul>
 		 */
-		"fnGetSelectionInfo": function () {
+		"fnGetSelectionInfo" : function() {
 			var _d = this._data;
-			if (_d.selectedAll){
-				return {"all": true, "idList": new Array(), "idListSelected": false};
+			if (_d.selectedAll) {
+				return {
+					"all" : true,
+					"idList" : new Array(),
+					"idListSelected" : false
+				};
 			} else {
-				return {"all": false, "idList": _d.idList.slice(), "idListSelected": _d.idListSelected};
+				return {
+					"all" : false,
+					"idList" : _d.idList.slice(),
+					"idListSelected" : _d.idListSelected
+				};
 			}
 		},
 
@@ -468,8 +487,8 @@ var GvNIX_Selection;
 				if (!_d.idListSelected) {
 					// before add, check for multi options
 					if (!s.multiRow) {
-						// check for previso selection
-						if (this.fnHasSeletion()) {
+						// check for previous selection
+						if (this.fnHasSelection()) {
 							this.fnSelectNone(redraw, false);
 						}
 					}
@@ -483,7 +502,8 @@ var GvNIX_Selection;
 					this.fnRedrawRow(trId, true);
 					this._fnUpdateInfo();
 				}
-				_d.selectionChangeCallbacks.fireWith(this,[this,'select',trId]);
+				_d.selectionChangeCallbacks.fireWith(this, [ this, 'select',
+						trId ]);
 			}
 			return changed;
 		},
@@ -508,7 +528,8 @@ var GvNIX_Selection;
 					this.fnRedrawRow(trId);
 					this._fnUpdateInfo();
 				}
-				_d.selectionChangeCallbacks.fireWith(this,[this,'deselect',trId]);
+				_d.selectionChangeCallbacks.fireWith(this, [ this, 'deselect',
+						trId ]);
 				return true;
 			}
 			var changed = false;
@@ -520,8 +541,8 @@ var GvNIX_Selection;
 					_d.idList.push(trId);
 					changed = true;
 				}
-				if (this.fnSelectionCount() == 0){
-					// reset flag and list 
+				if (this.fnSelectionCount() == 0) {
+					// reset flag and list
 					_d.idList = [];
 					_d.idListSelected = true;
 				}
@@ -538,7 +559,8 @@ var GvNIX_Selection;
 					this.fnRedrawRow(trId);
 					this._fnUpdateInfo();
 				}
-				_d.selectionChangeCallbacks.fireWith(this,[this,'deselect',trId]);
+				_d.selectionChangeCallbacks.fireWith(this, [ this, 'deselect',
+						trId ]);
 			}
 			return changed;
 		},
@@ -562,7 +584,7 @@ var GvNIX_Selection;
 				this.fnRedrawVisibleRows();
 				this._fnUpdateInfo();
 			}
-			_d.selectionChangeCallbacks.fireWith(this,[this,'all',null]);
+			_d.selectionChangeCallbacks.fireWith(this, [ this, 'all', null ]);
 			return true;
 		},
 
@@ -591,29 +613,29 @@ var GvNIX_Selection;
 					this._fnUpdateInfo();
 				}
 			}
-			_d.selectionChangeCallbacks.fireWith(this,[this,'none',null]);
+			_d.selectionChangeCallbacks.fireWith(this, [ this, 'none', null ]);
 			return true;
 		},
-		
+
 		/**
-		 * Add a selectionChange callback
+		 * Add given function handler to {@link selectionChange} Callback
 		 * 
-		 * Selection change notification receives:
-		 * <code>selectionSuppor</code> (GvNIX_Selection) instance which fires the event
-		 * <code>action</code> (string) one of ['select','deselect','all','none']
-		 * <code>id</code> (string) id affected by action (null for 'none','all')
-		 * 
-		 * @param callback
-		 *            function to register
+		 * @param callback function to register that can declare following
+		 *            parameters:
+		 *            <code>selectionSupport</code> (GvNIX_Selection) instance which fires the event
+		 *            <code>action</code> (string) one of ['select','deselect','all','none'] 
+		 *            <code>id</code> (string) ID of row affected by given action (null for
+		 *            'none','all')
 		 */
 		"fnAddSelectionChangeCallback" : function(callback) {
 			var _d = this._data;
 			if (this.s.debug) {
-				this.log("fnAddSelectionChangeCallback: " + (callback.name ? callback.name : callback ));
+				this.log("fnAddSelectionChangeCallback: "
+						+ (callback.name ? callback.name : callback));
 			}
 			_d.selectionChangeCallbacks.add(callback);
 		},
-		
+
 		/**
 		 * Remove a selectionChange callback function
 		 * 
@@ -623,17 +645,14 @@ var GvNIX_Selection;
 		"fnRemoveSelectionChangeCallback" : function(callback) {
 			var _d = this._data;
 			if (this.s.debug) {
-				this.log("fnRemoveSelectionChangeCallback: " + (callback.name ? callback.name : callback ));
+				this.log("fnRemoveSelectionChangeCallback: "
+						+ (callback.name ? callback.name : callback));
 			}
 			_d.selectionChangeCallbacks.remove(callback);
 		},
-		
 
-		/***********************************************************************
-		 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-		 * Private methods (they are of course public in JS, but recommended as
-		 * private) * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-		 */
+		// Private methods (they are of course public in JS, but recommended as
+		// private) * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 		/**
 		 * Informs if trId is selected
@@ -656,19 +675,23 @@ var GvNIX_Selection;
 
 			var that = this, dt = this._data.dt;
 
-			dt.oApi._fnCallbackReg(dt, 'aoRowCallback', function(
-					nRow, aData, iDisplayIndex) {
+			dt.oApi._fnCallbackReg(dt, 'aoRowCallback', function(nRow, aData,
+					iDisplayIndex) {
+
 				// Locate Id
 				var rowId = nRow.id;
 				if (!rowId) {
+
 					// Check for DT_RowId in data
 					rowId = aData.DT_RowId;
 				}
 				if (!rowId) {
 					throw "Can't get Row id for manage selection!!";
 				}
-				// update row stile
+
+				// update row style
 				that._fnUpdateRowTr(nRow, that.fnIsSelected(rowId));
+
 				// Check if it's already bind click event
 				that._fnBindClickEvent(nRow);
 			}, 'addSelectionSupport');
@@ -677,8 +700,8 @@ var GvNIX_Selection;
 		/**
 		 * Datatables fnInfoCallback
 		 * 
-		 * This funtion will register a callback on datatables to draw the table
-		 * to add 'infoMessage' to datatable info label.
+		 * This function will register a callback on datatables to draw the
+		 * table to add 'infoMessage' to datatable info label.
 		 * 
 		 * This concatenate to the end of 'sPre' (message generated by
 		 * datatables or custom user function) the value of 'infoMessage' after
@@ -695,8 +718,8 @@ var GvNIX_Selection;
 				this._data.user_fnInfoCallBack = dt.oLanguage.fnInfoCallback;
 			}
 
-			dt.oLanguage.fnInfoCallback = function(oSettings,
-					iStart, iEnd, iMax, iTotal, sPre) {
+			dt.oLanguage.fnInfoCallback = function(oSettings, iStart, iEnd,
+					iMax, iTotal, sPre) {
 				var usr_callbck = that._data.user_fnInfoCallBack;
 
 				if (usr_callbck) {
@@ -753,8 +776,8 @@ var GvNIX_Selection;
 				checkValue = s.checkColumnClass ? false : null;
 			}
 			if (s.debug) {
-				this.log("_fnUpdateRowTr: id=" + nRow.id + " +" + classToAdd + " -"
-						+ classToRemove + " check:" + checkValue);
+				this.log("_fnUpdateRowTr: id=" + nRow.id + " +" + classToAdd
+						+ " -" + classToRemove + " check:" + checkValue);
 			}
 			// update row values
 			var $nRow = jQuery(nRow);
@@ -765,8 +788,8 @@ var GvNIX_Selection;
 				$nRow.removeClass(classToRemove);
 			}
 			if (checkValue != null) {
-				var checkbox = jQuery("input." + s.checkColumnClass + ":checkbox",
-						nRow);
+				var checkbox = jQuery("input." + s.checkColumnClass
+						+ ":checkbox", nRow);
 				checkbox.prop('checked', checkValue);
 			}
 		},
@@ -778,8 +801,8 @@ var GvNIX_Selection;
 		 *            (node)
 		 */
 		"_fnBindClickEvent" : function(nRow) {
-			
-			if (!nRow){
+
+			if (!nRow) {
 				// nothing to do
 				return;
 			}
@@ -792,8 +815,8 @@ var GvNIX_Selection;
 			}
 			if (s.checkColumnClass) {
 				// bind checkbox
-				var checkbox = jQuery("input." + s.checkColumnClass + ":checkbox",
-						nRow);
+				var checkbox = jQuery("input." + s.checkColumnClass
+						+ ":checkbox", nRow);
 				checkbox.on('change', function() {
 					var id = jQuery(this).closest('tr').prop('id');
 					if (this.checked) {
@@ -813,7 +836,7 @@ var GvNIX_Selection;
 		},
 
 		/**
-		 * Initialize componente
+		 * Initialize component
 		 */
 		"_fnConstruct" : function(iSettings) {
 			var s = this.s, _d = this._data, dt = _d.dt;
@@ -836,16 +859,17 @@ var GvNIX_Selection;
 				}
 				if (iSettings.debug !== undefined) {
 					s.debug = iSettings.debug;
-					if (s.debug){
-						// Regsiter a selectionChange calback to log the event fire
-						_d.selectionChangeCallbacks.add(
-								function (selection,action,id){
-									selection.log("selectionChange: [" + action + "]" + 
-											(id ? "id: '" +id + "'" : ""));
-								});
+					if (s.debug) {
+						// Regsiter a selectionChange calback to log the event
+						// fire
+						_d.selectionChangeCallbacks.add(function(selection,
+								action, id) {
+							selection.log("selectionChange: [" + action + "]"
+									+ (id ? "id: '" + id + "'" : ""));
+						});
 					}
 				}
-				if (typeof iSettings.selectionChange == "object"){
+				if (typeof iSettings.selectionChange == "object") {
 					_d.selectionChangeCallbacks.add(iSettings.selectionChange);
 				}
 			}
@@ -874,10 +898,7 @@ var GvNIX_Selection;
 
 	};
 
-	/***************************************************************************
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * Static variables * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 */
+	// Static variables * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 	/**
 	 * Store of all instances that have been created of TableTools, so one can
@@ -889,46 +910,42 @@ var GvNIX_Selection;
 	 * @private
 	 */
 	GvNIX_Selection._aInstances = [];
-	
-	/**
-	 * Store selection callbacks which are not registed yet in instances
-	 * (usually because not initialiced yet).
-	 * When the refered instance is register on _aInstances
-	 * the related callback will be added.
-	 */
-	GvNIX_Selection._aSelectionCallbacksPendingToRegister = [];
-	
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * Static methods
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 	/**
-	 * Store new GvNIX_Selection instance.
-	 * Also register pending callback.
-	 *  @method  _fnAddInstance
-	 *  @static
+	 * Store selection callbacks which are not registed yet in instances
+	 * (usually because not initialiced yet). When the refered instance is
+	 * register on _aInstances the related callback will be added.
 	 */
-	GvNIX_Selection._fnAddInstance = function ( instance )
-	{
+	GvNIX_Selection._aSelectionCallbacksPendingToRegister = [];
+
+	// Static methods * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+	/**
+	 * Store new GvNIX_Selection instance. Also register pending callback.
+	 * 
+	 * @method _fnAddInstance
+	 * @static
+	 */
+	GvNIX_Selection._fnAddInstance = function(instance) {
 		GvNIX_Selection._aInstances.push(instance);
+
 		// Register pending callback
 		var nodeId = instance._data.dt.nTable.id;
 		var register = GvNIX_Selection._aSelectionCallbacksPendingToRegister;
-		
+
 		var regInfo;
 		// Check if there is a pending register
-		for ( var i=0, iLen=register.length ; i<iLen ; i++ ) {
+		for ( var i = 0, iLen = register.length; i < iLen; i++) {
 			regInfo = register[i];
-			
+
 			// If table id match
-			if (regInfo.id == nodeId)
-			{
+			if (regInfo.id == nodeId) {
 				// register all callback
 				var callbacks = regInfo.callbacks;
-				while (callbacks.length > 0){
+				while (callbacks.length > 0) {
 					instance.fnAddSelectionChangeCallback(callbacks.pop());
 				}
-				
+
 				// remove pending callback register for this id
 				register.splice(i, 1);
 				// All done
@@ -937,109 +954,104 @@ var GvNIX_Selection;
 		}
 	};
 
-	
 	/**
 	 * Get the instance for a table node (or id if a string is given)
-	 *  @method  fnGetInstance
-	 *  @returns {Object} ID of table OR table node, for which we want the GvNIX_Seletion instance
-	 *  @static
+	 * 
+	 * @method fnGetInstance
+	 * @returns {Object} ID of table OR table node, for which we want the
+	 *          GvNIX_Seletion instance
+	 * @static
 	 */
-	GvNIX_Selection.fnGetInstance = function ( node )
-	{
-		if ( typeof node != 'object' )
-		{
-			node = jQuery("#"+node);
+	GvNIX_Selection.fnGetInstance = function(node) {
+		if (typeof node != 'object') {
+			node = jQuery("#" + node);
 		}
-		
-		if ($.fn.DataTable.fnIsDataTable( node )){
-			throw "Datatable not found: "+ node;
+
+		if ($.fn.DataTable.fnIsDataTable(node)) {
+			throw "Datatable not found: " + node;
 		}
 		var dt = node.dataTable();
-		
-		for ( var i=0, iLen=GvNIX_Selection._aInstances.length ; i<iLen ; i++ )
-		{
-			if ( GvNIX_Selection._aInstances[i]._data.dt == dt )
-			{
+
+		for ( var i = 0, iLen = GvNIX_Selection._aInstances.length; i < iLen; i++) {
+			if (GvNIX_Selection._aInstances[i]._data.dt == dt) {
 				return GvNIX_Selection._aInstances[i];
 			}
 		}
 		return null;
 	};
-	
+
 	/**
-	 * Register a SelectionChange Callback on table node (or id if a string is given). This
-	 * works including when datatable is not ready. In this case, this will store the function
-	 * and register it when selection support is initialized for related datatable.
+	 * Register a SelectionChange Callback on table node (or id if a string is
+	 * given). This works including when datatable is not ready. In this case,
+	 * this will store the function and register it when selection support is
+	 * initialized for related datatable.
 	 * 
-	 *  @method  fnGetInstance
-	 *  @returns {Object} ID of table OR table node, for which we want the GvNIX_Seletion instance
-	 *  @static
+	 * @method fnGetInstance
+	 * @returns {Object} ID of table OR table node, for which we want the
+	 *          GvNIX_Seletion instance
+	 * @static
 	 */
-	GvNIX_Selection.fnAddSelectionChangeCallback = function (node, callback )
-	{
+	GvNIX_Selection.fnAddSelectionChangeCallback = function(node, callback) {
 		var nodeId;
-		if ( typeof node != 'object' )
-		{
+		if (typeof node != 'object') {
 			nodeId = node;
-			node = jQuery("#"+node);
+			node = jQuery("#" + node);
 		} else {
 			nodeId = node.id;
 		}
-		
-					
-		if (jQuery.fn.DataTable.fnIsDataTable( node )){
+
+		if (jQuery.fn.DataTable.fnIsDataTable(node)) {
 			// found node
 			var dt = node.dataTable();
-			
-			for ( var i=0, iLen=GvNIX_Selection._aInstances.length ; i<iLen ; i++ )
-			{
-				if ( GvNIX_Selection._aInstances[i]._data.dt == dt )
-				{
+
+			for ( var i = 0, iLen = GvNIX_Selection._aInstances.length; i < iLen; i++) {
+				if (GvNIX_Selection._aInstances[i]._data.dt == dt) {
 					// found datatable: register callback in datatable
-					GvNIX_Selection._aInstances[i].fnAddSelectionChangeCallback(callback);
+					GvNIX_Selection._aInstances[i]
+							.fnAddSelectionChangeCallback(callback);
 					return true;
 				}
 			}
 		}
 		// Store in pending to assing
 		var register = GvNIX_Selection._aSelectionCallbacksPendingToRegister;
-		
+
 		// Check if there is a pending register
-		for ( var i=0, iLen=register.length ; i<iLen ; i++ ) {
-			if (register[i].id == nodeId)
-			{
+		for ( var i = 0, iLen = register.length; i < iLen; i++) {
+			if (register[i].id == nodeId) {
 				register[i].callbacks.push(callback);
 				return false;
 			}
 		}
 		// nothing registered yet. create a new register
-		register.push({'id' : nodeId, 'callbacks' : [callback]});
+		register.push({
+			'id' : nodeId,
+			'callbacks' : [ callback ]
+		});
 		return false;
 	};
-	
-	
-	
+
 	/**
 	 * Name of this class
-	 *  @constant CLASS
-	 *  @type	 String
-	 *  @default  TableTools
+	 * 
+	 * @constant CLASS
+	 * @type String
+	 * @default TableTools
 	 */
 	GvNIX_Selection.prototype.CLASS = "GvNIX_Selection";
-	
+
 	/**
 	 * TableTools version
-	 *  @constant  VERSION
-	 *  @type	  String
-	 *  @default   See code
+	 * 
+	 * @constant VERSION
+	 * @type String
+	 * @default See code
 	 */
-	GvNIX_Selection.VERSION = "${gvnix.version}";
+	GvNIX_Selection.VERSION = "1.0.2-SNAPSHOT";
 	GvNIX_Selection.prototype.VERSION = GvNIX_Selection.VERSION;
 
+	/** TODO Add as datatable feature * */
 
-	/** TODO Add as datatable feature  **/
-	
-	
 })(jQuery, window, document);
 
 /** *********************************************** */
@@ -1048,22 +1060,23 @@ var GvNIX_Selection;
  * 
  * Gets/initialize gvnix Selection support on a datatables
  * 
+ * @param oSettings
+ * @param iSelectionSettings
+ * @return GvNIX_Selection object
  * @author gvNIX Team
  */
 jQuery.fn.dataTableExt.oApi.fnSelection = function(oSettings,
 		iSelectionSettings) {
-	var _that = this;
 
-	var selectionSupport = oSettings.gvnix_selection_support;
-	if (oSettings.gvnix_selection_support === undefined) {
-		selectionSupport = new GvNIX_Selection(oSettings,
-				iSelectionSettings);
+	var selectionSupport = oSettings.GvNIX_Selection_support;
+
+	if (oSettings.GvNIX_Selection_support === undefined) {
+		selectionSupport = new GvNIX_Selection(oSettings, iSelectionSettings);
 	} else {
 		// TODO adjust settings on already initialized selection support
-
 	}
 
-	oSettings.gvnix_selection_support = selectionSupport;
+	oSettings.GvNIX_Selection_support = selectionSupport;
 
 	return selectionSupport;
-}
+};
