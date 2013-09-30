@@ -96,6 +96,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     private static final JavaType DATATABLES_ANNOTATION = new JavaType(
             GvNIXDatatables.class.getName());
 
+    private static final JavaType JQUERY_ANNOTATION = new JavaType(
+            "org.gvnix.addon.web.mvc.jquery.GvNIXWebJQuery");
+
     private static final JavaType JPA_ACTIVE_RECORD_ANNOTATION = new JavaType(
             RooJpaActiveRecord.class.getName());
 
@@ -201,8 +204,19 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 .getAnnotationOfType(existing.getAnnotations(),
                         SCAFFOLD_ANNOTATION);
 
-        Validate.isTrue(controllerAnnotation != null,
-                "Operation for @RooWebScaffold annotated controllers only.");
+        Validate.isTrue(
+                controllerAnnotation != null,
+                javaType.getFullyQualifiedTypeName()
+                        .concat(": Operation for @RooWebScaffold annotated controllers only."));
+
+        final AnnotationMetadata jQueryAnnotation = MemberFindingUtils
+                .getAnnotationOfType(existing.getAnnotations(),
+                        JQUERY_ANNOTATION);
+
+        Validate.isTrue(
+                jQueryAnnotation != null,
+                javaType.getFullyQualifiedTypeName()
+                        .concat(": Operation for @GvNIXWebJQuery annotated controllers only."));
 
         final boolean isDatatablesAnnotated = MemberFindingUtils
                 .getAnnotationOfType(existing.getAnnotations(),
