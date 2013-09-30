@@ -1,17 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
@@ -23,10 +23,12 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -100,6 +102,16 @@ public class JpaQueryMetadata extends
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
+    private static final Comparator<? super FieldMetadata> FIELD_COMPARATOR = new Comparator<FieldMetadata>() {
+
+        @Override
+        public int compare(FieldMetadata o1, FieldMetadata o2) {
+            return o1.getFieldName().getSymbolName()
+                    .compareTo(o2.getFieldName().getSymbolName());
+        }
+
+    };
+
     public static final String getMetadataIdentiferType() {
         return PROVIDES_TYPE;
     }
@@ -149,7 +161,9 @@ public class JpaQueryMetadata extends
         this.helper = new ItdBuilderHelper(this,
                 builder.getImportRegistrationResolver());
 
-        Map<FieldMetadata, AnnotationMetadata> fieldsToProcess = new HashMap<FieldMetadata, AnnotationMetadata>();
+        // Prepare fields Map ordered by name
+        Map<FieldMetadata, AnnotationMetadata> fieldsToProcess = newFieldsMap();
+
         // Locate field with @GvNIXJpaFilterProperty
         AnnotationMetadata annotation;
         for (FieldMetadata field : governorTypeDetails.getDeclaredFields()) {
@@ -178,6 +192,15 @@ public class JpaQueryMetadata extends
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
+    }
+
+    /**
+     * @return a new instance of a (ordered) map to store filed
+     */
+    private Map<FieldMetadata, AnnotationMetadata> newFieldsMap() {
+        Map<FieldMetadata, AnnotationMetadata> fieldsToProcess = new TreeMap<FieldMetadata, AnnotationMetadata>(
+                FIELD_COMPARATOR);
+        return fieldsToProcess;
     }
 
     /**
@@ -388,7 +411,7 @@ public class JpaQueryMetadata extends
      */
     private Map<FieldMetadata, AnnotationMetadata> getRelationFields(
             Map<FieldMetadata, AnnotationMetadata> fields) {
-        Map<FieldMetadata, AnnotationMetadata> result = new HashMap<FieldMetadata, AnnotationMetadata>();
+        Map<FieldMetadata, AnnotationMetadata> result = newFieldsMap();
         JavaType type;
         for (Entry<FieldMetadata, AnnotationMetadata> entry : fields.entrySet()) {
             type = entry.getKey().getFieldType();
