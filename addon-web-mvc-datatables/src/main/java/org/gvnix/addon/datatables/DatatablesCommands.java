@@ -115,7 +115,8 @@ public class DatatablesCommands implements CommandMarker {
     /**
      * Setup datatables artifacts
      * 
-     * @param webPackage (optional) controller package. Required if no conversionService declared on project
+     * @param webPackage (optional) controller package. Required if no
+     *        conversionService declared on project
      */
     @CliCommand(value = "web mvc datatables setup", help = "Setup datatables support")
     public void setup(
