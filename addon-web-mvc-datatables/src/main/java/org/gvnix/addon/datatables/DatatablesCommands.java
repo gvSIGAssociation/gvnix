@@ -20,6 +20,7 @@ package org.gvnix.addon.datatables;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
@@ -113,10 +114,13 @@ public class DatatablesCommands implements CommandMarker {
 
     /**
      * Setup datatables artifacts
+     * 
+     * @param webPackage (optional) controller package. Required if no conversionService declared on project
      */
     @CliCommand(value = "web mvc datatables setup", help = "Setup datatables support")
-    public void setup() {
-        operations.setup();
+    public void setup(
+            @CliOption(key = "package", mandatory = false, help = "controllers base package. Required if no conversionService registered jet.") JavaPackage webPackage) {
+        operations.setup(webPackage);
     }
 
     /**

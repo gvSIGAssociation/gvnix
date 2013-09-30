@@ -41,6 +41,7 @@ import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
+import org.springframework.roo.addon.web.mvc.controller.WebMvcOperations;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
@@ -58,6 +59,7 @@ import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.operations.AbstractOperations;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.MutableFile;
@@ -140,6 +142,12 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      */
     @Reference
     private PropFileOperations propFileOperations;
+
+    /**
+     * Reference to WebMvcOperations
+     */
+    @Reference
+    private WebMvcOperations webMvcOperations;
 
     /**
      * Update dependencies if is needed
@@ -474,7 +482,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     }
 
     /** {@inheritDoc} */
-    public void setup() {
+    public void setup(JavaPackage webPackage) {
         // Setup repository and dependencies
         setupProjectPom();
 
@@ -492,7 +500,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         addJSToLoadScriptsTag();
 
         // Update webmvc-config.xml
-        updateWebMvcConfigFile();
+        updateWebMvcConfigFile(webPackage);
 
         // Update web.xml
         updateWebXmlFile();
@@ -654,7 +662,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     }
 
     @Override
-    public void updateWebMvcConfigFile() {
+    public void updateWebMvcConfigFile(JavaPackage destinationPackage) {
         LogicalPath webappPath = WebProjectUtils
                 .getWebappPath(projectOperations);
         String webMvcXmlPath = projectOperations.getPathResolver()
@@ -681,6 +689,35 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                         "annotation-driven[@conversion-service='applicationConversionService']",
                         root);
 
+        if (annotationDrivenFound.isEmpty()) {
+            // Delegate on Roo install operation
+            if (destinationPackage == null) {
+                throw new IllegalStateException(
+                        "No conversion service found on webmvc-config.xml: package parameter is required.");
+            }
+            webMvcOperations.installConversionService(destinationPackage);
+
+            // commit fileManager changes (so get final webmvc-config.xml
+            // content)
+            fileManager.commit();
+
+            // reload xml file after Roo update it
+            try {
+                webMvcXmlMutableFile = fileManager.updateFile(webMvcXmlPath);
+                webMvcXml = XmlUtils.getDocumentBuilder().parse(
+                        webMvcXmlMutableFile.getInputStream());
+            }
+            catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+            root = webMvcXml.getDocumentElement();
+
+            // Get annotation-driven for conversion service
+            annotationDrivenFound = XmlUtils
+                    .findElements(
+                            "annotation-driven[@conversion-service='applicationConversionService']",
+                            root);
+        }
         Validate.isTrue(
                 !annotationDrivenFound.isEmpty(),
                 "mvc:annotation-driven conversion-service=\"applicationConversionService\" tag not found in webmvc-config.xml");

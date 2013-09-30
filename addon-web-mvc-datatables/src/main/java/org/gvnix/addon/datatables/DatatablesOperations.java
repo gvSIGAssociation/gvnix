@@ -1,22 +1,23 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
 package org.gvnix.addon.datatables;
 
+import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Feature;
 
@@ -77,8 +78,11 @@ public interface DatatablesOperations extends Feature {
 
     /**
      * Setup all artifacts
+     * 
+     * @param webPackage (optional) controllers package. Only required if no
+     *        conversionService registered.
      */
-    void setup();
+    void setup(JavaPackage webPackage);
 
     /**
      * Indicate if setup command should be available
@@ -123,9 +127,12 @@ public interface DatatablesOperations extends Feature {
     void addJSToLoadScriptsTag();
 
     /**
-     * Updates the webmvn-config.xml file
+     * updates webmvc-config.xml file
+     * 
+     * @param destinationPackage (optional) only required if no
+     *        conversionService found on project
      */
-    void updateWebMvcConfigFile();
+    void updateWebMvcConfigFile(JavaPackage destinationPackage);
 
     /**
      * updates the web.xml file to add filters and servlets definitions. <br>
