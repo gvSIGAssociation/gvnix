@@ -18,7 +18,7 @@
    <!-- ====================================== -->
    <tag>
       <description>Generate a HTML table thanks to the awesome
-           Dandelion-DataTables.</description>      
+           Dandelion-DataTables.</description>
       <name>table</name>
       <tag-class>org.gvnix.datatables.tags.RooTableTag</tag-class>
       <tei-class>com.github.dandelion.datatables.jsp.tei.TableTagExtraInfo</tei-class>
@@ -320,7 +320,7 @@
          <name>filterPlaceholder</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
-      
+
       <!-- ====================================== -->
       <!-- Extra features -->
       <!-- ====================================== -->
@@ -362,13 +362,13 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
-         <description> (true|false) When vertical (y) scrolling is enabled, 
-         	DataTables will force the height of the table's viewport to the 
-         	given height at all times (useful for layout). However, this can 
-         	look odd when filtering data down to a small data set, and 
-         	the footer is left "floating" further down. This parameter 
-         	(when enabled) will cause DataTables to collapse the table's 
-         	viewport down when the result set will fit within the given 
+         <description> (true|false) When vertical (y) scrolling is enabled,
+         	DataTables will force the height of the table's viewport to the
+         	given height at all times (useful for layout). However, this can
+         	look odd when filtering data down to a small data set, and
+         	the footer is left "floating" further down. This parameter
+         	(when enabled) will cause DataTables to collapse the table's
+         	viewport down when the result set will fit within the given
          	Y height. (default : false)</description>
           <name>scrollCollapse</name>
           <rtexprvalue>true</rtexprvalue>
@@ -380,7 +380,7 @@
           <rtexprvalue>true</rtexprvalue>
       </attribute>
       <attribute>
-          <description>Use more width than it might otherwise do when 
+          <description>Use more width than it might otherwise do when
           x-scrolling is enabled.
           (default : disabled)</description>
           <name>scrollXInner</name>
@@ -396,7 +396,7 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
       <dynamic-attributes>true</dynamic-attributes>
-      
+
        <!-- ====================================== -->
        <!-- Roo attributes -->
        <!-- ====================================== -->
@@ -467,14 +467,12 @@
       <name>column</name>
       <tag-class>org.gvnix.datatables.tags.RooColumnTag</tag-class>
       <body-content>JSP</body-content>
-      <!-- Replaced by the roo id attribute
       <attribute>
           <description>Unique arbitrary id of the column, used in
               relation to the columnHead tag</description>
          <name>uid</name>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
-       -->
       <attribute>
          <description>Column title.</description>
          <name>title</name>
