@@ -60,6 +60,13 @@
 		    	<li><a href="#${datatablesId}"><span><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${detailItem.property}" htmlEscape="false" /></span></a></li>
 			</c:forEach>
 			</ul>
+
+			<script type="text/javascript">
+				var ${mainDatatablesId}_received_bodies = [];
+			</script>
+
+			<!-- Error message when detail request fails -->
+	    	<spring:message code="datatables_detail_get_error" javaScriptEscape="true" text="Error getting detail datatable from server." var="datatablesDetailErrorMessage" />
 	    
 	    	<!-- Tabs contents -->
 	    	<!-- <div id="tabs-1"></div> -->
@@ -71,31 +78,13 @@
 			    <div id="${datatablesId}">
 			    <!-- Block to include one detail -->
 			    </div>
+
+			    <spring:url value="${detailItem.path}/list" var="datatablesDetailUrl">
+			    	<spring:param name="datatablesMappedProperty" value="${detailItem.mappedBy}"/>
+			    </spring:url>
+
 			    <script type="text/javascript">
 			    
-			    	function loadDetail${datatablesId} (trId) {
-				    	var url = '<spring:url value="${detailItem.path}/list" javaScriptEscape="true" />?${detailItem.mappedBy}=' + trId + '&amp;datatablesMappedProperty=${detailItem.mappedBy}&amp;datatablesMappedValue=' + trId;
-						$.get(url)
-						.done(function(datatablesDetailContent) {
-							var datatablesDetailContainer = $('#${datatablesId}');
-							datatablesDetailContainer.html(datatablesDetailContent);
-							$('#${mainDatatablesId}').show();
-						})
-						.fail(function(error) {
-							if (error.status != 0) {
-								alert('<spring:message code="datatables_detail_get_error" text="Error getting detail datatable from server." javaScriptEscape="true" />' +
-										' (Error: ' + error.status + ', URL: ' + url + ').');
-							}
-							$('#${mainDatatablesId}').hide();
-						});
-			    	}
-			    	
-			    	function hideDetail${datatablesId} () {
-			    		$('#${mainDatatablesId}').hide();
-			    	}
-					
-					// para registrar un callback
-					
 					function callbackFunct${datatablesId} (selection, action, trId){
 						var selectCount = selection.fnVisibleRowsSelecteds();
 						// action puede ser 'all', 'none', 'select' o 'deselect'
@@ -106,9 +95,9 @@
 							if (trNode){
 								// hacer cosas
 								if (action == 'select') {
-									loadDetail${datatablesId}(trId);
+									loadDetail(trId, "${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesDetailUrl}", "${detailItem.mappedBy}", trId) , "${datatablesDetailErrorMessage}", ${mainDatatablesId}_received_bodies, ${fn:length(detailsInfo)});
 								} else {
-									hideDetail${datatablesId}();
+									hideDetail("${datatablesId}");
 								}
 							} else {
 								// el nodo 'tr' no esta accesible (modo AJAX y registro en otra pagina)
@@ -116,7 +105,7 @@
 						}
 					}
 					
-					hideDetail${datatablesId}();
+					hideDetail("${mainDatatablesId}");
 					
 					<c:if test="${datatablesStandardMode}">
 						GvNIX_Selection.fnAddSelectionChangeCallback("${parentId}", callbackFunct${datatablesId});
@@ -128,10 +117,13 @@
 	
 			<c:if test="${not datatablesStandardMode}">
 			<script type="text/javascript">
-				function rowCallback( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+				function rowCallback(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
 					<c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
 			    		<c:set value="${mainDatatablesId}_${detailIndex.index}" var="datatablesId" />
-			    		loadDetail${datatablesId}(nRow.id);
+					    <spring:url javaScriptEscape="true" value="${detailItem.path}/list" var="datatablesDetailUrl">
+					    	<spring:param name="datatablesMappedProperty" value="${detailItem.mappedBy}"/>
+					    </spring:url>
+			    		loadDetail(nRow.id, "${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesDetailUrl}", "${detailItem.mappedBy}", nRow.id), "${datatablesDetailErrorMessage}", ${mainDatatablesId}_received_bodies, ${fn:length(detailsInfo)});
 			    	</c:forEach>
 				}
 			</script>
@@ -140,17 +132,9 @@
 		<!-- End the JQuery HTML structure to show tabs -->		
 		</div>
 		
-		<!-- Initialize the JQuery HTML structure to show tabs -->
+		<!-- Initialize the JQuery HTML structure to draw it as tabs -->
 		<script type="text/javascript">
-			$(function() {
-				var tabs = $( "#${mainDatatablesId}" ).tabs();
-				tabs.find( ".ui-tabs-nav" ).sortable({
-					axis: "x",
-					stop: function() {
-						tabs.tabs( "refresh" );
-					}
-				});
-			});
+		$(showDetailTabs("${mainDatatablesId}"));
 		</script>
     
     </c:if>
