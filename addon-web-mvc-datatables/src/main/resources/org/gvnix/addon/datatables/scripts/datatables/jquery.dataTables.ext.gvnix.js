@@ -53,6 +53,17 @@ function fnDatatablesExtInit(tableId, options) {
 			$table.fnEditing();
 		}
 	}
+
+	// Init gvNIX rowclick support. Note this function is in file
+	// 'jquery.dataTables.ext.gvnix.rowclick.js', so we must check if
+	// init function has been loaded
+	if (options.rowclick && typeof ($table.fnRowClick) === "function") {
+		if (typeof options.rowclick == "object") {
+			$table.fnRowClick(options.rowclick);
+		} else {
+			$table.fnRowClick();
+		}
+	}
 }
 
 /**

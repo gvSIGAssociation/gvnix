@@ -23,9 +23,11 @@
   <jsp:directive.attribute name="actionHeaderCssStyle" type="java.lang.String" required="false" description="Custom css-style for action columns header" />
 
   <!-- selection -->
+  <!-- This options now are configured base on datatablesConfig
   <jsp:directive.attribute name="selection" type="java.lang.Boolean" required="false" description="Enable selection (default: true)" />
   <jsp:directive.attribute name="selectionMultiRow" type="java.lang.Boolean" required="false" description="Enable selection on multiple rows" />
   <jsp:directive.attribute name="selectionByCheck" type="java.lang.Boolean" required="false" description="Use checkbox to select" />
+   -->
   <jsp:directive.attribute name="selectionCheckCssClass" type="java.lang.String" required="false" description="Css class for selection checkbox" />
   <jsp:directive.attribute name="selectionSelectedCssClass" type="java.lang.String" required="false" description="Css class for selected rows [default: 'row_selected']" />
   <jsp:directive.attribute name="selectionNotSelectedCssClass" type="java.lang.String" required="false" description="Css class for not-selected rows" />
@@ -128,11 +130,13 @@
 
   <!-- Type Name -->
   <spring:message var="typeName" code="menu_item_${fn:toLowerCase(fn:split(id,'_')[fn:length(fn:split(id,'_')) - 1])}_new_label" htmlEscape="false" />
+  <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="entity_title" htmlEscape="false" />
 
   <!-- Add random value to datatables identifier to avoid collisions when multiple datatables details -->
   <jsp:scriptlet>
   jspContext.setAttribute("currentRandomInt", new Random(System.currentTimeMillis()).nextInt(99999));
   </jsp:scriptlet>
+
   <c:set value="${id}_${currentRandomInt}" var="id" />
   <!-- This datatables identifier is required by list.tagx when show datatables details -->
   <c:set value="${id}" var="parentId" scope="request" />
@@ -238,12 +242,20 @@
   </script>
 
   <!-- Default CRUD -->
-  <c:if test="${empty selection}">
+  <!-- selection -->
+  <!-- enable selection only on standar mode and with batch support -->
+  <c:choose>
+  <c:when test="${datatablesStandardMode and datatablesHasBatchSupport}">
     <c:set var="selection" value="true"/>
-  </c:if>
-  <c:if test="${empty selectionMultiRow}">
+    <c:set var="selectionMultiRow" value="true"/>
+    <c:set var="selectionByCheck" value="true"/>
+  </c:when>
+  <c:otherwise>
+    <c:set var="selection" value="false"/>
     <c:set var="selectionMultiRow" value="false"/>
-  </c:if>
+    <c:set var="selectionByCheck" value="false"/>
+  </c:otherwise>
+  </c:choose>
 
   <c:if test="${empty create}">
       <c:set var="create" value="true"/>
@@ -344,29 +356,21 @@
 	     	</c:set>
     	</c:if>
  	  </c:if>
-
-                <!-- Add create functions to the script element before Datatables element -->
-                <c:set target="${datatables_javaScript_elements_before}" property="selection_tools">
-                /* Select none handler */
-                function ${id}_selectNone(){
-                    $('#${id}').dataTable().fnSelection().fnSelectNone();
-                };
-                var ${id}_selectionTools_str = '<a href="javascript:${id}_selectNone();" class="icon select_none" title="${selection_none_msg}"></a>';
-
-                <c:if test="${selection_all_link}">
-                    /* Select all handler */
-                    function ${id}_selectAll(){
-                        $('#${id}').dataTable().fnSelection().fnSelectAll();
-                    };
-                    ${id}_selectionTools_str += '<a href="javascript:${id}_selectAll();" class="icon select_all" title="${selection_all_msg}"></a>';
-		</c:if>
-      </c:set>
-
                 <!-- In Datatables initialization callback handler add call to
                     functions that will initialize select options -->
       <c:set target="${datatables_javaScript_elements_init}" property="selection_tools">
-                // Invoke function that adds the selection btns in gvNIX toolbar
-                $('#${id}_gvnix_toolbar').append( ${id}_selectionTools_str );
+                // Bind click on toggle selecet icon
+                jQuery("a.select_toggle").click(function (){
+                	var selSupport = jQuery('#${id}').dataTable().fnSelection();
+                	if (!selSupport) {
+                		return;
+                	}
+                	if (selSupport.fnIsAllSelected()) {
+                		selSupport.fnSelectNone();
+                	} else {
+                		selSupport.fnSelectAll();
+                	}
+                });
       </c:set>
             </c:when><!-- /empty selection or selection -->
 
@@ -504,8 +508,7 @@
           </spring:escapeBody>
         </c:set>
         <spring:url value="/resources/images/delete.png" var="delete_image_url" />
-        <c:choose>
-        <c:when test="${selectionMultiRow and datatablesHasBatchSupport}">
+        <c:if test="${selectionMultiRow and datatablesHasBatchSupport}">
 	        <c:set var="delete_multirow_confirm_msg">
 	          <spring:escapeBody javaScriptEscape="true" htmlEscape="false">
 	             <spring:message code="entity_delete_multirow_confirm" />
@@ -528,7 +531,7 @@
 	        </c:set>
 
                       <!-- Add delete functions to the script element before Datatables element -->
-		    <c:set target="${datatables_javaScript_elements_before}" property="${removeColumnId}">
+		    <c:set target="${datatables_javaScript_elements_before}" property="${removeColumnId}Batch">
 
 		        var ${removeColumnId}_delete_error = "${delete_error_msg}";
 		        var ${removeColumnId}_deleted = "${delete_ok_msg}";
@@ -537,7 +540,7 @@
 		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
 
                       /* ... */
-		        function ${removeColumnId}() {
+		        function ${removeColumnId}_selected() {
 		        	var $table = $('#${id}').dataTable();
 
                           // Get the table GvNIX_Selection object
@@ -609,19 +612,18 @@
                        '<a id="${removeColumnId}" href="#" alt="${delete_label}" title="${delete_label}" class="icon delete_entity">'
                        + '</a>';
                           $('#${id}_gvnix_toolbar').append( result );
-           			$('#${removeColumnId}').on('click', ${removeColumnId});
+           			$('#${removeColumnId}').on('click', ${removeColumnId}_selected);
 	    		}
 		     </c:set>
 
                         <!-- In Datatables initialization callback handler add call to
                             functions that will initialize delete options -->
-		     <c:set target="${datatables_javaScript_elements_init}" property="${removeColumnId}">
+		     <c:set target="${datatables_javaScript_elements_init}" property="${removeColumnId}Batch">
                         // Invoke function that adds the delete btn in gvNIX toolbar
 		     	${removeColumnId}_div();
 		     </c:set>
 
-        </c:when>
-        <c:otherwise>
+        </c:if>
                         <!-- Add delete functions to the script element before Datatables element -->
 		    <c:set target="${datatables_javaScript_elements_before}" property="${removeColumnId}">
 		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
@@ -635,8 +637,6 @@
 	                return result;
 			    }
 		     </c:set>
-	     </c:otherwise>
-	     </c:choose>
      </c:if>
   </c:if><!-- /empty delete or delete -->
 
@@ -656,6 +656,56 @@
 		<c:forEach var="entry" items="${datatables_javaScript_elements_before}">
 		${entry.value}
 		</c:forEach>
+
+	// Initialize custom API functions for this table
+	function ${initCustomFunctionsCallbackId}() {
+	           // Create toolbar
+        jQuery('#${id}_wrapper')
+            		.prepend('<div id="${id}_gvnix_toolbar" class="gvnix_dataTables_toolbar"></div>');
+
+        fnDatatablesExtInit('${id}', {
+	    		'filterOnReturn': '${filterOnReturn}',
+	    		'filteringDelay' : '${filteringDelay}'
+	    		<c:if test="${selection}">
+	    		, 'selection': {
+                    'toolbarId': '${id}_gvnix_toolbar', // TODO: Create btns in .js
+	    			'multiRow': ${selectionMultiRow},
+	    			'checkColumnClass': '${selectionCheckCssClass}',
+	    			'infoMessage': '${selection_info_msg}',
+	    			<c:if test="${not empty selectionSelectedCssClass}">
+	    			'classForSelectedRow': '${selectionSelectedCssClass}',
+	    			</c:if>
+	    			<c:if test="${not empty selectionNotSelectedCssClass}">
+	    			'classForNotSelectedRow': '${selectionNotSelectedCssClass}',
+	    			</c:if>
+	    			'debug': false}
+	    		</c:if>
+            <c:if test="${inlineEditing}">
+                , 'editing' : {
+                    'toolbarId': '${id}_gvnix_toolbar',
+                    'applicationContext': '${urlPath}',
+                    'update': ${update},
+                    'updateBtnLabel': '${udpate_label}',
+                    'updateBtnClass': 'icon update_entity',
+                    'submitBtnLabel': '${submit_label}',
+                    'submitBtnClass': 'icon submit_entity',
+                    'cancelBtnLabel': '${cancel_label}',
+                    'cancelBtnClass': 'icon cancel_entity',
+                    'create': ${create},
+                    'delete': ${delete},
+                    'infoMessage': '${editing_info_msg}',
+                    'debug': false}
+            </c:if>
+            <c:if test="${not empty detailsInfo}">
+                , 'rowclick' : true
+            </c:if>
+	    	});
+
+			<c:forEach var="entry" items="${datatables_javaScript_elements_init}">
+			${entry.value}
+			</c:forEach>
+	}
+
   </script>
   </c:if>
 
@@ -730,13 +780,14 @@
     	<c:when test="${not datatablesStandardMode}">
     		<!-- Cell to replace by data -->
 			<gvnixddt:column id="${columnId}" searchable="false" property="${rowIdBase}"
-				filterable="false" sortable="false"></gvnixddt:column>
+				filterable="false" sortable="false" title="${entity_title}"></gvnixddt:column>
 
            <!--  callback to initialize custom api functions -->
            <datatables:callback type="draw" function="evalScripts" />
 
-           <!-- TODO Include it only in show mode -->
+           <c:if test="${not empty detailsInfo}">
            <datatables:callback type="row" function="rowCallback" />
+           </c:if>
             </c:when>
 
             <!-- On table view mode, setup columns for action buttons -->
@@ -749,12 +800,12 @@
 
                         <!-- AJAX cell render -->
             <c:when test="${serverSide}">
-		      <table:action-column id="${selectionCheckColumnId}" cssClass="utilbox" cssCellClass="utilbox" renderFunction="${selectionCheckColumnId}" cssStyle="${actionHeaderCssStyle}"/>
+		      <table:action-column uid="${selectionCheckColumnId}" id="${selectionCheckColumnId}" cssClass="utilbox" cssCellClass="utilbox" renderFunction="${selectionCheckColumnId}" cssStyle="${actionHeaderCssStyle}"/>
             </c:when>
 
                         <!-- DOM cell render -->
 		    <c:otherwise>
-			  <table:action-column id="${selectionCheckColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
+			  <table:action-column uid="${selectionCheckColumnId}" id="${selectionCheckColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
 			  	<c:if test="${not empty item }">
 			  	<input type="checkbox" class="${selectionCheckCssClass}" form="${selectionCheckColumnId}_form"/>
 			  	</c:if>
@@ -763,6 +814,9 @@
 		  </c:choose>
 		</c:if>
 
+    	  <datatables:columnHead uid="${selectionCheckColumnId}">
+    	  	<a href="#" class="icon select_toggle"></a>
+    	  </datatables:columnHead>
 		<!-- data columns will be inserted here -->
         <jsp:doBody />
 
@@ -830,9 +884,7 @@
 
                         <!-- AJAX cell render -->
 			  <c:when test="${serverSide}">
-			  	<c:if test="${not (selectionMultiRow and datatablesHasBatchSupport)}">
-				    <table:action-column id="${removeColumnId}" cssCellClass="utilbox" renderFunction="${removeColumnId}" cssStyle="${actionHeaderCssStyle}"/>
-				</c:if>
+				<table:action-column id="${removeColumnId}" cssCellClass="utilbox" renderFunction="${removeColumnId}" cssStyle="${actionHeaderCssStyle}"/>
 			  </c:when>
 
                         <!-- DOM cell render -->
@@ -874,55 +926,6 @@
 	<c:forEach var="entry" items="${datatables_javaScript_elements_after}">
 	${entry.value}
 	</c:forEach>
-
-    // Initialize custom API functions for this table
-	    function ${initCustomFunctionsCallbackId}() {
-    	fnDatatablesExtInit('${id}', {
-	    		'filterOnReturn': '${filterOnReturn}',
-	    		'filteringDelay' : '${filteringDelay}'
-	    		<c:if test="${selection}">
-	    		, 'selection': {
-                    'toolbarId': '${id}_gvnix_toolbar', // TODO: Create btns in .js
-	    			'multiRow': ${selectionMultiRow},
-	    			'checkColumnClass': '${selectionCheckCssClass}',
-	    			'infoMessage': '${selection_info_msg}',
-	    			<c:if test="${not empty selectionSelectedCssClass}">
-	    			'classForSelectedRow': '${selectionSelectedCssClass}',
-	    			</c:if>
-	    			<c:if test="${not empty selectionNotSelectedCssClass}">
-	    			'classForNotSelectedRow': '${selectionNotSelectedCssClass}',
-	    			</c:if>
-	    			'debug': false}
-	    		</c:if>
-            <c:if test="${inlineEditing}">
-                , 'editing' : {
-                    'toolbarId': '${id}_gvnix_toolbar',
-                    'applicationContext': '${urlPath}',
-                    'update': ${update},
-                    'updateBtnLabel': '${udpate_label}',
-                    'updateBtnClass': 'icon update_entity',
-                    'submitBtnLabel': '${submit_label}',
-                    'submitBtnClass': 'icon submit_entity',
-                    'cancelBtnLabel': '${cancel_label}',
-                    'cancelBtnClass': 'icon cancel_entity',
-                    'create': ${create},
-                    'delete': ${delete},
-                    'infoMessage': '${editing_info_msg}',
-                    'debug': true}
-            </c:if>
-	    		});
-
-        <c:if test="${inlineEditing}">
-        // Initialize editing tools for this table
-        var $table = $('#${id}').dataTable();
-        var $editor = $table.fnEditing();
-        $editor.fnInitEditingTools();
-        </c:if>
-
-			<c:forEach var="entry" items="${datatables_javaScript_elements_init}">
-			${entry.value}
-			</c:forEach>
-	    }
   </script>
   </div>
 </jsp:root>

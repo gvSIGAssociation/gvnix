@@ -1,5 +1,5 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -1478,7 +1478,7 @@ var GvNIX_Editing;
 			for ( var i = 0; i < aoData.length; i++) {
 				var nRow = aoData[i].nTr;
 				this._fnBindRowEvents(nRow);
-				this._fnBindDoubleClickEvent(nRow);
+				// this._fnBindDoubleClickEvent(nRow);
 			}
 
 			// Register Row callback without remove user configuration
@@ -1486,6 +1486,9 @@ var GvNIX_Editing;
 
 			// Register callback to update info label
 			this._fnRegisterEditingInfoCallback();
+
+			// Initialize tools
+			this.fnInitEditingTools();
 
 			// Update visible rows
 			this.fnRedrawVisibleRows();
@@ -1648,7 +1651,7 @@ var GvNIX_Editing;
 	 * @type String
 	 * @default See code
 	 */
-	GvNIX_Editing.VERSION = "1.0.2-SNAPSHOT";
+	GvNIX_Editing.VERSION = "${gvnix.version}";
 	GvNIX_Editing.prototype.VERSION = GvNIX_Editing.VERSION;
 
 	/** TODO Add as datatable feature * */

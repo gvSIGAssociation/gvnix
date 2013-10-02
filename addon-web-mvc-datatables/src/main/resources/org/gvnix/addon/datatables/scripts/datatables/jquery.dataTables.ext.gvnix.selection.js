@@ -1,5 +1,5 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@ var GvNIX_Selection;
 
 			/**
 			 * Allow multiple row selection
-			 * 
+			 *
 			 * @property multiRow
 			 * @type boolean
 			 * @default false
@@ -46,7 +46,7 @@ var GvNIX_Selection;
 
 			/**
 			 * Show messages on console
-			 * 
+			 *
 			 * @property debug
 			 * @type boolean
 			 * @default false
@@ -55,7 +55,7 @@ var GvNIX_Selection;
 
 			/**
 			 * Css class of checkbox to manage selection
-			 * 
+			 *
 			 * @property checkColumnClass
 			 * @type string
 			 * @default null
@@ -65,7 +65,7 @@ var GvNIX_Selection;
 			/**
 			 * Css class to set
 			 * <tr> on selected rows
-			 * 
+			 *
 			 * @property classForSelectedRow
 			 * @type string
 			 * @default 'row_selected'
@@ -75,7 +75,7 @@ var GvNIX_Selection;
 			/**
 			 * Css class to set
 			 * <tr> on not-selected rows
-			 * 
+			 *
 			 * @property classForNotSelectedRow
 			 * @type string
 			 * @default null
@@ -85,7 +85,7 @@ var GvNIX_Selection;
 			/**
 			 * Show a information message on datatables info label. Ex: '<br/>
 			 * Selected _SEL-COUNT_ rows, _SEL-VISIBLE-COUNT_ on this page'
-			 * 
+			 *
 			 * @property _infoMessage
 			 * @type string
 			 * @default null
@@ -103,7 +103,7 @@ var GvNIX_Selection;
 			/**
 			 * Store 'this' so the instance can be retrieved from the settings
 			 * object
-			 * 
+			 *
 			 * @property that
 			 * @type object
 			 * @default this
@@ -112,7 +112,7 @@ var GvNIX_Selection;
 
 			/**
 			 * DataTables settings objects
-			 * 
+			 *
 			 * @property dt
 			 * @type object
 			 * @default <i>From the oDT init option</i>
@@ -122,7 +122,7 @@ var GvNIX_Selection;
 			/**
 			 * save user-defined fnInfoCallBack before replace it for set
 			 * infoMessage.
-			 * 
+			 *
 			 * @property classForNotSelectedRow
 			 * @type function
 			 * @default null
@@ -132,7 +132,7 @@ var GvNIX_Selection;
 			/**
 			 * List of ids. This list could be selected or not-selected ids
 			 * depending on idListSelected value.
-			 * 
+			 *
 			 * @property idList
 			 * @type array
 			 * @default []
@@ -141,7 +141,7 @@ var GvNIX_Selection;
 			/**
 			 * Informs if items from _idList are selected (true) or not-selected
 			 * (false) idListSelected value.
-			 * 
+			 *
 			 * @property idListSelected
 			 * @type boolean
 			 * @default true
@@ -150,7 +150,7 @@ var GvNIX_Selection;
 
 			/**
 			 * Flag to mark all-items-selected.
-			 * 
+			 *
 			 * @property selectedAll
 			 * @type boolean
 			 * @default false
@@ -158,15 +158,15 @@ var GvNIX_Selection;
 			"selectedAll" : false,
 
 			/**
-			 * Callback for selection change notification. The handler 
+			 * Callback for selection change notification. The handler
 			 * functions this object contains, receives following data:
-			 * 
+			 *
 			 * <code>selectionSupport</code> (GvNIX_Selection) instance which
-			 * fires the event 
-			 * <code>action</code> (string) one of ['select','deselect','all','none'] 
-			 * <code>id</code> (string) ID of row affected by given action 
+			 * fires the event
+			 * <code>action</code> (string) one of ['select','deselect','all','none']
+			 * <code>id</code> (string) ID of row affected by given action
 			 * (null for 'none','all')
-			 * 
+			 *
 			 * @property selectionChangeCallbacks
 			 * @type jQuery.Callbacks
 			 * @default jQuery.Callbacks("unique")
@@ -178,7 +178,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Retreieve the settings object from an instance
-		 * 
+		 *
 		 * @method fnSettings
 		 * @returns {object} TableTools settings object
 		 */
@@ -200,7 +200,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Try to show a message on browser JS console
-		 * 
+		 *
 		 * @param message
 		 *            to show
 		 */
@@ -214,7 +214,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Gets the row (node) from its id
-		 * 
+		 *
 		 * @param id
 		 *            value
 		 */
@@ -231,7 +231,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Redraw a row
-		 * 
+		 *
 		 * @param trId
 		 *            tr.id value (could be DT_RowId on AJAX mode)
 		 * @param isSelected
@@ -250,7 +250,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Redraw all visible rows
-		 * 
+		 *
 		 * @param trId
 		 *            tr.id value (could be DT_RowId on AJAX mode)
 		 * @param isSelected
@@ -295,7 +295,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Informs if trId is selected
-		 * 
+		 *
 		 * @param trId
 		 *            tr.id value (could be DT_RowId on AJAX mode)
 		 */
@@ -310,8 +310,19 @@ var GvNIX_Selection;
 		},
 
 		/**
+		 * Informs if all rows are selected
+		 *
+		 */
+		"fnIsAllSelected" : function() {
+			if (this._data.selectedAll){
+				return true;
+			}
+			return this.fnSelectionCount() == this._data.dt.fnRecordsTotal();
+		},
+
+		/**
 		 * Toggle trId selection status
-		 * 
+		 *
 		 * @param trId
 		 *            tr.id value (could be DT_RowId on AJAX mode)
 		 */
@@ -332,7 +343,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Get selection count
-		 * 
+		 *
 		 * @returns number of row selected
 		 */
 		"fnSelectionCount" : function() {
@@ -347,7 +358,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Get if there is at least one row selected
-		 * 
+		 *
 		 * @returns true if there is any row selected
 		 */
 		"fnHasSelection" : function() {
@@ -362,10 +373,10 @@ var GvNIX_Selection;
 
 		/**
 		 * Gets an array of all selected ids
-		 * 
+		 *
 		 * WARNING: not supported if bServerSide datatables is set. Use
 		 * fnGetSelectionInfo in that cases (AJAX mode).
-		 * 
+		 *
 		 * @returns an array of selected id.
 		 */
 		"fnGetSelectedIds" : function() {
@@ -398,7 +409,7 @@ var GvNIX_Selection;
 		/**
 		 * Gets an array of all selected IDs of rows which is currently on
 		 * display on the page.
-		 * 
+		 *
 		 * @returns an array of selected IDs
 		 */
 		"fnGetDisplaySelectedIds" : function() {
@@ -449,7 +460,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Set trId as selected
-		 * 
+		 *
 		 * @param trId
 		 *            tr.id value (could be DT_RowId on AJAX mode)
 		 * @param redraw
@@ -510,7 +521,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Set trId as no-selected
-		 * 
+		 *
 		 * @param trId
 		 *            tr.id value (could be DT_RowId on AJAX mode)
 		 * @param redraw
@@ -567,7 +578,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Set all rows as selected
-		 * 
+		 *
 		 * @param redraw
 		 *            row if change state
 		 * @returns true if selection has been change
@@ -590,7 +601,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Set all rows as no-selected
-		 * 
+		 *
 		 * @param redraw
 		 *            row if change state
 		 * @param updateInfo
@@ -619,11 +630,11 @@ var GvNIX_Selection;
 
 		/**
 		 * Add given function handler to {@link selectionChange} Callback
-		 * 
+		 *
 		 * @param callback function to register that can declare following
 		 *            parameters:
 		 *            <code>selectionSupport</code> (GvNIX_Selection) instance which fires the event
-		 *            <code>action</code> (string) one of ['select','deselect','all','none'] 
+		 *            <code>action</code> (string) one of ['select','deselect','all','none']
 		 *            <code>id</code> (string) ID of row affected by given action (null for
 		 *            'none','all')
 		 */
@@ -638,7 +649,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Remove a selectionChange callback function
-		 * 
+		 *
 		 * @param callback
 		 *            function to remove
 		 */
@@ -656,7 +667,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Informs if trId is selected
-		 * 
+		 *
 		 * @param trId
 		 *            tr.id value (could be DT_RowId on AJAX mode)
 		 */
@@ -666,9 +677,9 @@ var GvNIX_Selection;
 
 		/**
 		 * Register a Datatables fnRowDrawCallback
-		 * 
+		 *
 		 * This registers a function on datatable to draw row.
-		 * 
+		 *
 		 * Also bind click event on row to manage selection.
 		 */
 		"_fnRegisterDrawSelectionRowCallback" : function() {
@@ -699,10 +710,10 @@ var GvNIX_Selection;
 
 		/**
 		 * Datatables fnInfoCallback
-		 * 
+		 *
 		 * This function will register a callback on datatables to draw the
 		 * table to add 'infoMessage' to datatable info label.
-		 * 
+		 *
 		 * This concatenate to the end of 'sPre' (message generated by
 		 * datatables or custom user function) the value of 'infoMessage' after
 		 * replacing '_SEL-VISIBLE-COUNT_' and '_SEL-COUNT_' variables.
@@ -749,7 +760,7 @@ var GvNIX_Selection;
 
 		/**
 		 * update graphically a row (node)
-		 * 
+		 *
 		 * @param nRow
 		 * @param selectec
 		 */
@@ -796,7 +807,7 @@ var GvNIX_Selection;
 
 		/**
 		 * Bind click event of a row to toggle select action
-		 * 
+		 *
 		 * @param nRow
 		 *            (node)
 		 */
@@ -903,7 +914,7 @@ var GvNIX_Selection;
 	/**
 	 * Store of all instances that have been created of TableTools, so one can
 	 * look up other (when there is need of a master)
-	 * 
+	 *
 	 * @property _aInstances
 	 * @type Array
 	 * @default []
@@ -922,7 +933,7 @@ var GvNIX_Selection;
 
 	/**
 	 * Store new GvNIX_Selection instance. Also register pending callback.
-	 * 
+	 *
 	 * @method _fnAddInstance
 	 * @static
 	 */
@@ -956,7 +967,7 @@ var GvNIX_Selection;
 
 	/**
 	 * Get the instance for a table node (or id if a string is given)
-	 * 
+	 *
 	 * @method fnGetInstance
 	 * @returns {Object} ID of table OR table node, for which we want the
 	 *          GvNIX_Seletion instance
@@ -985,7 +996,7 @@ var GvNIX_Selection;
 	 * given). This works including when datatable is not ready. In this case,
 	 * this will store the function and register it when selection support is
 	 * initialized for related datatable.
-	 * 
+	 *
 	 * @method fnGetInstance
 	 * @returns {Object} ID of table OR table node, for which we want the
 	 *          GvNIX_Seletion instance
@@ -1033,7 +1044,7 @@ var GvNIX_Selection;
 
 	/**
 	 * Name of this class
-	 * 
+	 *
 	 * @constant CLASS
 	 * @type String
 	 * @default TableTools
@@ -1042,12 +1053,12 @@ var GvNIX_Selection;
 
 	/**
 	 * TableTools version
-	 * 
+	 *
 	 * @constant VERSION
-	 * @type String
+	 * @type StrFing
 	 * @default See code
 	 */
-	GvNIX_Selection.VERSION = "1.0.2-SNAPSHOT";
+	GvNIX_Selection.VERSION = "${gvnix.version}";
 	GvNIX_Selection.prototype.VERSION = GvNIX_Selection.VERSION;
 
 	/** TODO Add as datatable feature * */
@@ -1057,9 +1068,9 @@ var GvNIX_Selection;
 /** *********************************************** */
 
 /**
- * 
+ *
  * Gets/initialize gvnix Selection support on a datatables
- * 
+ *
  * @param oSettings
  * @param iSelectionSettings
  * @return GvNIX_Selection object

@@ -13,6 +13,7 @@
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <!-- Datatables parameters -->
+  <jsp:directive.attribute name="uid" type="java.lang.String" required="false" rtexprvalue="true" description="Unique arbitrary id of the column, used in relation to the columnHead tag" />
   <jsp:directive.attribute name="title" type="java.lang.String" required="false" rtexprvalue="true" description="Name of the attribute of the current object being iterated object on, regardless the data source (DOM or AJAX) (precedence over label property)" />
   <jsp:directive.attribute name="defaultValue" type="java.lang.String" required="false" rtexprvalue="true" description="Default value if the property's value is null (Default : empty string)" />
   <jsp:directive.attribute name="sortable" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable sorting on column. (Default : true)" />
@@ -76,6 +77,7 @@
   		z="${z}"
         data-property="${property}" 
   		
+  		uid="${uid}"
   		title="${title}"
   		default="${defaultValue}"
   		sortable="${empty sortable or sortable}"

@@ -130,6 +130,12 @@ a.select_none {
 	background: url("../../images/datatables/book_delete.png") no-repeat scroll center center transparent;
 }
 
+a.select_toggle {
+	background: url("../../images/datatables/tick.png") no-repeat scroll center center transparent;
+}
+
+
+
 a.update_entity {
 	background: url("../../images/update.png") no-repeat scroll center center transparent;
 }
@@ -139,12 +145,21 @@ a.show_entity {
 a.create_entity {
 	background: url("../../images/create.png") no-repeat scroll center center transparent;
 }
+a.delete_entity {
+	background: url("../../images/delete.png") no-repeat scroll center center transparent;
+}
 a.submit_entity {
 	background: url("../../images/datatables/accept.png") no-repeat scroll center center transparent;
 }
 a.cancel_entity {
 	background: url("../../images/datatables/cancel.png") no-repeat scroll center center transparent;
 }
+
+table.dataTable tr.row_clicked td[class*="sorting_"],
+table.dataTable tr.row_clicked td {
+	background-color: #baffb4;
+}
+
 table.dataTable tr.row_editing_error td[class*="sorting_"],
 table.dataTable tr.row_editing_error td {
 	background-color: #ffa0a0;

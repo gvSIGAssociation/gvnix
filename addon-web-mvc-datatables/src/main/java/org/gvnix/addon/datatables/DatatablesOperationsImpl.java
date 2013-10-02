@@ -665,12 +665,17 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         jsList.add(new ImmutablePair<String, String>(
                 "js_jquery_datatables_edit_url",
                 "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.editing.js"));
-        
+
+        // Add jquery.dataTables.ext.gvnix.rowclick.js
+        jsList.add(new ImmutablePair<String, String>(
+                "js_jquery_datatables_rowclik_url",
+                "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.rowclick.js"));
+
         // Add jquery.dataTables.ext.gvnix.detail.js
         jsList.add(new ImmutablePair<String, String>(
                 "js_jquery_datatables_detail_url",
                 "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.detail.js"));
-        
+
         // Add jquery.dataTables.ext.gvnix.js
         jsList.add(new ImmutablePair<String, String>(
                 "js_jquery_datatables_custom_api_url",

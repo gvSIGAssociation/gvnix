@@ -13,7 +13,7 @@
   <!-- ====================================== -->
   <!-- Extra features -->
   <!-- ====================================== -->
-  
+
   <jsp:directive.attribute name="detail" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if detail datatables for N:M relations of this controller entity should be showed related for this datatables" />
   <jsp:directive.attribute name="detailsList" type="java.util.Collection" required="false" rtexprvalue="true" description="Detail datatables references list to show for N:M relations of this controller entity related for this datatables (List&lt;Map&lt;String, String&gt;&gt; with path and mappedBy keys) (by default value set in controller)" />
   <jsp:directive.attribute name="detailParentId" type="java.lang.String" required="false" rtexprvalue="true" description="Parent datatables identifier to be connected with detail datatables: if parent row selected, load their own details (by default value set in table.tagx)" />
@@ -29,54 +29,54 @@
     <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
         <jsp:doBody />
     </util:panel>
-    
+
     <!-- Get datatable details list from model (set on controller) if not set directly on tag -->
     <c:if test="${not empty detailsList}">
     	<c:set value="${detailsList}" var="detailsInfo" />
     </c:if>
-    
+
     <!-- Get datatable parent id from table.tagx if not set directly on tag -->
     <c:if test="${not empty detailParentId}">
     	<c:set value="${detailParentId}" var="parentId" />
     </c:if>
-	
+
     <!-- Show detail if not manually disabled and datatables details list defined -->
     <c:if test="${(empty detail or detail) and fn:length(detailsInfo) gt 0}">
-    
+
     	<!-- Generate identifiers with random value to avoid collisions when multiple datatables levels -->
 		<jsp:scriptlet>
 		jspContext.setAttribute("currentRandomInt", new Random(System.currentTimeMillis()).nextInt(99999));
 		</jsp:scriptlet>
     	<c:set value="${id}_${currentRandomInt}_detail" var="mainDatatablesId" />
-    	
+
+
+		<script type="text/javascript">
+			var ${mainDatatablesId}_received_bodies = [];
+		</script>
     	<!-- Start the JQuery HTML structure to show tabs -->
-    	<div id="${mainDatatablesId}"> 
-	    	
+    	<div id="${mainDatatablesId}">
 	    	<!-- Tabs headers -->
-	    	<!-- <ul><li><a href="#tabs-1">Tabs 1</a></li></ul> -->
 	    	<ul>
 		    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
-		    	<c:set value="${mainDatatablesId}_${detailIndex.index}" var="datatablesId" />
-		    	<li><a href="#${datatablesId}"><span><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${detailItem.property}" htmlEscape="false" /></span></a></li>
+		    	<c:set var="datatablesId">#${mainDatatablesId}_${detailIndex.index}</c:set>
+		    	<li><a href="${datatablesId}"><span><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${detailItem.property}" htmlEscape="false" /></span></a></li>
 			</c:forEach>
 			</ul>
 
-			<script type="text/javascript">
-				var ${mainDatatablesId}_received_bodies = [];
-			</script>
 
 			<!-- Error message when detail request fails -->
 	    	<spring:message code="datatables_detail_get_error" javaScriptEscape="true" text="Error getting detail datatable from server." var="datatablesDetailErrorMessage" />
-	    
+
 	    	<!-- Tabs contents -->
 	    	<!-- <div id="tabs-1"></div> -->
 		    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
-		
+
 				<!-- Generate this detail identifie with collection index to avoid collisions when multiple datatables tabs -->
 		    	<c:set value="${mainDatatablesId}_${detailIndex.index}" var="datatablesId" />
-		    
+
 			    <div id="${datatablesId}">
 			    <!-- Block to include one detail -->
+			    <span></span>
 			    </div>
 
 			    <spring:url value="${detailItem.path}/list" var="datatablesDetailUrl">
@@ -84,37 +84,29 @@
 			    </spring:url>
 
 			    <script type="text/javascript">
-			    
-					function callbackFunct${datatablesId} (selection, action, trId){
-						var selectCount = selection.fnVisibleRowsSelecteds();
-						// action puede ser 'all', 'none', 'select' o 'deselect'
-						// trId es el id del registro (null para 'all' y 'none')
+
+					function callbackFunct${datatablesId} (selection, trId){
 						if (trId){
 							// obter el nodo 'tr' de la fila afectada por el cambio
 							var trNode = selection.fnGetRowById(trId);
 							if (trNode){
 								// hacer cosas
-								if (action == 'select') {
-									loadDetail(trId, "${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesDetailUrl}", "${detailItem.mappedBy}", trId) , "${datatablesDetailErrorMessage}", ${mainDatatablesId}_received_bodies, ${fn:length(detailsInfo)});
-								} else {
-									hideDetail("${datatablesId}");
-								}
+								loadDetail(trId, "${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesDetailUrl}", "${detailItem.mappedBy}", trId) , "${datatablesDetailErrorMessage}", ${mainDatatablesId}_received_bodies, ${fn:length(detailsInfo)});
 							} else {
 								// el nodo 'tr' no esta accesible (modo AJAX y registro en otra pagina)
 							}
 						}
 					}
-					
+
 					hideDetail("${mainDatatablesId}");
-					
+
 					<c:if test="${datatablesStandardMode}">
-						GvNIX_Selection.fnAddSelectionChangeCallback("${parentId}", callbackFunct${datatablesId});
+						GvNIX_RowClick.fnAddRowClickCallback("${parentId}", callbackFunct${datatablesId});
 					</c:if>
-					
+
 			    </script>
-			    
+
 			</c:forEach>
-	
 			<c:if test="${not datatablesStandardMode}">
 			<script type="text/javascript">
 				function rowCallback(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
@@ -128,16 +120,16 @@
 				}
 			</script>
 			</c:if>
-		
-		<!-- End the JQuery HTML structure to show tabs -->		
+
+		<!-- End the JQuery HTML structure to show tabs -->
 		</div>
-		
+
 		<!-- Initialize the JQuery HTML structure to draw it as tabs -->
 		<script type="text/javascript">
 		$(showDetailTabs("${mainDatatablesId}"));
 		</script>
-    
+
     </c:if>
-    
+
   </c:if>
 </jsp:root>

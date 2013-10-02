@@ -14,7 +14,7 @@ function loadDetail(trId, detailDatatableId, mainDatatablesId, url, errorMessage
 		if (error.status != 0) {
 			alert(errorMessage + ' (Error: ' + error.status + ', URL: ' + url + ').');
 		}
-		$('#' + mainDatatablesId).hide();
+		jQuery('#' + mainDatatablesId).hide();
 	});
 }
 
@@ -26,8 +26,10 @@ function received(bodyId, mainDatatablesId, bodyReceived, received_bodies, lengt
 			var $container = jQuery('#'+value.id);
 			$container.html(value.body);
 		});
-		received_bodies = [];
-		$('#' + mainDatatablesId).show();
+		received_bodies.splice(0,received_bodies.length);
+		var tab = jQuery('#' + mainDatatablesId);
+		tab.tabs('refresh');
+		tab.show();
 	}
 }
 
@@ -35,11 +37,11 @@ function received(bodyId, mainDatatablesId, bodyReceived, received_bodies, lengt
  * Hide a detail datatables content.
  */
 function hideDetail(detailDatatableId) {
-	$('#' + detailDatatableId).hide();
+	jQuery('#' + detailDatatableId).hide();
 }
 
 /**
- * generate url to obtain some detail. 
+ * generate url to obtain some detail.
  */
 function getDetailUrl(baseUrl, mappedBy, rowId) {
 	return baseUrl + '&' + mappedBy + '=' + rowId + '&datatablesMappedValue=' + rowId;
@@ -49,7 +51,7 @@ function getDetailUrl(baseUrl, mappedBy, rowId) {
  * Initialize the JQuery HTML structure to draw it as tabs.
  */
 function showDetailTabs(mainDatatablesId) {
-	var tabs = $("#" + mainDatatablesId).tabs();
+	var tabs = jQuery("#" + mainDatatablesId).tabs();
 	tabs.find( ".ui-tabs-nav" ).sortable({
 		axis: "x",
 		stop: function() {

@@ -2513,77 +2513,128 @@ public class DatatablesMetadata extends
 
             List<FieldMetadata> entityFields = entityMemberDetails.getFields();
 
+            // For each fields
             for (int i = 0; i < fieldNames.length; i++) {
 
                 String fieldName = fieldNames[i];
+                boolean found = false;
 
                 for (FieldMetadata entityField : entityFields) {
 
                     if (entityField.getFieldName().getSymbolName()
                             .equals(fieldName)) {
+                        found = true;
 
-                        AnnotationMetadata entityFieldOneToManyAnnotation = entityField
-                                .getAnnotation(new JavaType(
-                                        "javax.persistence.OneToMany"));
-
-                        if (entityFieldOneToManyAnnotation != null
-                                && entityFieldOneToManyAnnotation
-                                        .getAttribute("mappedBy") != null) {
-
-                            String entityFieldOneToManyAnnotationMappedBy = entityFieldOneToManyAnnotation
-                                    .getAttribute("mappedBy").getValue()
-                                    .toString();
-
-                            if (entityFieldOneToManyAnnotationMappedBy != null) {
-
-                                // Get type of list (entity): if not a list, do
-                                // nothing
-                                JavaType entityFieldBaseType = entityField
-                                        .getFieldType().getBaseType();
-                                if (entityFieldBaseType != null) {
-
-                                    JavaTypeMetadataDetails javaTypeMetadataDetails = webMetadataService
-                                            .getJavaTypeMetadataDetails(
-                                                    entityFieldBaseType,
-                                                    entityMemberDetails,
-                                                    entityIdentifier
-                                                            .getDeclaredByMetadataId());
-
-                                    bodyBuilder
-                                            .appendFormalLine("details = new HashMap<String, String>();");
-
-                                    bodyBuilder
-                                            .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
-                                    bodyBuilder
-                                            .appendFormalLine("details.put(\"path\", \""
-                                                    .concat(javaTypeMetadataDetails
-                                                            .getControllerPath())
-                                                    .concat("\");"));
-                                    bodyBuilder
-                                            .appendFormalLine("details.put(\"property\", \""
-                                                    .concat(entityField
-                                                            .getFieldName()
-                                                            .getSymbolName())
-                                                    .concat("\");"));
-                                    bodyBuilder
-                                            .appendFormalLine("// Property name in detail entity with the relation to master entity");
-                                    bodyBuilder
-                                            .appendFormalLine("details.put(\"mappedBy\", \""
-                                                    .concat(entityFieldOneToManyAnnotationMappedBy)
-                                                    .concat("\");"));
-
-                                    bodyBuilder
-                                            .appendFormalLine("detailsInfo.add(details);");
-                                }
-                            }
-                        }
+                        buildFieldDetailInfo(bodyBuilder, entityField);
                     }
+                }
+                if (!found) {
+                    throw new IllegalStateException(
+                            String.format(
+                                    "%s: Can't create datatables detail information: property %s.%s not found",
+                                    getAspectName().getFullyQualifiedTypeName(),
+                                    entity.getFullyQualifiedTypeName(),
+                                    fieldName));
+
                 }
 
             }
             bodyBuilder
                     .appendFormalLine("uiModel.addAttribute(\"detailsInfo\", detailsInfo);");
         }
+    }
+
+    /**
+     * Build method code to load detailsInfo with a property information
+     * 
+     * @param bodyBuilder
+     * @param entityField
+     */
+    private void buildFieldDetailInfo(InvocableMemberBodyBuilder bodyBuilder,
+            FieldMetadata entityField) {
+        AnnotationMetadata entityFieldOneToManyAnnotation = entityField
+                .getAnnotation(new JavaType("javax.persistence.OneToMany"));
+
+        // Check property annotation (@OneToMany)
+        if (entityFieldOneToManyAnnotation == null) {
+            throw new IllegalStateException(
+                    String.format(
+                            "%s: Can't create datatables detail information: property %s.%s is not OneToMany",
+                            getAspectName().getFullyQualifiedTypeName(), entity
+                                    .getFullyQualifiedTypeName(), entityField
+                                    .getFieldName().getSymbolName()));
+
+        }
+        if (entityFieldOneToManyAnnotation.getAttribute("mappedBy") == null) {
+            throw new IllegalStateException(
+                    String.format(
+                            "%s: Can't create datatables detail information: property %s.%s has no mappedBy information",
+                            getAspectName().getFullyQualifiedTypeName(), entity
+                                    .getFullyQualifiedTypeName(), entityField
+                                    .getFieldName().getSymbolName()));
+
+        }
+
+        String entityFieldOneToManyAnnotationMappedBy = entityFieldOneToManyAnnotation
+                .getAttribute("mappedBy").getValue().toString();
+
+        // Check @OneToMay mappedBy value
+        if (entityFieldOneToManyAnnotationMappedBy == null) {
+            throw new IllegalStateException(
+                    String.format(
+                            "%s: Can't create datatables detail information: property %s.%s has invalid mappedBy information",
+                            getAspectName().getFullyQualifiedTypeName(), entity
+                                    .getFullyQualifiedTypeName(), entityField
+                                    .getFieldName().getSymbolName()));
+
+        }
+
+        // Get type of list (entity): if not a list, do
+        // nothing
+        JavaType entityFieldBaseType = entityField.getFieldType().getBaseType();
+
+        // Get target entity based on property type: ej Set<Pet> --> Pet
+        if (entityFieldBaseType == null) {
+            throw new IllegalStateException(
+                    String.format(
+                            "%s: Can't create datatables detail information: property %s.%s can't identify target entity",
+                            getAspectName().getFullyQualifiedTypeName(), entity
+                                    .getFullyQualifiedTypeName(), entityField
+                                    .getFieldName().getSymbolName()));
+        }
+
+        // Locate target entity metadata
+        JavaTypeMetadataDetails javaTypeMetadataDetails = webMetadataService
+                .getJavaTypeMetadataDetails(entityFieldBaseType,
+                        entityMemberDetails,
+                        entityIdentifier.getDeclaredByMetadataId());
+
+        // Check if metadata found
+        if (javaTypeMetadataDetails == null) {
+            throw new IllegalStateException(
+                    String.format(
+                            "%s: Can't create datatables detail information: property %s.%s can't get target entity metadata",
+                            getAspectName().getFullyQualifiedTypeName(), entity
+                                    .getFullyQualifiedTypeName(), entityField
+                                    .getFieldName().getSymbolName()));
+        }
+
+        // Generate datailInfo code for current property
+        bodyBuilder
+                .appendFormalLine("details = new HashMap<String, String>();");
+
+        bodyBuilder
+                .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
+        bodyBuilder.appendFormalLine("details.put(\"path\", \"".concat(
+                javaTypeMetadataDetails.getControllerPath()).concat("\");"));
+        bodyBuilder.appendFormalLine("details.put(\"property\", \"".concat(
+                entityField.getFieldName().getSymbolName()).concat("\");"));
+        bodyBuilder
+                .appendFormalLine("// Property name in detail entity with the relation to master entity");
+        bodyBuilder.appendFormalLine("details.put(\"mappedBy\", \"".concat(
+                entityFieldOneToManyAnnotationMappedBy).concat("\");"));
+
+        bodyBuilder.appendFormalLine("detailsInfo.add(details);");
     }
 
     /**
