@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_addon-web-mvc"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+
+  <title xml:lang="es">Comandos del add-on Web MVC</title>
+
+  <para xml:lang="es">Para una descripción detallada de las características
+  del add-on consultar la documentación del <link linkend="addon-web-mvc">
+  add-on Web MVC</link>.</para>
+
+  <table>
+    <title xml:lang="es">Comandos de add-on Web MVC</title>
+
+    <tgroup cols="2">
+      <colspec colwidth="145" />
+      <colspec colwidth="300" />
+      <thead>
+        <row>
+          <entry xml:lang="es" align="center">Comando</entry>
+
+          <entry xml:lang="es" align="center">Descripción</entry>
+        </row>
+      </thead>
+
+      <tbody>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-setup">web mvc batch setup</link></entry>
+
+          <entry xml:lang="es">Instala el soporte para la funcionalidad Web Batch</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-add">web mvc batch add</link></entry>
+
+          <entry xml:lang="es">Genera los métodos de de persistencia en bloque para un controlador.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-all">web mvc batch all</link></entry>
+
+          <entry xml:lang="es">Genera los métodos de de persistencia en bloque para todos los controladores.</entry>
+        </row>
+        <row>
+          <entry></entry>
+          <entry xml:lang="es"></entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup">web mvc jquery setup</link></entry>
+
+          <entry xml:lang="es">Instala los artefacto necesario para usar vistas usando la librería JavaScript jQuery.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-update-tags">web
+          mvc jquery update tags</link></entry>
+
+          <entry xml:lang="es">Actualiza los artefactos, ya instalados en el add-on, por los
+          actuales.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-add">web mvc jquery add</link></entry>
+
+          <entry xml:lang="es">Convierte las vistas de un controlador a jQuery.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-all">web mvc jquery all</link></entry>
+
+          <entry xml:lang="es">Convierte todas las vistas a jQuery.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <section xml:id="apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-setup">
+    <title>web mvc batch setup</title>
+
+    <para xml:lang="es">Instala las dependencias necesarias
+    y configura el proyecto para dar soporte a las peticiones de persistencia en bloque.</para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-add">
+    <title>web mvc batch add</title>
+
+    <para xml:lang="es">Añade los métodos al controlador para peticiones de persistencia en bloque.</para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--controller</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido] [Clase controlador] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Controlador destino.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>--service</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Opcional] [Clase de servicios de persistencia] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Añade los métodos al todos los controladores para peticiones de persistencia en bloque.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    </para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-all">
+    <title>web mvc batch all</title>
+
+    <para xml:lang="es">Crea el servicio de persistencia en bloque para
+    todas las entidades de la aplicación.</para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup">
+    <title>web mvc jquery setup</title>
+
+    <para xml:lang="es">Instala los artefactos necesario para usar vistas
+    que use la librería jQuery.</para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-update-tags">
+    <title>web mvc jquery update tags</title>
+
+	<para xml:lang="es">Actualiza todos los artefactos necesario para que el add-on funcione.
+	Este comando es útil cuando se actualiza la versión del add-on y se desea utilizar los
+	cambios en los tagx u otros artefactos de la nueva versión.</para>
+
+	<para xml:lang="es"><emphasis>Advertencia:</emphasis>Al ejecutar este comando,
+	<emphasis>los artefactos del proyecto serán reescritos</emphasis>. Cualquier
+	cambio sobre los originales se perderá. Por lo tanto, es conveniente disponer
+	de una <emphasis>copia de seguridad o un sistema de control de versiones</emphasis>
+	para revisar las diferencias entre los artefactos anteriores y la actualización.</para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-add">
+    <title>web mvc jquery add</title>
+
+    <para xml:lang="es">Convierte las vistas de un controlador a jQuery.</para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--type</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido] [Clase controlador] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Controlador cuyas vistas se desea convertir a jQuery.</para>
+            </listitem>
+          </varlistentry>
+      </variablelist>
+    </para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-all">
+    <title>web mvc jquery all</title>
+
+    <para xml:lang="es">Convierte las vistas de todos los controladores a jQuery.</para>
+  </section>
+
+</section>

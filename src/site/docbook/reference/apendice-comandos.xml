@@ -11,6 +11,8 @@
 
   <xi:include href="apendice-comandos_addon-occ.xml" />
 
+  <xi:include href="apendice-comandos_addon-jpa.xml" />
+
   <xi:include href="apendice-comandos_addon-theme.xml" />
 
   <xi:include href="apendice-comandos_addon-web-dialog.xml" />
@@ -20,7 +22,7 @@
   <xi:include href="apendice-comandos_addon-web-screen-pattern.xml" />
 
   <xi:include href="apendice-comandos_addon-cit-security.xml" />
-	
+
   <xi:include href="apendice-comandos_addon-web-report.xml" />
 
   <xi:include href="apendice-comandos_addon-service.xml" />
@@ -30,6 +32,8 @@
   <xi:include href="apendice-comandos_addon-dynamic_config.xml" />
 
   <xi:include href="apendice-comandos_addon-web-mvc-binding.xml" />
+
+  <xi:include href="apendice-comandos_addon-web-mvc.xml" />
 
   <xi:include href="apendice-comandos_addon-web-mvc-datatables.xml" />
 </chapter>

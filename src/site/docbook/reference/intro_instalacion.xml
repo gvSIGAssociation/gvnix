@@ -18,18 +18,14 @@
 
     <itemizedlist>
       <listitem>
-        <para>Java JDK 5, 6 o 7 (<link
-        xlink:href="http://www.oracle.com/technetwork/java/javase/downloads/jdk6-jsp-136632.html">Más información</link>).</para>
+        <para>Versión más actual de Java JDK 6 instalado en el sistema (<link
+        xlink:href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Más información</link>).</para>
       </listitem>
 
       <listitem>
-        <para xlink:href="http://maven.apache.org/">Maven 2.0.9 o superior
+        <para xlink:href="http://maven.apache.org/">Maven 3.0.x o superior
         (<link
         xlink:href="http://maven.apache.org/">http://maven.apache.org/</link>).</para>
-
-        <para xlink:href="http://maven.apache.org/"><emphasis
-        role="bold">Importante</emphasis>: usar las versiones de Maven 2.0.x o
-        Maven 3.0.x. La versión Maven 2.2.x no es compatible.</para>
       </listitem>
 
       <listitem>
@@ -163,7 +159,7 @@ OS name: "linux", version: "3.2.0-30-generic", arch: "amd64", family: "unix"</pr
 
           <programlisting>roo-gvNIX&gt; <emphasis role="bold">proxy configuration</emphasis>
                      *** Your system has no proxy setup ***
-http://download.oracle.com/javase/6/docs/technotes/guides/net/proxies.html offers 
+http://download.oracle.com/javase/6/docs/technotes/guides/net/proxies.html offers
 useful information.
 For most people, simply edit /etc/java-6-openjdk/net.properties (or equivalent) and
 set the java.net.useSystemProxies=true property to use your operating system-defined
@@ -335,13 +331,13 @@ export PATH=$JAVA_HOME/bin:$M2:$GVNIX_HOME/bin:$PATH</programlisting>
       <para>Con esto se abrirá la consola de gvNIX y se mostrará algo similar
       a lo siguiente:</para>
 
-	    <programlisting>    ____  ____  ____  
-			   / __ \/ __ \/ __ \ 
-			  / /_/ / / / / / / / 
+	    <programlisting>    ____  ____  ____
+			   / __ \/ __ \/ __ \
+			  / /_/ / / / / / / /
 			 / _, _/ /_/ / /_/ /   gvNIX x.x.x distribution
 			/_/ |_|\____/\____/    x.x.x-RELEASE [rev xxxxxxx]
-			
-			
+
+
 			Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
 			roo-gvNIX&gt;
 		</programlisting>

@@ -13,9 +13,9 @@
 	almacenar la información en, por ejemplo, una base de datos.
 	Este acceso se puede estructurar en una sola capa en la que las entidades definen tanto
 	el modelo de los datos, como sus métodos de interacción con la base de datos y la lógica
-	de negocio utilizando entonces un modelo llamado <emphasis>Registro Activo</emphasis>. 
+	de negocio utilizando entonces un modelo llamado <emphasis>Registro Activo</emphasis>.
 	Existen otros casos más clásicos como la estructuración en una capa de entidades, otra
-	de acceso a datos (DAO) y una última de servicios con la lógica de negocio; todo ello 
+	de acceso a datos (DAO) y una última de servicios con la lógica de negocio; todo ello
 	llamado <emphasis>Servicios y Repositorios</emphasis>.
 	Este capítulo se centrará en la generación de la capa de entidades ya que es el método
 	que se utiliza habitualmente en las aplicaciones desarrolladas con gvNIX y para el cual
@@ -98,11 +98,11 @@ public class Entity1 {
     comandos</title>
 
     <para xml:lang="es">Desde el intérprete de comandos se puede crear
-    entidades de forma sencilla con los comandos: <command>entity</command> y
+    entidades de forma sencilla con los comandos: <command>entity jpa</command> y
     <command>field</command>.</para>
 
     <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_entity">
-      <title xml:lang="es">Comando entity</title>
+      <title xml:lang="es">Comando entity jpa</title>
 
       <para xml:lang="es">Este comando crea una nueva entidad en el
       proyecto. Requiere como mínimo definir el parámetro
@@ -127,7 +127,7 @@ public class Entity1 {
         </varlistentry>
       </variablelist>
 
-      <para xml:lang="es">Entre los principales parámetros opcionales 
+      <para xml:lang="es">Entre los principales parámetros opcionales
       (notar que hay más) se encuentran:</para>
 
       <variablelist>
@@ -135,13 +135,13 @@ public class Entity1 {
           <term xml:lang="es">--activeRecord</term>
 
           <listitem>
-            <para xml:lang="es">Generar los métodos de creación, 
+            <para xml:lang="es">Generar los métodos de creación,
             lectura, actualización y borrado (CRUD) para esta
             entidad. Esto implica el uso de un patrón de entidades
             del tipo registro activo.</para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term xml:lang="es">--entityName</term>
 
@@ -152,7 +152,7 @@ public class Entity1 {
             </para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term xml:lang="es">--identifierType</term>
 
@@ -193,7 +193,7 @@ public class Entity1 {
             otra base de datos.</para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term xml:lang="es">--schema</term>
 
@@ -202,7 +202,7 @@ public class Entity1 {
             se encontrará la tabla asociada con la entidad.</para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term xml:lang="es">--table</term>
 
@@ -221,7 +221,7 @@ public class Entity1 {
             usando JUnit.</para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term xml:lang="es">--versionColumn</term>
 
@@ -231,7 +231,7 @@ public class Entity1 {
             optimista basado en número de versión.</para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term xml:lang="es">--versionType</term>
 
@@ -244,8 +244,8 @@ public class Entity1 {
       </variablelist>
 
       <para xml:lang="es">El resto de las opciones podemos verlas con el
-      autocompletado del comando escribiendo <emphasis>--</emphasis>, 
-      en la documentación oficial de Roo o 
+      autocompletado del comando escribiendo <emphasis>--</emphasis>,
+      en la documentación oficial de Roo o
       usando el comando <command>help entity</command>.</para>
 
       <important>
@@ -303,7 +303,7 @@ public class Entity1 {
             direcciones de correo electrónico.</para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term xml:lang="es">field embedded</term>
 
@@ -318,11 +318,11 @@ public class Entity1 {
 
           <listitem xml:lang="es">
             <para>Crea un campo de tipo enumerado. El tipo enumerado
-            debe haber sido creado previamente con el comando 
+            debe haber sido creado previamente con el comando
             <emphasis>enum type</emphasis>.</para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term xml:lang="es">field file</term>
 
@@ -367,7 +367,7 @@ public class Entity1 {
       </variablelist>
 
       <para>Cada uno de estos comandos admiten bastantes parámetros que
-      permiten definir múltiples comportamientos especiales, algunos aplicables a todos los comandos 
+      permiten definir múltiples comportamientos especiales, algunos aplicables a todos los comandos
       y otros específicos solo para algunos de ellos. Entre los generales que aplicar
       a la mayoría podemos encontrar los siguientes:</para>
 
@@ -378,7 +378,7 @@ public class Entity1 {
 
           <listitem>
             <para xml:lang="es">Clase entidad dondecrear el campo.
-            Admite el uso de <literal>~</literal> para identificar al 
+            Admite el uso de <literal>~</literal> para identificar al
             paquete base del proyecto y tiene autocompletado. No es
             necesario de especificar si acabamos de crear una entidad.</para>
           </listitem>
@@ -409,7 +409,7 @@ public class Entity1 {
             los valores nulos.</para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term>--regexp</term>
 
@@ -426,7 +426,7 @@ public class Entity1 {
             <para xml:lang="es">Limitaciones de tamaño.</para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term>--transient</term>
 
@@ -436,7 +436,7 @@ public class Entity1 {
             ni obtiene de ella.</para>
           </listitem>
         </varlistentry>
-        
+
         <varlistentry>
           <term>--unique</term>
 
@@ -449,7 +449,7 @@ public class Entity1 {
 
       <para xml:lang="es">Existen más opciones dependiendo del tipo de dato,
       para más información ver la ayuda de la consola o acceder a la documentación
-      oficial de Roo en 
+      oficial de Roo en
       <link xlink:href="http://static.springsource.org/spring-roo/reference/html/">
       http://static.springsource.org/spring-roo/reference/html/</link></para>
 
@@ -501,7 +501,7 @@ public class Entity1 {
           <para xml:lang="es">Pizza:</para>
 
           <programlisting>~.domain.Base roo-gvNIX&gt; <command>entity jpa --class ~.domain.Pizza --testAutomatically</command>
-~.domain.Pizza roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2 
+~.domain.Pizza roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2
 		--comment "Nombre de la pizza" --column pizza_nombre --regexp [A-Za-z0-9].*</command>
 ~.domain.Pizza roo-gvNIX&gt; <command>field number --fieldName price --type java.lang.Float</command>
 ~.domain.Pizza roo-gvNIX&gt; <command>field set --fieldName toppings --type ~.domain.Topping</command>
@@ -535,7 +535,7 @@ public class Pizza {
     private Float price;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    private Set&lt;Topping&gt; toppings = 
+    private Set&lt;Topping&gt; toppings =
       new HashSet&lt;Topping&gt;();
 
     @ManyToOne(targetEntity = Base.class)
@@ -589,7 +589,7 @@ public class Pizza {
 
     <para>Es importante destacar que el objetivo de utilizar anotaciones
     es permitir que el proyecto se pueda gestionar codificando las clases
-    con cualquier IDE. Entonces al arrancar la consola se generará toda la 
+    con cualquier IDE. Entonces al arrancar la consola se generará toda la
     infraestructura necesaria para la persistencia, validación, etc</para>
 
     <para xml:lang="es">Entre las anotaciones que se pueden utilizar en la
@@ -641,8 +641,8 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
     </important>
 
     <para>Consultar la <link
-    xlink:href="http://static.springsource.org/spring-roo/reference/html/">
-    documentación oficial de Roo</link> 
+    xlink:href="http://docs.spring.io/spring-roo/reference/html/">
+    documentación oficial de Roo</link>
     para un detalle exhaustivo de las anotaciones.</para>
   </section>
 
@@ -687,7 +687,7 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
 
     <para xml:lang="es">A diferencia de la creación de entidades, la
     modificación del modelo del dominio debe realizarse modificando
-    la clase Java de la entidad, por ejemplo, mediante un IDE de 
+    la clase Java de la entidad, por ejemplo, mediante un IDE de
     desarrollo.</para>
 
     <variablelist>
@@ -784,7 +784,7 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
     <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_tablas">
       <title>Definir un nombre de tabla</title>
 
-      <para>Con la anotación de clase 
+      <para>Con la anotación de clase
       <classname>@RooJpaActiveRecord(..., table = "table_name")</classname>
       se puede definir el nombre de la tabla donde se guardará la información
       asociada con la entidad.</para>
@@ -818,7 +818,7 @@ public class Entity1 {
 
           <listitem>
             <para>Indica el nombre de la columna de la base de datos en donde se almacenará el
-            valor del atributo. Si se omite esta anotación se aplicará una convención 
+            valor del atributo. Si se omite esta anotación se aplicará una convención
             por la que el nombre de la columna será el mismo que el del atributo de la clase.</para>
           </listitem>
         </varlistentry>
@@ -851,13 +851,13 @@ public class Entity1 {
 
         <varlistentry>
           <term><classname><link
-          xlink:href="http://docs.oracle.com/javaee/6/docs/api/javax/persistence/JoinTable.html">@JoinTable</link></classname>,
+          xlink:href="http://docs.oracle.com/javaee/6/api/javax/persistence/JoinTable.html">@JoinTable</link></classname>,
           <classname><link
-          xlink:href="http://docs.oracle.com/javaee/6/docs/api/javax/persistence/OneToMany.html">@OneToMany</link></classname>,
+          xlink:href="http://docs.oracle.com/javaee/6/api/javax/persistence/OneToMany.html">@OneToMany</link></classname>,
           <classname><link
-          xlink:href="http://docs.oracle.com/javaee/6/docs/api/javax/persistence/ManyToMany.html">@ManyToMany</link></classname>,
+          xlink:href="http://docs.oracle.com/javaee/6/api/javax/persistence/ManyToMany.html">@ManyToMany</link></classname>,
           <classname><link
-          xlink:href="http://docs.oracle.com/javaee/6/docs/api/javax/persistence/OrderBy.html">@OrderBy</link></classname></term>
+          xlink:href="http://docs.oracle.com/javaee/6/api/javax/persistence/OrderBy.html">@OrderBy</link></classname></term>
 
           <listitem>
             <para>Define la correspondencia de una asociación
@@ -1034,7 +1034,7 @@ public class Entity1 {
         <programlisting>
 @RooJavaBean
 @RooToString
-@RooJpaActiveRecord(identifierField="ent1Id", 
+@RooJpaActiveRecord(identifierField="ent1Id",
         identifierType=Long.class, identifierColumn="ENT_ID")
 public class Entity1 {
 
@@ -1042,7 +1042,7 @@ public class Entity1 {
 
 }</programlisting>
       </example>
-      
+
        <para>Observar que todas estas características se pueden
        especificar en el momento de la creación de la entidad
        mediante el comando <emphasis>entity</emphasis>.</para>
@@ -1060,7 +1060,7 @@ public class Entity1 {
        los identificador para cada Entidad se puede utilizar el atributo
        <emphasis>--sequenceName</emphasis> del comando <emphasis>entity</emphasis>.
        Si la entidad ya fue creada con anterioridad y no se desea volver a crearla
-       mediante el comando con la nueva característica, 
+       mediante el comando con la nueva característica,
        modificar la anotación @RooJpaActiveRecord de la siguiente forma:</para>
 
           <programlisting>
@@ -1095,8 +1095,8 @@ public class Entity1 {
        Para más información sobre la optimización de generadores de
        secuencia consultar la <link
        xlink:href="http://docs.jboss.org/hibernate/core/3.3/reference/en/html/mapping.html#mapping-declaration-id-enhanced-optimizers">documentación
-       de Hibernate</link>. Es posible modificar este comportamiento 
-       haciendo push-in de la propiedad id y añadiendo 
+       de Hibernate</link>. Es posible modificar este comportamiento
+       haciendo push-in de la propiedad id y añadiendo
        a la anotación <emphasis>@SequenceGenerator</emphasis> el atributo
        <emphasis>allocationSize = 1.</emphasis></para>
 
@@ -1105,25 +1105,25 @@ public class Entity1 {
     <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_campo-control-optimista">
       <title>Campo para el control de concurrencia optimista.</title>
 
-      <para>En la ingeniería directa, por defecto, para cada entidad 
+      <para>En la ingeniería directa, por defecto, para cada entidad
       se genera un campo de control de concurrencia
       optimista con nombre <literal>version</literal> y de tipo
       <classname>java.lang.Integer</classname></para>
-      
+
 	<para>El control por versión utiliza números de versión, o sellos de fecha
 	(timestamps), para detectar actualizaciones en conflicto y prevenir la
 	pérdida de actualizaciones. Cuando 2 usuarios actualizan el mismo registro de
 	forma simultánea, sin control de concurrencia, los cambios del segundo usuario
 	en actualizar sobreescriben los datos actualizados por el primer, dando la
 	sensación al primer usuario que sus datos se perdieron o nunca existieron.</para>
-	
+
 	<para>En el control de concurrencia por versión hay una columna <emphasis>Version</emphasis> en la
 	tabla de base de datos que se mapea a un atributo de la entidad anotado con
 	<emphasis>@Version</emphasis>. Al hacer update o delete se añade al WHERE la clave primaria
 	y la comparación de versión, <emphasis>si version != VERSION_DB</emphasis> no se actualiza nada.
 	</para>
-	
-	<para>Observar que todas estas características se pueden especificar en el 
+
+	<para>Observar que todas estas características se pueden especificar en el
 	momento de la creación de la entidad mediante el comando entity.
 	Para ajustarlo posteriormente existen otras opciones:</para>
 
@@ -1135,7 +1135,7 @@ public class Entity1 {
           <programlisting>
 @RooJavaBean
 @RooToString
-@RooJpaActiveRecord(versionField="version", 
+@RooJpaActiveRecord(versionField="version",
         versionType=Long.class, versionColumn="ENT_ID")
 public class Entity1 {
 
@@ -1160,24 +1160,24 @@ public class Entity1 {
         </listitem>
 
       </orderedlist>
-      
+
       <para>Mas adelante se verán otros mecanismos para realizar un
       control de concurrencia optimista. Para más información
       consultar el comando <command><link
       linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">
       occ checksum set</link></command>.</para>
-          
+
     </section>
 
     <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">
       <title xml:lang="es">Regeneración de la Base de datos en cada
       arranque.</title>
 
-      <para xml:lang="es">Recordar que por defecto, en la ingeniería directa, 
+      <para xml:lang="es">Recordar que por defecto, en la ingeniería directa,
       la configuración que se genera
       <emphasis role="bold">reconstruye la base de datos en cada ejecución de
       la aplicación</emphasis>. Si se desea modificar este comportamiento
-      consultar la sección 
+      consultar la sección
       <link linkend="guia-desarrollo_acceso-datos_actualizacion-esquema">
       Actualización automática del esquema</link>
       .</para>
@@ -1185,11 +1185,11 @@ public class Entity1 {
 
     <section>
       <title>Creación de una nueva entidad sin comandos</title>
-      
+
       <para>En el ejemplo que se está siguiendo a lo largo de la documentación,
       se puede definir una nueva entidad <emphasis>Repartidor</emphasis>
       creando la siguiente clase Java. También se puede realizar
-      su creación mediante los comandos <emphasis>entity</emphasis> y 
+      su creación mediante los comandos <emphasis>entity</emphasis> y
       <emphasis>field</emphasis>.</para>
 
       <programlisting>package com.springsource.roo.pizzashop.domain;
@@ -1231,7 +1231,7 @@ public class Repartidor {
 
     <para xml:lang="es">El framework permite realizar una ingeniería inversa
     multiesquema e incremental de un modelo relacional de base de datos existente,
-    de forma que basándose en la metainformación recopilada de la BBDD se generarán todas 
+    de forma que basándose en la metainformación recopilada de la BBDD se generarán todas
     las entidades con sus respectivos campos de manera automática.
     El encargado de esta funcionalidad es el
     Add-on <emphasis>Database Reverse Engineering</emphasis> disponible
@@ -1259,7 +1259,7 @@ public class Repartidor {
           hay driver disponible para HSQLDB.</para>
         </warning>Por ejemplo, si se ejecuta la ingeniería inversa en un proyecto con
         PostgreSQL configurado como sistema de base de datos:
-        
+
         <programlisting>roo-gvNIX&gt; <emphasis role="bold">database introspect --schema unable-to-obtain-connection</emphasis>
 Located add-on that may offer this JDBC driver
 1 found, sorted by rank; T = trusted developer; R = Roo 1.2 compatible
@@ -1333,7 +1333,7 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
       representando las tablas y columnas de la BBDD. Al igual que antes
       --schema es obligatorio. Se debe usar --package para indicar el nombre
       del paquete del proyecto donde crear las clases Java, como convención
-      se recomienda utilizar el subpaquete domain dentro del paquete base, 
+      se recomienda utilizar el subpaquete domain dentro del paquete base,
       ese decir, <emphasis>~.domain</emphasis>.</para>
 
       <para>Podemos indicar también que se generen automáticamente los test de
@@ -1415,7 +1415,7 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
         <emphasis>validate</emphasis> de modo que en el arranque de la aplicación
         se realizará la fase de validación del esquema.</para>
       </important>
-      
+
       <important>
 	      <para>Si se realiza la ingeniería inversa de alguna vista,
 	      es recomendable leer la sección <link
@@ -1493,18 +1493,18 @@ public class LineItemPK {
         @EmbeddedId del tipo LineItemPK:</para>
 
         <programlisting>privileged aspect LineItem_Roo_Jpa_Entity {
-    
+
     declare @type: LineItem: @Entity;
-    
+
     declare @type: LineItem: @Table(name = "line_item", schema = "order");
-    
+
     @EmbeddedId
     private LineItemPK LineItem.id;
-    
+
     public LineItemPK LineItem.getId() {
         return this.id;
     }
-    
+
     public void LineItem.setId(LineItemPK id) {
         this.id = id;
     }
@@ -1517,15 +1517,15 @@ public class LineItemPK {
         @Embeddable:</para>
 
         <programlisting>privileged aspect LineItemPK_Roo_Identifier {
-    
+
     declare @type: LineItemPK: @Embeddable;
-    
+
     @Column(name = "line_item_id", nullable = false)
     private BigDecimal LineItemPK.lineItemId;
-    
+
     @Column(name = "order_id", nullable = false)
     private BigDecimal LineItemPK.orderId;
-    
+
     public LineItemPK.new(BigDecimal lineItemId, BigDecimal orderId) {
         super();
         this.lineItemId = lineItemId;
@@ -1547,11 +1547,11 @@ public class LineItemPK {
       <para>La ingeniería inversa proporcionada por el framework
       ofrece soporte para la conexión con múltiples esquemas de la
       misma base de datos de forma automática.</para>
-      
+
       <para>El opción <emphasis>--schema</emphasis> de los comandos
       de la ingeniería inversa permiten especificar una lista de esquemas
       separados por espacios y englobados todos ellos por dobles comillas.</para>
-      
+
       <para>La ingeniería inversa también se puede hacer de
       distintas fuentes de datos utilizando para ello la documentación
       de la sección <link
@@ -1560,7 +1560,7 @@ public class LineItemPK {
 
       <para/>
     </section>
-    
+
     <section>
       <title>Ingeniería inversa incremental</title>
 
@@ -1568,7 +1568,7 @@ public class LineItemPK {
       permite ejecutarse todas las veces que sea necesario de forma
       que se pueden modificar las características y elementos
       incluidos en ingenierías inversas anteriores.</para>
-      
+
       <para>Si al hacer una ingeniería inversa no se incluyó
       alguna tabla que posteriormente se ha visto necesario,
       basta con volver a ejecutar el comando de ingeniería
@@ -1586,30 +1586,30 @@ public class LineItemPK {
       realizar algunas modificaciones manuales para que funcione
       correctamente y que no son posibles realizar de manera automática
       ya que se requiere tomar ciertas decisiones de diseño.</para>
-      
+
       <para xml:lang="es">En una vista, por definición, no existe definida
       ninguna clave primaria. Sin embargo, al convertir esta estructura
       relacional al modelo orientado a objetos es necesario definir uno
       o varios campos que identifiquen de forma unívoca cada resultado
       que se vaya a obtener de la vista.</para>
-      
+
       <para xml:lang="es">La ingeniería inversa de vistas, por defecto,
       configura todas las columnas de la vista como clave primaria compuesta.
       Es por ello que todas las propiedades serán creadas en la clase con sufijo
       PK, por ejemplo EntidadPK, y no se creará ninguna propiedad en la clase
       base, por ejemplo Entidad.</para>
-      
+
       <para xml:lang="es">Habitualmente algunas columnas de la vista serán
       opcionales. Sin embargo, en el modelo orientado a objetos es incorrecto que
       alguna de las propiedades que representan a la clave primaria compuesta
-      tenga valores nulos.</para> 
-      
+      tenga valores nulos.</para>
+
       <para xml:lang="es">Es por ello que deberemos analizar el modo en el que está
       construida la vista en la base de datos para así identificar uno o varios
       campos que representen de forma unívoca cada resultado de la vista. En algunos
       casos en los que la vista de alimenta de otra tabla, la clave primaria de la
       vista suele ser la misma que la de la tabla.</para>
-      
+
       <para xml:lang="es">Una vez detectadas las propiedades que conforman la clave
       primaria de la vista deberán realizarse las siguientes modificaciones:
 
@@ -1642,7 +1642,7 @@ public class LineItemPK {
 		        <listitem>
 		        <para xml:lang="es">
 				Añadir a la anotación @RooJpaActiveRecord de la clase Entidad los siguientes atributos
-				que desactivarán el borrado, creación y actualización en la capa de entidades: 
+				que desactivarán el borrado, creación y actualización en la capa de entidades:
 				removeMethod = "", persistMethod = "", mergeMethod = "".
 				</para>
 				</listitem>
@@ -1653,21 +1653,21 @@ public class LineItemPK {
 		        <para xml:lang="es">
 				Si se ha generado la capa web asociada a la entidad que representa a la vista,
 				añadir a la anotación @RooWebScaffold de la clase EntidadController los siguientes atributos
-				que desactivarán el borrado, creación y actualización en la capa web: 
+				que desactivarán el borrado, creación y actualización en la capa web:
 				removeMethod = "", persistMethod = "", mergeMethod = "".
 				</para>
 				</listitem>
 	        </varlistentry>
 	      </variablelist>
       </para>
-      
+
       </para>
 
 	    <section>
 	      <title xml:lang="es" xml:id="guia-desarrollo_gestion-entidades_ingenieria_inversa-vistas-tests">
 	      Tests de la ingeniería inversa de vistas</title>
-	
-	      <para xml:lang="es">En las vistas que no realizamos push-in e identificamos un 
+
+	      <para xml:lang="es">En las vistas que no realizamos push-in e identificamos un
 	      elemento como clave primaria hay que realizar los siguientes cambios si deseamos
 	      mantenerlos ejecutándose con éxito.
 	      Como ejemplo pondremos VaumAplusuPerfiles.</para>
@@ -1687,7 +1687,7 @@ public class LineItemPK {
 			        <listitem>
 			        <para xml:lang="es">
 			        Al count y persist le eliminaremos la siguiente línea, que es la primera que tiene en código:
-			        Assert.assertNotNull("Data on demand for 'VaumAplusuPerfiles' failed to initialize correctly", dod.getRandomVaumAplusuPerfiles()); 
+			        Assert.assertNotNull("Data on demand for 'VaumAplusuPerfiles' failed to initialize correctly", dod.getRandomVaumAplusuPerfiles());
 			        Esto no afecta a la comprobación de si el count funciona correctamente.
 			        </para>
 			        </listitem>
@@ -1696,7 +1696,7 @@ public class LineItemPK {
 			        <term>Modificar finder un resultado</term>
 			        <listitem>
 			        <para xml:lang="es">
-			        Al finder de un objeto de la entidad en concreto (testFindVaumAplusuPerfiles) lo que haremos será insertar un objeto que sabemos que todos los valores no son null utilizando dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE); y posteriormente buscaremos dicho elemento: 
+			        Al finder de un objeto de la entidad en concreto (testFindVaumAplusuPerfiles) lo que haremos será insertar un objeto que sabemos que todos los valores no son null utilizando dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE); y posteriormente buscaremos dicho elemento:
 			        Sustituimos VaumAplusuPerfiles obj = dod.getRandomVaumAplusuPerfiles();
 			        por VaumAplusuPerfiles obj = dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE); obj.persist();
 			        </para>
@@ -1717,7 +1717,7 @@ public class LineItemPK {
 			        <listitem>
 			        <para xml:lang="es">
 			        Al remove le sustetuiremos VaumAplusuPerfiles obj = dod.getRandomVaumAplusuPerfiles();
-			        por VaumAplusuPerfiles obj = dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE); 
+			        por VaumAplusuPerfiles obj = dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE);
 			        obj.persist();
 			        </para>
 			        </listitem>

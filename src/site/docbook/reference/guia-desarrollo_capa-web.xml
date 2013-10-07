@@ -13,15 +13,15 @@
   necesaria para gestionar las peticiones HTTP y visualizar cierta información
   al usuario como respuesta. Actualmente esta capa puede
   desarrollarse con <link
-  xlink:href="http:///spring/docs/3.0.x/spring-framework-reference/html/mvc.html">Spring
-  MVC</link>, 
+  xlink:href="http://docs.spring.io/spring/docs/3.2.4.RELEASE/spring-framework-reference/html/mvc.html">Spring
+  MVC</link>,
   <link xlink:href="http://code.google.com/webtoolkit/">GWT</link>,
   <link xlink:href="http://www.adobe.com/es/products/flex.html">Flex</link>,
   <link xlink:href="http://javaserverfaces.java.net/">JSF</link> y
   <link xlink:href="https://vaadin.com/">Vaadin</link>.
   Cada una de estas tecnologías está integrada a distinto nivel con la
   generación de código del framework por lo que cada una de ellas ofrecerá
-  ciertas características. Este capítulo se centrará en la 
+  ciertas características. Este capítulo se centrará en la
   generación de la capa web con Spring MVC ya que se trata de la tecnología
   más evolucionada dentro de la generación de código del framework y para
   la que gvNIX ha añadido la mayoría de sus nuevas funcionalidades.</para>
@@ -52,7 +52,7 @@
       <listitem>
         <para><command>web mvc setup</command></para>
       </listitem>
-      
+
       <listitem>
         <para><command>web mvc scaffold</command></para>
       </listitem>
@@ -68,7 +68,7 @@
 
     <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-setup">
       <title>web mvc setup</title>
-      
+
       <para xml:lang="es">Este comando crea toda la configuración
       necesaria para el funcionamiento de Spring MVC en el proyecto.
       Esto implica varios ficheros de configuración preparados para
@@ -76,7 +76,7 @@
       hojas de estilo, soporte multidioma, páginas iniciales, tags, menú, etc.
       </para>
 	</section>
-	
+
     <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-scaffold">
       <title>web mvc scaffold</title>
 
@@ -175,7 +175,7 @@
           </listitem>
         </varlistentry>
       </variablelist>
-      
+
 
       <para>Un ejemplo:</para>
 
@@ -228,7 +228,7 @@ roo-gvNIX&gt; <command>web mvc controller --class ~.web.MyController</command></
 public class MyController {
 
     @RequestMapping
-    public void get(ModelMap modelMap, HttpServletRequest request, 
+    public void get(ModelMap modelMap, HttpServletRequest request,
     		HttpServletResponse response) {
     }
 
@@ -271,7 +271,7 @@ public class MyController {
 
       <para xml:lang="es">Para más información sobre la anotación
       <classname>@RequestMapping</classname> ver la documentación de <link
-      xlink:href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping">Spring
+      xlink:href="http://docs.spring.io/spring/docs/3.2.4.RELEASE/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping">Spring
       MVC</link>.</para>
 
       <para>Este comando, además, generará la vista la vista
@@ -300,7 +300,7 @@ public class MyController {
     <para xml:lang="es">Para que una clase <literal>Java</literal> sea un
     controlador de Spring MVC debe estar anotada con la anotación
     <classname>@Controller</classname> y añadir la anotación <link
-    xlink:href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping">
+    xlink:href="http://docs.spring.io/spring/docs/3.2.4.RELEASE/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping">
     <classname>@RequestMapping</classname></link>
     como convenga para definir la correspondencia entre una URL y
     los métodos del controlador. Los controladores pueden ser a medida,
@@ -344,7 +344,7 @@ public class MyController {
 @RooWebScaffold(path = "bases", formBackingObject = Base.class)
 public class BaseController {
 }</programlisting>
-      
+
       <para xml:lang="es">Estas clases contienen, además de las anotaciones ya
       explicadas, la anotación <classname>@RooWebScaffold</classname> que
       admite los siguientes atributos obligatorios:</para>
@@ -371,9 +371,9 @@ public class BaseController {
           </listitem>
         </varlistentry>
       <variablelist>
-      
+
       <para xml:lang="es">Y también admite los siguientes atributos opcionales:</para>
-      
+
       </variablelist>
         <varlistentry>
           <term>update, delete y create</term>
@@ -525,15 +525,15 @@ public class BaseController {
         <emphasis>default.jspx</emphasis>:</para>
 
         <programlisting>&lt;html xmlns:jsp="http://java.sun.com/JSP/Page"
- xmlns:c="http://java.sun.com/jsp/jstl/core" 
+ xmlns:c="http://java.sun.com/jsp/jstl/core"
  xmlns:tiles="http://tiles.apache.org/tags-tiles"
- xmlns:spring="http://www.springframework.org/tags" 
- xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" &gt;  
+ xmlns:spring="http://www.springframework.org/tags"
+ xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" &gt;
 
   &lt;jsp:output doctype-root-element="HTML" doctype-system="about:legacy-compat" /&gt;
 
-  &lt;jsp:directive.page contentType="text/html;charset=UTF-8" /&gt;  
-  &lt;jsp:directive.page pageEncoding="UTF-8" /&gt; 
+  &lt;jsp:directive.page contentType="text/html;charset=UTF-8" /&gt;
+  &lt;jsp:directive.page pageEncoding="UTF-8" /&gt;
 
   &lt;head&gt;
     &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /&gt;
@@ -548,9 +548,9 @@ public class BaseController {
   &lt;body class="tundra spring"&gt;
     &lt;div id="wrapper"&gt;
       <emphasis role="bold">&lt;tiles:insertAttribute name="header" ignore="true" /&gt;</emphasis>
-      &lt;tiles:insertAttribute name="menu" ignore="true" /&gt;   
+      &lt;tiles:insertAttribute name="menu" ignore="true" /&gt;
       &lt;div id="main"&gt;
-        <emphasis role="bold">&lt;tiles:insertAttribute name="body"/&gt;</emphasis> 
+        <emphasis role="bold">&lt;tiles:insertAttribute name="body"/&gt;</emphasis>
         &lt;tiles:insertAttribute name="footer" ignore="true"/&gt;
       &lt;/div&gt;
     &lt;/div&gt;
@@ -693,7 +693,7 @@ public class BaseController {
   &lt;field:display/&gt;
 &lt;/page:show&gt;</programlisting>
 
-        <para>Muestra los campos de un registro concreto de la entidad 
+        <para>Muestra los campos de un registro concreto de la entidad
         en formato texto en la que cada campo se representa mediante la etiqueta
         <emphasis>&lt;field:display/&gt;</emphasis>. Esta página también solo proporciona
         visualización de valores, por lo que tampoco es
@@ -724,7 +724,7 @@ public class BaseController {
     la aplicación, es decir, en el proyecto PizzaShop de ejemplo, tomando
     la definición de la página jspx de listado de como la entidad PizzaOrder:</para>
 
-    <programlisting>&lt;field:display <emphasis role="bold">field="pizzas"</emphasis> 
+    <programlisting>&lt;field:display <emphasis role="bold">field="pizzas"</emphasis>
 		id="s_com_disid_roo_pizzashop_domain_<emphasis role="bold">PizzaOrder</emphasis>_pizzas" object="${pizzaorder}"
 		z="WSxjsiiEWhA5vo8ecxRoox5EjKA="/&gt;</programlisting>
 
@@ -753,10 +753,10 @@ public class BaseController {
     adaptarlo a sus requerimientos. En la sección sobre modificación de código se
     explica como hacerlo.</para>
   </section>
-  
+
   <section>
   	<title>Mejoras de renimiento</title>
-  
+
   	<para xml:lang="es">Se pueden implementar algunas mejoras de rendimiento
   	definidas en la sección
   	<link linkend="guia-desarrollo_mejoras-rendimiento-evitar-carga-listas-innecesarias">

@@ -95,17 +95,17 @@
     <xi:include href="guia-desarrollo_generacion-codigo.xml"/>
 
     <xi:include href="guia-desarrollo_entidades.xml"/>
-    
+
     <xi:include href="guia-desarrollo_entidades-buscadores.xml"/>
-    
+
     <xi:include href="guia-desarrollo_entidades-pruebas.xml"/>
 
     <xi:include href="guia-desarrollo_capa-web.xml"/>
-    
+
     <xi:include href="guia-desarrollo_capa-web-buscadores.xml"/>
-    
+
     <xi:include href="guia-desarrollo_capa-web-arranque-pruebas.xml"/>
-    
+
     <xi:include href="guia-desarrollo_mejoras-rendimiento.xml"/>
   </part>
 
@@ -146,15 +146,15 @@
         <listitem>
           <para xml:lang="es">Control de acceso (autenticación y autorización) y seguridad.</para>
         </listitem>
-        
+
         <listitem>
           <para xml:lang="es">Generación de documentos (reportes).</para>
         </listitem>
-        
+
         <listitem>
           <para xml:lang="es">Gestión de servicios locales y servicios web (importación y exposición).</para>
         </listitem>
-        
+
         <listitem>
           <para xml:lang="es">Soporte de idiomas oficiales para el estado Español
           (inicialmente incluido el Valenciano).</para>
@@ -163,13 +163,13 @@
         <listitem>
           <para xml:lang="es">Gestión de configuraciones por entorno.</para>
         </listitem>
-        
+
         <listitem>
           <para xml:lang="es">Gestión de transformación de cadenas vacías a valores nulos.</para>
         </listitem>
 
       </itemizedlist>
-      
+
       <para xml:lang="es">Cada uno de estos elementos son añadidos (add-ons) que
       gvNIX incluye de forma adicional a todas las funcionalidades que ya
       proporciona su núcleo Spring Roo. Cada uno de estos addons pueden ser también
@@ -181,12 +181,18 @@
       modelos de dominio y visuales y en futuras versiones se irá incrementando
       dicha compatibilidad.
       .</para>
-      
+
     </partintro>
 
     <xi:include href="addon-theme-manager.xml"/>
 
     <xi:include href="addon-web-menu.xml"/>
+
+    <xi:include href="addon-jpa.xml"/>
+
+    <xi:include href="addon-web-mvc.xml"/>
+
+    <xi:include href="addon-web-mvc-datatables.xml"/>
 
     <xi:include href="addon-web-screen-pattern.xml"/>
 
@@ -205,10 +211,8 @@
     <xi:include href="addon-dynamic-config.xml"/>
 
     <xi:include href="addon-web-mvc-binding.xml"/>
-    
+
     <xi:include href="addon-flex.xml"/>
-    
-    <xi:include href="addon-web-mvc-datatables.xml"/>
   </part>
 
   <part>
@@ -218,7 +222,7 @@
       <para xml:lang="es">En esta parte se verán distintas guías para realizar ciertas
       modificaciones sobre el código generado para adaptarlo a distintas necesidades.</para>
 	</partintro>
-	
+
     <xi:include href="recetas.xml"/>
   </part>
 

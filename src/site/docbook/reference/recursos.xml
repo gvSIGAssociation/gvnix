@@ -55,31 +55,31 @@
     <itemizedlist>
       <listitem>
         <para xml:lang="es"><link
-        xlink:href="http://www.springsource.org/roo">Página del
+        xlink:href="http://projects.spring.io/spring-roo/">Página del
         proyecto</link></para>
       </listitem>
 
       <listitem>
         <para xml:lang="es"><link
-        xlink:href="http://forum.springsource.org/forumdisplay.php?f=67">Foro
+        xlink:href="http://forum.spring.io/forum/spring-projects/roo">Foro
         de Spring Roo</link></para>
       </listitem>
 
       <listitem>
         <para xml:lang="es"><link
-        xlink:href="http://jira.springframework.org/browse/ROO">JIRA de Spring
+        xlink:href="https://jira.springsource.org/browse/ROO">JIRA de Spring
         Roo</link></para>
       </listitem>
 
       <listitem>
         <para><link
-        xlink:href="http://www.springsource.com/products/sts">Spring STS
+        xlink:href="http://spring.io/tools">Spring STS
         (Spring Tools Suite)</link></para>
       </listitem>
 
       <listitem>
         <para xml:lang="es"><link
-        xlink:href="http://forum.springsource.org/showthread.php?t=71985">Página
+        xlink:href="http://forum.spring.io/forum/spring-projects/roo/64079-latest-project-links-and-version-details">Página
         con recursos para Roo</link></para>
       </listitem>
     </itemizedlist>
@@ -94,25 +94,25 @@
     <itemizedlist>
       <listitem>
         <para><link
-        xlink:href="http://www.springsource.org/about">Spring</link></para>
+        xlink:href="http://spring.io/">Spring</link></para>
       </listitem>
-      
+
       <listitem>
         <para><link
-        xlink:href="http://static.springsource.org/spring/docs/3.0.x/reference/index.html">
+        xlink:href="http://docs.spring.io/spring/docs/3.2.3.RELEASE/spring-framework-reference/html/">
         Documentación de Spring Framework</link></para>
       </listitem>
 
       <listitem>
         <para><link
-        xlink:href="http://static.springsource.org/spring/docs/3.0.x/reference/mvc.html">
+        xlink:href="http://docs.spring.io/spring/docs/3.2.3.RELEASE/spring-framework-reference/html/mvc.html">
         Documentación de Spring MVC</link></para>
-      </listitem>      
+      </listitem>
 
       <listitem>
         <para><link
-        xlink:href="http://static.springsource.org/spring-security/site/">Spring
-        Security</link></para>
+        xlink:href="http://docs.spring.io/spring-security/site/docs/3.1.4.RELEASE/reference/springsecurity.html/">
+        Spring Security</link></para>
       </listitem>
 
       <listitem>
@@ -124,6 +124,32 @@
         <para><link
         xlink:href="http://www.eclipse.org/ajdt/">AJDT</link></para>
       </listitem>
+
+      <listitem>
+        <para><link
+        xlink:href="http://jquery.com/">jQuery</link></para>
+      </listitem>
+
+      <listitem>
+        <para><link
+        xlink:href="http://jqueryui.com/">jQueryUI</link></para>
+      </listitem>
+
+      <listitem>
+        <para><link
+        xlink:href="http://datatables.net/">DatatTables</link></para>
+      </listitem>
+
+      <listitem>
+        <para><link
+        xlink:href="http://dandelion.github.io/datatables/">Dandelion-DatatTables</link></para>
+      </listitem>
+
+      <listitem>
+        <para><link
+        xlink:href="http://jqueryvalidation.org/">jQuery Validation Plugin</link></para>
+      </listitem>
+
     </itemizedlist>
   </section>
 </chapter>

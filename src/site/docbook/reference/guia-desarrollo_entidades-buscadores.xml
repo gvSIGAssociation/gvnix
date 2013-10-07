@@ -5,7 +5,7 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-         
+
   	<title xml:lang="es">Buscadores de entidades</title>
 
 	<para xml:lang="es">En la sección de recetas se puede encontrar
@@ -16,33 +16,33 @@
 
 	<section xml:id="guia-desarrollo_entidades-buscadores-descripcion">
 	   <title xml:lang="es">Descripción</title>
-	
+
 	   <para xml:lang="es">El framework permite generar buscadores sobre cualquier
 	   entidad del modelo de la aplicación mediante el comando <link
-	   xlink:href="http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-finder-add">
+	   xlink:href="http://docs.spring.io/spring-roo/reference/html/command-index.html#command-index-finder-commands">
 	   finder add</link>. El comando espera el nombre del buscador a generar
 	   en un formato determinado. Para conocer el formato se puede utilizar como ayuda
 	   el comando  <link
-	   xlink:href="http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-finder-list">
+	   xlink:href="http://docs.spring.io/spring-roo/reference/html/command-index.html#command-index-finder-list">
 	   finder list</link>.</para>
-	   
+
 	   <para xml:lang="es">En los siguientes puntos se muestra un ejemplo de como elegir y generar un buscador
 	   sobre una de las entidades del proyecto del script de ejemplo <emphasis>clinic.roo</emphasis>
 	   que viene incluido con el framework. Se utilizará la entidad Owner para
 	   generar un buscador sobre ella.</para>
-	
+
 	</section>
-	
+
 	<section xml:id="guia-desarrollo_entidades-buscadores-listado">
 	   <title xml:lang="es">Listar buscadores</title>
-	
+
 	   <para xml:lang="es">Ejecutar el comando finder list sobre la entidad Owner</para>
-	
+
 	   <programlisting>roo-gvNIX&gt; <command>finder list --class ~.domain.Owner --depth 2 --filter LastName</command>
 		...
 		findOwnersByLastNameLikeAndCityLike(String lastName, String city)
 		...</programlisting>
-	
+
 	   <para xml:lang="es">En el comando se indica la entidad sobre la que se desea consultar
 	   sus buscadores con <emphasis>--class</emphasis>. El resto de parámetros son
 	   opcionales. El parámetro <emphasis>--depth</emphasis> indica el nivel de profundidad
@@ -51,22 +51,22 @@
 	   para una entidad, está limitado a un máximo de 3. El parámetro
 	   <emphasis>--filter</emphasis> aplica un filtro de forma que solo se
 	   mostrarán los posibles buscadores que contengan la cadena indicada.</para>
-	
+
 	   <para xml:lang="es">El comando devuelve una lista de resultados con todos los
 	   posibles buscadores que coinciden con los términos de búsqueda, de entre ellos
 	   se va a escoger findOwnersByLastNameLikeAndCityLike que genera un buscador para la
 	   entidad Owners cuyo <emphasis>lastName</emphasis> y <emphasis>city</emphasis>
 	   contenga la cadena que se le pase como parámetro respectivamente,
 	   ambas utilizando para ello el operador <emphasis>like</emphasis>.</para>
-	   
+
 	   <para xml:lang="es">Consultar la documentación del comando <link
-	   xlink:href="http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-finder-list">
+	   xlink:href="http://docs.spring.io/spring-roo/reference/html/command-index.html#command-index-finder-list">
 	   finder list</link> para más información.</para>
 	</section>
-	
+
 	<section xml:id="guia-desarrollo_entidades-buscadores-crear">
 	   <title xml:lang="es">Creación de un buscador</title>
-	   
+
 	   <para xml:lang="es">Es importante resaltar que no es necesario utilizar
 	   el comando <emphasis>finder list</emphasis> antes de utilizar el
 	   comando <emphasis>finder add</emphasis>. Una vez conocida la nomenclatura
@@ -74,9 +74,9 @@
 	   el nombre del buscador deseado. A continuación, se muestra
 	   una pequeña guía con el formato que sigue la definición del nombre
 	   de un buscador:</para>
-	   
+
 	   <programlisting>findEntitiesByPropertyFilterOperator</programlisting>
-	   
+
 	   <itemizedlist>
 		<listitem>
 			<para xml:lang="es">Entities: Nombre de la entidad sobre la que
@@ -85,15 +85,15 @@
 			entidad <emphasis>Entity</emphasis> tomará como plural
 			<emphasis>Entities</emphasis>.</para>
 		</listitem>
-	
+
 		<listitem>
 	    	<para xml:lang="es">La porción del buscador <emphasis>PropertyFilter</emphasis>
 	    	puede repetirse tantas veces como propiedades se desee añadir al filtro
 	    	siempre y cuando se utilice un <emphasis>Operator</emphasis> para
 	    	separar el filtro sobre una propiedad y el siguiente.</para>
-		    
+
 		    <itemizedlist>
-		    
+
 				<listitem>
 					<para xml:lang="es">Property: Nombre de la propiedad de la entidad
 					a incluir como filtro en el buscador. Debe tener el mismo nombre que
@@ -104,7 +104,7 @@
 					<para xml:lang="es">Filter: Tipo de filtro a aplicar sobre la propiedad
 					anterior de entre los siguientes posibles valores en función del tipo
 					de dato de la propiedad.</para>
-		
+
 				    <itemizedlist>
 						<listitem>
 							<para xml:lang="es">Cadenas (String, ...): Equals, IsNotNull, IsNull,
@@ -146,48 +146,48 @@
 	    	</itemizedlist>
 	     </listitem>
 		</itemizedlist>
-	
+
 		<para xml:lang="es">Algunos ejemplos serían: findOwnersByFirstNameLike,
 		findPetsByWeightGreaterThan, findVetsByBirthDayBetween, findPetsBySendRemindersNot,
 		findPetsByType, findVisitsByPet, findOwnersByPets,
-		findOwnersByTelephoneIsNotNullAndBirthDayEquals, 
+		findOwnersByTelephoneIsNotNullAndBirthDayEquals,
 		findPetsByWeightLessThanEqualsOrTypeOrSendRemindersNot.</para>
-		   
+
 		<para xml:lang="es">Al ejecutar el comando <emphasis>finder add</emphasis> con el
 		nombre del buscador deseado se generará el buscador en la capa de las entidades,
 		pero no se generará todavía ningún código en la capa de la vista.</para>
-	
+
 		<programlisting>roo-gvNIX&gt; <command>finder add --class ~.domain.Owner
 	   		--finderName findOwnersByLastNameLikeAndCityLike</command>
 		Updated SRC_MAIN_JAVA/com/springsource/petclinic/domain/Owner.java
 		Created SRC_MAIN_JAVA/com/springsource/petclinic/domain/Owner_Roo_Finder.aj
 		</programlisting>
-		
+
 		<para xml:lang="es">Consultar la documentación del comando <link
-		xlink:href="http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-finder-add">
+		xlink:href="http://docs.spring.io/spring-roo/reference/html/command-index.html#command-index-finder-add">
 		finder add</link> para más información.</para>
 	</section>
-	
+
 	<section xml:id="guia-desarrollo_entidades-buscadores-codigo-generado">
 	   <title xml:lang="es">Código generado</title>
-	   
+
 		<para xml:lang="es">La ejecución del comando <emphasis>finder add</emphasis>
 		desencadenará la modificación de una anotación en la clase Java de la entidad
 		especificada.</para>
-		
+
 		<programlisting>...
 		@RooJpaActiveRecord(<command>finders = { "findOwnersByLastNameLikeAndCityLike" }</command>)
 		public class Owner extends AbstractPerson {
 		}
 		</programlisting>
-		
+
 		<para xml:lang="es">La aparición del atributo <emphasis>finders</emphasis>
 		en la anotación <emphasis>RooJpaActiveRecord</emphasis> de la entidad
 		provocará la generación del aspecto Java correspondiente
 		que implementará el buscador solicitado.</para>
-	
+
 		<programlisting>privileged aspect Owner_Roo_Finder {
-		
+
 		 public static TypedQuery&lt;Owner&gt; Owner.findOwnersByLastNameLikeAndCityLike(
 		 		String lastName, String city) {
 		     if (lastName == null || lastName.length() == 0)
@@ -209,7 +209,7 @@
 		         city = city + &quot;%&quot;;
 		     }
 		     EntityManager em = Owner.entityManager();
-		     TypedQuery&lt;Owner&gt; q = em.createQuery(&quot;SELECT o FROM Owner AS o WHERE &quot; + 
+		     TypedQuery&lt;Owner&gt; q = em.createQuery(&quot;SELECT o FROM Owner AS o WHERE &quot; +
 		     		&quot;LOWER(o.lastName) LIKE LOWER(:lastName) AND LOWER(o.city) LIKE LOWER(:city)&quot;,
 		     		Owner.class);
 		     q.setParameter(&quot;lastName&quot;, lastName);
@@ -217,7 +217,7 @@
 		     return q;
 		 }
 		}</programlisting>
-	   
+
 	</section>
-	
+
 </chapter>

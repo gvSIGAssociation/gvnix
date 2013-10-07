@@ -69,7 +69,7 @@ Similarly, for MongoDB persistence, type 'mongo setup' and ENTER.
 roo-gvNIX&gt;</programlisting>
 
     <para xml:lang="es">En el ámbito de esta documentación es suficiente con
-    conectar la aplicación con una base de datos que no necesita ningún 
+    conectar la aplicación con una base de datos que no necesita ningún
     servidor instalado como Hypersonic e Hibernate como implementación del
     sistema de persistencia:</para>
 
@@ -77,17 +77,15 @@ roo-gvNIX&gt;</programlisting>
 Created SPRING_CONFIG_ROOT/database.properties
 Updated SPRING_CONFIG_ROOT/applicationContext.xml
 Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
-Updated ROOT/pom.xml [added dependencies org.hsqldb:hsqldb:1.8.0.10,
-org.hibernate:hibernate-core:3.6.9.Final,
-org.hibernate:hibernate-entitymanager:3.6.9.Final,
+Updated ROOT/pom.xml [added dependencies org.hsqldb:hsqldb:2.2.9,
+org.hibernate:hibernate-core:4.2.2.Final, org.hibernate:hibernate-entitymanager:4.2.2.Final,
 org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final,
 commons-collections:commons-collections:3.2.1,
-org.hibernate:hibernate-validator:4.2.0.Final,
-javax.validation:validation-api:1.0.0.GA, cglib:cglib-nodep:2.2.2,
-javax.transaction:jta:1.1,
-org.springframework:spring-jdbc:${spring.version},
+org.hibernate:hibernate-validator:4.3.1.Final,
+javax.validation:validation-api:1.0.0.GA,
+javax.transaction:jta:1.1, org.springframework:spring-jdbc:${spring.version},
 org.springframework:spring-orm:${spring.version},
-commons-pool:commons-pool:1.5.6, commons-dbcp:commons-dbcp:1.3]
+commons-pool:commons-pool:1.5.6, commons-dbcp:commons-dbcp:1.4]
 roo-gvNIX&gt;</programlisting>
 
     <warning>
@@ -99,13 +97,13 @@ roo-gvNIX&gt;</programlisting>
     <warning>
       <para xml:lang="es">Con la ingeniería directa, es decir, la creación
       de entidades y campos mediante los comandos de la consola, se configura
-      el sistema de persistencia para crear la base de datos cada vez 
+      el sistema de persistencia para crear la base de datos cada vez
       que se arranca la aplicación. Por eso, los datos de la demo se perderán cada
       vez que se inicie la aplicación. Esto no es así cuando se utiliza la
       ingeniería inversa a partir de un esquema de base de datos ya
       existente.</para>
 
-      <para xml:lang="es">Este comportamiento se puede cambiar en la 
+      <para xml:lang="es">Este comportamiento se puede cambiar en la
       configuración del sistema de persistencia:
       <filename>src/main/resources/META-INF/persistence.xml</filename>.
       Consultar la sección <link
@@ -261,11 +259,11 @@ roo-gvNIX&gt;</programlisting>
           </listitem>
         </varlistentry>
       </variablelist>
-      
+
       <variablelist>
-      
+
 		<para xml:lang="es">Los parámetros opcionales que permite este comando son:</para>
-		
+
         <varlistentry>
           <term>--applicationId</term>
 
@@ -439,21 +437,18 @@ roo-gvNIX&gt;</programlisting>
           <programlisting>roo-gvNIX&gt; <command>jpa setup --provider HIBERNATE --database POSTGRES --databaseName my_db
           			 --userName user1 --password 1234 --hostName dbserver</command>
 Created SPRING_CONFIG_ROOT/database.properties
-Please update your database details in 
+Please update your database details in
  src/main/resources/META-INF/spring/database.properties.
 Updated SPRING_CONFIG_ROOT/applicationContext.xml
 Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
-Updated ROOT/pom.xml [added dependencies postgresql:postgresql:9.1-901.jdbc3,
-org.hibernate:hibernate-core:3.6.9.Final,
-org.hibernate:hibernate-entitymanager:3.6.9.Final,
-org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final,
-commons-collections:commons-collections:3.2.1,
-org.hibernate:hibernate-validator:4.2.0.Final,
-javax.validation:validation-api:1.0.0.GA, cglib:cglib-nodep:2.2.2,
-javax.transaction:jta:1.1,
-org.springframework:spring-jdbc:${spring.version}, 
-org.springframework:spring-orm:${spring.version}, commons-pool:commons-pool:1.5.6,
-commons-dbcp:commons-dbcp:1.3]
+Updated ROOT/pom.xml [added dependencies postgresql:postgresql:9.1-901-1.jdbc4,
+ org.hibernate:hibernate-core:4.2.2.Final, org.hibernate:hibernate-entitymanager:4.2.2.Final,
+ org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final,
+ commons-collections:commons-collections:3.2.1,
+ org.hibernate:hibernate-validator:4.3.1.Final, javax.validation:validation-api:1.0.0.GA,
+ javax.transaction:jta:1.1, org.springframework:spring-jdbc:${spring.version},
+ org.springframework:spring-orm:${spring.version}, commons-pool:commons-pool:1.5.6,
+ commons-dbcp:commons-dbcp:1.4]
 roo-gvNIX&gt; </programlisting>
         </listitem>
 
@@ -483,7 +478,7 @@ roo-gvNIX&gt; </programlisting>
           set</command>:</para>
 
           <programlisting>
-roo-gvNIX&gt; <command>database properties set --key database.url --value 
+roo-gvNIX&gt; <command>database properties set --key database.url --value
 				jdbc:postgresql://dbserver:5438/my_db </command>
 Updated SPRING_CONFIG_ROOT/database.properties
 roo-gvNIX&gt; </programlisting>
@@ -510,9 +505,9 @@ roo-gvNIX&gt; </programlisting>
       <title>Actualización automática del esquema</title>
 
       <para xml:lang="es">Al crear las entidades y los campos desde la consola
-      mediante los comandos de ingeniería directa, en el arranque de la 
+      mediante los comandos de ingeniería directa, en el arranque de la
 	  aplicación se crea automáticamente el esquema de base
-	  de datos que se corresponde con el modelo de entidades. 
+	  de datos que se corresponde con el modelo de entidades.
       Esto no es así cuando se realiza la ingeniería inversa a partir
       de un esquema de base de datos ya existente.</para>
 
@@ -577,7 +572,7 @@ roo-gvNIX&gt; </programlisting>
       con distintos esquemas de la misma base de datos que está tanto soportado
       como contemplado por la generación automática que realiza la ingeniería
       inversa.</para>
-      
+
       <para>A continuación se muestran los pasos a seguir para configurar la
       conexión con distintas bases de datos en una misma aplicación mediante el
       proveedor de persistencia Hibernate:</para>
@@ -587,7 +582,7 @@ roo-gvNIX&gt; </programlisting>
           <para xml:lang="es">En <emphasis>src/main/resources/META-INF/persistence.xml</emphasis>
           incluir la siguiente configuración reemplazando los puntos suspensivos por
           los valores adecuados para la nueva conexión de base de datos:</para>
-          
+
           <programlisting>
 		    &lt;persistence-unit name=&quot;persistenceUnit2&quot; transaction-type=&quot;RESOURCE_LOCAL&quot;&gt;
 		        &lt;provider&gt;org.hibernate.ejb.HibernatePersistence&lt;/provider&gt;
@@ -600,14 +595,14 @@ roo-gvNIX&gt; </programlisting>
 		    &lt;/persistence-unit&gt;
 		  </programlisting>
         </listitem>
-        
+
         <listitem>
           <para xml:lang="es">En <emphasis>src/main/resources/META-INF/spring/applicationContext.xml</emphasis>
           incluir la siguiente configuración reemplazando los puntos suspensivos por
           los valores adecuados para la nueva conexión de base de datos:</para>
-          
+
           <programlisting>
-		    &lt;bean class=&quot;org.apache.commons.dbcp.BasicDataSource&quot; destroy-method=&quot;close&quot; 
+		    &lt;bean class=&quot;org.apache.commons.dbcp.BasicDataSource&quot; destroy-method=&quot;close&quot;
 		    		id=&quot;dataSource2&quot;&gt;
 		        &lt;property name=&quot;driverClassName&quot; value=&quot;...&quot;/&gt;
 		        &lt;property name=&quot;url&quot; value=&quot;...&quot;/&gt;
@@ -621,31 +616,31 @@ roo-gvNIX&gt; </programlisting>
 		        &lt;property name=&quot;minEvictableIdleTimeMillis&quot; value=&quot;...&quot;/&gt;
 		        &lt;property name=&quot;validationQuery&quot; value=&quot;...&quot;/&gt;
 		 	&lt;/bean&gt;
-		    &lt;bean class=&quot;org.springframework.orm.jpa.JpaTransactionManager&quot; 
+		    &lt;bean class=&quot;org.springframework.orm.jpa.JpaTransactionManager&quot;
 		    		id=&quot;transactionManager2&quot;&gt;
 		        &lt;property name=&quot;entityManagerFactory&quot; ref=&quot;entityManagerFactory2&quot;/&gt;
 		    &lt;/bean&gt;
 		    &lt;tx:annotation-driven mode=&quot;aspectj&quot; transaction-manager=&quot;transactionManager2&quot;/&gt;
-		    &lt;bean class=&quot;org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean&quot; 
+		    &lt;bean class=&quot;org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean&quot;
 		    		id=&quot;entityManagerFactory2&quot;&gt;
 		        &lt;property name=&quot;persistenceUnitName&quot; value=&quot;persistenceUnit2&quot; /&gt;
 		        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource2&quot;/&gt;
 		    &lt;/bean&gt;
 		  </programlisting>
         </listitem>
-        
+
         <listitem>
           <para xml:lang="es">En la clase Java de la entidad, por ejemplo,
           <emphasis>src/main/java/.../domain/Entidad.java</emphasis> añadir en la
-          anotación <emphasis>@RooJpaActiveRecord</emphasis> el atributo 
+          anotación <emphasis>@RooJpaActiveRecord</emphasis> el atributo
           <emphasis>persistenceUnit = "persistenceUnit2"</emphasis> haciendo
           referencia a la nueva conexión configurada:</para>
-          
+
           <programlisting>
 		    @RooJpaActiveRecord(persistenceUnit = "persistenceUnit2")
 		    class Entity
 		  </programlisting>
-		  
+
 		  <para xml:lang="es">De esta forma, para cada entidad de datos se
 		  puede asociar la conexión de base de datos que se desee.</para>
 		</listitem>

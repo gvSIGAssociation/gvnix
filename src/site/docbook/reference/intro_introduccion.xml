@@ -52,7 +52,7 @@
 
       <listitem>
         <para xml:lang="es"><link
-        xlink:href="http://www.springsource.org/spring-roo">Página oficial de
+        xlink:href="http://projects.spring.io/spring-roo/">Página oficial de
         Spring Roo</link></para>
       </listitem>
     </itemizedlist>
@@ -151,6 +151,14 @@
       <listitem>
         <para>Control de concurrencia a nivel de aplicación sin campos en base
         de datos.</para>
+      </listitem>
+
+      <listitem>
+        <para>Utilidades de generación de consultas.</para>
+      </listitem>
+
+      <listitem>
+        <para>Utilidades de modificaciones múltiples de entidades.</para>
       </listitem>
 
       <listitem>
@@ -331,9 +339,9 @@
 
     <para>La consola tiene el siguiente aspecto:</para>
 
-    <programlisting>    ____  ____  ____  
-   / __ \/ __ \/ __ \ 
-  / /_/ / / / / / / / 
+    <programlisting>    ____  ____  ____
+   / __ \/ __ \/ __ \
+  / /_/ / / / / / / /
  / _, _/ /_/ / /_/ /   gvNIX x.x.x distribution
 /_/ |_|\____/\____/    x.x.x-RELEASE [rev xxxxxxx]
 

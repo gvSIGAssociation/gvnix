@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-web-mvc" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Add-on Web MVC</title>
+
+  <para xml:lang="es">Add-on de utilidades para la capa Web de tipo Spring MVC.</para>
+
+  <para xml:lang="es">Este add-on incluye dos funcionalidades:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para xml:lang="es">Interfaz Web para operaciones de persistencia de entidades en bloque.</para>
+    </listitem>
+    <listitem>
+      <para xml:lang="es">Visualización de vistas usando jQuery como librería de JavaScript.</para>
+    </listitem>
+  </itemizedlist>
+
+  <section xml:id="addon-web-mvc_batch">
+    <title>Interfaz para operaciones de persistencia en bloque</title>
+
+    <para xml:lang="es">Esta funcionalidad añade el interfaz web
+    a un controlador para poder recibir peticiones de creación,
+    actualización y eliminación de registros de una entidad
+    en bloque.</para>
+
+    <para xml:lang="es">Actualmente se utiliza para dar soporte a las
+    operaciones de modificación múltiple que el
+    <link linkend="addon-web-mvc-datatables">
+    add-on web mvc datatables</link>.</para>
+
+    <para xml:lang="es">Los método añadidos por esta funcionalidad
+    se apoyan en las operaciones de persistencia en bloque generadas
+    por el <command><link linkend="addon-jpa_batch">add-on jpa</link></command>
+    proporciona. Por ello, sólo se podrá añadir sobre controladores
+    cuya entidad relacionada tenga generado este servicio.</para>
+
+    <para xml:lang="es">Para generar estos métodos se pueden utilizar los
+    siguientes comandos:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><command><link
+        linkend="apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-setup">
+        web mvc batch setup</link></command></term>
+
+        <listitem>
+          <para xml:lang="es">Instala las dependencias y ajusta la configuración.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><command><link
+        linkend="apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-add">
+        web mvc batch add</link></command></term>
+
+        <listitem>
+          <para xml:lang="es">Genera los métodos en un controlador.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><command><link
+        linkend="apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-all">
+        web mvc batch all</link></command></term>
+
+        <listitem>
+          <para xml:lang="es">Genera los métodos para todos los controladores.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+
+    <section xml:id="addon-web-mvc_batch_create-update">
+      <title>Métodos de creación y actualización</title>
+
+      <para xml:lang="es">Los métodos de actualización y creación
+      reciben una <emphasis>Array</emphasis> de elementos en formato
+      <link xlink:href="http://es.wikipedia.org/wiki/JSON">JSON</link>.</para>
+
+      <para xml:lang="es">Como resultado generan un objeto
+      <emphasis>JsonResponse</emphasis> (también en formato
+      JSON) con el resultado de la operación.</para>
+
+      <para xml:lang="es">El <emphasis>JsonResponse</emphasis>
+      se compone de las siguientes propiedades:
+        <variablelist>
+          <varlistentry>
+             <term>status</term>
+             <listitem>
+               <para xml:lang="es">Resultado de la operación: <emphasis>SUCCESS</emphasis> o <emphasis>ERROR</emphasis> </para>
+             </listitem>
+          </varlistentry>
+          <varlistentry>
+             <term>exceptionMessage</term>
+             <listitem>
+               <para xml:lang="es">Mensaje de error (si lo hay) encontrado al ejecutar la operación.</para>
+             </listitem>
+          </varlistentry>
+          <varlistentry>
+             <term>bindingResult</term>
+             <listitem>
+               <para xml:lang="es">Errores encontrados en la carga y/o validación de los datos recibidos.</para>
+               <para xml:lang="es">El formato de este objeto en JSON es como el siguiente:</para>
+               <programlisting> {
+    OBJECT_INDEX : { FIELD1_NAME : FIELD_ERROR_MSG, FIELD2_NAME : FIELD_ERROR_MSG, ...},
+    OBJECT_INDEX2 : { FIELD1_NAME : FIELD_ERROR_MSG,
+      FIELD_OBJECT_NAME : { SUBOBJECT_FIELD: FIELD_ERROR_MSG, ... }
+      FIELD_LIST_NAME: {
+         OBJECT_FIELD_ITEM_INDEX : {ITEM_LIST_FIELD: FIELD_ERROR_MSG, ... },
+         OBJECT_FIELD_ITEM_INDEX2 : {ITEM_LIST_FIELD: FIELD_ERROR_MSG, ... },
+      },
+      ...
+    },
+    ...
+ }
+               </programlisting>
+             </listitem>
+          </varlistentry>
+          <varlistentry>
+             <term>value</term>
+             <listitem>
+               <para xml:lang="es">Objetos persistidos o recibidos.</para>
+             </listitem>
+          </varlistentry>
+        </variablelist>
+      </para>
+    </section>
+
+
+    <section xml:id="addon-web-mvc_batch_delete">
+      <title>Método de eliminación</title>
+
+      <para xml:lang="es">El método de eliminación recibe los siguientes
+      parámetros:</para>
+
+        <variablelist>
+          <varlistentry>
+             <term>{entidad}</term>
+             <listitem>
+               <para xml:lang="es">Valores de las propiedades usado como
+               <emphasis>filtro base</emphasis> de la operación de borrado completo.</para>
+             </listitem>
+          </varlistentry>
+          <varlistentry>
+             <term>all</term>
+             <listitem>
+               <para xml:lang="es">Si recibe un <emphasis>true</emphasis>
+               elimina todos los elementos que cumplan el <emphasis>filtro base</emphasis>.
+               Si no se ha recibido <emphasis>filtro base borrará todos los elementos.</emphasis>
+               Los parámetros relativos a borrado por identificadores serán ignorados.</para>
+             </listitem>
+          </varlistentry>
+          <varlistentry>
+             <term>idList[]</term>
+             <listitem>
+               <para xml:lang="es">Lista de identificadores de elementos a tener en cuenta
+               para el borrado.</para>
+             </listitem>
+          </varlistentry>
+          <varlistentry>
+             <term>deleteIn</term>
+             <listitem>
+               <para xml:lang="es">Si recibe un <emphasis>true</emphasis>
+                  cuyo identificador se encuentra en <emphasis>idList[]</emphasis>. De lo
+                  contrario elimina los elementos cuyo identificado <emphasis>no se encuentra
+                  en idList[]</emphasis>.</para>
+             </listitem>
+          </varlistentry>
+        </variablelist>
+
+      <para xml:lang="es">Como resultado, el método devuelve: el número de elementos eliminados</para>
+
+      <para xml:lang="es">Si se produce un error en la eliminación el método devuelve un estado
+      <emphasis>INTERNAL_SERVER_ERROR(500)</emphasis> y el mensaje de error.</para>
+    </section>
+
+    <section xml:id="addon-web-mvc_batch_json-binding">
+      <title>Carga de datos en formato JSON</title>
+
+        <para xml:lang="es">Debido a que las operaciones de creación y
+        actualización reciben los datos en formato
+        <link xlink:href="http://es.wikipedia.org/wiki/JSON">JSON</link> y
+        Spring no tiene soporte todavía para cargar objetos en este
+        formato usando el <emphasis>conversionService</emphasis>
+        (ver <link xlink:href="https://jira.springsource.org/browse/SPR-6731">
+        tarea en el JIRA de Spring</link>). Mientras tanto, esta funcionalidad
+        incluye una librería propia que añade un
+        <emphasis>MappingHandlerAdapter</emphasis> que es capaz de hacerlo. Además,
+        este objeto realizar la validación y rellenar un <emphasis>BindingResult</emphasis>
+        con los resultados de la carga.</para>
+
+        <para xml:lang="es">El <emphasis>Jackson2RequestMappingHandlerAdapter</emphasis>
+        se configura en el fichero <filename>webmvc-config.xml</filename> y se encarga de
+        gestionar todas las peticiones cuyo <classname>@RequestMapping</classname>
+        esté configurado con <programlisting>consumes = "application/json"</programlisting>.</para>
+        </section>
+
+  </section>
+  <section xml:id="addon-web-mvc_jquery">
+    <title>Visualización con jQuery</title>
+
+    <para xml:lang="es">Esta funcionalidad permite modificar la visualización de las
+    vista para que utilice la librería <emphasis>jQuery</emphasis> en vez de la estándar
+    <emphasis>jQuery</emphasis>.</para>
+
+    <para xml:lang="es">Las opciones de este add-on <emphasis>no son compatibles
+    con el <link linkend="addon-web-screen-patterns">add-on Web Screen Patterns</link>
+    </emphasis>.</para>
+
+
+    <para xml:lang="es">Para poder utilizar el <emphasis>list</emphasis>
+      generado por el <link linkend="addon-web-mvc-datatables">
+      add-on web mvc datatables</link> es necesario que la vista
+      esté convertida a jQuery (ya que el componente <emphasis>dataTables</emphasis>
+      que se utiliza está creado en base a esta librería).</para>
+
+    <para xml:lang="es">Los artefactos que se instalan son:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">Ficheros <filename>.js</filename> de la librería <emphasis>jQuery</emphasis>
+        y <emphasis>jQueryUI</emphasis> además de otros plugins, como <emphasis>jQuery.validate</emphasis>,
+        necesarios para reemplazar todas las funcionalidades disponibles de base en las vistas.</para>
+      </listitem>
+      <listitem>
+        <para xml:lang="es">Ficheros <filename>.tagx</filename> con la nueva implementación de
+        pintado de los componentes.</para>
+      </listitem>
+      <listitem>
+        <para xml:lang="es">Ficheros de estilos e imágenes.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para xml:lang="es">Para utilizar esta funcionalidad dispone de los
+    siguientes comandos:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><command><link
+        linkend="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup">
+        web mvc jquery setup</link></command></term>
+
+        <listitem>
+          <para xml:lang="es">Instala los artefactos necesarios.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><command><link
+        linkend="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-add">
+        web mvc jquery add</link></command></term>
+
+        <listitem>
+          <para xml:lang="es">Convierte las vista de un controlador a jQuery.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><command><link
+        linkend="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-all">
+        web mvc jquery all</link></command></term>
+
+        <listitem>
+          <para xml:lang="es">Convierte todas las vistas a jQuery.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><command><link
+        linkend="apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-update-tags">
+        web mvc jquery update tags</link></command></term>
+
+        <listitem>
+          <para xml:lang="es">Actualiza los artefactos requeridos por jQuery. Util
+          para actualizar un proyecto a una nueva versión de gvNIX.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+
+    <section xml:id="addon-web-mvc_jquery_view-conversion">
+      <title>Conversión de las vistas a jQuery</title>
+
+        <para xml:lang="es">En el proceso de conversión consta de la correspondiente
+        anotación en el controlador <classname>@GvNIXWebJQuery</classname> y la
+        actualización de las rutas a los <filename>.tagx</filename> en sus
+        ficheros <filename>.jspx</filename>.</para>
+
+        <para xml:lang="es">Los <filename>.tagx</filename> se han creado para
+        que sean compatibles con los originales, por lo que, en principio, no será
+        necesario modificar las páginas <filename>.jspx</filename> generadas de
+        forma estándar por los comandos de ROO.</para>
+
+        <para xml:lang="es">Si se han añadido nuevos <filename>.tagx</filename>
+        personalizados al proyecto basados en <emphasis>DOJO</emphasis>, es
+        posible que tengan que ser replicados usando la nueva librería.</para>
+
+    </section>
+  </section>
+</chapter>

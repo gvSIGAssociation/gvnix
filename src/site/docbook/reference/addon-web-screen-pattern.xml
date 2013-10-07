@@ -6,7 +6,7 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-         
+
   <title xml:lang="es">Add-on Web Screen Patterns</title>
 
   <para xml:lang="es">Add-on para aplicar patrones de visualización sobre
@@ -15,6 +15,10 @@
   <para xml:lang="es">¿Qué entendemos por patrón de visualización? <link
   xlink:href="http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns">"12
   patrones de pantalla estándar"</link></para>
+
+  <para xml:lang="es">Las opciones de este add-on <emphasis>no son compatibles
+  con el <link linkend="addon-web-mvc_jquery">add-on web mvc de jQuery</link> ni con
+  <link linkend="addon-web-mvc-datatables">add-on web mvc datatables</link></emphasis>.</para>
 
   <section xml:id="addon-web-relation-styles_descripcion">
     <title xml:lang="es">Descripción</title>
@@ -39,15 +43,15 @@
       <listitem>
         <para>Maestro registro - Detalle tabular</para>
       </listitem>
-      
+
       <listitem>
         <para>Maestro registro - Detalle tabular con edición registro</para>
       </listitem>
-      
+
       <listitem>
         <para>Maestro tabular - Detalle tabular</para>
       </listitem>
-      
+
       <listitem>
         <para>Maestro tabular - Detalle tabular con edición registro</para>
       </listitem>
@@ -55,7 +59,7 @@
       <listitem>
         <para>Maestro tabular con edición registro - Detalle tabular</para>
       </listitem>
-      
+
       <listitem>
         <para>Maestro tabular con edición registro - Detalle tabular con edición registro</para>
       </listitem>
@@ -63,21 +67,21 @@
 
     <para xml:lang="es">Cuando un patrón maestro tiene algún detalle,
     el detalle de una entidad se corresponde con las relaciones 1 a n
-    <emphasis>ONE_TO_MANY</emphasis> o las relaciones n a n 
+    <emphasis>ONE_TO_MANY</emphasis> o las relaciones n a n
     <emphasis>MANY_TO_MANY</emphasis> que tiene con otras entidades.
     Así mismo, un maestro puede tener múltiples detalles y serán visualizados
     en la parte inferior de la pantalla mediante una pestaña por cada
     una de las relaciones.</para>
   </section>
-  
+
   <section xml:id="addon-web-relation-styles_instalacion">
     <title xml:lang="es">Instalación</title>
-    
+
   	<para xml:lang="es">El add-on ofrece el comando <link
     linkend="apendice-comandos_addon-web_mvc_pattern_setup">
     web mvc pattern setup</link> que crea en el proyecto los
     ficheros que utilizarán los patrones de visualización.</para>
-    
+
     <itemizedlist>
       <listitem>
         <para xml:lang="es">Nuevas librerías de tags e inclusión de nuevos tags en librerías existentes</para>
@@ -99,17 +103,17 @@
         <para xml:lang="es">Propiedades para el soporte de múltiples idiomas</para>
       </listitem>
     </itemizedlist>
-    
-	<para xml:lang="es">Este comando solo estará disponible para la 
-	inicialización de los artefactos. Si se desea restaurar los 
+
+	<para xml:lang="es">Este comando solo estará disponible para la
+	inicialización de los artefactos. Si se desea restaurar los
 	artefactos o acualizarlos después de un cambio de versión
 	del add-on es necesario utilizar el comando <link
     linkend="apendice-comandos_addon-web_mvc_pattern_update_tags">
     web mvc pattern update tags</link>.</para>
-    
+
   	<para xml:lang="es">La ejecución del comando realizará las siguientes
   	modificaciones en el proyecto.</para>
-    
+
 	<programlisting>roo-gvNIX> <command>web mvc pattern setup</command>
 	Created SRC_MAIN_WEBAPP/images/pattern
 	Created SRC_MAIN_WEBAPP/images/pattern/enEdicion.gif
@@ -159,12 +163,12 @@
 	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/selectRelated.tagx
 	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/simple.tagx
 	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/textarea.tagx</programlisting>
-  	
+
     <para xml:lang="es">Algunos de los componentes que se incluyen en el
     proyecto no son utilizados automáticamente por los patrones de visualización,
     sino que serán útiles para modificar el comportamiento de ciertas
     funcionalidades en la aplicación.</para>
-  	
+
   </section>
 
   <section xml:id="addon-web-relation-styles_creacion">
@@ -180,11 +184,11 @@
     <para xml:lang="es">Al definir un patrón de visualización sobre un
     controlador, se está definiendo un patrón maestro para la entidad gestionada
     por dicho controlador. Al definir un patrón de visualización sobre un
-    controlador y una relación, se está definiendo un patrón detalle 
+    controlador y una relación, se está definiendo un patrón detalle
     para la entidad relacionada.</para>
 
-    <para xml:lang="es"><emphasis>Advertencia:</emphasis> Actualmente, este 
-    add-on solo soporta controladores cuya entidad sea un 
+    <para xml:lang="es"><emphasis>Advertencia:</emphasis> Actualmente, este
+    add-on solo soporta controladores cuya entidad sea un
     <emphasis>Active record</emphasis> (que son aquellas que tengan declarada
     la notación <literal>@RooJpaActiveRecord</literal>).</para>
 
@@ -199,7 +203,7 @@
 	  Set&lt;Entidad3&gt; campo3;
 	  ...
 	}
-	
+
 	@RooJpaActiveRecord
 	public class Entidad2 {
 	  ...
@@ -219,7 +223,7 @@
 	public class Controlador1 {
 	  ...
 	}
-	
+
 	@RooWebScaffold(..., formBackingObject=Entidad2.class)
 	@Controller
 	public class Controlador2 {
@@ -239,10 +243,10 @@
 	    Spring MVC necesarios (diferentes archivos tagx, jspx, imágenes, javascript,
 	    ...) y se generarán los aspectos Java apropiados para lograr
 	    visualizar el patrón elegido.</para>
-	    
+
 		<figure>
 		<title xml:lang="es">Patrón maestro</title>
-		
+
 		<mediaobject>
 		  <imageobject>
 		    <imagedata align="center"
@@ -250,7 +254,7 @@
 		  </imageobject>
 		</mediaobject>
 		</figure>
-	  
+
 	</section>
 
   	<section xml:id="addon-web-relation-styles_creacion-detalle">
@@ -278,10 +282,10 @@
 	    maestro sobre el mismo controlador. Es decir, el controlador
 	    debe tener definida la anotación <emphasis>@GvNIXPattern</emphasis>.
 	    </para>
-	    
+
 		<figure>
 		<title xml:lang="es">Patrón maestro con un detalle</title>
-		
+
 		<mediaobject>
 		  <imageobject>
 		    <imagedata align="center"
@@ -289,7 +293,7 @@
 		  </imageobject>
 		</mediaobject>
 		</figure>
-	  
+
 	</section>
   </section>
 
@@ -298,7 +302,7 @@
 
     <section>
       <title>Tabular</title>
-      
+
       <para>Este patrón se identifica mediante el código
       <emphasis>tabular</emphasis>.</para>
 
@@ -308,7 +312,7 @@
 
 	  <figure>
 	  <title xml:lang="es">Tabular</title>
-	
+
 	  <mediaobject>
 	    <imageobject>
 	      <imagedata align="center"
@@ -316,7 +320,7 @@
 	    </imageobject>
 	  </mediaobject>
 	  </figure>
-    
+
       <para>Las operaciones de creación, actualización y borrado en este
       formato de visualización se pueden realizar sobre varios registros
       de forma simultánea. Estas operaciones se realizarán de forma transaccional,
@@ -376,26 +380,26 @@
           booleano que indica si se debe permitir la actualización de
           registros existentes desde el patrón.</para>
         </listitem>
-        
+
 		<listitem>
           <para><emphasis>deleteLink = true|false</emphasis>
           booleano que indica si se debe permitir el borrado de
           registros existentes desde el patrón.</para>
         </listitem>
-        
+
 		<listitem>
           <para><emphasis>resetLink = true|false</emphasis>
           booleano que indica si se debe permitir refrescar la lista
           de registros existentes en el patrón.</para>
         </listitem>
-                
+
 		<listitem>
           <para><emphasis>checkSelect = true|false</emphasis>
           booleano que indica si se debe mostrar un campo de selección
           a la izquierda de cada uno de los registros del patrón para
           marcar uno o varios de ellos.</para>
         </listitem>
-        
+
         <listitem>
           <para><emphasis>finder = NombreBuscador</emphasis> si está establecido,
           se mostrará una pestaña con la imagen de una lupa en la parte
@@ -405,18 +409,18 @@
           alguno y por lo tanto no mostrará la pestaña.
           Por ejemplo, <emphasis>finder="ByOwner"</emphasis>.</para>
         </listitem>
-        
+
 		<listitem>
           <para><emphasis>idRender = true|false</emphasis>
           booleano que indica si el campo identificador se debe ver en pantalla.</para>
         </listitem>
-        
+
 		<listitem>
           <para><emphasis>idDisabled = true|false</emphasis>
           booleano que indica si el campo identificador debe estar desactivado,
           es decir, el usuario no debe poder modificarlo.</para>
         </listitem>
-        
+
 		<listitem>
           <para><emphasis>roles = ListaRoles</emphasis>
           Lista separada por comas con los roles que tienen permiso para
@@ -426,24 +430,24 @@
           el <link linkend="addon-cit-security">add-on CIT Security</link>
           o el add-on Typical security.</para>
         </listitem>
-        
+
       </itemizedlist>
-      
+
     </section>
 
     <section>
       <title>Tabular con edición registro</title>
-      
+
       <para>Este patrón se identifica mediante el código
       <emphasis>tabular_edit_register</emphasis>.</para>
 
       <para>El patrón tabular define una visualización de varios registros
       simultaneos con la posibilidad de desplazarse a lo largo de todos los
       registros existentes mediante paginación.</para>
-      
+
 	  <figure>
 	  <title xml:lang="es">Tabular</title>
-	
+
 	  <mediaobject>
 	    <imageobject>
 	      <imagedata align="center"
@@ -456,10 +460,10 @@
       formato de visualización se realizan sobre un único registro seleccionado
       de la lista tabular y se realiza en una página nueva en formato
       registro.</para>
-      
+
 	  <figure>
 	  <title xml:lang="es">Edición</title>
-	
+
 	  <mediaobject>
 	    <imageobject>
 	      <imagedata align="center"
@@ -516,26 +520,26 @@
           booleano que indica si se debe permitir la actualización de
           registros existentes desde el patrón.</para>
         </listitem>
-        
+
 		<listitem>
           <para><emphasis>deleteLink = true|false</emphasis>
           booleano que indica si se debe permitir el borrado de
           registros existentes desde el patrón.</para>
         </listitem>
-        
+
 		<listitem>
           <para><emphasis>resetLink = true|false</emphasis>
           booleano que indica si se debe permitir refrescar la lista
           de registros existentes en el patrón.</para>
         </listitem>
-                
+
 		<listitem>
           <para><emphasis>checkSelect = true|false</emphasis>
           booleano que indica si se debe mostrar un campo de selección
           a la izquierda de cada uno de los registros del patrón para
           marcar alguno de ellos.</para>
         </listitem>
-        
+
         <listitem>
           <para><emphasis>finder = NombreBuscador</emphasis> si está establecido,
           se mostrará una pestaña con la imagen de una lupa en la parte
@@ -545,12 +549,12 @@
           alguno y por lo tanto no mostrará la pestaña.
           Por ejemplo, <emphasis>finder="ByOwner"</emphasis>.</para>
         </listitem>
-        
+
 		<listitem>
           <para><emphasis>idRender = true|false</emphasis>
           booleano que indica si el campo identificador se debe ver en pantalla.</para>
         </listitem>
-        
+
 		<listitem>
           <para><emphasis>roles = ListaRoles</emphasis>
           Lista separada por comas con los roles que tienen permiso para
@@ -560,9 +564,9 @@
           el <link linkend="addon-cit-security">add-on CIT Security</link>
           o el add-on Typical security.</para>
         </listitem>
-        
+
       </itemizedlist>
-      
+
     </section>
 
     <section>
@@ -574,10 +578,10 @@
       <para>Este patrón realiza la visualización de un único registro pero con la
       posibilidad de avanzar, mediante paginación de uno en uno, entre todos
       los registros existentes.</para>
-      
+
 	  <figure>
 	  <title xml:lang="es">Registro</title>
-	
+
 	  <mediaobject>
 	    <imageobject>
 	      <imagedata align="center"
@@ -585,7 +589,7 @@
 	    </imageobject>
 	  </mediaobject>
 	  </figure>
-	  
+
       <para>La generación automática de código de este patrón posiciona los
       campos de la entidad unos debajo de otros. A parte de generar la
       jspx propia del patrón, también modifica las jspx <emphasis>create,
@@ -597,7 +601,7 @@
       <emphasis>&lt;li&gt;campo_entidad&lt;/li&gt;</emphasis> dentro de otros elementos
       <emphasis>&lt;ul/&gt;</emphasis> de forma que los campos se mostrarán en
       columnas. El CSS de la aplicación está preparado para ello.</para>
-      
+
       <para>Por ejemplo, para el siguiente código extraído de
       <emphasis>show.jspx</emphasis>:</para>
 
@@ -684,7 +688,7 @@
           el <link linkend="addon-cit-security">add-on CIT Security</link>
           o el add-on Typical security.</para>
         </listitem>
-        
+
       </itemizedlist>
     </section>
 

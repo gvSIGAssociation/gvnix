@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-jpa" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Add-on JPA</title>
+
+  <para xml:lang="es">Add-on de utilidades enfocadas a la persistencia y consulta de las
+  entidades.</para>
+
+  <para xml:lang="es">Este add-on incluye dos funcionalidades:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para xml:lang="es">Servicios de persistencia de entidades en bloque.</para>
+    </listitem>
+    <listitem>
+      <para xml:lang="es">Registro de información adicional para búsquedas por relaciones.</para>
+    </listitem>
+  </itemizedlist>
+
+  <para xml:lang="es">Para poder utilizar estas funcionalidades hay que ejecutar
+    previamente el comando <command><link linkend="apendice-comandos_addon-jpa_jpa-gvnix-setup">
+    jpa gvnix setup</link></command>.</para>
+
+  <section xml:id="addon-jpa_batch">
+    <title>Servicios persistencia en bloque</title>
+
+    <para xml:lang="es">Esta funcionalidad permite generar <emphasis>servicios</emphasis> que
+    permiten realizar operaciones de creación, actualización y eliminación
+    de múltiples instancias de una entidad en una sola petición y de
+    forma transaccional.</para>
+
+    <para xml:lang="es">Estos <emphasis>servicios</emphasis> se generan como un
+    <emphasis>bean</emphasis> de Spring, de forma que, para utilizarlos,
+    solo es necesario declararlos como propiedad en la clase que los requiera
+    y serán inyectados en el momento de la construcción de la instancia
+    por Spring.</para>
+
+    <para xml:lang="es">Un ejemplo de este servicio generado sería este:</para>
+
+    <programlisting>package com.springsource.petclinic.domain;
+import org.gvnix.addon.jpa.batch.GvNIXJpaBatch;
+import org.springframework.stereotype.Service;
+
+@Service
+@GvNIXJpaBatch(entity = Owner.class)
+public class OwnerBatchService {
+}
+    </programlisting>
+
+    <para xml:lang="es">En el correspondiente fichero <filename>OwnerBatchService_Roo_GvNIXJpaBatch.aj</filename>
+    se generarán los siguientes métodos:
+
+    <variablelist>
+      <varlistentry>
+       <term>deleteAll()</term>
+       <listitem>
+          <para xml:lang="es">Elimina todos los registro de la entidad.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>deleteIn(List&lt;Long&gt; ids)</term>
+       <listitem>
+          <para xml:lang="es">Elimina los registro de la entidad cuyos indentificadores
+          se encuentren en la lista <emphasis>ids</emphasis>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>deleteNotIn(List&lt;Long&gt; ids)</term>
+       <listitem>
+          <para xml:lang="es">Elimina los registro de la entidad cuyos indentificadores
+          <emphasis>no</emphasis> se encuentren en la lista <emphasis>ids</emphasis>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>create(List&lt;Owner&gt; owners)</term>
+       <listitem>
+          <para xml:lang="es">Persiste como nuevos todos los elementos de la lista
+          <emphasis>owners</emphasis>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>update(List&lt;Owner&gt; owners)</term>
+       <listitem>
+          <para xml:lang="es">Persiste todos los elementos de la lista
+          <emphasis>owners</emphasis>.</para>
+          <note>
+            <para xml:lang="es"><emphasis>Importante:</emphasis> Si algún
+            elemento de la lista no tiene establecido su campo de clave
+            primaria o su campo de control de concurrencia (este último sólo si
+            está definido) el registro <emphasis>se guardará como
+            registro nuevo</emphasis>.</para>
+          </note>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>findByValues(Map&lt;String,Object&gt; propertyValues)</term>
+       <listitem>
+          <para xml:lang="es">Devuelve una lista de elemento cuyas propiedades
+          coincidan (se usa el operador <emphasis>igual a</emphasis>) con
+          <emphasis>todos</emphasis> valores recibidos en <emphasis> propertyValues</emphasis>.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>deleteByValues(Map&lt;String,Object&gt; propertyValues)</term>
+       <listitem>
+          <para xml:lang="es">Elimina todos elementos cuyas propiedades
+          coincidan (se usa el operador <emphasis>igual a</emphasis>) con
+          <emphasis>todos</emphasis> valores recibidos en <emphasis> propertyValues</emphasis>.
+          </para>
+        </listitem>
+      </varlistentry>
+
+    </variablelist>
+    </para>
+
+    <para xml:lang="es">Para poder usar este servicio en cualquier clase solo es
+    necesario declarar una propiedad con la anotación <link href="http://docs.spring.io/spring/docs/3.0.x/javadoc-api/org/springframework/beans/factory/annotation/Autowired.html">
+    @Autowire</link>. Spring se encarga de inyectar una instancia del servicio en la
+    propiedad. Este sería un ejemplo de la declaración para usarlo:
+    </para>
+
+    <programlisting>class MyClass {
+
+    @Autowire
+    private OwnerBatchService ownerBatch;
+    </programlisting>
+
+    <para xml:lang="es">Todas las operaciones generadas (excepto <emphasis>findByValues</emphasis>)
+    son <emphasis>transaccionales</emphasis>. Por lo que, si se produce un error
+    en cualquier elemento afectado, <emphasis>la operación entera</emphasis> será
+    abortada (no se guardarán los cambios)</para>
+
+    <para xml:lang="es">Esta funcionalidad es requerida por otros add-ons como
+    <link linkend="addon-web-mvc-datatables">Web Mvc datatables</link> para poder
+    realizar operaciones sobre múltiples registros a la vez.
+    </para>
+
+    <para xml:lang="es">Para generar estos servicios se pueden utilizar los
+    siguientes comandos:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><command><link
+        linkend="apendice-comandos_addon-jpa_jpa-batch_jpa-batch-add">
+        jpa batch add</link></command></term>
+
+        <listitem>
+          <para xml:lang="es">Genera el servicio para una entidad.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><command><link
+        linkend="apendice-comandos_addon-jpa_jpa-batch_jpa-batch-all">
+        jpa batch all</link></command></term>
+
+        <listitem>
+          <para xml:lang="es">Genera el servicio para todas
+          las entidades de la aplicación.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="addon-jpa_query">
+    <title>Información adicional para búsquedas por relaciones</title>
+
+    <para xml:lang="es">Esta funcionalidad permite definir información
+    adicional sobre las propiedades de la entidad que declaran una relación que
+    permiten realizar búsquedas y ordenaciones sobre ella.</para>
+
+    <para xml:lang="es">Esta información se utiliza actualmente
+    para permitir realizar búsquedas de texto dentro de entidades relacionadas
+    y su ordenación cuando se usa el
+    <link linkend="apendice-comandos_addon-web-mvc-datatables">
+    add-on web mvc datatables</link>.</para>
+
+    <para xml:lang="es">No tiene implementado ningún comando. Funciona
+    añadiendo la anotación <emphasis>GvNIXJpaQuery</emphasis>a la propiedad.
+    Por ejemplo, para permitir que, desde el listado de <emphasis>Pet</emphasis>,
+    sea posible buscar por el nombre y apellido de su <emphasis>Owner</emphasis>
+    y cuando se ordene por su columna se utilicen los mismos campos,
+    deberíamos añadir la siguiente anotación:</para>
+
+    <programlisting>
+....
+public class Pet {
+    ....
+    ....
+
+    @GvNIXJpaQuery(filterBy={"lastName","firstName"}, orderBy={"lastName","firstName"})
+    @ManyToOne
+    private Owner owner;
+
+    </programlisting>
+
+  </section>
+</chapter>

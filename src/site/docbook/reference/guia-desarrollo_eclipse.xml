@@ -9,7 +9,7 @@
   <title xml:lang="es">Desarrollo con Eclipse</title>
 
   <section xml:id="guia-desarrollo_eclipse-instalar">
-     
+
     <title xml:lang="es">Instalación</title>
 
     <para>Spring ha desarrollado una extensión para Eclipse llamada
@@ -20,8 +20,8 @@
     Eclipse.</para>
 
     <para>Hay dos formas de instalar STS, la primera es como una distribución
-    propia y la segunda es como un plugin de un Eclipse ya existente. 
-    Se recomienda encarecidamente utilizar la primera de ellas por su 
+    propia y la segunda es como un plugin de un Eclipse ya existente.
+    Se recomienda encarecidamente utilizar la primera de ellas por su
     facilidad de instalación y mejor rendimiento.</para>
 
     <section xml:id="guia-desarrollo_eclipse-instalar1">
@@ -37,16 +37,9 @@
       <itemizedlist>
         <listitem>
           <para>Descargar la última versión de Springsource Tool Suite desde
-          <link xlink:href="http://www.springsource.org/springsource-tool-suite-download">
-          http://www.springsource.org/springsource-tool-suite-download</link>. Elegir
-          la versión comprimida que se adapte al sistema operativo y
-          arquitectura de 32bits o 64bits.</para>
+          <link xlink:href="http://spring.io/tools">
+          http://spring.io/tools</link></para>
         </listitem>
-        
-	    <note>
-	      <para>Se recomienda descargar la versión basada en Eclipse 3.x debido
-	      a ciertos problemas observados en la versión 4.x de Eclipse.</para>
-	    </note>
 
         <listitem>Descomprimir el archivo descargado y moverlo a una carpeta,
         por ejemplo $HOME/software.</listitem>
@@ -137,7 +130,7 @@
         "Work with:" indicar que se usará el site:
         <link xlink:href="http://m2eclipse.sonatype.org/sites/m2e">
         http://m2eclipse.sonatype.org/sites/m2e</link>.
-        A continución eleccionar "Maven Integration for Eclipse". 
+        A continución eleccionar "Maven Integration for Eclipse".
         Pulsar en siguiente y tras aceptar la licencia del plugin instalar.</para>
       </listitem>
 
@@ -174,7 +167,7 @@
       Source Tool Suite Installation Instructions</link>.</listitem>
     </itemizedlist>
 
-     
+
   </section>
 
   <section>
@@ -185,7 +178,7 @@
     antes hay que indicarle a Eclipse donde está instalada la nueva versión de
     gvNIX.</para>
 
-    <para>En el menú <emphasis>Window &gt; Preferences &gt; Spring &gt; 
+    <para>En el menú <emphasis>Window &gt; Preferences &gt; Spring &gt;
     Roo Support</emphasis>.
     Pulsar sobre el botón Add y buscar en el navegador de archivos el lugar
     donde está instalado gvNIX. Aparecerá una pantalla similar a la
@@ -203,7 +196,7 @@
 
     <para>Presionando en OK sobre las dos pantallas que abiertas ya estará
     configurado el soporte para la linea de comandos de gvNIX. Para poder
-    usarlo abrir la perspectiva de Spring con <emphasis>Window &gt; Open 
+    usarlo abrir la perspectiva de Spring con <emphasis>Window &gt; Open
     Perspective &gt; Other &gt; Spring</emphasis>.
     En la parte inferior de la pantalla aparecerá una
     pestaña llamada Roo Shell. Si no apareciese la pestaña, puede abrirse
@@ -276,14 +269,14 @@
 
       <programlisting>roo-gvNIX&gt; <emphasis role="bold">jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
 Created ...
-roo-gvNIX&gt;<emphasis role="bold"> entity jpa --class ~.domain.Timer --testAutomatically</emphasis> 
+roo-gvNIX&gt;<emphasis role="bold"> entity jpa --class ~.domain.Timer --testAutomatically</emphasis>
 Created ...
 ~.domain.Timer roo-gvNIX&gt;<emphasis role="bold"> field string --fieldName message --notNull</emphasis>
 Managed ...</programlisting>
 
-      <para xml:lang="es">El comando <emphasis role="bold">persistence
-      setup</emphasis> permite configurar la capa de acceso a datos de manera
-      sencilla. El comando <emphasis role="bold">entitiy</emphasis> sirve para
+      <para xml:lang="es">El comando <emphasis role="bold">jpa setup</emphasis>
+      permite configurar la capa de acceso a datos de manera
+      sencilla. El comando <emphasis role="bold">entitiy jpa</emphasis> sirve para
       crear una nueva entidad y <emphasis role="bold">field</emphasis> crea
       atributos en la entidad. Estos comandos se verán con más
       detalle en la sección <link
@@ -352,7 +345,7 @@ Created ...</programlisting>
 ~.domain.PizzaOrder roo-gvNIX&gt;</programlisting>
 
       <para xml:lang="es">Este comando termina ejecutando el comando del
-      sistema<command>mvn eclipse:eclipse</command> en el proyecto, por 
+      sistema<command>mvn eclipse:eclipse</command> en el proyecto, por
       lo que es indiferente el uso de cualquiera de los dos métodos.
       Tener en cuenta que este último comando necesita tener configurado
       Maven.</para>
@@ -385,14 +378,14 @@ Created ...</programlisting>
   <section xml:id="guia-desarrollo_eclipse-pruebas-unitarias">
     <title xml:lang="es">Generación de pruebas de integración</title>
 
-    <para>El comando <emphasis>entity</emphasis> dispone de la opción testAutomatically
+    <para>El comando <emphasis>entity jpa</emphasis> dispone de la opción testAutomatically
     que al ser especificada generará los test de integración para dicha entidad
     usando JUnit.</para>
-    
+
     <para>Si los tests no fueron creados en el momento de la ejecución
-    del comando <emphasis>entity</emphasis>, pueden ser generados con 
+    del comando <emphasis>entity</emphasis>, pueden ser generados con
     posterioridad mediante otro comando:</para>
-    
+
     <programlisting>
     test integration --entity ~.domain.Timer
     </programlisting>
@@ -583,7 +576,7 @@ Created ...</programlisting>
 
         <itemizedlist>
           <listitem>
-            <para>En la pantalla de opciones de la configuración del 
+            <para>En la pantalla de opciones de la configuración del
             servidor acceder a <emphasis>Open launch configuration
             </emphasis></para>
           </listitem>
@@ -597,7 +590,7 @@ Created ...</programlisting>
           </listitem>
         </itemizedlist>
       </important>
-      
+
     </section>
 
     <section>
@@ -607,7 +600,7 @@ Created ...</programlisting>
       este la aplicación que se desea ejecutar en él. Se puede ejecutar más de
       una a la vez. En la vista Servers, pulsar con el botón derecho sobre el
       servidor deseado y seleccionar la opción <emphasis>Add and Remove ...
-      </emphasis>. En el diálogo que se abre seleccionar de la lista de la 
+      </emphasis>. En el diálogo que se abre seleccionar de la lista de la
       izquierda la aplicación y pulsar el botón <emphasis>Add</emphasis>.
       Por último, cerrar el diálogo con <emphasis>Finish</emphasis>.</para>
 
@@ -653,11 +646,11 @@ Created ...</programlisting>
 
       <para>Una vez arrancado el servidor se podrá navegar por la aplicación
       bien desde un navegador externo (Firefox) o bien desde un navegador
-      propio que incorpora Eclipse accediendo a la dirección 
+      propio que incorpora Eclipse accediendo a la dirección
       <link xlink:href="http://localhost:8080/tenminutes">
       http://localhost:8080/tenminutes</link>. Observar que el final de la
       dirección se corresponde con el nombre de la aplicación proporcionado
-      al crear el proyecto. Para abrir el navegador interno 
+      al crear el proyecto. Para abrir el navegador interno
       de Eclipse utilizar <emphasis>Window &gt; Show view &gt; Internal Web
       Browser</emphasis>.</para>
 

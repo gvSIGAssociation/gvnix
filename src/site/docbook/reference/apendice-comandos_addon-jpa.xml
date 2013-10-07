@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_addon-jpa"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+
+  <title xml:lang="es">Comandos del add-on JPA</title>
+
+  <para xml:lang="es">Para una descripción detallada de las características
+  del add-on consultar la documentación del <link linkend="addon-jpa">
+  add-on JPA</link>.</para>
+
+  <table>
+    <title xml:lang="es">Comandos de add-on jpa</title>
+
+    <tgroup cols="2">
+      <colspec colwidth="145" />
+      <colspec colwidth="300" />
+      <thead>
+        <row>
+          <entry xml:lang="es" align="center">Comando</entry>
+
+          <entry xml:lang="es" align="center">Descripción</entry>
+        </row>
+      </thead>
+
+      <tbody>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-gvnix-setup">jpa gvnix setup</link></entry>
+
+          <entry xml:lang="es">Instala el soporte para la funcionalidad</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-batch_jpa-batch-add">jpa batch add</link></entry>
+
+          <entry xml:lang="es">General el servicio de persistencia en bloque para una entidad.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-batch_jpa-batch-all">jpa batch all</link></entry>
+
+          <entry xml:lang="es">General el servicio de persistencia en bloque para todas las entidades.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <section xml:id="apendice-comandos_addon-jpa_jpa-gvnix-setup">
+    <title>jpa gvnix setup</title>
+
+    <para xml:lang="es">Instala las dependencias necesarias
+    para las funcionalidades del add-on.</para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-jpa_jpa-batch_jpa-batch-add">
+    <title>jpa batch add</title>
+
+    <para xml:lang="es">Crea el servicio de persistencia en bloque para
+    una entidad.</para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--entity</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido] [Clase entidad] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Entidad destino de las operaciones de persistencia.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>--type</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Opcional] [Clase] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Clase de servicio a generar. Si se omite se generará
+              una clase, con nombre basado en el nombre de la entidad, en el mismo paquete
+              que la entidad.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    </para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-jpa_jpa-batch_jpa-batch-all">
+    <title>jpa batch all</title>
+
+    <para xml:lang="es">Crea el servicio de presistencia en bloque para
+    todas las entidades de la aplicación.</para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--package</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Opcional] [Paquete] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Paquete donde se generarán las clases de servicio a generar.
+              Si se omite se generarán en el mismo paquete que la entidad a la que afecta.
+              El nombre de la clase del servicio se genera a partir del nombre de la entidad.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    </para>
+  </section>
+
+</section>
