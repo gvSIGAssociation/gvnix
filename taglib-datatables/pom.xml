@@ -14,9 +14,9 @@
       Licensed under the Apache License, Version 2.0 (the "License");
       you may not use this file except in compliance with the License.
       You may obtain a copy of the License at
-  
+
       http://www.apache.org/licenses/LICENSE-2.0
-  
+
       Unless required by applicable law or agreed to in writing, software
       distributed under the License is distributed on an "AS IS" BASIS,
       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,13 +38,13 @@
   </organization>
   <description>JSP Tag lib which adaptes Dandelion datatables (http://dandelion.github.com/datatables) to work in gvNIX</description>
   <url>http://www.gvnix.org</url>
-  
+
   <dependencies>
         <dependency>
             <groupId>javax.servlet.jsp.jstl</groupId>
             <artifactId>jstl-api</artifactId>
             <version>1.2</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
@@ -73,7 +73,7 @@
             <groupId>com.github.dandelion</groupId>
             <artifactId>datatables-servlet2</artifactId>
             <version>${dandelion-datatables.version}</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>com.github.dandelion</groupId>
             <artifactId>datatables-export-itext</artifactId>
@@ -120,11 +120,10 @@
         </dependency>
   </dependencies>
   <properties>
-        <dandelion-datatables.version>0.9.1</dandelion-datatables.version>
         <jackson.version>1.9.12</jackson.version>
   </properties>
   <build>
-  
+
   	<!-- DiSiD: Add build resources filtering -->
     <resources>
       <resource>
@@ -142,7 +141,7 @@
         </includes>
       </resource>
     </resources>
-    
+
   	<pluginManagement>
   		<plugins>
   			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
