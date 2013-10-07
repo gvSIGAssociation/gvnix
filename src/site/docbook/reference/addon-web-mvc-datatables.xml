@@ -285,7 +285,7 @@
       </para>
 
     <para xml:lang="es">El modo de datos del controlador se establece con
-      la opción <programlisting>--ajax</programlisting> al ejecutar el comando
+      la opción <literal>--ajax</literal> al ejecutar el comando
       <command><link linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add">
       web mvc datatables add</link></command> o modificar el atributo <emphasis>ajax</emphasis>
       de la anotación <classname>GvNIXDatatables</classname>. gvNIX actualizará
@@ -335,7 +335,7 @@
     el resultado en la tabla.</para>
 
     <para xml:lang="es">Para activar el filtrado en una columna hay
-    que añadir el parámetro <programlisting>filterable="true"</programlisting>
+    que añadir el parámetro <literal>filterable="true"</literal>
     en la etiqueta <classname>table:column</classname> correspondiente a la columna
     en el fichero <filename>list.jspx</filename></para>
   </section>
@@ -356,7 +356,7 @@
     ordenación, filtros y edición.</para>
 
     <para xml:lang="es">Para establece este modo de visualización
-    hay que usar el parámetro <programlisting>--mode show</programlisting>
+    hay que usar el parámetro <literal>--mode show</literal>
     al ejecutar el comando <command><link
     linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add">
     web mvc datatables add</link></command>.</para>
@@ -364,9 +364,9 @@
     <para xml:lang="es">Para vistas que ya transformadas, se pude
     establecer este modo modificando los valores de la anotación
     <classname>@GvNIXDatatables</classname> y añadirle el atributo
-    <programlisting>mode = "show"</programlisting>. Comprobar
+    <literal>mode = "show"</literal>. Comprobar
     que también esta establecido el valor
-    <programlisting>ajax = true</programlisting>.</para>
+    <literal>ajax = true</literal>.</para>
   </section>
 
   <section xml:id="addon-web-mvc-datatables_add-details">
@@ -376,7 +376,7 @@
     de datos relacionados con un registro al pie de la página.
     Los datos mostrados se obtendrán a parir de una propiedad de
     relación 1:N de la entidad actual. La propiedad debe
-    tener configurada el valor <programlisting>mappedBy</programlisting>
+    tener configurada el valor <literal>mappedBy</literal>
     en la anotación <classname>@OneToMany</classname></para>
 
     <para xml:lang="es">Para mostrar los datos del detalle
@@ -506,7 +506,7 @@
     debajo de cada campo afectado.</para>
 
     <para xml:lang="es">Para activar esta opción
-    hay que usar el parámetro <programlisting>--inline true</programlisting>
+    hay que usar el parámetro <literal>--inline true</literal>
     al ejecutar el comando <command><link
     linkend="apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add">
     web mvc datatables add</link></command>.</para>
@@ -514,7 +514,7 @@
     <para xml:lang="es">Para vistas que ya transformadas, se pude
     activar la opción modificando los valores de la anotación
     <classname>@GvNIXDatatables</classname> y añadirle el atributo
-    <programlisting>inlineEditing = true</programlisting>.</para>
+    <literal>inlineEditing = true</literal>.</para>
 
   </section>
 </chapter>
