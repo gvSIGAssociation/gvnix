@@ -1,12 +1,40 @@
 /**
  * gvNIX Datatables extended initialization
  *
+ * @param datatable settings
  * @param tableId
+ * @param options to initialize
+ * @param count of tries-to-delay-initialize
  */
-function fnDatatablesExtInit(tableId, options) {
-	var tableObj = $('#' + tableId);
-	var $table = tableObj.dataTable();
+function fnDatatablesExtInit(oSettings, tableId, options, count) {
 
+	var $table = null;
+	var atables = $.fn.dataTable.fnTables(true);
+	for (i = 0; i < atables.length; i++) {
+		$table = jQuery(atables[i]).dataTable();
+		if ($table.fnSettings().sTableId == tableId){
+			break;
+		}
+		$table = null;
+	}
+	if ($table == null) {
+		// dataTable instance not found
+		if (count) {
+			// Check number of tries
+			if (count > 12) {
+				throw "Can't initialize datatable '"+ tableId + "' for 5 times"
+			}
+			// increase tries count
+			count++;
+		} else {
+			// init try count
+			count = 1;
+		}
+		// Try to load it delayed
+		log("Delay loading of '"+ tableId+"':"+count);
+		window.setTimeout(fnDatatablesExtInit, 100, oSettings, tableId, options,count);
+		return;
+	}
 	if (options.filterOnReturn) {
 
 		// Enable filter on return
@@ -63,6 +91,11 @@ function fnDatatablesExtInit(tableId, options) {
 		} else {
 			$table.fnRowClick();
 		}
+	}
+
+	if (count) {
+		// If delay loading adjust column size
+		$table.fnAdjustColumnSizing();
 	}
 }
 

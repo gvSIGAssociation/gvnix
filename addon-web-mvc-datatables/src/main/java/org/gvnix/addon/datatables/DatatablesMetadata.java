@@ -2432,6 +2432,20 @@ public class DatatablesMetadata extends
     private void buildListDatatablesRequesMethodDomBody(
             InvocableMemberBodyBuilder bodyBuilder) {
 
+        // // Get parentId parameter for details
+        bodyBuilder.appendFormalLine("// Get parentId parameter for details");
+
+        // if (request.getParameterMap().containsKey("_dt_parentId")){
+        bodyBuilder
+                .appendFormalLine("if (request.getParameterMap().containsKey(\"_dt_parentId\")){");
+        bodyBuilder.indent();
+        // uiModel.addAttribute("parentId",request.getParameter("_dt_parentId"));
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"parentId\",request.getParameter(\"_dt_parentId\"));");
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
         String listVarName = StringUtils.uncapitalize(entityPlural);
 
         bodyBuilder
@@ -2472,6 +2486,28 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine(String.format("%s params = %s(request);",
                 helper.getFinalTypeName(MAP_STRING_STRING),
                 POPULATE_PARAMETERS_MAP.getSymbolName()));
+
+        // [Code generated] // Get parentId information for details render
+        bodyBuilder
+                .appendFormalLine("// Get parentId information for details render");
+
+        // [Code generated] String parentId = params.remove("_dt_parentId");
+        bodyBuilder
+                .appendFormalLine("String parentId = params.remove(\"_dt_parentId\");");
+
+        // [Code generated] if (!params.isEmpty()) {
+        bodyBuilder.appendFormalLine(String.format(
+                "if (%s.isNotBlank(parentId)) {",
+                helper.getFinalTypeName(STRING_UTILS)));
+        bodyBuilder.indent();
+
+        // [Code generated] uiModel.addAttribute("parentId", parentId);
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"parentId\", parentId);");
+
+        // [Code generated] }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
 
         // [Code generated] if (!params.isEmpty()) {
         bodyBuilder.appendFormalLine("if (!params.isEmpty()) {");

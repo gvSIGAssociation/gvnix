@@ -765,7 +765,7 @@ var GvNIX_Selection;
 		 * @param selectec
 		 */
 		"_fnUpdateRowTr" : function(nRow, selected) {
-			var s = this.s;
+			var s = this.s, nTable = this._data.dt.nTable;
 			var classToAdd = null, classToRemove = null, checkValue = null;
 
 			// prepare values
@@ -791,7 +791,7 @@ var GvNIX_Selection;
 						+ " -" + classToRemove + " check:" + checkValue);
 			}
 			// update row values
-			var $nRow = jQuery(nRow);
+			var $nRow = jQuery(nRow,nTable);
 			if (classToAdd) {
 				$nRow.addClass(classToAdd);
 			}
@@ -800,7 +800,7 @@ var GvNIX_Selection;
 			}
 			if (checkValue != null) {
 				var checkbox = jQuery("input." + s.checkColumnClass
-						+ ":checkbox", nRow);
+						+ ":checkbox", $nRow);
 				checkbox.prop('checked', checkValue);
 			}
 		},

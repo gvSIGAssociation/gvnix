@@ -63,6 +63,16 @@ var GvNIX_RowClick;
 			 * @default ["utilbox"]
 			 */
 			"ignoreCellClasses" : ["utilbox"],
+
+			/**
+			 * Persist state on datatable store
+			 *
+			 * @property persistState
+			 * @type boolean
+			 * @default false
+			 */
+			"persistState" : false
+
 		};
 
 		/**
@@ -249,11 +259,13 @@ var GvNIX_RowClick;
 		 *            tr.id value (could be DT_RowId on AJAX mode)
 		 * @param redraw
 		 *            row if change state
+		 * @param force
+		 *            force to execute callbacks
 		 * @returns true if selection has been change
 		 */
-		"fnSetLastClicked" : function(trId, redraw) {
+		"fnSetLastClicked" : function(trId, redraw, force) {
 			var _d = this._data;
-			if (trId == _d.lastClickedId) {
+			if ((trId == _d.lastClickedId) && !force) {
 				// is the same row: do nothing
 				return false;
 			} else if (_d.lastClickedId && redraw) {
@@ -266,6 +278,9 @@ var GvNIX_RowClick;
 				this.fnRedrawRow(trId, true);
 			}
 			_d.rowClickedCallbacks.fireWith(this, [ this, trId ]);
+			if (this.s.persistState) {
+				this.fnSaveState();
+			}
 			return true;
 		},
 
@@ -300,6 +315,39 @@ var GvNIX_RowClick;
 			}
 			_d.rowClickedCallbacks.remove(callback);
 		},
+
+		/**
+		 * Load previous state of control from
+		 * the cookie
+		 *
+		 *@param force force load
+		 */
+		"fnLoadState" : function(force) {
+			var dt = this._data.dt;
+
+			var id = dt.oApi._fnReadCookie("gvnixRowclk-"+dt.nTable.id);
+			if (id) {
+				this.fnSetLastClicked(id, true,true);
+			}
+		},
+
+		/**
+		 * Save current state of control to
+		 * the cookie
+		 *
+		 */
+		"fnSaveState" : function() {
+			var _d = this._data, dt = _d.dt;
+
+			dt.oApi._fnCreateCookie("gvnixRowclk-"+dt.nTable.id,
+					_d.lastClickedId,
+					10*60, // 10 minutes
+					"gvnixRowclk-",
+					null
+					);
+
+		},
+
 
 		// Private methods (they are of course public in JS, but recommended as
 		// private) * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -344,7 +392,7 @@ var GvNIX_RowClick;
 		 * @param selectec
 		 */
 		"_fnUpdateRowTr" : function(nRow, selected) {
-			var s = this.s;
+			var s = this.s, nTable = this._data.dt.nTable;
 			var classToAdd = null, classToRemove = null;
 
 			// prepare values
@@ -360,7 +408,7 @@ var GvNIX_RowClick;
 						+ (classToRemove ? " -" + classToRemove : ""));
 			}
 			// update row values
-			var $nRow = jQuery(nRow);
+			var $nRow = jQuery(nRow,nTable);
 			if (classToAdd) {
 				$nRow.addClass(classToAdd);
 			}
@@ -426,6 +474,16 @@ var GvNIX_RowClick;
 				if (typeof iSettings.rowClicked == "object") {
 					_d.rowClickedCallbacks.add(iSettings.rowClicked);
 				}
+				if (iSettings.ignoreCellClasses !== undefined) {
+					if (jQuery.isArray(iSettings.ignoreCellClasses)) {
+						s.ignoreCellClasses = iSettings.ignoreCellClasses;
+					} else if (typeof iSettings.ignoreCellClasses === "string" ){
+						s.ignoreCellClasses = [iSettings.ignoreCellClasses];
+					}
+				}
+				if (iSettings.persistState) {
+					s.persistState = true;
+				}
 			}
 
 			// Initialize Variables to store data
@@ -440,6 +498,11 @@ var GvNIX_RowClick;
 
 			// Register Row callback without remove user configuration
 			this._fnRegisterDrawRowCallback();
+
+			// Register store state
+			if (s.persistState) {
+				this.fnLoadState();
+			}
 
 			// Update visible rows
 			this.fnRedrawVisibleRows();
@@ -512,18 +575,26 @@ var GvNIX_RowClick;
 	 * @static
 	 */
 	GvNIX_RowClick.fnGetInstance = function(node) {
+		var nodeId = null;
+		var $node = null;
 		if (typeof node != 'object') {
-			node = jQuery("#" + node);
+			nodeId = node;
+			$node = jQuery("#" + node);
+			if ($node.length < 1){
+				return null;
+			}
+			node = $node[0];
+		} else {
+			nodeId = node.id;
+			$node = jQuery(node);
 		}
 
-		if ($.fn.DataTable.fnIsDataTable(node)) {
-			throw "Datatable not found: " + node;
-		}
-		var dt = node.dataTable();
-
-		for ( var i = 0, iLen = GvNIX_RowClick._aInstances.length; i < iLen; i++) {
-			if (GvNIX_RowClick._aInstances[i]._data.dt == dt) {
-				return GvNIX_RowClick._aInstances[i];
+		if (jQuery.fn.DataTable.fnIsDataTable(node)) {
+			// found node
+			for ( var i = 0, iLen = GvNIX_RowClick._aInstances.length; i < iLen; i++) {
+				if (GvNIX_RowClick._aInstances[i]._data.dt.nTable == node) {
+					return GvNIX_RowClick._aInstances[i];
+				}
 			}
 		}
 		return null;
@@ -541,20 +612,25 @@ var GvNIX_RowClick;
 	 * @static
 	 */
 	GvNIX_RowClick.fnAddRowClickCallback = function(node, callback) {
-		var nodeId;
+		var nodeId = null;
+		var $node = null;
 		if (typeof node != 'object') {
 			nodeId = node;
-			node = jQuery("#" + node);
+			$node = jQuery("#" + node);
+			if ($node.length < 1){
+				return null;
+			}
+			node = $node[0];
 		} else {
 			nodeId = node.id;
+			$node = jQuery(node);
 		}
-
 		if (jQuery.fn.DataTable.fnIsDataTable(node)) {
 			// found node
 			var dt = node.dataTable();
 
 			for ( var i = 0, iLen = GvNIX_RowClick._aInstances.length; i < iLen; i++) {
-				if (GvNIX_RowClick._aInstances[i]._data.dt == dt) {
+				if (GvNIX_RowClick._aInstances[i]._data.dt.nTable == node) {
 					// found datatable: register callback in datatable
 					GvNIX_RowClick._aInstances[i]
 							.fnAddRowClickCallback(callback);

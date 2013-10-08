@@ -19,7 +19,7 @@ function loadDetail(trId, detailDatatableId, mainDatatablesId, url, errorMessage
 }
 
 function received(bodyId, mainDatatablesId, bodyReceived, received_bodies, length) {
-	console.log(received_bodies.length);
+	//console.log(received_bodies.length);
 	received_bodies.push({'id': bodyId, 'body': bodyReceived});
 	if (received_bodies.length == length) {
 		jQuery.each(received_bodies, function (index,value){
@@ -43,8 +43,8 @@ function hideDetail(detailDatatableId) {
 /**
  * generate url to obtain some detail.
  */
-function getDetailUrl(baseUrl, mappedBy, rowId) {
-	return baseUrl + '&' + mappedBy + '=' + rowId + '&datatablesMappedValue=' + rowId;
+function getDetailUrl(mainDatatableId, baseUrl, mappedBy, rowId) {
+	return baseUrl + '&' + mappedBy + '=' + rowId + '&datatablesMappedValue=' + rowId + '&_dt_parentId='+mainDatatableId;
 }
 
 /**

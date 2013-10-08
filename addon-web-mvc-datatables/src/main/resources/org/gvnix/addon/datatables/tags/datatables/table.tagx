@@ -70,7 +70,7 @@
   <jsp:directive.attribute name="serverParams" type="java.lang.String" rtexprvalue="true" required="false" description="Allows you to send extra information to the server when using AJAX source" />
   <jsp:directive.attribute name="pipelining" type="java.lang.Boolean" rtexprvalue="true" required="false" description="Enable pipelining data for paging when server-side processing is enabled" />
   <jsp:directive.attribute name="pipeSize" type="java.lang.Integer" rtexprvalue="true" required="false" description="Pipe size used when pipelining is enabled, ie times that the user can page before a request must be made of the server. (Default : 5)" />
-  <jsp:directive.attribute name="stateSave" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable state saving.  When enabled a cookie will be used to save table display information such as pagination information, display length, filtering and sorting. As such when the end user reloads the page the display display will match what thy had previously set up. (Default : false, see http://datatables.net/ref#bStateSave)" />
+  <jsp:directive.attribute name="stateSave" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable state saving.  When enabled a cookie will be used to save table display information such as pagination information, display length, filtering and sorting. As such when the end user reloads the page the display display will match what thy had previously set up. (Default : true, see http://datatables.net/ref#bStateSave)" />
   <jsp:directive.attribute name="export" type="java.lang.String" rtexprvalue="true" required="false" description="Enable the export functionality" />
   <jsp:directive.attribute name="exportLinks" type="java.lang.String" rtexprvalue="true" required="false" description="(TOP_LEFT|TOP_MIDDLE|TOP_RIGHT|BOTTOM_LEFT|BOTTOM_MIDDLE|BOTTOM_RIGHT) Comma-separated list of positions where the export links will be generated (Default : TOP_RIGHT)" />
   <jsp:directive.attribute name="jqueryUI" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable jQuery UI ThemeRoller support (Default : false, see http://datatables.net/ref#bJQueryUI)" />
@@ -133,13 +133,11 @@
   <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="entity_title" htmlEscape="false" />
 
   <!-- Add random value to datatables identifier to avoid collisions when multiple datatables details -->
-  <jsp:scriptlet>
-  jspContext.setAttribute("currentRandomInt", new Random(System.currentTimeMillis()).nextInt(99999));
-  </jsp:scriptlet>
-
-  <c:set value="${id}_${currentRandomInt}" var="id" />
   <!-- This datatables identifier is required by list.tagx when show datatables details -->
-  <c:set value="${id}" var="parentId" scope="request" />
+  	<c:if test="${not empty parentId }">
+  		<c:set value="${parentId}_${id}" var="id" />
+  	</c:if>
+	<c:set value="${id}" var="parentId" scope="request" />
 
   <c:if test="${empty appear}">
   	<c:set var="appear" value="block"/>
@@ -358,9 +356,11 @@
  	  </c:if>
                 <!-- In Datatables initialization callback handler add call to
                     functions that will initialize select options -->
+ 	  <c:set var="selectionToggleButton" value="${id}_selectionToggleButton"/>
       <c:set target="${datatables_javaScript_elements_init}" property="selection_tools">
                 // Bind click on toggle selecet icon
-                jQuery("a.select_toggle").click(function (){
+                jQuery("#${selectionToggleButton}").click(function (event){
+                	event.preventDefault();
                 	var selSupport = jQuery('#${id}').dataTable().fnSelection();
                 	if (!selSupport) {
                 		return;
@@ -612,7 +612,7 @@
                        '<a id="${removeColumnId}" href="#" alt="${delete_label}" title="${delete_label}" class="icon delete_entity">'
                        + '</a>';
                           $('#${id}_gvnix_toolbar').append( result );
-           			$('#${removeColumnId}').on('click', ${removeColumnId}_selected);
+           			$('#${removeColumnId}').on('click', function (event) {event.preventDefault(); ${removeColumnId}_selected() });
 	    		}
 		     </c:set>
 
@@ -658,12 +658,12 @@
 		</c:forEach>
 
 	// Initialize custom API functions for this table
-	function ${initCustomFunctionsCallbackId}() {
+	function ${initCustomFunctionsCallbackId}(oSettings,json) {
 	           // Create toolbar
         jQuery('#${id}_wrapper')
             		.prepend('<div id="${id}_gvnix_toolbar" class="gvnix_dataTables_toolbar"></div>');
 
-        fnDatatablesExtInit('${id}', {
+        fnDatatablesExtInit(oSettings,'${id}', {
 	    		'filterOnReturn': '${filterOnReturn}',
 	    		'filteringDelay' : '${filteringDelay}'
 	    		<c:if test="${selection}">
@@ -696,8 +696,8 @@
                     'infoMessage': '${editing_info_msg}',
                     'debug': false}
             </c:if>
-            <c:if test="${not empty detailsInfo}">
-                , 'rowclick' : true
+            <c:if test="${not empty detailsInfo and datatablesStandardMode}">
+                , 'rowclick' : {persistState: true}
             </c:if>
 	    	});
 
@@ -815,7 +815,7 @@
 		</c:if>
 
     	  <datatables:columnHead uid="${selectionCheckColumnId}">
-    	  	<a href="#" class="icon select_toggle"></a>
+    	  	<a id="${selectionToggleButton}" href="#" class="icon select_toggle"></a>
     	  </datatables:columnHead>
 		<!-- data columns will be inserted here -->
         <jsp:doBody />
@@ -926,6 +926,12 @@
 	<c:forEach var="entry" items="${datatables_javaScript_elements_after}">
 	${entry.value}
 	</c:forEach>
+
+	<c:if test="${not empty detailsInfo and datatablesStandardMode}">
+	jQuery(document).ready(function (){
+		GvNIX_RowClick.fnGetInstance('${id}').fnLoadState(true);
+	});
+	</c:if>
   </script>
   </div>
 </jsp:root>
