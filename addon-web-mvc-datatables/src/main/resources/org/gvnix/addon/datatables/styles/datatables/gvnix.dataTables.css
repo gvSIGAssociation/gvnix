@@ -109,6 +109,7 @@ div.dataTables_info {
 /* A bit of padding between the pagination and the table. */
 div.dataTables_paginate {
   padding-top: 4px;
+  padding-bottom: 4px;
 }
 
 
