@@ -928,8 +928,28 @@
 	</c:forEach>
 
 	<c:if test="${not empty detailsInfo and datatablesStandardMode}">
+	
+	function loadDatatablesState${id} (count) {
+		
+		if (!count) count = 1;
+		if (count > 12) {
+			log ("Datatables ${id} row click state is not loaded because it's current not available (not visible tab)");
+			return;
+		}
+		
+		var instance = GvNIX_RowClick.fnGetInstance('${id}');
+		
+		if (!instance) {
+			count++;
+			window.setTimeout(loadDatatablesState${id}, 100, count);
+			return;
+		}
+		
+		instance.fnLoadState(true);
+	}
+	
 	jQuery(document).ready(function (){
-		GvNIX_RowClick.fnGetInstance('${id}').fnLoadState(true);
+		window.setTimeout(loadDatatablesState${id}, 100);
 	});
 	</c:if>
   </script>

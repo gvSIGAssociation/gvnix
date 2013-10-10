@@ -22,7 +22,8 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 		if (count) {
 			// Check number of tries
 			if (count > 12) {
-				throw "Can't initialize datatable '"+ tableId + "' for 5 times"
+				log("Datatables " + tableId + " gvnix init ext is not loaded because it's currently not available (not visible tab)");
+				return;
 			}
 			// increase tries count
 			count++;

@@ -627,7 +627,7 @@ var GvNIX_RowClick;
 		}
 		if (jQuery.fn.DataTable.fnIsDataTable(node)) {
 			// found node
-			var dt = node.dataTable();
+			var dt = $node.dataTable();
 
 			for ( var i = 0, iLen = GvNIX_RowClick._aInstances.length; i < iLen; i++) {
 				if (GvNIX_RowClick._aInstances[i]._data.dt.nTable == node) {
