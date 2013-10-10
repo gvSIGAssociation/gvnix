@@ -304,8 +304,8 @@
          */
         function evalScripts( oSettings ) {
           if ( typeof oTable_${id} != 'undefined' ) {
-              oTable_${id}.$('td').each(function(i) {
-                  $(this).wrapInner($('<div></div>'));
+              oTable_${id}.jQuery('td').each(function(i) {
+                  jQuery(this).wrapInner(jQuery('<div></div>'));
               });
           }
         }
@@ -422,7 +422,7 @@
                var result =
                '<a href="${urlPath}${urlParams}&amp;' + datatablesRedirect + '" alt="${create_label}" title="${create_label}" class="icon create_entity">'
                + '</a>';
-                $('#${id}_gvnix_toolbar').append( result );
+                jQuery('#${id}_gvnix_toolbar').append( result );
 	    }
     </c:set>
 
@@ -541,7 +541,7 @@
 
                       /* ... */
 		        function ${removeColumnId}_selected() {
-		        	var $table = $('#${id}').dataTable();
+		        	var $table = jQuery('#${id}').dataTable();
 
                           // Get the table GvNIX_Selection object
 		        	var $selection = $table.fnSelection();
@@ -611,8 +611,8 @@
            			var result =
                        '<a id="${removeColumnId}" href="#" alt="${delete_label}" title="${delete_label}" class="icon delete_entity">'
                        + '</a>';
-                          $('#${id}_gvnix_toolbar').append( result );
-           			$('#${removeColumnId}').on('click', function (event) {event.preventDefault(); ${removeColumnId}_selected() });
+                          jQuery('#${id}_gvnix_toolbar').append( result );
+           			jQuery('#${removeColumnId}').on('click', function (event) {event.preventDefault(); ${removeColumnId}_selected() });
 	    		}
 		     </c:set>
 

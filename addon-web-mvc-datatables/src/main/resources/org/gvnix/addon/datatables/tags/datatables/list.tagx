@@ -122,7 +122,7 @@
 
 		<!-- Initialize the JQuery HTML structure to draw it as tabs -->
 		<script type="text/javascript">
-		$(showDetailTabs("${mainDatatablesId}"));
+		jQuery(showDetailTabs("${mainDatatablesId}"));
 		</script>
 
     </c:if>

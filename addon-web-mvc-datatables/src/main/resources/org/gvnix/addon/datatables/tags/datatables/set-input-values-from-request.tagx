@@ -2,13 +2,13 @@
   <jsp:output omit-xml-declaration="yes"/>
   
   <script type="text/javascript">
-  $(document).ready(function() {
+  jQuery(document).ready(function() {
 	  
-	$("#_${param['datatablesMappedProperty']}_id").each(function(index, node) {
+	jQuery("#_${param['datatablesMappedProperty']}_id").each(function(index, node) {
 		node.value = "${param['datatablesMappedValue']}";
 	});
   
-	var select = $("#_${param['datatablesMappedProperty']}_id option[value='${param['datatablesMappedValue']}']");
+	var select = jQuery("#_${param['datatablesMappedProperty']}_id option[value='${param['datatablesMappedValue']}']");
 	select.parent().parent().parent().hide();
   });
   </script>

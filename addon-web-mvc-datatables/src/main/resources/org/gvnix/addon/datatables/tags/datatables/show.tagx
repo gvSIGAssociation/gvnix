@@ -30,9 +30,9 @@
 	  </div>
   
 	  <script type="text/javascript">
-	  $(document).ready(function() {
-		  var redirecTextBox = $("#${fn:escapeXml(id)}_submit");
-		  $("section").append(redirecTextBox);
+	  jQuery(document).ready(function() {
+		  var redirecTextBox = jQuery("#${fn:escapeXml(id)}_submit");
+		  jQuery("section").append(redirecTextBox);
 	  });
 	  </script>
 	  
