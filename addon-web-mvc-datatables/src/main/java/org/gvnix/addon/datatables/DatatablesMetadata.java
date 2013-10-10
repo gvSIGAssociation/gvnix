@@ -1250,6 +1250,12 @@ public class DatatablesMetadata extends
                 new JavaSymbolName("bindingResult"), UI_MODEL,
                 new JavaSymbolName("httpServletRequest"));
 
+        // Add method javadoc (not generated to disk because #10229)
+        CommentStructure comments = new CommentStructure();
+        JavadocComment javadoc = new JavadocComment(
+                "Create an entity and redirect to given URL.");
+        comments.addComment(javadoc, CommentStructure.CommentLocation.BEGINNING);
+        
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
@@ -1284,6 +1290,7 @@ public class DatatablesMetadata extends
                 parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
+        methodBuilder.setCommentStructure(comments);
 
         return methodBuilder.build(); // Build and return a MethodMetadata
                                       // instance
@@ -1354,6 +1361,12 @@ public class DatatablesMetadata extends
                         .getSimpleTypeName().toLowerCase()),
                 new JavaSymbolName("bindingResult"), UI_MODEL,
                 new JavaSymbolName("httpServletRequest"));
+        
+        // Add method javadoc (not generated to disk because #10229)
+        CommentStructure comments = new CommentStructure();
+        JavadocComment javadoc = new JavadocComment(
+                "Update an entity and redirect to given URL.");
+        comments.addComment(javadoc, CommentStructure.CommentLocation.BEGINNING);
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -1389,7 +1402,8 @@ public class DatatablesMetadata extends
                 parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
-
+        methodBuilder.setCommentStructure(comments);
+        
         return methodBuilder.build(); // Build and return a MethodMetadata
                                       // instance
     }
@@ -1468,6 +1482,12 @@ public class DatatablesMetadata extends
                 new JavaSymbolName("page"), new JavaSymbolName("size"),
                 UI_MODEL);
 
+        // Add method javadoc (not generated to disk because #10229)
+        CommentStructure comments = new CommentStructure();
+        JavadocComment javadoc = new JavadocComment(
+                "Delete an entity and redirect to given URL.");
+        comments.addComment(javadoc, CommentStructure.CommentLocation.BEGINNING);
+
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
@@ -1499,7 +1519,8 @@ public class DatatablesMetadata extends
                 parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
-
+        methodBuilder.setCommentStructure(comments);
+        
         return methodBuilder.build(); // Build and return a MethodMetadata
                                       // instance
     }
