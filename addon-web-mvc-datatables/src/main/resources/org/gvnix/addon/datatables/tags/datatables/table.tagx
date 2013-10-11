@@ -932,7 +932,7 @@
 	function loadDatatablesState${id} (count) {
 
 		if (!count) count = 1;
-		if (count > 12) {
+		if (count > 50) {
 			log ("Datatables ${id} row click state is not loaded because it's current not available (not visible tab)");
 			return;
 		}

@@ -430,6 +430,10 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         modified = WebProjectUtils.addJSToTag(docTagx, root, "app_js_url",
                 "/resources/scripts/jquery/application.js") || modified;
 
+        // Add jQuery cookie.js
+        modified = WebProjectUtils.addJSToTag(docTagx, root, "jquery_cookie_js_url",
+                "/resources/scripts/jquery/jquery.cookie.js") || modified;
+
         // Add i18n customization var
         modified = WebProjectUtils.addLocaleVarToTag(docTagx, root,
                 "jqueryLocale") || modified;

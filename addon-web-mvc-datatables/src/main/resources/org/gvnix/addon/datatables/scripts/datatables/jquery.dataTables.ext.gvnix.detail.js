@@ -27,12 +27,18 @@ function showDetailTabs(mainDatatablesId) {
           ui.jqXHR.error(function() {
             ui.panel.html("Error getting detail datatable from server.");
           });
-      }
+      },
+      active: jQuery.cookie(mainDatatablesId + "_active_panel"),
     });
 	tabs.find( ".ui-tabs-nav" ).sortable({
 		axis: "x",
 		stop: function() {
 			tabs.tabs( "refresh" );
 		}
+	});
+	tabs.click(function(e) {
+		var curTab = jQuery('.ui-tabs-active');
+        curTabIndex = curTab.index();
+    	jQuery.cookie(mainDatatablesId + "_active_panel", curTabIndex);		
 	});
 }
