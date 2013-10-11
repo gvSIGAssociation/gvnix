@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.time.DateUtils;
 
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.Order;
@@ -309,34 +310,175 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return where clause expression for date properties by casting it to
-     * string before check its value.
-     * <p/>
-     * Querydsl Expr:
-     * {@code entityPath.fieldName.stringValue() like ('%' + searchStr + '%')}
-     * Database operation:
-     * {@code str(entity.fieldName) like ('%' + searchStr + '%')}
-     * <p/>
-     * Like operation is case sensitive.
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the value to find, may be null
-     * @return PredicateOperation
-     */
+	 * Return where clause expression for date properties, trying to parse the
+	 * value to find to date and comparing it to the value of the date; if the
+	 * value to find cannot be parsed to date, then try to cast the value to
+	 * string before check it.
+	 * <p/>
+	 * <ul>
+	 * <li>
+	 * If value to find {@code searchStr} can be parsed using the patterns
+	 * <em>dd-MM-yyyy HH:mm:ss</em> or <em>dd-MM-yyyy HH:mm</em> or 
+	 * <em>dd-MM-yyyy</em> to {@code searchDate}, then search by specific date:
+	 * <p/>
+	 * - Querydsl Expr:
+	 * {@code entityPath.fieldName = searchDate}
+	 * <p/>
+	 * - Database operation:
+	 * {@code entity.fieldName = searchDate}
+	 * </li>
+	 * <li>
+	 * If value to find {@code searchStr} can be parsed using the pattern
+	 * <em>dd-MM</em> to {@code searchDate}, then search by specific day and
+	 * month:
+	 * <p/>
+	 * - Querydsl Expr:
+	 * {@code entityPath.fieldName.dayOfMonth() = searchDate.day and entityPath.fieldName.month() = searchDate.month}
+	 * <p/>
+	 * - Database operation:
+	 * {@code dayofmonth(entity.fieldName) = searchDate.day && month(entity.fieldName) = searchDate.month}
+	 * </li>
+	 * <li>
+	 * If value to find {@code searchStr} can be parsed using the pattern
+	 * <em>MM-aaaa</em> to {@code searchDate}, then obtain the first day of the
+	 * month for that year and the last day of the month for that year and check
+	 * that value is into between theses values:
+	 * <p/>
+	 * - Querydsl Expr:
+	 * {@code entityPath.fieldName.between(searchDate.firstDayOfMonth, searchDate.lastDayOfMonth)}
+	 * <p/>
+	 * - Database operation:
+	 * {@code entity.fieldName between searchDate.firstDayOfMonth and searchDate.lastDayOfMonth}
+	 * </li>
+	 * <li>
+	 * If value to find cannot be parsed as date, then try to cast the value to
+	 * string before check it:
+	 * <p/>
+	 * - Querydsl Expr:
+	 * {@code entityPath.fieldName.stringValue() like ('%' + searchStr + '%')}
+	 * <p/>
+	 * - Database operation:
+	 * {@code str(entity.fieldName) like ('%' + searchStr + '%')}
+	 * <p/>
+	 * Note that like operation is case sensitive.
+	 * </li>
+	 * </ul>
+	 * 
+	 * @param entityPath
+	 *            Full path to entity and associations. For example: {@code Pet}
+	 *            , {@code Pet.owner}
+	 * @param fieldName
+	 *            Property name in the given entity path. For example:
+	 *            {@code weight} in {@code Pet} entity, {@code age} in
+	 *            {@code Pet.owner} entity.
+	 * @param searchStr
+	 *            the value to find, may be null
+	 * @return PredicateOperation
+	 */
     public static <T, C extends java.lang.Comparable<?>> BooleanExpression createDateExpression(
             PathBuilder<T> entityPath, String fieldName, Class<C> fieldType,
             String searchStr) {
         if (StringUtils.isEmpty(searchStr)) {
             return null;
         }
+
         DatePath<C> dateExpression = entityPath.getDate(fieldName, fieldType);
-        BooleanExpression expression = dateExpression.stringValue().like(
-                "%".concat(searchStr).concat("%"));
-        return expression;
+
+		// Search by full date
+		String[] parsePatterns = new String[] { "dd-MM-yyyy HH:mm:ss",
+				"dd/MM/yyyy HH:mm:ss", "MM-dd-yyyy HH:mm:ss",
+				"MM/dd/yyyy HH:mm:ss", "dd-MM-yyyy HH:mm", "dd/MM/yyyy HH:mm",
+				"MM-dd-yyyy HH:mm", "MM/dd/yyyy HH:mm", "dd-MM-yyyy",
+				"dd/MM/yyyy", "MM-dd-yyyy", "MM/dd/yyyy" };
+		try {
+			Date searchDate = DateUtils.parseDateStrictly(searchStr, parsePatterns);
+			return dateExpression.eq((fieldType.cast(searchDate)));
+		}
+        catch (Exception e) {
+            // do nothing, and try the next parsing
+        }
+        
+		// Search by day and month
+		parsePatterns = new String[] { "dd-MM", "dd/MM", "MM-dd", "MM/dd" };
+		try {
+			Date searchDate = DateUtils.parseDateStrictly(searchStr,
+					parsePatterns);
+			Calendar searchCal = Calendar.getInstance();
+			searchCal.setTime(searchDate);
+			return dateExpression
+					.dayOfMonth().eq(searchCal.get(Calendar.DAY_OF_MONTH))
+					.and(dateExpression.month().eq(
+							searchCal.get(Calendar.MONTH) + 1));
+        }
+        catch (Exception e) {
+            // do nothing, and try the next parsing
+        }
+
+        // Search by month and year
+		parsePatterns = new String[] { "MM-yyyy", "MM/yyyy" };
+		try {
+			Date searchDate = DateUtils.parseDateStrictly(searchStr,
+					parsePatterns);
+			Calendar searchCal = Calendar.getInstance();
+			searchCal.setTime(searchDate);
+
+            // from 1st day of the month
+            Calendar monthStartCal = Calendar.getInstance();
+			monthStartCal.set(searchCal.get(Calendar.YEAR),
+					searchCal.get(Calendar.MONTH), 0, 23, 59, 59);
+			monthStartCal.set(Calendar.MILLISECOND, 999);
+
+            // to last day of the month
+            Calendar monthEndCal = Calendar.getInstance();
+			monthEndCal.set(searchCal.get(Calendar.YEAR),
+					(searchCal.get(Calendar.MONTH) + 1), 0, 23, 59, 59);
+            monthEndCal.set(Calendar.MILLISECOND, 999);
+			return dateExpression.between(
+					fieldType.cast(monthStartCal.getTime()),
+					fieldType.cast(monthEndCal.getTime()));
+        }
+        catch (Exception e) {
+            // do nothing, and try the next parsing
+        }
+
+        // Search by year
+        // NOT NEEDED; JUST USE DEFAULT EXPRESSION
+        /*
+		parsePatterns = new String[] { "yyyy" };
+		try {
+			if (searchStr.length() == 4) {
+				Date searchDate = DateUtils.parseDateStrictly(searchStr,
+						parsePatterns);
+				Calendar searchCal = Calendar.getInstance();
+				searchCal.setTime(searchDate);
+
+				// from 1st day of the year
+				Calendar monthStartYear = Calendar.getInstance();
+				monthStartYear.set(searchCal.get(Calendar.YEAR),
+						Calendar.JANUARY, 1, 0, 0, 0);
+
+				// to last day of the year
+				Calendar monthEndYear = Calendar.getInstance();
+				monthEndYear.set(searchCal.get(Calendar.YEAR),
+						searchCal.getActualMaximum(Calendar.MONTH) + 1,
+						searchCal.getActualMaximum(Calendar.DAY_OF_MONTH), 23,
+						59, 59);
+            	monthEndYear.set(Calendar.MILLISECOND, 999);
+
+				// year condition: date_col >= value AND date_col <= value
+				return dateExpression.between(
+						fieldType.cast(monthStartYear.getTime()),
+						fieldType.cast(monthEndYear.getTime()));
+			}
+		}
+        catch (Exception e) {
+            // do nothing, at the end the method returns the default expression
+        }
+        */
+
+		// Default expression
+		return dateExpression.stringValue().like(
+				"%".concat(searchStr).concat("%"));
     }
 
     /**
