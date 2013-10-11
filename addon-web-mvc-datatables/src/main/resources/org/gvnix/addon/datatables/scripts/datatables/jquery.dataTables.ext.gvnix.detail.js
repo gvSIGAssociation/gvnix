@@ -5,53 +5,32 @@
 /**
  * Request an include on page a detail datatables content.
  */
-function loadDetail(trId, detailDatatableId, mainDatatablesId, url, errorMessage, received_bodies, length) {
-	$.get(url)
-	.done(function(datatablesDetailContent) {
-		received(detailDatatableId, mainDatatablesId, datatablesDetailContent, received_bodies, length);
-	})
-	.fail(function(error) {
-		if (error.status != 0) {
-			alert(errorMessage + ' (Error: ' + error.status + ', URL: ' + url + ').');
-		}
-		jQuery('#' + mainDatatablesId).hide();
-	});
-}
-
-function received(bodyId, mainDatatablesId, bodyReceived, received_bodies, length) {
-	//console.log(received_bodies.length);
-	received_bodies.push({'id': bodyId, 'body': bodyReceived});
-	if (received_bodies.length == length) {
-		jQuery.each(received_bodies, function (index,value){
-			var $container = jQuery('#'+value.id);
-			$container.html(value.body);
-		});
-		received_bodies.splice(0,received_bodies.length);
-		var tab = jQuery('#' + mainDatatablesId);
-		tab.tabs('refresh');
-		tab.show();
-	}
-}
-
-/**
- * Hide a detail datatables content.
- */
-function hideDetail(detailDatatableId) {
-	jQuery('#' + detailDatatableId).hide();
+function loadDetail(detailDatatableId, mainDatatablesId, url, errorMessage) {
+	jQuery("#" + mainDatatablesId).tabs("destroy");
+	jQuery('#' + detailDatatableId).attr('href', url);
+	showDetailTabs(mainDatatablesId);
 }
 
 /**
  * generate url to obtain some detail.
  */
 function getDetailUrl(mainDatatableId, baseUrl, mappedBy, rowId) {
-	return baseUrl + '&' + mappedBy + '=' + rowId + '&datatablesMappedValue=' + rowId + '&_dt_parentId='+mainDatatableId;
+	return baseUrl + '&' + mappedBy + '=' + rowId + '&datatablesMappedValue=' + rowId + '&_dt_parentId=' + mainDatatableId;
 }
 
 /**
  * Initialize the JQuery HTML structure to draw it as tabs.
  */
 function showDetailTabs(mainDatatablesId) {
-	var tabs = jQuery("#" + mainDatatablesId).tabs();
+	var tabs = jQuery("#" + mainDatatablesId).tabs({
+      beforeLoad: function( event, ui ) {
+          ui.jqXHR.error(function() {
+            ui.panel.html(
+              "Couldn't load this tab. We'll try to fix this as soon as possible. " +
+              "If this wouldn't be a demo." );
+          });
+      }
+    });
 	tabs.find( ".ui-tabs-nav" ).sortable({
 		axis: "x",
 		stop: function() {

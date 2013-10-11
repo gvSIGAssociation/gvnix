@@ -42,38 +42,28 @@
     <!-- Show detail if not manually disabled and datatables details list defined -->
     <c:if test="${(empty detail or detail) and fn:length(detailsInfo) gt 0}">
 
-    	<!-- Generate identifiers based o paraent id -->
-    	<c:set value="${detailParentId}_${id}_detail" var="mainDatatablesId" />
+    	<!-- Generate identifiers based on parent id -->
+    	<c:set value="${parentId}_${id}_detail" var="mainDatatablesId" />
 
-
-		<script type="text/javascript">
-			var ${mainDatatablesId}_received_bodies = [];
-		</script>
     	<!-- Start the JQuery HTML structure to show tabs -->
     	<div id="${mainDatatablesId}">
+    	
 	    	<!-- Tabs headers -->
 	    	<ul>
 		    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
-		    	<c:set var="datatablesId">#${mainDatatablesId}_${detailItem.property}</c:set>
-		    	<li><a href="${datatablesId}"><span><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${detailItem.property}" htmlEscape="false" /></span></a></li>
+		    	<c:set var="datatablesId">${mainDatatablesId}_${detailItem.property}</c:set>
+		    	<li><a id="${datatablesId}" href="about:blank"><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${detailItem.property}" htmlEscape="false" /></a></li>
 			</c:forEach>
 			</ul>
-
 
 			<!-- Error message when detail request fails -->
 	    	<spring:message code="datatables_detail_get_error" javaScriptEscape="true" text="Error getting detail datatable from server." var="datatablesDetailErrorMessage" />
 
 	    	<!-- Tabs contents -->
-	    	<!-- <div id="tabs-1"></div> -->
 		    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
 
-				<!-- Generate this detail identifie with collection index to avoid collisions when multiple datatables tabs -->
+				<!-- Generate this detail identifier with collection index to avoid collisions when multiple datatables tabs -->
 		    	<c:set value="${mainDatatablesId}_${detailItem.property}" var="datatablesId" />
-
-			    <div id="${datatablesId}">
-			    <!-- Block to include one detail -->
-			    <span></span>
-			    </div>
 
 			    <spring:url value="${detailItem.path}/list" var="datatablesDetailUrl">
 			    	<spring:param name="datatablesMappedProperty" value="${detailItem.mappedBy}"/>
@@ -83,18 +73,16 @@
 
 					function callbackFunct${datatablesId} (selection, trId){
 						if (trId){
-							// obter el nodo 'tr' de la fila afectada por el cambio
+							// Get 'tr' node from the affected row
 							var trNode = selection.fnGetRowById(trId);
 							if (trNode){
-								// hacer cosas
-								loadDetail(trId, "${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", trId) , "${datatablesDetailErrorMessage}", ${mainDatatablesId}_received_bodies, ${fn:length(detailsInfo)});
+								// Redraw detail
+								loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", trId) , "${datatablesDetailErrorMessage}");
 							} else {
-								// el nodo 'tr' no esta accesible (modo AJAX y registro en otra pagina)
+								// 'tr' node not reachable (AJAX mode and register in other page)
 							}
 						}
 					}
-
-					hideDetail("${mainDatatablesId}");
 
 					<c:if test="${datatablesStandardMode}">
 						GvNIX_RowClick.fnAddRowClickCallback("${parentId}", callbackFunct${datatablesId});
@@ -111,7 +99,7 @@
 					    <spring:url javaScriptEscape="true" value="${detailItem.path}/list" var="datatablesDetailUrl">
 					    	<spring:param name="datatablesMappedProperty" value="${detailItem.mappedBy}"/>
 					    </spring:url>
-			    		loadDetail(nRow.id, "${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}","${datatablesDetailUrl}", "${detailItem.mappedBy}", nRow.id), "${datatablesDetailErrorMessage}", ${mainDatatablesId}_received_bodies, ${fn:length(detailsInfo)});
+			    		loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}","${datatablesDetailUrl}", "${detailItem.mappedBy}", nRow.id), "${datatablesDetailErrorMessage}");
 			    	</c:forEach>
 				}
 			</script>
@@ -122,7 +110,7 @@
 
 		<!-- Initialize the JQuery HTML structure to draw it as tabs -->
 		<script type="text/javascript">
-		jQuery(showDetailTabs("${mainDatatablesId}"));
+		showDetailTabs("${mainDatatablesId}");
 		</script>
 
     </c:if>
