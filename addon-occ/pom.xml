@@ -31,7 +31,7 @@
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.root</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0-RELEASE</version>
   </parent>
   <artifactId>org.gvnix.occ.roo.addon</artifactId>
   <packaging>bundle</packaging>
