@@ -337,12 +337,12 @@
       </c:if>
       <spring:message code="${selectionInfoLabel}" htmlEscape="false" var="selection_info_msg"/>
       <c:if test="${selectionByCheck}">
+    	<c:set var="selectionCheckColumnId" value="${id}_select_col"/>
         <form id="${selectionCheckColumnId}_form" name="${selectionCheckColumnId}_form">
         </form>
         <c:if test="${empty selectionCheckCssClass}">
       		<c:set var="selectionCheckCssClass" value="check_select_row"/>
       	</c:if>
-    	<c:set var="selectionCheckColumnId" value="${id}_select_col"/>
     	<c:if test="${serverSide}">
 
                         <!-- Add selection functions to the script element before Datatables element -->
@@ -812,11 +812,11 @@
 			  </table:action-column>
 		    </c:otherwise>
 		  </c:choose>
-		</c:if>
-
     	  <datatables:columnHead uid="${selectionCheckColumnId}">
     	  	<a id="${selectionToggleButton}" href="#" class="icon select_toggle"></a>
     	  </datatables:columnHead>
+		</c:if>
+
 		<!-- data columns will be inserted here -->
         <jsp:doBody />
 
@@ -928,26 +928,26 @@
 	</c:forEach>
 
 	<c:if test="${not empty detailsInfo and datatablesStandardMode}">
-	
+
 	function loadDatatablesState${id} (count) {
-		
+
 		if (!count) count = 1;
 		if (count > 12) {
 			log ("Datatables ${id} row click state is not loaded because it's current not available (not visible tab)");
 			return;
 		}
-		
+
 		var instance = GvNIX_RowClick.fnGetInstance('${id}');
-		
+
 		if (!instance) {
 			count++;
 			window.setTimeout(loadDatatablesState${id}, 100, count);
 			return;
 		}
-		
+
 		instance.fnLoadState(true);
 	}
-	
+
 	jQuery(document).ready(function (){
 		window.setTimeout(loadDatatablesState${id}, 100);
 	});

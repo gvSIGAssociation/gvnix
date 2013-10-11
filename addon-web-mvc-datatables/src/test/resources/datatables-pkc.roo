@@ -1,9 +1,9 @@
 #
 # Master entity with two one to many detail entities.
 # Master has composite identifier and details composite identifier.
-# Use command parameters to change default values (entity name, identifier, fields, ...) 
+# Use command parameters to change default values (entity name, identifier, fields, ...)
 # Create one finder for each entity (check URL mapping with patterns and finders works)
-# Create all master and master/detail screen patterns combinations. 
+# Create all master and master/detail screen patterns combinations.
 # Generate automatic test for every screen pattern.
 #
 
@@ -46,6 +46,9 @@ web mvc setup
 web mvc all --package ~.web
 
 web mvc jquery setup
+
+web mvc jquery all
+
 web mvc datatables setup
 
 web mvc datatables all
