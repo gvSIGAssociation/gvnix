@@ -52,13 +52,10 @@
 	    	<ul>
 		    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
 		    	<c:set var="datatablesId">${mainDatatablesId}_${detailItem.property}</c:set>
-		    	<li><a id="${datatablesId}" href="about:blank"><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${detailItem.property}" htmlEscape="false" /></a></li>
+		    	<li><a id="${datatablesId}"><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${detailItem.property}" htmlEscape="false" /></a></li>
 			</c:forEach>
 			</ul>
-
-			<!-- Error message when detail request fails -->
-	    	<spring:message code="datatables_detail_get_error" javaScriptEscape="true" text="Error getting detail datatable from server." var="datatablesDetailErrorMessage" />
-
+			
 	    	<!-- Tabs contents -->
 		    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
 
@@ -77,7 +74,7 @@
 							var trNode = selection.fnGetRowById(trId);
 							if (trNode){
 								// Redraw detail
-								loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", trId) , "${datatablesDetailErrorMessage}");
+								loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", trId));
 							} else {
 								// 'tr' node not reachable (AJAX mode and register in other page)
 							}
@@ -99,7 +96,7 @@
 					    <spring:url javaScriptEscape="true" value="${detailItem.path}/list" var="datatablesDetailUrl">
 					    	<spring:param name="datatablesMappedProperty" value="${detailItem.mappedBy}"/>
 					    </spring:url>
-			    		loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}","${datatablesDetailUrl}", "${detailItem.mappedBy}", nRow.id), "${datatablesDetailErrorMessage}");
+			    		loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}","${datatablesDetailUrl}", "${detailItem.mappedBy}", nRow.id));
 			    	</c:forEach>
 				}
 			</script>

@@ -5,7 +5,7 @@
 /**
  * Request an include on page a detail datatables content.
  */
-function loadDetail(detailDatatableId, mainDatatablesId, url, errorMessage) {
+function loadDetail(detailDatatableId, mainDatatablesId, url) {
 	jQuery("#" + mainDatatablesId).tabs("destroy");
 	jQuery('#' + detailDatatableId).attr('href', url);
 	showDetailTabs(mainDatatablesId);
@@ -23,11 +23,9 @@ function getDetailUrl(mainDatatableId, baseUrl, mappedBy, rowId) {
  */
 function showDetailTabs(mainDatatablesId) {
 	var tabs = jQuery("#" + mainDatatablesId).tabs({
-      beforeLoad: function( event, ui ) {
+      beforeLoad: function(event, ui) {
           ui.jqXHR.error(function() {
-            ui.panel.html(
-              "Couldn't load this tab. We'll try to fix this as soon as possible. " +
-              "If this wouldn't be a demo." );
+            ui.panel.html("Error getting detail datatable from server.");
           });
       }
     });
