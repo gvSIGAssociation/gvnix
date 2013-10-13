@@ -820,8 +820,8 @@ public class DatatablesUtils {
         }
 
         // Otherwise get pattern by Roo key
-		String rooKey = entityClass.getSimpleName().toLowerCase().concat("_")
-				.concat(fieldName.toLowerCase()).concat("_date_format");
+        String rooKey = entityClass.getSimpleName().toLowerCase().concat("_")
+                .concat(fieldName.toLowerCase()).concat("_date_format");
 
         pattern = (String) datePatterns.get(rooKey);
         return pattern;
