@@ -609,10 +609,11 @@ public class DatatablesUtils {
 
         if (isPaged) {
             limit = new Long(datatablesCriterias.getDisplaySize());
-        }
-        if (datatablesCriterias.getDisplayStart() >= 0) {
-            offset = new Long(datatablesCriterias.getDisplayStart());
-        }
+		}
+		if (datatablesCriterias.getDisplayStart() != null
+				&& datatablesCriterias.getDisplayStart() >= 0) {
+			offset = new Long(datatablesCriterias.getDisplayStart());
+		}
 
         // QueryModifiers combines limit and offset
         QueryModifiers queryModifiers = new QueryModifiers(limit, offset);
@@ -666,6 +667,12 @@ public class DatatablesUtils {
         long totalBaseCount = baseQuery.count();
 
         // Create a new SearchResults instance
+        if (offset == null) {
+        	offset = new Long(0);
+        }
+        if (limit == null) {
+        	limit = totalBaseCount;
+        }
         SearchResults<T> searchResults = new SearchResults<T>(elements,
                 totalResultCount, isPaged, offset, limit, totalBaseCount);
 
