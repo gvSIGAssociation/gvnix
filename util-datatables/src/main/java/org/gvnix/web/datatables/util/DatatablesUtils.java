@@ -19,6 +19,7 @@ package org.gvnix.web.datatables.util;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +48,11 @@ import com.github.dandelion.datatables.core.ajax.ColumnDef;
 import com.github.dandelion.datatables.core.ajax.ColumnDef.SortDirection;
 import com.github.dandelion.datatables.core.ajax.DataSet;
 import com.github.dandelion.datatables.core.ajax.DatatablesCriterias;
+import com.github.dandelion.datatables.core.export.ExportConf;
+import com.github.dandelion.datatables.core.export.HtmlTableBuilder;
+import com.github.dandelion.datatables.core.export.HtmlTableBuilder.BeforeEndStep;
+import com.github.dandelion.datatables.core.export.HtmlTableBuilder.ColumnStep;
+import com.github.dandelion.datatables.core.html.HtmlTable;
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.QueryModifiers;
 import com.mysema.query.jpa.impl.JPAQuery;
@@ -609,11 +616,11 @@ public class DatatablesUtils {
 
         if (isPaged) {
             limit = new Long(datatablesCriterias.getDisplaySize());
-		}
-		if (datatablesCriterias.getDisplayStart() != null
-				&& datatablesCriterias.getDisplayStart() >= 0) {
-			offset = new Long(datatablesCriterias.getDisplayStart());
-		}
+        }
+        if (datatablesCriterias.getDisplayStart() != null
+                && datatablesCriterias.getDisplayStart() >= 0) {
+            offset = new Long(datatablesCriterias.getDisplayStart());
+        }
 
         // QueryModifiers combines limit and offset
         QueryModifiers queryModifiers = new QueryModifiers(limit, offset);
@@ -668,10 +675,10 @@ public class DatatablesUtils {
 
         // Create a new SearchResults instance
         if (offset == null) {
-        	offset = new Long(0);
+            offset = new Long(0);
         }
         if (limit == null) {
-        	limit = totalBaseCount;
+            limit = totalBaseCount;
         }
         SearchResults<T> searchResults = new SearchResults<T>(elements,
                 totalResultCount, isPaged, offset, limit, totalBaseCount);
@@ -832,5 +839,101 @@ public class DatatablesUtils {
 
         pattern = (String) datePatterns.get(rooKey);
         return pattern;
+    }
+
+    /**
+	 * Constructs the {@code HtmlTable} used to export the data.
+	 * <p />
+	 * It uses the parameters of the request to check if the column is
+	 * exportable or not, these parameters are named:
+	 * <ul>
+	 * <li>{@code [export_type_extension]ExportColumns}, where
+	 * <emp>[export_type_extension]</emp> is the extension of the format to
+	 * export, for example: {@code csvExportColumns}</li>
+	 * <li>{@code allExportColumns}</li>
+	 * </ul>
+	 * <p />
+	 * Also uses the parameter {@code columnsTitle} to indicate the title of
+	 * each column, this parameter has as value a {@code String} with the format
+	 * of a Map as follows:
+	 * <pre>
+	 * {property1||value1, property2||value2, ... , propertyN||valueN}
+	 * </pre>
+	 * 
+	 * @param data
+	 *            the data to make the {@code HtmlTable}.
+	 * @param criterias
+	 *            the {@code DatatablesCriterias}.
+	 * @param exportConf
+	 *            the {@code ExportConf}.
+	 * @param request
+	 *            the {@code HttpServletRequest}.
+	 * @return the {@code HtmlTable} used to export the data.
+	 */
+    public static HtmlTable makeHtmlTable(List<Map<String, String>> data,
+            DatatablesCriterias criterias, ExportConf exportConf,
+            HttpServletRequest request) {
+
+        ColumnStep tableBuilder = new HtmlTableBuilder<Map<String, String>>()
+                .newBuilder("tableId", data, request);
+
+        // Obtain exportable columns
+		String exportTypeExtension = StringUtils.lowerCase(exportConf.getType()
+				.getExtension());
+		String thisFormatExportColumnsStr = request
+				.getParameter(exportTypeExtension.concat("ExportColumns"));
+		if (StringUtils.isEmpty(thisFormatExportColumnsStr)) {
+			thisFormatExportColumnsStr = "";
+		}
+		String allFormatExportColumnsStr = request
+				.getParameter("allExportColumns");
+		if (StringUtils.isEmpty(allFormatExportColumnsStr)) {
+			allFormatExportColumnsStr = "";
+		}
+		List<String> thisFormatExporColumns = Arrays.asList(StringUtils.split(
+				thisFormatExportColumnsStr, ","));
+		List<String> allFormatExportColumns = Arrays.asList(StringUtils.split(
+				allFormatExportColumnsStr, ","));
+
+		BeforeEndStep columns = null;
+		if (!allFormatExportColumns.isEmpty()
+				|| !thisFormatExporColumns.isEmpty()) {
+
+			// Obtain the column titles
+			Map<String, String> columnsTitleMap = new HashMap<String, String>();
+			String columnsTitleStr = request.getParameter("columnsTitle");
+			columnsTitleStr = StringUtils.substring(columnsTitleStr, 1,
+					(columnsTitleStr.length() - 1));
+			List<String> columnsTitleList = Arrays.asList(StringUtils.split(
+					columnsTitleStr, ","));
+			for (String columnsTitle : columnsTitleList) {
+				String[] columsTitleArray = StringUtils.split(columnsTitle,
+						"||");
+				if (columsTitleArray.length == 2) {
+					columnsTitleMap.put(columsTitleArray[0].trim(),
+							columsTitleArray[1].trim());
+				}
+			}
+
+			List<ColumnDef> columnDefs = criterias.getColumnDefs();
+			for (ColumnDef columnDef : columnDefs) {
+				String columnProperty = columnDef.getName();
+				if (allFormatExportColumns.contains(columnProperty)
+						|| thisFormatExporColumns.contains(columnProperty)) {
+					String columnTitle = columnsTitleMap.get(columnProperty);
+					if (StringUtils.isBlank(columnTitle)) {
+						columnTitle = columnProperty;
+					}
+					columns = tableBuilder.column()
+							.fillWithProperty(columnProperty)
+							.title(columnTitle);
+				}
+			}
+		}
+        if (columns == null) {
+            columns = tableBuilder.column().fillWithProperty("-").title("---");
+        }
+
+        return columns.configureExport(exportConf).build();
     }
 }
