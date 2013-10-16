@@ -924,6 +924,7 @@ public class DatatablesUtils {
 					if (StringUtils.isBlank(columnTitle)) {
 						columnTitle = columnProperty;
 					}
+					columnTitle = StringUtils.replace(columnTitle, "~~", ",");
 					columns = tableBuilder.column()
 							.fillWithProperty(columnProperty)
 							.title(columnTitle);
