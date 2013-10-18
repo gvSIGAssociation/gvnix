@@ -117,6 +117,8 @@
   <jsp:useBean id="datatables_javaScript_elements_before" class="java.util.HashMap" scope="request"/>
   <jsp:useBean id="datatables_javaScript_elements_after" class="java.util.HashMap" scope="request"/>
   <jsp:useBean id="datatables_javaScript_elements_init" class="java.util.HashMap" scope="request"/>
+  <jsp:useBean id="datatables_export_columns" class="java.util.HashMap" scope="request"/>
+  <jsp:useBean id="datatables_export_columns_title" class="java.util.HashMap" scope="request"/>
 
   <!-- typeIdFieldName -->
   <c:if test="${empty typeIdFieldName}">
@@ -193,17 +195,10 @@
   	<c:set var="pipeSize" value="5"/>
   </c:if>
 
-  <!-- Export buttons are rendered in DOM mode only -->
-  <c:choose>
-	  <c:when test="${serverSide}">
-	  	<c:set var="export" value=""/>
-	  </c:when>
-	  <c:otherwise>
-		  <c:if test="${empty export}">
-		  	<c:set var="export" value="csv,xls,pdf"/>
-		  </c:if>
-	  </c:otherwise>
-  </c:choose>
+  <!-- If empty, display CSV, XLS and PDF export buttons -->
+  <c:if test="${empty export}">
+  	<c:set var="export" value="csv,xls,pdf"/>
+  </c:if>
 
   <!-- set row id based on entity id attribute -->
   <c:if test="${(not serverSide) and (empty rowIdBase)}">
@@ -651,11 +646,12 @@
     <c:set var="initCustomFunctionsCallbackId" value="${id}_init_custom_callbk"/>
 
   <div id="${id}_gvnix_datatables">
-  <c:if test="${not empty datatables_javaScript_elements_before}">
   <script type="text/javascript">
+  <c:if test="${not empty datatables_javaScript_elements_before}">
 		<c:forEach var="entry" items="${datatables_javaScript_elements_before}">
-		${entry.value}
+		  ${entry.value}
 		</c:forEach>
+  </c:if>
 
 	// Initialize custom API functions for this table
 	function ${initCustomFunctionsCallbackId}(oSettings,json) {
@@ -707,7 +703,6 @@
 	}
 
   </script>
-  </c:if>
 
     <!-- Dandelion-Datatables -->
     <gvnixddt:table
@@ -908,13 +903,31 @@
 			  </c:otherwise>
             </c:choose>
           </c:if>
-
-     <!-- configure some export formats -->
-     <c:forTokens items="${export}" delims="," var="export_format">
-     	<c:set var="export_format_lower" value="${fn:toLowerCase(export_format)}"/>
-     	<datatables:export type="${export_format_lower}" includeHeader="true"
-     		fileName="${typeName}" cssClass="icon export_${export_format_lower}" label="${export_format_lower}"/>
-     </c:forTokens>
+          
+        <!-- configure some export formats -->
+        <c:forTokens items="${export}" delims="," var="export_format">
+         	<c:set var="export_format_lower" value="${fn:toLowerCase(export_format)}" />
+          <c:choose>
+          
+            <!-- AJAX export configuration -->
+            <c:when test="${serverSide}">
+              
+              <c:set var="exportColumns" value="${datatables_export_columns[export_format_lower]}" />
+              <c:set var="exportColumnsAllFormats" value="${datatables_export_columns['all']}" />
+              <c:set var="columnsTitleStr">${datatables_export_columns_title}</c:set>
+              <c:set var="columnsTitle" value="${fn:replace(columnsTitleStr, '=', '||')}" />
+             	<datatables:export type="${export_format_lower}" includeHeader="true" method="post"
+             		fileName="${typeName}" cssClass="icon export_${export_format_lower}" label="${export_format_lower}"
+                url="${urlPath}/export${export_format_lower}?${export_format}ExportColumns=${exportColumns}&amp;allExportColumns=${exportColumnsAllFormats}&amp;columnsTitle=${columnsTitle}"/>
+            </c:when>
+      
+            <!-- DOM export configuration -->
+            <c:otherwise>
+              <datatables:export type="${export_format_lower}" includeHeader="true" autoSize="true"
+                fileName="${typeName}" cssClass="icon export_${export_format_lower}" label="${export_format_lower}" />
+            </c:otherwise>
+          </c:choose>
+         </c:forTokens>
 
                 <!-- Set the function that initializes custom API functions -->
                 <datatables:callback type="init" function="${initCustomFunctionsCallbackId}" />

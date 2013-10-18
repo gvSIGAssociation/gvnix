@@ -35,7 +35,6 @@
   <jsp:directive.attribute name="selector" type="java.lang.String" required="false" rtexprvalue="true" description="jQuery selector used to populate a placeholder with a filtering widget." />
   <jsp:directive.attribute name="sortType" type="java.lang.String" required="false" rtexprvalue="true" description="Type of sorting function to apply on the column." />
   
-  
   <!-- Default values -->
   <c:if test="${empty dateTimePattern}">
     <c:set value="MM/dd/yyyy" var="dateTimePattern" />
@@ -66,6 +65,24 @@
   <c:if test="${empty display}">
   	<c:set var="display" value="ALL" />
   </c:if>
+  
+  <!-- Prepare the variable to indicate which columns are exportable for each format (only used on AJAX) -->
+  <c:set var="display_lower" value="${fn:toLowerCase(display)}" />
+  <c:set var="display_formats" value="${fn:split(display_lower,',')}" />
+  <c:forEach items="${display_formats}" var="display_format">
+    <c:choose>
+      <c:when test="${empty datatables_export_columns[display_format]}">
+        <c:set target="${datatables_export_columns}" property="${display_format}" value="${property}" />
+      </c:when>
+      <c:otherwise>
+        <c:set target="${datatables_export_columns}" property="${display_format}" value="${datatables_export_columns[display_format]},${property}" />
+      </c:otherwise>
+    </c:choose>
+  </c:forEach>
+  
+  <!-- Prepare the variable to indicate the title of each columns to use for the
+       export files (only used on AJAX). Replace each 'comma' by '~~' symbols. -->
+  <c:set target="${datatables_export_columns_title}" property="${property}" value="${fn:replace(title, ',', '~~')}" />
   
   <gvnixddt:column
   		id="${id}" 

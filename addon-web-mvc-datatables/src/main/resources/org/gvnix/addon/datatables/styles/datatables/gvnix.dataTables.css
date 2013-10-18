@@ -71,6 +71,11 @@ table.dataTable tfoot th {
   padding: 2px;
 }
 
+table.dataTable thead th.sorting_disabled {
+  cursor: auto;
+  background: none repeat scroll 0 0 #FFFFFF;
+}
+
 /* Export links */
 a.icon {
   /* If not block, the size cannot be set. */
@@ -82,6 +87,7 @@ a.icon {
   text-indent: 100%;
   white-space: nowrap;
   background: none no-repeat scroll center center transparent;
+  cursor: pointer;
 }
 
 a.export_pdf {
@@ -92,8 +98,16 @@ a.export_xls {
   background: url("../../images/datatables/page_lightning.png") no-repeat scroll center center transparent;
 }
 
+a.export_xlsx {
+  background: url("../../images/datatables/page_white_lightning.png") no-repeat scroll center center transparent;
+}
+
 a.export_csv {
   background: url("../../images/datatables/page_white_text.png") no-repeat scroll center center transparent;
+}
+
+a.export_xml {
+  background: url("../../images/datatables/page_white_code.png") no-repeat scroll center center transparent;
 }
 
 /* TABLE FOOT */

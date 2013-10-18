@@ -37,7 +37,7 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
 /**
- * Constants used in clases
+ * Constants used in classes
  * 
  * @author gvNIX Team
  */
@@ -242,4 +242,31 @@ public class DatatablesConstants {
     static final JavaType QUERYDSL_UTILS = new JavaType(
             "org.gvnix.web.datatables.util.QuerydslUtils");
 
+    static final JavaType DATATABLES_EXPORT = new JavaType(
+            "com.github.dandelion.datatables.core.export.DatatablesExport");
+    static final JavaType DATATABLES_EXPORT_CONF = new JavaType(
+            "com.github.dandelion.datatables.core.export.ExportConf");
+    static final JavaType DATATABLES_EXPORT_UTILS = new JavaType(
+            "com.github.dandelion.datatables.core.export.ExportUtils");
+    static final JavaType DATATABLES_EXPORT_TYPE = new JavaType(
+            "com.github.dandelion.datatables.core.export.ExportType");
+    static final JavaType DATATABLES_CSV_EXPORT = new JavaType(
+            "com.github.dandelion.datatables.core.export.CsvExport");
+    static final JavaType DATATABLES_PDF_EXPORT = new JavaType(
+            "com.github.dandelion.datatables.extras.export.itext.PdfExport");
+    static final JavaType DATATABLES_XLS_EXPORT = new JavaType(
+            "com.github.dandelion.datatables.extras.export.poi.XlsExport");
+    static final JavaType DATATABLES_XLSX_EXPORT = new JavaType(
+            "com.github.dandelion.datatables.extras.export.poi.XlsxExport");
+    static final JavaType DATATABLES_XML_EXPORT = new JavaType(
+            "com.github.dandelion.datatables.core.export.XmlExport");
+    static final JavaType DATATABLES_EXPORT_EXCEPTION = new JavaType(
+            "com.github.dandelion.datatables.core.exception.ExportException");
+    static final JavaType DATATABLES_HTML_TABLE = new JavaType(
+            "com.github.dandelion.datatables.core.html.HtmlTable");
+
+    static final JavaSymbolName DATATABLES_EXPORT_NAME = new JavaSymbolName(
+            "datatablesExport");
+    static final JavaSymbolName DATATABLES_EXPORT_TYPE_NAME = new JavaSymbolName(
+            "exportType");
 }

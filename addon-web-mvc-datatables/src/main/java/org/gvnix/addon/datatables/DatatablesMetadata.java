@@ -335,6 +335,9 @@ public class DatatablesMetadata extends
                             finder.getValue()));
                 }
             }
+
+            // Export via AJAX methods
+            addAjaxExportMethods();
         }
         else if (!isStantardMode()) {
             // Non-Standard view mode requires AJAX data mode
@@ -3193,6 +3196,425 @@ public class DatatablesMetadata extends
     private boolean isConversionServiceField(FieldMetadata field) {
         return field != null && field.getAnnotation(AUTOWIRED) != null
                 && field.getFieldType().equals(CONVERSION_SERVICE);
+    }
+
+    /**
+     * Add the methods needed to support export via AJAX.
+     */
+    private void addAjaxExportMethods() {
+        builder.addMethod(getExportCsvMethod());
+        builder.addMethod(getExportPdfMethod());
+        builder.addMethod(getExportXlsMethod());
+        builder.addMethod(getExportXlsxMethod());
+        builder.addMethod(getExportXmlMethod());
+        builder.addMethod(getExportMethod());
+        builder.addMethod(getRetrieveDataMethod());
+    }
+
+    /**
+     * Returns <code>exportCsv</code> method for render-a-view visualization
+     * mode.
+     * <p />
+     * This method handles datatables AJAX request for export data to a CSV
+     * file.
+     * 
+     * @return
+     */
+    private MethodMetadata getExportCsvMethod() {
+        String exportType = "csv";
+        JavaType exportTypeJavaType = DATATABLES_CSV_EXPORT;
+        return getExportFormatMethod(exportType, exportTypeJavaType);
+    }
+
+    /**
+     * Returns <code>exportPdf</code> method for render-a-view visualization
+     * mode.
+     * <p />
+     * This method handles datatables AJAX request for export data to a PDF
+     * file.
+     * 
+     * @return
+     */
+    private MethodMetadata getExportPdfMethod() {
+        String exportType = "pdf";
+        JavaType exportTypeJavaType = DATATABLES_PDF_EXPORT;
+        return getExportFormatMethod(exportType, exportTypeJavaType);
+    }
+
+    /**
+     * Returns <code>exportXls</code> method for render-a-view visualization
+     * mode.
+     * <p />
+     * This method handles datatables AJAX request for export data to a XLS
+     * file.
+     * 
+     * @return
+     */
+    private MethodMetadata getExportXlsMethod() {
+        String exportType = "xls";
+        JavaType exportTypeJavaType = DATATABLES_XLS_EXPORT;
+        return getExportFormatMethod(exportType, exportTypeJavaType);
+    }
+
+    /**
+     * Returns <code>exportXlsx</code> method for render-a-view visualization
+     * mode.
+     * <p />
+     * This method handles datatables AJAX request for export data to a XLSX
+     * file.
+     * 
+     * @return
+     */
+    private MethodMetadata getExportXlsxMethod() {
+        String exportType = "xlsx";
+        JavaType exportTypeJavaType = DATATABLES_XLSX_EXPORT;
+        return getExportFormatMethod(exportType, exportTypeJavaType);
+    }
+
+    /**
+     * Returns <code>exportXml</code> method for render-a-view visualization
+     * mode.
+     * <p />
+     * This method handles datatables AJAX request for export data to a XML
+     * file.
+     * 
+     * @return
+     */
+    private MethodMetadata getExportXmlMethod() {
+        String exportType = "xml";
+        JavaType exportTypeJavaType = DATATABLES_XML_EXPORT;
+        return getExportFormatMethod(exportType, exportTypeJavaType);
+    }
+
+    /**
+     * Returns export method for a specific format for a render-a-view
+     * visualization mode.
+     * <p />
+     * This method handles datatables AJAX request for export data to a format
+     * specified in the @{code exportType} parameter.
+     * 
+     * @param exportType the export type: csv, xml, pdf, etc.
+     * @param exportTypeJavaType the @{code JavaType} of the export type.
+     * @return
+     */
+    private MethodMetadata getExportFormatMethod(String exportType,
+            JavaType exportTypeJavaType) {
+
+        String exportTypeUpperCase = StringUtils.upperCase(exportType);
+        String exportTypeCapitalized = StringUtils.capitalize(exportType);
+
+        /*
+        * @RequestMapping(value = "/exportcsv", produces = "text/csv")
+        * public void PetController.exportCsv(
+        * 		@DatatablesParams DatatablesCriterias criterias,
+        * 		@ModelAttribute Pet pet, HttpServletRequest request,
+        * 		HttpServletResponse response) throws ServletException, IOException,
+        * 		ExportException {
+        * 	...
+        * }
+        */
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        parameterTypes.add(new AnnotatedJavaType(DATATABLES_CRITERIA_TYPE,
+                new AnnotationMetadataBuilder(DATATABLES_PARAMS).build()));
+        parameterTypes.add(new AnnotatedJavaType(entity,
+                new AnnotationMetadataBuilder(MODEL_ATTRIBUTE).build()));
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(HTTP_SERVLET_REQUEST));
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(HTTP_SERVLET_RESPONSE));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(findAllMethodName,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
+        methodAnnotation.setAnnotationType(REQUEST_MAPPING);
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
+                        "/export".concat(exportType));
+        methodAnnotation
+                .addStringAttribute(
+                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
+                        "text/".concat(exportType));
+        annotations.add(methodAnnotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+        throwsTypes.add(SERVLET_EXCEPTION);
+        throwsTypes.add(IO_EXCEPTION);
+        throwsTypes.add(DATATABLES_EXPORT_EXCEPTION);
+
+        // Define method parameter names
+        JavaSymbolName entityNameParam = new JavaSymbolName(entityName);
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(CRITERIA_PARAM_NAME);
+        parameterNames.add(entityNameParam);
+        parameterNames.add(REQUEST_PARAM_NAME);
+        parameterNames.add(RESPONSE_PARAM_NAME);
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        /*
+         * export(criterias, pet, ExportType.CSV, new CsvExport(), request,
+         * response);
+         */
+        String format = "export(%s, %s, %s.".concat(exportTypeUpperCase)
+                .concat(", new %s(), %s, %s);");
+        bodyBuilder.appendFormalLine(String.format(format,
+                CRITERIA_PARAM_NAME.getSymbolName(),
+                entityNameParam.getSymbolName(),
+                helper.getFinalTypeName(DATATABLES_EXPORT_TYPE),
+                helper.getFinalTypeName(exportTypeJavaType),
+                REQUEST_PARAM_NAME.getSymbolName(),
+                RESPONSE_PARAM_NAME.getSymbolName()));
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, new JavaSymbolName(
+                        "export".concat(exportTypeCapitalized)),
+                JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    /**
+     * Returns <code>export</code> method for a render-a-view visualization
+     * mode.
+     * <p />
+     * This is a private method that handles datatables AJAX request for a
+     * specific format.
+     * 
+     * @return
+     */
+    private MethodMetadata getExportMethod() {
+
+        /*
+        * private void export(DatatablesCriterias criterias, Pet pet,
+        * 		 ExportType exportType, DatatablesExport datatablesExport,
+        * 		 HttpServletRequest request, HttpServletResponse response)
+        * 		 throws ExportException {
+        * 	   ...
+        * }
+        */
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(DATATABLES_CRITERIA_TYPE));
+        parameterTypes.add(AnnotatedJavaType.convertFromJavaType(entity));
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(DATATABLES_EXPORT_TYPE));
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(DATATABLES_EXPORT));
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(HTTP_SERVLET_REQUEST));
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(HTTP_SERVLET_RESPONSE));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(findAllMethodName,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+        throwsTypes.add(DATATABLES_EXPORT_EXCEPTION);
+
+        // Define method parameter names
+        JavaSymbolName entityNameParam = new JavaSymbolName(entityName);
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(CRITERIA_PARAM_NAME);
+        parameterNames.add(entityNameParam);
+        parameterNames.add(DATATABLES_EXPORT_TYPE_NAME);
+        parameterNames.add(DATATABLES_EXPORT_NAME);
+        parameterNames.add(REQUEST_PARAM_NAME);
+        parameterNames.add(RESPONSE_PARAM_NAME);
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        /*
+         * // Does the export process as is explained in http://dandelion.github.io/datatables/tutorials/export/controller-based-exports.html
+           // 1. Retrieve the data
+           List<Map<String, String>> data = retrieveData(criterias, pet, request);
+         */
+        bodyBuilder
+                .appendFormalLine("// Does the export process as is explained in http://dandelion.github.io/datatables/tutorials/export/controller-based-exports.html");
+        bodyBuilder.appendFormalLine("// 1. Retrieve the data");
+        String format = "%s data = retrieveData(%s, %s, %s);";
+        bodyBuilder.appendFormalLine(String.format(format, helper
+                .getFinalTypeName(LIST_MAP_STRING_STRING), CRITERIA_PARAM_NAME
+                .getSymbolName(), new JavaSymbolName(entityName)
+                .getSymbolName(), REQUEST_PARAM_NAME.getSymbolName()));
+
+        /*
+         * // 2. Build an instance of "ExportConf".
+           ExportConf exportConf = new ExportConf.Builder(exportType).header(true)
+                           .exportClass(datatablesExport).autoSize(true)
+                           .fileName(pet.getClass().getSimpleName()).build();
+         */
+        bodyBuilder
+                .appendFormalLine("// 2. Build an instance of \"ExportConf\"");
+        format = "%s exportConf = new %s.Builder(%s).header(true).exportClass(%s).autoSize(true).fileName(%s.getClass().getSimpleName()).build();";
+        bodyBuilder.appendFormalLine(String.format(format,
+                helper.getFinalTypeName(DATATABLES_EXPORT_CONF),
+                helper.getFinalTypeName(DATATABLES_EXPORT_CONF),
+                DATATABLES_EXPORT_TYPE_NAME.getSymbolName(),
+                DATATABLES_EXPORT_NAME.getSymbolName(),
+                entityNameParam.getSymbolName()));
+
+        /*
+         * // 3. Build an instance of "HtmlTable"
+           HtmlTable table = DatatablesUtils.makeHtmlTable(data, criterias,
+                exportConf, request);
+         */
+        bodyBuilder
+                .appendFormalLine("// 3. Build an instance of \"HtmlTable\"");
+        format = "%s table = %s.makeHtmlTable(data, %s, exportConf, %s);";
+        bodyBuilder.appendFormalLine(String.format(format,
+                helper.getFinalTypeName(DATATABLES_HTML_TABLE),
+                helper.getFinalTypeName(DATATABLES_UTILS),
+                CRITERIA_PARAM_NAME.getSymbolName(),
+                REQUEST_PARAM_NAME.getSymbolName()));
+
+        /*
+         * // 4. Render the generated export file
+           ExportUtils.renderExport(table, exportConf, response);
+         */
+        bodyBuilder.appendFormalLine("// 4. Render the generated export file");
+        format = "%s.renderExport(table, exportConf, %s);";
+        bodyBuilder.appendFormalLine(String.format(format,
+                helper.getFinalTypeName(DATATABLES_EXPORT_UTILS),
+                RESPONSE_PARAM_NAME.getSymbolName()));
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PRIVATE, new JavaSymbolName("export"),
+                JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    /**
+     * Returns <code>retrieveData</code> method for a render-a-view
+     * visualization mode.
+     * 
+     * @return
+     */
+    private MethodMetadata getRetrieveDataMethod() {
+
+        /*
+        * private List<Map<String, String>> retrieveData(
+            DatatablesCriterias criterias, Pet pet, HttpServletRequest request) {
+        *          ...
+        * }
+        */
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(DATATABLES_CRITERIA_TYPE));
+        parameterTypes.add(AnnotatedJavaType.convertFromJavaType(entity));
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(HTTP_SERVLET_REQUEST));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(findAllMethodName,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(CRITERIA_PARAM_NAME);
+        parameterNames.add(new JavaSymbolName(entityName));
+        parameterNames.add(REQUEST_PARAM_NAME);
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        /*
+         * // Cloned criteria in order to not paginate the results
+           DatatablesCriterias noPaginationCriteria = new DatatablesCriterias(
+                criterias.getSearch(), 0, null, criterias.getColumnDefs(),
+                criterias.getSortingColumnDefs(),
+                criterias.getInternalCounter());
+         */
+        bodyBuilder
+                .appendFormalLine("// Cloned criteria in order to not paginate the results");
+        String format = "%s noPaginationCriteria = new %s(%s.getSearch(), 0, null, %s.getColumnDefs(), %s.getSortingColumnDefs(), %s.getInternalCounter());";
+        String datatablesCriteriaType = helper
+                .getFinalTypeName(DATATABLES_CRITERIA_TYPE);
+        String criteriaParamName = CRITERIA_PARAM_NAME.getSymbolName();
+        bodyBuilder.appendFormalLine(String.format(format,
+                datatablesCriteriaType, datatablesCriteriaType,
+                criteriaParamName, criteriaParamName, criteriaParamName,
+                criteriaParamName));
+
+        /*
+         * // Do the search to obtain the data
+           @SuppressWarnings("unchecked")
+           SearchResults<Pet> searchResult = DatatablesUtils.findByCriteria(
+                   Pet.class, Pet.entityManager(), noPaginationCriteria,
+                   getPropertyMap(pet, request.getParameterNames()));
+         */
+        bodyBuilder.appendFormalLine("// Do the search to obtain the data");
+        format = "@SuppressWarnings(\"unchecked\") %s searchResult = %s.findByCriteria(%s.class, %s.entityManager(), noPaginationCriteria, getPropertyMap(%s, %s.getParameterNames()));";
+        String entityTypeName = helper.getFinalTypeName(entity);
+        bodyBuilder.appendFormalLine(String.format(format, new JavaType(
+                SEARCH_RESULTS.getFullyQualifiedTypeName(), 0, DataType.TYPE,
+                null, Arrays.asList(entity)), helper
+                .getFinalTypeName(DATATABLES_UTILS), entityTypeName,
+                entityTypeName, new JavaSymbolName(entityName).getSymbolName(),
+                REQUEST_PARAM_NAME.getSymbolName()));
+
+        /*
+         * // Use ConversionService with the obtained data
+           return DatatablesUtils.populateDataSet(searchResult.getResults(), "id",
+                   searchResult.getTotalCount(), searchResult.getResultsCount(),
+                   criterias.getColumnDefs(), null, conversionService_dtt)
+                   .getRows();
+         */
+        bodyBuilder
+                .appendFormalLine("// Use ConversionService with the obtained data");
+        format = "return %s.populateDataSet(searchResult.getResults(), \"id\", searchResult.getTotalCount(), searchResult.getResultsCount(), %s.getColumnDefs(), null, conversionService_dtt).getRows();";
+        bodyBuilder.appendFormalLine(String.format(format,
+                helper.getFinalTypeName(DATATABLES_UTILS),
+                CRITERIA_PARAM_NAME.getSymbolName()));
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PRIVATE, new JavaSymbolName("retrieveData"),
+                LIST_MAP_STRING_STRING, parameterTypes, parameterNames,
+                bodyBuilder);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
     }
 
     /**
