@@ -36,6 +36,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.ObjectUtils;
 
+import com.github.dandelion.datatables.core.configuration.Configuration;
 import com.github.dandelion.datatables.jsp.tag.ColumnTag;
 import com.github.dandelion.datatables.jsp.tag.TableTag;
 
@@ -107,6 +108,7 @@ public class RooColumnTag extends ColumnTag {
     }
 
     private void doInitialization() throws JspException {
+        
         // Parent tag uses the 'title' attribute as the column title
         // Get the label value like the current line in the roo tag files:
         // <spring:message
@@ -121,6 +123,16 @@ public class RooColumnTag extends ColumnTag {
                 label = helper.resolveMessage(this.pageContext, code);
             }
             setTitle(label);
+        }
+        
+        // Remove configuration of the property "sortInit" if it's empty.
+        if (StringUtils.isBlank((String) stagingConf.get(Configuration.COLUMN_SORTINIT))) {
+            stagingConf.remove(Configuration.COLUMN_SORTINIT);
+        }
+        
+        // Remove configuration of the property "sortDirection" if it's empty.
+        if (StringUtils.isBlank((String) stagingConf.get(Configuration.COLUMN_SORTDIRECTION))) {
+            stagingConf.remove(Configuration.COLUMN_SORTDIRECTION);
         }
     }
 

@@ -52,10 +52,6 @@
      this tag must care about set default values in datatables parameters
      when it are empty.
   -->
-  
-  <c:if test="${empty sortInit}">
-  	<c:set var="sortInit" value="asc"/>
-  </c:if>
   <c:if test="${empty sortDirection}">
   	<c:set var="sortDirection" value="asc,desc" />
   </c:if>
