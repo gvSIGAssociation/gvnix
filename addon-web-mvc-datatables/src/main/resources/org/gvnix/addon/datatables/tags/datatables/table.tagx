@@ -36,6 +36,9 @@
   <!-- inline editing -->
   <jsp:directive.attribute name="editingInfoLabel" type="java.lang.String" required="false" description="Label to use for inline-editing information (default 'datatables_editing_info')" />
 
+  <!-- show button -->
+  <jsp:directive.attribute name="show" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Include 'show' link into table (default true)" />
+
   <!-- ====================================== -->
   <!-- ====================================== -->
   <!-- Datatables parameters -->
@@ -84,8 +87,6 @@
   <jsp:directive.attribute name="confGroup" type="java.lang.String" rtexprvalue="true" required="false" description="Name of the configuration group to activate for the current table." />
   <jsp:directive.attribute name="filterPlaceholder" type="java.lang.String" rtexprvalue="true" required="false" description="Placeholder used to hold the individual column filtering elements." />
 
-
-
   <!-- ====================================== -->
   <!-- Extra features -->
   <!-- ====================================== -->
@@ -108,7 +109,6 @@
   <!-- Filtering options -->
   <jsp:directive.attribute name="filterOnReturn" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Wait until Intro key is pressed to perform a search or filtering. (Default : false)" />
   <jsp:directive.attribute name="filteringDelay" type="java.lang.Integer" rtexprvalue="true" required="false" description="Milisecons to wait from last key-press event to perform a search or filtering. (Default: 500)" />
-
 
   <!-- ====================== -->
   <!-- Prepare default values -->
@@ -250,6 +250,9 @@
   </c:otherwise>
   </c:choose>
 
+  <c:if test="${empty show}">
+      <c:set var="show" value="true"/>
+  </c:if>
   <c:if test="${empty create}">
       <c:set var="create" value="true"/>
   </c:if>
@@ -375,11 +378,11 @@
     </c:otherwise>
   </c:choose>
 
-
   <!-- show -->
-  <c:set var="showColumnId" value="${id}_show_col"/>
-  <c:if test="${serverSide}">
-
+  <c:if test="${show}">
+    <c:set var="showColumnId" value="${id}_show_col"/>
+    <c:if test="${serverSide}">
+  
       <c:set var="show_label">
 	      <spring:escapeBody javaScriptEscape="true">
 	         <spring:message arguments="${typeName}" code="entity_show" />
@@ -387,7 +390,7 @@
       </c:set>
       <spring:url value="/resources/images/show.png" var="show_image_url" />
 
-            <!-- Add show functions to the script element before Datatables element -->
+      <!-- Add show functions to the script element before Datatables element -->
       <c:set target="${datatables_javaScript_elements_before}" property="${showColumnId}">
 	    function ${showColumnId}(data, type, full) {
 		    var result =
@@ -395,9 +398,10 @@
 	           + '</a>';
 
 	        return result;
-		}
-	  </c:set>
-        </c:if><!-- /serverSide -->
+  		}
+  	  </c:set>
+    </c:if><!-- /serverSide -->
+  </c:if><!-- /show -->
 
         <!-- Setup row creation option -->
   <c:if test="${create}">
@@ -815,28 +819,30 @@
 		<!-- data columns will be inserted here -->
         <jsp:doBody />
 
-                <!-- Add action column with show row details button -->
-        <c:choose>
+    <!-- Add action column with show row details button -->
+    <c:if test="${show}">
+      <c:choose>
 
-                    <!-- AJAX cell render -->
-          <c:when test="${serverSide}">
-			<table:action-column id="${showColumnId}" cssClass="utilbox" cssCellClass="utilbox" renderFunction="${showColumnId}" cssStyle="${actionHeaderCssStyle}"/>
-          </c:when>
-
-                    <!-- DOM cell render -->
-		  <c:otherwise>
-			  <table:action-column id="${showColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
-			  <c:if test="${not empty item }">
-	            <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
-                  <spring:url value="${path}/${itemId}" var="show_form_url" />
-                  <spring:url value="/resources/images/show.png" var="show_image_url" />
-                  <spring:message arguments="${typeName}" code="entity_show" var="show_label" htmlEscape="false" />
-                  <a href="#" onclick="javascript: window.location = '${show_form_url}?' + datatablesRedirect" alt="${fn:escapeXml(show_label)}" title="${fn:escapeXml(show_label)}" class="icon show_entity">
-                  </a>
-		     </c:if>
-		     </table:action-column>
-		   </c:otherwise>
-         </c:choose>
+        <!-- AJAX cell render -->
+        <c:when test="${serverSide}">
+          <table:action-column id="${showColumnId}" cssClass="utilbox" cssCellClass="utilbox" renderFunction="${showColumnId}" cssStyle="${actionHeaderCssStyle}"/>
+        </c:when>
+  
+        <!-- DOM cell render -->
+  		  <c:otherwise>
+  			  <table:action-column id="${showColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
+            <c:if test="${not empty item }">
+              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
+              <spring:url value="${path}/${itemId}" var="show_form_url" />
+              <spring:url value="/resources/images/show.png" var="show_image_url" />
+              <spring:message arguments="${typeName}" code="entity_show" var="show_label" htmlEscape="false" />
+              <a href="#" onclick="javascript: window.location = '${show_form_url}?' + datatablesRedirect" alt="${fn:escapeXml(show_label)}" title="${fn:escapeXml(show_label)}" class="icon show_entity">
+              </a>
+  		     </c:if>
+  	     </table:action-column>
+  	   </c:otherwise>
+     </c:choose>
+   </c:if><!-- /show -->
 
                 <!-- Add action column with row update button if inline
                     editing is not enabled -->
