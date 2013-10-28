@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -501,6 +502,14 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         }
     }
 
+    /**
+     * Gets method body expression for property-getter method
+     * 
+     * @param prefix
+     * @param propAccessorName
+     * @param fieldName
+     * @return
+     */
     private String getPropertyAccesorExpression(String prefix,
             JavaSymbolName propAccessorName, JavaSymbolName fieldName) {
         if (StringUtils.isBlank(prefix)) {
@@ -511,6 +520,13 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         }
     }
 
+    /**
+     * Replace map values on a template string
+     * 
+     * @param template
+     * @param params
+     * @return
+     */
     private String replaceParams(String template, Map<String, String> params) {
         for (Entry<String, String> entry : params.entrySet()) {
             template = StringUtils.replace(template, "${" + entry.getKey()
@@ -519,6 +535,14 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         return template;
     }
 
+    /**
+     * Add checksum field (plus getter/setter) to builder
+     * 
+     * @param field
+     * @param getter
+     * @param setter
+     * @param typeManagementService
+     */
     private void addChecksumFieldToEntity(FieldMetadata field,
             MethodMetadata getter, MethodMetadata setter,
             TypeManagementService typeManagementService) {
@@ -540,15 +564,14 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         // Try to locate an existing field with @javax.persistence.Version
 
         try {
-            // FIXME List type is not equal to object to check (it's a bug??)
-            if (!mutableTypeDetails.getDeclaredFields().contains(field)) {
+            if (!fieldExist(mutableTypeDetails, field)) {
                 mutableTypeDetails.addField(new FieldMetadataBuilder(
                         governorTypeDetails.getDeclaredByMetadataId(), field));
             }
-            if (!mutableTypeDetails.getDeclaredMethods().contains(getter)) {
+            if (!methodExists(mutableTypeDetails, getter)) {
                 mutableTypeDetails.addMethod(getter);
             }
-            if (!mutableTypeDetails.getDeclaredMethods().contains(setter)) {
+            if (!methodExists(mutableTypeDetails, setter)) {
                 mutableTypeDetails.addMethod(setter);
             }
             typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetails
@@ -562,6 +585,112 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     }
 
+    /**
+     * Check if received method exists
+     * 
+     * @param mutableTypeDetails
+     * @param method
+     * @return
+     */
+    private boolean methodExists(
+            ClassOrInterfaceTypeDetailsBuilder mutableTypeDetails,
+            MethodMetadata method) {
+
+        for (MethodMetadataBuilder methodBuilder : mutableTypeDetails
+                .getDeclaredMethods()) {
+            if (!methodBuilder.getReturnType().equals(method.getReturnType())) {
+                continue;
+            }
+            if (!methodBuilder.getMethodName().equals(method.getMethodName())) {
+                continue;
+            }
+            if (methodBuilder.getParameterTypes().size() != method
+                    .getParameterTypes().size()) {
+                continue;
+            }
+            Iterator<AnnotatedJavaType> builderParamTypeIter = methodBuilder
+                    .getParameterTypes().iterator();
+            Iterator<AnnotatedJavaType> paramTypeIter = method
+                    .getParameterTypes().iterator();
+            AnnotatedJavaType builderParamType, paramType;
+            boolean match = true;
+            while (builderParamTypeIter.hasNext()) {
+                builderParamType = builderParamTypeIter.next();
+                paramType = paramTypeIter.next();
+                if (!builderParamType.equals(paramType)) {
+                    match = false;
+                    break;
+                }
+            }
+            if (!match) {
+                continue;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if recived filed exist
+     * 
+     * @param mutableTypeDetails
+     * @param field
+     * @return
+     */
+    private boolean fieldExist(
+            ClassOrInterfaceTypeDetailsBuilder mutableTypeDetails,
+            FieldMetadata field) {
+        boolean annotationFound;
+        boolean found = false;
+        for (FieldMetadataBuilder fieldBuilder : mutableTypeDetails
+                .getDeclaredFields()) {
+            if (!fieldBuilder.getFieldType().equals(field.getFieldType())) {
+                continue;
+            }
+            if (!fieldBuilder.getFieldName().equals(field.getFieldName())) {
+                continue;
+            }
+            if (fieldBuilder.getAnnotations() != null
+                    && field.getAnnotations() == null) {
+                continue;
+            }
+            else if (fieldBuilder.getAnnotations() == null
+                    && fieldBuilder.getAnnotations() != null) {
+                continue;
+            }
+            else if (fieldBuilder.getAnnotations().size() != fieldBuilder
+                    .getAnnotations().size()) {
+                continue;
+            }
+
+            found = true;
+            for (AnnotationMetadataBuilder annotation : fieldBuilder
+                    .getAnnotations()) {
+                annotationFound = false;
+                for (AnnotationMetadata fieldAnnotation : field
+                        .getAnnotations()) {
+                    if (annotation.getAnnotationType().equals(
+                            fieldAnnotation.getAnnotationType())) {
+                        annotationFound = true;
+                        break;
+                    }
+                }
+                if (!annotationFound) {
+                    found = false;
+                    break;
+                }
+            }
+            if (!found) {
+                continue;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         ToStringBuilder tsc = new ToStringBuilder(this);
@@ -573,10 +702,19 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         return tsc.toString();
     }
 
+    /**
+     * @return metadata identifier type
+     */
     public static final String getMetadataIdentiferType() {
         return PROVIDES_TYPE;
     }
 
+    /**
+     * Checks if Metadata is valid
+     * 
+     * @param metadataIdentificationString
+     * @return
+     */
     public static boolean isValid(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING,
                 metadataIdentificationString);
@@ -753,10 +891,16 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                 metadataIdentificationString);
     }
 
+    /**
+     * @return gets Itd file contents
+     */
     public String getItdFileContents() {
         return itdFileContents;
     }
 
+    /* (non-Javadoc)
+     * @see org.springframework.roo.classpath.itd.MemberHoldingTypeDetailsMetadataItem#getMemberHoldingTypeDetails()
+     */
     public ItdTypeDetails getMemberHoldingTypeDetails() {
         // TODO Auto-generated method stub
         return null;
