@@ -1,5 +1,5 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -377,6 +377,7 @@ public class QuerydslUtils {
 
         DatePath<C> dateExpression = entityPath.getDate(fieldName, fieldType);
 
+        BooleanExpression expression;
         // Search by full date
         String[] parsePatterns = new String[] { "dd-MM-yyyy HH:mm:ss",
                 "dd/MM/yyyy HH:mm:ss", "MM-dd-yyyy HH:mm:ss",
@@ -386,94 +387,73 @@ public class QuerydslUtils {
         try {
             Date searchDate = DateUtils.parseDateStrictly(searchStr,
                     parsePatterns);
-            return dateExpression.eq((fieldType.cast(searchDate)));
+            expression = dateExpression.eq((fieldType.cast(searchDate)));
         }
         catch (Exception e) {
             // do nothing, and try the next parsing
+            expression = null;
         }
 
-        // Search by day and month
-        parsePatterns = new String[] { "dd-MM", "dd/MM", "MM-dd", "MM/dd" };
-        try {
-            Date searchDate = DateUtils.parseDateStrictly(searchStr,
-                    parsePatterns);
-            Calendar searchCal = Calendar.getInstance();
-            searchCal.setTime(searchDate);
-            return dateExpression
-                    .dayOfMonth()
-                    .eq(searchCal.get(Calendar.DAY_OF_MONTH))
-                    .and(dateExpression.month().eq(
-                            searchCal.get(Calendar.MONTH) + 1));
-        }
-        catch (Exception e) {
-            // do nothing, and try the next parsing
+        if (expression == null) {
+            // Search by day and month
+            parsePatterns = new String[] { "dd-MM", "dd/MM", "MM-dd", "MM/dd" };
+            try {
+                Date searchDate = DateUtils.parseDateStrictly(searchStr,
+                        parsePatterns);
+                Calendar searchCal = Calendar.getInstance();
+                searchCal.setTime(searchDate);
+                expression = dateExpression
+                        .dayOfMonth()
+                        .eq(searchCal.get(Calendar.DAY_OF_MONTH))
+                        .and(dateExpression.month().eq(
+                                searchCal.get(Calendar.MONTH) + 1));
+            }
+            catch (Exception e) {
+                // do nothing, and try the next parsing
+                expression = null;
+            }
         }
 
         // Search by month and year
-        parsePatterns = new String[] { "MM-yyyy", "MM/yyyy" };
-        try {
-            Date searchDate = DateUtils.parseDateStrictly(searchStr,
-                    parsePatterns);
-            Calendar searchCal = Calendar.getInstance();
-            searchCal.setTime(searchDate);
+        if (expression == null) {
+            parsePatterns = new String[] { "MM-yyyy", "MM/yyyy" };
+            try {
+                Date searchDate = DateUtils.parseDateStrictly(searchStr,
+                        parsePatterns);
+                Calendar searchCal = Calendar.getInstance();
+                searchCal.setTime(searchDate);
 
-            // from 1st day of the month
-            Calendar monthStartCal = Calendar.getInstance();
-            monthStartCal.set(searchCal.get(Calendar.YEAR),
-                    searchCal.get(Calendar.MONTH), 0, 23, 59, 59);
-            monthStartCal.set(Calendar.MILLISECOND, 999);
+                // from 1st day of the month
+                Calendar monthStartCal = Calendar.getInstance();
+                monthStartCal.set(searchCal.get(Calendar.YEAR),
+                        searchCal.get(Calendar.MONTH), 0, 23, 59, 59);
+                monthStartCal.set(Calendar.MILLISECOND, 999);
 
-            // to last day of the month
-            Calendar monthEndCal = Calendar.getInstance();
-            monthEndCal.set(searchCal.get(Calendar.YEAR),
-                    (searchCal.get(Calendar.MONTH) + 1), 0, 23, 59, 59);
-            monthEndCal.set(Calendar.MILLISECOND, 999);
-            return dateExpression.between(
-                    fieldType.cast(monthStartCal.getTime()),
-                    fieldType.cast(monthEndCal.getTime()));
-        }
-        catch (Exception e) {
-            // do nothing, and try the next parsing
+                // to last day of the month
+                Calendar monthEndCal = Calendar.getInstance();
+                monthEndCal.set(searchCal.get(Calendar.YEAR),
+                        (searchCal.get(Calendar.MONTH) + 1), 0, 23, 59, 59);
+                monthEndCal.set(Calendar.MILLISECOND, 999);
+                expression = dateExpression.between(
+                        fieldType.cast(monthStartCal.getTime()),
+                        fieldType.cast(monthEndCal.getTime()));
+            }
+            catch (Exception e) {
+                // do nothing, and try the next parsing
+                expression = null;
+            }
         }
 
         // Search by year
         // NOT NEEDED; JUST USE DEFAULT EXPRESSION
-        /*
-        parsePatterns = new String[] { "yyyy" };
-        try {
-        	if (searchStr.length() == 4) {
-        		Date searchDate = DateUtils.parseDateStrictly(searchStr,
-        				parsePatterns);
-        		Calendar searchCal = Calendar.getInstance();
-        		searchCal.setTime(searchDate);
 
-        		// from 1st day of the year
-        		Calendar monthStartYear = Calendar.getInstance();
-        		monthStartYear.set(searchCal.get(Calendar.YEAR),
-        				Calendar.JANUARY, 1, 0, 0, 0);
-
-        		// to last day of the year
-        		Calendar monthEndYear = Calendar.getInstance();
-        		monthEndYear.set(searchCal.get(Calendar.YEAR),
-        				searchCal.getActualMaximum(Calendar.MONTH) + 1,
-        				searchCal.getActualMaximum(Calendar.DAY_OF_MONTH), 23,
-        				59, 59);
-            	monthEndYear.set(Calendar.MILLISECOND, 999);
-
-        		// year condition: date_col >= value AND date_col <= value
-        		return dateExpression.between(
-        				fieldType.cast(monthStartYear.getTime()),
-        				fieldType.cast(monthEndYear.getTime()));
-        	}
+        if (expression == null) {
+            // Default expression
+            expression = dateExpression.stringValue().like(
+                    "%".concat(searchStr).concat("%"));
         }
-        catch (Exception e) {
-            // do nothing, at the end the method returns the default expression
-        }
-        */
 
-        // Default expression
-        return dateExpression.stringValue().like(
-                "%".concat(searchStr).concat("%"));
+        return expression;
     }
 
     /**
