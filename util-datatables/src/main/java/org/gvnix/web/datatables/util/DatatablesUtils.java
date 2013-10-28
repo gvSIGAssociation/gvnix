@@ -842,34 +842,31 @@ public class DatatablesUtils {
     }
 
     /**
-	 * Constructs the {@code HtmlTable} used to export the data.
-	 * <p />
-	 * It uses the parameters of the request to check if the column is
-	 * exportable or not, these parameters are named:
-	 * <ul>
-	 * <li>{@code [export_type_extension]ExportColumns}, where
-	 * <emp>[export_type_extension]</emp> is the extension of the format to
-	 * export, for example: {@code csvExportColumns}</li>
-	 * <li>{@code allExportColumns}</li>
-	 * </ul>
-	 * <p />
-	 * Also uses the parameter {@code columnsTitle} to indicate the title of
-	 * each column, this parameter has as value a {@code String} with the format
-	 * of a Map as follows:
-	 * <pre>
-	 * {property1||value1, property2||value2, ... , propertyN||valueN}
-	 * </pre>
-	 * 
-	 * @param data
-	 *            the data to make the {@code HtmlTable}.
-	 * @param criterias
-	 *            the {@code DatatablesCriterias}.
-	 * @param exportConf
-	 *            the {@code ExportConf}.
-	 * @param request
-	 *            the {@code HttpServletRequest}.
-	 * @return the {@code HtmlTable} used to export the data.
-	 */
+     * Constructs the {@code HtmlTable} used to export the data.
+     * <p />
+     * It uses the parameters of the request to check if the column is
+     * exportable or not, these parameters are named:
+     * <ul>
+     * <li>{@code [export_type_extension]ExportColumns}, where
+     * <emp>[export_type_extension]</emp> is the extension of the format to
+     * export, for example: {@code csvExportColumns}</li>
+     * <li>{@code allExportColumns}</li>
+     * </ul>
+     * <p />
+     * Also uses the parameter {@code columnsTitle} to indicate the title of
+     * each column, this parameter has as value a {@code String} with the format
+     * of a Map as follows:
+     * 
+     * <pre>
+     * {property1||value1, property2||value2, ... , propertyN||valueN}
+     * </pre>
+     * 
+     * @param data the data to make the {@code HtmlTable}.
+     * @param criterias the {@code DatatablesCriterias}.
+     * @param exportConf the {@code ExportConf}.
+     * @param request the {@code HttpServletRequest}.
+     * @return the {@code HtmlTable} used to export the data.
+     */
     public static HtmlTable makeHtmlTable(List<Map<String, String>> data,
             DatatablesCriterias criterias, ExportConf exportConf,
             HttpServletRequest request) {
@@ -878,59 +875,59 @@ public class DatatablesUtils {
                 .newBuilder("tableId", data, request);
 
         // Obtain exportable columns
-		String exportTypeExtension = StringUtils.lowerCase(exportConf.getType()
-				.getExtension());
-		String thisFormatExportColumnsStr = request
-				.getParameter(exportTypeExtension.concat("ExportColumns"));
-		if (StringUtils.isEmpty(thisFormatExportColumnsStr)) {
-			thisFormatExportColumnsStr = "";
-		}
-		String allFormatExportColumnsStr = request
-				.getParameter("allExportColumns");
-		if (StringUtils.isEmpty(allFormatExportColumnsStr)) {
-			allFormatExportColumnsStr = "";
-		}
-		List<String> thisFormatExporColumns = Arrays.asList(StringUtils.split(
-				thisFormatExportColumnsStr, ","));
-		List<String> allFormatExportColumns = Arrays.asList(StringUtils.split(
-				allFormatExportColumnsStr, ","));
+        String exportTypeExtension = StringUtils.lowerCase(exportConf.getType()
+                .getExtension());
+        String thisFormatExportColumnsStr = request
+                .getParameter(exportTypeExtension.concat("ExportColumns"));
+        if (StringUtils.isEmpty(thisFormatExportColumnsStr)) {
+            thisFormatExportColumnsStr = "";
+        }
+        String allFormatExportColumnsStr = request
+                .getParameter("allExportColumns");
+        if (StringUtils.isEmpty(allFormatExportColumnsStr)) {
+            allFormatExportColumnsStr = "";
+        }
+        List<String> thisFormatExporColumns = Arrays.asList(StringUtils.split(
+                thisFormatExportColumnsStr, ","));
+        List<String> allFormatExportColumns = Arrays.asList(StringUtils.split(
+                allFormatExportColumnsStr, ","));
 
-		BeforeEndStep columns = null;
-		if (!allFormatExportColumns.isEmpty()
-				|| !thisFormatExporColumns.isEmpty()) {
+        BeforeEndStep columns = null;
+        if (!allFormatExportColumns.isEmpty()
+                || !thisFormatExporColumns.isEmpty()) {
 
-			// Obtain the column titles
-			Map<String, String> columnsTitleMap = new HashMap<String, String>();
-			String columnsTitleStr = request.getParameter("columnsTitle");
-			columnsTitleStr = StringUtils.substring(columnsTitleStr, 1,
-					(columnsTitleStr.length() - 1));
-			List<String> columnsTitleList = Arrays.asList(StringUtils.split(
-					columnsTitleStr, ","));
-			for (String columnsTitle : columnsTitleList) {
-				String[] columsTitleArray = StringUtils.split(columnsTitle,
-						"||");
-				if (columsTitleArray.length == 2) {
-					columnsTitleMap.put(columsTitleArray[0].trim(),
-							columsTitleArray[1].trim());
-				}
-			}
+            // Obtain the column titles
+            Map<String, String> columnsTitleMap = new HashMap<String, String>();
+            String columnsTitleStr = request.getParameter("columnsTitle");
+            columnsTitleStr = StringUtils.substring(columnsTitleStr, 1,
+                    (columnsTitleStr.length() - 1));
+            List<String> columnsTitleList = Arrays.asList(StringUtils.split(
+                    columnsTitleStr, ","));
+            for (String columnsTitle : columnsTitleList) {
+                String[] columsTitleArray = StringUtils.split(columnsTitle,
+                        "||");
+                if (columsTitleArray.length == 2) {
+                    columnsTitleMap.put(columsTitleArray[0].trim(),
+                            columsTitleArray[1].trim());
+                }
+            }
 
-			List<ColumnDef> columnDefs = criterias.getColumnDefs();
-			for (ColumnDef columnDef : columnDefs) {
-				String columnProperty = columnDef.getName();
-				if (allFormatExportColumns.contains(columnProperty)
-						|| thisFormatExporColumns.contains(columnProperty)) {
-					String columnTitle = columnsTitleMap.get(columnProperty);
-					if (StringUtils.isBlank(columnTitle)) {
-						columnTitle = columnProperty;
-					}
-					columnTitle = StringUtils.replace(columnTitle, "~~", ",");
-					columns = tableBuilder.column()
-							.fillWithProperty(columnProperty)
-							.title(columnTitle);
-				}
-			}
-		}
+            List<ColumnDef> columnDefs = criterias.getColumnDefs();
+            for (ColumnDef columnDef : columnDefs) {
+                String columnProperty = columnDef.getName();
+                if (allFormatExportColumns.contains(columnProperty)
+                        || thisFormatExporColumns.contains(columnProperty)) {
+                    String columnTitle = columnsTitleMap.get(columnProperty);
+                    if (StringUtils.isBlank(columnTitle)) {
+                        columnTitle = columnProperty;
+                    }
+                    columnTitle = StringUtils.replace(columnTitle, "~~", ",");
+                    columns = tableBuilder.column()
+                            .fillWithProperty(columnProperty)
+                            .title(columnTitle);
+                }
+            }
+        }
         if (columns == null) {
             columns = tableBuilder.column().fillWithProperty("-").title("---");
         }
