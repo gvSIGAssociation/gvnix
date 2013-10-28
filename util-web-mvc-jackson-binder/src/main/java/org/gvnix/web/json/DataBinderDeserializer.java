@@ -45,7 +45,7 @@ import com.fasterxml.jackson.databind.util.NameTransformer;
  * This deserializer requires a {@link DataBinder} was stored in
  * {@link ThreadLocal} with key "{@link BindingResult#MODEL_KEY_PREFIX}" +
  * {@code "JSON_DataBinder"}
- *
+ * 
  * @author gvNIX Team
  * @since TODO: Class version
  */
@@ -75,7 +75,7 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Uses {@link DataBinderDeserializer}
      */
     @Override
@@ -85,7 +85,7 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Uses {@link DataBinderDeserializer}
      */
     @Override
@@ -102,11 +102,11 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
      * It is a workaround for issue
      * https://jira.springsource.org/browse/SPR-6731 that should be removed from
      * next gvNIX releases when that issue will be resolved.
-     *
+     * 
      * @param parser Parsed used for reading JSON content
      * @param ctxt Context that can be used to access information about this
      *        deserialization activity.
-     *
+     * 
      * @return Deserializer value
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -176,7 +176,7 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
      * <p/>
      * Iterate over every object's property and delegates on
      * {@link #readField(JsonParser, DeserializationContext, JsonToken, String)}
-     *
+     * 
      * @param parser JSON parser
      * @param ctxt context
      * @param prefix object DataBinder path
@@ -210,7 +210,7 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
      * Iterate over every array's item to generate a prefix for property names
      * on DataBinder style (
      * <em>{prefix}[{index}].<em>) and delegates on {@link #readField(JsonParser, DeserializationContext, JsonToken, String)}
-     *
+     * 
      * @param parser JSON parser
      * @param ctxt context
      * @param prefix array dataBinder path
@@ -253,7 +253,7 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
      * <li>If it's an array, calls to
      * {@link #readArray(JsonParser, DeserializationContext, String)}</li>
      * </ul>
-     *
+     * 
      * @param parser
      * @param ctxt
      * @param token current token
@@ -323,10 +323,11 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
         case END_OBJECT:
             // Skip array and object end markers
             parser.nextToken();
-            return Collections.emptyMap();
+            break;
         default:
             throw ctxt.mappingException(getBeanClass());
         }
+        return Collections.emptyMap();
     }
 
     /**
@@ -339,7 +340,7 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Not used
      */
     @Override
@@ -352,7 +353,7 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Not used
      */
     @Override
@@ -363,7 +364,7 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Not used
      */
     @Override
@@ -376,7 +377,7 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Not used
      */
     @Override
