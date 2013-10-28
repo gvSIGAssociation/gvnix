@@ -447,8 +447,10 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + controller.getSimpleTypeName() + "'");
 
-        WebProjectUtils.updateTagxUriInJspx(controllerPath, jspxName, uriMap,
-                projectOperations, fileManager);
+        if (controllerPath != null) {
+            WebProjectUtils.updateTagxUriInJspx(controllerPath, jspxName,
+                    uriMap, projectOperations, fileManager);
+        }
     }
 
     /**
