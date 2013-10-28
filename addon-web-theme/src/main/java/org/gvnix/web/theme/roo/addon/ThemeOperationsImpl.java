@@ -825,7 +825,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         List<Theme> themes = new ArrayList<Theme>();
 
         // find themes in bundles and local repository
-        Set<URL> urls = findThemeDescriptors();
+        List<URL> urls = findThemeDescriptors();
 
         for (URL url : urls) {
             // load the theme
@@ -997,10 +997,10 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * 
      * @return UIRs to available theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Set<URL> findThemeDescriptors() {
+    private List<URL> findThemeDescriptors() {
 
         // URLs to repository theme descriptors
-        Set<URL> urls = findFileThemeDescriptorsURLs(getThemesRepositoryPath());
+        List<URL> urls = findFileThemeDescriptorsURLs(getThemesRepositoryPath());
 
         // URLs to theme descriptors in OSGi bundles
         urls.addAll(findBundleThemeDescriptors());
@@ -1030,8 +1030,8 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * 
      * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Set<URL> findFileThemeDescriptorsURLs(File path) {
-        Set<URL> urls = new HashSet<URL>();
+    private List<URL> findFileThemeDescriptorsURLs(File path) {
+        List<URL> urls = new ArrayList<URL>();
 
         // find themes in the local theme repository (if it exists)
         if (path == null) {
@@ -1060,7 +1060,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                 }
             }
         }
-        return urls;
+        return FileUtils.removeDuplicates(urls);
     }
 
     /**
