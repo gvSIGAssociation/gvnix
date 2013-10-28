@@ -2635,11 +2635,14 @@ public class DatatablesMetadata extends
 
         }
 
-        String entityFieldOneToManyAnnotationMappedBy = entityFieldOneToManyAnnotation
-                .getAttribute("mappedBy").getValue().toString();
+        String entityFieldOneToManyAnnotationMappedBy = null;
 
         // Check @OneToMay mappedBy value
-        if (entityFieldOneToManyAnnotationMappedBy == null) {
+        try {
+            entityFieldOneToManyAnnotationMappedBy = entityFieldOneToManyAnnotation
+                    .getAttribute("mappedBy").getValue().toString();
+        }
+        catch (Exception e) {
             throw new IllegalStateException(
                     String.format(
                             "%s: Can't create datatables detail information: property %s.%s has invalid mappedBy information",
