@@ -1,17 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
@@ -159,20 +159,15 @@ public class JQueryJspMetadataListener implements MetadataProvider,
 
         // Moreover, if we created a valid WebFinderMetadata, given meta-data
         // ID refers to WebFinderMetadata and we must update the finders
-        if (finderMetadata != null && finderMetadata.isValid()) {
-
-            // Call to operations for update pages
-            operations.updateFindJsp(controller, finderMetadata);
-        }
-
-        // Otherwise, neither JQueryMetadata nor WebFinderMetadata are
-        // available or valid
-        if ((jqueryMetadata == null || !jqueryMetadata.isValid())
-                && (finderMetadata == null || !finderMetadata.isValid())) {
-
-            // Can't get the corresponding JQuery information, so we
-            // certainly don't need to manage any JSPs at this time
-            return null;
+        if (finderMetadata != null) {
+            if (finderMetadata.isValid()) {
+                // Call to operations for update pages
+                operations.updateFindJsp(controller, finderMetadata);
+            }
+            else {
+                // Finder meta-data is not valid
+                return null;
+            }
         }
 
         return new JQueryJspMetadata(jqueryJspMetadataId, jqueryMetadata);
