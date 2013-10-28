@@ -1,5 +1,5 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -119,7 +119,7 @@ public class ConversionServiceBeanSerializerModifier extends
                 // Field contains info about Annotations, info that
                 // ConversionService uses for success formatting, use it if
                 // available. Otherwise use the class of given value.
-                TypeDescriptor sourceType = annotatedEl instanceof Field ? new TypeDescriptor(
+                TypeDescriptor sourceType = annotatedEl != null ? new TypeDescriptor(
                         (Field) annotatedEl) : TypeDescriptor
                         .valueOf(propertyType);
 

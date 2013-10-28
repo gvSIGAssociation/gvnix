@@ -78,18 +78,16 @@ public class QuerydslUtils {
         // Using BooleanBuilder, a cascading builder for
         // Predicate expressions
         BooleanBuilder predicate = new BooleanBuilder();
-        if (searchArgs.isEmpty()) {
+        if (searchArgs == null || searchArgs.isEmpty()) {
             return predicate;
         }
 
         // Build the predicate
-        if (searchArgs != null && !searchArgs.isEmpty()) {
-            for (Entry<String, Object> entry : searchArgs.entrySet()) {
-                // TODO: use the operator
-                // searchArgs can contain "_operator_" entries for each field
-                predicate.and(createObjectExpression(entity, entry.getKey(),
-                        entry.getValue()));
-            }
+        for (Entry<String, Object> entry : searchArgs.entrySet()) {
+            // TODO: use the operator
+            // searchArgs can contain "_operator_" entries for each field
+            predicate.and(createObjectExpression(entity, entry.getKey(),
+                    entry.getValue()));
         }
         return predicate;
     }

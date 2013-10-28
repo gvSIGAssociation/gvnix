@@ -1,5 +1,5 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.gvnix.web.json.DataBinderMappingJackson2HttpMessageConverter.DataBinderList;
 import org.springframework.beans.BeanUtils;
@@ -50,9 +51,12 @@ import com.fasterxml.jackson.databind.util.NameTransformer;
 public class DataBinderDeserializer extends BeanDeserializerBase {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -7345091954698956061L;
+
+    private static final Logger LOGGER = Logger
+            .getLogger(DataBinderDeserializer.class.getName());
 
     public DataBinderDeserializer(BeanDeserializerBase source) {
         super(source);
@@ -140,11 +144,13 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
             }
             else if (target instanceof Map) {
                 // TODO
+                LOGGER.warning("Map deserialization not implemented yet!");
             }
             Map<String, String> obj = readObject(parser, ctxt, prefix);
             propertyValues.addPropertyValues(obj);
         }
         else {
+            LOGGER.warning("Deserialization for non-object not implemented yet!");
             return null; // TODO?
         }
 
