@@ -655,10 +655,10 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                 continue;
             }
             else if (fieldBuilder.getAnnotations() == null
-                    && fieldBuilder.getAnnotations() != null) {
+                    && field.getAnnotations() != null) {
                 continue;
             }
-            else if (fieldBuilder.getAnnotations().size() != fieldBuilder
+            else if (fieldBuilder.getAnnotations().size() != field
                     .getAnnotations().size()) {
                 continue;
             }
