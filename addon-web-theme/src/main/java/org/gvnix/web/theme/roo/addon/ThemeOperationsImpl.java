@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -1186,7 +1186,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         }
 
         // Set of resource URLs to be copied to target dir
-        Set<URL> urls = new HashSet<URL>();
+        List<URL> urls = new ArrayList<URL>();
 
         // if source URI schema is file:// , source files are in a local
         // repository
@@ -1223,6 +1223,9 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                 urls,
                 "No resources found to copy in '".concat(
                         sourceDirectory.toString()).concat("'"));
+
+        // remove duplicates on urls
+        urls = FileUtils.removeDuplicates(urls);
 
         // iterate over Theme resources and copy them with same dir layout
         for (URL url : urls) {
