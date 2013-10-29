@@ -3126,21 +3126,23 @@ public class DatatablesMetadata extends
                 "String pkFieldName = \"%s\";", entityIdentifier.getFieldName()
                         .getSymbolName()));
 
+        String dateFormatVarName = getCodeToAddDateTimeFormatPatterns(bodyBuilder);
+
         bodyBuilder.appendFormalLine("");
         /*
          * DataSet<Map<String, String>> dataSet =
          * DatatablesUtils.populateDataSet(searchResult.getResult(),
          * pkFieldName, totalRecords, recordsFound, criterias.getColumnDefs(),
-         * null, conversionService_datatables);
+         * datePattern, conversionService_datatables);
          */
 
         bodyBuilder
                 .appendFormalLine(String
-                        .format("%s dataSet = %s.populateDataSet(searchResult.getResults(), pkFieldName, totalRecords, recordsFound, criterias.getColumnDefs(), null, %s); ",
+                        .format("%s dataSet = %s.populateDataSet(searchResult.getResults(), pkFieldName, totalRecords, recordsFound, criterias.getColumnDefs(), %s, %s); ",
                                 helper.getFinalTypeName(DATA_SET_MAP_STRING_STRING),
                                 helper.getFinalTypeName(DATATABLES_UTILS),
-                                getConversionServiceField().getFieldName()
-                                        .getSymbolName()));
+                                dateFormatVarName, getConversionServiceField()
+                                        .getFieldName().getSymbolName()));
 
         // return DatatablesResponse.build(dataSet,criterias);
         bodyBuilder.appendFormalLine(String.format(
@@ -3596,6 +3598,8 @@ public class DatatablesMetadata extends
                 entityTypeName, new JavaSymbolName(entityName).getSymbolName(),
                 REQUEST_PARAM_NAME.getSymbolName()));
 
+        String dateFormatVarName = getCodeToAddDateTimeFormatPatterns(bodyBuilder);
+
         /*
          * // Use ConversionService with the obtained data
            return DatatablesUtils.populateDataSet(searchResult.getResults(), "id",
@@ -3605,10 +3609,11 @@ public class DatatablesMetadata extends
          */
         bodyBuilder
                 .appendFormalLine("// Use ConversionService with the obtained data");
-        format = "return %s.populateDataSet(searchResult.getResults(), \"id\", searchResult.getTotalCount(), searchResult.getResultsCount(), %s.getColumnDefs(), null, conversionService_dtt).getRows();";
+        format = "return %s.populateDataSet(searchResult.getResults(), \"id\", searchResult.getTotalCount(), searchResult.getResultsCount(), %s.getColumnDefs(), %s, %s).getRows();";
         bodyBuilder.appendFormalLine(String.format(format,
                 helper.getFinalTypeName(DATATABLES_UTILS),
-                CRITERIA_PARAM_NAME.getSymbolName()));
+                CRITERIA_PARAM_NAME.getSymbolName(), dateFormatVarName,
+                getConversionServiceField().getFieldName().getSymbolName()));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -3618,6 +3623,37 @@ public class DatatablesMetadata extends
 
         return methodBuilder.build(); // Build and return a MethodMetadata
                                       // instance
+    }
+
+    /**
+     * Add the Java code to call tje dateformat method named
+     * "addDateTimeFormatPatterns(uiModel)".
+     * 
+     * @param bodyBuilder the InvocableMemberBodyBuilder
+     * @return the name of the date format variable.
+     */
+    private String getCodeToAddDateTimeFormatPatterns(
+            InvocableMemberBodyBuilder bodyBuilder) {
+
+        // Call to dateformat method named "addDateTimeFormatPatterns(uiModel)"
+        String dateFormatVarName = "null";
+        if (entityDatePatterns != null && !entityDatePatterns.isEmpty()) {
+
+            // Model uiModel = new ExtendedModelMap();
+            bodyBuilder.appendFormalLine(String.format(
+                    "%s uiModel = new %s();", MODEL, EXTENDED_MODEL_MAP));
+
+            // addDateTimeFormatPatterns(uiModel);
+            bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
+
+            // Map<String, Object> datePattern = uiModel.asMap();
+            bodyBuilder.appendFormalLine(String.format(
+                    "%s datePattern = uiModel.asMap();",
+                    helper.getFinalTypeName(MAP_STRING_OBJECT)));
+
+            dateFormatVarName = "datePattern";
+        }
+        return dateFormatVarName;
     }
 
     /**
