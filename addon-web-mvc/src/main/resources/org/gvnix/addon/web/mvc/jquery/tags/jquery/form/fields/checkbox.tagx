@@ -18,7 +18,7 @@
     <!-- 
     <script type="text/javascript">dojo.require("dijit.form.CheckBox");</script>
     -->
-    <div id="_${sec_id}_id" class="control-group">
+    <div id="_${fn:escapeXml(id)}_id" class="control-group">
       <label for="_${sec_field}_id" class="control-label">
         <c:out value="${fn:escapeXml(label)}" />:
       </label>
