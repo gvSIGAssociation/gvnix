@@ -1,4 +1,4 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:table="urn:jsptagdir:/WEB-INF/tags/datatables" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixddt="http://www.gvnix.org/gvnix-datatables" xmlns:datatables="http://github.com/dandelion/datatables" version="2.0">
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:table="urn:jsptagdir:/WEB-INF/tags/datatables" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixddt="http://www.gvnix.org/gvnix-datatables" xmlns:datatables="http://github.com/dandelion/datatables" version="2.0">
   <jsp:directive.tag import="java.util.Random"/>
   <jsp:directive.tag import="org.springframework.web.servlet.support.RequestContext"/>
   <jsp:directive.tag import="org.springframework.web.servlet.tags.RequestContextAwareTag"/>
@@ -302,7 +302,7 @@
          */
         function evalScripts( oSettings ) {
           if ( typeof oTable_${id} != 'undefined' ) {
-              oTable_${id}.jQuery('td').each(function(i) {
+              jQuery('oTable_${id}').find('td').each(function(i) {
                   jQuery(this).wrapInner(jQuery('<div></div>'));
               });
           }
@@ -311,6 +311,28 @@
    </c:when>
 
   <c:otherwise>
+  
+  <!-- ******* Begin inline creation panel ********** -->
+  <c:set var="inlineCreating" value="false" />
+  <c:if test="${serverSide and datatablesInlineCreating}">
+    <c:set var="inlineCreating" value="true" />
+  </c:if>
+  <c:if test="${inlineCreating}">
+    <spring:message code="global_menu_new" var="label" arguments="${entity_title}" htmlEscape="false" />
+    <!-- 
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#${id}CreateForm">${label}</a></li>
+    </ul>
+    -->
+    <div class="tab-content create-div table-responsive" id="${id}CreateForm" style="display: none;">
+      <h4>${label}</h4>
+    </div>
+    <c:set target="${datatables_javaScript_elements_init}" property="displayCreateForm">
+      fnDisplayCreateForm('${id}');
+    </c:set>
+  </c:if>
+  <!-- ******* End inline creation panel ********** -->
+  
   <!--
   *******	Tabular views configuration ******
    -->
@@ -403,33 +425,31 @@
     </c:if><!-- /serverSide -->
   </c:if><!-- /show -->
 
-        <!-- Setup row creation option -->
-  <c:if test="${create}">
-            <c:set var="fnRenderCreateButton" value="${id}_render_createBtn"/>
-
+  <!-- Setup row creation option -->
+  <c:if test="${create and !inlineCreating}">
+    <c:set var="fnRenderCreateButton" value="${id}_render_createBtn"/>
     <c:set var="create_label">
-	  <spring:escapeBody javaScriptEscape="true">
-    	<spring:message arguments="${typeName}" code="entity_create"/>
+      <spring:escapeBody javaScriptEscape="true">
+        <spring:message arguments="${typeName}" code="entity_create"/>
       </spring:escapeBody>
     </c:set>
-    <spring:url value="/resources/images/add.png" var="create_image_url" />
 
     <!-- Add create functions to the script element before Datatables element -->
-	<c:set target="${datatables_javaScript_elements_before}" property="${fnRenderCreateButton}">
-            /* Add the create button to gvNIX toolbar */
-            function ${fnRenderCreateButton}() {
-               var result =
-               '<a href="${urlPath}${urlParams}&amp;' + datatablesRedirect + '" alt="${create_label}" title="${create_label}" class="icon create_entity">'
-               + '</a>';
-                jQuery('#${id}_gvnix_toolbar').append( result );
-	    }
+    <c:set target="${datatables_javaScript_elements_before}" property="${fnRenderCreateButton}">
+      /* Add the create button to gvNIX toolbar */
+      function ${fnRenderCreateButton}() {
+        var result =
+          '<a href="${urlPath}${urlParams}&amp;' + datatablesRedirect + '" alt="${create_label}" title="${create_label}" class="icon create_entity">'
+          + '</a>';
+        jQuery('#${id}_gvnix_toolbar').append( result );
+      }
     </c:set>
 
-            <!-- In Datatables initialization callback handler add call to
-                functions that will initialize create options -->
-            <c:set target="${datatables_javaScript_elements_init}" property="${fnRenderCreateButton}">
-                // Invoke function that adds the create btn in gvNIX toolbar
-                ${fnRenderCreateButton}();
+    <!-- In Datatables initialization callback handler add call to
+         functions that will initialize create options -->
+    <c:set target="${datatables_javaScript_elements_init}" property="${fnRenderCreateButton}">
+      // Invoke function that adds the create btn in gvNIX toolbar
+      ${fnRenderCreateButton}();
     </c:set>
   </c:if><!-- /empty create or create -->
 

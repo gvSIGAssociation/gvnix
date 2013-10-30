@@ -359,7 +359,8 @@ public class DatatablesMetadata extends
                                 .getFullyQualifiedTypeName()
                                 .concat(". Inline editing requires update view uses. Run 'web mvc jquery add' command"));
             }
-            builder.addMethod(getUpdateJsonFormsMethod());
+            builder.addMethod(getJsonFormsMethod(true));
+            builder.addMethod(getJsonFormsMethod(false));
             builder.addMethod(getRenderUpdateFormsMethod());
             builder.addMethod(getPopulateItemForRenderMethod());
         }
@@ -369,20 +370,32 @@ public class DatatablesMetadata extends
     }
 
     /**
-     * Return method <code>updateJsonForms</code>
+     * Return method to obtain JSon forms to create or update, depending if the
+     * parameter {@code isCreateJsonForm} is true or false.
      * 
+     * @param isCreateJsonForm true to return the method to obtain the create
+     *        JSon form, false to obtain the update one.
      * @return
      */
-    private MethodMetadata getUpdateJsonFormsMethod() {
+    private MethodMetadata getJsonFormsMethod(boolean isCreateJsonForm) {
+
         // method name
         JavaSymbolName methodName = UPDATE_JSON_FORMS_METHOD;
+        if (isCreateJsonForm) {
+            methodName = CREATE_JSON_FORM_METHOD;
+        }
 
         // Define method parameter types
-        final List<AnnotatedJavaType> parameterTypes = Arrays.asList(
-                helper.createRequestParam(entityIdArrayType, "id", null, null),
-                AnnotatedJavaType.convertFromJavaType(HTTP_SERVLET_REQUEST),
-                AnnotatedJavaType.convertFromJavaType(HTTP_SERVLET_RESPONSE),
-                AnnotatedJavaType.convertFromJavaType(MODEL));
+        final List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        if (!isCreateJsonForm) {
+            parameterTypes.add(helper.createRequestParam(entityIdArrayType,
+                    "id", null, null));
+        }
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(HTTP_SERVLET_REQUEST));
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(HTTP_SERVLET_RESPONSE));
+        parameterTypes.add(AnnotatedJavaType.convertFromJavaType(MODEL));
 
         // Check if a method exist in type
         final MethodMetadata method = methodExists(methodName, parameterTypes);
@@ -396,10 +409,13 @@ public class DatatablesMetadata extends
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
 
         // @RequestMapping
+        String requestMappingValue = "/datatables/updateforms";
+        if (isCreateJsonForm) {
+            requestMappingValue = "/datatables/createform";
+        }
         AnnotationMetadataBuilder requestMappingAnnotation = helper
-                .getRequestMappingAnnotation("/datatables/updateforms", null,
-                        null, "application/json", null,
-                        "Accept=application/json");
+                .getRequestMappingAnnotation(requestMappingValue, null, null,
+                        "application/json", null, "Accept=application/json");
         annotations.add(requestMappingAnnotation);
         // @ResponseBody
         AnnotationMetadataBuilder responseBodyAnnotation = new AnnotationMetadataBuilder();
@@ -413,14 +429,21 @@ public class DatatablesMetadata extends
 
         // Define method parameter names (none in this case)
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-        parameterNames.add(IDS_PARAM_NAME);
+        if (!isCreateJsonForm) {
+            parameterNames.add(IDS_PARAM_NAME);
+        }
         parameterNames.add(REQUEST_PARAM_NAME);
         parameterNames.add(RESPONSE_PARAM_NAME);
         parameterNames.add(UI_MODEL);
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildUpdateJsonFormsMethod(bodyBuilder);
+        if (isCreateJsonForm) {
+            buildCreateJsonFormMethod(bodyBuilder);
+        }
+        else {
+            buildUpdateJsonFormsMethod(bodyBuilder);
+        }
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -433,6 +456,11 @@ public class DatatablesMetadata extends
         // instance
     }
 
+    /**
+     * Build code for the method to obtain the update JSon forms.
+     * 
+     * @param bodyBuilder the InvocableMemberBodyBuilder
+     */
     private void buildUpdateJsonFormsMethod(
             InvocableMemberBodyBuilder bodyBuilder) {
         // if (ArrayUtils.isEmpty(ids)) {
@@ -515,6 +543,164 @@ public class DatatablesMetadata extends
                 RESPONSE_PARAM_NAME.getSymbolName()));
         // return udpateForms;
         bodyBuilder.appendFormalLine("return udpateForms;");
+    }
+
+    /**
+     * Build code for the method to obtain the create JSon form.
+     * 
+     * @param bodyBuilder the InvocableMemberBodyBuilder
+     */
+    private void buildCreateJsonFormMethod(
+            InvocableMemberBodyBuilder bodyBuilder) {
+
+        // // Prepare result
+        bodyBuilder.appendFormalLine("");
+        bodyBuilder.appendFormalLine("// Prepare result");
+
+        // List<Map<String, String>> result = new ArrayList<Map<String,
+        // String>>();
+        bodyBuilder.appendFormalLine(String.format("%s result = new %s();",
+                helper.getFinalTypeName(LIST_MAP_STRING_STRING),
+                helper.getFinalTypeName(ARRAYLIST_MAP_STRING_STRING)));
+
+        // String controllerPath = "vets";
+        bodyBuilder.appendFormalLine(String.format(
+                "String controllerPath = \"%s\";",
+                webScaffoldAnnotationValues.getPath()));
+
+        // String pageToUse = "update";
+        bodyBuilder.appendFormalLine("String pageToUse = \"create\";");
+
+        // String renderUrl = String.format("/WEB-INF/views/%s/%s.jspx",
+        // controllerPath, pageToUse);
+        bodyBuilder
+                .appendFormalLine("String renderUrl = String.format(\"/WEB-INF/views/%s/%s.jspx\", controllerPath, pageToUse);");
+        bodyBuilder.appendFormalLine("");
+
+        // Map<String, String> item = new HashMap<String, String>();
+        bodyBuilder.appendFormalLine(String.format("%s item = new %s();",
+                helper.getFinalTypeName(MAP_STRING_STRING),
+                helper.getFinalTypeName(HASHMAP_STRING_STRING)));
+
+        // final StringWriter buffer = new StringWriter();
+        bodyBuilder.appendFormalLine(String.format(
+                "final %s buffer = new %s();",
+                helper.getFinalTypeName(STRING_WRITER),
+                helper.getFinalTypeName(STRING_WRITER)));
+        bodyBuilder.appendFormalLine("");
+
+        // // Call JSP to render update form
+        bodyBuilder.appendFormalLine("// Call JSP to render update form");
+
+        // RequestDispatcher dispatcher =
+        // request.getRequestDispatcher(renderUrl);
+        bodyBuilder.appendFormalLine(String.format(
+                "%s dispatcher = %s.getRequestDispatcher(renderUrl);",
+                helper.getFinalTypeName(REQUEST_DISPATCHER),
+                REQUEST_PARAM_NAME.getSymbolName()));
+        bodyBuilder.appendFormalLine("");
+
+        // // spring from:input tag uses BindingResult to locate property
+        // editors
+        // // for each bean property. So, we add a request attribute (required
+        // key
+        // // id BindingResult.MODEL_KEY_PREFIX + object name) with a correctly
+        // // initialized bindingResult.
+        bodyBuilder
+                .appendFormalLine("// spring from:input tag uses BindingResult to locate property editors");
+        bodyBuilder
+                .appendFormalLine("// for each bean property. So, we add a request attribute (required key");
+        bodyBuilder
+                .appendFormalLine("// id BindingResult.MODEL_KEY_PREFIX + object name) with a correctly");
+        bodyBuilder.appendFormalLine("// initialized bindingResult.");
+
+        // Vet vet = new Vet();
+        bodyBuilder.appendFormalLine(String.format("%s %s = new %s();",
+                helper.getFinalTypeName(entity), entityName,
+                helper.getFinalTypeName(entity)));
+
+        // BeanPropertyBindingResult bindingResult = new
+        // BeanPropertyBindingResult(pet, "pet");
+        bodyBuilder.appendFormalLine(String.format(
+                "%s bindingResult = new %s(%s, \"%s\");",
+                helper.getFinalTypeName(BEAN_PROPERTY_BINDING_RESULT),
+                helper.getFinalTypeName(BEAN_PROPERTY_BINDING_RESULT),
+                entityName, entityName));
+
+        // bindingResult.initConversion(conversionService_dtt);
+        bodyBuilder.appendFormalLine(String.format(
+                "bindingResult.initConversion(%s);",
+                getConversionServiceField().getFieldName().getSymbolName()));
+
+        // request.setAttribute(BindingResult.MODEL_KEY_PREFIX + "pet",
+        // bindingResult);
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("%s.setAttribute(%s.MODEL_KEY_PREFIX + \"%s\", bindingResult);",
+                                REQUEST_PARAM_NAME.getSymbolName(),
+                                helper.getFinalTypeName(BINDING_RESULT),
+                                entityName));
+        bodyBuilder.appendFormalLine("");
+
+        // populateItemForRender(request, vet, true);
+        bodyBuilder.appendFormalLine(String.format(
+                "populateItemForRender(%s, %s, true);",
+                REQUEST_PARAM_NAME.getSymbolName(), entityName));
+        bodyBuilder.appendFormalLine("");
+
+        // dispatcher.include(request, new HttpServletResponseWrapper(response)
+        // {
+        bodyBuilder.appendFormalLine(String.format(
+                "dispatcher.include(%s, new %s(response) {",
+                REQUEST_PARAM_NAME.getSymbolName(),
+                helper.getFinalTypeName(HTTP_SERVLET_RESPONSE_WRAPPER)));
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("");
+
+        String printWriter = helper.getFinalTypeName(PRINT_WRITER);
+        // private PrintWriter writer = new PrintWriter(buffer);
+        bodyBuilder.appendFormalLine(String.format(
+                "private %s writer = new PrintWriter(buffer);", printWriter,
+                printWriter));
+        bodyBuilder.appendFormalLine("");
+
+        // @Override
+        bodyBuilder.appendFormalLine("@Override");
+
+        // public PrintWriter getWriter() throws IOException {
+        bodyBuilder.appendFormalLine(String.format(
+                "public %s getWriter() throws %s {", printWriter,
+                helper.getFinalTypeName(IO_EXCEPTION)));
+        bodyBuilder.indent();
+
+        // return writer;
+        bodyBuilder.appendFormalLine("return writer;");
+
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // });
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("});");
+
+        // String render = buffer.toString();
+        bodyBuilder.appendFormalLine("String render = buffer.toString();");
+        bodyBuilder.appendFormalLine("");
+
+        // // Put rendered content into first column
+        bodyBuilder
+                .appendFormalLine("// Put rendered content into first column");
+
+        // item.put("form", render);
+        bodyBuilder.appendFormalLine("item.put(\"form\", render);");
+
+        // result.add(item);
+        bodyBuilder.appendFormalLine("result.add(item);");
+        bodyBuilder.appendFormalLine("");
+
+        // return result;
+        bodyBuilder.appendFormalLine("return result;");
     }
 
     /**
@@ -2180,6 +2366,9 @@ public class DatatablesMetadata extends
                 "uiModel.addAttribute(\"datatablesUseAjax\",%s);", isAjax()));
         bodyBuilder.appendFormalLine(String.format(
                 "uiModel.addAttribute(\"datatablesInlineEditing\",%s);",
+                isInlineEditing()));
+        bodyBuilder.appendFormalLine(String.format(
+                "uiModel.addAttribute(\"datatablesInlineCreating\",%s);",
                 isInlineEditing()));
         bodyBuilder.appendFormalLine(String.format(
                 "uiModel.addAttribute(\"datatablesStandardMode\",%s);",

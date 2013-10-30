@@ -230,6 +230,8 @@ public class DatatablesConstants {
 
     static final JavaSymbolName UPDATE_JSON_FORMS_METHOD = new JavaSymbolName(
             "updateJsonForms");
+    static final JavaSymbolName CREATE_JSON_FORM_METHOD = new JavaSymbolName(
+            "createJsonForm");
 
     static final JavaSymbolName RENDER_UPDATE_FORMS_METHOD = new JavaSymbolName(
             "renderUpdateForm");
@@ -241,6 +243,9 @@ public class DatatablesConstants {
 
     static final JavaType QUERYDSL_UTILS = new JavaType(
             "org.gvnix.web.datatables.util.QuerydslUtils");
+
+    static final JavaType BINDING_RESULT = new JavaType(
+            "org.springframework.validation.BindingResult");
 
     static final JavaType DATATABLES_EXPORT = new JavaType(
             "com.github.dandelion.datatables.core.export.DatatablesExport");

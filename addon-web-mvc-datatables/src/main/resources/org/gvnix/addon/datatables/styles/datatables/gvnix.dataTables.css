@@ -176,8 +176,29 @@ table.dataTable tr.row_clicked td {
 }
 
 table.dataTable tr.row_editing_error td[class*="sorting_"],
-table.dataTable tr.row_editing_error td {
+table.dataTable tr.row_editing_error td,
+table.table tr.row_editing_error td {
 	background-color: #ffa0a0;
+}
+
+form.create-form {
+  overflow: auto;
+}
+.create-div {
+  background-color: #FFFFFF;
+  border-color: #DDDDDD;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  box-shadow: none;
+  margin-left: 0;
+  margin-right: 0;
+  position: relative;
+  padding: 5px 5px 5px 5px;
+  margin-bottom: 10px;
+}
+.create-div h4 {
+  margin: 5px 0px 5px 0px;
 }
 
 span.errors {

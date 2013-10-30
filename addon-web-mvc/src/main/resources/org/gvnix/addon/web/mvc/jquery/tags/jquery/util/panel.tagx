@@ -24,11 +24,13 @@
       <spring:escapeBody javaScriptEscape="true" >${title}</spring:escapeBody>
     </c:set>
 
-    <section>
+    <section id="${sec_id}">
+      <c:if test="${!empty title}">
         <div class="page-header">
             <h1>${title}</h1>
         </div>    
-        <jsp:doBody />
+      </c:if>
+      <jsp:doBody />
     </section>
   </c:if>
 </jsp:root>

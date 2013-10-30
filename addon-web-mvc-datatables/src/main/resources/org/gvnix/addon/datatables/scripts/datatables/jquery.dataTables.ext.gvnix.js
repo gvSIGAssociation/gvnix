@@ -101,6 +101,19 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 }
 
 /**
+ * Display create form.
+ *
+ * @param sPanelId
+ */
+function fnDisplayCreateForm(sTableId) {
+	var oTable = jQuery('#' + sTableId);
+	if (oTable.length == 0) {
+		throw "fnDisplayCreateForm : id not found '"+ sTableId + "'";
+	}
+	oTable.dataTable().fnEditing().fnBeginCreate(sTableId);
+}
+
+/**
  * Start editing a row of a datatables
  *
  * @param sTableId
@@ -113,6 +126,7 @@ function fnEditDatatableRow(sTableId, sRowId) {
 	}
 	oTable.dataTable().fnEditing().fnEditRows(sRowId);
 }
+
 /**
  * Perform datatables AJAX request using POST method
  *

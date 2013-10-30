@@ -174,6 +174,41 @@ var GvNIX_Editing;
 			"oEditingRows" : {},
 
 			/**
+			 * Information of rows which are in creating mode. This Map
+			 * holds as key the ROW_ID and as value an instance of
+			 * {@link GvNIX_Editing.models.oCreatingRow}
+			 *
+			 * @property oCreatingRows
+			 * @type object
+			 * @default empty
+			 */
+			"oCreatingRows" : {},
+
+			/**
+			 * The panel that contains the create table
+			 * 
+			 * @type object
+			 * @default empty
+			 */
+			"oCreatePanel" : {},
+
+			/**
+			 * The create table
+			 * 
+			 * @type object
+			 * @default empty
+			 */
+			"oCreateTable" : {},
+
+			/**
+			 * Array with one element for each entity property. Relates each
+			 * column of the create table with the entity property which value
+			 * is shown in that column. Example: aColumnField[0] = "firstName"
+			 * means column 0 is shown the value of the "firstName" field
+			 */
+			"aCreateColumnField" : [],
+
+			/**
 			 * Array with one element for each entity property. Relates
 			 * each column with the entity property which value is shown in
 			 * that column. Example: aColumnField[0] = "firstName" means
@@ -321,6 +356,21 @@ var GvNIX_Editing;
 				if (nRow.id == trId) {
 					return nRow;
 				}
+			}
+			return null;
+		},
+
+		/**
+		 * Gets the cretion row (node) from its id
+		 *
+		 * @param the numer of the row
+		 */
+		"fnGetCreationRowById" : function(numRow) {
+			var createTable = this._data.oCreateTable;
+			var $trs = jQuery('>tbody >tr', createTable);
+			var row = $trs[numRow];
+			if (row !== undefined && row) {
+				return row;
 			}
 			return null;
 		},
@@ -798,11 +848,283 @@ var GvNIX_Editing;
 		/**
 		 * Begin create rows
 		 *
-		 * @param rows templates to add to table
+		 * @param id the identifier
 		 */
-		"fnBeginCreate" : function(rows) {
+		"fnBeginCreate" : function(id) {
+			var createPanel = jQuery('#' + id + 'CreateForm');
+			if (createPanel.length == 0) {
+				throw "fnDisplayCreateForm : id not found '" + id + "CreateForm'";
+			}
+			
 			var _d = this._data;
-			// TODO
+
+			// Request for create form
+			var appCtx = this._options.applicationContext;
+			var jqxhr = jQuery.ajax(appCtx + "/datatables/createform", {
+				traditional : true,
+				dataType : 'json'
+			});
+
+			jqxhr.done(jQuery.proxy(function(response) {
+
+				// Create jQuery object for easier access to create form components
+				var sCreateForm = response[0].form;
+				var htmlCreateForm = jQuery.parseHTML(sCreateForm);
+				var $createForm = jQuery(htmlCreateForm);
+				
+				// Create empty form
+				var $form = $createForm.find("form");
+				var formHtml = '<form id="' + $form.attr('id') + 'CreateForm"'
+						+ ' class="' + $form.attr('class') + ' form-inline create-form"'
+						+ ' enctype="' + $form.attr('enctype')
+						+ '" method="' + $form.attr('method') + '">'
+						+ '</form>';
+				var formHtmlParsed = jQuery.parseHTML(formHtml);
+				var $emptyForm = jQuery(formHtmlParsed);
+
+				var oCreateRow = jQuery.extend( true, {}, GvNIX_Editing.models.oCreatingRow );
+				var rowId = 0; // Currently only create one row
+				oCreateRow.sRowId = rowId;
+				
+				// Init data containers
+				oCreateRow.oCreatingData.id = rowId;
+				
+				// Iterate over column fields to get create controls from
+				// entire create form
+				var aFields = _d.aColumnField;
+				var aHeaderCells = [];
+				var aFormCells = [];
+				for (var colIdx = 0; colIdx < aFields.length; colIdx++) {
+					var property = aFields[colIdx];
+
+					// property is undefined for action columns
+					if (property !== undefined) {
+						
+						// Roo property id has the pattern "... _Entity_propertyName_id"
+						var $ctrlGroup = $createForm.find("div[id $= '_" + property + "_id'].control-group");
+						var $createCtrls = $ctrlGroup.find("div.controls");
+						var $input = $createCtrls.find(":input");
+						if ($input.length == 0) {
+							this.error("[fnDisplayCreateForm] Input control for property '" + property + "' not found.");
+							continue;
+						}
+
+						var value = fnVal($input);
+						
+						// Store value received from server in array of values by column index
+						oCreateRow.aCreatingData.push(value);
+
+						// Store value received from server in Map of values by property name
+						oCreateRow.oCreatingData[property] = value;
+						
+						// Store current value to be able to recover when redraw the create form
+						oCreateRow.aOriginalData.push(value);
+						oCreateRow.oOriginalData[property] = value;
+						
+						// Store property name in array of values by column index
+						_d.aCreateColumnField.push(property);
+						
+						// Create header cell
+						var headerCell = '<th>' + _d.oSettings.aoColumns[colIdx].sTitle + '</th>';
+						aHeaderCells.push(headerCell);
+						
+						// Create form cell
+						var inputClass = $input.attr('class');
+						if (inputClass !== undefined && inputClass) {
+							inputClass = inputClass + ' form-control';
+						} else {
+							inputClass = 'form-control';
+						}
+						$input.attr('class', inputClass);
+						var formCell = '<td><div class="controls">' + fnOuterHTML($input) + '</div></td>';
+						aFormCells.push(formCell);
+					}
+				}
+				
+				// Add a column to send button
+				aHeaderCells.push('<th></th>');
+				var oOpts = this._options;
+				var sSubmitBtnId = id + '_submit_btn';
+				var submitBtnHtml = '<td><a href="#" id="' + sSubmitBtnId + '"'
+						+ ' alt="' + oOpts.submitBtnLabel + '"' + ' title="'
+						+ oOpts.submitBtnLabel + '" class="btn btn-primary">'
+						+ oOpts.submitBtnLabel + '</a></td>';
+				aFormCells.push(submitBtnHtml);
+
+				// Store create row
+				_d.oCreatingRows[rowId] = oCreateRow;
+				
+				// We need all values in received from to complete the
+				// request to send to server (by example: version, other
+				// required fields, etc...)
+				jQuery.each($createForm.find(":input"), function (index, input) {
+					var $input = jQuery(input);
+					var name = $input.attr('name');
+					if (name !== undefined && name) {
+						oCreateRow.oAllItemData[name] = fnVal($input);
+					}
+				});
+				
+				// Make the create table
+				var createTable = '<table class="table table-condensed table-bordered"><thead><tr>';
+				for (var i = 0; i < aHeaderCells.length; i++) {
+					createTable = createTable + aHeaderCells[i];
+				}
+				createTable = createTable + '</thead><tbody><tr id="' + rowId + '">';
+				for (var i = 0; i < aFormCells.length; i++) {
+					createTable = createTable + aFormCells[i];
+				}
+				
+				$emptyForm.append(createTable);
+				createPanel.append(fnOuterHTML($emptyForm));
+				
+				// Store createPanel and createTable into data
+				_d.oCreatePanel = jQuery(createPanel);
+				jQueryInitializeComponents(_d.oCreatePanel);
+				_d.oCreateTable = jQuery(jQuery('>form >table', createPanel));
+				
+				// Display createPanel
+				createPanel.show();
+				
+				// Bind events for create inputs and focus cursor
+				this._fnBindCreateRowEvents(this.fnGetCreationRowById(oCreateRow.sRowId));
+				
+				// Handler submit button
+				jQuery('#' + sSubmitBtnId).click( function() {
+					jQuery('#' + id).dataTable().fnEditing().fnSendCreationForm(rowId);
+					return false;
+				});
+			}, this));
+			
+			return true;
+		},
+
+		/**
+		 * Send creation form info
+		 *
+		 * @param trId of editing row. Accepts an array or a single row id. if null
+		 * 		finish all creating rows
+		 * @returns true if the data of the form is successful saved
+		 */
+		"fnSendCreationForm" : function(trId) {
+			var _d = this._data, oTable = _d.oSettings.oInstance;
+			var appCtx = this._options.applicationContext;
+			if( appCtx === undefined) {
+				this.error("[fnSendCreationForm] No application context given, nothing to do.");
+				return false;
+			}
+
+			var creatingIds = [];
+			if (trId != null && trId !== undefined) {
+				if (jQuery.isArray(trId)) {
+					[].push.apply(creatingIds, trId);
+				} else {
+					creatingIds.push(trId);
+				}
+			}
+			else {
+				// Iterate over creating rows and get creating row IDs
+				jQuery.each(oCreatingRows, function(key, value) {
+					creatingIds.push(key);
+				});
+			}
+			if (creatingIds.length === 0) {
+				return false; // nothing to do
+			}
+
+			// show processing
+			oTable.fnProcessingIndicator(true);
+			
+			// Prepare data for server update request
+			var dataToSend = this._fnPrepareDataToCreate(creatingIds);
+			
+			// Prepare Request
+			var jqxhr = jQuery.ajax(appCtx, {
+				contentType: "application/json",
+				//traditional: true,
+				handleAs : "json",
+				data: JSON.stringify(dataToSend),
+				type: "POST",
+				dataType: 'json'
+			});
+
+			// Do request to server
+			jqxhr.done(jQuery.proxy(function(response) {
+				var _d = this._data, oCreatingRows = _d.oCreatingRows;
+				var oTable = _d.oSettings.oInstance;
+				
+				// With proxy(), 'this' refers to the object encapsulates
+				// this function.
+				if (response.status == 'SUCCESS') {
+					var oCreateRow = oCreatingRows[trId];
+					
+					// Set original values
+					var aOriginalData = oCreateRow.aOriginalData;
+					var aCreatingData = oCreateRow.aCreatingData;
+					jQuery.each(aOriginalData, function(index) {
+						aCreatingData[index] = aOriginalData[index];
+					});
+					oCreateRow.aCreatingData = aCreatingData;
+					var oOriginalData = oCreateRow.oOriginalData;
+					var oCreatingData = oCreateRow.oCreatingData;
+					jQuery.each(oOriginalData, function(key, value) {
+						oCreatingData[key] = value;
+					});
+					oCreateRow.oCreatingData = oCreatingData;
+					
+					// Remove error class from row
+					var nRow = this.fnGetCreationRowById(trId);
+					jQuery(nRow).removeClass(this._options.classForEditingRowError);
+					
+					// Set original values, stored in 'aOriginalData', in each
+					// cell of given row
+					var $tds = jQuery('>td', nRow);
+					$tds.each(function(index) {
+						var $input = jQuery(':input', $tds[index]);
+						var originalValue = oCreateRow.aOriginalData[index];
+						$input.val(originalValue);
+						
+						// Focus on the first input
+						if (index === 0) {
+							$input.focus();
+						}
+						
+						// Remove error messages from cells
+						var $div = jQuery("div", $tds[index]);
+						var $span = jQuery("span.errors", $div);
+						if ($span.length) {
+							$span.remove();
+						}
+					});
+
+					// Redraw table
+					oTable.fnDraw();
+				} else {
+					
+					// there are errors
+					if (response.errorMessage){
+						showMessage("Error",response.errorMessage); // TODO i18n
+					}
+					if (response.bindingResult) {
+						jQuery.each(response.bindingResult,jQuery.proxy(function(index, oErrors) {
+							var rowId = creatingIds[index];
+							var oCreatingRow = oCreatingRows[rowId];
+							oCreatingRow.oLastCreatingErrors = oErrors;
+							this._fnShowBindingCreateErrors(oCreatingRow, oErrors);
+						}, this));
+					}
+				}
+			}, this))
+			.always(jQuery.proxy(function () {
+				// Always hide processing indicator
+				this._data.oSettings.oInstance.fnProcessingIndicator(false);
+				}, this))
+			.fail(jQuery.proxy(function (jqXHR, textStatus, errorThrown) {
+				this.error(textStatus +": " + errorThrown); // TODO i18n
+				showMessage("Error updating data", textStatus +": " + errorThrown);
+			}, this));
+
+			return true;
 		},
 
 		// Callback components ---
@@ -1036,7 +1358,7 @@ var GvNIX_Editing;
 		// private) * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 		/**
-		 * Prepares an array o data to send to server
+		 * Prepares an array of data to send to server
 		 *
 		 * @param trIds Array of trId to prepare
 		 */
@@ -1055,6 +1377,34 @@ var GvNIX_Editing;
 				});
 				// Update the edited values
 				jQuery.each(oEditingRow.oEditingData, function (property,value){
+					item[property] = value;
+				});
+				// Store item values
+				requestData.push(item);
+			});
+			return requestData;
+		},
+		
+		/**
+		 * Prepares an array of data to send to server to create a new value
+		 *
+		 * @param trIds Array of trId to prepare
+		 */
+		"_fnPrepareDataToCreate" : function(trIds) {
+			var oEditingRows = this._data.oCreatingRows;
+
+			var requestData = [];
+			// For each ids
+			jQuery.each(trIds, function(index, key) {
+				var item = {};
+				// get editedRow info
+				var oEditingRow = oEditingRows[key];
+				// Store original values from received form
+				jQuery.each(oEditingRow.oAllItemData, function (property, value){
+					item[property] = value;
+				});
+				// Update the edited values
+				jQuery.each(oEditingRow.oCreatingData, function (property, value){
 					item[property] = value;
 				});
 				// Store item values
@@ -1084,6 +1434,54 @@ var GvNIX_Editing;
 							fnErrorDrawer(this,$tds[colIndex], property,  errorMessage);
 						} catch (e) {
 							this.error("[_fnShowBindingErrors] error calling configured binding-error drawer: { property:'"+  property + "' errorMessage: '" + errorMessage +"'} exception: "+ e);
+						}
+					} else {
+						var $div = jQuery("div", $tds[colIndex]);
+						var $span = jQuery("span.errors", $div);
+						if (!$span.length) {
+							$div.append('<span class="errors">' + errorMessage + '</span>');
+						} else {
+							$span.html(errorMessage);
+						}
+					}
+				} else {
+					this.error("[_fnShowBindingErrors] find binding error of a proprerty ("+ property+ ") which has no column on table: '" + errorMessage+ "'");
+				}
+			}, this));
+		},
+
+		/**
+		 * Show binding error of a oCreatingRow
+		 *
+		 * @param oCreatingRow
+		 * @param oErrors of the refered row
+		 */
+		"_fnShowBindingCreateErrors" : function(oCreatingRow, oErrors) {
+			var aCreateColumnField = this._data.aCreateColumnField;
+			var fnErrorDrawer = this._options.bindingErrorDrawer;
+			var nRow = this.fnGetCreationRowById(oCreatingRow.sRowId);
+
+			jQuery(nRow).addClass(this._options.classForEditingRowError);
+			var $tds = jQuery('>td', nRow);
+
+			// Remove previous error messages
+			$tds.each(function(index) {
+				var $div = jQuery("div", $tds[index]);
+				var $span = jQuery("span.errors", $div);
+				if ($span.length) {
+					$span.remove();
+				}
+			});
+			
+			// Put error messages in the right cells
+			jQuery.each(oErrors, jQuery.proxy(function (property, errorMessage) {
+				var colIndex = aCreateColumnField.indexOf(property);
+				if (colIndex > -1) {
+					if (fnErrorDrawer) {
+						try {
+							fnErrorDrawer(this,$tds[colIndex], property,  errorMessage);
+						} catch (e) {
+							this.error("[_fnShowBindingCreateErrors] error calling configured binding-error drawer: { property: '"+  property + "' errorMessage: '" + errorMessage +"'} exception: "+ e);
 						}
 					} else {
 						var $div = jQuery("div", $tds[colIndex]);
@@ -1430,6 +1828,72 @@ var GvNIX_Editing;
 		},
 
 		/**
+		 * Bind events required to manage a row creating.
+		 *
+		 * The most important is register 'onChange' callback
+		 * on every input.
+		 *
+		 * @param nRow
+		 *            (node)
+		 */
+		"_fnBindCreateRowEvents" : function(nRow) {
+			var _d = this._data;
+			if (!nRow) {
+				// nothing to do
+				return;
+			}
+
+			var rowId = nRow.id;
+			if (_d.oCreatingRows[rowId] == null) {
+				// No created row: do nothing
+				return;
+			}
+
+			// Iterate over row TDs to be sure index (i) match the column index
+			var anTd = jQuery('>td', nRow);
+			for (var i = 0; i < anTd.length; i++) {
+				var property = _d.aCreateColumnField[i];
+
+				// ignore non-property cells
+				if (!property) {
+					continue;
+				}
+
+				var $input = jQuery(':input', anTd[i]);
+				
+				// Focus cursor
+				if (i == 0) {
+					$input.focus();
+				}
+				
+				$input.change( /* Event params*/ {'colIdx': i, 'rowId': rowId, 'property' : property},
+						jQuery.proxy( function(event){
+					var _d = this._data;
+
+					// prepare values needed
+					var oEventParams = event.data;
+					var $input = jQuery(event.currentTarget);
+					var value = $input.val(); // Use .val() to get new value
+					var property = oEventParams.property;
+					var oCreatRow = _d.oCreatingRows[oEventParams.rowId];
+					var previousValue = oCreatRow.oCreatingData[property];
+					var rowId = oEventParams.rowId;
+					try {
+						this.debug("[inputChange] {" + rowId + " [" + property + "]} <-- '"+ value + "'");
+						oCreatRow.aCreatingData[oEventParams.colIdx] = value;
+						oCreatRow.oCreatingData[property] = value;
+						oEventParams.isDirty = true;
+					} catch (e) {
+						// calbacks throw event, cancel change
+						$input.val(previousValue);
+						this.debug("[inputChange]  Canceled cell change {" + rowId + "[" + property + "]} <-- '"+ value + "' : exception : " + e);
+					}
+					return;
+				}, this));
+			}
+		},
+
+		/**
 		 * Initialize component
 		 */
 		"_fnConstruct" : function(iSettings) {
@@ -1550,7 +2014,7 @@ var GvNIX_Editing;
 
 	/**
 	 * Template object for the way in which plugin holds information about
-	 * edited row.
+	 * created/edited row.
 	 * @namespace
 	 */
 	GvNIX_Editing.models = {};
@@ -1558,7 +2022,7 @@ var GvNIX_Editing;
 
 		/**
 		 * Hold the row identifier
-		 *
+		 * 
 		 * @type integer
 		 * @default null
 		 */
@@ -1566,7 +2030,7 @@ var GvNIX_Editing;
 
 		/**
 		 * Hold the row identifier
-		 *
+		 * 
 		 * @type string
 		 * @default null
 		 */
@@ -1574,37 +2038,37 @@ var GvNIX_Editing;
 
 		/**
 		 * Informs if any row data has been modified.
-		 *
+		 * 
 		 * @type boolean
 		 * @default false
 		 */
 		"dirty" : false,
 
 		/**
-		 * Data from the original data source for the row.
-		 * This is an array of values with one element for each column.
-		 *
-		 * Use this values to cancel editing, that is, on cancel just put
-		 * this values in given row.
-		 *
+		 * Data from the original data source for the row. This is an array of
+		 * values with one element for each column.
+		 * 
+		 * Use this values to cancel editing, that is, on cancel just put this
+		 * values in given row.
+		 * 
 		 * @type array
 		 * @default empty
 		 */
 		"aOriginalData" : [],
 
 		/**
-		 * Data being edited. This is an array of values with one element
-		 * for each column.
-		 *
+		 * Data being edited. This is an array of values with one element for
+		 * each column.
+		 * 
 		 * @type array
 		 * @default empty
 		 */
 		"aEditingData" : [],
 
 		/**
-		 * Data being edited. This is a Map of values with one element
-		 * for entity property.
-		 *
+		 * Data being edited. This is a Map of values with one element for
+		 * entity property.
+		 * 
 		 * @type object
 		 * @default empty
 		 */
@@ -1612,27 +2076,88 @@ var GvNIX_Editing;
 
 		/**
 		 * Errors found on the last save request
-		 *
+		 * 
 		 * @type object
 		 * @default empty
 		 */
 		"oLastEditingErrors" : {},
 
 		/**
-		 * Editing components. This is an array of HTML components with
-		 * one element for each column.
-		 *
+		 * Editing components. This is an array of HTML components with one
+		 * element for each column.
+		 * 
 		 * @type array
 		 * @default empty
 		 */
 		"aEditingControls" : [],
 
 		/**
-		 * All data received from server about element.
-		 * This includes non-visible columns which are required
-		 * to update/create a item (by example version field).
-		 * This values will be added to update/create server
-		 * request.
+		 * All data received from server about element. This includes
+		 * non-visible columns which are required to update a item (by example
+		 * version field). This values will be added to update server request.
+		 */
+		"oAllItemData" : {},
+	};
+	GvNIX_Editing.models.oCreatingRow = {
+
+		/**
+		 * Hold the row identifier
+		 * 
+		 * @type string
+		 * @default null
+		 */
+		"sRowId" : null,
+
+		/**
+		 * Data from the original data source for the row. This is an array of
+		 * values with one element for each column.
+		 * 
+		 * Use this values to redraw the create table.
+		 * 
+		 * @type array
+		 * @default empty
+		 */
+		"aOriginalData" : [],
+
+		/**
+		 * Data being created. This is an array of values with one element for
+		 * each column.
+		 * 
+		 * @type array
+		 * @default empty
+		 */
+		"aCreatingData" : [],
+
+		/**
+		 * Data from the original data source for the row. This is a Map of
+		 * values with one element for entity property.
+		 * 
+		 * @type object
+		 * @default empty
+		 */
+		"oOriginalData" : {},
+
+		/**
+		 * Data being created. This is a Map of values with one element for
+		 * entity property.
+		 * 
+		 * @type object
+		 * @default empty
+		 */
+		"oCreatingData" : {},
+
+		/**
+		 * Errors found on the last save request
+		 * 
+		 * @type object
+		 * @default empty
+		 */
+		"oLastCreatingErrors" : {},
+
+		/**
+		 * All data received from server about element. This includes
+		 * non-visible columns which are required to create a item (by example
+		 * version field). This values will be added to create server request.
 		 */
 		"oAllItemData" : {},
 	};
@@ -1670,7 +2195,7 @@ var GvNIX_Editing;
  */
 jQuery.fn.dataTableExt.oApi.fnEditing = function(oSettings, iSettings) {
 
-	// TODO: Inicializar toolbar, etc desde aquí
+	// TODO: Inicializar toolbar, etc from here
 
 	var editing = oSettings.GvNIX_Editing_support;
 
