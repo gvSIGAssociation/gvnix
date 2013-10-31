@@ -702,7 +702,8 @@ public class DatatablesUtils {
      * @param datePatterns Patterns to convert Date fields to String. The Map
      *        contains one pattern for each entity Date field keyed by field
      *        name. For Roo compatibility the key could follow the pattern
-     *        {@code ENTITY + "_" + lower_case( FIELD ) + "_date_format"} too
+     *        {@code uncapitalize( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
+     *        too
      * @param conversionService
      * @return
      */
@@ -817,7 +818,7 @@ public class DatatablesUtils {
      * Get Date pattern by field name
      * <p/>
      * If no pattern found, try standard Roo key
-     * {@code ENTITY + "_" + lower_case( FIELD ) + "_date_format"}
+     * {@code uncapitalize( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
      * 
      * @param datePatterns Contains field name and related data pattern
      * @param entityClass Entity class to which the field belong to
@@ -834,8 +835,9 @@ public class DatatablesUtils {
         }
 
         // Otherwise get pattern by Roo key
-        String rooKey = entityClass.getSimpleName().concat("_")
-                .concat(fieldName.toLowerCase()).concat("_date_format");
+        String rooKey = StringUtils.uncapitalize(entityClass.getSimpleName())
+                .concat("_").concat(fieldName.toLowerCase())
+                .concat("_date_format");
 
         pattern = (String) datePatterns.get(rooKey);
         return pattern;
