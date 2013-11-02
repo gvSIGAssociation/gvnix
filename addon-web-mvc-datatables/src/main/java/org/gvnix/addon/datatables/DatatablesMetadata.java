@@ -17,13 +17,80 @@
  */
 package org.gvnix.addon.datatables;
 
-import static org.gvnix.addon.datatables.DatatablesConstants.*;
+import static org.gvnix.addon.datatables.DatatablesConstants.ARRAYLIST_MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.ARRAYLIST_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.ARRAY_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.AUTOWIRED;
+import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_PROPERTY_BINDING_RESULT;
+import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_WRAPPER;
+import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_WRAPPER_IMP;
+import static org.gvnix.addon.datatables.DatatablesConstants.BINDING_RESULT;
+import static org.gvnix.addon.datatables.DatatablesConstants.COLLECTIONS;
+import static org.gvnix.addon.datatables.DatatablesConstants.COLLECTION_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.CONVERSION_SERVICE;
+import static org.gvnix.addon.datatables.DatatablesConstants.CREATE_JSON_FORM_METHOD;
+import static org.gvnix.addon.datatables.DatatablesConstants.CRITERIA_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_CRITERIA_TYPE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_CSV_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_CONF;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_EXCEPTION;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_TYPE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_TYPE_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_HTML_TABLE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_PARAMS;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_PDF_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_RESPONSE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_XLSX_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_XLS_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_XML_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATA_SET_MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.ENUMERATION_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.EXTENDED_MODEL_MAP;
+import static org.gvnix.addon.datatables.DatatablesConstants.FIND_ALL_RETURN;
+import static org.gvnix.addon.datatables.DatatablesConstants.GET_PROPERTY_MAP;
+import static org.gvnix.addon.datatables.DatatablesConstants.HASHMAP_STRING_OBJECT;
+import static org.gvnix.addon.datatables.DatatablesConstants.HASHMAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.HTTP_SERVLET_REQUEST;
+import static org.gvnix.addon.datatables.DatatablesConstants.HTTP_SERVLET_RESPONSE;
+import static org.gvnix.addon.datatables.DatatablesConstants.HTTP_SERVLET_RESPONSE_WRAPPER;
+import static org.gvnix.addon.datatables.DatatablesConstants.IDS_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.IO_EXCEPTION;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_DATATABLES;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_ROO;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.MAP_STRING_OBJECT;
+import static org.gvnix.addon.datatables.DatatablesConstants.MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_DATATABLES_CONFIG;
+import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_ITEM_FOR_RENDER;
+import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_PARAMETERS_MAP;
+import static org.gvnix.addon.datatables.DatatablesConstants.PRINT_WRITER;
+import static org.gvnix.addon.datatables.DatatablesConstants.QDSL_BOOLEAN_BUILDER;
+import static org.gvnix.addon.datatables.DatatablesConstants.QDSL_JPA_QUERY;
+import static org.gvnix.addon.datatables.DatatablesConstants.QDSL_PATH_BUILDER;
+import static org.gvnix.addon.datatables.DatatablesConstants.QUERYDSL_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.RENDER_UPDATE_FORMS_METHOD;
+import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_DISPATCHER;
+import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_METHOD;
+import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.RESPONSE_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.SEARCH_RESULTS;
+import static org.gvnix.addon.datatables.DatatablesConstants.SERVLET_EXCEPTION;
+import static org.gvnix.addon.datatables.DatatablesConstants.STRING_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.STRING_WRITER;
+import static org.gvnix.addon.datatables.DatatablesConstants.UI_MODEL;
+import static org.gvnix.addon.datatables.DatatablesConstants.UPDATE_JSON_FORMS_METHOD;
 import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.SpringJavaType.MODEL;
 import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
 import static org.springframework.roo.model.SpringJavaType.REQUEST_MAPPING;
 import static org.springframework.roo.model.SpringJavaType.RESPONSE_BODY;
 
+import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +139,9 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.JdkJavaType;
 import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
@@ -211,6 +281,8 @@ public class DatatablesMetadata extends
      */
     private final WebMetadataService webMetadataService;
 
+    private final ProjectOperations projectOperations;
+
     private JavaType entityIdentifierType;
 
     private JavaType entityIdArrayType;
@@ -229,7 +301,8 @@ public class DatatablesMetadata extends
             JpaQueryMetadata jpaQueryMetadata,
             WebScaffoldAnnotationValues webScaffoldAnnotationValues,
             Map<FinderMetadataDetails, QueryHolderTokens> findersRegistered,
-            WebMetadataService webMetadataService) {
+            WebMetadataService webMetadataService,
+            ProjectOperations projectOperations) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -286,6 +359,8 @@ public class DatatablesMetadata extends
         }
 
         this.webMetadataService = webMetadataService;
+
+        this.projectOperations = projectOperations;
 
         // Adding precedence declaration
         // This aspect before webScaffold
@@ -2370,6 +2445,12 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine(String.format(
                 "uiModel.addAttribute(\"datatablesInlineCreating\",%s);",
                 isInlineEditing()));
+
+        // TODO
+        bodyBuilder.appendFormalLine(String.format(
+                "uiModel.addAttribute(\"datatablesSecurityApplied\",%s);",
+                isSecurityApplied()));
+
         bodyBuilder.appendFormalLine(String.format(
                 "uiModel.addAttribute(\"datatablesStandardMode\",%s);",
                 isStantardMode()));
@@ -3935,5 +4016,19 @@ public class DatatablesMetadata extends
      */
     public boolean isInlineEditing() {
         return annotationValues.isInlineEditing();
+    }
+
+    /**
+     * @return informs if Spring Security is applied to the project
+     */
+    private boolean isSecurityApplied() {
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        String appSecurityXMLPath = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""),
+                "applicationContext-security.xml");
+        if (new File(appSecurityXMLPath).exists()) {
+            return true;
+        }
+        return false;
     }
 }

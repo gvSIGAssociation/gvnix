@@ -1,4 +1,4 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:table="urn:jsptagdir:/WEB-INF/tags/datatables" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixddt="http://www.gvnix.org/gvnix-datatables" xmlns:datatables="http://github.com/dandelion/datatables" version="2.0">
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:table="urn:jsptagdir:/WEB-INF/tags/datatables" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixddt="http://www.gvnix.org/gvnix-datatables" xmlns:datatables="http://github.com/dandelion/datatables" xmlns:sec="http://www.springframework.org/security/tags" version="2.0">
   <jsp:directive.tag import="java.util.Random"/>
   <jsp:directive.tag import="org.springframework.web.servlet.support.RequestContext"/>
   <jsp:directive.tag import="org.springframework.web.servlet.tags.RequestContextAwareTag"/>
@@ -109,6 +109,14 @@
   <!-- Filtering options -->
   <jsp:directive.attribute name="filterOnReturn" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Wait until Intro key is pressed to perform a search or filtering. (Default : false)" />
   <jsp:directive.attribute name="filteringDelay" type="java.lang.Integer" rtexprvalue="true" required="false" description="Milisecons to wait from last key-press event to perform a search or filtering. (Default: 500)" />
+
+  <!-- ========================================================================= -->
+  <!-- Authorize features (only work when Spring Security is applied to project) -->
+  <!-- ========================================================================= -->
+  <jsp:directive.attribute name="rolesAuthorizedShow" type="java.lang.String" required="false" rtexprvalue="true" description="Comma separated list of user roles allowed to show." />
+  <jsp:directive.attribute name="rolesAuthorizedCreate" type="java.lang.String" required="false" rtexprvalue="true" description="Comma separated list of user roles allowed to create." />
+  <jsp:directive.attribute name="rolesAuthorizedUpdate" type="java.lang.String" required="false" rtexprvalue="true" description="Comma separated list of user roles allowed to update." />
+  <jsp:directive.attribute name="rolesAuthorizedDelete" type="java.lang.String" required="false" rtexprvalue="true" description="Comma separated list of user roles allowed to delete." />
 
   <!-- ====================== -->
   <!-- Prepare default values -->
@@ -250,16 +258,35 @@
   </c:otherwise>
   </c:choose>
 
-  <c:if test="${empty show}">
+  <!-- When a list of roles is supplied: check if some role is granted and then show create, update and delete controls -->
+  <c:set var="authorizedShow" value="true" />
+  <c:set var="authorizedCreate" value="true" />
+  <c:set var="authorizedUpdate" value="true" />
+  <c:set var="authorizedDelete" value="true" />
+  <c:if test="${datatablesSecurityApplied}">
+	  <c:if test="${not empty rolesAuthorizedShow}">
+	    <sec:authorize var="authorizedShow" ifAnyGranted="${roles}" />
+	  </c:if>
+	  <c:if test="${not empty rolesAuthorizedCreate}">
+	    <sec:authorize var="authorizedCreate" ifAnyGranted="${roles}" />
+	  </c:if>
+	  <c:if test="${not empty rolesAuthorizedUpdate}">
+	    <sec:authorize var="authorizedUpdate" ifAnyGranted="${roles}" />
+	  </c:if>
+	  <c:if test="${not empty rolesAuthorizedDelete}">
+	    <sec:authorize var="authorizedDelete" ifAnyGranted="${roles}" />
+	  </c:if>
+  </c:if>
+  <c:if test="${empty show and authorizedShow}">
       <c:set var="show" value="true"/>
   </c:if>
-  <c:if test="${empty create}">
+  <c:if test="${empty create and authorizedCreate}">
       <c:set var="create" value="true"/>
   </c:if>
-  <c:if test="${empty update}">
+  <c:if test="${empty update and authorizedUpdate}">
       <c:set var="update" value="true"/>
   </c:if>
-  <c:if test="${empty delete}">
+  <c:if test="${empty delete and authorizedDelete}">
       <c:set var="delete" value="true"/>
   </c:if>
 
@@ -404,7 +431,7 @@
   <c:if test="${show}">
     <c:set var="showColumnId" value="${id}_show_col"/>
     <c:if test="${serverSide}">
-  
+
       <c:set var="show_label">
 	      <spring:escapeBody javaScriptEscape="true">
 	         <spring:message arguments="${typeName}" code="entity_show" />
@@ -847,7 +874,7 @@
         <c:when test="${serverSide}">
           <table:action-column id="${showColumnId}" cssClass="utilbox" cssCellClass="utilbox" renderFunction="${showColumnId}" cssStyle="${actionHeaderCssStyle}"/>
         </c:when>
-  
+
         <!-- DOM cell render -->
   		  <c:otherwise>
   			  <table:action-column id="${showColumnId}" cssCellClass="utilbox" cssStyle="${actionHeaderCssStyle}" >
@@ -914,6 +941,8 @@
 			    <c:if test="${not empty item }">
 	              <c:set var="itemId"><spring:eval expression="item[typeIdFieldName]"/></c:set>
                   <spring:url value="${path}/${itemId}" var="delete_form_url" />
+
+                  <!-- improvement TBC -->
                   <spring:url value="/resources/images/delete.png" var="delete_image_url" />
                   <form:form action="#" onsubmit="javascript: this.action = '${delete_form_url}?' + datatablesRedirect" method="DELETE">
                     <spring:message arguments="${typeName}" code="entity_delete" var="delete_label" htmlEscape="false" />
@@ -929,15 +958,15 @@
 			  </c:otherwise>
             </c:choose>
           </c:if>
-          
+
         <!-- configure some export formats -->
         <c:forTokens items="${export}" delims="," var="export_format">
          	<c:set var="export_format_lower" value="${fn:toLowerCase(export_format)}" />
           <c:choose>
-          
+
             <!-- AJAX export configuration -->
             <c:when test="${serverSide}">
-              
+
               <c:set var="exportColumns" value="${datatables_export_columns[export_format_lower]}" />
               <c:set var="exportColumnsAllFormats" value="${datatables_export_columns['all']}" />
               <c:set var="columnsTitleStr">${datatables_export_columns_title}</c:set>
@@ -946,7 +975,7 @@
              		fileName="${typeName}" cssClass="icon export_${export_format_lower}" label="${export_format_lower}"
                 url="${urlPath}/export${export_format_lower}?${export_format}ExportColumns=${exportColumns}&amp;allExportColumns=${exportColumnsAllFormats}&amp;columnsTitle=${columnsTitle}"/>
             </c:when>
-      
+
             <!-- DOM export configuration -->
             <c:otherwise>
               <datatables:export type="${export_format_lower}" includeHeader="true" autoSize="true"
@@ -991,6 +1020,7 @@
 		window.setTimeout(loadDatatablesState${id}, 100);
 	});
 	</c:if>
+
   </script>
   </div>
 </jsp:root>

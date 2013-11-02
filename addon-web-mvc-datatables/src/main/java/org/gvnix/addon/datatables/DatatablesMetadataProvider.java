@@ -66,6 +66,7 @@ import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.ProjectOperations;
 
 /**
  * Provides {@link DatatablesMetadata}.
@@ -80,6 +81,9 @@ public final class DatatablesMetadataProvider extends
 
     @Reference
     private WebMetadataService webMetadataService;
+
+    @Reference
+    protected ProjectOperations projectOperations;
 
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
@@ -208,7 +212,7 @@ public final class DatatablesMetadataProvider extends
                 entityManagerMethodName, datePatterns, webScaffoldAspectName,
                 webJpaBatchMetadata, jpaQueryMetadata,
                 webScaffoldAnnotationValues, findersRegistered,
-                webMetadataService);
+                webMetadataService, projectOperations);
     }
 
     /**
