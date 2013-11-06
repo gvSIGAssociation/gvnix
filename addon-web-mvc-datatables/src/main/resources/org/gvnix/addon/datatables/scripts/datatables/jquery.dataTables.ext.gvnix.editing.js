@@ -927,15 +927,20 @@ var GvNIX_Editing;
 						// Create header cell
 						var headerCell = '<th>' + _d.oSettings.aoColumns[colIdx].sTitle + '</th>';
 						aHeaderCells.push(headerCell);
-						
+
 						// Create form cell
-						var inputClass = $input.attr('class');
-						if (inputClass !== undefined && inputClass) {
-							inputClass = inputClass + ' form-control';
+						var divClass = 'controls';
+						if ($input.attr('type') == 'checkbox') {
+							divClass = divClass + ' checkbox';
 						} else {
-							inputClass = 'form-control';
+							var inputClass = $input.attr('class');
+							if (inputClass !== undefined && inputClass) {
+								inputClass = inputClass + ' form-control';
+							} else {
+								inputClass = 'form-control';
+							}
+							$input.attr('class', inputClass);
 						}
-						$input.attr('class', inputClass);
 						var formCell = '<td><div class="controls">' + fnOuterHTML($input) + '</div></td>';
 						aFormCells.push(formCell);
 					}
@@ -980,14 +985,14 @@ var GvNIX_Editing;
 				
 				// Store createPanel and createTable into data
 				_d.oCreatePanel = jQuery(createPanel);
-				jQueryInitializeComponents(_d.oCreatePanel);
 				_d.oCreateTable = jQuery(jQuery('>form >table', createPanel));
 				
 				// Display createPanel
 				createPanel.show();
 				
-				// Bind events for create inputs and focus cursor
+				// Bind events for create inputs, focus cursor and initialize components
 				this._fnBindCreateRowEvents(this.fnGetCreationRowById(oCreateRow.sRowId));
+				jQueryInitializeComponents(_d.oCreatePanel);
 				
 				// Handler submit button
 				jQuery('#' + sSubmitBtnId).click( function() {
