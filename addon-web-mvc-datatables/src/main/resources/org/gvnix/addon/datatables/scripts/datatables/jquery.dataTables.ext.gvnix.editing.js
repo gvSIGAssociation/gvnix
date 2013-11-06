@@ -952,7 +952,7 @@ var GvNIX_Editing;
 				var sSubmitBtnId = id + '_submit_btn';
 				var submitBtnHtml = '<td><a href="#" id="' + sSubmitBtnId + '"'
 						+ ' alt="' + oOpts.submitBtnLabel + '"' + ' title="'
-						+ oOpts.submitBtnLabel + '" class="btn btn-primary">'
+						+ oOpts.submitBtnLabel + '" class="btn btn-primary btn-sm">'
 						+ oOpts.submitBtnLabel + '</a></td>';
 				aFormCells.push(submitBtnHtml);
 
