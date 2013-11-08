@@ -71,6 +71,9 @@ public class DatatablesUtils {
     private static Logger logger = LoggerFactory
             .getLogger(DatatablesUtils.class);
 
+    private static final String SEPARATOR_FIELDS = ".";
+    private static final String SEPARATOR_FIELDS_ESCAPED = "_~~_";
+
     /**
      * Execute a select query on entityClass using {@code DatatablesCriterias}
      * information for filter, sort and paginate result.
@@ -363,7 +366,7 @@ public class DatatablesUtils {
 
             // If no joins given for this column, don't add the JOIN to query
             // to improve performance
-            String associationName = column.getName();
+            String associationName = unescapeDot(column.getName());
             if (!filterByAssociations.containsKey(associationName)) {
                 continue;
             }
@@ -416,10 +419,8 @@ public class DatatablesUtils {
                     if (findInColumn) {
 
                         // Entity field name and type
-                        String fieldName = column.getName();
-                        Class<?> fieldType = BeanUtils
-                                .findPropertyType(fieldName, ArrayUtils
-                                        .<Class<?>> toArray(entity.getType()));
+                        String fieldName = unescapeDot(column.getName());
+                        Class<?> fieldType = getFieldType(fieldName, entity);
 
                         // On column search, connect where clauses together by
                         // AND
@@ -487,10 +488,8 @@ public class DatatablesUtils {
                     if (column.isFilterable()) {
 
                         // Entity field name and type
-                        String fieldName = column.getName();
-                        Class<?> fieldType = BeanUtils
-                                .findPropertyType(fieldName, ArrayUtils
-                                        .<Class<?>> toArray(entity.getType()));
+                        String fieldName = unescapeDot(column.getName());
+                        Class<?> fieldType = getFieldType(fieldName, entity);
 
                         // Find in all columns means we want to find given
                         // value in at least one entity property, so we must
@@ -565,10 +564,8 @@ public class DatatablesUtils {
 
                 // Entity field name and type. Type must extend Comparable
                 // interface
-                String fieldName = column.getName();
-                Class<E> fieldType = (Class<E>) BeanUtils.findPropertyType(
-                        fieldName,
-                        ArrayUtils.<Class<?>> toArray(entity.getType()));
+                String fieldName = unescapeDot(column.getName());
+                Class<E> fieldType = (Class<E>) getFieldType(fieldName, entity);
 
                 List<String> attributes = orderByAssociations.get(fieldName);
                 try {
@@ -750,9 +747,11 @@ public class DatatablesUtils {
             BeanWrapper entityBean = new BeanWrapperImpl(entity);
             for (String fieldName : fields) {
 
+                String unescapedFieldName = unescapeDot(fieldName);
+
                 // check if property exists (trace it else)
-                if (!entityBean.isReadableProperty(fieldName)) {
-                    logger.debug("Property [".concat(fieldName)
+                if (!entityBean.isReadableProperty(unescapedFieldName)) {
+                    logger.debug("Property [".concat(unescapedFieldName)
                             .concat("] not found in bean [")
                             .concat(entity.toString()).concat("]"));
                     continue;
@@ -762,14 +761,15 @@ public class DatatablesUtils {
 
                 // Convert field value to string
                 try {
-                    value = entityBean.getPropertyValue(fieldName);
+                    value = entityBean.getPropertyValue(unescapedFieldName);
                     if (value != null) {
                         if (Calendar.class.isAssignableFrom(value.getClass())) {
                             value = ((Calendar) value).getTime();
                         }
                         if (Date.class.isAssignableFrom(value.getClass())) {
                             String pattern = getPattern(datePatterns,
-                                    entityBean.getWrappedClass(), fieldName);
+                                    entityBean.getWrappedClass(),
+                                    unescapedFieldName);
                             DateFormat format = StringUtils.isEmpty(pattern) ? defaultFormat
                                     : new SimpleDateFormat(pattern);
                             valueStr = format.format(value);
@@ -935,5 +935,47 @@ public class DatatablesUtils {
         }
 
         return columns.configureExport(exportConf).build();
+    }
+
+    /**
+     * Unescapes the string to represent it with dot ".", that is, the default
+     * character used to indicate attributes of an object (p.e. "user.name")
+     * 
+     * @param str the string to unescape.
+     * @return the string unescaped.
+     */
+    private static String unescapeDot(String str) {
+        return str.replace(SEPARATOR_FIELDS_ESCAPED, SEPARATOR_FIELDS);
+    }
+
+    /**
+     * Obtains the class type of the property named as {@code fieldName} of the
+     * entity.
+     * 
+     * @param fieldName the field name.
+     * @param entity the entity with a property named as {@code fieldName}
+     * @return the class type
+     */
+    private static <T> Class<?> getFieldType(String fieldName,
+            PathBuilder<T> entity) {
+        Class<?> entityType = entity.getType();
+        String fieldNameToFindType = fieldName;
+
+        // Makes the array of classes to find fieldName agains them
+        Class<?>[] classArray = ArrayUtils.<Class<?>> toArray(entityType);
+        if (fieldName.contains(SEPARATOR_FIELDS)) {
+            String[] fieldNameSplitted = StringUtils.split(fieldName,
+                    SEPARATOR_FIELDS);
+            for (int i = 0; i < fieldNameSplitted.length - 1; i++) {
+                Class<?> fieldType = BeanUtils.findPropertyType(
+                        fieldNameSplitted[i],
+                        ArrayUtils.<Class<?>> toArray(entityType));
+                classArray = ArrayUtils.add(classArray, fieldType);
+                entityType = fieldType;
+            }
+            fieldNameToFindType = fieldNameSplitted[fieldNameSplitted.length - 1];
+        }
+
+        return BeanUtils.findPropertyType(fieldNameToFindType, classArray);
     }
 }

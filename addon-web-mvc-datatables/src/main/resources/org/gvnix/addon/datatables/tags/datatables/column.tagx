@@ -61,6 +61,9 @@
   <c:if test="${empty display}">
   	<c:set var="display" value="ALL" />
   </c:if>
+
+  <!-- Format property replacing "." by "_~~_" in order to support access to specific properties -->
+  <c:set var="property" value="${fn:replace(property, '.', '_~~_')}" />
   
   <!-- Prepare the variable to indicate which columns are exportable for each format (only used on AJAX) -->
   <c:set var="display_lower" value="${fn:toLowerCase(display)}" />

@@ -91,6 +91,9 @@ public class RooColumnTag extends ColumnTag {
 
     private SpringContextHelper helper = new SpringContextHelper();
 
+    private static final String SEPARATOR_FIELDS = ".";
+    private static final String SEPARATOR_FIELDS_ESCAPED = "_~~_";
+
     private boolean doRender() {
         return Boolean.TRUE.equals(render) || render == null;
     }
@@ -170,13 +173,15 @@ public class RooColumnTag extends ColumnTag {
 
         // TODO log problem resolving column content
 
-        if (StringUtils.isBlank(property)) {
+        if (StringUtils.isBlank(this.property)) {
             return "";
         }
         TableTag parent = (TableTag) getParent();
 
         ExpressionParser parser = new SpelExpressionParser();
-        Expression exp = parser.parseExpression(this.property);
+        String unescapedProperty = this.property.replace(
+                SEPARATOR_FIELDS_ESCAPED, SEPARATOR_FIELDS);
+        Expression exp = parser.parseExpression(unescapedProperty);
         EvaluationContext context = new StandardEvaluationContext(
                 parent.getCurrentObject());
 
