@@ -164,23 +164,28 @@ public class QuerydslUtils {
                     return createNumberExpression(entityPath, fieldName,
                             (Class<Byte>) fieldType, searchStr);
                 }
-                if (Double.class.isAssignableFrom(fieldType)) {
+                if (Double.class.isAssignableFrom(fieldType)
+                        || double.class == fieldType) {
                     return createNumberExpression(entityPath, fieldName,
                             (Class<Double>) fieldType, searchStr);
                 }
-                if (Float.class.isAssignableFrom(fieldType)) {
+                if (Float.class.isAssignableFrom(fieldType)
+                        || float.class == fieldType) {
                     return createNumberExpression(entityPath, fieldName,
                             (Class<Float>) fieldType, searchStr);
                 }
-                if (Integer.class.isAssignableFrom(fieldType)) {
+                if (Integer.class.isAssignableFrom(fieldType)
+                        || int.class == fieldType) {
                     return createNumberExpression(entityPath, fieldName,
                             (Class<Integer>) fieldType, searchStr);
                 }
-                if (Long.class.isAssignableFrom(fieldType)) {
+                if (Long.class.isAssignableFrom(fieldType)
+                        || long.class == fieldType) {
                     return createNumberExpression(entityPath, fieldName,
                             (Class<Long>) fieldType, searchStr);
                 }
-                if (Short.class.isAssignableFrom(fieldType)) {
+                if (Short.class.isAssignableFrom(fieldType)
+                        || short.class == fieldType) {
                     return createNumberExpression(entityPath, fieldName,
                             (Class<Short>) fieldType, searchStr);
                 }
