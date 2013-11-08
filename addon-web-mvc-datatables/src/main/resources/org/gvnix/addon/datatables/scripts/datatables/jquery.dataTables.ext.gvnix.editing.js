@@ -585,6 +585,10 @@ var GvNIX_Editing;
 								continue;
 							}
 
+							// Make a new unique ID for the input to avoid
+							// collisions with other elements with same ID
+							$inputCtrl.attr('id', $inputCtrl.attr('id') + '_edit_' + rowId);
+							
 							var value = fnVal( $inputCtrl );
 
 							// Store current value to be able to recover if user
@@ -929,6 +933,8 @@ var GvNIX_Editing;
 						aHeaderCells.push(headerCell);
 
 						// Create form cell
+						
+						// Add proper CSS classes to contained and input
 						var divClass = 'controls';
 						if ($input.attr('type') == 'checkbox') {
 							divClass = divClass + ' checkbox';
@@ -941,7 +947,12 @@ var GvNIX_Editing;
 							}
 							$input.attr('class', inputClass);
 						}
-						var formCell = '<td><div class="controls">' + fnOuterHTML($input) + '</div></td>';
+
+						// Make a new unique ID for the input to avoid
+						// collisions with other elements with same ID
+						$input.attr('id', $input.attr('id') + '_create_' + rowId);
+						
+						var formCell = '<td><div class="' + divClass + '">' + fnOuterHTML($input) + '</div></td>';
 						aFormCells.push(formCell);
 					}
 				}
