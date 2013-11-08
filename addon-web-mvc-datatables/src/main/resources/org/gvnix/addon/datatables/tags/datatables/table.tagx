@@ -586,25 +586,37 @@
 		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
 
                       /* ... */
-		        function ${removeColumnId}_selected() {
+		        function ${removeColumnId}_selected(aId) {
 		        	var $table = jQuery('#${id}').dataTable();
-
-                          // Get the table GvNIX_Selection object
-		        	var $selection = $table.fnSelection();
-		        	var selCount = $selection.fnSelectionCount();
-		        	if ( selCount > 1) {
-			        	if (!confirm(${removeColumnId}_multiconfirmation + ' ' + selCount)){
+		        	
+		          if (aId == null || aId === undefined || aId == '') {
+	
+	                          // Get the table GvNIX_Selection object
+			        	var $selection = $table.fnSelection();
+			        	var selCount = $selection.fnSelectionCount();
+			        	if ( selCount > 1) {
+				        	if (!confirm(${removeColumnId}_multiconfirmation + ' ' + selCount)){
+				        		return;
+				        	}
+			        	} else if (selCount == 1){
+				        	if (!confirm(${removeColumnId}_confirmation)){
+				        		return;
+				        	}
+			        	} else {
+			        		alert("Select records to remove");
 			        		return;
 			        	}
-		        	} else if (selCount == 1){
-			        	if (!confirm(${removeColumnId}_confirmation)){
-			        		return;
-			        	}
+			        	var selectionInfo = $selection.fnGetSelectionInfo();
 		        	} else {
-		        		alert("Select records to remove");
-		        		return;
+								if (!confirm(${removeColumnId}_confirmation)){
+								  return;
+								}
+								var selectionInfo = {
+								   'all' : false,
+								      'idListSelected': true,
+								      'idList' : [aId]
+								}
 		        	}
-		        	var selectionInfo = $selection.fnGetSelectionInfo();
 		        	var deleteParams = {
 					    <c:if test="${not empty baseFilter}">
 					    <c:forEach items="${baseFilter}" var="entry">
@@ -674,13 +686,9 @@
 		    <c:set target="${datatables_javaScript_elements_before}" property="${removeColumnId}">
 		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
 		        function ${removeColumnId}(data, type, full) {
-		        	var result =
-		                '<form action="${urlPath}/'+full.${typeIdFieldName}+'?' + datatablesRedirect + '" method="post">'
-		                + '  <input type="hidden" value="DELETE" name="_method"/>'
-		                + '  <input alt="${delete_label}" class="image" src="${delete_image_url}" title="${delete_label}" type="image" value="${delete_label}" onclick="return confirm(${removeColumnId}_confirmation);" />'
-		                + '</form>';
-
-	                return result;
+                <c:set var="hrefRemoveAction">javascript:${removeColumnId}_selected(\''+full.${typeIdFieldName}+'\')</c:set>
+                var result = '<a id="${removeColumnId}" href="${hrefRemoveAction}" alt="${delete_label}" title="${delete_label}" class="icon delete_entity"></a>';
+                return result;
 			    }
 		     </c:set>
      </c:if>

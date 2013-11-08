@@ -982,7 +982,7 @@ var GvNIX_Editing;
 				});
 				
 				// Make the create table
-				var createTable = '<table class="table table-condensed table-bordered"><thead><tr>';
+				var createTable = '<table class="table table-condensed"><thead><tr>';
 				for (var i = 0; i < aHeaderCells.length; i++) {
 					createTable = createTable + aHeaderCells[i];
 				}
