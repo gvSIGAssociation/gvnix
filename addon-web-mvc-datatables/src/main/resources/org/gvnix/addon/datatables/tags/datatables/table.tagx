@@ -588,11 +588,11 @@
                       /* ... */
 		        function ${removeColumnId}_selected(aId) {
 		        	var $table = jQuery('#${id}').dataTable();
+              
+              // Get the table GvNIX_Selection object
+              var $selection = $table.fnSelection();
 		        	
 		          if (aId == null || aId === undefined || aId == '') {
-	
-	                          // Get the table GvNIX_Selection object
-			        	var $selection = $table.fnSelection();
 			        	var selCount = $selection.fnSelectionCount();
 			        	if ( selCount > 1) {
 				        	if (!confirm(${removeColumnId}_multiconfirmation + ' ' + selCount)){
