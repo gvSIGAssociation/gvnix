@@ -80,7 +80,7 @@ public class WsdlParserUtilsTest {
 
         Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
         Element root = wsdl.getDocumentElement();
-        assertEquals("org.tempuri.",
+        assertEquals("com.w3schools.www.webservices.",
                 WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
 
         File file = new File(SRC_TEST_RESOURCES_PATH,
@@ -106,7 +106,7 @@ public class WsdlParserUtilsTest {
 
         Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
         Element root = wsdl.getDocumentElement();
-        assertEquals("org.tempuri.TempConvert",
+        assertEquals("com.w3schools.www.webservices.TempConvert",
                 WsdlParserUtils.getServiceClassPath(root, WsType.IMPORT));
 
         File file = new File(SRC_TEST_RESOURCES_PATH,
@@ -128,7 +128,7 @@ public class WsdlParserUtilsTest {
 
         Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
         Element root = wsdl.getDocumentElement();
-        assertEquals("org.tempuri.TempConvertSoap",
+        assertEquals("com.w3schools.www.webservices.TempConvertSoap",
                 WsdlParserUtils.getPortTypeClassPath(root, WsType.IMPORT));
 
         wsdl = XmlUtils.getDocumentBuilder().parse(KK_WEB_SERVICE_ENG_WSDL);
