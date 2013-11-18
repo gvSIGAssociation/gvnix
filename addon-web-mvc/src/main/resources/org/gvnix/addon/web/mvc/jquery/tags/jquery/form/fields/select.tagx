@@ -137,7 +137,7 @@
                       </select>
                     </c:when>
                     <c:otherwise>
-                      <select id="_${sec_field}_id" name="${sec_field}" multiple="${multiple}" data-required="${required}">
+                      <select id="_${sec_field}_id" name="${sec_field}" data-required="${required}">
                         <c:forEach items="${items}" var="item">
                           <option value="${item[fn:escapeXml(itemValue)]}">
                             <c:choose>
