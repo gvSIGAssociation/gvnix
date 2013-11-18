@@ -596,6 +596,10 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
             ClassOrInterfaceTypeDetailsBuilder mutableTypeDetails,
             MethodMetadata method) {
 
+        if (method == null) {
+            return false;
+        }
+
         for (MethodMetadataBuilder methodBuilder : mutableTypeDetails
                 .getDeclaredMethods()) {
             if (!methodBuilder.getReturnType().equals(method.getReturnType())) {
