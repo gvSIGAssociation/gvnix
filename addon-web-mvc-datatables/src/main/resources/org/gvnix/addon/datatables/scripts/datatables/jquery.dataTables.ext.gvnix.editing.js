@@ -580,6 +580,20 @@ var GvNIX_Editing;
 							var $ctrlGroup = $updateForm.find("div[id $= '_" + property + "_id'].control-group");
 							var $editCtrls = $ctrlGroup.find("div.controls");
 							var $inputCtrl = $editCtrls.find(":input");
+							
+							// Update input class
+							if ($inputCtrl.attr('type') == 'checkbox') {
+								$editCtrls.attr('class', $editCtrls.attr('class') + ' checkbox');
+							} else {
+								var inputClass = $inputCtrl.attr('class');
+								if (inputClass !== undefined && inputClass) {
+									inputClass = inputClass + ' form-control input-sm';
+								} else {
+									inputClass = 'form-control input-sm';
+								}
+								$inputCtrl.attr('class', inputClass);
+							}
+							
 							if ($inputCtrl.length == 0) {
 								this.error("[fnEditRows] Input control for property '" + property + "' not found.");
 								continue;
@@ -941,9 +955,9 @@ var GvNIX_Editing;
 						} else {
 							var inputClass = $input.attr('class');
 							if (inputClass !== undefined && inputClass) {
-								inputClass = inputClass + ' form-control';
+								inputClass = inputClass + ' form-control input-sm';
 							} else {
-								inputClass = 'form-control';
+								inputClass = 'form-control input-sm';
 							}
 							$input.attr('class', inputClass);
 						}
