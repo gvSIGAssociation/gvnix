@@ -47,9 +47,14 @@ do
     esac
 done
 
+# Exit script on any error
+set -e 
+# Echo all commands
+set -x 
+
 # Remove old roo and gvNIX installed dependencies
-rm -rf ~/.m2/repository/org/springframework/roo
-rm -rf ~/.m2/repository/org/gvnix
+rm -rf ~/.m2/repository/org/springframework/roo || true
+rm -rf ~/.m2/repository/org/gvnix || true
 
 ### ROO PACKAGE
 
@@ -57,7 +62,7 @@ rm -rf ~/.m2/repository/org/gvnix
 cd roo
 
 # Remove bundles Felix cache
-rm -rf bootstrap/target/osgi
+rm -rf bootstrap/target/osgi || true
 
 # Test, install, site, assembly and package Roo modules
 mvn clean install
@@ -135,6 +140,9 @@ mkdir -p target/gvnix-dist
 cp /tmp/gvNIX-$GVNIX_VERSION.zip target/gvnix-dist/
 
 # Info messages
+echo '*************************'
+echo " Build process: SUCCESS"
+echo '************************'
 echo ""
 echo "gvNIX release created: ./target/gvnix-dist/gvNIX-$GVNIX_VERSION.zip"
 echo "gvNIX installed on /tmp and setted on PATH for test purpouses."
