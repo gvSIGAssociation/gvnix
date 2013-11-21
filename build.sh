@@ -4,7 +4,7 @@
 
 # TODO: Comprobar versión de JDK (1.6+) y MVN (3.0+)
 
-GVNIX_VERSION=1.2.1-SNAPSHOT
+GVNIX_VERSION=1.2.1-RELEASE
 ROO_VERSION=1.2.4.RELEASE
 
 DEPLOY='0';
@@ -47,14 +47,9 @@ do
     esac
 done
 
-# Exit script on any error
-set -e 
-# Echo all commands
-set -x 
-
 # Remove old roo and gvNIX installed dependencies
-rm -rf ~/.m2/repository/org/springframework/roo || true
-rm -rf ~/.m2/repository/org/gvnix || true
+rm -rf ~/.m2/repository/org/springframework/roo
+rm -rf ~/.m2/repository/org/gvnix
 
 ### ROO PACKAGE
 
@@ -62,7 +57,7 @@ rm -rf ~/.m2/repository/org/gvnix || true
 cd roo
 
 # Remove bundles Felix cache
-rm -rf bootstrap/target/osgi || true
+rm -rf bootstrap/target/osgi
 
 # Test, install, site, assembly and package Roo modules
 mvn clean install
