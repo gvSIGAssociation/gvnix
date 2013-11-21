@@ -32,7 +32,7 @@
   <parent>
     <groupId>org.gvnix.wrapping</groupId>
     <artifactId>org.gvnix.wrapping.root</artifactId>
-    <version>1.2.1-RELEASE</version>
+    <version>1.3.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.gvnix.wrapping.postgresql.root</artifactId>
