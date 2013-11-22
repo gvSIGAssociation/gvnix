@@ -159,6 +159,9 @@ Package gvNIX
   If some errors, revert the changes::
 
    bash:~/gvnix/trunk/code$ mvn release:rollback
+  
+  If release don't work whit this method, do manually replace old version with new one searching in text mode into all project.
+  Then do tag manually and iterate to new SNAPSHOT version manually replacing too.
 
 * To package the binary release use the following commands::
 
@@ -183,34 +186,9 @@ Package gvNIX
 
 * Test uncompress ZIP file, start it, execute some script and check in STS.
 
-* Publish into gvnix.googlecode.com the gvNIX binary zip, the gvNIX source zip and version changes summary.
+* Publish into gvnix.googlecode.com the gvNIX binary zip.
 
-* Publish into www.gvnix.org the html single page reference guide.
-
-* Update (or create if not exists) the wiki page for each add-on from add-on user guide on html format.
-
-* Write a post into Roo forum about new version.
-
-* Send to communication department the final release date and version changes summary to publish on social networks:
-
-  * gvNIX linkedin group
-  * gvNIX twit with Google Code link
-  * Facebook DISID
-
-Source code
------------
-
-* Optional, package the source code release use the following command::
-
-   bash:/tmp$ svn export http://scmcit.gva.es/svn/gvnix/tags/{version}
-
-  Rename folder:
-
-   bash:/tmp$ mv {version} gvNIX-{version}-src/
-
-  ZIP created folder with name ``gvNIX-{version}-src.zip``::
-
-   bash:/tmp$ zip -r -9 gvNIX-{version}-src.zip gvNIX-{version}-src/
+* Notify to the communication department the new version. 
 
 Branch
 ------
@@ -245,7 +223,6 @@ Contact us ?
 * http://listserv.gva.es/cgi-bin/mailman/listinfo/gvNIX_soporte
 * http://www.gvpontis.gva.es/cast/gvnix
 * If you use Twitter, you're encouraged to follow @gvnix and we appreciate youur mentions.
-
 
 Need more info ?
 ----------------
@@ -286,5 +263,3 @@ Write doc
 
 * Download and install XMLmind XML Editor Personal Edition ( http://www.xmlmind.com/xmleditor/download.shtml )
 * Use the previous editor to open ``src/site/docbook/developer/index.xml`` and contribute with your knowledge.
-
-
