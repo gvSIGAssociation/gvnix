@@ -956,7 +956,7 @@ public class DatatablesUtils {
      * @param entity the entity with a property named as {@code fieldName}
      * @return the class type
      */
-    private static <T> Class<?> getFieldType(String fieldName,
+    public static <T> Class<?> getFieldType(String fieldName,
             PathBuilder<T> entity) {
         Class<?> entityType = entity.getType();
         String fieldNameToFindType = fieldName;

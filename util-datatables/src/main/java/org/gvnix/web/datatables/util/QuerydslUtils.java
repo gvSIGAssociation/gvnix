@@ -19,8 +19,10 @@ package org.gvnix.web.datatables.util;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
@@ -51,6 +53,20 @@ public class QuerydslUtils {
     public static final Set<Class<?>> NUMBER_PRIMITIVES = new HashSet<Class<?>>(
             Arrays.asList(new Class<?>[] { int.class, long.class, double.class,
                     float.class, short.class }));
+
+    public static final String OPERATOR_PREFIX = "_operator_";
+
+    public static final String[] FULL_DATE_PATTERNS = new String[] {
+            "dd-MM-yyyy HH:mm:ss", "dd/MM/yyyy HH:mm:ss",
+            "MM-dd-yyyy HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "dd-MM-yyyy HH:mm",
+            "dd/MM/yyyy HH:mm", "MM-dd-yyyy HH:mm", "MM/dd/yyyy HH:mm",
+            "dd-MM-yyyy", "dd/MM/yyyy", "MM-dd-yyyy", "MM/dd/yyyy" };
+
+    public static final String[] DAY_AND_MONTH_DATE_PATTERNS = new String[] {
+            "dd-MM", "dd/MM", "MM-dd", "MM/dd" };
+
+    public static final String[] MONTH_AND_YEAR_DATE_PATTERNS = new String[] {
+            "MM-yyyy", "MM/yyyy" };
 
     /**
      * Creates a WHERE clause by the intersection of the given search-arguments
@@ -84,10 +100,29 @@ public class QuerydslUtils {
 
         // Build the predicate
         for (Entry<String, Object> entry : searchArgs.entrySet()) {
-            // TODO: use the operator
+            String key = entry.getKey();
+
             // searchArgs can contain "_operator_" entries for each field
-            predicate.and(createObjectExpression(entity, entry.getKey(),
-                    entry.getValue()));
+            if (!key.startsWith(OPERATOR_PREFIX)) {
+                Object valueToSearch = entry.getValue();
+                String operator = (String) searchArgs.get(OPERATOR_PREFIX
+                        .concat(key));
+
+                // If value to search is a collection, creates a predicate for
+                // each object of the collection
+                if (valueToSearch instanceof Collection) {
+                    @SuppressWarnings("unchecked")
+                    Collection<Object> valueColl = (Collection<Object>) valueToSearch;
+                    for (Object valueObj : valueColl) {
+                        predicate.and(createExpression(entity, key, valueObj,
+                                operator));
+                    }
+                }
+                else {
+                    predicate.and(createExpression(entity, key, valueToSearch,
+                            operator));
+                }
+            }
         }
         return predicate;
     }
@@ -222,11 +257,194 @@ public class QuerydslUtils {
      */
     public static <T> BooleanExpression createObjectExpression(
             PathBuilder<T> entityPath, String fieldName, Object searchObj) {
+        return createExpression(entityPath, fieldName, searchObj, null);
+    }
+
+    /**
+     * Return an expression for {@code entityPath.fieldName} with the
+     * {@code operator} or "equal" by default.
+     * <p/>
+     * Expr: {@code entityPath.fieldName eq searchObj}
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet}, {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code name} in {@code Pet} entity, {@code firstName} in
+     *        {@code Pet.owner} entity.
+     * @param searchObj the value to find, may be null
+     * @param operator the operator to use into the expression. Supported
+     *        operators:
+     *        <ul>
+     *        <li>For all types: {@code eq}, {@code in}, {@code ne},
+     *        {@code notIn}, {@code isNull} and {@code isNotNull}.</li> <li>For
+     *        strings and numbers: {@code goe}, {@code gt}, {@code loe},
+     *        {@code lt} and {@code like}.</li> <li> For booleans: {@code goe},
+     *        {@code gt}, {@code loe} and {@code lt}.</li> <li>For dates:
+     *        {@code goe}, {@code gt}, {@code before}, {@code loe}, {@code lt}
+     *        and {@code after}. </li>
+     *        </ul>
+     * @return BooleanExpression
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static <T> BooleanExpression createExpression(
+            PathBuilder<T> entityPath, String fieldName, Object searchObj,
+            String operator) {
         if (searchObj == null) {
             return null;
         }
-        BooleanExpression expression = entityPath.get(fieldName).eq(searchObj);
-        return expression;
+
+        if (StringUtils.isBlank(operator)
+                || StringUtils.equalsIgnoreCase(operator, "eq")) {
+            return entityPath.get(fieldName).eq(searchObj);
+        }
+        else if (StringUtils.equalsIgnoreCase(operator, "in")) {
+            return entityPath.get(fieldName).in(searchObj);
+        }
+        else if (StringUtils.equalsIgnoreCase(operator, "ne")) {
+            return entityPath.get(fieldName).ne(searchObj);
+        }
+        else if (StringUtils.equalsIgnoreCase(operator, "notIn")) {
+            return entityPath.get(fieldName).notIn(searchObj);
+        }
+        else if (StringUtils.equalsIgnoreCase(operator, "isNull")) {
+            return entityPath.get(fieldName).isNull();
+        }
+        else if (StringUtils.equalsIgnoreCase(operator, "isNotNull")) {
+            return entityPath.get(fieldName).isNotNull();
+        }
+
+        Class<?> fieldType = DatatablesUtils
+                .getFieldType(fieldName, entityPath);
+        if (String.class == fieldType && String.class == searchObj.getClass()) {
+            if (StringUtils.equalsIgnoreCase(operator, "goe")) {
+                return entityPath.getString(fieldName).goe((String) searchObj);
+            }
+            else if (StringUtils.equalsIgnoreCase(operator, "gt")) {
+                return entityPath.getString(fieldName).gt((String) searchObj);
+            }
+            else if (StringUtils.equalsIgnoreCase(operator, "loe")) {
+                return entityPath.getString(fieldName).loe((String) searchObj);
+            }
+            else if (StringUtils.equalsIgnoreCase(operator, "lt")) {
+                return entityPath.getString(fieldName).lt((String) searchObj);
+            }
+            else if (StringUtils.equalsIgnoreCase(operator, "like")) {
+                return entityPath.getString(fieldName).like((String) searchObj);
+            }
+        }
+        else if ((Boolean.class == fieldType || boolean.class == fieldType)
+                && String.class == searchObj.getClass()) {
+            Boolean value = BooleanUtils.toBooleanObject((String) searchObj);
+            if (value != null) {
+                if (StringUtils.equalsIgnoreCase(operator, "goe")) {
+                    return entityPath.getBoolean(fieldName).goe(value);
+                }
+                else if (StringUtils.equalsIgnoreCase(operator, "gt")) {
+                    return entityPath.getBoolean(fieldName).gt(value);
+                }
+                else if (StringUtils.equalsIgnoreCase(operator, "loe")) {
+                    return entityPath.getBoolean(fieldName).loe(value);
+                }
+                else if (StringUtils.equalsIgnoreCase(operator, "lt")) {
+                    return entityPath.getBoolean(fieldName).lt(value);
+                }
+            }
+        }
+        else if ((Number.class.isAssignableFrom(fieldType) || NUMBER_PRIMITIVES
+                .contains(fieldType))
+                && String.class == searchObj.getClass()
+                && NumberUtils.isNumber((String) searchObj)) {
+            NumberPath numberExpression = null;
+            if (BigDecimal.class.isAssignableFrom(fieldType)) {
+                numberExpression = entityPath.getNumber(fieldName,
+                        (Class<BigDecimal>) fieldType);
+            }
+            else if (BigInteger.class.isAssignableFrom(fieldType)) {
+                numberExpression = entityPath.getNumber(fieldName,
+                        (Class<BigInteger>) fieldType);
+            }
+            else if (Byte.class.isAssignableFrom(fieldType)) {
+                numberExpression = entityPath.getNumber(fieldName,
+                        (Class<Byte>) fieldType);
+            }
+            else if (Double.class.isAssignableFrom(fieldType)
+                    || double.class == fieldType) {
+                numberExpression = entityPath.getNumber(fieldName,
+                        (Class<Double>) fieldType);
+            }
+            else if (Float.class.isAssignableFrom(fieldType)
+                    || float.class == fieldType) {
+                numberExpression = entityPath.getNumber(fieldName,
+                        (Class<Float>) fieldType);
+            }
+            else if (Integer.class.isAssignableFrom(fieldType)
+                    || int.class == fieldType) {
+                numberExpression = entityPath.getNumber(fieldName,
+                        (Class<Integer>) fieldType);
+            }
+            else if (Long.class.isAssignableFrom(fieldType)
+                    || long.class == fieldType) {
+                numberExpression = entityPath.getNumber(fieldName,
+                        (Class<Long>) fieldType);
+            }
+            else if (Short.class.isAssignableFrom(fieldType)
+                    || short.class == fieldType) {
+                numberExpression = entityPath.getNumber(fieldName,
+                        (Class<Short>) fieldType);
+            }
+            if (numberExpression != null) {
+                Number value = NumberUtils.createNumber((String) searchObj);
+                if (StringUtils.equalsIgnoreCase(operator, "goe")) {
+                    return numberExpression.goe(value);
+                }
+                else if (StringUtils.equalsIgnoreCase(operator, "gt")) {
+                    return numberExpression.gt(value);
+                }
+                else if (StringUtils.equalsIgnoreCase(operator, "like")) {
+                    return numberExpression.like((String) searchObj);
+                }
+                else if (StringUtils.equalsIgnoreCase(operator, "loe")) {
+                    return numberExpression.loe(value);
+                }
+                else if (StringUtils.equalsIgnoreCase(operator, "lt")) {
+                    return numberExpression.lt(value);
+                }
+            }
+
+        }
+        else if ((Date.class.isAssignableFrom(fieldType) || Calendar.class
+                .isAssignableFrom(fieldType))
+                && String.class == searchObj.getClass()) {
+            DatePath<Date> dateExpression = entityPath.getDate(fieldName,
+                    (Class<Date>) fieldType);
+            try {
+                Date value = DateUtils.parseDateStrictly((String) searchObj,
+                        FULL_DATE_PATTERNS);
+                if (StringUtils.equalsIgnoreCase(operator, "goe")) {
+                    return dateExpression.goe(value);
+                }
+                else if (StringUtils.equalsIgnoreCase(operator, "gt")
+                        || StringUtils.equalsIgnoreCase(operator, "after")) {
+                    return dateExpression.gt(value);
+                }
+                else if (StringUtils.equalsIgnoreCase(operator, "loe")) {
+                    return dateExpression.loe(value);
+                }
+                else if (StringUtils.equalsIgnoreCase(operator, "lt")
+                        || StringUtils.equalsIgnoreCase(operator, "before")) {
+                    return dateExpression.lt(value);
+                }
+            }
+            catch (ParseException e) {
+                // Do nothing
+            }
+        }
+        else if (fieldType.isEnum() && String.class == searchObj.getClass()) {
+            return createEnumExpression(entityPath, fieldName,
+                    (String) searchObj, (Class<? extends Enum>) fieldType);
+        }
+
+        return entityPath.get(fieldName).eq(searchObj);
     }
 
     /**
@@ -382,15 +600,13 @@ public class QuerydslUtils {
 
         BooleanExpression expression;
         // Search by full date
-        String[] parsePatterns = new String[] { "dd-MM-yyyy HH:mm:ss",
-                "dd/MM/yyyy HH:mm:ss", "MM-dd-yyyy HH:mm:ss",
-                "MM/dd/yyyy HH:mm:ss", "dd-MM-yyyy HH:mm", "dd/MM/yyyy HH:mm",
-                "MM-dd-yyyy HH:mm", "MM/dd/yyyy HH:mm", "dd-MM-yyyy",
-                "dd/MM/yyyy", "MM-dd-yyyy", "MM/dd/yyyy" };
+        String[] parsePatterns = FULL_DATE_PATTERNS;
         try {
             Date searchDate = DateUtils.parseDateStrictly(searchStr,
                     parsePatterns);
-            expression = dateExpression.eq((fieldType.cast(searchDate)));
+            Calendar searchCal = Calendar.getInstance();
+            searchCal.setTime(searchDate);
+            expression = dateExpression.eq((fieldType.cast(searchCal)));
         }
         catch (Exception e) {
             // do nothing, and try the next parsing
@@ -399,7 +615,7 @@ public class QuerydslUtils {
 
         if (expression == null) {
             // Search by day and month
-            parsePatterns = new String[] { "dd-MM", "dd/MM", "MM-dd", "MM/dd" };
+            parsePatterns = DAY_AND_MONTH_DATE_PATTERNS;
             try {
                 Date searchDate = DateUtils.parseDateStrictly(searchStr,
                         parsePatterns);
@@ -419,7 +635,7 @@ public class QuerydslUtils {
 
         // Search by month and year
         if (expression == null) {
-            parsePatterns = new String[] { "MM-yyyy", "MM/yyyy" };
+            parsePatterns = MONTH_AND_YEAR_DATE_PATTERNS;
             try {
                 Date searchDate = DateUtils.parseDateStrictly(searchStr,
                         parsePatterns);
@@ -429,17 +645,18 @@ public class QuerydslUtils {
                 // from 1st day of the month
                 Calendar monthStartCal = Calendar.getInstance();
                 monthStartCal.set(searchCal.get(Calendar.YEAR),
-                        searchCal.get(Calendar.MONTH), 0, 23, 59, 59);
+                        searchCal.get(Calendar.MONTH), 1, 23, 59, 59);
                 monthStartCal.set(Calendar.MILLISECOND, 999);
 
                 // to last day of the month
                 Calendar monthEndCal = Calendar.getInstance();
                 monthEndCal.set(searchCal.get(Calendar.YEAR),
-                        (searchCal.get(Calendar.MONTH) + 1), 0, 23, 59, 59);
+                        (searchCal.get(Calendar.MONTH) + 1), 1, 23, 59, 59);
                 monthEndCal.set(Calendar.MILLISECOND, 999);
+                
                 expression = dateExpression.between(
-                        fieldType.cast(monthStartCal.getTime()),
-                        fieldType.cast(monthEndCal.getTime()));
+                        fieldType.cast(monthStartCal),
+                        fieldType.cast(monthEndCal));
             }
             catch (Exception e) {
                 // do nothing, and try the next parsing
@@ -449,7 +666,6 @@ public class QuerydslUtils {
 
         // Search by year
         // NOT NEEDED; JUST USE DEFAULT EXPRESSION
-
         if (expression == null) {
             // Default expression
             expression = dateExpression.stringValue().like(
