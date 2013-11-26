@@ -653,7 +653,7 @@ public class QuerydslUtils {
                 monthEndCal.set(searchCal.get(Calendar.YEAR),
                         (searchCal.get(Calendar.MONTH) + 1), 1, 23, 59, 59);
                 monthEndCal.set(Calendar.MILLISECOND, 999);
-                
+
                 expression = dateExpression.between(
                         fieldType.cast(monthStartCal),
                         fieldType.cast(monthEndCal));
