@@ -70,7 +70,7 @@ public class WebJpaBatchCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc batch setup", help = "Enables gvNIX Web MVC Batch utilities on project")
+    @CliCommand(value = "web mvc batch setup", help = "Install the project dependencies and update the webmvc config that gvNIX Web MVC Batch needs")
     public void setup() {
         operations.setup();
     }
@@ -83,7 +83,7 @@ public class WebJpaBatchCommands implements CommandMarker {
      *        use for batch operations. If no specified uses controller's
      *        formBacking object service."
      */
-    @CliCommand(value = "web mvc batch add", help = "Adds support to JPA batch operation in a controller")
+    @CliCommand(value = "web mvc batch add", help = "Adds support for JPA batch operations in given Controller")
     public void create(
             @CliOption(key = "controller", mandatory = true, help = "Target Web MVC controller to add support") JavaType controller,
             @CliOption(key = "service", mandatory = false, help = "Spring service (annotated wid GvNIXJpaBatch) to use for batch operations. If no specified uses controller's formBacking object service.") JavaType service) {
@@ -93,7 +93,7 @@ public class WebJpaBatchCommands implements CommandMarker {
     /**
      * Adds {@link GvNIXWebJpaBatch} annotation to a Controller
      */
-    @CliCommand(value = "web mvc batch all", help = "Adds support to JPA batch operation in all controller which related entities has created a JPA Batch spring service")
+    @CliCommand(value = "web mvc batch all", help = "Adds support for JPA batch operations in all Controller which related entity has a related JPA Batch Spring @Service")
     public void all() {
         operations.addAll();
     }
