@@ -77,12 +77,12 @@ public class DatatablesCommands implements CommandMarker {
      * 
      * @param type target controller
      */
-    @CliCommand(value = "web mvc datatables add", help = "Use datatable component for a controller list view")
+    @CliCommand(value = "web mvc datatables add", help = "Add Dandelion Datatables requests support to given Controller and change the tables in the JSP pages of the related weblayer to Dandelion Datatables")
     public void add(
             @CliOption(key = "type", mandatory = true, help = "The controller to apply this component to") JavaType target,
-            @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "Datatables will use AJAX request to get data data or not") boolean ajax,
-            @CliOption(key = "inline", mandatory = false, unspecifiedDefaultValue = "false", help = "Allow user to modify data inside the datatable (in-line editing)") boolean inline,
-            @CliOption(key = "mode", mandatory = false, unspecifiedDefaultValue = GvNIXDatatables.TABLE, help = "visualization mode: if empty (default) shows a table, otherwise create one-row-per-page, one-cell-per-row datatable which cell content is the render of requiered page. (example: \"show\" renders the show view for every item ") String mode) {
+            @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "true (default) to load data using AJAX, otherwise the data are loaded on page render time") boolean ajax,
+            @CliOption(key = "inline", mandatory = false, unspecifiedDefaultValue = "false", help = "Allow user to modify data in-line, that is, enable in-line editing") boolean inline,
+            @CliOption(key = "mode", mandatory = false, unspecifiedDefaultValue = GvNIXDatatables.TABLE, help = "Visualization mode: if empty (default) renders a table, otherwise create one-row-per-page + one-cell-per-row datatable will be created. On each cell the content of given mode will be rendered, that is, by setting mode == show, each cell will have the show.jspx containing the data of the current entity") String mode) {
         operations.annotateController(target, ajax, mode, inline);
     }
 
@@ -118,7 +118,7 @@ public class DatatablesCommands implements CommandMarker {
      * @param webPackage (optional) controller package. Required if no
      *        conversionService declared on project
      */
-    @CliCommand(value = "web mvc datatables setup", help = "Setup datatables support")
+    @CliCommand(value = "web mvc datatables setup", help = "Install the project dependencies, tags and artifacts that Dandelion Datatables needs")
     public void setup(
             @CliOption(key = "package", mandatory = false, help = "controllers base package. Required if no conversionService registered jet.") JavaPackage webPackage) {
         operations.setup(webPackage);
