@@ -77,7 +77,7 @@ public class JQueryCommands implements CommandMarker {
      * 
      * @param type target controller
      */
-    @CliCommand(value = "web mvc jquery add", help = "Use JQuery for a controller list view")
+    @CliCommand(value = "web mvc jquery add", help = "Change given view to jQuery")
     public void add(
             @CliOption(key = "type", mandatory = true, help = "The controller to apply JQuery to") JavaType target) {
         operations.annotateController(target);
@@ -87,7 +87,7 @@ public class JQueryCommands implements CommandMarker {
      * This method registers a command with the Roo shell. It has no command
      * attribute.
      */
-    @CliCommand(value = "web mvc jquery all", help = "Use JQuery for all list view in this application")
+    @CliCommand(value = "web mvc jquery all", help = "Change all views to jQuery")
     public void all() {
         operations.annotateAll();
     }
@@ -95,7 +95,7 @@ public class JQueryCommands implements CommandMarker {
     /**
      * Setup JQuery artifacts
      */
-    @CliCommand(value = "web mvc jquery setup", help = "Setup JQuery support")
+    @CliCommand(value = "web mvc jquery setup", help = "Install JQuery support")
     public void setup() {
         operations.setup();
     }
