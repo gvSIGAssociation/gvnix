@@ -835,9 +835,9 @@ var GvNIX_Editing;
 
 				} else {
 					// there are errors
-					if (response.errorMessage){
+					if (response.exceptionMessage){
 						// TODO i18n
-						showMessage("Error",response.errorMessage);
+						showMessage("Error",response.exceptionMessage);
 					}
 					if (response.bindingResult) {
 						jQuery.each(response.bindingResult,jQuery.proxy( function (index, oErrors) {
@@ -1132,8 +1132,8 @@ var GvNIX_Editing;
 				} else {
 					
 					// there are errors
-					if (response.errorMessage){
-						showMessage("Error",response.errorMessage); // TODO i18n
+					if (response.exceptionMessage){
+						showMessage("Error",response.exceptionMessage); // TODO i18n
 					}
 					if (response.bindingResult) {
 						jQuery.each(response.bindingResult,jQuery.proxy(function(index, oErrors) {
