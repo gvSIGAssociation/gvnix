@@ -1,5 +1,5 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 /**
  * Jackson {@link BeanDeserializerModifier} which return
  * {@link DataBinderDeserializer}.
- * 
+ *
  * @author gvNIX Team
  * @since TODO: Class version
  */
@@ -39,7 +39,13 @@ public class DataBinderBeanDeserializerModifier extends
     @Override
     public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config,
             BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
-        return new DataBinderDeserializer((BeanDeserializerBase) deserializer);
+        if (deserializer instanceof BeanDeserializerBase) {
+            return new DataBinderDeserializer(
+                    (BeanDeserializerBase) deserializer);
+        }
+        // When there is no custom-deserializer implementation returns the
+        // default jackson deserializer
+        return deserializer;
     }
 
 }
