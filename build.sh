@@ -47,14 +47,14 @@ do
     esac
 done
 
-# Exit script on any error
-set -e 
-# Echo all commands
-set -x 
+## Exit script on any error
+#set -e 
+## Echo all commands
+#set -x 
 
 # Remove old roo and gvNIX installed dependencies
-rm -rf ~/.m2/repository/org/springframework/roo || true
-rm -rf ~/.m2/repository/org/gvnix || true
+rm -rf ~/.m2/repository/org/springframework/roo ## || true
+rm -rf ~/.m2/repository/org/gvnix ## || true
 
 ### ROO PACKAGE
 
@@ -62,7 +62,7 @@ rm -rf ~/.m2/repository/org/gvnix || true
 cd roo
 
 # Remove bundles Felix cache
-rm -rf bootstrap/target/osgi || true
+rm -rf bootstrap/target/osgi ## || true
 
 # Test, install, site, assembly and package Roo modules
 mvn clean install
