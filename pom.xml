@@ -60,6 +60,7 @@
     <module>addon-service</module>
     <module>addon-occ</module>
     <module>addon-cit-security</module>
+    <module>addon-gva-security</module>
     <module>addon-web-pattern</module>
     <module>addon-web-mvc-binding</module>
     <module>addon-web-dialog</module>
