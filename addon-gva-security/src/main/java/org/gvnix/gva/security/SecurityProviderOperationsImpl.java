@@ -1,4 +1,4 @@
-package org.gvnix.gva.security.addon;
+package org.gvnix.gva.security;
 
 import java.util.ArrayList;
 import java.util.Collections;

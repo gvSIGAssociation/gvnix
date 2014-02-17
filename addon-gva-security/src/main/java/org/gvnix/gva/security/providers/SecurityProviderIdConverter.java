@@ -9,7 +9,7 @@ import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.apache.felix.scr.annotations.ReferencePolicy;
 import org.apache.felix.scr.annotations.ReferenceStrategy;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.gva.security.addon.SecurityProviderOperations;
+import org.gvnix.gva.security.SecurityProviderOperations;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.shell.Completion;
 import org.springframework.roo.shell.Converter;
