@@ -74,7 +74,7 @@
   <jsp:directive.attribute name="pipelining" type="java.lang.Boolean" rtexprvalue="true" required="false" description="Enable pipelining data for paging when server-side processing is enabled" />
   <jsp:directive.attribute name="pipeSize" type="java.lang.Integer" rtexprvalue="true" required="false" description="Pipe size used when pipelining is enabled, ie times that the user can page before a request must be made of the server. (Default : 5)" />
   <jsp:directive.attribute name="stateSave" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable state saving.  When enabled a cookie will be used to save table display information such as pagination information, display length, filtering and sorting. As such when the end user reloads the page the display display will match what thy had previously set up. (Default : true, see http://datatables.net/ref#bStateSave)" />
-  <jsp:directive.attribute name="export" type="java.lang.String" rtexprvalue="true" required="false" description="Enable the export functionality" />
+  <jsp:directive.attribute name="export" type="java.lang.String" rtexprvalue="true" required="false" description="(HTML|PDF|CSV|XLS|XLSX|XML) Comma-separated list of export types (Default : PDF,XLS,CSV). 'false' to disable it." />
   <jsp:directive.attribute name="exportLinks" type="java.lang.String" rtexprvalue="true" required="false" description="(TOP_LEFT|TOP_MIDDLE|TOP_RIGHT|BOTTOM_LEFT|BOTTOM_MIDDLE|BOTTOM_RIGHT) Comma-separated list of positions where the export links will be generated (Default : TOP_RIGHT)" />
   <jsp:directive.attribute name="jqueryUI" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable jQuery UI ThemeRoller support (Default : false, see http://datatables.net/ref#bJQueryUI)" />
   <jsp:directive.attribute name="footer" type="java.lang.String" rtexprvalue="true" required="false" description="(header) Choose if you want to have the footer appear.  (Default : none)" />
@@ -204,9 +204,14 @@
   </c:if>
 
   <!-- If empty, display CSV, XLS and PDF export buttons -->
-  <c:if test="${empty export}">
-  	<c:set var="export" value="csv,xls,pdf"/>
-  </c:if>
+  <c:choose>
+	  <c:when test="${empty export &amp;&amp; 'false' != export}">
+	  	<c:set var="export" value="csv,xls,pdf"/>
+	  </c:when>
+	  <c:otherwise>
+      <c:set var="export" value=""/>
+	  </c:otherwise>
+  </c:choose>
 
   <!-- set row id based on entity id attribute -->
   <c:if test="${(not serverSide) and (empty rowIdBase)}">
@@ -265,16 +270,16 @@
   <c:set var="authorizedDelete" value="true" />
   <c:if test="${datatablesSecurityApplied}">
 	  <c:if test="${not empty rolesAuthorizedShow}">
-	    <sec:authorize var="authorizedShow" ifAnyGranted="${roles}" />
+	    <sec:authorize var="authorizedShow" ifAnyGranted="${rolesAuthorizedShow}" />
 	  </c:if>
 	  <c:if test="${not empty rolesAuthorizedCreate}">
-	    <sec:authorize var="authorizedCreate" ifAnyGranted="${roles}" />
+	    <sec:authorize var="authorizedCreate" ifAnyGranted="${rolesAuthorizedCreate}" />
 	  </c:if>
 	  <c:if test="${not empty rolesAuthorizedUpdate}">
-	    <sec:authorize var="authorizedUpdate" ifAnyGranted="${roles}" />
+	    <sec:authorize var="authorizedUpdate" ifAnyGranted="${rolesAuthorizedUpdate}" />
 	  </c:if>
 	  <c:if test="${not empty rolesAuthorizedDelete}">
-	    <sec:authorize var="authorizedDelete" ifAnyGranted="${roles}" />
+	    <sec:authorize var="authorizedDelete" ifAnyGranted="${rolesAuthorizedDelete}" />
 	  </c:if>
   </c:if>
   <c:if test="${empty show and authorizedShow}">
@@ -289,7 +294,6 @@
   <c:if test="${empty delete and authorizedDelete}">
       <c:set var="delete" value="true"/>
   </c:if>
-
 
   <!-- ================================= -->
   <!-- Datatables settings, handlers ... -->
@@ -351,8 +355,14 @@
         <h3 class="panel-title">${label}</h3>
       </div>
     </div>
+    <c:set var="submit_label">
+      <spring:escapeBody javaScriptEscape="true">
+        <spring:message code="button_submit" />
+      </spring:escapeBody>
+    </c:set>
+    <spring:url value="/resources/images/datatables/accept.png" var="submit_image_url" />
     <c:set target="${datatables_javaScript_elements_init}" property="displayCreateForm">
-      fnDisplayCreateForm('${id}');
+      fnDisplayCreateForm('${id}', '${param['datatablesMappedProperty']}', '${param['datatablesMappedValue']}');
     </c:set>
   </c:if>
   <!-- ******* End inline creation panel ********** -->
@@ -540,21 +550,17 @@
   <c:if test="${delete}">
   	<c:set var="removeColumnId" value="${id}_remove_col"/>
   	<c:if test="${serverSide or selectionMultiRow}">
-  	    <c:set var="delete_label">
-	      <spring:escapeBody javaScriptEscape="true">
-            <spring:message arguments="${typeName}" code="entity_delete"/>
-          </spring:escapeBody>
-        </c:set>
+        <spring:message arguments="${typeName}" code="entity_delete" var="delete_label"/>
         <c:set var="delete_confirm_msg">
-          <spring:escapeBody javaScriptEscape="true">
-             <spring:message code="entity_delete_confirm" />
+          <spring:escapeBody javaScriptEscape="true" htmlEscape="false">
+             <spring:message htmlEscape="false" code="entity_delete_confirm" />
           </spring:escapeBody>
         </c:set>
         <spring:url value="/resources/images/delete.png" var="delete_image_url" />
         <c:if test="${selectionMultiRow and datatablesHasBatchSupport}">
 	        <c:set var="delete_multirow_confirm_msg">
 	          <spring:escapeBody javaScriptEscape="true" htmlEscape="false">
-	             <spring:message code="entity_delete_multirow_confirm" />
+	             <spring:message htmlEscape="false" code="entity_delete_multirow_confirm"/>
 	          </spring:escapeBody>
 	        </c:set>
 	        <c:set var="delete_ok_msg">
@@ -572,6 +578,9 @@
 	             <spring:message code="entity_deleted_error" />
 	          </spring:escapeBody>
 	        </c:set>
+	        <spring:escapeBody javaScriptEscape="true">
+	          <spring:message code="entity_select_records" htmlEscape="false" var="selectRecords" />
+	        </spring:escapeBody>
 
                       <!-- Add delete functions to the script element before Datatables element -->
 		    <c:set target="${datatables_javaScript_elements_before}" property="${removeColumnId}Batch">
@@ -592,20 +601,20 @@
 		          if (aId == null || aId === undefined || aId == '') {
 			        	var selCount = $selection.fnSelectionCount();
 			        	if ( selCount > 1) {
-				        	if (!confirm(${removeColumnId}_multiconfirmation + ' ' + selCount)){
+				        	if (!confirm(${removeColumnId}_multiconfirmation + ' ' + selCount)) {
 				        		return;
 				        	}
 			        	} else if (selCount == 1){
-				        	if (!confirm(${removeColumnId}_confirmation)){
+				        	if (!confirm(${removeColumnId}_confirmation)) {
 				        		return;
 				        	}
 			        	} else {
-			        		alert("Select records to remove");
+			        		showMessage("${delete_label}", "${selectRecords}", null);
 			        		return;
 			        	}
 			        	var selectionInfo = $selection.fnGetSelectionInfo();
 		        	} else {
-								if (!confirm(${removeColumnId}_confirmation)){
+								if (!confirm(${removeColumnId}_confirmation)) {
 								  return;
 								}
 								var selectionInfo = {
@@ -631,31 +640,31 @@
 		        			log('delete OK: ' + data);
 					  		var count = parseInt(data);
 					  		if (count > 0){
-			        			alert(${removeColumnId}_deleted + ' ' + data);
+			        			showMessage("${delete_label}", ${removeColumnId}_deleted + ' ' + data, null);
 		        			} else {
-			        			alert(${removeColumnId}_deleted_none);
+			        			showMessage("${delete_label}", ${removeColumnId}_deleted_none, null);
 		        			}
 		        			<c:choose>
-		        			<c:when test="${serverSide}">
-		        			$table.fnDraw();
-		        			</c:when>
-		        			<c:otherwise>
-	        				// TODO optimize it (remove lines instead reload page)
-	        				location.reload();
-	        				</c:otherwise>
+			        			<c:when test="${serverSide}">
+			        			  $table.fnDraw();
+			        			</c:when>
+			        			<c:otherwise>
+			        				// TODO optimize it (remove lines instead reload page)
+			        				location.reload();
+		        				</c:otherwise>
 	        				</c:choose>
 	        				$selection.fnSelectNone();
 		        		}
 					  ).fail( function (data) {
 		        			log('delete ERROR: ' + data.status + ' ' + data.statusText + '-' + data.responseText);
 		        			if (!data || !data.responseText) {
-		        				alert(${removeColumnId}_delete_error);
+                    showMessage("${delete_label}", ${removeColumnId}_delete_error, null);
 		        			} else if (typeof data.responseText) {
 		        			    try {
 		        			    	var responseObj = jQuery.parseJSON(data.responseText);
-		        					alert(${removeColumnId}_delete_error + ': ' + (responseObj.localizedMessage ? responseObj.localizedMessage : responseObj.message));
+                        showMessage("${delete_label}", ${removeColumnId}_delete_error + ': ' + (responseObj.localizedMessage ? responseObj.localizedMessage : responseObj.message), null);
 		        				} catch (e) {
-		        					alert(${removeColumnId}_delete_error + ': ' + data.responseText);
+                      showMessage("${delete_label}", ${removeColumnId}_delete_error + ': ' + data.responseText, null);
 		        				}
 		        			}
 		        		});
@@ -732,7 +741,7 @@
 	    			</c:if>
 	    			'debug': false}
 	    		</c:if>
-            <c:if test="${inlineEditing}">
+            <c:if test="${inlineEditing || inlineCreating}">
                 , 'editing' : {
                     'toolbarId': '${id}_gvnix_toolbar',
                     'applicationContext': '${urlPath}',
@@ -757,7 +766,6 @@
 			${entry.value}
 			</c:forEach>
 	}
-
   </script>
 
     <!-- Dandelion-Datatables -->
@@ -824,7 +832,7 @@
 
       colReorder="${colReorder}"
     >
-    	<c:choose>
+			<c:choose>
 
             <!-- On register view mode add a datatables column only, checkbox,
                  row update button, etc aren't needed -->
@@ -952,8 +960,8 @@
                   <form:form action="#" onsubmit="javascript: this.action = '${delete_form_url}?' + datatablesRedirect" method="DELETE">
                     <spring:message arguments="${typeName}" code="entity_delete" var="delete_label" htmlEscape="false" />
                     <c:set var="delete_confirm_msg">
-                      <spring:escapeBody javaScriptEscape="true">
-                         <spring:message code="entity_delete_confirm" />
+                      <spring:escapeBody javaScriptEscape="true" htmlEscape="false">
+                         <spring:message htmlEscape="false" code="entity_delete_confirm" />
                       </spring:escapeBody>
                     </c:set>
                     <input alt="${fn:escapeXml(delete_label)}" class="image" src="${delete_image_url}" title="${fn:escapeXml(delete_label)}" type="image" value="${fn:escapeXml(delete_label)}" onclick="return confirm('${delete_confirm_msg}');" />
