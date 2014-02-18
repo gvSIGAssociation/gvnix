@@ -55,11 +55,19 @@ public class QuerydslUtils {
                     float.class, short.class }));
 
     public static final String OPERATOR_PREFIX = "_operator_";
-
+    
     public static final String[] FULL_DATE_PATTERNS = new String[] {
+        "dd-MM-yyyy HH:mm:ss", "dd/MM/yyyy HH:mm:ss",
+        "MM-dd-yyyy HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "dd-MM-yyyy HH:mm",
+        "dd/MM/yyyy HH:mm", "MM-dd-yyyy HH:mm", "MM/dd/yyyy HH:mm",
+        "dd-MM-yyyy", "dd/MM/yyyy", "MM-dd-yyyy", "MM/dd/yyyy" };
+    
+    public static final String[] FULL_DATE_PATTERNS_WITH_TIME = new String[] {
             "dd-MM-yyyy HH:mm:ss", "dd/MM/yyyy HH:mm:ss",
             "MM-dd-yyyy HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "dd-MM-yyyy HH:mm",
-            "dd/MM/yyyy HH:mm", "MM-dd-yyyy HH:mm", "MM/dd/yyyy HH:mm",
+            "dd/MM/yyyy HH:mm", "MM-dd-yyyy HH:mm", "MM/dd/yyyy HH:mm" };
+    
+    public static final String[] FULL_DATE_PATTERNS_WITHOUT_TIME = new String[] {
             "dd-MM-yyyy", "dd/MM/yyyy", "MM-dd-yyyy", "MM/dd/yyyy" };
 
     public static final String[] DAY_AND_MONTH_DATE_PATTERNS = new String[] {
@@ -599,9 +607,11 @@ public class QuerydslUtils {
         DatePath<C> dateExpression = entityPath.getDate(fieldName, fieldType);
 
         BooleanExpression expression;
+        
         // Search by full date
-        String[] parsePatterns = FULL_DATE_PATTERNS;
+        String[] parsePatterns = null;
         try {
+            parsePatterns = FULL_DATE_PATTERNS_WITH_TIME;
             Date searchDate = DateUtils.parseDateStrictly(searchStr,
                     parsePatterns);
             Calendar searchCal = Calendar.getInstance();
@@ -611,6 +621,23 @@ public class QuerydslUtils {
         catch (Exception e) {
             // do nothing, and try the next parsing
             expression = null;
+        }
+        
+        if (expression == null) {
+            try {
+                parsePatterns = FULL_DATE_PATTERNS_WITHOUT_TIME;
+                Date searchDate = DateUtils.parseDateStrictly(searchStr,
+                        parsePatterns);
+                Calendar searchCal = Calendar.getInstance();
+                searchCal.setTime(searchDate);
+                expression = dateExpression.dayOfMonth().eq(searchCal.get(Calendar.DAY_OF_MONTH))
+                        .and(dateExpression.month().eq(searchCal.get(Calendar.MONTH) + 1))
+                        .and(dateExpression.year().eq(searchCal.get(Calendar.YEAR)));
+            }
+            catch (Exception e) {
+                // do nothing, and try the next parsing
+                expression = null;
+            }
         }
 
         if (expression == null) {
