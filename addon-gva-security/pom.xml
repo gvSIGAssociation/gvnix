@@ -71,6 +71,14 @@
       <artifactId>org.gvnix.support</artifactId>
       <version>${gvnix.version}</version>
     </dependency>
+    
+    <!-- gvNIX -->
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.dynamic.configuration.roo.addon</artifactId>
+      <version>${gvnix.version}</version>
+    </dependency>
+    
   </dependencies>
   
   <!-- DiSiD: Add google code distribution management -->

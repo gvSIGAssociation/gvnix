@@ -13,6 +13,7 @@ import org.apache.felix.scr.annotations.References;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.gva.security.providers.SecurityProvider;
 import org.gvnix.gva.security.providers.SecurityProviderId;
+import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.FeatureNames;
 import org.springframework.roo.project.ProjectOperations;
@@ -73,7 +74,8 @@ public class SecurityProviderOperationsImpl implements
     }
 
     @Override
-    public void installProvider(SecurityProviderId prov) {
+    public void installProvider(SecurityProviderId prov,
+            JavaPackage targetPackage) {
         SecurityProvider provider = null;
         for (SecurityProvider tmpProvider : providers) {
             if (prov.is(tmpProvider)) {
@@ -85,7 +87,7 @@ public class SecurityProviderOperationsImpl implements
             throw new RuntimeException("Provider '".concat(prov.getId())
                     .concat("' not found'"));
         }
-        provider.install();
+        provider.install(targetPackage);
     }
 
     @Override

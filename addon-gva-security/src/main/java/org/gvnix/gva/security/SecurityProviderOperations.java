@@ -3,6 +3,7 @@ package org.gvnix.gva.security;
 import java.util.List;
 
 import org.gvnix.gva.security.providers.SecurityProviderId;
+import org.springframework.roo.model.JavaPackage;
 
 /**
  * Interface of commands that are available via the Roo shell.
@@ -31,7 +32,7 @@ public interface SecurityProviderOperations {
      * 
      * @param provider Provider SecurityProviderId
      */
-    void installProvider(SecurityProviderId provider);
+    void installProvider(SecurityProviderId provider, JavaPackage targetPackage);
 
     /**
      * Gets the current provider by name

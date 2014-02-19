@@ -7,6 +7,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.gva.security.providers.SecurityProviderId;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
@@ -68,7 +69,8 @@ public class SecurityProviderCommands implements CommandMarker {
      */
     @CliCommand(value = "security provider add", help = "Adds a security provider")
     public void securityProviderAdd(
-            @CliOption(key = "name", mandatory = true, help = "Provider's Name") SecurityProviderId name) {
-        operations.installProvider(name);
+            @CliOption(key = "name", mandatory = true, help = "Provider's Name") SecurityProviderId name,
+            @CliOption(key = "package", mandatory = true, help = "Package where you want to generete Java classes") JavaPackage targetPackage) {
+        operations.installProvider(name, targetPackage);
     }
 }

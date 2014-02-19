@@ -38,7 +38,7 @@ import org.springframework.roo.project.ProjectOperations;
  */
 @Component
 @Service
-public final class SafeSecurityProviderMetadataProvider extends
+public final class SafeSecurityProviderPasswordMetadataProvider extends
         AbstractItdMetadataProvider {
 
     @Reference
@@ -56,7 +56,8 @@ public final class SafeSecurityProviderMetadataProvider extends
         metadataDependencyRegistry.registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        addMetadataTrigger(new JavaType(GvNIXProviderSAFE.class.getName()));
+        addMetadataTrigger(new JavaType(
+                GvNIXPasswordHandlerSAFE.class.getName()));
     }
 
     /**
@@ -68,7 +69,8 @@ public final class SafeSecurityProviderMetadataProvider extends
         metadataDependencyRegistry.deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        removeMetadataTrigger(new JavaType(GvNIXProviderSAFE.class.getName()));
+        removeMetadataTrigger(new JavaType(
+                GvNIXPasswordHandlerSAFE.class.getName()));
     }
 
     /**
@@ -79,13 +81,14 @@ public final class SafeSecurityProviderMetadataProvider extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
 
-        JavaType javaType = SafeSecurityProviderMetadata
+        JavaType javaType = SafeSecurityProviderPasswordMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = SafeSecurityProviderMetadata
+        LogicalPath path = SafeSecurityProviderPasswordMetadata
                 .getPath(metadataIdentificationString);
 
-        return new SafeSecurityProviderMetadata(metadataIdentificationString,
-                aspectName, governorPhysicalTypeMetadata);
+        return new SafeSecurityProviderPasswordMetadata(
+                metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata);
     }
 
     /**
@@ -98,18 +101,19 @@ public final class SafeSecurityProviderMetadataProvider extends
 
     protected String getGovernorPhysicalTypeIdentifier(
             String metadataIdentificationString) {
-        JavaType javaType = SafeSecurityProviderMetadata
+        JavaType javaType = SafeSecurityProviderPasswordMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = SafeSecurityProviderMetadata
+        LogicalPath path = SafeSecurityProviderPasswordMetadata
                 .getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
     protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
-        return SafeSecurityProviderMetadata.createIdentifier(javaType, path);
+        return SafeSecurityProviderPasswordMetadata.createIdentifier(javaType,
+                path);
     }
 
     public String getProvidesType() {
-        return SafeSecurityProviderMetadata.getMetadataIdentiferType();
+        return SafeSecurityProviderPasswordMetadata.getMetadataIdentiferType();
     }
 }

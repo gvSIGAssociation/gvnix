@@ -1,8 +1,11 @@
 package org.gvnix.gva.security.providers.safe;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -16,14 +19,25 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.gva.security.providers.SecurityProvider;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
+import org.springframework.roo.classpath.PhysicalTypeCategory;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaPackage;
+import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.JdkJavaType;
+import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
+import org.springframework.roo.project.Resource;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
@@ -34,6 +48,12 @@ import org.w3c.dom.Node;
 @Component
 @Service
 public class SafeSecurityProvider implements SecurityProvider {
+
+    private static final String ENDPOINT_AUTORIZA_VALUE = "${wsdl.SAFEAutorizacion.location}";
+
+    private static final String ENDPOINT_AUTORIZA = "endpointAutoriza";
+
+    private static final String ALIAS = "alias";
 
     private static final String LOCATION_VALUE = "classpath*:META-INF/spring/*.properties,classpath*:safe_client.properties";
 
@@ -81,7 +101,7 @@ public class SafeSecurityProvider implements SecurityProvider {
 
     private static final String SAFE_BEAN_ID = "wsSafeProvider";
 
-    private static final String SAFE_BEAN_CLASS = "~.security.authentication.wssafe.WsSafeProvider";
+    private static final String SAFE_BEAN_CLASS = ".SafeProvider";
 
     private static final String ID = "id";
 
@@ -120,6 +140,9 @@ public class SafeSecurityProvider implements SecurityProvider {
     private ProjectOperations projectOperations;
 
     @Reference
+    private TypeLocationService typeLocationService;
+
+    @Reference
     private TilesOperations tilesOperations;
 
     @Reference
@@ -139,15 +162,25 @@ public class SafeSecurityProvider implements SecurityProvider {
     }
 
     @Override
-    public void install() {
+    public void install(JavaPackage targetPackage) {
         // Adding POM dependencies
         addPomDependencies();
+        // You must add WSDL
+        log.info("*********************************************");
+        log.info("** Remember. You must to add ${wsdl.AutenticacionArangiService} and ${wsdl.AutorizacionService}"
+                + " to dynamic configuration file. **");
+        log.info("*********************************************");
+        // Generating java resources with annotations
+        generatePasswordHandler(targetPackage);
+        generateSafeUser(targetPackage);
+        generateSafeUserAuthority(targetPackage);
+        generateSafeProvider(targetPackage);
         // Copying properties file
         copySafeClientPropertiesFile();
         // Modifying Application Context
         modifyApplicationContext();
         // Modifying Application Context Security
-        modifyApplicationContextSecurity();
+        modifyApplicationContextSecurity(targetPackage);
 
     }
 
@@ -190,22 +223,231 @@ public class SafeSecurityProvider implements SecurityProvider {
         DependenciesVersionManager.manageDependencyVersion(metadataService,
                 projectOperations, depens);
 
-       /* // Install Plugins
+        // Install Plugins
         List<Element> plugins = XmlUtils.findElements(
-                "/configuration/gvnix/build/plugins", configuration);
+                "/configuration/gvnix/build/plugins/plugin", configuration);
 
         for (Element plugin : plugins) {
-            projectOperations.addProperty(projectOperations
-                    .getFocusedModuleName(), new Property(plugin));
+            projectOperations.addBuildPlugin(
+                    projectOperations.getFocusedModuleName(),
+                    new Plugin(plugin));
         }
 
         // Install Resources
-        List<Resource> resources = XmlUtils.findElements(
-                "/configuration/gvnix/build/resources", configuration);
+        List<Element> resources = XmlUtils.findElements(
+                "/configuration/gvnix/build/resources/resource", configuration);
 
-        for (Resource resource : resources) {
-            projectOperations.addResource("", resource);
-        }*/
+        for (Element resource : resources) {
+            projectOperations.addResource(projectOperations
+                    .getFocusedModuleName(), new Resource(resource));
+        }
+
+    }
+
+    /**
+     * This method generates the file PasswordHandler.java with the annotation
+     * <code>@GvNIXPasswordHandlerSAFE</code>
+     * 
+     */
+    public void generatePasswordHandler(JavaPackage targetPackage) {
+        JavaType entity = new JavaType(String.format("%s.PasswordHandler",
+                targetPackage.getFullyQualifiedPackageName()));
+
+        Validate.notNull(entity, "Entity required");
+
+        int modifier = Modifier.PUBLIC;
+
+        final String declaredByMetadataId = PhysicalTypeIdentifier
+                .createIdentifier(entity,
+                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
+
+        File targetFile = new File(
+                typeLocationService
+                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
+        Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
+                entity);
+
+        // Prepare class builder
+        final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                declaredByMetadataId, modifier, entity,
+                PhysicalTypeCategory.CLASS);
+
+        // Prepare annotations array
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                1);
+
+        // Add @GvNIXPasswordHandlerSAFE annotation
+        AnnotationMetadataBuilder gvnixPasswordHandlerAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(GvNIXPasswordHandlerSAFE.class));
+        annotations.add(gvnixPasswordHandlerAnnotation);
+
+        // Add Implements Type
+        cidBuilder.addImplementsType(new JavaType(
+                "javax.security.auth.callback.CallbackHandler"));
+
+        // Set annotations
+        cidBuilder.setAnnotations(annotations);
+
+        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
+
+    }
+
+    /**
+     * This method generates the file SafeUser.java with the annotation
+     * <code>@GvNIXUserSAFE</code>
+     * 
+     */
+    public void generateSafeUser(JavaPackage targetPackage) {
+        JavaType entity = new JavaType(String.format("%s.SafeUser",
+                targetPackage.getFullyQualifiedPackageName()));
+
+        Validate.notNull(entity, "Entity required");
+
+        int modifier = Modifier.PUBLIC;
+
+        final String declaredByMetadataId = PhysicalTypeIdentifier
+                .createIdentifier(entity,
+                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
+
+        File targetFile = new File(
+                typeLocationService
+                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
+        Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
+                entity);
+
+        // Prepare class builder
+        final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                declaredByMetadataId, modifier, entity,
+                PhysicalTypeCategory.CLASS);
+
+        // Prepare annotations array
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                2);
+
+        // Add @GvNIXUserSAFE annotation
+        AnnotationMetadataBuilder gvnixUserSafeAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(GvNIXUserSAFE.class));
+        annotations.add(gvnixUserSafeAnnotation);
+
+        // Add @RooJavaBean annotation
+        AnnotationMetadataBuilder javaBeanAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.roo.addon.javabean.RooJavaBean"));
+        annotations.add(javaBeanAnnotation);
+
+        // Add Implements Type
+        cidBuilder.addImplementsType(new JavaType(
+                "org.springframework.security.core.userdetails.UserDetails"));
+        cidBuilder.addImplementsType(new JavaType("java.io.Serializable"));
+
+        // Set annotations
+        cidBuilder.setAnnotations(annotations);
+
+        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
+
+    }
+
+    /**
+     * This method generates the file SafeUserAuthority.java with the annotation
+     * <code>@GvNIXUserAuthoritySAFE</code>
+     * 
+     */
+    public void generateSafeUserAuthority(JavaPackage targetPackage) {
+        JavaType entity = new JavaType(String.format("%s.SafeUserAuthority",
+                targetPackage.getFullyQualifiedPackageName()));
+
+        Validate.notNull(entity, "Entity required");
+
+        int modifier = Modifier.PUBLIC;
+
+        final String declaredByMetadataId = PhysicalTypeIdentifier
+                .createIdentifier(entity,
+                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
+
+        File targetFile = new File(
+                typeLocationService
+                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
+        Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
+                entity);
+
+        // Prepare class builder
+        final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                declaredByMetadataId, modifier, entity,
+                PhysicalTypeCategory.CLASS);
+
+        // Prepare annotations array
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                2);
+
+        // Add @GvNIXUserAuthoritySAFE annotation
+        AnnotationMetadataBuilder gvnixUserAuthoritySafeAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(GvNIXUserAuthoritySAFE.class));
+        annotations.add(gvnixUserAuthoritySafeAnnotation);
+
+        // Add @RooJavaBean annotation
+        AnnotationMetadataBuilder javaBeanAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.roo.addon.javabean.RooJavaBean"));
+        annotations.add(javaBeanAnnotation);
+
+        // Add Implements Type
+        cidBuilder.addImplementsType(new JavaType(
+                "org.springframework.security.core.GrantedAuthority"));
+        cidBuilder.addImplementsType(new JavaType("java.io.Serializable"));
+
+        // Set annotations
+        cidBuilder.setAnnotations(annotations);
+
+        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
+
+    }
+
+    /**
+     * This method generates the file SafeProvider.java with the annotation
+     * <code>@GvNIXProviderSAFE</code>
+     * 
+     */
+    public void generateSafeProvider(JavaPackage targetPackage) {
+        JavaType entity = new JavaType(String.format("%s.SafeProvider",
+                targetPackage.getFullyQualifiedPackageName()));
+
+        Validate.notNull(entity, "Entity required");
+
+        int modifier = Modifier.PUBLIC;
+
+        final String declaredByMetadataId = PhysicalTypeIdentifier
+                .createIdentifier(entity,
+                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
+
+        File targetFile = new File(
+                typeLocationService
+                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
+        Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
+                entity);
+
+        // Prepare class builder
+        final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                declaredByMetadataId, modifier, entity,
+                PhysicalTypeCategory.CLASS);
+
+        // Prepare annotations array
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                1);
+
+        // Add @GvNIXProviderSAFE annotation
+        AnnotationMetadataBuilder gvnixProviderSafeAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(GvNIXProviderSAFE.class));
+        annotations.add(gvnixProviderSafeAnnotation);
+
+        // Add Extends Type
+        cidBuilder
+                .addExtendsTypes(new JavaType(
+                        "org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider"));
+
+        // Set annotations
+        cidBuilder.setAnnotations(annotations);
+
+        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
 
     }
 
@@ -292,8 +534,10 @@ public class SafeSecurityProvider implements SecurityProvider {
      * This method modifies the applicationContext-security.xml file to
      * configure the authentication using SAFE.
      * 
+     * TODO: Improve this method
+     * 
      */
-    public void modifyApplicationContextSecurity() {
+    public void modifyApplicationContextSecurity(JavaPackage targetPackage) {
 
         final String applicationContextPath = pathResolver
                 .getFocusedIdentifier(Path.SRC_MAIN_RESOURCES,
@@ -311,20 +555,6 @@ public class SafeSecurityProvider implements SecurityProvider {
             parent.removeChild(authenticationManager);
         }
 
-        // Creating new authenticationManager
-
-        Element newAuthenticationManager = document
-                .createElement(AUTH_MANAGER_TAG);
-        newAuthenticationManager.setAttribute(NAME_ATTR, NAME_ATTR_VALUE);
-
-        Element newAuthenticationProvider = document
-                .createElement(AUTH_PROVIDER_TAG);
-        newAuthenticationProvider.setAttribute(REF_ATTR, REF_ATTR_VALUE);
-
-        newAuthenticationManager.appendChild(newAuthenticationProvider);
-
-        parent.appendChild(newAuthenticationManager);
-
         List<Element> beans = DomUtils.getChildElementsByTagName(config,
                 BEANS_BEAN);
 
@@ -338,15 +568,39 @@ public class SafeSecurityProvider implements SecurityProvider {
             }
         }
 
+        fileManager.createOrUpdateTextFileIfRequired(applicationContextPath,
+                XmlUtils.nodeToString(document), false);
+
+        // Creating new authenticationManager
+
+        Element newAuthenticationManager = document
+                .createElement(AUTH_MANAGER_TAG);
+        newAuthenticationManager.setAttribute(ALIAS, NAME_ATTR_VALUE);
+
+        Element newAuthenticationProvider = document
+                .createElement(AUTH_PROVIDER_TAG);
+        newAuthenticationProvider.setAttribute(REF_ATTR, REF_ATTR_VALUE);
+
+        newAuthenticationManager.appendChild(newAuthenticationProvider);
+
+        parent.appendChild(newAuthenticationManager);
+
         // Adding Safe Beans and childs
 
         Element newSafeBeans = document.createElement(BEANS_BEAN);
-        newSafeBeans.setAttribute(CLASS, SAFE_BEAN_CLASS);
+        newSafeBeans.setAttribute(CLASS, targetPackage
+                .getFullyQualifiedPackageName().concat(SAFE_BEAN_CLASS));
         newSafeBeans.setAttribute(ID, SAFE_BEAN_ID);
 
         Element endPointProperty = document.createElement(BEANS_PROPERTY);
         endPointProperty.setAttribute(NAME_PROPERTY, ENDPOINT);
         endPointProperty.setAttribute(VALUE_PROPERTY, SAFE_LOCATION);
+
+        Element endPointAutorizaProperty = document
+                .createElement(BEANS_PROPERTY);
+        endPointAutorizaProperty.setAttribute(NAME_PROPERTY, ENDPOINT_AUTORIZA);
+        endPointAutorizaProperty.setAttribute(VALUE_PROPERTY,
+                ENDPOINT_AUTORIZA_VALUE);
 
         Element passwordEncoderProperty = document
                 .createElement(BEANS_PROPERTY);
@@ -367,6 +621,7 @@ public class SafeSecurityProvider implements SecurityProvider {
         environmentProperty.setAttribute(VALUE_PROPERTY, ENVIRONMENT_VALUE);
 
         newSafeBeans.appendChild(endPointProperty);
+        newSafeBeans.appendChild(endPointAutorizaProperty);
         newSafeBeans.appendChild(passwordEncoderProperty);
         newSafeBeans.appendChild(saltSourceProperty);
         newSafeBeans.appendChild(applicationIdProperty);

@@ -1,5 +1,7 @@
 package org.gvnix.gva.security.providers;
 
+import org.springframework.roo.model.JavaPackage;
+
 /**
  * 
  * Interface of Provider Security
@@ -26,7 +28,7 @@ public interface SecurityProvider {
      * 
      * @return true if the result is ok
      */
-    void install();
+    void install(JavaPackage targetPackage);
 
     /**
      * Informs if this provider is already installed on project
