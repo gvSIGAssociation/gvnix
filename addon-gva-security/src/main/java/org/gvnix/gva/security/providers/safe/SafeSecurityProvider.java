@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
@@ -28,8 +29,6 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadataB
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.model.JdkJavaType;
-import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
@@ -117,8 +116,6 @@ public class SafeSecurityProvider implements SecurityProvider {
 
     private static final String NAME_ATTR_VALUE = "authenticationManager";
 
-    private static final String NAME_ATTR = NAME_PROPERTY;
-
     private static final String AUTH_MANAGER_TAG = "authentication-manager";
 
     private static final String SECURITY_CONTEXT_PATH = "META-INF/spring/applicationContext-security.xml";
@@ -165,11 +162,6 @@ public class SafeSecurityProvider implements SecurityProvider {
     public void install(JavaPackage targetPackage) {
         // Adding POM dependencies
         addPomDependencies();
-        // You must add WSDL
-        log.info("*********************************************");
-        log.info("** Remember. You must to add ${wsdl.AutenticacionArangiService} and ${wsdl.AutorizacionService}"
-                + " to dynamic configuration file. **");
-        log.info("*********************************************");
         // Generating java resources with annotations
         generatePasswordHandler(targetPackage);
         generateSafeUser(targetPackage);
@@ -181,6 +173,8 @@ public class SafeSecurityProvider implements SecurityProvider {
         modifyApplicationContext();
         // Modifying Application Context Security
         modifyApplicationContextSecurity(targetPackage);
+        // Showing next steps
+        showNextSteps();
 
     }
 
@@ -655,6 +649,33 @@ public class SafeSecurityProvider implements SecurityProvider {
 
         fileManager.createOrUpdateTextFileIfRequired(applicationContextPath,
                 XmlUtils.nodeToString(document), false);
+    }
+
+    public void showNextSteps() {
+        log.log(Level.INFO, "");
+        log.log(Level.INFO, "");
+        log.log(Level.INFO,
+                "*** Before execute your application you must to configure the follow"
+                        + " SAFE Client Properties:");
+        log.log(Level.INFO,
+                "--------------------------------------------------------------------");
+        log.log(Level.INFO, "    - wsdl.AutenticacionArangiService");
+        log.log(Level.INFO, "    - wsdl.AutorizacionService");
+        log.log(Level.INFO, "    - security.SAFE.appId");
+        log.log(Level.INFO, "    - security.SAFE.environment");
+        log.log(Level.INFO, "    - security.SAFE.alias.password");
+        log.log(Level.INFO, "    - security.SAFE.keystore.alias");
+        log.log(Level.INFO, "    - security.SAFE.keystore.file");
+        log.log(Level.INFO, "    - security.SAFE.keystore.password");
+        log.log(Level.INFO, "    - security.SAFE.keystore.type.keystore");
+        log.log(Level.INFO, "    - security.SAFE.mapRoles");
+        log.log(Level.INFO, "    - wsdl.SAFE.location");
+        log.log(Level.INFO, "    - wsdl.SAFEAutorizacion.location");
+        log.log(Level.INFO, "");
+        log.log(Level.INFO,
+                "*** Use the configuration commands to set this parameters");
+        log.log(Level.INFO, "");
+        log.log(Level.INFO, "");
     }
 
 }
