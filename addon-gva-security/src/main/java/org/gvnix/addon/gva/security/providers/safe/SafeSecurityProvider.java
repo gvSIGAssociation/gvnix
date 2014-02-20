@@ -163,10 +163,18 @@ public class SafeSecurityProvider implements SecurityProvider {
         // Adding POM dependencies
         addPomDependencies();
         // Generating java resources with annotations
-        generatePasswordHandler(targetPackage);
-        generateSafeUser(targetPackage);
-        generateSafeUserAuthority(targetPackage);
-        generateSafeProvider(targetPackage);
+        if (!fileExists("PasswordHandler", targetPackage)) {
+            generatePasswordHandler(targetPackage);
+        }
+        if (!fileExists("SafeUser", targetPackage)) {
+            generateSafeUser(targetPackage);
+        }
+        if (!fileExists("SafeUserAuthority", targetPackage)) {
+            generateSafeUserAuthority(targetPackage);
+        }
+        if (!fileExists("SafeProvider", targetPackage)) {
+            generateSafeProvider(targetPackage);
+        }
         // Copying properties file
         copySafeClientPropertiesFile();
         // Modifying Application Context
@@ -182,6 +190,21 @@ public class SafeSecurityProvider implements SecurityProvider {
     public Boolean isInstalled() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public boolean fileExists(String fileName, JavaPackage targetPackage) {
+        JavaType entity = new JavaType(String.format("%s.".concat(fileName),
+                targetPackage.getFullyQualifiedPackageName()));
+
+        final String declaredByMetadataId = PhysicalTypeIdentifier
+                .createIdentifier(entity,
+                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
+
+        File targetFile = new File(
+                typeLocationService
+                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
+
+        return targetFile.exists();
     }
 
     /**
@@ -651,6 +674,11 @@ public class SafeSecurityProvider implements SecurityProvider {
                 XmlUtils.nodeToString(document), false);
     }
 
+    /**
+     * This method shows the next steps to configure the application correctly
+     * to use this provider
+     * 
+     */
     public void showNextSteps() {
         log.log(Level.INFO, "");
         log.log(Level.INFO, "");

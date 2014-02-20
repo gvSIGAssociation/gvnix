@@ -79,6 +79,13 @@
       <version>${gvnix.version}</version>
     </dependency>
     
+    <!-- gvNIX -->
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.cit.security.roo.addon</artifactId>
+      <version>${gvnix.version}</version>
+    </dependency>
+    
   </dependencies>
   
   <!-- DiSiD: Add google code distribution management -->
