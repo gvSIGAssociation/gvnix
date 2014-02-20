@@ -38,19 +38,19 @@
           </elementProp>
           <elementProp name="user" elementType="Argument">
             <stringProp name="Argument.name">user</stringProp>
-            <stringProp name="Argument.value">admin</stringProp>
+            <stringProp name="Argument.value">provagenerica_pro</stringProp>
             <stringProp name="Argument.desc">Usuario LDAP para acceder a la aplicación</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="pass" elementType="Argument">
             <stringProp name="Argument.name">pass</stringProp>
-            <stringProp name="Argument.value">admin</stringProp>
+            <stringProp name="Argument.value">683791pre</stringProp>
             <stringProp name="Argument.desc">Contraseña LDAP para acceder a la aplicación</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="numeroprueba" elementType="Argument">
             <stringProp name="Argument.name">numeroprueba</stringProp>
-            <stringProp name="Argument.value">1</stringProp>
+            <stringProp name="Argument.value">8</stringProp>
             <stringProp name="Argument.desc">Veces que se lanza la prueba con este usuario</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
@@ -63,7 +63,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.num_threads">150</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
         <longProp name="ThreadGroup.start_time">1390301073000</longProp>
         <longProp name="ThreadGroup.end_time">1390301073000</longProp>
