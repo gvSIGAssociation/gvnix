@@ -15,10 +15,10 @@ import org.springframework.roo.shell.MethodTarget;
 
 @Component
 @Service
-@Reference(name = "operations", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = SecurityProviderOperations.class, cardinality = ReferenceCardinality.MANDATORY_UNARY)
 public class SecurityProviderIdConverter implements
         Converter<SecurityProviderId> {
 
+    @Reference
     private SecurityProviderOperations operations;
 
     protected void bindOperations(SecurityProviderOperations operations) {

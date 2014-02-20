@@ -24,12 +24,11 @@ import org.springframework.roo.project.ProjectOperations;
  */
 @Component
 @Service
-@References({
-        @Reference(name = "provider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = SecurityProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE),
-        @Reference(name = "projectOperations", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = ProjectOperations.class, cardinality = ReferenceCardinality.MANDATORY_UNARY) })
+@Reference(name = "provider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = SecurityProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class SecurityProviderOperationsImpl implements
         SecurityProviderOperations {
 
+    @Reference
     private ProjectOperations projectOperations;
 
     private List<SecurityProvider> providers = new ArrayList<SecurityProvider>();
@@ -47,16 +46,6 @@ public class SecurityProviderOperationsImpl implements
 
     protected void unbindProvider(final SecurityProvider provider) {
         providers.remove(provider);
-    }
-
-    protected void bindProjectOperations(ProjectOperations projectOperations) {
-        this.projectOperations = projectOperations;
-        providersId = null;
-    }
-
-    protected void unbindProjectOperations(ProjectOperations projectOperations) {
-        this.projectOperations = null;
-        providersId = null;
     }
 
     @Override
