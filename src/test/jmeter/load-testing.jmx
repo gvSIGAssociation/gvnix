@@ -13,6 +13,12 @@
     <hashTree>
       <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="Gestor de Cookies HTTP" enabled="true">
         <collectionProp name="CookieManager.cookies"/>
+        <stringProp name="TestPlan.comments">Load testing is the simplest form of performance testing. A load test is usually conducted to understand
+the behaviour of the system under a specific expected load. This load can be the expected concurrent 
+number of users on the application performing a specific number of transactions within the set duration.
+This test will give out the response times of all the important business critical transactions. If the database, 
+application server, etc. are also monitored, then this simple test can itself point towards bottlenecks in the 
+application software.</stringProp>
         <boolProp name="CookieManager.clearEachIteration">false</boolProp>
       </CookieManager>
       <hashTree/>

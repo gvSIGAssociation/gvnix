@@ -13,6 +13,10 @@
     <hashTree>
       <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="Gestor de Cookies HTTP" enabled="true">
         <collectionProp name="CookieManager.cookies"/>
+        <stringProp name="TestPlan.comments">Stress testing is normally used to understand the upper limits of capacity within the system. This kind of 
+test is done to determine the system&apos;s robustness in terms of extreme load and helps application 
+administrators to determine if the system will perform sufficiently if the current load goes well above the 
+expected maximum.</stringProp>
         <boolProp name="CookieManager.clearEachIteration">false</boolProp>
       </CookieManager>
       <hashTree/>

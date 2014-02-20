@@ -2,7 +2,12 @@
 <jmeterTestPlan version="1.2" properties="2.5" jmeter="2.10 r1533061">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Plan de Pruebas" enabled="true">
-      <stringProp name="TestPlan.comments"></stringProp>
+      <stringProp name="TestPlan.comments">Soak testing, also known as endurance testing, is usually done to determine if the system can sustain 
+the continuous expected load. During soak tests, memory utilization is monitored to detect potential leaks.
+Also important, but often overlooked is performance degradation. That is, to ensure that the throughput 
+and/or response times after some long period of sustained activity are as good or better than at the 
+beginning of the test. It essentially involves applying a significant load to a system for an extended, 
+significant period of time. The goal is to discover how the system behaves under sustained use.</stringProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
       <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Variables definidas por el Usuario" enabled="true">
