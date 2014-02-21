@@ -201,6 +201,8 @@
     <xi:include href="addon-web-dialog.xml"/>
 
     <xi:include href="addon-cit-security.xml"/>
+    
+    <xi:include href="addon-gva-security.xml"/>
 
     <xi:include href="addon-web-report.xml"/>
 

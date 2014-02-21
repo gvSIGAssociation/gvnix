@@ -240,6 +240,15 @@ project ...
       </listitem>
     </varlistentry>
     
+    <varlistentry>
+      <term>gvasecurity.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo configurando como proveedor
+        de seguridad SAFE y APLUSU</para>
+      </listitem>
+    </varlistentry>
+    
   </variablelist>
 
   <para>La mayoría de esto ejemplos utilizan bases de datos en memoria por lo

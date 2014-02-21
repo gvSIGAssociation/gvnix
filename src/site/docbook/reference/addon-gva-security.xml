@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-gva-security" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+         
+  <title xml:lang="es">Add-on GVA Security</title>
+
+  <section xml:id="addon-gva-security_descripcion">
+    <title xml:lang="es">Descripción</title>
+
+    <para xml:lang="es">El add-on permite instalar clientes de autenticación y autorización
+    y lo integra con el sistema de seguridad Spring Security. Por defecto están configurados
+    los proveedores SAFE y APLUSU (antiguo CIT security addon) pero se pueden añadir nuevos
+    proveedores implementando la interfaz SecurityProvider</para>
+
+    <para xml:lang="es">Para instalarlo, hay que utilizar el comando <link
+    linkend="apendice-comandos_addon-gva-security_security-provider-add">security provider
+    add</link> con los parámetro adecuados (nombre del proveedor y paquete en el que se instalará). 
+    El add-on instalará las clases necesarias para hacer la llamada al servicio, el
+    modelo de datos de usuario cumpliendo con los interfaces de Spring
+    Security y el proveedor de autentificación que sirve de pasarela entre los
+    dos elementos. Además, permitirá al desarrollador configurar mediante dynamic configuration 
+    los parámetros necesarios para utilizar cada uno de los proveedores. </para>
+    
+    <para xml:lang="es">Para ver con mas detalle el comando que proporciona el add-on
+    consultar la sección de <link linkend="apendice-comandos_gva-security">
+    comandos del add-on GVA Security</link>.</para>
+  </section>
+  
+</chapter>

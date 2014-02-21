@@ -31,7 +31,7 @@
         <row>
           <entry><link
           linkend="apendice-comandos_addon-cit-security_cit-security-setup">cit
-          security setup</link></entry>
+          security setup [DEPRECATED]</link></entry>
 
           <entry xml:lang="es">Instala y configura el sistema de autenticación y
           autorización de la CITMA.</entry>
