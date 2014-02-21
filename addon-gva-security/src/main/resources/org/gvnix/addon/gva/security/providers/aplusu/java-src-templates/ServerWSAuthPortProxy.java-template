@@ -1,0 +1,108 @@
+package __TARGET_PACKAGE__;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
+ *
+ * @author rgarcia <a href="mailto:rgarcia@disid.com">Ricardo Garcia
+ *         Fernandez</a>
+ *
+ */
+public class ServerWSAuthPortProxy implements ServerWSAuthPort {
+  private String endpoint = null;
+  private ServerWSAuthPort serverWSAuthPort = null;
+
+  /**
+   *  Defaull constructor
+   */
+  public ServerWSAuthPortProxy() {
+    initServerWSAuthPortProxy();
+  }
+
+  /**
+   * Constructor with end-point
+   * 
+   * @param endpoint
+   */
+  public ServerWSAuthPortProxy(String endpoint) {
+    this.endpoint = endpoint;
+    initServerWSAuthPortProxy();
+  }
+
+  private void initServerWSAuthPortProxy() {
+	try {
+	    serverWSAuthPort = (new ServerWSAuthServiceLocator())
+		    .getServerWSAuthPort(new URL(endpoint));
+	    if (serverWSAuthPort != null) {
+		  if (endpoint == null) {
+			  endpoint = (String) ((javax.xml.rpc.Stub) serverWSAuthPort)
+					  ._getProperty("javax.xml.rpc.service.endpoint.address");
+		  } else {
+			  ((javax.xml.rpc.Stub) serverWSAuthPort)
+			  ._setProperty(
+					  "javax.xml.rpc.service.endpoint.address",
+					  endpoint);
+	      }
+		}
+
+	} catch (javax.xml.rpc.ServiceException serviceException) {
+		serverWSAuthPort = null;
+	} catch (MalformedURLException serviceException) {
+		serverWSAuthPort = null;
+	}
+  }
+
+  /**
+   * Returns the end-point
+   * 
+   * @return
+   */
+  public String getEndpoint() {
+    return endpoint;
+  }
+
+  /**
+   * Sets the end-point
+   * 
+   * @param endpoint
+   */
+  public void setEndpoint(String endpoint) {
+    this.endpoint = endpoint;
+    if (serverWSAuthPort != null) {
+      ((javax.xml.rpc.Stub)serverWSAuthPort)._setProperty("javax.xml.rpc.service.endpoint.address", this.endpoint);
+    }
+  }
+
+  /**
+   * Gets server port
+   * 
+   * @return
+   */
+  public ServerWSAuthPort getServerWSAuthPort() {
+    if (serverWSAuthPort == null) {
+      initServerWSAuthPortProxy();
+    }
+    return serverWSAuthPort;
+  }
+
+  /* (non-Javadoc)
+   * @see es.gva.cit.aplusu.security.authentication.wscit.ServerWSAuthPort#valida(es.gva.cit.aplusu.security.authentication.wscit.CredencialCIT, java.lang.String, java.lang.String, java.lang.String)
+   */
+  public ValidaStruct valida(CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException{
+    if (serverWSAuthPort == null) {
+      initServerWSAuthPortProxy();
+    }
+    return serverWSAuthPort.valida(credencial, usuario, password, aplicacion);
+  }
+
+  /* (non-Javadoc)
+   * @see es.gva.cit.aplusu.security.authentication.wscit.ServerWSAuthPort#valida_ldap(es.gva.cit.aplusu.security.authentication.wscit.CredencialCIT, java.lang.String, java.lang.String, java.lang.String)
+   */
+  public ValidaStruct valida_ldap(CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException{
+    if (serverWSAuthPort == null) {
+      initServerWSAuthPortProxy();
+    }
+    return serverWSAuthPort.valida_ldap(credencial, usuario, password, aplicacion);
+  }
+}

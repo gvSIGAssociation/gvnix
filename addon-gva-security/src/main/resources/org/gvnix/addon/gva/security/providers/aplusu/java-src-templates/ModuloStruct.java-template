@@ -1,0 +1,230 @@
+package __TARGET_PACKAGE__;
+
+import javax.xml.namespace.QName;
+/**
+ *
+ * @author rgarcia <a href="mailto:rgarcia@disid.com">Ricardo Garcia
+ *         Fernandez</a>
+ *
+ */
+public class ModuloStruct implements java.io.Serializable {
+	
+	private static final String WS_AUTH_CIT_XSD = "http://WSAuth.cit.gva.es/xsd";
+
+	private static final long serialVersionUID = 1L;
+	
+    private String modulo;
+
+    private String valor;
+
+    private String descrip;
+
+    private String tipo;
+
+    /**
+     * Default constructor
+     */
+    public ModuloStruct() {
+    	// Default constructor
+    }
+
+    /**
+     * Constructor with data
+     * 
+     * @param modulo
+     * @param valor
+     * @param descrip
+     * @param tipo
+     */
+    public ModuloStruct(
+           String modulo,
+           String valor,
+           String descrip,
+           String tipo) {
+           this.modulo = modulo;
+           this.valor = valor;
+           this.descrip = descrip;
+           this.tipo = tipo;
+    }
+
+
+    /**
+     * Gets the modulo value for this ModuloStruct.
+     *
+     * @return modulo
+     */
+    public String getModulo() {
+        return modulo;
+    }
+
+
+    /**
+     * Sets the modulo value for this ModuloStruct.
+     *
+     * @param modulo
+     */
+    public void setModulo(String modulo) {
+        this.modulo = modulo;
+    }
+
+
+    /**
+     * Gets the valor value for this ModuloStruct.
+     *
+     * @return valor
+     */
+    public String getValor() {
+        return valor;
+    }
+
+
+    /**
+     * Sets the valor value for this ModuloStruct.
+     *
+     * @param valor
+     */
+    public void setValor(String valor) {
+        this.valor = valor;
+    }
+
+
+    /**
+     * Gets the descrip value for this ModuloStruct.
+     *
+     * @return descrip
+     */
+    public String getDescrip() {
+        return descrip;
+    }
+
+
+    /**
+     * Sets the descrip value for this ModuloStruct.
+     *
+     * @param descrip
+     */
+    public void setDescrip(String descrip) {
+        this.descrip = descrip;
+    }
+
+
+    /**
+     * Gets the tipo value for this ModuloStruct.
+     *
+     * @return tipo
+     */
+    public String getTipo() {
+        return tipo;
+    }
+
+
+    /**
+     * Sets the tipo value for this ModuloStruct.
+     *
+     * @param tipo
+     */
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    /* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((descrip == null) ? 0 : descrip.hashCode());
+		result = prime * result + ((modulo == null) ? 0 : modulo.hashCode());
+		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
+		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof ModuloStruct)) {
+			return false;
+		}
+		ModuloStruct other = (ModuloStruct) obj;
+		if (descrip == null) {
+			if (other.descrip != null) {
+				return false;
+			}
+		} else if (!descrip.equals(other.descrip)) {
+			return false;
+		}
+		if (modulo == null) {
+			if (other.modulo != null) {
+				return false;
+			}
+		} else if (!modulo.equals(other.modulo)) {
+			return false;
+		}
+		if (tipo == null) {
+			if (other.tipo != null) {
+				return false;
+			}
+		} else if (!tipo.equals(other.tipo)) {
+			return false;
+		}
+		if (valor == null) {
+			if (other.valor != null) {
+				return false;
+			}
+		} else if (!valor.equals(other.valor)) {
+			return false;
+		}
+		return true;
+	}
+
+	// Type metadata
+    private static org.apache.axis.description.TypeDesc typeDesc =
+        new org.apache.axis.description.TypeDesc(ModuloStruct.class, true);
+
+    static {
+        typeDesc.setXmlType(new QName(WS_AUTH_CIT_XSD, "ModuloStruct"));
+        StructUtil.addStringField(typeDesc, "modulo");
+        StructUtil.addStringField(typeDesc, "valor");
+        StructUtil.addStringField(typeDesc, "descrip");
+        StructUtil.addStringField(typeDesc, "tipo");
+    }
+
+    /**
+     * Return type metadata object
+     */
+    public static org.apache.axis.description.TypeDesc getTypeDesc() {
+        return typeDesc;
+    }
+
+    /**
+     * Get Custom Serializer
+     */
+    public static org.apache.axis.encoding.Serializer getSerializer(
+           String mechType,
+           Class javaType,
+           QName xmlType) {
+        return
+          new  org.apache.axis.encoding.ser.BeanSerializer(
+            javaType, xmlType, typeDesc);
+    }
+
+    /**
+     * Get Custom Deserializer
+     */
+    public static org.apache.axis.encoding.Deserializer getDeserializer(
+           String mechType,
+           Class javaType,
+           QName xmlType) {
+        return
+          new  org.apache.axis.encoding.ser.BeanDeserializer(
+            javaType, xmlType, typeDesc);
+    }
+
+}

@@ -1,0 +1,34 @@
+package __TARGET_PACKAGE__;
+
+
+/**
+ *
+ * @author rgarcia <a href="mailto:rgarcia@disid.com">Ricardo Garcia
+ *         Fernandez</a>
+ *
+ */
+public interface ServerWSAuthPort extends java.rmi.Remote {
+    /**
+     * Perform call to service "valida"
+     * 
+     * @param credencial
+     * @param usuario
+     * @param password
+     * @param aplicacion
+     * @return
+     * @throws java.rmi.RemoteException
+     */
+    public ValidaStruct valida(CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException;
+    
+    /**
+     * Perform call to service "valida_ldap"
+     * 
+     * @param credencial
+     * @param usuario
+     * @param password
+     * @param aplicacion
+     * @return
+     * @throws java.rmi.RemoteException
+     */
+    public ValidaStruct valida_ldap(CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException;
+}

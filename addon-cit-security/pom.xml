@@ -35,7 +35,7 @@
   </parent>
   <artifactId>org.gvnix.cit.security.roo.addon</artifactId>
   <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - CIT - Security</name>
+  <name>gvNIX - Spring Roo - Addon - CIT - Security [DEPRECATED]</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>

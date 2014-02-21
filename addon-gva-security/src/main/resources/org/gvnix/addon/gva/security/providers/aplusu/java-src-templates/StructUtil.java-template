@@ -1,0 +1,93 @@
+package __TARGET_PACKAGE__;
+
+import javax.xml.namespace.QName;
+
+import org.apache.axis.description.ElementDesc;
+import org.apache.axis.description.TypeDesc;
+
+/**
+ * Utility class for xxStruct classes
+ * 
+ * @author jmvivo <a href="mailto:jmvivo@disid.com">Jose manuel
+ *         Vivó Arnal</a>
+ *
+ */
+public class StructUtil {
+
+	private static final String W3_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+	
+	private static final String STRING_TYPE = "string";
+	
+	private StructUtil(){
+	}
+	
+	/**
+	 * Add a standard not-nillable String field to typeDesc
+	 * 
+	 * @param typeDesc
+	 * @param fieldName
+	 */
+	public static void addStringField(TypeDesc typeDesc, String fieldName) {
+		addStringField(typeDesc, fieldName, false);
+	}
+
+	/**
+	 * Add a standard String field to typeDesc
+	 * 
+	 * @param typeDesc
+	 * @param fieldName
+	 */
+	public static void addStringField(TypeDesc typeDesc, String fieldName, boolean nillable) {
+		addField(typeDesc, fieldName, W3_XML_SCHEMA, STRING_TYPE, nillable);
+	}
+	
+	/**
+	 * Add a standard not-nillable int field to typeDesc
+	 * 
+	 * @param typeDesc
+	 * @param fieldName
+	 */
+	public static void addIntField(TypeDesc typeDesc, String fieldName) {
+		addIntField(typeDesc, fieldName, false);
+	}
+	
+	/**
+	 * Add a standard int field to typeDesc
+	 * 
+	 * @param typeDesc
+	 * @param fieldName
+	 * @param nillable
+	 */
+	public static void addIntField(TypeDesc typeDesc, String fieldName, boolean nillable) {
+		addField(typeDesc, fieldName, W3_XML_SCHEMA, "int", nillable);
+	}
+	
+	/**
+	 * Add a not-nillable field to typeDesc
+	 * 
+	 * @param typeDesc
+	 * @param fieldName
+	 */
+	public static void addField(TypeDesc typeDesc, String fieldName,
+			String schema, String typeName) {
+		addField(typeDesc, fieldName, schema, typeName, false);
+	}
+	
+	/**
+	 * Add a field to typeDesc
+	 * 
+	 * @param typeDesc
+	 * @param fieldName
+	 */
+	public static void addField(TypeDesc typeDesc, String fieldName, 
+			String schema, String typeName, boolean nillable) {
+		ElementDesc elemField = new ElementDesc();
+		elemField.setFieldName(fieldName);
+		elemField.setXmlName(new QName("", fieldName));
+		elemField.setXmlType(new QName(
+			schema, typeName));
+		elemField.setNillable(nillable);
+		typeDesc.addFieldDesc(elemField);
+	}
+
+}

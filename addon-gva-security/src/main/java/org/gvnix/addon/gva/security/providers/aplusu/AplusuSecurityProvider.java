@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.cit.security.roo.addon;
+package org.gvnix.addon.gva.security.providers.aplusu;
 
 import java.io.*;
 import java.util.Map;
@@ -31,8 +31,10 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.gva.security.providers.SecurityProvider;
 import org.springframework.roo.addon.security.SecurityOperations;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.*;
@@ -42,35 +44,44 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Clase que implementa las operaciones del add-on <b>cit securty</b>
+ * <b>APLUSU</b> Security Provider
  * 
  * @author Jose Manuel Vivó ( jmvivo at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * @author Juan Carlos García ( jcgarcia at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
 @Component
 @Service
-public class CitSecurityOperationsImpl implements CitSecurityOperations {
+public class AplusuSecurityProvider implements SecurityProvider {
+
+    private static final String DESCRIPTION = "Security APLUSU Provider";
+
+    private static final String NAME = "APLUSU";
 
     /**
      * Installed classes package
      */
-    public static final String AUTHENTICATION_SUBPACKAGE = ".security.authentication.wscit";
+
+    public String aplusuPackage = ".security.authentication.aplusu";
 
     static final Integer DEFAUL_SESSION_TIMEOUT = 45;
 
     /**
      * Spring Security authentication provider to use
      */
-    private static final String PROVIDER_CLASS_FILENAME = "WscitAuthenticationProvider.java";
+    private static final String PROVIDER_CLASS_FILENAME = "AplusuSecurityProvider.java";
 
     /**
      * Classes with Spring Security integration
      */
     private static final String[] JAVA_CLASS_FILENAMES = new String[] {
-            PROVIDER_CLASS_FILENAME, "WscitAuthenticationProvider.java",
-            "WscitUserAuthority.java", "WscitUser.java", };
+            PROVIDER_CLASS_FILENAME, "AplusuSecurityProvider.java",
+            "AplusuUserAuthority.java", "AplusuUser.java", };
 
     /**
      * Classes with Web-service client
@@ -84,7 +95,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      * Classes with service data structures
      */
     private static final String[] JAVA_XSD_CLASS_FILENAMES = new String[] {
-            "CredencialCIT.java", "ModuloStruct.java", "ValidaStruct.java",
+            "CredencialAplusu.java", "ModuloStruct.java", "ValidaStruct.java",
             "StructUtil.java" };
 
     /**
@@ -92,9 +103,9 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      */
     private static final String[] JAVA_TEST_CLASS_FILENAMES = new String[] {
             "ServerWSAuthBindingStubTest.java",
-            "WscitAuthenticationProviderTest.java" };
+            "AplusuSecurityProviderTest.java" };
 
-    private static final String WSAUTH_PROPERTIES_NAME = "CITWSAuth.properties";
+    private static final String WSAUTH_PROPERTIES_NAME = "aplusu.properties";
 
     private static final Dependency AXIS_DEPENDENCY = new Dependency("axis",
             "axis", "1.4");
@@ -104,7 +115,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             DependencyScope.TEST);
 
     private static Logger logger = Logger
-            .getLogger(CitSecurityOperationsImpl.class.getName());
+            .getLogger(AplusuSecurityProvider.class.getName());
 
     @Reference
     private FileManager fileManager;
@@ -122,20 +133,18 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private SecurityOperations securityOperations;
 
     /**
-     * Get java package of cit security classes into destination project.
+     * Get java package of APLUSU security classes into destination project.
      * 
-     * @return Cit security classes java package
+     * @return APLUSU security classes java package
      */
     protected String getClassesPackage() {
-        return projectOperations.getFocusedTopLevelPackage()
-                .getFullyQualifiedPackageName()
-                .concat(AUTHENTICATION_SUBPACKAGE);
+        return aplusuPackage;
     }
 
     /**
-     * Get folder path of cit security files into destination project.
+     * Get folder path of APLUSU security files into destination project.
      * 
-     * @return Cit security files folder path
+     * @return APLUSU security files folder path
      */
     protected String getClassesPath() {
 
@@ -143,20 +152,14 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     }
 
     /**
-     * Get file path of cit security provider file into destination project.
+     * Get file path of APLUSU security provider file into destination project.
      * 
-     * @return Cit security provider file path
+     * @return APLUSU security provider file path
      */
     protected String getProviderTargetClassFileName() {
         return getClassesPath() + File.separator + PROVIDER_CLASS_FILENAME;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.gvnix.cit.security.roo.addon.CitSecurityOperations#isSetupAvailable()
-     */
     public boolean isSetupAvailable() {
         // Si no esta configurada la seguriad pero se puede configurar
         // ya lo haremos nosotros
@@ -240,13 +243,6 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                 "/WEB-INF/layouts/layouts.xml");
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.gvnix.cit.security.roo.addon.CitSecurityOperations#setup(java.lang
-     * .String, java.lang.String, java.lang.String, java.lang.String)
-     */
     public void setup(String url, String login, String password, String appName) {
         // Si no esta configurada la seguriad pero se puede configurar
         // ya lo haremos nosotros
@@ -277,15 +273,6 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
         // Añadimos dependencias
         addDependencies();
-
-        // Informing to developer that this method is deprecated and the
-        // new alternative to implement APLUSU security.
-        logger.log(Level.INFO, "");
-        logger.log(
-                Level.INFO,
-                "** This method is DEPRECATED. You can implement "
-                        + "APLUSU security using 'security provider add --name APLUSU --package xxxxxx' **");
-        logger.log(Level.INFO, "");
 
     }
 
@@ -369,7 +356,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         InputStream templateInputStream = null;
         try {
             templateInputStream = FileUtils.getInputStream(getClass(),
-                    "config/" + WSAUTH_PROPERTIES_NAME);
+                    WSAUTH_PROPERTIES_NAME);
             String template = IOUtils.toString(new InputStreamReader(
                     templateInputStream));
             template = StringUtils.replace(template, "__URL__", url);
@@ -410,7 +397,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
     private void updateSecurityConfig() {
 
-        String secTemplate = "config/applicationContext-security-template.xml";
+        String secTemplate = "applicationContext-security-template.xml";
         String secXmlPath = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""),
                 "applicationContext-security.xml");
@@ -434,7 +421,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
             Element root = secXmlDoc.getDocumentElement();
             Element bean = XmlUtils.findFirstElement(
-                    "/beans/bean[@id='wscitAuthenticationProvider']", root);
+                    "/beans/bean[@id='aplusuSecurityProvider']", root);
             String clazz = bean.getAttribute("class");
             bean.setAttribute("class",
                     clazz.replace("__TARGET_PACKAGE__", getClassesPackage()));
@@ -614,23 +601,9 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                 // Read template and insert the user's package
                 String input = IOUtils.toString(new InputStreamReader(
                         templateInputStream));
-                input = input.replace(
-                        "__TOP_LEVEL_PACKAGE__",
-                        projectOperations
-                                .getTopLevelPackage(
-                                        projectOperations
-                                                .getFocusedModuleName())
-                                .getFullyQualifiedPackageName()
-                                .concat(AUTHENTICATION_SUBPACKAGE));
+                input = input.replace("__TOP_LEVEL_PACKAGE__", aplusuPackage);
 
-                input = input.replace(
-                        "__TARGET_PACKAGE__",
-                        projectOperations
-                                .getTopLevelPackage(
-                                        projectOperations
-                                                .getFocusedModuleName())
-                                .getFullyQualifiedPackageName()
-                                .concat(AUTHENTICATION_SUBPACKAGE));
+                input = input.replace("__TARGET_PACKAGE__", aplusuPackage);
 
                 if (parameters != null) {
                     for (Entry<String, String> entry : parameters.entrySet()) {
@@ -661,6 +634,55 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                         + targetFilename + "'", ioe);
             }
         }
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
+    }
+
+    @Override
+    public void install(JavaPackage targetPackage) {
+        // Changing default package with the developer package
+        aplusuPackage = targetPackage.getFullyQualifiedPackageName();
+        setup("", "", "", "");
+        // Showing next steps to do
+        showNextSteps();
+    }
+
+    @Override
+    public Boolean isInstalled() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * This method shows the next steps to configure the application correctly
+     * to use this provider
+     * 
+     */
+    public void showNextSteps() {
+        logger.log(Level.INFO, "");
+        logger.log(Level.INFO, "");
+        logger.log(Level.INFO,
+                "*** Before execute your application you must to configure the follow"
+                        + " APLUSU Client Properties:");
+        logger.log(Level.INFO,
+                "--------------------------------------------------------------------");
+        logger.log(Level.INFO, "    - wsauth.loggin");
+        logger.log(Level.INFO, "    - wsauth.password");
+        logger.log(Level.INFO, "    - wsauth.appName");
+        logger.log(Level.INFO, "    - wsauth.url");
+        logger.log(Level.INFO, "");
+        logger.log(Level.INFO,
+                "*** Use the configuration commands to set this parameters");
+        logger.log(Level.INFO, "");
+        logger.log(Level.INFO, "");
     }
 
 }

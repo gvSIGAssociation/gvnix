@@ -1,0 +1,167 @@
+package __TARGET_PACKAGE__;
+
+import javax.xml.namespace.QName;
+
+/**
+ *
+ * @author rgarcia <a href="mailto:rgarcia@disid.com">Ricardo Garcia
+ *         Fernandez</a>
+ *
+ */
+public class CredencialAplusu  implements java.io.Serializable {
+	
+	private static final String WS_AUTH_CIT_XSD = "http://WSAuth.cit.gva.es/xsd";
+
+	private static final long serialVersionUID = 1L;
+	
+    private String login;
+
+    private String password;
+
+    /**
+     * Default constructor
+     */
+    public CredencialAplusu() {
+        // Default constructor
+    }
+
+    /**
+     * Default constructor with data
+     * 
+     * @param login
+     * @param password
+     */
+    public CredencialAplusu(
+           String login,
+           String password) {
+           this.login = login;
+           this.password = password;
+    }
+
+
+    /**
+     * Gets the login value for this CredencialAplusu.
+     *
+     * @return login
+     */
+    public String getLogin() {
+        return login;
+    }
+
+
+    /**
+     * Sets the login value for this CredencialAplusu.
+     *
+     * @param login
+     */
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+
+    /**
+     * Gets the password value for this CredencialAplusu.
+     *
+     * @return password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+
+    /**
+     * Sets the password value for this CredencialAplusu.
+     *
+     * @param password
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((login == null) ? 0 : login.hashCode());
+		result = prime * result
+				+ ((password == null) ? 0 : password.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof CredencialAplusu)) {
+			return false;
+		}
+		CredencialAplusu other = (CredencialAplusu) obj;
+		if (login == null) {
+			if (other.login != null) {
+				return false;
+			}
+		} else if (!login.equals(other.login)) {
+			return false;
+		}
+		if (password == null) {
+			if (other.password != null) {
+				return false;
+			}
+		} else if (!password.equals(other.password)) {
+			return false;
+		}
+		return true;
+	}
+
+	// Type metadata
+    private static org.apache.axis.description.TypeDesc typeDesc =
+        new org.apache.axis.description.TypeDesc(CredencialAplusu.class, true);
+
+    static {
+        typeDesc.setXmlType(new QName(WS_AUTH_CIT_XSD, "credencialAplusu"));
+        StructUtil.addStringField(typeDesc, "login");
+        StructUtil.addStringField(typeDesc, "password");
+    }
+
+    /**
+     * Get Custom Deserializer
+     */
+    public static org.apache.axis.encoding.Deserializer getDeserializer(
+           String mechType,
+           Class javaType,
+           QName xmlType) {
+        return
+          new  org.apache.axis.encoding.ser.BeanDeserializer(
+            javaType, xmlType, typeDesc);
+    }
+
+    /**
+     * Return type metadata object
+     */
+    public static org.apache.axis.description.TypeDesc getTypeDesc() {
+        return typeDesc;
+    }
+
+    /**
+     * Get Custom Serializer
+     */
+    public static org.apache.axis.encoding.Serializer getSerializer(
+           String mechType,
+           Class javaType,
+           QName xmlType) {
+        return
+          new  org.apache.axis.encoding.ser.BeanSerializer(
+            javaType, xmlType, typeDesc);
+    }
+
+}

@@ -1,0 +1,165 @@
+package __TARGET_PACKAGE__;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.reset;
+
+import java.rmi.RemoteException;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.ReflectionSaltSource;
+import org.springframework.security.authentication.encoding.PlaintextPasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+
+/**
+ * Test for {@link WscitAuthenticationProvider} class <br>
+ * This class perform a whole authentication mechanism check.
+ * 
+ * @author jmvivo <a href="mailto:jmvivo@disid.com">Jose manuel
+ *         Vivó Arnal</a>
+ * 
+ */
+public class AplusuSecurityProviderTest {
+
+	private static final String USER_PASSWORD = "password";
+	private static final String USER_NAME = "user";
+	private static final String CIT_LOGIN = "myApp";
+	private static final String CIT_LOGIN_PWD = "myApp";
+	private static final String APP_NAME = "myApp";
+	private static final String SALT_PROPERTY = "codper";
+
+	private WscitAuthenticationProvider authenticationProvider;
+	private ServerWSAuthPortProxy proxy;
+	private PlaintextPasswordEncoder passwordEncoder;
+	private ReflectionSaltSource saltSource;
+
+	@Before
+	public void init() {
+		proxy = mock(ServerWSAuthPortProxy.class);
+		passwordEncoder = new PlaintextPasswordEncoder();
+		saltSource = new ReflectionSaltSource();
+		saltSource.setUserPropertyToUse(SALT_PROPERTY);
+		authenticationProvider = new WscitAuthenticationProvider();
+		authenticationProvider.setServerWSAuthPortProxy(proxy);
+		authenticationProvider.setCredentialCitLogin(CIT_LOGIN);
+		authenticationProvider.setCredentialCitPassword(CIT_LOGIN_PWD);
+		authenticationProvider.setApplicationName(APP_NAME);
+		authenticationProvider.setPasswordEncoder(passwordEncoder);
+
+	}
+
+	/**
+	 * Test {@link WscitAuthenticationProvider}
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testAuthentication() throws Exception {
+		// setup
+		UsernamePasswordAuthenticationToken noAutenticated = getAuthenticationToken(USER_NAME,
+				USER_PASSWORD);
+		
+		proxyInitialization();
+		
+		Authentication result = authenticationProvider.authenticate(noAutenticated);
+		
+		assertNotNull(result);
+		assertTrue(result.isAuthenticated());
+		
+		// reset proxy to avoid ws user return
+		reset(proxy);
+
+		// Check authenticate fails
+		AuthenticationException authExt = null;
+		try {
+			result = authenticationProvider.authenticate(noAutenticated);
+		} catch (AuthenticationException e) {
+			authExt = e;
+		}
+		assertNotNull(authExt);
+		
+	}
+	
+	/**
+	 * Test {@link WscitAuthenticationProvider} when password is incorrect
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testAuthenticationFailPassword() throws Exception {
+		// setup
+		UsernamePasswordAuthenticationToken noAutenticated = getAuthenticationToken(USER_NAME,
+				"------");
+		
+		proxyInitialization();
+		
+		AuthenticationException authExt = null;
+		try {
+			authenticationProvider.authenticate(noAutenticated);
+		} catch (AuthenticationException e) {
+			authExt = e;
+		}
+		assertNotNull(authExt);
+	}
+	
+	/**
+	 * Test {@link WscitAuthenticationProvider} when user is not found
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testAuthenticationFailUser() throws Exception {
+	    // setup
+		UsernamePasswordAuthenticationToken noAutenticated = getAuthenticationToken("------",
+				"------");
+		
+		proxyInitialization();
+	
+		AuthenticationException authExt = null;
+		try {
+			authenticationProvider.authenticate(noAutenticated);
+		} catch (AuthenticationException e) {
+			authExt = e;
+		}
+		assertNotNull(authExt);
+	}
+
+	/**
+	 * Create a authenticantion token from user and password
+	 * 
+	 * @param userName
+	 * @param pwd
+	 * @return
+	 */
+	private UsernamePasswordAuthenticationToken getAuthenticationToken(
+			String userName, String pwd) {
+		return new UsernamePasswordAuthenticationToken(userName, pwd);
+	}
+	
+	/**
+	 * Initializes mock {@link ServerWSAuthPortProxy} object
+	 * for return valid value with default data.
+	 * 
+	 * @throws RemoteException
+	 * @see {@link #USER_NAME}
+	 * @see {@link #USER_PASSWORD}
+	 * @see {@link #CIT_LOGIN}
+	 * @see {@link #CIT_LOGIN_PWD}
+	 * @see {@link #APP_NAME}
+	 */
+	private void proxyInitialization() throws RemoteException {
+		CredencialCIT credntialCIT = new CredencialCIT(CIT_LOGIN, CIT_LOGIN_PWD);
+		ValidaStruct validateStruct = new ValidaStruct();
+		validateStruct.setNombre(USER_NAME);
+		validateStruct.setUsuario(USER_NAME);
+		validateStruct.setCodper(5);
+		validateStruct.setModulos(new ModuloStruct[] {new ModuloStruct("M1", "M1", "M1", "M1")});
+		
+		when(proxy.valida(credntialCIT, USER_NAME, USER_PASSWORD, APP_NAME)).thenReturn(validateStruct);
+	}
+}

@@ -1,0 +1,105 @@
+package __TARGET_PACKAGE__;
+
+import java.io.Serializable;
+
+import org.springframework.roo.addon.javabean.RooJavaBean;
+import org.springframework.security.core.GrantedAuthority;
+
+/**
+ * Structure of module's C.I.T information provided by WSAuth service.
+ *
+ * @author jmvivo <a href="mailto:jmvivo@disid.com">Jose Manuel Vivó Arnal</a>
+ *
+ */
+@RooJavaBean
+public class AplusuUserAuthority implements GrantedAuthority, Serializable {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -2443806778851127910L;
+
+	// ************** <GrantedAuthority> ****************
+
+	private String authority;
+
+	// ************** </GrantedAuthority> ****************
+
+	// ************** <CIT data> ****************
+	private String modulo;
+	private String valor;
+	private String descrip;
+	private String tipo;
+
+	// ************** <CIT data> ****************
+
+    /* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((authority == null) ? 0 : authority.hashCode());
+		result = prime * result + ((modulo == null) ? 0 : modulo.hashCode());
+		result = prime * result + ((descrip == null) ? 0 : descrip.hashCode());
+		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
+		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		AplusuUserAuthority other = (AplusuUserAuthority) obj;
+		if (authority == null) {
+			if (other.authority != null) {
+				return false;
+			}
+		} else if (!authority.equals(other.authority)) {
+			return false;
+		}
+		if (modulo == null) {
+			if (other.modulo != null) {
+				return false;
+			}
+		} else if (!modulo.equals(other.modulo)) {
+			return false;
+		}
+		if (descrip == null) {
+			if (other.descrip != null) {
+				return false;
+			}
+		} else if (!descrip.equals(other.descrip)) {
+			return false;
+		}
+		if (valor == null) {
+			if (other.valor != null) {
+				return false;
+			}
+		} else if (!valor.equals(other.valor)) {
+			return false;
+		}		
+		if (tipo == null) {
+			if (other.tipo != null) {
+				return false;
+			}
+		} else if (!tipo.equals(other.tipo)) {
+			return false;
+		}
+		return true;
+	}
+
+}

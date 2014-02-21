@@ -1,0 +1,823 @@
+package __TARGET_PACKAGE__;
+
+import java.util.Arrays;
+import javax.xml.namespace.QName;
+
+/**
+ * 
+ * @author rgarcia <a href="mailto:rgarcia@disid.com">Ricardo Garcia
+ *         Fernandez</a>
+ * 
+ */
+public class ValidaStruct implements java.io.Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private static final String WS_AUTH_CIT_XSD = "http://WSAuth.cit.gva.es/xsd";
+
+	private String usuario;
+
+    private String nombre;
+
+    private String correo;
+
+    private String telefono;
+
+    private String nrp;
+
+    private int codper;
+
+    private String cpro;
+
+    private String dgral;
+
+    private String cserv;
+
+    private String tipousu;
+
+    private String daplicacion;
+
+    private String version;
+
+    private ModuloStruct[] modulos;
+
+    private String ultentra;
+
+    private String ultentra_s;
+
+    private String param1;
+
+    private String param2;
+
+    private String param3;
+
+    private String rolusuar;
+
+    private String bd;
+
+    private String server;
+
+    private String tipo;
+
+    private String comentario;
+
+    /**
+     * Default constructor
+     */
+    public ValidaStruct() {
+        // Default constructor
+    }
+
+    /**
+     * Constructor with data
+     * 
+     * @param usuario
+     * @param nombre
+     * @param correo
+     * @param telefono
+     * @param nrp
+     * @param codper
+     * @param cpro
+     * @param dgral
+     * @param cserv
+     * @param tipousu
+     * @param daplicacion
+     * @param version
+     * @param modulos
+     * @param ultentra
+     * @param ultentra_s
+     * @param param1
+     * @param param2
+     * @param param3
+     * @param rolusuar
+     * @param bd
+     * @param server
+     * @param tipo
+     * @param comentario
+     */
+    public ValidaStruct(String usuario, String nombre,
+	    String correo, String telefono,
+	    String nrp, int codper, String cpro,
+	    String dgral, String cserv,
+	    String tipousu, String daplicacion,
+	    String version,
+	    ModuloStruct[] modulos,
+	    String ultentra, String ultentra_s,
+	    String param1, String param2,
+	    String param3, String rolusuar,
+	    String bd, String server,
+	    String tipo, String comentario) {
+	this.usuario = usuario;
+	this.nombre = nombre;
+	this.correo = correo;
+	this.telefono = telefono;
+	this.nrp = nrp;
+	this.codper = codper;
+	this.cpro = cpro;
+	this.dgral = dgral;
+	this.cserv = cserv;
+	this.tipousu = tipousu;
+	this.daplicacion = daplicacion;
+	this.version = version;
+	this.modulos = modulos;
+	this.ultentra = ultentra;
+	this.ultentra_s = ultentra_s;
+	this.param1 = param1;
+	this.param2 = param2;
+	this.param3 = param3;
+	this.rolusuar = rolusuar;
+	this.bd = bd;
+	this.server = server;
+	this.tipo = tipo;
+	this.comentario = comentario;
+    }
+
+    /**
+     * Gets the usuario value for this ValidaStruct.
+     * 
+     * @return usuario
+     */
+    public String getUsuario() {
+	return usuario;
+    }
+
+    /**
+     * Sets the usuario value for this ValidaStruct.
+     * 
+     * @param usuario
+     */
+    public void setUsuario(String usuario) {
+	this.usuario = usuario;
+    }
+
+    /**
+     * Gets the nombre value for this ValidaStruct.
+     * 
+     * @return nombre
+     */
+    public String getNombre() {
+	return nombre;
+    }
+
+    /**
+     * Sets the nombre value for this ValidaStruct.
+     * 
+     * @param nombre
+     */
+    public void setNombre(String nombre) {
+	this.nombre = nombre;
+    }
+
+    /**
+     * Gets the correo value for this ValidaStruct.
+     * 
+     * @return correo
+     */
+    public String getCorreo() {
+	return correo;
+    }
+
+    /**
+     * Sets the correo value for this ValidaStruct.
+     * 
+     * @param correo
+     */
+    public void setCorreo(String correo) {
+	this.correo = correo;
+    }
+
+    /**
+     * Gets the telefono value for this ValidaStruct.
+     * 
+     * @return telefono
+     */
+    public String getTelefono() {
+	return telefono;
+    }
+
+    /**
+     * Sets the telefono value for this ValidaStruct.
+     * 
+     * @param telefono
+     */
+    public void setTelefono(String telefono) {
+	this.telefono = telefono;
+    }
+
+    /**
+     * Gets the nrp value for this ValidaStruct.
+     * 
+     * @return nrp
+     */
+    public String getNrp() {
+	return nrp;
+    }
+
+    /**
+     * Sets the nrp value for this ValidaStruct.
+     * 
+     * @param nrp
+     */
+    public void setNrp(String nrp) {
+	this.nrp = nrp;
+    }
+
+    /**
+     * Gets the codper value for this ValidaStruct.
+     * 
+     * @return codper
+     */
+    public int getCodper() {
+	return codper;
+    }
+
+    /**
+     * Sets the codper value for this ValidaStruct.
+     * 
+     * @param codper
+     */
+    public void setCodper(int codper) {
+	this.codper = codper;
+    }
+
+    /**
+     * Gets the cpro value for this ValidaStruct.
+     * 
+     * @return cpro
+     */
+    public String getCpro() {
+	return cpro;
+    }
+
+    /**
+     * Sets the cpro value for this ValidaStruct.
+     * 
+     * @param cpro
+     */
+    public void setCpro(String cpro) {
+	this.cpro = cpro;
+    }
+
+    /**
+     * Gets the dgral value for this ValidaStruct.
+     * 
+     * @return dgral
+     */
+    public String getDgral() {
+	return dgral;
+    }
+
+    /**
+     * Sets the dgral value for this ValidaStruct.
+     * 
+     * @param dgral
+     */
+    public void setDgral(String dgral) {
+	this.dgral = dgral;
+    }
+
+    /**
+     * Gets the cserv value for this ValidaStruct.
+     * 
+     * @return cserv
+     */
+    public String getCserv() {
+	return cserv;
+    }
+
+    /**
+     * Sets the cserv value for this ValidaStruct.
+     * 
+     * @param cserv
+     */
+    public void setCserv(String cserv) {
+	this.cserv = cserv;
+    }
+
+    /**
+     * Gets the tipousu value for this ValidaStruct.
+     * 
+     * @return tipousu
+     */
+    public String getTipousu() {
+	return tipousu;
+    }
+
+    /**
+     * Sets the tipousu value for this ValidaStruct.
+     * 
+     * @param tipousu
+     */
+    public void setTipousu(String tipousu) {
+	this.tipousu = tipousu;
+    }
+
+    /**
+     * Gets the daplicacion value for this ValidaStruct.
+     * 
+     * @return daplicacion
+     */
+    public String getDaplicacion() {
+	return daplicacion;
+    }
+
+    /**
+     * Sets the daplicacion value for this ValidaStruct.
+     * 
+     * @param daplicacion
+     */
+    public void setDaplicacion(String daplicacion) {
+	this.daplicacion = daplicacion;
+    }
+
+    /**
+     * Gets the version value for this ValidaStruct.
+     * 
+     * @return version
+     */
+    public String getVersion() {
+	return version;
+    }
+
+    /**
+     * Sets the version value for this ValidaStruct.
+     * 
+     * @param version
+     */
+    public void setVersion(String version) {
+	this.version = version;
+    }
+
+    /**
+     * Gets the modulos value for this ValidaStruct.
+     * 
+     * @return modulos
+     */
+    public ModuloStruct[] getModulos() {
+	return modulos;
+    }
+
+    /**
+     * Sets the modulos value for this ValidaStruct.
+     * 
+     * @param modulos
+     */
+    public void setModulos(ModuloStruct[] modulos) {
+	this.modulos = modulos;
+    }
+
+    /**
+     * Gets the ultentra value for this ValidaStruct.
+     * 
+     * @return ultentra
+     */
+    public String getUltentra() {
+	return ultentra;
+    }
+
+    /**
+     * Sets the ultentra value for this ValidaStruct.
+     * 
+     * @param ultentra
+     */
+    public void setUltentra(String ultentra) {
+	this.ultentra = ultentra;
+    }
+
+    /**
+     * Gets the ultentra_s value for this ValidaStruct.
+     * 
+     * @return ultentra_s
+     */
+    public String getUltentra_s() {
+	return ultentra_s;
+    }
+
+    /**
+     * Sets the ultentra_s value for this ValidaStruct.
+     * 
+     * @param ultentra_s
+     */
+    public void setUltentra_s(String ultentra_s) {
+	this.ultentra_s = ultentra_s;
+    }
+
+    /**
+     * Gets the param1 value for this ValidaStruct.
+     * 
+     * @return param1
+     */
+    public String getParam1() {
+	return param1;
+    }
+
+    /**
+     * Sets the param1 value for this ValidaStruct.
+     * 
+     * @param param1
+     */
+    public void setParam1(String param1) {
+	this.param1 = param1;
+    }
+
+    /**
+     * Gets the param2 value for this ValidaStruct.
+     * 
+     * @return param2
+     */
+    public String getParam2() {
+	return param2;
+    }
+
+    /**
+     * Sets the param2 value for this ValidaStruct.
+     * 
+     * @param param2
+     */
+    public void setParam2(String param2) {
+	this.param2 = param2;
+    }
+
+    /**
+     * Gets the param3 value for this ValidaStruct.
+     * 
+     * @return param3
+     */
+    public String getParam3() {
+	return param3;
+    }
+
+    /**
+     * Sets the param3 value for this ValidaStruct.
+     * 
+     * @param param3
+     */
+    public void setParam3(String param3) {
+	this.param3 = param3;
+    }
+
+    /**
+     * Gets the rolusuar value for this ValidaStruct.
+     * 
+     * @return rolusuar
+     */
+    public String getRolusuar() {
+	return rolusuar;
+    }
+
+    /**
+     * Sets the rolusuar value for this ValidaStruct.
+     * 
+     * @param rolusuar
+     */
+    public void setRolusuar(String rolusuar) {
+	this.rolusuar = rolusuar;
+    }
+
+    /**
+     * Gets the bd value for this ValidaStruct.
+     * 
+     * @return bd
+     */
+    public String getBd() {
+	return bd;
+    }
+
+    /**
+     * Sets the bd value for this ValidaStruct.
+     * 
+     * @param bd
+     */
+    public void setBd(String bd) {
+	this.bd = bd;
+    }
+
+    /**
+     * Gets the server value for this ValidaStruct.
+     * 
+     * @return server
+     */
+    public String getServer() {
+	return server;
+    }
+
+    /**
+     * Sets the server value for this ValidaStruct.
+     * 
+     * @param server
+     */
+    public void setServer(String server) {
+	this.server = server;
+    }
+
+    /**
+     * Gets the tipo value for this ValidaStruct.
+     * 
+     * @return tipo
+     */
+    public String getTipo() {
+	return tipo;
+    }
+
+    /**
+     * Sets the tipo value for this ValidaStruct.
+     * 
+     * @param tipo
+     */
+    public void setTipo(String tipo) {
+	this.tipo = tipo;
+    }
+
+    /**
+     * Gets the comentario value for this ValidaStruct.
+     * 
+     * @return comentario
+     */
+    public String getComentario() {
+	return comentario;
+    }
+
+    /**
+     * Sets the comentario value for this ValidaStruct.
+     * 
+     * @param comentario
+     */
+    public void setComentario(String comentario) {
+	this.comentario = comentario;
+    }
+
+
+
+    /* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((bd == null) ? 0 : bd.hashCode());
+		result = prime * result + codper;
+		result = prime * result
+				+ ((comentario == null) ? 0 : comentario.hashCode());
+		result = prime * result + ((correo == null) ? 0 : correo.hashCode());
+		result = prime * result + ((cpro == null) ? 0 : cpro.hashCode());
+		result = prime * result + ((cserv == null) ? 0 : cserv.hashCode());
+		result = prime * result
+				+ ((daplicacion == null) ? 0 : daplicacion.hashCode());
+		result = prime * result + ((dgral == null) ? 0 : dgral.hashCode());
+		result = prime * result + Arrays.hashCode(modulos);
+		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
+		result = prime * result + ((nrp == null) ? 0 : nrp.hashCode());
+		result = prime * result + ((param1 == null) ? 0 : param1.hashCode());
+		result = prime * result + ((param2 == null) ? 0 : param2.hashCode());
+		result = prime * result + ((param3 == null) ? 0 : param3.hashCode());
+		result = prime * result
+				+ ((rolusuar == null) ? 0 : rolusuar.hashCode());
+		result = prime * result + ((server == null) ? 0 : server.hashCode());
+		result = prime * result
+				+ ((telefono == null) ? 0 : telefono.hashCode());
+		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
+		result = prime * result + ((tipousu == null) ? 0 : tipousu.hashCode());
+		result = prime * result
+				+ ((ultentra == null) ? 0 : ultentra.hashCode());
+		result = prime * result
+				+ ((ultentra_s == null) ? 0 : ultentra_s.hashCode());
+		result = prime * result + ((usuario == null) ? 0 : usuario.hashCode());
+		result = prime * result + ((version == null) ? 0 : version.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof ValidaStruct)) {
+			return false;
+		}
+		ValidaStruct other = (ValidaStruct) obj;
+		if (bd == null) {
+			if (other.bd != null) {
+				return false;
+			}
+		} else if (!bd.equals(other.bd)) {
+			return false;
+		}
+		if (codper != other.codper) {
+			return false;
+		}
+		if (comentario == null) {
+			if (other.comentario != null) {
+				return false;
+			}
+		} else if (!comentario.equals(other.comentario)) {
+			return false;
+		}
+		if (correo == null) {
+			if (other.correo != null) {
+				return false;
+			}
+		} else if (!correo.equals(other.correo)) {
+			return false;
+		}
+		if (cpro == null) {
+			if (other.cpro != null) {
+				return false;
+			}
+		} else if (!cpro.equals(other.cpro)) {
+			return false;
+		}
+		if (cserv == null) {
+			if (other.cserv != null) {
+				return false;
+			}
+		} else if (!cserv.equals(other.cserv)) {
+			return false;
+		}
+		if (daplicacion == null) {
+			if (other.daplicacion != null) {
+				return false;
+			}
+		} else if (!daplicacion.equals(other.daplicacion)) {
+			return false;
+		}
+		if (dgral == null) {
+			if (other.dgral != null) {
+				return false;
+			}
+		} else if (!dgral.equals(other.dgral)) {
+			return false;
+		}
+		if (!Arrays.equals(modulos, other.modulos)) {
+			return false;
+		}
+		if (nombre == null) {
+			if (other.nombre != null) {
+				return false;
+			}
+		} else if (!nombre.equals(other.nombre)) {
+			return false;
+		}
+		if (nrp == null) {
+			if (other.nrp != null) {
+				return false;
+			}
+		} else if (!nrp.equals(other.nrp)) {
+			return false;
+		}
+		if (param1 == null) {
+			if (other.param1 != null) {
+				return false;
+			}
+		} else if (!param1.equals(other.param1)) {
+			return false;
+		}
+		if (param2 == null) {
+			if (other.param2 != null) {
+				return false;
+			}
+		} else if (!param2.equals(other.param2)) {
+			return false;
+		}
+		if (param3 == null) {
+			if (other.param3 != null) {
+				return false;
+			}
+		} else if (!param3.equals(other.param3)) {
+			return false;
+		}
+		if (rolusuar == null) {
+			if (other.rolusuar != null) {
+				return false;
+			}
+		} else if (!rolusuar.equals(other.rolusuar)) {
+			return false;
+		}
+		if (server == null) {
+			if (other.server != null) {
+				return false;
+			}
+		} else if (!server.equals(other.server)) {
+			return false;
+		}
+		if (telefono == null) {
+			if (other.telefono != null) {
+				return false;
+			}
+		} else if (!telefono.equals(other.telefono)) {
+			return false;
+		}
+		if (tipo == null) {
+			if (other.tipo != null) {
+				return false;
+			}
+		} else if (!tipo.equals(other.tipo)) {
+			return false;
+		}
+		if (tipousu == null) {
+			if (other.tipousu != null) {
+				return false;
+			}
+		} else if (!tipousu.equals(other.tipousu)) {
+			return false;
+		}
+		if (ultentra == null) {
+			if (other.ultentra != null) {
+				return false;
+			}
+		} else if (!ultentra.equals(other.ultentra)) {
+			return false;
+		}
+		if (ultentra_s == null) {
+			if (other.ultentra_s != null) {
+				return false;
+			}
+		} else if (!ultentra_s.equals(other.ultentra_s)) {
+			return false;
+		}
+		if (usuario == null) {
+			if (other.usuario != null) {
+				return false;
+			}
+		} else if (!usuario.equals(other.usuario)) {
+			return false;
+		}
+		if (version == null) {
+			if (other.version != null) {
+				return false;
+			}
+		} else if (!version.equals(other.version)) {
+			return false;
+		}
+		return true;
+	}
+
+
+
+	// Type metadata
+    private static org.apache.axis.description.TypeDesc typeDesc = new org.apache.axis.description.TypeDesc(
+	    ValidaStruct.class, true);
+
+    static {
+	typeDesc.setXmlType(new QName(
+		WS_AUTH_CIT_XSD, "validaStruct"));
+	StructUtil.addStringField(typeDesc,"usuario");
+	StructUtil.addStringField(typeDesc,"nombre");
+	StructUtil.addStringField(typeDesc,"correo");
+	StructUtil.addStringField(typeDesc,"telefono");
+	StructUtil.addStringField(typeDesc,"nrp");
+	StructUtil.addIntField(typeDesc,"codper");
+	StructUtil.addStringField(typeDesc,"cpro");
+	StructUtil.addStringField(typeDesc,"dgral");
+	StructUtil.addStringField(typeDesc,"cserv");
+	StructUtil.addStringField(typeDesc,"tipousu");
+	StructUtil.addStringField(typeDesc,"daplicacion");
+	StructUtil.addStringField(typeDesc,"version");
+	StructUtil.addField(typeDesc,"version",
+			WS_AUTH_CIT_XSD, "ModuloStruct");
+	StructUtil.addStringField(typeDesc,"ultentra");
+	StructUtil.addStringField(typeDesc,"ultentra_s");
+	StructUtil.addStringField(typeDesc,"param1");
+	StructUtil.addStringField(typeDesc,"param2");
+	StructUtil.addStringField(typeDesc,"param3");
+	StructUtil.addStringField(typeDesc,"rolusuar");
+	StructUtil.addStringField(typeDesc,"bd");
+	StructUtil.addStringField(typeDesc,"server");
+	StructUtil.addStringField(typeDesc,"tipo");
+	StructUtil.addStringField(typeDesc,"comentario");
+    }
+
+    /**
+     * Return type metadata object
+     */
+    public static org.apache.axis.description.TypeDesc getTypeDesc() {
+	  return typeDesc;
+    }
+
+    /**
+     * Get Custom Serializer
+     */
+    public static org.apache.axis.encoding.Serializer getSerializer(
+	    String mechType, Class javaType,
+	    QName xmlType) {
+	  return new org.apache.axis.encoding.ser.BeanSerializer(javaType,
+		  xmlType, typeDesc);
+    }
+
+    /**
+     * Get Custom Deserializer
+     */
+    public static org.apache.axis.encoding.Deserializer getDeserializer(
+	    String mechType, Class javaType,
+	    QName xmlType) {
+	  return new org.apache.axis.encoding.ser.BeanDeserializer(javaType,
+		  xmlType, typeDesc);
+    }
+
+}

@@ -47,7 +47,7 @@ public class CitSecurityCommands implements CommandMarker {
                 && citSecurityOperations.isSpringMvcTilesProject();
     }
 
-    @CliCommand(value = "cit security setup", help = "Create and configure the security artifacts needed for users authorization and authentication at Conselleria de Infraestructuras y Transporte.")
+    @CliCommand(value = "cit security setup", help = "[DEPRECATED] - Create and configure the security artifacts needed for users authorization and authentication at Conselleria de Infraestructuras y Transporte.")
     public void setup(
             @CliOption(key = "url", mandatory = true, help = "URL del servicio de autenticación.") String url,
             @CliOption(key = "login", mandatory = true, help = "Usuario de acceso al servicio.") String login,

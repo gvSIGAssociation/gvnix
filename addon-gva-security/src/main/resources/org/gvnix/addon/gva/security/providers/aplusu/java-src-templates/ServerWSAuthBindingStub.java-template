@@ -1,0 +1,245 @@
+package __TARGET_PACKAGE__;
+
+import java.util.Enumeration;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
+import org.apache.axis.description.ParameterDesc;
+import org.apache.axis.description.OperationDesc;
+
+/**
+ *
+ * @author rgarcia <a href="mailto:rgarcia@disid.com">Ricardo Garcia
+ *         Fernandez</a>
+ *
+ */
+public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
+	implements ServerWSAuthPort {
+    private static final String STRING_TYPE = "string";
+	private static final String W3_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+	private static final String WS_CIT_CREDENCIAL_XSD = "http://WS_CIT_Credencial.cit.gva.es/xsd";
+	private static final String WS_AUTH_CIT_XSD = "http://WSAuth.cit.gva.es/xsd";
+	private final List<Class> cachedSerClasses = new java.util.ArrayList<Class>();
+    private final List<QName> cachedSerQNames = new java.util.ArrayList<QName>();
+    private final List cachedSerFactories = new java.util.ArrayList();
+    private final List cachedDeserFactories = new java.util.ArrayList();
+
+    private static OperationDesc [] operations;
+
+    static {
+        operations = new OperationDesc[2];
+        initOperationDesc1();
+    }
+
+    private static void initOperationDesc1(){
+        operations[0] = createOperatorValida("valida");
+        operations[1] = createOperatorValida("valida_ldap");
+
+    }
+
+	private static OperationDesc createOperatorValida(String operName) {
+		OperationDesc oper;
+        ParameterDesc param;
+        oper = new OperationDesc();
+        oper.setName(operName);
+        param = new ParameterDesc(new QName("", "credencial"), ParameterDesc.IN, new QName(WS_CIT_CREDENCIAL_XSD, "credencialCIT"), CredencialCIT.class, false, false);
+        oper.addParameter(param);
+        param = new ParameterDesc(new QName("", "usuario"), ParameterDesc.IN, new QName(W3_XML_SCHEMA, STRING_TYPE), String.class, false, false);
+        oper.addParameter(param);
+        param = new ParameterDesc(new QName("", "password"), ParameterDesc.IN, new QName(W3_XML_SCHEMA, STRING_TYPE), String.class, false, false);
+        oper.addParameter(param);
+        param = new ParameterDesc(new QName("", "aplicacion"), ParameterDesc.IN, new QName(W3_XML_SCHEMA, STRING_TYPE), String.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new QName(WS_AUTH_CIT_XSD, "validaStruct"));
+        oper.setReturnClass(ValidaStruct.class);
+        oper.setReturnQName(new QName("", "resultado"));
+        oper.setStyle(org.apache.axis.constants.Style.RPC);
+        oper.setUse(org.apache.axis.constants.Use.ENCODED);
+		return oper;
+	}
+
+    /**
+     * Create server binding Stub
+     * 
+     * @throws org.apache.axis.AxisFault
+     */
+    public ServerWSAuthBindingStub() throws org.apache.axis.AxisFault {
+         this(null);
+    }
+
+    /**
+     * Create Server binding Stub base on service instance a end-point URL
+     * 
+     * @param endpointURL
+     * @param service
+     * @throws org.apache.axis.AxisFault
+     */
+    public ServerWSAuthBindingStub(java.net.URL endpointURL, javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
+         this(service);
+         super.cachedEndpoint = endpointURL;
+    }
+
+    /**
+     *  Create Server binding Stub based on a service instance
+     *  
+     * @param service
+     * @throws org.apache.axis.AxisFault
+     */
+    public ServerWSAuthBindingStub(javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
+        if (service == null) {
+            super.service = new org.apache.axis.client.Service();
+        } else {
+            super.service = service;
+        }
+        ((org.apache.axis.client.Service)super.service).setTypeMappingVersion("1.2");
+            Class cls;
+            QName qName;
+            QName qName2;
+            Class beansf = org.apache.axis.encoding.ser.BeanSerializerFactory.class;
+            Class beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
+            qName = new QName(WS_CIT_CREDENCIAL_XSD, "credencialCIT");
+            cachedSerQNames.add(qName);
+            cls = CredencialCIT.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new QName(WS_AUTH_CIT_XSD, "ModuloStruct");
+            cachedSerQNames.add(qName);
+            cls = ModuloStruct.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new QName(WS_AUTH_CIT_XSD, "ModulosValidaStruct");
+            cachedSerQNames.add(qName);
+            cls = ModuloStruct[].class;
+            cachedSerClasses.add(cls);
+            qName = new QName(WS_AUTH_CIT_XSD, "ModuloStruct");
+            qName2 = null;
+            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
+            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
+
+            qName = new QName(WS_AUTH_CIT_XSD, "validaStruct");
+            cachedSerQNames.add(qName);
+            cls = ValidaStruct.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+    }
+
+    protected org.apache.axis.client.Call createCall() throws java.rmi.RemoteException {
+        try {
+            org.apache.axis.client.Call call = super._createCall();
+            if (super.maintainSessionSet) {
+                call.setMaintainSession(super.maintainSession);
+            }
+            if (super.cachedUsername != null) {
+                call.setUsername(super.cachedUsername);
+            }
+            if (super.cachedPassword != null) {
+                call.setPassword(super.cachedPassword);
+            }
+            if (super.cachedEndpoint != null) {
+                call.setTargetEndpointAddress(super.cachedEndpoint);
+            }
+            if (super.cachedTimeout != null) {
+                call.setTimeout(super.cachedTimeout);
+            }
+            if (super.cachedPortName != null) {
+                call.setPortName(super.cachedPortName);
+            }
+            Enumeration keys = super.cachedProperties.keys();
+            while (keys.hasMoreElements()) {
+                String key = (String) keys.nextElement();
+                call.setProperty(key, super.cachedProperties.get(key));
+            }
+            // All the type mapping information is registered
+            // when the first call is made.
+            // The type mapping information is actually registered in
+            // the TypeMappingRegistry of the service, which
+            // is the reason why registration is only needed for the first call.
+            synchronized (this) {
+                if (firstCall()) {
+                    // must set encoding style before registering serializers
+                    call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+                    call.setEncodingStyle(org.apache.axis.Constants.URI_SOAP11_ENC);
+                    for (int i = 0; i < cachedSerFactories.size(); ++i) {
+                        Class cls = (Class) cachedSerClasses.get(i);
+                        QName qName =
+                                (QName) cachedSerQNames.get(i);
+                        Object x = cachedSerFactories.get(i);
+                        if (x instanceof Class) {
+                            Class sf = (Class)
+                                 cachedSerFactories.get(i);
+                            Class df = (Class)
+                                 cachedDeserFactories.get(i);
+                            call.registerTypeMapping(cls, qName, sf, df, false);
+                        }
+                        else if (x instanceof javax.xml.rpc.encoding.SerializerFactory) {
+                            org.apache.axis.encoding.SerializerFactory sf = (org.apache.axis.encoding.SerializerFactory)
+                                 cachedSerFactories.get(i);
+                            org.apache.axis.encoding.DeserializerFactory df = (org.apache.axis.encoding.DeserializerFactory)
+                                 cachedDeserFactories.get(i);
+                            call.registerTypeMapping(cls, qName, sf, df, false);
+                        }
+                    }
+                }
+            }
+            return call;
+        }
+        catch (java.lang.Throwable t) {
+            throw new org.apache.axis.AxisFault("Failure trying to get the Call object", t);
+        }
+    }
+    
+    private ValidaStruct doValidaCall(OperationDesc operation, String actionURI, String operationName, 
+    		CredencialCIT credencial, String usuario, String password, String aplicacion) throws java.rmi.RemoteException {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call call = createCall();
+        call.setOperation(operation);
+        call.setUseSOAPAction(true);
+        call.setSOAPActionURI(actionURI);
+        call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        call.setOperationName(new QName("urn:WSAuth", operationName));
+
+        setRequestHeaders(call);
+        setAttachments(call);
+        try {        
+        	Object resp = call.invoke(new Object[] {credencial, usuario, password, aplicacion});
+        	if (resp instanceof java.rmi.RemoteException) {
+        		throw (java.rmi.RemoteException)resp;
+        	} else {
+        		extractAttachments(call);
+            	try {
+                	return (ValidaStruct) resp;
+            	} catch (Exception exception) {
+            		return (ValidaStruct) org.apache.axis.utils.JavaUtils.convert(resp, ValidaStruct.class);
+            	}
+        	}
+  		} catch (org.apache.axis.AxisFault axisFaultException) {
+	  		throw axisFaultException;
+  		}
+    }
+
+    /* (non-Javadoc)
+     * @see es.gva.cit.aplusu.security.authentication.wscit.ServerWSAuthPort#valida(es.gva.cit.aplusu.security.authentication.wscit.CredencialCIT, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public ValidaStruct valida(CredencialCIT credencial, String usuario, String password, String aplicacion) throws java.rmi.RemoteException {
+    	return doValidaCall(operations[0], "urn:WSAuth#WSAuth#valida", "valida", 
+    			credencial, usuario, password, aplicacion);
+    }
+
+    /* (non-Javadoc)
+     * @see es.gva.cit.aplusu.security.authentication.wscit.ServerWSAuthPort#valida_ldap(es.gva.cit.aplusu.security.authentication.wscit.CredencialCIT, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public ValidaStruct valida_ldap(CredencialCIT credencial, String usuario, String password, String aplicacion) throws java.rmi.RemoteException {
+       	return doValidaCall(operations[1], "urn:WSAuth#WSAuth#valida_ldap", "valida_ldap", 
+    			credencial, usuario, password, aplicacion);
+    }
+
+}

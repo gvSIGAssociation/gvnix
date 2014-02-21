@@ -44,6 +44,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+/**
+ * <b>SAFE</b> Security Provider
+ * 
+ * @author Jose Manuel Vivó ( jmvivo at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * @author Juan Carlos García ( jcgarcia at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ */
+
 @Component
 @Service
 public class SafeSecurityProvider implements SecurityProvider {
