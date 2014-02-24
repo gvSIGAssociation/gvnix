@@ -43,6 +43,8 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 
+import com.springsource.petclinic.security.authentication.wssafe.WsSafeUser;
+
 /**
  * ITD generator for {@link GvNIXPasswordHandlerSAFE} annotation.
  * 
@@ -139,6 +141,9 @@ public class SafeSecurityProviderMetadata extends
         builder.addField(getField("mapRoles", "true",
                 JavaType.BOOLEAN_PRIMITIVE, Modifier.PRIVATE));
 
+        builder.addField(getField("active", null, JavaType.BOOLEAN_PRIMITIVE,
+                Modifier.PRIVATE));
+
         // Creating getters and setters
         builder.addMethod(getGetterMethod("saltSource", new JavaType(
                 "org.springframework.security.authentication.dao.SaltSource")));
@@ -164,6 +169,8 @@ public class SafeSecurityProviderMetadata extends
                 JavaType.BOOLEAN_PRIMITIVE));
         builder.addMethod(getSetterMethod("mapRoles",
                 JavaType.BOOLEAN_PRIMITIVE));
+        builder.addMethod(getGetterMethod("active", JavaType.BOOLEAN_PRIMITIVE));
+        builder.addMethod(getSetterMethod("active", JavaType.BOOLEAN_PRIMITIVE));
 
         // Creating methods
         builder.addMethod(getAdditionalAuthenticationChecksMethod());
@@ -535,6 +542,8 @@ public class SafeSecurityProviderMetadata extends
      */
     private void buildRetrieveUserMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine("if(getActive()){");
+        bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("String presentedPassword = authentication.getCredentials().toString();");
 
@@ -767,6 +776,14 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}else{");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("WsSafeUser user = new WsSafeUser();");
+        bodyBuilder.appendFormalLine("user.setUsername(username);");
+        bodyBuilder.appendFormalLine("return user;");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
     }

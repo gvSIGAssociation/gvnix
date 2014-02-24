@@ -90,10 +90,10 @@ public final class SafeSecurityProviderMetadataProvider extends
 
     /**
      * Define the unique ITD file name extension, here the resulting file name
-     * will be **_ROO_GvNIXSecurityProviderSAFE.aj
+     * will be **_ROO_GvNIXProviderSAFE.aj
      */
     public String getItdUniquenessFilenameSuffix() {
-        return "GvNIXSecurityProviderSAFE";
+        return "GvNIXProviderSAFE";
     }
 
     protected String getGovernorPhysicalTypeIdentifier(

@@ -61,6 +61,10 @@ import org.w3c.dom.Node;
 @Service
 public class SafeSecurityProvider implements SecurityProvider {
 
+    private static final String ACTIVE_VALUE = "${security.SAFE.active}";
+
+    private static final String ACTIVE = "active";
+
     private static final String ENDPOINT_AUTORIZA_VALUE = "${wsdl.SAFEAutorizacion.location}";
 
     private static final String ENDPOINT_AUTORIZA = "endpointAutoriza";
@@ -228,6 +232,7 @@ public class SafeSecurityProvider implements SecurityProvider {
     public void addPomDependencies() {
         // Get add-on configuration file
         Element configuration = XmlUtils.getConfiguration(getClass());
+        Element buildConfiguration = XmlUtils.getRootElement(getClass(), "buildconfiguration.xml");
 
         // Install the add-on repository needed
         List<Element> repos = XmlUtils.findElements(
@@ -255,7 +260,7 @@ public class SafeSecurityProvider implements SecurityProvider {
 
         // Install Plugins
         List<Element> plugins = XmlUtils.findElements(
-                "/configuration/gvnix/build/plugins/plugin", configuration);
+                "/configuration/gvnix/build/plugins/plugin", buildConfiguration);
 
         for (Element plugin : plugins) {
             projectOperations.addBuildPlugin(
@@ -265,7 +270,7 @@ public class SafeSecurityProvider implements SecurityProvider {
 
         // Install Resources
         List<Element> resources = XmlUtils.findElements(
-                "/configuration/gvnix/build/resources/resource", configuration);
+                "/configuration/gvnix/build/resources/resource", buildConfiguration);
 
         for (Element resource : resources) {
             projectOperations.addResource(projectOperations
@@ -649,6 +654,10 @@ public class SafeSecurityProvider implements SecurityProvider {
         Element environmentProperty = document.createElement(BEANS_PROPERTY);
         environmentProperty.setAttribute(NAME_PROPERTY, ENVIRONMENT);
         environmentProperty.setAttribute(VALUE_PROPERTY, ENVIRONMENT_VALUE);
+        
+        Element activeProperty = document.createElement(BEANS_PROPERTY);
+        activeProperty.setAttribute(NAME_PROPERTY, ACTIVE);
+        activeProperty.setAttribute(VALUE_PROPERTY, ACTIVE_VALUE);
 
         newSafeBeans.appendChild(endPointProperty);
         newSafeBeans.appendChild(endPointAutorizaProperty);
@@ -656,6 +665,7 @@ public class SafeSecurityProvider implements SecurityProvider {
         newSafeBeans.appendChild(saltSourceProperty);
         newSafeBeans.appendChild(applicationIdProperty);
         newSafeBeans.appendChild(environmentProperty);
+        newSafeBeans.appendChild(activeProperty);
 
         parent.appendChild(newSafeBeans);
 
@@ -710,6 +720,7 @@ public class SafeSecurityProvider implements SecurityProvider {
         log.log(Level.INFO, "    - security.SAFE.keystore.password");
         log.log(Level.INFO, "    - security.SAFE.keystore.type.keystore");
         log.log(Level.INFO, "    - security.SAFE.mapRoles");
+        log.log(Level.INFO, "    - security.SAFE.active");
         log.log(Level.INFO, "    - wsdl.SAFE.location");
         log.log(Level.INFO, "    - wsdl.SAFEAutorizacion.location");
         log.log(Level.INFO, "");

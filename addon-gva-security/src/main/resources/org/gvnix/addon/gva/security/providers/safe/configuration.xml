@@ -15,7 +15,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>org.gvnix</groupId>
-				<artifactId>org.gvnix.gva.security.addon</artifactId>
+				<artifactId>org.gvnix.addon.gva.security</artifactId>
 				<version>${gvnix.version}</version>
 				<type>jar</type>
 				<scope>provided</scope>
@@ -42,97 +42,5 @@
 				<version>${cxf.version}</version>
 			</dependency>
 		</dependencies>
-		<build>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.cxf</groupId>
-					<artifactId>cxf-java2ws-plugin</artifactId>
-					<version>${cxf.version}</version>
-					<dependencies>
-						<dependency>
-							<groupId>org.apache.cxf</groupId>
-							<artifactId>cxf-rt-frontend-jaxws</artifactId>
-							<version>${cxf.version}</version>
-						</dependency>
-						<dependency>
-							<groupId>org.apache.cxf</groupId>
-							<artifactId>cxf-rt-frontend-simple</artifactId>
-							<version>${cxf.version}</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.cxf</groupId>
-					<artifactId>cxf-codegen-plugin</artifactId>
-					<version>${cxf.version}</version>
-					<executions>
-						<execution>
-							<id>AutenticacionArangiService</id>
-							<phase>generate-sources</phase>
-							<goals>
-								<goal>wsdl2java</goal>
-							</goals>
-							<configuration>
-								<sourceRoot>${basedir}/target/generated-sources/client
-								</sourceRoot>
-								<defaultOptions>
-									<extendedSoapHeaders>true</extendedSoapHeaders>
-									<autoNameResolution>true</autoNameResolution>
-								</defaultOptions>
-								<wsdlOptions>
-									<wsdlOption>
-										<wsdl>${wsdl.AutenticacionArangiService}</wsdl>
-										<packagenames>
-											<packagename>es.gva.dgm.ayf.war.definitions.v2u00
-											</packagename>
-										</packagenames>
-									</wsdlOption>
-								</wsdlOptions>
-							</configuration>
-						</execution>
-						<execution>
-							<id>AutorizacionService</id>
-							<phase>generate-sources</phase>
-							<goals>
-								<goal>wsdl2java</goal>
-							</goals>
-							<configuration>
-								<sourceRoot>${basedir}/target/generated-sources/client
-								</sourceRoot>
-								<defaultOptions>
-									<extendedSoapHeaders>true</extendedSoapHeaders>
-									<autoNameResolution>true</autoNameResolution>
-								</defaultOptions>
-								<wsdlOptions>
-									<wsdlOption>
-										<wsdl>${wsdl.AutorizacionService}</wsdl>
-										<packagenames>
-											<packagename>es.gva.dgm.ayf.war.definitions.v2u00
-											</packagename>
-										</packagenames>
-									</wsdlOption>
-								</wsdlOptions>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
-			<resources>
-				<resource>
-					<directory>src/main/resources</directory>
-					<excludes>
-						<exclude>**/*.properties</exclude>
-					</excludes>
-					<filtering>false</filtering>
-				</resource>
-				<resource>
-					<directory>src/main/resources</directory>
-					<includes>
-						<include>**/*.properties</include>
-					</includes>
-					<filtering>true</filtering>
-				</resource>
-			</resources>
-		</build>
 	</gvnix>
 </configuration>
