@@ -1018,7 +1018,7 @@ public class SafeSecurityProviderMetadata extends
                 "loader = %s.currentThread().getContextClassLoader();",
                 helper.getFinalTypeName(new JavaType("java.lang.Thread"))));
         bodyBuilder
-                .appendFormalLine("stream = loader.getResourceAsStream(\"safe_client.properties\");");
+                .appendFormalLine("stream = loader.getResourceAsStream(\"safe_client_roles.properties\");");
         bodyBuilder.appendFormalLine("try {");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("prop.load(stream);");

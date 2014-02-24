@@ -61,6 +61,8 @@ import org.w3c.dom.Node;
 @Service
 public class SafeSecurityProvider implements SecurityProvider {
 
+    private static final String SAFE_CLIENT_ROLES_PROPERTIES = "safe_client_roles.properties";
+
     private static final String ACTIVE_VALUE = "${security.SAFE.active}";
 
     private static final String ACTIVE = "active";
@@ -498,8 +500,11 @@ public class SafeSecurityProvider implements SecurityProvider {
         final String propertiesFile = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES, SAFE_PROPERTIES_PATH);
 
-        final String rolesPropertiesFile = pathResolver.getFocusedIdentifier(
+        final String dynamicPropertiesFile = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES, SAFE_CLIENT_PROPERTIES);
+        
+        final String rolesPropertiesFile = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_RESOURCES, SAFE_CLIENT_ROLES_PROPERTIES);
 
         if (!fileManager.exists(propertiesFile)) {
             InputStream inputStream = null;
@@ -520,12 +525,31 @@ public class SafeSecurityProvider implements SecurityProvider {
             }
         }
 
-        if (!fileManager.exists(rolesPropertiesFile)) {
+        if (!fileManager.exists(dynamicPropertiesFile)) {
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {
                 inputStream = FileUtils.getInputStream(getClass(),
                         SAFE_CLIENT_PROPERTIES);
+                outputStream = fileManager.createFile(dynamicPropertiesFile)
+                        .getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            }
+            catch (final IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
+        
+        if (!fileManager.exists(rolesPropertiesFile)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = FileUtils.getInputStream(getClass(),
+                        SAFE_CLIENT_ROLES_PROPERTIES);
                 outputStream = fileManager.createFile(rolesPropertiesFile)
                         .getOutputStream();
                 IOUtils.copy(inputStream, outputStream);
