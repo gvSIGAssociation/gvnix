@@ -43,8 +43,6 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 
-import com.springsource.petclinic.security.authentication.wssafe.WsSafeUser;
-
 /**
  * ITD generator for {@link GvNIXPasswordHandlerSAFE} annotation.
  * 
