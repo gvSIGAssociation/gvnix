@@ -779,7 +779,7 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}else{");
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("WsSafeUser user = new WsSafeUser();");
+        bodyBuilder.appendFormalLine("SafeUser user = new SafeUser();");
         bodyBuilder.appendFormalLine("user.setUsername(username);");
         bodyBuilder.appendFormalLine("return user;");
         bodyBuilder.indentRemove();
