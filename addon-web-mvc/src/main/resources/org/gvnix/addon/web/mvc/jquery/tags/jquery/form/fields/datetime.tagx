@@ -58,8 +58,8 @@
         <spring:escapeBody javaScriptEscape="true">${field_invalid}</spring:escapeBody>
       </c:set>
       <c:set var="sec_dateTimePattern">
-        <spring:escapeBody javaScriptEscape="true">${dateTimePattern}</spring:escapeBody>
-      </c:set>
+		<spring:escapeBody htmlEscape="false" javaScriptEscape="false">${dateTimePattern}</spring:escapeBody>
+	  </c:set>
 
       <div class="controls">
       <c:choose>
