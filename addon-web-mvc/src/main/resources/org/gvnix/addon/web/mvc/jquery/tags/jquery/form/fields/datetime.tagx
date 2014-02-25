@@ -52,10 +52,10 @@
       </c:choose>
 
       <c:set var="sec_field_validation">
-        <spring:escapeBody javaScriptEscape="true">${field_validation}</spring:escapeBody>
+        <spring:escapeBody htmlEscape="false" javaScriptEscape="false">${field_validation}</spring:escapeBody>
       </c:set>
       <c:set var="sec_field_invalid">
-        <spring:escapeBody javaScriptEscape="true">${field_invalid}</spring:escapeBody>
+        <spring:escapeBody htmlEscape="false" javaScriptEscape="false">${field_invalid}</spring:escapeBody>
       </c:set>
       <c:set var="sec_dateTimePattern">
 		<spring:escapeBody htmlEscape="false" javaScriptEscape="false">${dateTimePattern}</spring:escapeBody>

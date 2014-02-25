@@ -72,7 +72,7 @@
       </c:choose>
 
       <c:set var="sec_field_validation">
-        <spring:escapeBody javaScriptEscape="true">${field_validation}</spring:escapeBody>
+        <spring:escapeBody htmlEscape="false" javaScriptEscape="false">${field_validation}</spring:escapeBody>
       </c:set>
       <c:set var="sec_field_invalid">
         <spring:escapeBody javaScriptEscape="true" htmlEscape="true">${field_invalid}</spring:escapeBody>
