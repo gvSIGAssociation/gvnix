@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 /**
  * Jackson {@link BeanDeserializerModifier} which return
  * {@link DataBinderDeserializer}.
- *
+ * 
  * @author gvNIX Team
  * @since TODO: Class version
  */

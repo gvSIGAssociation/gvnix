@@ -234,7 +234,8 @@ public class SafeSecurityProvider implements SecurityProvider {
     public void addPomDependencies() {
         // Get add-on configuration file
         Element configuration = XmlUtils.getConfiguration(getClass());
-        Element buildConfiguration = XmlUtils.getRootElement(getClass(), "buildconfiguration.xml");
+        Element buildConfiguration = XmlUtils.getRootElement(getClass(),
+                "buildconfiguration.xml");
 
         // Install the add-on repository needed
         List<Element> repos = XmlUtils.findElements(
@@ -261,8 +262,9 @@ public class SafeSecurityProvider implements SecurityProvider {
                 projectOperations, depens);
 
         // Install Plugins
-        List<Element> plugins = XmlUtils.findElements(
-                "/configuration/gvnix/build/plugins/plugin", buildConfiguration);
+        List<Element> plugins = XmlUtils
+                .findElements("/configuration/gvnix/build/plugins/plugin",
+                        buildConfiguration);
 
         for (Element plugin : plugins) {
             projectOperations.addBuildPlugin(
@@ -272,7 +274,8 @@ public class SafeSecurityProvider implements SecurityProvider {
 
         // Install Resources
         List<Element> resources = XmlUtils.findElements(
-                "/configuration/gvnix/build/resources/resource", buildConfiguration);
+                "/configuration/gvnix/build/resources/resource",
+                buildConfiguration);
 
         for (Element resource : resources) {
             projectOperations.addResource(projectOperations
@@ -502,7 +505,7 @@ public class SafeSecurityProvider implements SecurityProvider {
 
         final String dynamicPropertiesFile = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES, SAFE_CLIENT_PROPERTIES);
-        
+
         final String rolesPropertiesFile = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES, SAFE_CLIENT_ROLES_PROPERTIES);
 
@@ -543,7 +546,7 @@ public class SafeSecurityProvider implements SecurityProvider {
                 IOUtils.closeQuietly(outputStream);
             }
         }
-        
+
         if (!fileManager.exists(rolesPropertiesFile)) {
             InputStream inputStream = null;
             OutputStream outputStream = null;
@@ -678,7 +681,7 @@ public class SafeSecurityProvider implements SecurityProvider {
         Element environmentProperty = document.createElement(BEANS_PROPERTY);
         environmentProperty.setAttribute(NAME_PROPERTY, ENVIRONMENT);
         environmentProperty.setAttribute(VALUE_PROPERTY, ENVIRONMENT_VALUE);
-        
+
         Element activeProperty = document.createElement(BEANS_PROPERTY);
         activeProperty.setAttribute(NAME_PROPERTY, ACTIVE);
         activeProperty.setAttribute(VALUE_PROPERTY, ACTIVE_VALUE);
