@@ -25,7 +25,7 @@ Arquitectura de la solución
 =============================
 
 * Será necesario añadir los campos a la entidad para que sean persistidos.
-* Para actualizar los datos de los campos se usará un *listeners* de JPA.
+* Para actualizar los datos de los campos se usará un *listener* de JPA.
 * El *listener* será una clase generada para la propia entidad
 
 
@@ -41,11 +41,11 @@ En un proyecto con la presistencia configurada se ejecutará el siguiente comand
 
    gvNIX> jpa audit add --name ~.domain.Visit
 
-Esto probocará los siguientes cambios:
+Esto provocará los siguientes cambios:
 
 #. Se añadirá una anotación ``@GvNIXAudit`` en la entidad ``Visit``
 
-   * Esto genrará una fichero ``.aj`` en el que se deninirá las propiedades, getters y setters para los valores de auditoría:
+   * Esto generará una fichero ``.aj`` en el que se definirán las propiedades, getters y setters para los valores de auditoría:
 
      - Fecha de creación
      - Usuario de creación
@@ -97,7 +97,7 @@ Gestión de registro de listeners JPA
 
 El mecanismo se implementará dentro del add-on JPA de gvNIX.
 
-Consistirá en un ``MetadataListener`` (``JpaOrmEntityListenerMetadataListener``), al estilo de ``JspMetadatListener``, pero con la peculariedad de que el registro de las dependencias entre el ``MetadaListener`` y el metadata que que probocará su ejecución se realizará a traves de un ``JpaOrmEntityListenerRegistry``, que será llamado por el ``MetadataProvider`` del add-on que genere el listener de JPA en el momento de su activación. 
+Consistirá en un ``MetadataListener`` (``JpaOrmEntityListenerMetadataListener``), al estilo de ``JspMetadataListener``, pero con la peculariedad de que el registro de las dependencias entre el ``MetadataListener`` y el metadata que provocará su ejecución se realizará a traves de un ``JpaOrmEntityListenerRegistry``, que será llamado por el ``MetadataProvider`` del add-on que genere el listener de JPA en el momento de su activación. 
 
 En el momento de registro, los ``MetadataProvider`` deben poder establecer una prioridad de ejecución. Esta prioridad se definirá usando los identificadores base de los ``Metadata`` a traves de un método ``setListenerOrder(String idBefor, String idAfter)``.
 
@@ -105,19 +105,19 @@ Además, el ``Metadata`` del listener de JPA **deberá implementar un interface 
 
 Al lanzarse el ``Metadata`` del listener de JPA, el ``JpaOrmEntityListenerMetadata`` se encargará de:
 
-* Comprobar que exite el fichero *orm.xml*, sino crearlo
-* Búscar el *tag* de la entidad indicada por el ``Metadata``, sino crearlo
-* Cargar la lista de listeners
-* Comprueba que todas las clases existen, sino las elimina
-* Comprueba si está registrado el listener indicado por el ``Metadata``, sino lo añade
-* Ordena la lista de listeners según la dependencia indicada en el registro
-* Actualiza la lista de listener en el *tag* de la entidad
-* Graba el *orm.xml*
+* Comprobar que existe el fichero *orm.xml*, sino crearlo.
+* Búscar el *tag* de la entidad indicada por el ``Metadata``, sino crearlo.
+* Cargar la lista de listeners.
+* Comprueba que todas las clases existen, sino las elimina.
+* Comprueba si está registrado el listener indicado por el ``Metadata``, sino lo añade.
+* Ordena la lista de listeners según la dependencia indicada en el registro.
+* Actualiza la lista de listener en el *tag* de la entidad.
+* Graba el *orm.xml*.
 
 Implementación del propio add-on
 '''''''''''''''''''''''''''''''''
 
-La implementación del add tendrá los diguientes componentes:
+La implementación del add tendrá los siguientes componentes:
 
 * Commands:
 
@@ -151,7 +151,7 @@ La implementación del add tendrá los diguientes componentes:
 
   - Debe comprobar que la entidad referida está anotada con ``GvNIXAudit``.
 
-  - En su activación deberá registrar la denpendencia en ``JpaOrmEntityListenerRegistry``
+  - En su activación deberá registrar la dependencia en ``JpaOrmEntityListenerRegistry``
 
 Otras tareas
 ==============
