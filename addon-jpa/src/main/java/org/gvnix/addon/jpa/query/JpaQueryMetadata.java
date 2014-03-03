@@ -158,7 +158,7 @@ public class JpaQueryMetadata extends
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
 
-        this.helper = new ItdBuilderHelper(this,
+        this.helper = new ItdBuilderHelper(this, governorPhysicalTypeMetadata,
                 builder.getImportRegistrationResolver());
 
         // Prepare fields Map ordered by name

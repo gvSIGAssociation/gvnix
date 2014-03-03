@@ -1,0 +1,4 @@
+script --file multimodule.roo
+jpa gvnix setup
+security setup
+jpa audit all

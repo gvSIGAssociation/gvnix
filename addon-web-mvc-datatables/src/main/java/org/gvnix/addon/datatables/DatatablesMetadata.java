@@ -310,6 +310,7 @@ public class DatatablesMetadata extends
         this.annotationValues = annotationValues;
 
         this.helper = new WebItdBuilderHelper(this,
+                governorPhysicalTypeMetadata,
                 builder.getImportRegistrationResolver());
 
         // Roo only uses one property

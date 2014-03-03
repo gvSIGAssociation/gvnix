@@ -1,0 +1,81 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ */
+package org.gvnix.addon.jpa.audit;
+
+import org.springframework.roo.model.JavaPackage;
+import org.springframework.roo.model.JavaType;
+
+/**
+ * <code>jpa audit</code> operations. Manages basic audition information in
+ * entities (creation/last-update date and user).
+ * <p/>
+ * Audition data is managed using <em>JPA Entity Listeners</em>
+ * 
+ * @author gvNIX Team
+ * @since 1.3.0
+ */
+public interface JpaAuditOperations {
+
+    /**
+     * Indicate commands should be available
+     * 
+     * @return true if it should be available, otherwise false
+     */
+    boolean isCommandAvailable();
+
+    /**
+     * Enables audition on selected entity
+     * <p/>
+     * If <code>target</code> is not defined, the new class will be create from
+     * <code>entity</code> name adding <code>AuditListener</code> suffix, in the
+     * same package of <code>entity</code>.
+     * <p/>
+     * If <code>entity</code> already is configure throws an exception.
+     * 
+     * @param target (optional) class to create
+     * @param entity JPA Active-Record entity to manage
+     */
+    void create(JavaType entity, JavaType target);
+
+    /**
+     * Enables audition on every JPA Active-Record entity in current
+     * application. <br>
+     * The new classes will be create from <code>entity</code> name adding
+     * <code>AuditListener</code> suffix. If <code>targetPackage</code> is not
+     * defined, generated classes in the same package of <code>entity</code>.
+     * 
+     * @param targetPackage (optional)
+     */
+    void createAll(JavaPackage targetPackage);
+
+    /**
+     * Enables audition on selected entity
+     * <p/>
+     * If <code>target</code> is not defined, the new class will be create from
+     * <code>entity</code> name adding <code>AuditListener</code> suffix, in the
+     * same package of <code>entity</code>.
+     * 
+     * If <code>entity</code> already is configure and
+     * <code>failIfAlreadySet</code> throws an exception.
+     * 
+     * @param entity
+     * @param target
+     * @param failIfAlreadySet or not
+     */
+    void create(JavaType entity, JavaType target, boolean failIfAlreadySet);
+}
