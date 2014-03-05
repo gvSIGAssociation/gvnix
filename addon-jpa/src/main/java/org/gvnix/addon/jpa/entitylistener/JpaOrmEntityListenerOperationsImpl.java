@@ -86,7 +86,7 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
             String sourceMetadataProvider) {
 
         // Load xml file
-        Pair<MutableFile, Document> loadFileResult = loadOrmFile();
+        Pair<MutableFile, Document> loadFileResult = loadOrmFile(true);
         MutableFile ormXmlMutableFile = loadFileResult.getLeft();
         Document ormXml = loadFileResult.getRight();
         Element root = ormXml.getDocumentElement();
@@ -428,17 +428,21 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
     /**
      * Gets orm.xml path on project.
      * <p/>
-     * Creates it from add-on resources if not exists.
+     * if <code>create</code> Creates it from add-on resources if not exists.
      * 
+     * @param create file if not exists
      * @return orm.xml file path
      */
-    private String getOrmXmlPath() {
+    private String getOrmXmlPath(boolean create) {
         PathResolver pathResolver = projectOperations.getPathResolver();
 
         String ormXmlPath = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
                 ORM_XML_LOCATION);
         if (!fileManager.exists(ormXmlPath)) {
+            if (!create) {
+                return null;
+            }
             InputStream ins = null;
             try {
                 ins = getClass().getResourceAsStream(ORM_XML_TEMPLATE_LOCATION);
@@ -495,7 +499,11 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
     @Override
     public void cleanUpEntityListeners(JavaType entity) {
         // Load xml file
-        Pair<MutableFile, Document> loadFileResult = loadOrmFile();
+        Pair<MutableFile, Document> loadFileResult = loadOrmFile(false);
+        if (loadFileResult == null) {
+            // orm.xml not exists: nothing to do
+            return;
+        }
         MutableFile ormXmlMutableFile = loadFileResult.getLeft();
         Document ormXml = loadFileResult.getRight();
         Element root = ormXml.getDocumentElement();
@@ -555,11 +563,17 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
     /**
      * Load the orm.xml file
      * 
+     * @param create file if not exists
+     * 
      * @return {@link MutableFile} and {@link Document}
      */
-    private Pair<MutableFile, Document> loadOrmFile() {
+    private Pair<MutableFile, Document> loadOrmFile(boolean create) {
         // Get the orm.xml path (and create it if not exists)
-        String ormXmlPath = getOrmXmlPath();
+        String ormXmlPath = getOrmXmlPath(create);
+
+        if (ormXmlPath == null) {
+            return null;
+        }
 
         // Load xml file
         MutableFile ormXmlMutableFile = null;
