@@ -39,6 +39,18 @@
   <description>JSP Tag lib which adaptes Dandelion datatables (http://dandelion.github.com/datatables) to work in gvNIX</description>
   <url>http://www.gvnix.org</url>
 
+  <repositories>
+    <repository>
+      <id>gvnix-add-on-repository</id>
+      <name>gvNIX repository</name>
+      <url>https://gvnix.googlecode.com/svn/repo</url>
+      <snapshots>
+        <updatePolicy>never</updatePolicy>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
   <dependencies>
         <dependency>
             <groupId>javax.servlet.jsp.jstl</groupId>

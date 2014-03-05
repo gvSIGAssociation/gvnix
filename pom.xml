@@ -1453,7 +1453,7 @@
     <roo.version>1.2.4.RELEASE</roo.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- DiSiD: Add google code project name -->
-    <dandelion-datatables.version>0.9.2</dandelion-datatables.version>
+    <dandelion-datatables.version>0.9.3-GVNIX</dandelion-datatables.version>
     <google.code.project.name>gvnix</google.code.project.name>
   </properties>
 </project>
