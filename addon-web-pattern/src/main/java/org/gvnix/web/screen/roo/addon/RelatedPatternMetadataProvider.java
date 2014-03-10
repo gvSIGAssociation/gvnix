@@ -18,10 +18,12 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Logger;
@@ -284,6 +286,18 @@ public final class RelatedPatternMetadataProvider extends
             SortedMap<JavaType, JavaTypeMetadataDetails> tempMap = new TreeMap<JavaType, JavaTypeMetadataDetails>(
                     relatedEntities);
             tempMap.remove(entity);
+
+            ClassOrInterfaceTypeDetails cid = null;
+
+            Set<JavaType> keySet = tempMap.keySet();
+            Iterator<JavaType> it = keySet.iterator();
+            while (it.hasNext()) {
+                JavaType type = it.next();
+                cid = typeLocationService.getTypeDetails(type);
+                if (!cid.getEnumConstants().isEmpty()) {
+                    tempMap.remove(type);
+                }
+            }
 
             return tempMap.lastKey();
 
