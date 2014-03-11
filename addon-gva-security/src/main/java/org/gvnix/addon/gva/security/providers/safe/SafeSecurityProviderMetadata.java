@@ -58,6 +58,8 @@ public class SafeSecurityProviderMetadata extends
             "convertToApplicationRol");
     private static final JavaSymbolName CONVERT_WS_METHOD = new JavaSymbolName(
             "convertWSInfoToUser");
+    private static final JavaSymbolName CONVERT_WS_TODAS_METHOD = new JavaSymbolName(
+            "convertWSInfoToUserTodasAplicaciones");
     private static final JavaSymbolName SECURITY_METHOD = new JavaSymbolName(
             "setSecurity");
     private static final JavaSymbolName RETRIEVE_USER_METHOD = new JavaSymbolName(
@@ -142,6 +144,9 @@ public class SafeSecurityProviderMetadata extends
         builder.addField(getField("active", null, JavaType.BOOLEAN_PRIMITIVE,
                 Modifier.PRIVATE));
 
+        builder.addField(getField("filtrarPorAplicacion", null,
+                JavaType.BOOLEAN_PRIMITIVE, Modifier.PRIVATE));
+
         // Creating getters and setters
         builder.addMethod(getGetterMethod("saltSource", new JavaType(
                 "org.springframework.security.authentication.dao.SaltSource")));
@@ -169,12 +174,17 @@ public class SafeSecurityProviderMetadata extends
                 JavaType.BOOLEAN_PRIMITIVE));
         builder.addMethod(getGetterMethod("active", JavaType.BOOLEAN_PRIMITIVE));
         builder.addMethod(getSetterMethod("active", JavaType.BOOLEAN_PRIMITIVE));
+        builder.addMethod(getGetterMethod("filtrarPorAplicacion",
+                JavaType.BOOLEAN_PRIMITIVE));
+        builder.addMethod(getSetterMethod("filtrarPorAplicacion",
+                JavaType.BOOLEAN_PRIMITIVE));
 
         // Creating methods
         builder.addMethod(getAdditionalAuthenticationChecksMethod());
         builder.addMethod(getRetrieveUserMethod());
         builder.addMethod(getSetSecurityMethod());
         builder.addMethod(getConvertWSInfoToUserMethod());
+        builder.addMethod(getConvertWSInfoToUserTodasAplicacionesMethod());
         builder.addMethod(getConvertToApplicationRolMethod());
         builder.addMethod(getGetSafePropertiesMethod());
 
@@ -385,6 +395,64 @@ public class SafeSecurityProviderMetadata extends
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PRIVATE, CONVERT_WS_METHOD, new JavaType(
                         "SafeUser"), parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>convertWSInfoToUserTodasAplicaciones</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getConvertWSInfoToUserTodasAplicacionesMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(
+                        new JavaType(
+                                "es.gva.dgm.ayf.war.definitions.v2u00.GetInformacionWSResponse"),
+                        JavaType.STRING,
+                        new JavaType(
+                                "java.util.List",
+                                0,
+                                DataType.TYPE,
+                                null,
+                                Arrays.asList(new JavaType(
+                                        "es.gva.dgm.ayf.war.definitions.v2u00.Permiso"))));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(CONVERT_WS_TODAS_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName("userFromWS"));
+        parameterNames.add(new JavaSymbolName("username"));
+        parameterNames.add(new JavaSymbolName("listPermisos"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildConvertWSInfoToUserTodasAplicacionesMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PRIVATE, CONVERT_WS_TODAS_METHOD,
+                new JavaType("SafeUser"), parameterTypes, parameterNames,
                 bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
@@ -628,24 +696,57 @@ public class SafeSecurityProviderMetadata extends
                 .appendFormalLine(".getInformacionWS(getInformacionWSRequest);");
         bodyBuilder.indentRemove();
 
-        // RetornaAutorizacionWSRequest retornaUsuApliAut = new
-        // RetornaAutorizacionWSRequest();
+        bodyBuilder
+                .appendFormalLine("// Checking if is necessary filter by applicationId");
+        bodyBuilder.appendFormalLine("");
+
+        // RetornaAutorizacionWSRequest retornaUsuApliAut = null;
+        // RetornaTodasAutorizacionesDNIWSRequest retornaTodasAut = null;
         bodyBuilder
                 .appendFormalLine(String.format(
-                        "%s retornaUsuApliAut = new %s();",
-                        helper.getFinalTypeName(new JavaType(
-                                "es.gva.dgm.ayf.war.definitions.v2u00.RetornaAutorizacionWSRequest")),
+                        "%s retornaUsuApliAut = null;",
                         helper.getFinalTypeName(new JavaType(
                                 "es.gva.dgm.ayf.war.definitions.v2u00.RetornaAutorizacionWSRequest"))));
+        bodyBuilder
+                .appendFormalLine(String.format(
+                        "%s retornaTodasAut = null;",
+                        helper.getFinalTypeName(new JavaType(
+                                "es.gva.dgm.ayf.war.definitions.v2u00.RetornaTodasAutorizacionesDNIWSRequest"))));
+
+        // if(getFiltrarPorAplicacion()){
+        bodyBuilder.appendFormalLine("if(getFiltrarPorAplicacion()){");
+        bodyBuilder.indent();
+
+        // retornaUsuApliAut = new RetornaAutorizacionWSRequest();
+        // String applicationId = getApplicationId();
+        // retornaUsuApliAut.setIdAplicacion(applicationId);
+        // retornaUsuApliAut.setUsuarioHDFI(getInformacionWSResponse.getIdHDFI())
+        bodyBuilder
+                .appendFormalLine("retornaUsuApliAut = new RetornaAutorizacionWSRequest();");
         bodyBuilder
                 .appendFormalLine("String applicationId = getApplicationId();");
         bodyBuilder
                 .appendFormalLine("retornaUsuApliAut.setIdAplicacion(applicationId);");
         bodyBuilder
-                .appendFormalLine("retornaUsuApliAut.setUsuarioHDFI(getInformacionWSResponse");
-        bodyBuilder.indent();
-        bodyBuilder.appendFormalLine(".getIdHDFI());");
+                .appendFormalLine("retornaUsuApliAut.setUsuarioHDFI(getInformacionWSResponse.getIdHDFI());");
+
         bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}else{");
+        bodyBuilder.indent();
+
+        // retornaTodasAut = new RetornaTodasAutorizacionesDNIWSRequest();
+        // retornaTodasAut.setTipoBusqueda("ambas");
+        // retornaTodasAut.setUsuarioDNI(getInformacionWSResponse.getNif());
+
+        bodyBuilder
+                .appendFormalLine("retornaTodasAut = new RetornaTodasAutorizacionesDNIWSRequest();");
+        bodyBuilder
+                .appendFormalLine("retornaTodasAut.setTipoBusqueda(\"ambas\");");
+        bodyBuilder
+                .appendFormalLine("retornaTodasAut.setUsuarioDNI(getInformacionWSResponse.getNif());");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
 
         // AutorizacionService autorizaService = new AutorizacionService(
         bodyBuilder
@@ -682,6 +783,16 @@ public class SafeSecurityProviderMetadata extends
                                 "org.apache.cxf.frontend.ClientProxy"))));
         bodyBuilder.appendFormalLine("setSecurity(autorizaClient);");
 
+        bodyBuilder
+                .appendFormalLine("// Checking if is necessary filter by applicationId");
+        bodyBuilder.appendFormalLine("");
+
+        // SafeUser user = null;
+        bodyBuilder.appendFormalLine("SafeUser user = null;");
+
+        // if(getFiltrarPorAplicacion()){
+        bodyBuilder.appendFormalLine("if(getFiltrarPorAplicacion()){");
+        bodyBuilder.indent();
         // RetornaAutorizacionWSResponse autorizaResponse = autorizaPort
         bodyBuilder
                 .appendFormalLine(String.format(
@@ -689,6 +800,7 @@ public class SafeSecurityProviderMetadata extends
                         helper.getFinalTypeName(new JavaType(
                                 "es.gva.dgm.ayf.war.definitions.v2u00.RetornaAutorizacionWSResponse"))));
         bodyBuilder.indent();
+
         bodyBuilder
                 .appendFormalLine(".retornaAutorizacionWS(retornaUsuApliAut);");
         bodyBuilder.indentRemove();
@@ -705,10 +817,44 @@ public class SafeSecurityProviderMetadata extends
                                         Arrays.asList(new JavaType(
                                                 "es.gva.dgm.ayf.war.definitions.v2u00.Permisoapp"))))));
         bodyBuilder
-                .appendFormalLine("SafeUser user = convertWSInfoToUser(getInformacionWSResponse,");
+                .appendFormalLine("user = convertWSInfoToUser(getInformacionWSResponse,");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("username, listaPermisos);");
         bodyBuilder.indentRemove();
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}else{");
+        bodyBuilder.indent();
+        // RetornaTodasAutorizacionesDNIWSResponse autorizaResponse =
+        // autorizaPort
+        bodyBuilder
+                .appendFormalLine(String.format(
+                        "%s autorizaResponse = autorizaPort",
+                        helper.getFinalTypeName(new JavaType(
+                                "es.gva.dgm.ayf.war.definitions.v2u00.RetornaTodasAutorizacionesDNIWSResponse"))));
+        bodyBuilder.indent();
+
+        bodyBuilder
+                .appendFormalLine(".retornaTodasAutorizacionesDNIWS(retornaTodasAut);");
+        bodyBuilder.indentRemove();
+
+        // List<Permiso> listaPermisos = autorizaResponse.getLista();
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("%s listaPermisos = autorizaResponse.getLista();",
+                                helper.getFinalTypeName(new JavaType(
+                                        "java.util.List",
+                                        0,
+                                        DataType.TYPE,
+                                        null,
+                                        Arrays.asList(new JavaType(
+                                                "es.gva.dgm.ayf.war.definitions.v2u00.Permiso"))))));
+        bodyBuilder
+                .appendFormalLine("user = convertWSInfoToUserTodasAplicaciones(getInformacionWSResponse,");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("username, listaPermisos);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
 
         // Object salt = null;
         bodyBuilder.appendFormalLine(String.format("%s salt = null;",
@@ -985,6 +1131,122 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder
                 .appendFormalLine("usAuth.setUsrtipo(permisoApp.getUsrtipo());");
         bodyBuilder.appendFormalLine("usAuth.setIdrol(permisoApp.getIdrol());");
+        bodyBuilder.appendFormalLine("authorities.add(usAuth);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine("user.setAuthorities(authorities);");
+        bodyBuilder.appendFormalLine("return user;");
+
+    }
+
+    /**
+     * Builds body method for <code>convertWSInfoToUserTodasAplicaciones</code>
+     * method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildConvertWSInfoToUserTodasAplicacionesMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine("SafeUser user = new SafeUser();");
+        bodyBuilder.appendFormalLine("user.setNombre(userFromWS.getNombre());");
+        bodyBuilder.appendFormalLine("user.setEmail(userFromWS.getEmail());");
+        bodyBuilder
+                .appendFormalLine("user.setApellido1(userFromWS.getApellido1());");
+        bodyBuilder
+                .appendFormalLine("user.setApellido2(userFromWS.getApellido2());");
+        bodyBuilder.appendFormalLine("user.setCif(userFromWS.getCif());");
+        bodyBuilder
+                .appendFormalLine("user.setHabilitado(userFromWS.getHabilitado());");
+        bodyBuilder.appendFormalLine("user.setIdHDFI(userFromWS.getIdHDFI());");
+        bodyBuilder
+                .appendFormalLine("user.setIusserDN(userFromWS.getIssuerDN());");
+        bodyBuilder.appendFormalLine("user.setNif(userFromWS.getNif());");
+        bodyBuilder.appendFormalLine("user.setOid(userFromWS.getOid());");
+        bodyBuilder
+                .appendFormalLine("user.setRazonSocial(userFromWS.getRazonSocial());");
+        bodyBuilder
+                .appendFormalLine("user.setRepresentante(userFromWS.getRepresentante());");
+        bodyBuilder
+                .appendFormalLine("user.setSerialNumber(userFromWS.getSerialNumber());");
+        bodyBuilder
+                .appendFormalLine("user.setSubjectDN(userFromWS.getSubjectDN());");
+        bodyBuilder
+                .appendFormalLine("user.setTipoAut(userFromWS.getTipoAut());");
+        bodyBuilder
+                .appendFormalLine("user.setTipoCertificado(userFromWS.getTipoCertificado());");
+        bodyBuilder.appendFormalLine("// Spring Security User info");
+        bodyBuilder.appendFormalLine("user.setUsername(username);");
+        bodyBuilder
+                .appendFormalLine("user.setAccountNonExpired(true); // Status info");
+        bodyBuilder
+                .appendFormalLine("user.setAccountNonLocked(true);// Status info");
+        bodyBuilder
+                .appendFormalLine("user.setCredentialsNonExpired(true); // Status info");
+        bodyBuilder.appendFormalLine("user.setEnabled(true);// Status info");
+        bodyBuilder.appendFormalLine("// Roles");
+        bodyBuilder.appendFormalLine("if (listPermisos == null) {");
+        bodyBuilder.indent();
+
+        // throw new BadCredentialsException(
+        bodyBuilder
+                .appendFormalLine(String.format(
+                        "throw new %s(",
+                        helper.getFinalTypeName(new JavaType(
+                                "org.springframework.security.authentication.BadCredentialsException"))));
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("\" El usuario proporcionado no tiene módulos asignados\");");
+        bodyBuilder.indentRemove();
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+        bodyBuilder
+                .appendFormalLine(String.format(
+                        "%s<%s> authorities = new %s<%s>();",
+                        helper.getFinalTypeName(new JavaType("java.util.Set")),
+                        helper.getFinalTypeName(new JavaType(
+                                "org.springframework.security.core.GrantedAuthority")),
+                        helper.getFinalTypeName(new JavaType(
+                                "java.util.HashSet")),
+                        helper.getFinalTypeName(new JavaType(
+                                "org.springframework.security.core.GrantedAuthority"))));
+
+        // Iterator<Permiso> iter = listPermisos.iterator();
+        bodyBuilder.appendFormalLine(String.format(
+                "%s<%s> iter = listPermisos.iterator();", helper
+                        .getFinalTypeName(new JavaType("java.util.Iterator")),
+                helper.getFinalTypeName(new JavaType(
+                        "es.gva.dgm.ayf.war.definitions.v2u00.Permiso"))));
+        bodyBuilder.appendFormalLine("while (iter.hasNext()) {");
+        bodyBuilder.indent();
+
+        // Permisoapp permisoApp = iter.next();
+        bodyBuilder.appendFormalLine(String.format("%s permiso = iter.next();",
+                helper.getFinalTypeName(new JavaType(
+                        "es.gva.dgm.ayf.war.definitions.v2u00.Permiso"))));
+        bodyBuilder
+                .appendFormalLine("String rolUsu = convertToApplicationRol(permiso.getIdgrupo());");
+        bodyBuilder.appendFormalLine("if (rolUsu != null) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("String[] roles = rolUsu.split(\",\");");
+        bodyBuilder.appendFormalLine("for(int i = 0;i < roles.length;i++){");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("SafeUserAuthority usAuth = new SafeUserAuthority();");
+        bodyBuilder.appendFormalLine("usAuth.setAuthority(roles[i]);");
+        bodyBuilder
+                .appendFormalLine("usAuth.setIdgrupo(permiso.getIdgrupo());");
+        bodyBuilder
+                .appendFormalLine("usAuth.setIdaplicacion(permiso.getIdaplicacion());");
+        bodyBuilder.appendFormalLine("usAuth.setNif(userFromWS.getNif());");
+        bodyBuilder
+                .appendFormalLine("usAuth.setUsrtipo(permiso.getUsrtipo());");
+        bodyBuilder.appendFormalLine("usAuth.setIdrol(permiso.getIdrol());");
         bodyBuilder.appendFormalLine("authorities.add(usAuth);");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");

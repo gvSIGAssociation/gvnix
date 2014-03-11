@@ -61,6 +61,10 @@ import org.w3c.dom.Node;
 @Service
 public class SafeSecurityProvider implements SecurityProvider {
 
+    private static final String POR_APLICACION_VALUE = "${security.SAFE.autorizacion.poraplicacion}";
+
+    private static final String POR_APLICACION = "filtrarPorAplicacion";
+
     private static final String AUTORIZACION_PATH = "AutorizacionHDFI_v1_00.xml";
 
     private static final String AUTENTICACION_PATH = "AutenticacionArangi_v1_00.xml";
@@ -747,6 +751,11 @@ public class SafeSecurityProvider implements SecurityProvider {
         activeProperty.setAttribute(NAME_PROPERTY, ACTIVE);
         activeProperty.setAttribute(VALUE_PROPERTY, ACTIVE_VALUE);
 
+        Element porAplicacionProperty = document.createElement(BEANS_PROPERTY);
+        porAplicacionProperty.setAttribute(NAME_PROPERTY, POR_APLICACION);
+        porAplicacionProperty
+                .setAttribute(VALUE_PROPERTY, POR_APLICACION_VALUE);
+
         newSafeBeans.appendChild(endPointProperty);
         newSafeBeans.appendChild(endPointAutorizaProperty);
         newSafeBeans.appendChild(passwordEncoderProperty);
@@ -754,6 +763,7 @@ public class SafeSecurityProvider implements SecurityProvider {
         newSafeBeans.appendChild(applicationIdProperty);
         newSafeBeans.appendChild(environmentProperty);
         newSafeBeans.appendChild(activeProperty);
+        newSafeBeans.appendChild(porAplicacionProperty);
 
         parent.appendChild(newSafeBeans);
 
@@ -798,22 +808,25 @@ public class SafeSecurityProvider implements SecurityProvider {
                         + " SAFE Client Properties:");
         log.log(Level.INFO,
                 "--------------------------------------------------------------------");
-
         log.log(Level.INFO,
                 "    - security.SAFE.appId  (** Application SAFE ID )");
         log.log(Level.INFO, "    - security.SAFE.environment");
         log.log(Level.INFO, "    - security.SAFE.alias.password");
         log.log(Level.INFO,
-                "    - security.SAFE.keystore.alias  (** Certificate Alias)");
+                "    - security.SAFE.keystore.alias  (** Certificate Alias to sign SAFE request)");
         log.log(Level.INFO, "    - security.SAFE.keystore.file");
         log.log(Level.INFO, "    - security.SAFE.keystore.password");
         log.log(Level.INFO, "    - security.SAFE.keystore.type.keystore");
-        log.log(Level.INFO, "    - security.SAFE.mapRoles  (** Default: true)");
-        log.log(Level.INFO, "    - security.SAFE.active  (** Default: true)");
         log.log(Level.INFO,
-                "    - wsdl.SAFE.location  (** Authentication endpoint)");
+                "    - security.SAFE.mapRoles  (** Map Roles from your application. Default: true)");
         log.log(Level.INFO,
-                "    - wsdl.SAFEAutorizacion.location  (** Authorization endpoint)");
+                "    - security.SAFE.active  (** Active or deactivate SAFE. Default: true)");
+        log.log(Level.INFO,
+                "    - security.SAFE.autorizacion.poraplicacion  (** Get Authorization Roles Filtering by applicationId. Default: true)");
+        log.log(Level.INFO,
+                "    - wsdl.SAFE.location  (** Authentication endpoint URL)");
+        log.log(Level.INFO,
+                "    - wsdl.SAFEAutorizacion.location  (** Authorization endpoint URL)");
         log.log(Level.INFO, "");
         log.log(Level.INFO,
                 "*** Use the configuration commands to set this parameters (configuration property add --name XXX)");
