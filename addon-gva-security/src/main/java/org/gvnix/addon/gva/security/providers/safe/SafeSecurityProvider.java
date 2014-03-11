@@ -61,6 +61,10 @@ import org.w3c.dom.Node;
 @Service
 public class SafeSecurityProvider implements SecurityProvider {
 
+    private static final String AUTORIZACION_PATH = "AutorizacionHDFI_v1_00.xml";
+
+    private static final String AUTENTICACION_PATH = "AutenticacionArangi_v1_00.xml";
+
     private static final String SAFE_CLIENT_ROLES_PROPERTIES = "safe_client_roles.properties";
 
     private static final String ACTIVE_VALUE = "${security.SAFE.active}";
@@ -196,6 +200,8 @@ public class SafeSecurityProvider implements SecurityProvider {
         }
         // Copying properties file
         copySafeClientPropertiesFile();
+        // Copying wsdl files
+        copySafeWSDLFiles();
         // Modifying Application Context
         modifyApplicationContext();
         // Modifying Application Context Security
@@ -568,6 +574,61 @@ public class SafeSecurityProvider implements SecurityProvider {
     }
 
     /**
+     * This method copy AutenticacionArangi_v1_00.xml and
+     * AutorizacionHDFI_v1_00.xml to ${basedir}/src/main/resources/wsdl/safe
+     * 
+     * With this files we are going to generate JAVA classes to execute
+     * WebService SAFE Methods
+     */
+    public void copySafeWSDLFiles() {
+        final String autenticacionFile = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_RESOURCES,
+                "wsdl/safe/".concat(AUTENTICACION_PATH));
+
+        final String autorizacionFile = pathResolver
+                .getFocusedIdentifier(Path.SRC_MAIN_RESOURCES,
+                        "wsdl/safe/".concat(AUTORIZACION_PATH));
+
+        if (!fileManager.exists(autenticacionFile)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = FileUtils.getInputStream(getClass(),
+                        AUTENTICACION_PATH);
+                outputStream = fileManager.createFile(autenticacionFile)
+                        .getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            }
+            catch (final IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
+
+        if (!fileManager.exists(autorizacionFile)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = FileUtils.getInputStream(getClass(),
+                        AUTORIZACION_PATH);
+                outputStream = fileManager.createFile(autorizacionFile)
+                        .getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            }
+            catch (final IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
+    }
+
+    /**
      * This method modifies the applicationContext.xml file to configure the
      * properties files that SAFE use.
      * 
@@ -737,22 +798,25 @@ public class SafeSecurityProvider implements SecurityProvider {
                         + " SAFE Client Properties:");
         log.log(Level.INFO,
                 "--------------------------------------------------------------------");
-        log.log(Level.INFO, "    - wsdl.AutenticacionArangiService");
-        log.log(Level.INFO, "    - wsdl.AutorizacionService");
-        log.log(Level.INFO, "    - security.SAFE.appId");
+
+        log.log(Level.INFO,
+                "    - security.SAFE.appId  (** Application SAFE ID )");
         log.log(Level.INFO, "    - security.SAFE.environment");
         log.log(Level.INFO, "    - security.SAFE.alias.password");
-        log.log(Level.INFO, "    - security.SAFE.keystore.alias");
+        log.log(Level.INFO,
+                "    - security.SAFE.keystore.alias  (** Certificate Alias)");
         log.log(Level.INFO, "    - security.SAFE.keystore.file");
         log.log(Level.INFO, "    - security.SAFE.keystore.password");
         log.log(Level.INFO, "    - security.SAFE.keystore.type.keystore");
-        log.log(Level.INFO, "    - security.SAFE.mapRoles");
-        log.log(Level.INFO, "    - security.SAFE.active");
-        log.log(Level.INFO, "    - wsdl.SAFE.location");
-        log.log(Level.INFO, "    - wsdl.SAFEAutorizacion.location");
+        log.log(Level.INFO, "    - security.SAFE.mapRoles  (** Default: true)");
+        log.log(Level.INFO, "    - security.SAFE.active  (** Default: true)");
+        log.log(Level.INFO,
+                "    - wsdl.SAFE.location  (** Authentication endpoint)");
+        log.log(Level.INFO,
+                "    - wsdl.SAFEAutorizacion.location  (** Authorization endpoint)");
         log.log(Level.INFO, "");
         log.log(Level.INFO,
-                "*** Use the configuration commands to set this parameters");
+                "*** Use the configuration commands to set this parameters (configuration property add --name XXX)");
         log.log(Level.INFO, "");
         log.log(Level.INFO, "");
     }

@@ -5,8 +5,6 @@ security provider add --name SAFE --package com.springsource.petclinic.security.
 
 configuration create --name dev
 
-configuration property add --name wsdl.AutenticacionArangiService 
-configuration property add --name wsdl.AutorizacionService 
 configuration property add --name wsdl.SAFE.location 
 configuration property add --name wsdl.SAFEAutorizacion.location 
 configuration property add --name security.SAFE.alias.password 
@@ -17,7 +15,7 @@ configuration property add --name security.SAFE.keystore.file
 configuration property add --name security.SAFE.keystore.password 
 configuration property add --name security.SAFE.keystore.type.keystore 
 configuration property add --name security.SAFE.mapRoles 
-
+configuration property add --name security.SAFE.active
 
 configuration export
 

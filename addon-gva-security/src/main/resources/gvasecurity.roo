@@ -16,8 +16,6 @@ configuration export
 // Se añade el proveedor SAFE al paquete indicado y se crean las clases necesarias
 security provider add --name SAFE --package com.springsource.petclinic.security.safe
 // Propiedades necesarias para el funcionamiento de SAFE
-configuration property add --name wsdl.AutenticacionArangiService 
-configuration property add --name wsdl.AutorizacionService 
 configuration property add --name wsdl.SAFE.location 
 configuration property add --name wsdl.SAFEAutorizacion.location 
 configuration property add --name security.SAFE.alias.password 
@@ -28,5 +26,6 @@ configuration property add --name security.SAFE.keystore.file
 configuration property add --name security.SAFE.keystore.password 
 configuration property add --name security.SAFE.keystore.type.keystore 
 configuration property add --name security.SAFE.mapRoles 
+configuration property add --name security.SAFE.active 
 configuration export
 hint

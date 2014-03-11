@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://dgm.gva.es/ayf/war/definitions/v2_00" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:WL5G3N3="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:WL5G3N2="http://dgm.gva.es/ayf/war/definitions/v2_00" xmlns:WL5G3N0="http://schemas.xmlsoap.org/wsdl/" xmlns:WL5G3N1="http://dgm.gva.es/ayf/war/schemas/v2_00">
+    <wsdl:types>
+        <xsd:schema elementFormDefault="qualified" targetNamespace="http://dgm.gva.es/ayf/war/schemas/v2_00" xmlns:sch="http://dgm.gva.es/ayf/war/schemas/v2_00" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://dgm.gva.es/ayf/war/schemas/v2_00" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <xsd:element name="autenticaConFirmaWSRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" name="firma" type="xsd:base64Binary"/>
+                        <xsd:element minOccurs="1" name="codigoEntidad" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="autenticaConFirmaWSResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" name="token" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getInformacionWSRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" name="token" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="getInformacionWSResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" name="serialNumber" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="issuerDN" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="subjectDN" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="nombre" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="apellido1" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="apellido2" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="nif" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="cif" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="razon_social" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="habilitado" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="representante" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="oid" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="tipo_aut" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="idHDFI" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="email" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="tipoCertificado" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="autenticaUsuarioWSRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" name="usuario" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="password" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="autenticaUsuarioWSResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" name="token" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="autenticaUsuarioLDAPWSRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" name="usuarioLDAP" type="xsd:string"/>
+                        <xsd:element minOccurs="1" name="pwdLDAP" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="autenticaUsuarioLDAPWSResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" name="token" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="autenticaUsuarioWSRequest">
+        <wsdl:part name="autenticaUsuarioWSRequest" element="WL5G3N1:autenticaUsuarioWSRequest"/>
+    </wsdl:message>
+    <wsdl:message name="autenticaUsuarioWSResponse">
+        <wsdl:part name="autenticaUsuarioWSResponse" element="WL5G3N1:autenticaUsuarioWSResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getInformacionWSRequest">
+        <wsdl:part name="getInformacionWSRequest" element="WL5G3N1:getInformacionWSRequest"/>
+    </wsdl:message>
+    <wsdl:message name="getInformacionWSResponse">
+        <wsdl:part name="getInformacionWSResponse" element="WL5G3N1:getInformacionWSResponse"/>
+    </wsdl:message>
+    <wsdl:message name="autenticaConFirmaWSRequest">
+        <wsdl:part name="autenticaConFirmaWSRequest" element="WL5G3N1:autenticaConFirmaWSRequest"/>
+    </wsdl:message>
+    <wsdl:message name="autenticaConFirmaWSResponse">
+        <wsdl:part name="autenticaConFirmaWSResponse" element="WL5G3N1:autenticaConFirmaWSResponse"/>
+    </wsdl:message>
+    <wsdl:message name="autenticaUsuarioLDAPWSRequest">
+        <wsdl:part name="autenticaUsuarioLDAPWSRequest" element="WL5G3N1:autenticaUsuarioLDAPWSRequest"/>
+    </wsdl:message>
+    <wsdl:message name="autenticaUsuarioLDAPWSResponse">
+        <wsdl:part name="autenticaUsuarioLDAPWSResponse" element="WL5G3N1:autenticaUsuarioLDAPWSResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="AutenticacionArangiPortType">
+        <wsdl:operation name="autenticaUsuarioWS">
+            <wsdl:input name="autenticaUsuarioWSRequest" message="WL5G3N2:autenticaUsuarioWSRequest"/>
+            <wsdl:output name="autenticaUsuarioWSResponse" message="WL5G3N2:autenticaUsuarioWSResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getInformacionWS">
+            <wsdl:input name="getInformacionWSRequest" message="WL5G3N2:getInformacionWSRequest"/>
+            <wsdl:output name="getInformacionWSResponse" message="WL5G3N2:getInformacionWSResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="autenticaConFirmaWS">
+            <wsdl:input name="autenticaConFirmaWSRequest" message="WL5G3N2:autenticaConFirmaWSRequest"/>
+            <wsdl:output name="autenticaConFirmaWSResponse" message="WL5G3N2:autenticaConFirmaWSResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="autenticaUsuarioLDAPWS">
+            <wsdl:input name="autenticaUsuarioLDAPWSRequest" message="WL5G3N2:autenticaUsuarioLDAPWSRequest"/>
+            <wsdl:output name="autenticaUsuarioLDAPWSResponse" message="WL5G3N2:autenticaUsuarioLDAPWSResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="AutenticacionArangiPortTypeSoap11" type="WL5G3N2:AutenticacionArangiPortType">
+        <WL5G3N3:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="autenticaUsuarioWS">
+            <WL5G3N3:operation/>
+            <wsdl:input name="autenticaUsuarioWSRequest">
+                <WL5G3N3:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="autenticaUsuarioWSResponse">
+                <WL5G3N3:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getInformacionWS">
+            <WL5G3N3:operation/>
+            <wsdl:input name="getInformacionWSRequest">
+                <WL5G3N3:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="getInformacionWSResponse">
+                <WL5G3N3:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="autenticaConFirmaWS">
+            <WL5G3N3:operation/>
+            <wsdl:input name="autenticaConFirmaWSRequest">
+                <WL5G3N3:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="autenticaConFirmaWSResponse">
+                <WL5G3N3:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="autenticaUsuarioLDAPWS">
+            <WL5G3N3:operation/>
+            <wsdl:input name="autenticaUsuarioLDAPWSRequest">
+                <WL5G3N3:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="autenticaUsuarioLDAPWSResponse">
+                <WL5G3N3:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="AutenticacionArangiService">
+        <wsdl:port name="AutenticacionArangiPortTypeSoap11" binding="WL5G3N2:AutenticacionArangiPortTypeSoap11">
+            <WL5G3N3:address location="https://preinterint.gva.es:443/eSirca_Bus/ins/Proxy/SAFE/AutenticacionArangi_v1_00"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

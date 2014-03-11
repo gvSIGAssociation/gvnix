@@ -40,7 +40,8 @@
 								</defaultOptions>
 								<wsdlOptions>
 									<wsdlOption>
-										<wsdl>${wsdl.AutenticacionArangiService}</wsdl>
+										<wsdl>${basedir}/src/main/resources/wsdl/safe/AutenticacionArangi_v1_00.xml
+										</wsdl>
 										<packagenames>
 											<packagename>es.gva.dgm.ayf.war.definitions.v2u00
 											</packagename>
@@ -64,7 +65,8 @@
 								</defaultOptions>
 								<wsdlOptions>
 									<wsdlOption>
-										<wsdl>${wsdl.AutorizacionService}</wsdl>
+										<wsdl>${basedir}/src/main/resources/wsdl/safe/AutorizacionHDFI_v1_00.xml
+										</wsdl>
 										<packagenames>
 											<packagename>es.gva.dgm.ayf.war.definitions.v2u00
 											</packagename>
