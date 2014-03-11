@@ -46,7 +46,7 @@ public class ItdSourceFileComposer {
     /**
      * Constructs an {@link ItdSourceFileComposer} containing the members that
      * were requested in the passed object.
-     * 
+     *
      * @param itdTypeDetails to construct (required)
      */
     public ItdSourceFileComposer(final ItdTypeDetails itdTypeDetails) {
@@ -205,12 +205,12 @@ public class ItdSourceFileComposer {
         }
 
         content = true;
-        
+
         appendIndent();
         append("declare precedence: ");
-        
-        List<String> aspectNames = new ArrayList<String>(aspects.size()); 
-        
+
+        List<String> aspectNames = new ArrayList<String>(aspects.size());
+
         for (final JavaType aspect : aspects) {
             if (resolver
                     .isFullyQualifiedFormRequiredAfterAutoImport(aspect)) {
@@ -438,6 +438,11 @@ public class ItdSourceFileComposer {
                 indentRemove();
             }
             this.newLine(false);
+
+            // Write out constructors
+            indent();
+            writeInnerTypeConstructors(innerType.getName(), innerType.getDeclaredConstructors(), false, false);
+            indentRemove();
 
             // Write out methods
             indent();
@@ -751,4 +756,86 @@ public class ItdSourceFileComposer {
             this.newLine();
         }
     }
+
+    private void writeInnerTypeConstructors(final JavaType innerType, final List<? extends ConstructorMetadata> constructors,
+            final boolean defineTarget, final boolean isInterfaceMethod) {
+        for (final ConstructorMetadata constructor : constructors) {
+            Validate.isTrue(
+                    constructor.getParameterTypes().size() == constructor
+                            .getParameterNames().size(),
+                    "One constructor has mismatched parameter names against parameter types");
+
+            // Append annotations
+            for (final AnnotationMetadata annotation : constructor.getAnnotations()) {
+                appendIndent();
+                outputAnnotation(annotation);
+                this.newLine(false);
+            }
+
+            // Append "<modifier> <methodName>" portion
+            appendIndent();
+            if (constructor.getModifier() != 0) {
+                append(Modifier.toString(constructor.getModifier()));
+                append(" ");
+            }
+
+            append(innerType.getSimpleTypeName());
+
+            // Append parameter types and names
+            append("(");
+            final List<AnnotatedJavaType> parameterTypes = constructor
+                    .getParameterTypes();
+            final List<JavaSymbolName> parameterNames = constructor
+                    .getParameterNames();
+            for (int i = 0; i < parameterTypes.size(); i++) {
+                final AnnotatedJavaType paramType = parameterTypes.get(i);
+                final JavaSymbolName paramName = parameterNames.get(i);
+                for (final AnnotationMetadata methodParameterAnnotation : paramType
+                        .getAnnotations()) {
+                    outputAnnotation(methodParameterAnnotation);
+                    append(" ");
+                }
+                append(paramType.getJavaType().getNameIncludingTypeParameters(
+                        false, resolver));
+                append(" ");
+                append(paramName.getSymbolName());
+                if (i < parameterTypes.size() - 1) {
+                    append(", ");
+                }
+            }
+
+            // Add exceptions to be thrown
+            final List<JavaType> throwsTypes = constructor.getThrowsTypes();
+            if (throwsTypes.size() > 0) {
+                append(") throws ");
+                for (int i = 0; i < throwsTypes.size(); i++) {
+                    append(throwsTypes.get(i).getNameIncludingTypeParameters(
+                            false, resolver));
+                    if (throwsTypes.size() > i + 1) {
+                        append(", ");
+                    }
+                }
+            }
+            else {
+                append(")");
+            }
+
+            if (isInterfaceMethod) {
+                append(";");
+            }
+            else {
+                append(" {");
+                this.newLine(false);
+
+                // Add body
+                indent();
+                append(constructor.getBody());
+                indentRemove();
+
+                appendFormalLine("}");
+            }
+            this.newLine();
+        }
+    }
+
 }
