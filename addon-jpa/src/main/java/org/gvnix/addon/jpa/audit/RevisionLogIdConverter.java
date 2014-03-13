@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
-package org.gvnix.addon.jpa.audit.providers;
+package org.gvnix.addon.jpa.audit;
 
 import java.util.List;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.addon.jpa.audit.JpaAuditCommands;
-import org.gvnix.addon.jpa.audit.JpaAuditOperations;
+import org.gvnix.addon.jpa.audit.providers.RevisionLogProvider;
+import org.gvnix.addon.jpa.audit.providers.RevisionLogProviderId;
 import org.springframework.roo.shell.Completion;
 import org.springframework.roo.shell.Converter;
 import org.springframework.roo.shell.MethodTarget;

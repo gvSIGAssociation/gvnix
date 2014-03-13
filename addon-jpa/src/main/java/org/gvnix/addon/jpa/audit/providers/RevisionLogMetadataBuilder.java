@@ -19,7 +19,6 @@ package org.gvnix.addon.jpa.audit.providers;
 
 import java.util.List;
 
-import org.gvnix.addon.jpa.audit.GvNIXJpaAudit;
 import org.gvnix.addon.jpa.audit.JpaAuditMetadata;
 import org.gvnix.addon.jpa.audit.JpaAuditMetadata.Context;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
@@ -29,8 +28,9 @@ import org.springframework.roo.model.JavaSymbolName;
 
 /**
  * Interface provider by {@link RevisionLogProvider} which produces required
- * artifacts for entities annotated with {@link GvNIXJpaAudit} to handle
- * revisionLog functionality.
+ * artifacts for entities annotated with
+ * {@link org.gvnix.addon.jpa.audit.GvNIXJpaAudit} to handle revisionLog
+ * functionality.
  * 
  * @author gvNIX Team
  * @since 1.3.0

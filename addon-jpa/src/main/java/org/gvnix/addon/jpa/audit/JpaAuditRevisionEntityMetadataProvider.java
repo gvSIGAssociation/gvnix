@@ -99,11 +99,6 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
         RevisionLogProvider logProvider = operations
                 .getActiveRevisionLogProvider();
 
-        JavaType entity = JpaAuditRevisionEntityMetadata
-                .getJavaType(metadataIdentificationString);
-        LogicalPath entityPath = JpaAuditRevisionEntityMetadata
-                .getPath(metadataIdentificationString);
-
         if (logProvider == null) {
             LOGGER.severe(String
                     .format("%s is annotated with @%s but no revisionLog provider is active.",

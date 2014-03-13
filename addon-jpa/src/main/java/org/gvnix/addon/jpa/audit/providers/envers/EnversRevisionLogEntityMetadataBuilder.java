@@ -560,7 +560,6 @@ public class EnversRevisionLogEntityMetadataBuilder implements
 
     private FieldMetadata getUserNameField() {
         if (userNameField == null) {
-            List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
             userNameField = helper
                     .getField(
                             USER_NAME_FIELD,

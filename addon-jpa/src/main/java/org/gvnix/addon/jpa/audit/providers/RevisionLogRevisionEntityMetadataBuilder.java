@@ -17,14 +17,14 @@
  */
 package org.gvnix.addon.jpa.audit.providers;
 
-import org.gvnix.addon.jpa.audit.GvNIXJpaAuditRevisionEntity;
 import org.gvnix.addon.jpa.audit.JpaAuditRevisionEntityMetadata.Context;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
 
 /**
  * Interface provider by {@link RevisionLogProvider} which produces required
- * artifacts for the entity annotated with {@link GvNIXJpaAuditRevisionEntity}
- * to handle revisionLog functionality.
+ * artifacts for the entity annotated with
+ * {@link org.gvnix.addon.jpa.audit.GvNIXJpaAuditRevisionEntity} to handle
+ * revisionLog functionality.
  * 
  * @author gvNIX Team
  * @since 1.3.0

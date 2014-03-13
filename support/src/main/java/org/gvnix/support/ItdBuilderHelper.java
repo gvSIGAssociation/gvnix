@@ -87,6 +87,7 @@ public class ItdBuilderHelper {
             this.governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
         }
         else {
+            // This metadata is invalid
             this.governorTypeDetails = null;
         }
         this.importResolver = importResolver;
@@ -166,7 +167,6 @@ public class ItdBuilderHelper {
      */
     public void buildGetterMethodBody(InvocableMemberBodyBuilder bodyBuilder,
             JavaSymbolName fieldName) {
-        // return this.auditCreation;
         bodyBuilder.appendFormalLine(String.format("return this.%s;",
                 fieldName.getSymbolName()));
     }
@@ -179,7 +179,6 @@ public class ItdBuilderHelper {
      */
     public void buildSetterMethodBody(InvocableMemberBodyBuilder bodyBuilder,
             JavaSymbolName fieldName) {
-        // this.auditCreation = auditCreation;
         bodyBuilder.appendFormalLine(String.format("this.%s = %s;",
                 fieldName.getSymbolName(), fieldName.getSymbolName()));
     }
@@ -426,10 +425,8 @@ public class ItdBuilderHelper {
         }
         if (currentField != null) {
             // No compatible field: look for new name
-            currentField = null;
             JavaSymbolName newName = new JavaSymbolName(fieldName
                     .getSymbolName().concat("_"));
-            currentField = getDeclaredField(newName);
             return getField(newName, modifiers, fieldType, annotationsRequired,
                     whenExists);
         }
@@ -523,6 +520,46 @@ public class ItdBuilderHelper {
                     new JavadocComment(StringUtils.replace(description, "\n",
                             "\n<p/>\n")), CommentLocation.BEGINNING);
         }
+        addJavaDocParams(methodBuilder, comments, parametersInfo);
+
+        if (StringUtils.isNotBlank(returnInfo)) {
+            comments.addComment(new JavadocComment(), CommentLocation.BEGINNING);
+            comments.addComment(
+                    new JavadocComment("@returns ".concat(returnInfo)),
+                    CommentLocation.BEGINNING);
+        }
+
+        addJavaDocThrows(methodBuilder, comments);
+    }
+
+    /**
+     * Adds method throws to JavaDoc
+     * 
+     * @param methodBuilder
+     * @param comments
+     */
+    private void addJavaDocThrows(MethodMetadataBuilder methodBuilder,
+            CommentStructure comments) {
+        if (!methodBuilder.getThrowsTypes().isEmpty()) {
+            comments.addComment(new JavadocComment(), CommentLocation.BEGINNING);
+            for (JavaType throwType : methodBuilder.getThrowsTypes()) {
+                comments.addComment(
+                        new JavadocComment("@throws ".concat(throwType
+                                .getSimpleTypeName())),
+                        CommentLocation.BEGINNING);
+            }
+        }
+    }
+
+    /**
+     * Adds method params to JavaDoc
+     * 
+     * @param methodBuilder
+     * @param comments
+     * @param parametersInfo
+     */
+    private void addJavaDocParams(MethodMetadataBuilder methodBuilder,
+            CommentStructure comments, String... parametersInfo) {
         StringBuilder sBuilder;
         if (!methodBuilder.getParameterNames().isEmpty()) {
             comments.addComment(new JavadocComment(), CommentLocation.BEGINNING);
@@ -537,23 +574,6 @@ public class ItdBuilderHelper {
                 comments.addComment(new JavadocComment(sBuilder.toString()),
                         CommentLocation.BEGINNING);
                 paramIndex++;
-            }
-        }
-
-        if (StringUtils.isNotBlank(returnInfo)) {
-            comments.addComment(new JavadocComment(), CommentLocation.BEGINNING);
-            comments.addComment(
-                    new JavadocComment("@returns ".concat(returnInfo)),
-                    CommentLocation.BEGINNING);
-        }
-
-        if (!methodBuilder.getThrowsTypes().isEmpty()) {
-            comments.addComment(new JavadocComment(), CommentLocation.BEGINNING);
-            for (JavaType throwType : methodBuilder.getThrowsTypes()) {
-                comments.addComment(
-                        new JavadocComment("@throws ".concat(throwType
-                                .getSimpleTypeName())),
-                        CommentLocation.BEGINNING);
             }
         }
     }
