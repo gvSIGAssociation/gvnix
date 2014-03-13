@@ -79,11 +79,6 @@ public final class SafeSecurityProviderMetadataProvider extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
 
-        JavaType javaType = SafeSecurityProviderMetadata
-                .getJavaType(metadataIdentificationString);
-        LogicalPath path = SafeSecurityProviderMetadata
-                .getPath(metadataIdentificationString);
-
         return new SafeSecurityProviderMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata);
     }
