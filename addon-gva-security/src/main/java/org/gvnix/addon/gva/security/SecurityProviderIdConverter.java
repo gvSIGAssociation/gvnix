@@ -1,14 +1,11 @@
-package org.gvnix.addon.gva.security.providers;
+package org.gvnix.addon.gva.security;
 
 import java.util.List;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.ReferenceCardinality;
-import org.apache.felix.scr.annotations.ReferencePolicy;
-import org.apache.felix.scr.annotations.ReferenceStrategy;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.addon.gva.security.SecurityProviderOperations;
+import org.gvnix.addon.gva.security.providers.SecurityProviderId;
 import org.springframework.roo.shell.Completion;
 import org.springframework.roo.shell.Converter;
 import org.springframework.roo.shell.MethodTarget;
