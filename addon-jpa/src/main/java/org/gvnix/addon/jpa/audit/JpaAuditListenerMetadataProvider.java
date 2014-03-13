@@ -49,7 +49,7 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * register metadata dependencies.
  * 
  * @author gvNIX Team
- * @since 1.1
+ * @since 1.3.0
  */
 @Component
 @Service
@@ -108,19 +108,21 @@ public final class JpaAuditListenerMetadataProvider extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
 
+        // Get annotations values
         final JpaAuditListenerAnnotationValues annotationValues = new JpaAuditListenerAnnotationValues(
                 governorPhysicalTypeMetadata);
 
+        // get target entity class details
         final JavaType targetEntity = annotationValues.getEntity();
         if (!annotationValues.isAnnotationFound() || targetEntity == null) {
             return null;
         }
-
         final MemberDetails targetEntityMemberDetails = getMemberDetails(targetEntity);
         if (targetEntityMemberDetails == null) {
             return null;
         }
 
+        // Check than target entity class is a entity
         final MemberHoldingTypeDetails targetEntityMemberHoldingTypeDetails = MemberFindingUtils
                 .getMostConcreteMemberHoldingTypeDetailsWithTag(
                         targetEntityMemberDetails, PERSISTENT_TYPE);
@@ -128,22 +130,24 @@ public final class JpaAuditListenerMetadataProvider extends
             return null;
         }
 
-        // get target entity MID
+        // get target entity class MID and Loginal path
         final String domainTypeMid = typeLocationService
                 .getPhysicalTypeIdentifier(targetEntity);
         if (domainTypeMid == null) {
             return null;
         }
-
         LogicalPath path = JpaAuditListenerMetadata
                 .getPath(metadataIdentificationString);
 
-        String auditMetadataKey = JpaAuditMetadata.createIdentifier(
-                targetEntity, path);
         // register downstream dependency (entity --> jpaAuditListener)
         metadataDependencyRegistry.registerDependency(domainTypeMid,
                 metadataIdentificationString);
 
+        // Create MID to get JpaAudit Metadata info for target entity
+        String auditMetadataKey = JpaAuditMetadata.createIdentifier(
+                targetEntity, path);
+
+        // get JpaAudit metadata of target entity
         JpaAuditMetadata auditMetadata = (JpaAuditMetadata) metadataService
                 .get(auditMetadataKey);
 
@@ -155,9 +159,11 @@ public final class JpaAuditListenerMetadataProvider extends
             return null;
         }
 
+        // Check if springSecurity is installed
         boolean isSpringSecurityInstalled = projectOperations
                 .isFeatureInstalledInFocusedModule(FeatureNames.SECURITY);
 
+        // Generate metadata
         return new JpaAuditListenerMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, annotationValues,
                 targetEntity, auditMetadata, isSpringSecurityInstalled);

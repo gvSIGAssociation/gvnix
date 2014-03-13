@@ -358,6 +358,32 @@
 	echo occ end
 
 ##
+## gvNIX jpa add-on
+##
+	
+	## jpa-audit-test
+	echo jpa-audit-test start
+	mkdir jpa-audit
+	cd jpa-audit
+	$1/gvnix.sh script --file $2/code/addon-jpa/src/test/resources/jpa-audit-test.roo --lineNumbers true
+	# Create new pet
+	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/petclinic/pets --post-data 'name=a&weight=1&type=Dog' &
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	cd ..
+	echo jpa-audit-test end
+
+	## jpa-audit-envers
+	echo jpa-audit-envers start
+	mkdir jpa-audit
+	cd jpa-audit
+	$1/gvnix.sh script --file $2/code/addon-jpa/src/test/resources/jpa-audit-envers.roo --lineNumbers true
+	# Create new pet
+	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/petclinic/pets --post-data 'name=a&weight=1&type=Dog' &
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	cd ..
+	echo jpa-audit-envers end
+
+##
 ## gvNIX pattern add-on
 ##
 	

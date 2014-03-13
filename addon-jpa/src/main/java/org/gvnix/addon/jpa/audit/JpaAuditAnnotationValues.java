@@ -17,6 +17,7 @@
  */
 package org.gvnix.addon.jpa.audit;
 
+import org.gvnix.addon.jpa.audit.GvNIXJpaAudit.StoreRevisionLog;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
@@ -25,23 +26,26 @@ import org.springframework.roo.classpath.details.annotations.populator.AutoPopul
 import org.springframework.roo.model.JavaType;
 
 /**
- * Represents a parsed {@link GvNIXJpaAuditListener} values
+ * Represents a parsed {@link GvNIXJpaAudit} values
  * 
  * @author gvNIX Team
  * @since 1.3.0
  */
-public class JpaAuditListenerAnnotationValues extends AbstractAnnotationValues {
+public class JpaAuditAnnotationValues extends AbstractAnnotationValues {
 
-    public static final JavaType JPA_AUDIT_LISTENER_ANNOTATION = new JavaType(
-            GvNIXJpaAuditListener.class);
+    public static final JavaType JPA_AUDIT_ANNOTATION = new JavaType(
+            GvNIXJpaAudit.class);
 
     @AutoPopulate
-    JavaType entity;
+    GvNIXJpaAudit.StoreRevisionLog storeRevisionLog;
 
-    public JpaAuditListenerAnnotationValues(
+    public JpaAuditAnnotationValues(
             final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {
-        super(governorPhysicalTypeDetails, JPA_AUDIT_LISTENER_ANNOTATION);
+        super(governorPhysicalTypeDetails, JPA_AUDIT_ANNOTATION);
         AutoPopulationUtils.populate(this, annotationMetadata);
+        if (storeRevisionLog == null) {
+            storeRevisionLog = StoreRevisionLog.PROVIDER_DEFAULT;
+        }
     }
 
     /**
@@ -49,16 +53,19 @@ public class JpaAuditListenerAnnotationValues extends AbstractAnnotationValues {
      * 
      * @param governorPhysicalTypeMetadata
      */
-    public JpaAuditListenerAnnotationValues(
+    public JpaAuditAnnotationValues(
             final PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-        super(governorPhysicalTypeMetadata, JPA_AUDIT_LISTENER_ANNOTATION);
+        super(governorPhysicalTypeMetadata, JPA_AUDIT_ANNOTATION);
         AutoPopulationUtils.populate(this, annotationMetadata);
+        if (storeRevisionLog == null) {
+            storeRevisionLog = StoreRevisionLog.PROVIDER_DEFAULT;
+        }
     }
 
     /**
-     * @return related entity
+     * @return RevisionLog configuration
      */
-    public JavaType getEntity() {
-        return entity;
+    public GvNIXJpaAudit.StoreRevisionLog getStoreRevisionLog() {
+        return storeRevisionLog;
     }
 }

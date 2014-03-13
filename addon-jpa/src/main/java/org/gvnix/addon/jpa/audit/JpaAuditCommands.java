@@ -20,6 +20,7 @@ package org.gvnix.addon.jpa.audit;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.jpa.audit.providers.RevisionLogProviderId;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
@@ -31,7 +32,7 @@ import org.springframework.roo.shell.CommandMarker;
  * <code>jpa audit</code> commands class
  * 
  * @author gvNIX Team
- * @since 1.1
+ * @since 1.3.0
  */
 @Component
 @Service
@@ -53,6 +54,18 @@ public class JpaAuditCommands implements CommandMarker {
     @CliAvailabilityIndicator({ "jpa audit add", "jpa audit all" })
     public boolean isCommandAvailable() {
         return operations.isCommandAvailable();
+    }
+
+    /**
+     * Informs if <code>jpa audit revisionLog</code> commands is available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator({ "jpa audit revisionLog" })
+    public boolean isProvidersAvailable() {
+        return isCommandAvailable() && operations.isProvidersAvailable()
+                && operations.getActiveRevisionLogProvider() == null;
     }
 
     /**
@@ -82,5 +95,17 @@ public class JpaAuditCommands implements CommandMarker {
     public void all(
             @CliOption(key = "package", mandatory = false, help = "package for created classes. If not set, classes will be create in the same package of managed entity") JavaPackage targetPackage) {
         operations.createAll(targetPackage);
+    }
+
+    /**
+     * Setup a revision log provider to store all changes of audited entities in
+     * DB
+     * 
+     * @param provider to use to handle revision log information
+     */
+    @CliCommand(value = "jpa audit revisionLog", help = "Enable the revision log provider for audit entity changes.")
+    public void revisionLog(
+            @CliOption(key = "provider", mandatory = false, help = "Provider to use to handle revision log information") RevisionLogProviderId provider) {
+        operations.activeRevisionLog(provider);
     }
 }

@@ -19,8 +19,10 @@ package org.gvnix.support;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
@@ -33,8 +35,12 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadataB
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
 import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
+import org.springframework.roo.classpath.details.comments.CommentStructure;
+import org.springframework.roo.classpath.details.comments.CommentStructure.CommentLocation;
+import org.springframework.roo.classpath.details.comments.JavadocComment;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
+import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.ImportRegistrationResolver;
 import org.springframework.roo.model.JavaSymbolName;
@@ -50,18 +56,29 @@ public class ItdBuilderHelper {
     protected final AbstractItdTypeDetailsProvidingMetadataItem metadata;
     protected final ImportRegistrationResolver importResolver;
     protected final ClassOrInterfaceTypeDetails governorTypeDetails;
+    protected final MemberDetails memberDetails;
+
+    public ItdBuilderHelper(
+            AbstractItdTypeDetailsProvidingMetadataItem metadata,
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            ImportRegistrationResolver importResolver) {
+        this(metadata, governorPhysicalTypeMetadata, importResolver, null);
+    }
 
     /**
      * Constructor
      * 
      * @param metadata
+     * @param governorPhysicalTypeMetadata
      * @param importResolver (usually to get use
      *        <code>builder.getImportRegistrationResolver()</code>)
+     * @param memberDetails (optional)
      */
     public ItdBuilderHelper(
             AbstractItdTypeDetailsProvidingMetadataItem metadata,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            ImportRegistrationResolver importResolver) {
+            ImportRegistrationResolver importResolver,
+            MemberDetails memberDetails) {
         this.metadata = metadata;
         final Object physicalTypeDetails = governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
@@ -73,6 +90,7 @@ public class ItdBuilderHelper {
             this.governorTypeDetails = null;
         }
         this.importResolver = importResolver;
+        this.memberDetails = memberDetails;
     }
 
     /**
@@ -171,6 +189,24 @@ public class ItdBuilderHelper {
      * <p/>
      * First, try to locate it on governor. Otherwise create it.
      * 
+     * @param filedMetadata
+     * @param aAnnotations (optional) annotation list
+     * @return
+     */
+    public MethodMetadata getGetterMethod(FieldMetadata fieldMetadata,
+            List<AnnotationMetadataBuilder> aAnnotations) {
+
+        JavaSymbolName methodName = getGetterMethodNameForField(fieldMetadata
+                .getFieldName());
+        return getGetterMethod(fieldMetadata.getFieldName(), methodName,
+                fieldMetadata.getFieldType(), aAnnotations);
+    }
+
+    /**
+     * Prepares a field-getter method.
+     * <p/>
+     * First, try to locate it on governor. Otherwise create it.
+     * 
      * @param filedName
      * @param fieldType
      * @param aAnnotations (optional) annotation list
@@ -185,7 +221,7 @@ public class ItdBuilderHelper {
 
     /**
      * @param filedName
-     * @return
+     * @return default getter name for received fieldName
      */
     public JavaSymbolName getGetterMethodNameForField(JavaSymbolName filedName) {
         JavaSymbolName methodName = new JavaSymbolName("get".concat(filedName
@@ -251,6 +287,24 @@ public class ItdBuilderHelper {
      * <p/>
      * First, try to locate it on governor. Otherwise create it.
      * 
+     * @param filedMetadata
+     * @param aAnnotations (optional) annotation list
+     * @return
+     */
+    public MethodMetadata getSetterMethod(FieldMetadata fieldMetadata,
+            List<AnnotationMetadataBuilder> aAnnotations) {
+
+        JavaSymbolName methodName = getSetterMethodNameForField(fieldMetadata
+                .getFieldName());
+        return getSetterMethod(fieldMetadata.getFieldName(), methodName,
+                fieldMetadata.getFieldType(), aAnnotations);
+    }
+
+    /**
+     * Prepares a field-setter method.
+     * <p/>
+     * First, try to locate it on governor. Otherwise create it.
+     * 
      * @param filedName
      * @param fieldType
      * @param aAnnotations (optional) annotation list
@@ -264,7 +318,7 @@ public class ItdBuilderHelper {
 
     /**
      * @param filedName
-     * @return
+     * @return default setter name for received fieldName
      */
     public JavaSymbolName getSetterMethodNameForField(JavaSymbolName filedName) {
         JavaSymbolName methodName = new JavaSymbolName("set".concat(filedName
@@ -328,6 +382,14 @@ public class ItdBuilderHelper {
         // instance
     }
 
+    /**
+     * Action to do in
+     * {@link ItdBuilderHelper#getField(JavaSymbolName, int, JavaType, List, GET_FIELD_EXISTS_ACTION)}
+     * when required field is already defined in target class
+     * 
+     * @author gvNIX Team
+     * 
+     */
     public static enum GET_FIELD_EXISTS_ACTION {
         RETURN_EXISTING, RETURN_EXISTING_IF_ANNOTATION_MATCH, CREATE_NEW_ALWAYS, THROW_ERROR
     }
@@ -343,8 +405,7 @@ public class ItdBuilderHelper {
             GET_FIELD_EXISTS_ACTION whenExists) {
         JavaSymbolName curName = fieldName;
         // Check if field exist
-        FieldMetadata currentField = governorTypeDetails
-                .getDeclaredField(curName);
+        FieldMetadata currentField = getDeclaredField(curName);
         if (currentField != null) {
             if (whenExists == GET_FIELD_EXISTS_ACTION.RETURN_EXISTING) {
                 return currentField;
@@ -368,7 +429,7 @@ public class ItdBuilderHelper {
             currentField = null;
             JavaSymbolName newName = new JavaSymbolName(fieldName
                     .getSymbolName().concat("_"));
-            currentField = governorTypeDetails.getDeclaredField(newName);
+            currentField = getDeclaredField(newName);
             return getField(newName, modifiers, fieldType, annotationsRequired,
                     whenExists);
         }
@@ -386,6 +447,26 @@ public class ItdBuilderHelper {
         return fieldBuilder.build(); // Build and return a
                                      // FieldMetadata
         // instance
+    }
+
+    /**
+     * Look in current entity definitions for a field
+     * <p/>
+     * If {@link MemberDetails} is initialized look on it.
+     * 
+     * @param curName
+     * @return
+     */
+    private FieldMetadata getDeclaredField(JavaSymbolName name) {
+        if (memberDetails == null) {
+            return governorTypeDetails.getDeclaredField(name);
+        }
+        for (FieldMetadata field : memberDetails.getFields()) {
+            if (field.getFieldName().equals(name)) {
+                return field;
+            }
+        }
+        return null;
     }
 
     /**
@@ -409,4 +490,155 @@ public class ItdBuilderHelper {
         return true;
     }
 
+    /**
+     * Adds JavaDoc metadata to a method builder
+     * 
+     * @param methodBuilder
+     * @param description (optional) main method javaDoc
+     * @param returnInfo (optional) return description
+     * @param parametersInfo (optional) description of every parameters (if it's
+     *        set must match with method parameters )
+     */
+    public void addJavaDocToMethod(MethodMetadataBuilder methodBuilder,
+            String description, String returnInfo, String... parametersInfo) {
+
+        if (parametersInfo != null
+                && parametersInfo.length > 0
+                && parametersInfo.length != methodBuilder.getParameterNames()
+                        .size()) {
+            throw new IllegalArgumentException(
+                    "Parameter names size doesn't match with parameters info.");
+        }
+
+        CommentStructure comments = methodBuilder.getCommentStructure();
+
+        if (comments == null) {
+            comments = new CommentStructure();
+            methodBuilder.setCommentStructure(comments);
+        }
+
+        if (StringUtils.isNotBlank(description)) {
+            comments.addComment(new JavadocComment(), CommentLocation.BEGINNING);
+            comments.addComment(
+                    new JavadocComment(StringUtils.replace(description, "\n",
+                            "\n<p/>\n")), CommentLocation.BEGINNING);
+        }
+        StringBuilder sBuilder;
+        if (!methodBuilder.getParameterNames().isEmpty()) {
+            comments.addComment(new JavadocComment(), CommentLocation.BEGINNING);
+            int paramIndex = 0;
+            for (JavaSymbolName paramName : methodBuilder.getParameterNames()) {
+                sBuilder = new StringBuilder("@param ");
+                sBuilder.append(paramName.getSymbolName());
+                if (parametersInfo != null
+                        && paramIndex < parametersInfo.length) {
+                    sBuilder.append(parametersInfo[paramIndex]);
+                }
+                comments.addComment(new JavadocComment(sBuilder.toString()),
+                        CommentLocation.BEGINNING);
+                paramIndex++;
+            }
+        }
+
+        if (StringUtils.isNotBlank(returnInfo)) {
+            comments.addComment(new JavadocComment(), CommentLocation.BEGINNING);
+            comments.addComment(
+                    new JavadocComment("@returns ".concat(returnInfo)),
+                    CommentLocation.BEGINNING);
+        }
+
+        if (!methodBuilder.getThrowsTypes().isEmpty()) {
+            comments.addComment(new JavadocComment(), CommentLocation.BEGINNING);
+            for (JavaType throwType : methodBuilder.getThrowsTypes()) {
+                comments.addComment(
+                        new JavadocComment("@throws ".concat(throwType
+                                .getSimpleTypeName())),
+                        CommentLocation.BEGINNING);
+            }
+        }
+    }
+
+    /**
+     * Transform a list of {@link JavaType} to a list of
+     * {@link AnnotationMetadataBuilder}
+     * 
+     * @param annotations
+     * @return
+     */
+    public List<AnnotationMetadataBuilder> toAnnotationMetadata(
+            JavaType... annotations) {
+        return toAnnotationMetadata(Arrays.asList(annotations));
+    }
+
+    /**
+     * Transform a list of {@link JavaType} to a list of
+     * {@link AnnotationMetadataBuilder}
+     * 
+     * @param annotations
+     * @return
+     */
+    public List<AnnotationMetadataBuilder> toAnnotationMetadata(
+            List<JavaType> annotations) {
+        List<AnnotationMetadataBuilder> result = new ArrayList<AnnotationMetadataBuilder>();
+        if (annotations != null && !annotations.isEmpty()) {
+            for (JavaType annotation : annotations) {
+                result.add(new AnnotationMetadataBuilder(annotation));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Transform a list of {@link JavaType} to a list of
+     * {@link AnnotatatedJavaType}
+     * 
+     * @param types
+     * @return
+     */
+    public List<AnnotatedJavaType> toAnnotedJavaType(JavaType... types) {
+        return toAnnotedJavaType(Arrays.asList(types));
+    }
+
+    /**
+     * Transform a list of {@link JavaType} to a list of
+     * {@link AnnotationMetadataBuilder}
+     * 
+     * @param types
+     * @return
+     */
+    public List<AnnotatedJavaType> toAnnotedJavaType(List<JavaType> types) {
+        List<AnnotatedJavaType> result = new ArrayList<AnnotatedJavaType>();
+        if (types != null && !types.isEmpty()) {
+            for (JavaType type : types) {
+                result.add(new AnnotatedJavaType(type));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Transform a list of Strings to a list of {@link JavaSymbolName}
+     * 
+     * @param annotations
+     * @return
+     */
+    public List<JavaSymbolName> toSymbolName(String... names) {
+        return toSymbolName(Arrays.asList(names));
+    }
+
+    /**
+     * Transform a list of Strings to a list of {@link JavaSymbolName}
+     * 
+     * @param annotations
+     * @return
+     */
+    public List<JavaSymbolName> toSymbolName(List<String> names) {
+        List<JavaSymbolName> result = new ArrayList<JavaSymbolName>();
+        if (names != null && !names.isEmpty()) {
+            for (String name : names) {
+                result.add(new JavaSymbolName(name));
+            }
+        }
+        return result;
+    }
 }

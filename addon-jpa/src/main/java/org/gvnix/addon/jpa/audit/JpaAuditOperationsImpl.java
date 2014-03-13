@@ -20,14 +20,21 @@ package org.gvnix.addon.jpa.audit;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.ReferencePolicy;
+import org.apache.felix.scr.annotations.ReferenceStrategy;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.jpa.JpaOperations;
+import org.gvnix.addon.jpa.audit.providers.RevisionLogProvider;
+import org.gvnix.addon.jpa.audit.providers.RevisionLogProviderId;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.TypeLocationService;
@@ -48,10 +55,12 @@ import org.springframework.roo.support.logging.HandlerUtils;
 /**
  * Implementation of {@link JpaAuditOperations}
  * 
- * @since 1.1
+ * @author gvNIX Team
+ * @since 1.3.0
  */
 @Component
 @Service
+@Reference(name = "provider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = RevisionLogProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class JpaAuditOperationsImpl implements JpaAuditOperations {
 
     private static final JavaType AUDIT_ANNOTATION_TYPE = new JavaType(
@@ -72,11 +81,58 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations {
     @Reference
     private PathResolver pathResolver;
 
+    /**
+     * Registered providers
+     */
+    private List<RevisionLogProvider> providers = new ArrayList<RevisionLogProvider>();
+
+    /**
+     * Current active provider
+     */
+    private RevisionLogProvider currentProvider = null;
+
+    /**
+     * Bind a provider
+     * 
+     * @param provider
+     */
+    protected void bindProvider(final RevisionLogProvider provider) {
+        providers.add(provider);
+    }
+
+    /**
+     * Unbind a provider
+     * 
+     * @param provider
+     */
+    protected void unbindProvider(final RevisionLogProvider provider) {
+        providers.remove(provider);
+        // Reset current provider
+        currentProvider = null;
+    }
+
     /** {@inheritDoc} */
     public boolean isCommandAvailable() {
         // Check if gvNIX JPA dependencies installed
         return projectOperations
                 .isFeatureInstalledInFocusedModule(JpaOperations.FEATURE_NAME_GVNIX_JPA);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isProvidersAvailable() {
+
+        if (providers.isEmpty()) {
+            return false;
+        }
+        for (RevisionLogProvider provider : providers) {
+            if (provider.isAvailable()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -103,12 +159,6 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations {
         // specific annotation
         for (JavaType entity : typeLocationService
                 .findTypesWithAnnotation(RooJavaType.ROO_JPA_ACTIVE_RECORD)) {
-            ClassOrInterfaceTypeDetails entityDetails = typeLocationService
-                    .getTypeDetails(entity);
-            if (entityDetails.isAbstract()) {
-                // ignore abstract classes
-                continue;
-            }
             JavaType finalType = null;
             if (targetPackage != null) {
                 finalType = generateListenerJavaType(entity, targetPackage);
@@ -201,6 +251,7 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations {
     public boolean annotateEntity(final JavaType entity) {
         Validate.notNull(entity, "Java type required");
 
+        // get class details
         final ClassOrInterfaceTypeDetails cid = typeLocationService
                 .getTypeDetails(entity);
         if (cid == null) {
@@ -208,8 +259,10 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations {
                     + entity.getFullyQualifiedTypeName() + "'");
         }
 
+        // Check for @GvNIXJpaAudit annotation
         if (MemberFindingUtils.getAnnotationOfType(cid.getAnnotations(),
                 AUDIT_ANNOTATION_TYPE) == null) {
+            // Add GvNIXJpaAudit annotation
             final AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                     AUDIT_ANNOTATION_TYPE);
             final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
@@ -219,8 +272,124 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations {
             return true;
         }
         else {
+            // Already annotated
             return false;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<RevisionLogProvider> getAvailableRevisionLogProviders() {
+        List<RevisionLogProvider> availables = new ArrayList<RevisionLogProvider>(
+                providers.size());
+        if (!providers.isEmpty()) {
+            for (RevisionLogProvider provider : providers) {
+                if (provider.isAvailable()) {
+                    availables.add(provider);
+                }
+            }
+        }
+        return Collections.unmodifiableList(availables);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RevisionLogProvider getActiveRevisionLogProvider() {
+        // Try to use cached provider (if any)
+        if (currentProvider != null && currentProvider.isActive()) {
+            return currentProvider;
+        }
+        if (providers.isEmpty()) {
+            return null;
+        }
+        RevisionLogProvider active = null;
+        for (RevisionLogProvider provider : providers) {
+            if (!provider.isAvailable()) {
+                continue;
+            }
+            if (provider.isActive()) {
+                if (active != null) {
+                    throw new IllegalStateException(String.format(
+                            "Two active providers: %s and %s",
+                            active.getName(), provider.getName()));
+                }
+                active = provider;
+            }
+        }
+        // Cache activated found
+        currentProvider = active;
+        return currentProvider;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RevisionLogProviderId getProviderIdByName(String value) {
+        if (providers.isEmpty()) {
+            return null;
+        }
+
+        for (RevisionLogProvider provider : providers) {
+            if (provider.isAvailable()
+                    && StringUtils.equals(value, provider.getName())) {
+                return new RevisionLogProviderId(provider);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<RevisionLogProviderId> getProvidersId() {
+        List<RevisionLogProviderId> availables = new ArrayList<RevisionLogProviderId>(
+                providers.size());
+        if (!providers.isEmpty()) {
+            for (RevisionLogProvider provider : providers) {
+                if (provider.isAvailable()) {
+                    availables.add(new RevisionLogProviderId(provider));
+                }
+            }
+        }
+        return Collections.unmodifiableList(availables);
+    }
+
+    @Override
+    public void activeRevisionLog(RevisionLogProviderId provider) {
+
+        // Check current provider installed
+        RevisionLogProvider currentActive = getActiveRevisionLogProvider();
+        if (currentActive != null) {
+            // By now, we don't allow change provider
+            throw new IllegalStateException("Provider ".concat(
+                    currentActive.getName()).concat(" is alredy configured."));
+        }
+
+        // look for provider on available providers
+        RevisionLogProvider toActive = null;
+        List<RevisionLogProvider> availables = getAvailableRevisionLogProviders();
+        for (RevisionLogProvider toCheck : availables) {
+            if (provider.is(toCheck)) {
+                toActive = toCheck;
+                break;
+            }
+        }
+
+        // Provider not found
+        if (toActive == null) {
+            throw new IllegalArgumentException("Provider ".concat(
+                    provider.getId()).concat(
+                    " is not available for this project."));
+        }
+
+        // Setup provider
+        toActive.setup();
     }
 
 }

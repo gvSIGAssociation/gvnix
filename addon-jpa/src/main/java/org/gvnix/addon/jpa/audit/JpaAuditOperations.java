@@ -17,6 +17,10 @@
  */
 package org.gvnix.addon.jpa.audit;
 
+import java.util.List;
+
+import org.gvnix.addon.jpa.audit.providers.RevisionLogProvider;
+import org.gvnix.addon.jpa.audit.providers.RevisionLogProviderId;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 
@@ -37,6 +41,13 @@ public interface JpaAuditOperations {
      * @return true if it should be available, otherwise false
      */
     boolean isCommandAvailable();
+
+    /**
+     * Indicates if there are providers available
+     * 
+     * @return true if there is providers available
+     */
+    boolean isProvidersAvailable();
 
     /**
      * Enables audition on selected entity
@@ -78,4 +89,33 @@ public interface JpaAuditOperations {
      * @param failIfAlreadySet or not
      */
     void create(JavaType entity, JavaType target, boolean failIfAlreadySet);
+
+    /**
+     * @return the revision log providers available for current project
+     */
+    List<RevisionLogProvider> getAvailableRevisionLogProviders();
+
+    /**
+     * @return the active revision log provider or null if none is activated
+     * @throws IllegalStateException if more that one provider informs it's
+     *         activated
+     */
+    RevisionLogProvider getActiveRevisionLogProvider();
+
+    /**
+     * @return the revision log providers id by name
+     */
+    RevisionLogProviderId getProviderIdByName(String value);
+
+    /**
+     * @return the revision log providers id available for current project
+     */
+    List<RevisionLogProviderId> getProvidersId();
+
+    /**
+     * Activate revision log functionality
+     * 
+     * @param provider
+     */
+    void activeRevisionLog(RevisionLogProviderId provider);
 }

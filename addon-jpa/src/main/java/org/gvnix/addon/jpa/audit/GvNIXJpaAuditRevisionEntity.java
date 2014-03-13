@@ -22,22 +22,24 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.gvnix.addon.jpa.audit.providers.RevisionLogProvider;
+
 /**
- * Trigger annotation for jpa audit entity listener class.
+ * Trigger annotation for jpa audit revision log entity.
  * <p/>
- * Requires than {@link #entity()} has {@link GvNIXJpaAudit} annotation on it
+ * This annotation is used by current {@link RevisionLogProvider} to generated
+ * the required attributes and methods
+ * 
  * 
  * @author gvNIX Team
  * @since 1.3.0
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface GvNIXJpaAuditListener {
+public @interface GvNIXJpaAuditRevisionEntity {
 
     /**
-     * Entity which audit operations refer to.
-     * <p/>
-     * Target entity <em>must be annotated with {@link GvNIXJpaAudit}</em>
+     * Revision-log provider depended optional parameters
      */
-    Class<?> entity();
+    String[] value() default {};
 }

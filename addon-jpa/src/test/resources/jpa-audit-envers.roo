@@ -1,0 +1,7 @@
+
+script --file clinic.roo
+
+jpa gvnix setup
+security setup
+jpa audit all
+jpa audit revisionLog --provider H-ENVERS

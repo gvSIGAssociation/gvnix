@@ -44,7 +44,7 @@ import org.springframework.roo.project.LogicalPath;
  * ITD generator for {@link GvNIXJpaAudit} annotation.
  * 
  * @author gvNIX Team
- * @since 1.1.0
+ * @since 1.3.0
  */
 public class JpaAuditListenerMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem implements
@@ -108,6 +108,7 @@ public class JpaAuditListenerMetadata extends
     private final JpaAuditListenerAnnotationValues annotationValues;
     private final JavaSymbolName entityParamName;
     private final boolean isSpringSecurityInstalled;
+    private final boolean isEntityAbstract;
 
     public JpaAuditListenerMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -121,6 +122,8 @@ public class JpaAuditListenerMetadata extends
         this.helper = new ItdBuilderHelper(this, governorPhysicalTypeMetadata,
                 builder.getImportRegistrationResolver());
 
+        this.isEntityAbstract = auditMetadata.isAbstract();
+
         this.annotationValues = annotationValues;
         this.entity = entity;
         this.entityParamName = new JavaSymbolName(
@@ -129,10 +132,12 @@ public class JpaAuditListenerMetadata extends
 
         this.auditMetadata = auditMetadata;
 
-        // Add listener methods
-        builder.addMethod(getUserNameMethod());
-        builder.addMethod(getOnCreateMethod());
-        builder.addMethod(getOnUpdateMethod());
+        if (!isEntityAbstract) {
+            // Add listener methods (only in non-abstract entities)
+            builder.addMethod(getUserNameMethod());
+            builder.addMethod(getOnCreateMethod());
+            builder.addMethod(getOnUpdateMethod());
+        }
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
@@ -189,6 +194,7 @@ public class JpaAuditListenerMetadata extends
     private void buildGetUserNameMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
         if (!isSpringSecurityInstalled) {
+            bodyBuilder.appendFormalLine("// TODO identify user name");
             bodyBuilder.appendFormalLine("return null;");
         }
         else {
@@ -199,8 +205,9 @@ public class JpaAuditListenerMetadata extends
                     getFinalTypeName(SEC_AUTHENTICATION),
                     getFinalTypeName(SEC_SECURITY_CONTEXT_HOLDER)));
 
-            // if (auth == null) {
-            bodyBuilder.appendFormalLine("if (auth == null) {");
+            // if (auth == null || !auth.isAuthenticated()) {
+            bodyBuilder
+                    .appendFormalLine("if (auth == null || !auth.isAuthenticated()) {");
             bodyBuilder.indent();
 
             // return null;
@@ -363,14 +370,23 @@ public class JpaAuditListenerMetadata extends
                 entityParamName, auditMetadata.getSetLastUpdateByMethodName()));
     }
 
+    /**
+     * @return name of getUserName() method
+     */
     public JavaSymbolName getGetUserNameMethodName() {
         return GET_USER_NAME_METHOD;
     }
 
+    /**
+     * @return name of onCreate() method
+     */
     public JavaSymbolName getOnCreateMethodName() {
         return ON_CREATE_METHOD;
     }
 
+    /**
+     * @return name of onUpdate() method
+     */
     public JavaSymbolName getOnUpdateMethodName() {
         return ON_UPDATE_METHOD;
     }
@@ -398,16 +414,25 @@ public class JpaAuditListenerMetadata extends
                 builder.getImportRegistrationResolver());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JavaType getEntityClass() {
         return entity;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JavaType getListenerClass() {
         return governorTypeDetails.getType();
     }
 
+    /**
+     * @return annotation values
+     */
     public JpaAuditListenerAnnotationValues getAnnotationValues() {
         return annotationValues;
     }

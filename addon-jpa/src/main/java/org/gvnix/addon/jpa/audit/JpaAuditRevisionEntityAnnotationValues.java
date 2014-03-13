@@ -25,22 +25,23 @@ import org.springframework.roo.classpath.details.annotations.populator.AutoPopul
 import org.springframework.roo.model.JavaType;
 
 /**
- * Represents a parsed {@link GvNIXJpaAuditListener} values
+ * Represents a parsed {@link GvNIXJpaAuditRevisionEntity} values
  * 
  * @author gvNIX Team
- * @since 1.3.0
+ * @since 1.3
  */
-public class JpaAuditListenerAnnotationValues extends AbstractAnnotationValues {
+public class JpaAuditRevisionEntityAnnotationValues extends
+        AbstractAnnotationValues {
 
-    public static final JavaType JPA_AUDIT_LISTENER_ANNOTATION = new JavaType(
-            GvNIXJpaAuditListener.class);
+    public static final JavaType JPA_AUDIT_REVISON_ENTITY_ANNOTATION = new JavaType(
+            GvNIXJpaAuditRevisionEntity.class);
 
     @AutoPopulate
-    JavaType entity;
+    String[] value;
 
-    public JpaAuditListenerAnnotationValues(
+    public JpaAuditRevisionEntityAnnotationValues(
             final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {
-        super(governorPhysicalTypeDetails, JPA_AUDIT_LISTENER_ANNOTATION);
+        super(governorPhysicalTypeDetails, JPA_AUDIT_REVISON_ENTITY_ANNOTATION);
         AutoPopulationUtils.populate(this, annotationMetadata);
     }
 
@@ -49,16 +50,13 @@ public class JpaAuditListenerAnnotationValues extends AbstractAnnotationValues {
      * 
      * @param governorPhysicalTypeMetadata
      */
-    public JpaAuditListenerAnnotationValues(
+    public JpaAuditRevisionEntityAnnotationValues(
             final PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-        super(governorPhysicalTypeMetadata, JPA_AUDIT_LISTENER_ANNOTATION);
+        super(governorPhysicalTypeMetadata, JPA_AUDIT_REVISON_ENTITY_ANNOTATION);
         AutoPopulationUtils.populate(this, annotationMetadata);
     }
 
-    /**
-     * @return related entity
-     */
-    public JavaType getEntity() {
-        return entity;
+    public String[] getValue() {
+        return value;
     }
 }

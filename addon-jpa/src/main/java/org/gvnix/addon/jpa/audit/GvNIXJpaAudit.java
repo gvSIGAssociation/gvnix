@@ -34,9 +34,18 @@ import java.lang.annotation.Target;
  * 
  * 
  * @author gvNIX Team
- * @since 1.1
+ * @since 1.3.0
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface GvNIXJpaAudit {
+
+    public static enum StoreRevisionLog {
+        PROVIDER_DEFAULT, YES, NO
+    };
+
+    /**
+     * @return Configuration about store revision log in this entity
+     */
+    StoreRevisionLog storeRevisionLog() default StoreRevisionLog.PROVIDER_DEFAULT;
 }
