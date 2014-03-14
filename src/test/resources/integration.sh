@@ -374,8 +374,8 @@
 
 	## jpa-audit-envers
 	echo jpa-audit-envers start
-	mkdir jpa-audit
-	cd jpa-audit
+	mkdir jpa-audit-envers
+	cd jpa-audit-envers
 	$1/gvnix.sh script --file $2/code/addon-jpa/src/test/resources/jpa-audit-envers.roo --lineNumbers true
 	# Create new pet
 	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/petclinic/pets --post-data 'name=a&weight=1&type=Dog' &
