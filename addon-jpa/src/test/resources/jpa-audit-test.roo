@@ -2,5 +2,6 @@
 script --file clinic.roo
 
 jpa gvnix setup
-security setup
+// Don't set security to avoid selenium test problems
+// security setup
 jpa audit all
