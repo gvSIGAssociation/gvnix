@@ -233,8 +233,7 @@ public class JpaAuditMetadata extends
         this.revisionLogBuilder = revisionLogBuilder;
 
         this.entity = governorPhysicalTypeMetadata.getType();
-        this.entityName = JavaSymbolName.getReservedWordSafeName(entity)
-                .getSymbolName();
+        this.entityName = entity.getSimpleTypeName();
 
         this.entityPlural = entityPlural;
 

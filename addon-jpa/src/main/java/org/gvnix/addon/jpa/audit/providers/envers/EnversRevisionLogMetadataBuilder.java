@@ -943,7 +943,8 @@ public class EnversRevisionLogMetadataBuilder implements
 
         // Define method parameter names (none in this case)
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>(3);
-        parameterNames.add(new JavaSymbolName(context.getEntityName()));
+        parameterNames.add(new JavaSymbolName(StringUtils.uncapitalize(context
+                .getEntityName())));
         parameterNames.add(REV_ITEM_REVISON_ENTITY_FIELD);
         parameterNames.add(REV_ITEM_REVISON_TYPE_FIELD);
 
