@@ -17,8 +17,10 @@
  */
 package org.gvnix.addon.jpa.audit.providers;
 
-import org.gvnix.addon.jpa.audit.JpaAuditRevisionEntityMetadata.Context;
+import org.gvnix.addon.jpa.audit.JpaAuditRevisionEntityAnnotationValues;
+import org.gvnix.support.ItdBuilderHelper;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
+import org.springframework.roo.model.JavaType;
 
 /**
  * Interface provider by {@link RevisionLogProvider} which produces required
@@ -49,5 +51,35 @@ public interface RevisionLogRevisionEntityMetadataBuilder {
      * Fill revision entity with required artifacts
      */
     void fillEntity();
+
+    /**
+     * Interface which contains generation time metadata information required by
+     * RevisionLogRevisionEntityMetadataBuilder
+     * 
+     * @author gvNIX Team
+     * 
+     */
+    public interface Context {
+
+        /**
+         * @return the helper
+         */
+        public ItdBuilderHelper getHelper();
+
+        /**
+         * @return the annotationValues
+         */
+        public JpaAuditRevisionEntityAnnotationValues getAnnotationValues();
+
+        /**
+         * @return metadataId
+         */
+        public String getMetadataId();
+
+        /**
+         * @return entity
+         */
+        public JavaType getEntity();
+    }
 
 }

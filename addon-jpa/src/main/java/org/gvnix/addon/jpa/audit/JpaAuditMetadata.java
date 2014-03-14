@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.addon.jpa.audit.providers.RevisionLogMetadataBuilder;
+import org.gvnix.addon.jpa.audit.providers.RevisionLogMetadataBuilder.Context;
 import org.gvnix.support.ItdBuilderHelper;
 import org.gvnix.support.ItdBuilderHelper.GET_FIELD_EXISTS_ACTION;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
@@ -315,7 +316,7 @@ public class JpaAuditMetadata extends
      * @return create a build context instance required by revision log builder
      */
     private Context createBuildContext() {
-        return new Context(getId(), helper, this.annotationValues, entity,
+        return new BuildContext(getId(), helper, this.annotationValues, entity,
                 entityName, this.entityPlural, findAllMethodName,
                 findMethodName, getRevisionsMethodName,
                 findRevisionsByDatesMethodName, findRevisionsMethodName,
@@ -1187,7 +1188,7 @@ public class JpaAuditMetadata extends
      * @author gvNIX Team
      * 
      */
-    public static class Context {
+    private class BuildContext implements Context {
 
         private final ItdBuilderHelper helper;
 
@@ -1208,7 +1209,7 @@ public class JpaAuditMetadata extends
         private final JavaType revisonItemListType;
         private final boolean isAbstractEntity;
 
-        public Context(String metadataId, ItdBuilderHelper helper,
+        public BuildContext(String metadataId, ItdBuilderHelper helper,
                 JpaAuditAnnotationValues annotationValues, JavaType entity,
                 String entityName, String entityPlural,
                 JavaSymbolName findAllMethodName,

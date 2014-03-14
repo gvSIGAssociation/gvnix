@@ -27,7 +27,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.gvnix.addon.jpa.audit.GvNIXJpaAudit;
 import org.gvnix.addon.jpa.audit.JpaAuditMetadata;
-import org.gvnix.addon.jpa.audit.JpaAuditMetadata.Context;
 import org.gvnix.addon.jpa.audit.JpaAuditRevisionEntityMetadata;
 import org.gvnix.addon.jpa.audit.providers.RevisionLogMetadataBuilder;
 import org.gvnix.support.ItdBuilderHelper;

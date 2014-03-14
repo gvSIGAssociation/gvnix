@@ -19,12 +19,15 @@ package org.gvnix.addon.jpa.audit.providers;
 
 import java.util.List;
 
+import org.gvnix.addon.jpa.audit.JpaAuditAnnotationValues;
 import org.gvnix.addon.jpa.audit.JpaAuditMetadata;
-import org.gvnix.addon.jpa.audit.JpaAuditMetadata.Context;
+import org.gvnix.support.ItdBuilderHelper;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
+import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 
 /**
  * Interface provider by {@link RevisionLogProvider} which produces required
@@ -217,5 +220,105 @@ public interface RevisionLogMetadataBuilder {
      * @param body
      */
     void buildBodyRevisionItemGetType(InvocableMemberBodyBuilder body);
+
+    /**
+     * Interface which contains generation time metadata information required by
+     * {@link RevisionLogMetadataBuilder}
+     * 
+     * @author gvNIX Team
+     * 
+     */
+    public interface Context {
+        /**
+         * @return the helper
+         */
+        public ItdBuilderHelper getHelper();
+
+        /**
+         * @return the annotationValues
+         */
+        public JpaAuditAnnotationValues getAnnotationValues();
+
+        /**
+         * @return the entity
+         */
+        public JavaType getEntity();
+
+        /**
+         * @return the entityName
+         */
+        public String getEntityName();
+
+        /**
+         * @return the entityPlural
+         */
+        public String getEntityPlural();
+
+        /**
+         * @return the findAllMethodName
+         */
+        public JavaSymbolName getFindAllMethodName();
+
+        /**
+         * @return the findMethodName
+         */
+        public JavaSymbolName getFindMethodName();
+
+        /**
+         * @return the getRevisionsMethodName
+         */
+        public JavaSymbolName getGetRevisionsMethodName();
+
+        /**
+         * @return the findRevisionsByDatesMethodName
+         */
+        public JavaSymbolName getFindRevisionsByDatesMethodName();
+
+        /**
+         * @return the findRevisionsMethodName
+         */
+        public JavaSymbolName getFindRevisionsMethodName();
+
+        /**
+         * @return the revisonItemTypeName
+         */
+        public String getRevisonItemTypeName();
+
+        /**
+         * @return entityListType
+         */
+        public JavaType getEntityListType();
+
+        /**
+         * @return RevisionItem javaType for this entity (XXXRevision)
+         */
+        public JavaType getRevisonItemType();
+
+        /**
+         * @return current metadata identifier (required for class artifacts
+         *         builders)
+         */
+        public String getMetadataId();
+
+        /**
+         * @return getRevisionNumberForDate method name
+         */
+        public JavaSymbolName getGetRevisionNumberForDate();
+
+        /**
+         * @return identifier field definition of current entity
+         */
+        public FieldMetadata getIdentifier();
+
+        /**
+         * @return javaType of List<XXXRevsion>
+         */
+        public JavaType getRevisonItemListType();
+
+        /**
+         * @return if entity is an abstract class
+         */
+        public boolean isAbstractEntity();
+    }
 
 }

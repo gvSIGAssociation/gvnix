@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.gvnix.addon.jpa.audit.GvNIXJpaAuditRevisionEntity;
-import org.gvnix.addon.jpa.audit.JpaAuditRevisionEntityMetadata.Context;
 import org.gvnix.addon.jpa.audit.providers.RevisionLogRevisionEntityMetadataBuilder;
 import org.gvnix.support.ItdBuilderHelper;
 import org.gvnix.support.ItdBuilderHelper.GET_FIELD_EXISTS_ACTION;

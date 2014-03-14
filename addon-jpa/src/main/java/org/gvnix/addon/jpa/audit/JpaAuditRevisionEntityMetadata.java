@@ -20,6 +20,7 @@ package org.gvnix.addon.jpa.audit;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.addon.jpa.audit.providers.RevisionLogRevisionEntityMetadataBuilder;
+import org.gvnix.addon.jpa.audit.providers.RevisionLogRevisionEntityMetadataBuilder.Context;
 import org.gvnix.support.ItdBuilderHelper;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -95,8 +96,8 @@ public class JpaAuditRevisionEntityMetadata extends
 
         this.revisionLogBuilder = revisionLogBuilder;
 
-        this.buildContext = new Context(getId(), helper, this.annotationValues,
-                governorPhysicalTypeMetadata.getType());
+        this.buildContext = new BuildContext(getId(), helper,
+                this.annotationValues, governorPhysicalTypeMetadata.getType());
 
         this.revisionLogBuilder.initialize(builder, buildContext);
 
@@ -145,7 +146,7 @@ public class JpaAuditRevisionEntityMetadata extends
      * @author gvNIX Team
      * 
      */
-    public static class Context {
+    private class BuildContext implements Context {
 
         private final ItdBuilderHelper helper;
 
@@ -155,7 +156,7 @@ public class JpaAuditRevisionEntityMetadata extends
 
         private final JavaType entity;
 
-        public Context(String metadataId, ItdBuilderHelper helper,
+        public BuildContext(String metadataId, ItdBuilderHelper helper,
                 JpaAuditRevisionEntityAnnotationValues annotationValues,
                 JavaType entity) {
             super();
