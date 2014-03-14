@@ -111,12 +111,27 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
         // Gets entity JPA metadata
         String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
                 entityPath);
+
+        // Add dependency with JPA metadata
+        metadataDependencyRegistry.registerDependency(jpaMetadataId,
+                metadataIdentificationString);
+
         JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
                 .get(jpaMetadataId);
+
+        if (jpaMetadata == null) {
+            // There is no JpaMetadata yet: return null
+            return null;
+        }
 
         // Gets entity identifier field definition
         List<FieldMetadata> identifiers = persistenceMemberLocator
                 .getIdentifierFields(entity);
+
+        if (identifiers == null || identifiers.isEmpty()) {
+            // There is no JpaMetadata yet: return null
+            return null;
+        }
 
         // Gets the plural of current entity
         String plural = jpaMetadata.getPlural();
