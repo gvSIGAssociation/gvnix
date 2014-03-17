@@ -62,8 +62,6 @@ public class EnversRevisionLogMetadataBuilder implements
     // Defined names
     private static final JavaSymbolName AUDIT_READER_STATIC_METHOD = new JavaSymbolName(
             "auditReader");
-    private static final JavaSymbolName AUDIT_READER_METHOD = new JavaSymbolName(
-            "getAuditReader");
     private static final JavaSymbolName GET_PROPERTY_METHOD = new JavaSymbolName(
             "getProperty");
     private static final JavaSymbolName CREATE_ITEM_LIST_METHOD = new JavaSymbolName(
@@ -86,8 +84,6 @@ public class EnversRevisionLogMetadataBuilder implements
             "org.hibernate.envers.query.AuditEntity");
     private static final JavaType AUDIT_QUERY = new JavaType(
             "org.hibernate.envers.query.AuditQuery");
-    private static final JavaType AUDIT_QUERY_CREATOR = new JavaType(
-            "org.hibernate.envers.query.AuditQueryCreator");
     private static final JavaType AUDIT_CONJUNTION = new JavaType(
             "org.hibernate.envers.query.criteria.AuditConjunction");
     private static final JavaType AUDIT_PROPERTY = new JavaType(
@@ -125,6 +121,7 @@ public class EnversRevisionLogMetadataBuilder implements
     private static final JavaType COLLECTIONS = new JavaType(Collections.class);
 
     // local properties
+    @SuppressWarnings("unused")
     private final PhysicalTypeMetadata governorPhysicalTypeMetadata;
 
     private ClassOrInterfaceTypeDetails governorTypeDetails;
@@ -218,7 +215,6 @@ public class EnversRevisionLogMetadataBuilder implements
 
         if (!context.isAbstractEntity()) {
             builder.addMethod(getAuditReaderStaticMethod());
-            builder.addMethod(getAuditReaderMethod());
             builder.addMethod(getPropertyMethod());
             builder.addMethod(getPropertyMethodWithWrapper());
         }
@@ -401,20 +397,12 @@ public class EnversRevisionLogMetadataBuilder implements
     }
 
     /**
-     * @return creates auditReader() method
-     */
-    private MethodMetadata getAuditReaderMethod() {
-        return commonGetAuditReaderStaticMethod(context, AUDIT_READER_METHOD,
-                Modifier.PUBLIC, "return %s.get(entityManager);");
-    }
-
-    /**
      * @return creates getAuditReader() method
      */
     private MethodMetadata getAuditReaderStaticMethod() {
         return commonGetAuditReaderStaticMethod(context,
                 AUDIT_READER_STATIC_METHOD, Modifier.PUBLIC + Modifier.STATIC,
-                "return %s.get(entityManager());");
+                "return %s.get(entityManager());", null);
     }
 
     /**
@@ -425,10 +413,12 @@ public class EnversRevisionLogMetadataBuilder implements
      * @param methodName
      * @param modifiers
      * @param bodyStr
+     * @param annotations (optional)
      * @return
      */
     private MethodMetadata commonGetAuditReaderStaticMethod(Context context,
-            JavaSymbolName methodName, int modifiers, String bodyStr) {
+            JavaSymbolName methodName, int modifiers, String bodyStr,
+            List<AnnotationMetadataBuilder> aAnnotations) {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>(
                 0);
@@ -443,6 +433,9 @@ public class EnversRevisionLogMetadataBuilder implements
 
         // Define method annotations (none in this case)
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        if (aAnnotations != null && !aAnnotations.isEmpty()) {
+            annotations.addAll(aAnnotations);
+        }
 
         // Define method throws types (none in this case)
         List<JavaType> throwsTypes = new ArrayList<JavaType>();
