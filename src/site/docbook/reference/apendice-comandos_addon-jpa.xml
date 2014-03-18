@@ -38,13 +38,31 @@
           <entry><link
           linkend="apendice-comandos_addon-jpa_jpa-batch_jpa-batch-add">jpa batch add</link></entry>
 
-          <entry xml:lang="es">General el servicio de persistencia en bloque para una entidad.</entry>
+          <entry xml:lang="es">Genera el servicio de persistencia en bloque para una entidad.</entry>
         </row>
         <row>
           <entry><link
           linkend="apendice-comandos_addon-jpa_jpa-batch_jpa-batch-all">jpa batch all</link></entry>
 
-          <entry xml:lang="es">General el servicio de persistencia en bloque para todas las entidades.</entry>
+          <entry xml:lang="es">Genera el servicio de persistencia en bloque para todas las entidades.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-add">jpa audit add</link></entry>
+
+          <entry xml:lang="es">Añade el soporte de auditoría a una entidad.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-all">jpa audit all</link></entry>
+
+          <entry xml:lang="es">Añade el soporte de auditoría todas las entidades.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-revisionlog">jpa audit revisionLog</link></entry>
+
+          <entry xml:lang="es">Establece el proveedor de registro de cambios a usar.</entry>
         </row>
       </tbody>
     </tgroup>
@@ -92,7 +110,7 @@
   <section xml:id="apendice-comandos_addon-jpa_jpa-batch_jpa-batch-all">
     <title>jpa batch all</title>
 
-    <para xml:lang="es">Crea el servicio de presistencia en bloque para
+    <para xml:lang="es">Crea el servicio de persistencia en bloque para
     todas las entidades de la aplicación.</para>
 
     <para xml:lang="es">Sus parámetros son:
@@ -106,6 +124,87 @@
               <para xml:lang="es">Paquete donde se generarán las clases de servicio a generar.
               Si se omite se generarán en el mismo paquete que la entidad a la que afecta.
               El nombre de la clase del servicio se genera a partir del nombre de la entidad.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    </para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-add">
+    <title>jpa audit add</title>
+
+    <para xml:lang="es">Añade el soporte de auditoría a una entidad.</para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--entity</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido] [Clase entidad] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Entidad a la que añadir la auditoría.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>--type</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Opcional] [Clase] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Clase a crear como <emphasis>EntityListener</emphasis>
+              para establecer los datos de auditoría. Si no se establece se genera una clase,
+              basada en el nombre de la entidad, en el mismo paquete que la entidad.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    </para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-all">
+    <title>jpa adudit all</title>
+
+    <para xml:lang="es">Añade el soporte de auditoría a
+    todas las entidades de la aplicación.</para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--package</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Opcional] [Paquete] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Paquete donde se generarán las clases
+              <emphasis>EntityListener</emphasis>.
+              Si se omite se generarán en el mismo paquete que la entidad a la que afecta.
+              El nombre de la clase <emphasis>EntityListener</emphasis> se genera a partir del
+              nombre de la entidad.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    </para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-revisionlog">
+    <title>jpa adudit revisionLog</title>
+
+    <para xml:lang="es">Selecciona el proveedor de gestión de revisiones
+    de entidades a usar.</para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--provider</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido] [Identificador de proveedor] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Identificador del proveedor de revisiones a usar. Sólo estarán
+              visibles aquellos proveedor que puedan utilizarse en el proyecto actual (esto
+              se consulta al la propia instancia de proveedor). Los proveedores se registran como
+              add-ons en el framework (al estilo de los proveedores de JDBC para la
+              ingeniería inversa) y deben de implementar un interfaz definido.</para>
             </listitem>
           </varlistentry>
         </variablelist>
