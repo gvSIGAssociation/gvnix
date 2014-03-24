@@ -17,38 +17,20 @@
  */
 package org.gvnix.addon.jpa.audit.providers.envers;
 
-import java.io.File;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.addon.jpa.audit.GvNIXJpaAudit;
-import org.gvnix.addon.jpa.audit.GvNIXJpaAuditRevisionEntity;
-import org.gvnix.addon.jpa.audit.JpaAuditMetadata;
+import org.gvnix.addon.jpa.audit.JpaAuditOperationsSPI;
 import org.gvnix.addon.jpa.audit.JpaAuditRevisionEntityMetadata;
 import org.gvnix.addon.jpa.audit.providers.RevisionLogMetadataBuilder;
 import org.gvnix.addon.jpa.audit.providers.RevisionLogProvider;
 import org.gvnix.addon.jpa.audit.providers.RevisionLogRevisionEntityMetadataBuilder;
-import org.springframework.roo.classpath.PhysicalTypeCategory;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.TypeLocationService;
-import org.springframework.roo.classpath.TypeManagementService;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.metadata.MetadataService;
-import org.springframework.roo.model.JavaPackage;
-import org.springframework.roo.model.JavaType;
-import org.springframework.roo.model.RooJavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
@@ -81,17 +63,11 @@ import org.w3c.dom.Element;
 @Service
 public class EnversRevisionLogProvider implements RevisionLogProvider {
 
-    private static final String REVISION_LOG_ENTITY_NAME = "RevisionLogEntity";
-
     private static final String STORE_DATA_AT_DELETE_PROP_NAME = "org.hibernate.envers.store_data_at_delete";
 
     @SuppressWarnings("unused")
     private static final Logger LOGGER = HandlerUtils
             .getLogger(EnversRevisionLogProvider.class);
-
-    private static final Dependency SPRING_SEC_DEPENDENCY = new Dependency(
-            "org.springframework.security", "spring-security-core",
-            "3.1.0.RELEASE");
 
     private static final Dependency HIBERNATE_DEPENDENCY = new Dependency(
             "org.hibernate", "hibernate-entitymanager", "4.2.2.Final");
@@ -104,22 +80,10 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
     private static String PROVIDER_NAME = "H-ENVERS";
     private static String PROVIDER_DESCRIPTION = "Revision-log provider base on Hibernate envers module";
 
-    private static final JavaType REVISON_ENTITY_ANNOTATION = new JavaType(
-            "org.hibernate.envers.RevisionEntity");
-
     private static final String PERSISTENCE_XML_LOCATION = "META-INF/persistence.xml";
-
-    private static final JavaType GVNIX_REVION_ENTITY_ANNOTATION = new JavaType(
-            GvNIXJpaAuditRevisionEntity.class);
 
     @Reference
     private ProjectOperations projectOperations;
-
-    @Reference
-    private TypeLocationService typeLocationService;
-
-    @Reference
-    private TypeManagementService typeManagementService;
 
     @Reference
     private FileManager fileManager;
@@ -127,8 +91,9 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
     @Reference
     private MetadataService metadataService;
 
-    private JavaType revisionEntityJavaType;
-
+    /**
+     * {@inheritDoc} Checks Hibernate dependency to show it as available
+     */
     @Override
     public boolean isAvailable() {
         ProjectMetadata projectMetadata = getProjectMetadata();
@@ -143,17 +108,25 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
         return projectOperations.getFocusedProjectMetadata();
     }
 
-    public boolean isSpringSecInstalled() {
-        return getProjectMetadata().getPom().hasDependencyExcludingVersion(
-                SPRING_SEC_DEPENDENCY);
-    }
-
+    /**
+     * Gets Hibernate dependencies declared on current project (excluding
+     * version)
+     * 
+     * @param metadata of current project
+     * @return
+     */
     private Set<Dependency> getHibernateDependency(ProjectMetadata metadata) {
-        // TODO check persistence.xml???
         return metadata.getPom().getDependenciesExcludingVersion(
                 HIBERNATE_DEPENDENCY);
     }
 
+    /**
+     * Checks if Hibernate is declared as dependency on current project
+     * (excluding version)
+     * 
+     * @param metadata of current project
+     * @return
+     */
     private boolean isHibernateEnversInstalled(ProjectMetadata metadata) {
         return metadata.getPom().hasDependencyExcludingVersion(
                 HIBERNATE_ENVERS_DEPENDENCY);
@@ -165,9 +138,6 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
     @Override
     public boolean isActive() {
         ProjectMetadata projectMetadata = getProjectMetadata();
-        if (getHibernateDependency(projectMetadata).isEmpty()) {
-            return false;
-        }
         if (!isHibernateEnversInstalled(projectMetadata)) {
             return false;
         }
@@ -209,7 +179,7 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
      * 
      */
     @Override
-    public void setup() {
+    public void setup(JpaAuditOperationsSPI operations) {
 
         // Installs envers dependency on pom.xml
         installEnversDependency();
@@ -218,115 +188,11 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
         configurePersistenceXML();
 
         // Install revision entity class on project
-        installRevisonEntity();
+        operations.installRevisonEntity(null);
 
         // Refresh all audited entity metadata
-        refreshAuditedEntities();
+        operations.refreshAuditedEntities();
 
-    }
-
-    /**
-     * Performs a {@link MetadataService#evictAndGet(String)} of all entities
-     * annotated with {@link GvNIXJpaAudit}. This regenerates related
-     * <em>.aj</em> files.
-     */
-    public void refreshAuditedEntities() {
-        // Use the TypeLocationService to scan project for all types with
-        // jpaAudit
-        // annotation
-        String metadataId;
-        PathResolver pathResolver = projectOperations.getPathResolver();
-        LogicalPath path = pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA);
-        for (JavaType entity : typeLocationService
-                .findTypesWithAnnotation(new JavaType(GvNIXJpaAudit.class))) {
-            metadataId = JpaAuditMetadata.createIdentifier(entity, path);
-            metadataService.evictAndGet(metadataId);
-        }
-    }
-
-    /**
-     * Create the class for entity which will hold the revision information for
-     * Hibernate Envers
-     * <p/>
-     * This use {@link #REVISION_LOG_ENTITY_NAME} as class name and look for
-     * <em>the first package which contains a entity</em> to place it.
-     * 
-     */
-    private void installRevisonEntity() {
-
-        PathResolver pathResolver = projectOperations.getPathResolver();
-
-        JavaType target = generateRevionEntityJavaType();
-
-        int modifier = Modifier.PUBLIC;
-
-        final String declaredByMetadataId = PhysicalTypeIdentifier
-                .createIdentifier(target,
-                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
-        File targetFile = new File(
-                typeLocationService
-                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
-        if (targetFile.exists()) {
-            Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
-                    target);
-        }
-
-        // Prepare class builder
-        final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
-                declaredByMetadataId, modifier, target,
-                PhysicalTypeCategory.CLASS);
-
-        // Prepare annotations array
-        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
-                1);
-
-        // Add @GvNIXJpaAuditListener annotation
-        AnnotationMetadataBuilder jpaAuditRevisionEntityAnnotation = new AnnotationMetadataBuilder(
-                new JavaType(GvNIXJpaAuditRevisionEntity.class));
-        annotations.add(jpaAuditRevisionEntityAnnotation);
-
-        // Set annotations
-        cidBuilder.setAnnotations(annotations);
-
-        // Create Revision entity class
-        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
-    }
-
-    /**
-     * Generates new a JavaType for revision log entity.
-     * <p/>
-     * Locates the early package which contains a entity and use it as domain
-     * package.
-     * 
-     * @return
-     */
-    private JavaType generateRevionEntityJavaType() {
-        // Use the TypeLocationService to scan project for all types with entity
-        // annotation
-        Set<JavaPackage> packages = new HashSet<JavaPackage>();
-        for (JavaType entity : typeLocationService
-                .findTypesWithAnnotation(RooJavaType.ROO_JPA_ACTIVE_RECORD)) {
-            packages.add(entity.getPackage());
-        }
-
-        // Get the shorter (lowest deep level) package which contains an entity
-        JavaPackage targetPackage = null;
-        for (JavaPackage cur : packages) {
-            if (targetPackage == null
-                    || cur.getElements().size() < targetPackage.getElements()
-                            .size()) {
-                targetPackage = cur;
-            }
-        }
-
-        if (targetPackage == null) {
-            throw new IllegalStateException(
-                    "No entities found on project: Can't identify package for revision entity.");
-        }
-
-        // Create JavaType with locate package
-        return new JavaType(targetPackage.getFullyQualifiedPackageName()
-                .concat(".").concat(REVISION_LOG_ENTITY_NAME));
     }
 
     /**
@@ -453,10 +319,11 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
      */
     @Override
     public RevisionLogMetadataBuilder getMetadataBuilder(
+            JpaAuditOperationsSPI operations,
             PhysicalTypeMetadata governorPhysicalTypeMetadata) {
 
         String revisionEntityMetadatId = JpaAuditRevisionEntityMetadata
-                .createIdentifier(getRevisionEntityJavaType(),
+                .createIdentifier(operations.getRevisionEntityJavaType(),
                         LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
         JpaAuditRevisionEntityMetadata revisionEntityMetada = (JpaAuditRevisionEntityMetadata) metadataService
                 .get(revisionEntityMetadatId);
@@ -470,44 +337,13 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
     }
 
     /**
-     * @return installed RevisonEntity JavaType
-     */
-    public JavaType getRevisionEntityJavaType() {
-        if (this.revisionEntityJavaType == null) {
-            Set<ClassOrInterfaceTypeDetails> found = typeLocationService
-                    .findClassesOrInterfaceDetailsWithAnnotation(GVNIX_REVION_ENTITY_ANNOTATION);
-
-            if (found.isEmpty()) {
-                throw new IllegalStateException(String.format(
-                        "Class with %s annotation is missing",
-                        GVNIX_REVION_ENTITY_ANNOTATION
-                                .getFullyQualifiedTypeName()));
-            }
-            else if (found.size() > 1) {
-                throw new IllegalStateException(String.format(
-                        "More than 1 classes with %s annotation",
-                        GVNIX_REVION_ENTITY_ANNOTATION
-                                .getFullyQualifiedTypeName()));
-            }
-            this.revisionEntityJavaType = found.iterator().next().getType();
-        }
-        return this.revisionEntityJavaType;
-    }
-
-    /**
-     * Clean cached revision entity javaType
-     */
-    void cleanRevisionEntityJavaType() {
-        this.revisionEntityJavaType = null;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public RevisionLogRevisionEntityMetadataBuilder getRevisonEntityMetadataBuilder(
+            JpaAuditOperationsSPI operations,
             PhysicalTypeMetadata governorPhysicalTypeMetadata) {
         return new EnversRevisionLogEntityMetadataBuilder(
-                governorPhysicalTypeMetadata, isSpringSecInstalled());
+                governorPhysicalTypeMetadata);
     }
 }

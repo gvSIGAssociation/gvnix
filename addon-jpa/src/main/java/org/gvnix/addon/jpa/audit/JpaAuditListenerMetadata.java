@@ -61,18 +61,12 @@ public class JpaAuditListenerMetadata extends
             "onCreate");
     private static final JavaSymbolName ON_UPDATE_METHOD = new JavaSymbolName(
             "onUpdate");
-    private static final JavaSymbolName GET_USER_NAME_METHOD = new JavaSymbolName(
-            "getUserName");
 
     // Refered types
     private static final JavaType JPA_PRE_PRESIST = new JavaType(
             "javax.persistence.PrePersist");
     private static final JavaType JPA_PRE_UPDATE = new JavaType(
             "javax.persistence.PreUpdate");
-    private static final JavaType SEC_AUTHENTICATION = new JavaType(
-            "org.springframework.security.core.Authentication");
-    private static final JavaType SEC_SECURITY_CONTEXT_HOLDER = new JavaType(
-            "org.springframework.security.core.context.SecurityContextHolder");
 
     public static final String getMetadataIdentiferType() {
         return PROVIDES_TYPE;
@@ -107,13 +101,15 @@ public class JpaAuditListenerMetadata extends
     private final JpaAuditMetadata auditMetadata;
     private final JpaAuditListenerAnnotationValues annotationValues;
     private final JavaSymbolName entityParamName;
-    private final boolean isSpringSecurityInstalled;
     private final boolean isEntityAbstract;
+    private final JavaType userType;
+    private final JavaType userService;
 
     public JpaAuditListenerMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             JpaAuditListenerAnnotationValues annotationValues, JavaType entity,
-            JpaAuditMetadata auditMetadata, boolean isSpringSecurityInstalled) {
+            JpaAuditMetadata auditMetadata, JavaType userType,
+            JavaType userService) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -122,106 +118,26 @@ public class JpaAuditListenerMetadata extends
         this.helper = new ItdBuilderHelper(this, governorPhysicalTypeMetadata,
                 builder.getImportRegistrationResolver());
 
-        this.isEntityAbstract = auditMetadata.isAbstract();
+        this.isEntityAbstract = auditMetadata.isAbstractEntity();
 
         this.annotationValues = annotationValues;
         this.entity = entity;
         this.entityParamName = new JavaSymbolName(
                 StringUtils.uncapitalize(entity.getSimpleTypeName()));
-        this.isSpringSecurityInstalled = isSpringSecurityInstalled;
 
         this.auditMetadata = auditMetadata;
 
+        this.userType = userType;
+        this.userService = userService;
+
         if (!isEntityAbstract) {
             // Add listener methods (only in non-abstract entities)
-            builder.addMethod(getUserNameMethod());
             builder.addMethod(getOnCreateMethod());
             builder.addMethod(getOnUpdateMethod());
         }
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
-    }
-
-    /**
-     * @return the getUserName method definition
-     */
-    private MethodMetadata getUserNameMethod() {
-        // method name
-        JavaSymbolName methodName = GET_USER_NAME_METHOD;
-
-        // Define method parameter types
-        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
-
-        // Check if a method exist in type
-        final MethodMetadata method = helper.methodExists(methodName,
-                parameterTypes);
-        if (method != null) {
-            // If it already exists, just return the method
-            return method;
-        }
-
-        // Define method annotations (none in this case)
-        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
-
-        // Define method throws types (none in this case)
-        List<JavaType> throwsTypes = new ArrayList<JavaType>();
-
-        // Define method parameter names (none in this case)
-        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-
-        // Create the method body
-        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildGetUserNameMethodBody(bodyBuilder);
-
-        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
-        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
-                parameterTypes, parameterNames, bodyBuilder);
-        methodBuilder.setAnnotations(annotations);
-        methodBuilder.setThrowsTypes(throwsTypes);
-
-        return methodBuilder.build(); // Build and return a MethodMetadata
-    }
-
-    /**
-     * Build getUserName method code
-     * <p/>
-     * Generated code is dependent on Spring Security is configured or not
-     * 
-     * @param bodyBuilder
-     */
-    private void buildGetUserNameMethodBody(
-            InvocableMemberBodyBuilder bodyBuilder) {
-        if (!isSpringSecurityInstalled) {
-            bodyBuilder.appendFormalLine("// TODO identify user name");
-            bodyBuilder.appendFormalLine("return null;");
-        }
-        else {
-            // Authentication auth =
-            // SecurityContextHolder.getContext().getAuthentication();
-            bodyBuilder.appendFormalLine(String.format(
-                    "%s auth = %s.getContext().getAuthentication();",
-                    getFinalTypeName(SEC_AUTHENTICATION),
-                    getFinalTypeName(SEC_SECURITY_CONTEXT_HOLDER)));
-
-            // if (auth == null || !auth.isAuthenticated()) {
-            bodyBuilder
-                    .appendFormalLine("if (auth == null || !auth.isAuthenticated()) {");
-            bodyBuilder.indent();
-
-            // return null;
-            bodyBuilder.appendFormalLine("return null;");
-
-            // }
-            bodyBuilder.indentRemove();
-            bodyBuilder.appendFormalLine("}");
-
-            // return auth.getName();
-            bodyBuilder.appendFormalLine("return auth.getName();");
-
-        }
-
     }
 
     /**
@@ -281,8 +197,7 @@ public class JpaAuditListenerMetadata extends
                 getFinalTypeName(JdkJavaType.CALENDAR)));
 
         // String user = this.getUserName();
-        bodyBuilder.appendFormalLine(String.format("String user = %s();",
-                GET_USER_NAME_METHOD));
+        buildGetUserMethodBodyLine(bodyBuilder);
 
         // visit.setAuditLastUpdate(now);
         bodyBuilder.appendFormalLine(String.format("%s.%s(now);",
@@ -291,6 +206,17 @@ public class JpaAuditListenerMetadata extends
         // visit.setAuditLastUpdatedBy(user);
         bodyBuilder.appendFormalLine(String.format("%s.%s(user);",
                 entityParamName, auditMetadata.getSetLastUpdateByMethodName()));
+    }
+
+    /**
+     * @param bodyBuilder
+     */
+    private void buildGetUserMethodBodyLine(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine(String.format("%s user = %s.%s();",
+                helper.getFinalTypeName(userType),
+                helper.getFinalTypeName(userService),
+                JpaAuditUserServiceMetadata.GET_USER_METHOD));
     }
 
     /**
@@ -350,8 +276,7 @@ public class JpaAuditListenerMetadata extends
                 getFinalTypeName(JdkJavaType.CALENDAR)));
 
         // String user = this.getUserName();
-        bodyBuilder.appendFormalLine(String.format("String user = %s();",
-                GET_USER_NAME_METHOD));
+        buildGetUserMethodBodyLine(bodyBuilder);
 
         // visit.setAuditCreation(now);
         bodyBuilder.appendFormalLine(String.format("%s.%s(now);",
@@ -368,13 +293,6 @@ public class JpaAuditListenerMetadata extends
         // visit.setAuditLastUpdatedBy(user);
         bodyBuilder.appendFormalLine(String.format("%s.%s(user);",
                 entityParamName, auditMetadata.getSetLastUpdateByMethodName()));
-    }
-
-    /**
-     * @return name of getUserName() method
-     */
-    public JavaSymbolName getGetUserNameMethodName() {
-        return GET_USER_NAME_METHOD;
     }
 
     /**

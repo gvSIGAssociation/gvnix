@@ -29,20 +29,36 @@ Arquitectura de la solución
 * El *listener* será una clase generada para la propia entidad
 * Para el soporte de registro de histórico se creará un sistema de proveedores (componentes OSGi que deben cumplir un interfaz).
 * Para el sistema de proveedores se creará la infraestructura necesaria para que el API generado en las entidades para la lectura del registro de cambios sea independiente de proveedor de registro.
+* Se creará una clase que proveea del objeto que se almacenará como valor de *usuario* en las entidades y en la gestión de revisiones.
 
 Soluciones propuesta
 ======================
 
 * *Esta solución está probada en el proof http://scmcit.gva.es/svn/gvnix-proof/tags/petclinic-audit/v2.0*
-* *La Parte de Registro de histórico está provada en http://scmcit.gva.es/svn/gvnix-proof/tags/petclinic-revision-log/v1.1*
+* *La Parte de Registro de histórico está provada en http://scmcit.gva.es/svn/gvnix-proof/tags/petclinic-revision-log/v1.2*
 
 Uso del addon
 ---------------
 
-Establecer auditoría
+Inicializar auditoría
 ''''''''''''''''''''''
 
 En un proyecto con la persistencia configurada se ejecutará el siguiente comando::
+
+   gvNIX> jpa audit setup --service ~.servicies.AuditUserService --userType ~.domain.UserLogin
+
+Esto provocará los siguientes cambios:
+
+#. Se la clase *~.servicies.AuditUserService*, anotada con ``@GvNIXJpaAuditUserService(userType=UserLogin.class)``
+
+#. En su correspondiente fichero *.aj* se creará un método ``getUser()`` que devuelve un ``UserLogin``.
+
+#. Como el ``userType`` no es String (el valor por defecto) y ``UserLogin`` no implementa la interfaz de *String Security* ``UserDetails`` se mostrará un aviso al usuario que debe ajustar el método ``getUser()`` de la clase *~.servicies.AuditUserService*.
+
+Establecer auditoría
+''''''''''''''''''''''
+
+Para estabecer la auditoría a una entidad se ejecutará el comando::
 
    gvNIX> jpa audit add --name ~.domain.Visit
 
@@ -53,23 +69,18 @@ Esto provocará los siguientes cambios:
    * Esto generará una fichero ``.aj`` en el que se definirán las propiedades, getters y setters para los valores de auditoría:
 
      - Fecha de creación
-     - Usuario de creación
+     - Usuario de creación (del tipo especificado en ``@GvNIXJpaAuditUserService``)
      - Fecha última actualización
-     - Usuario de última actualización
+     - Usuario de última actualización (del tipo especificado en ``@GvNIXJpaAuditUserService``)
 
 #. Se creará una clase ``Visit_auditListener``
 
    * Estará anotada con ``@GvNIXAuditListener``
    * Esta anotación generará un fichero ``.aj`` con los siguentes métodos:
 
-     - getUserName(): Devuelve el usuario actual.
+     - onCreate(Visit visit): Anotado con ``@PrePersist``. Establece los valores de Fechas y usuario (creación y actualización por igual) usando la fecha actual y el valor devuelto por la clase anotada ``@GvNIXJpaAuditUserService``.
 
-       + Devuelve ``null`` si no está configurado Spring Security
-       + Devuelve el nombre del usuario actual del contexto de Spring Security
-
-     - onCreate(Visit visit): Anotado con ``@PrePersist``. Establece los valores de Fechas y usuario (creación y actualización por igual) usando la fecha actual y el string devuelto por ``getUserName()``.
-
-     - onUpdate(Visit visit): Anotado con ``@PreUpdate``. Establece los valores de Fechas y usuario de última actualización usando la fecha actual y el string devuelto por ``getUserName()``.
+     - onUpdate(Visit visit): Anotado con ``@PreUpdate``. Establece los valores de Fechas y usuario de última actualización usando la fecha actual y el valor devuelto por la clase anotada ``@GvNIXJpaAuditUserService``.
 
 #. Se creará/actualizará el fichero *META-INF/orm.xml* (al lado de *persistence.xml*) para registrar el listener ``Visit_auditListener`` a la entidad ``Visit``::
 
@@ -114,7 +125,7 @@ Después del comando, aquellas entidades anotadas con ``@GvNIXAudit`` y tenga es
   - Visit getItem()
   - Date getRevisionDate()
   - Long getRevisionNumber()
-  - String getRevisionUserName()
+  - ??? getRevisionUser()
   - String getType()
   - boolean isCreate()
   - boolean isDelete()
@@ -162,6 +173,18 @@ Implementación del propio add-on
 La implementación del add tendrá los siguientes componentes:
 
 * Commands:
+
+  - ``jpa audit setup``: Configura la auditoría de historico creando la clase que proveera del nombre de usuario que realiza el cambio. Sólo se puede ejecutar una vez. Parámetros:
+
+      + ``service`` (obligatorio): Nombre de la clase a crear para hacer de proveedor del objeto usuario.
+
+      + ``userType`` (opcional): Clase a usar como usuario. Por defecto ``String``.
+
+         * Lanzará un warning informando que tiene que ajustar la implementación de la clase en dos circunstancias:
+
+           - Si no está configurado Spring Security
+
+           - Si la clase ``userType`` no es String y no implementa ``UserDetails``.
 
   - ``jpa audit revisionLog``: Configura un proveedor de revisiones de histórico. Solo disponible si hay alguno disponible. Parámetros:
 

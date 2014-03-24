@@ -54,7 +54,7 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
             .getLogger(JpaAuditMetadataProvider.class);
 
     @Reference
-    private JpaAuditOperations operations;
+    private JpaAuditOperationsMetadata operations;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -101,6 +101,11 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
         // Gets active revisionLog provider
         RevisionLogProvider logProvider = operations
                 .getActiveRevisionLogProvider();
+
+        if (operations.getUserType() == null) {
+            // No user type defined
+            return null;
+        }
 
         // prepares entity information
         JavaType entity = JpaAuditMetadata
@@ -166,8 +171,8 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
             }
             if (useRevisionLog) {
                 // Use revision log: require builder to provider
-                revisionLogBuilder = logProvider
-                        .getMetadataBuilder(governorPhysicalTypeMetadata);
+                revisionLogBuilder = logProvider.getMetadataBuilder(operations,
+                        governorPhysicalTypeMetadata);
             }
             // otherwise: pass revisionLogBuilder as null: don't use revision
             // log
@@ -176,7 +181,8 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
         // Pass dependencies required by the metadata in through its constructor
         return new JpaAuditMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, plural,
-                revisionLogBuilder, identifiers);
+                revisionLogBuilder, identifiers, operations.getUserType(),
+                operations.isUserTypeEntity());
     }
 
     /**

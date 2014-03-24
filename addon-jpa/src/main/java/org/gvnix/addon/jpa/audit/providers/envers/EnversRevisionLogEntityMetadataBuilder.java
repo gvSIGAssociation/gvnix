@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.gvnix.addon.jpa.audit.GvNIXJpaAuditRevisionEntity;
+import org.gvnix.addon.jpa.audit.JpaAuditUserServiceMetadata;
 import org.gvnix.addon.jpa.audit.providers.RevisionLogRevisionEntityMetadataBuilder;
 import org.gvnix.support.ItdBuilderHelper;
 import org.gvnix.support.ItdBuilderHelper.GET_FIELD_EXISTS_ACTION;
@@ -59,8 +60,8 @@ public class EnversRevisionLogEntityMetadataBuilder implements
     private static final JavaSymbolName ID_FIELD = new JavaSymbolName("id");
     private static final JavaSymbolName TIMESTAMP_FIELD = new JavaSymbolName(
             "timestamp");
-    private static final JavaSymbolName USER_NAME_FIELD = new JavaSymbolName(
-            "userName");
+    private static final JavaSymbolName USER_FIELD = new JavaSymbolName(
+            "revisonUser");
     private static final JavaSymbolName TO_STRING_METHOD = new JavaSymbolName(
             "toString");
 
@@ -89,21 +90,16 @@ public class EnversRevisionLogEntityMetadataBuilder implements
     private static final JavaType REVISION_TIMESTAMP = new JavaType(
             "org.hibernate.envers.RevisionTimestamp");
 
-    private static final JavaType AUTHENTICATION = new JavaType(
-            "org.springframework.security.core.Authentication");
-    private static final JavaType SECURITY_CONTEXT_HOLDER = new JavaType(
-            "org.springframework.security.core.context.SecurityContextHolder");
     private static final JavaType REVISION_LISTENER = new JavaType(
             "org.hibernate.envers.RevisionListener");
 
     private final PhysicalTypeMetadata governorPhysicalTypeMetadata;
     private final ClassOrInterfaceTypeDetails governorTypeDetails;
-    private final boolean isSpringSecurityConfigured;
 
     private JavaType revisionListenerType;
     private FieldMetadata idField;
     private FieldMetadata timestampField;
-    private FieldMetadata userNameField;
+    private FieldMetadata userField;
     private MethodMetadata idFieldGetter;
     private MethodMetadata idFieldSetter;
     private MethodMetadata timestampFieldGetter;
@@ -117,8 +113,7 @@ public class EnversRevisionLogEntityMetadataBuilder implements
     private ItdBuilderHelper helper;
 
     public EnversRevisionLogEntityMetadataBuilder(
-            PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            boolean isSpringSecurityConfigured) {
+            PhysicalTypeMetadata governorPhysicalTypeMetadata) {
         this.governorPhysicalTypeMetadata = governorPhysicalTypeMetadata;
         final Object physicalTypeDetails = governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
@@ -130,7 +125,6 @@ public class EnversRevisionLogEntityMetadataBuilder implements
             throw new IllegalArgumentException(
                     "Invalid governorPhysicalTypeMetadata");
         }
-        this.isSpringSecurityConfigured = isSpringSecurityConfigured;
     }
 
     @Override
@@ -178,8 +172,8 @@ public class EnversRevisionLogEntityMetadataBuilder implements
         builder.addField(getTimestampField());
         builder.addMethod(getTimestampGetter());
         builder.addMethod(getTimestampSetter());
-        builder.addField(getUserNameField());
-        builder.addMethod(getUserNameGetter());
+        builder.addField(getUserField());
+        builder.addMethod(getUserGetter());
         builder.addMethod(getUserNameSetter());
         builder.addMethod(getRevisionDate());
 
@@ -269,8 +263,8 @@ public class EnversRevisionLogEntityMetadataBuilder implements
                 .format("return new %s(this).append(\"%s\", this.%s).append(\"%s\", this.%s()).append(\"%s\", this.%s).toString();",
                         helper.getFinalTypeName(TO_STRING_BUILDER), ID_FIELD,
                         ID_FIELD, REVISION_DATE_TRANSIENT_FIELD,
-                        getRevisionDate().getMethodName(), USER_NAME_FIELD,
-                        USER_NAME_FIELD));
+                        getRevisionDate().getMethodName(), USER_FIELD,
+                        USER_FIELD));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -351,30 +345,11 @@ public class EnversRevisionLogEntityMetadataBuilder implements
                         .getSimpleTypeName(), context.getEntity()
                         .getSimpleTypeName()));
 
-        if (isSpringSecurityConfigured) {
-
-            // Authentication auth =
-            // SecurityContextHolder.getContext().getAuthentication();
-            body.appendFormalLine(String.format(
-                    "%s auth = %s.getContext().getAuthentication();",
-                    helper.getFinalTypeName(AUTHENTICATION),
-                    helper.getFinalTypeName(SECURITY_CONTEXT_HOLDER)));
-
-            // if (auth != null && auth.isAuthenticated()) {
-            body.appendFormalLine("if (auth != null && auth.isAuthenticated()) {");
-            body.indent();
-
-            // revison.setUserNsame(auth.getName());
-            body.appendFormalLine("revision.setUserName(auth.getName());");
-
-            // }
-            body.indentRemove();
-            body.appendFormalLine("}");
-        }
-        else {
-            body.appendFormalLine(String.format(
-                    "// TODO set revision.%s value here", USER_NAME_FIELD));
-        }
+        // revison.setUserNsame(AuditUserService.getUser());
+        body.appendFormalLine(String.format("revision.%s(%s.%s());",
+                helper.getSetterMethodNameForField(USER_FIELD),
+                helper.getFinalTypeName(context.getUserService()),
+                JpaAuditUserServiceMetadata.GET_USER_METHOD));
 
     }
 
@@ -511,18 +486,16 @@ public class EnversRevisionLogEntityMetadataBuilder implements
         body.appendFormalLine("return true;");
     }
 
-    private MethodMetadata getUserNameGetter() {
+    private MethodMetadata getUserGetter() {
         if (userNameFieldGetter == null) {
-            userNameFieldGetter = helper.getGetterMethod(getUserNameField(),
-                    null);
+            userNameFieldGetter = helper.getGetterMethod(getUserField(), null);
         }
         return userNameFieldGetter;
     }
 
     private MethodMetadata getUserNameSetter() {
         if (userNameFieldSetter == null) {
-            userNameFieldSetter = helper.getSetterMethod(getUserNameField(),
-                    null);
+            userNameFieldSetter = helper.getSetterMethod(getUserField(), null);
         }
         return userNameFieldSetter;
     }
@@ -557,17 +530,24 @@ public class EnversRevisionLogEntityMetadataBuilder implements
         return idFieldSetter;
     }
 
-    private FieldMetadata getUserNameField() {
-        if (userNameField == null) {
-            userNameField = helper
+    private FieldMetadata getUserField() {
+        if (userField == null) {
+            List<AnnotationMetadataBuilder> annotations = null;
+            if (context.getUserTypeIsEntity()) {
+                annotations = new ArrayList<AnnotationMetadataBuilder>(1);
+                annotations.add(new AnnotationMetadataBuilder(
+                        AnnotationMetadataBuilder.JPA_MANY_TO_ONE_ANNOTATION));
+
+            }
+            userField = helper
                     .getField(
-                            USER_NAME_FIELD,
+                            USER_FIELD,
                             Modifier.PRIVATE,
-                            JavaType.STRING,
-                            null,
+                            context.getUserType(),
+                            annotations,
                             GET_FIELD_EXISTS_ACTION.RETURN_EXISTING_IF_ANNOTATION_MATCH);
         }
-        return userNameField;
+        return userField;
     }
 
     private FieldMetadata getTimestampField() {
@@ -614,6 +594,6 @@ public class EnversRevisionLogEntityMetadataBuilder implements
     }
 
     public JavaSymbolName getRevisonUserGetterName() {
-        return getUserNameGetter().getMethodName();
+        return getUserGetter().getMethodName();
     }
 }

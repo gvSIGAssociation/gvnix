@@ -82,7 +82,7 @@ public class JpaAuditMetadata extends
     public static final JavaSymbolName REV_ITEM_GET_REVISION_NUMBER_METHOD = new JavaSymbolName(
             "getRevisionNumber");
     public static final JavaSymbolName REV_ITEM_GET_REVISION_USER_METHOD = new JavaSymbolName(
-            "getRevisionUserName");
+            "getRevisionUser");
     public static final JavaSymbolName REV_ITEM_GET_REVISION_DATE_METHOD = new JavaSymbolName(
             "getRevisionDate");
     public static final JavaSymbolName REV_ITEM_IS_CREATE_METHOD = new JavaSymbolName(
@@ -195,6 +195,16 @@ public class JpaAuditMetadata extends
     private JavaSymbolName findRevisionsMethodName;
 
     /**
+     * Type to use for "user" fields
+     */
+    private final JavaType userType;
+
+    /**
+     * Type to use for "user" is an Entity
+     */
+    private final boolean userTypeEntity;
+
+    /**
      * Name of revision item (based on entity name)
      */
     private String revisonItemTypeName;
@@ -219,7 +229,8 @@ public class JpaAuditMetadata extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             JpaAuditAnnotationValues annotationValues, String entityPlural,
             RevisionLogMetadataBuilder revisionLogBuilder,
-            List<FieldMetadata> identifiers) {
+            List<FieldMetadata> identifiers, JavaType userType,
+            boolean userTypeEntity) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -242,11 +253,15 @@ public class JpaAuditMetadata extends
 
         this.identifier = identifiers.get(0);
 
+        this.userType = userType;
+
+        this.userTypeEntity = userTypeEntity;
+
         this.isAbstract = governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails().isAbstract();
 
         // Generate base auditing fields
-        if (!isAbstract()) {
+        if (!isAbstractEntity()) {
             // Only add audit fields on non-abstract instances
 
             // add auditCreation field (and getter/setter)
@@ -320,7 +335,7 @@ public class JpaAuditMetadata extends
                 findMethodName, getRevisionsMethodName,
                 findRevisionsByDatesMethodName, findRevisionsMethodName,
                 revisonItemTypeName, entityListType, revisonItemType,
-                this.identifier, revisonItemListType, isAbstract);
+                this.identifier, revisonItemListType, isAbstract, userType);
     }
 
     /**
@@ -373,7 +388,7 @@ public class JpaAuditMetadata extends
         // Add Revision item common methods
         classBuilder.addMethod(createRevisionItemGetItemMethod());
         classBuilder.addMethod(createRevisionItemGetRevisionNumberMethod());
-        classBuilder.addMethod(createRevisionItemGetRevisionUserNameMethod());
+        classBuilder.addMethod(createRevisionItemGetRevisionUserMethod());
         classBuilder.addMethod(createRevisionItemGetRevisionDateMethod());
         classBuilder.addMethod(createRevisionItemIsCreateMethod());
         classBuilder.addMethod(createRevisionItemIsUpdateMethod());
@@ -470,13 +485,13 @@ public class JpaAuditMetadata extends
     }
 
     /**
-     * @return creates XXRevision.getUserName() method
+     * @return creates XXRevision.getUser() method
      */
-    private MethodMetadata createRevisionItemGetRevisionUserNameMethod() {
+    private MethodMetadata createRevisionItemGetRevisionUserMethod() {
         InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
         revisionLogBuilder.buildBodyRevisionItemGetRevisionUser(body);
         return createRevisionItemMethod(REV_ITEM_GET_REVISION_USER_METHOD,
-                JavaType.STRING, body);
+                userType, body);
     }
 
     /**
@@ -923,8 +938,15 @@ public class JpaAuditMetadata extends
      * @return auditLastUpdatedBy field
      */
     private FieldMetadata getFieldAuditLastUpdatedBy() {
+        List<AnnotationMetadataBuilder> annotations = null;
+        if (userTypeEntity) {
+            annotations = new ArrayList<AnnotationMetadataBuilder>(1);
+            annotations.add(new AnnotationMetadataBuilder(
+                    AnnotationMetadataBuilder.JPA_MANY_TO_ONE_ANNOTATION));
+
+        }
         return helper.getField(LAST_UPDATED_BY_FIELD, Modifier.PRIVATE,
-                JavaType.STRING, null, GET_FIELD_EXISTS_ACTION.RETURN_EXISTING);
+                userType, annotations, GET_FIELD_EXISTS_ACTION.RETURN_EXISTING);
     }
 
     /**
@@ -940,8 +962,15 @@ public class JpaAuditMetadata extends
      * @return auditCreatedBy field
      */
     private FieldMetadata getFieldAuditCreatedBy() {
-        return helper.getField(CREATED_BY_FIELD, Modifier.PRIVATE,
-                JavaType.STRING, null, GET_FIELD_EXISTS_ACTION.RETURN_EXISTING);
+        List<AnnotationMetadataBuilder> annotations = null;
+        if (userTypeEntity) {
+            annotations = new ArrayList<AnnotationMetadataBuilder>(1);
+            annotations.add(new AnnotationMetadataBuilder(
+                    AnnotationMetadataBuilder.JPA_MANY_TO_ONE_ANNOTATION));
+
+        }
+        return helper.getField(CREATED_BY_FIELD, Modifier.PRIVATE, userType,
+                annotations, GET_FIELD_EXISTS_ACTION.RETURN_EXISTING);
     }
 
     /**
@@ -992,7 +1021,7 @@ public class JpaAuditMetadata extends
      * @return
      */
     private MethodMetadata getGetAuditCreatedByMethod() {
-        return helper.getGetterMethod(CREATED_BY_FIELD, JavaType.STRING, null);
+        return helper.getGetterMethod(CREATED_BY_FIELD, userType, null);
     }
 
     /**
@@ -1001,7 +1030,7 @@ public class JpaAuditMetadata extends
      * @return
      */
     private MethodMetadata getSetAuditCreatedByMethod() {
-        return helper.getSetterMethod(CREATED_BY_FIELD, JavaType.STRING, null);
+        return helper.getSetterMethod(CREATED_BY_FIELD, userType, null);
     }
 
     /**
@@ -1030,8 +1059,7 @@ public class JpaAuditMetadata extends
      * @return
      */
     private MethodMetadata getGetAuditLastUpdatedByMethod() {
-        return helper.getGetterMethod(LAST_UPDATED_BY_FIELD, JavaType.STRING,
-                null);
+        return helper.getGetterMethod(LAST_UPDATED_BY_FIELD, userType, null);
     }
 
     /**
@@ -1040,8 +1068,7 @@ public class JpaAuditMetadata extends
      * @return
      */
     private MethodMetadata getSetAuditLastUpdatedByMethod() {
-        return helper.getSetterMethod(LAST_UPDATED_BY_FIELD, JavaType.STRING,
-                null);
+        return helper.getSetterMethod(LAST_UPDATED_BY_FIELD, userType, null);
     }
 
     public String toString() {
@@ -1176,8 +1203,15 @@ public class JpaAuditMetadata extends
     /**
      * @return if entity is abstract class
      */
-    public boolean isAbstract() {
+    public boolean isAbstractEntity() {
         return isAbstract;
+    }
+
+    /**
+     * @return class to use to store "user" information
+     */
+    public JavaType getUserType() {
+        return userType;
     }
 
     /**
@@ -1207,6 +1241,7 @@ public class JpaAuditMetadata extends
         private final FieldMetadata identifier;
         private final JavaType revisonItemListType;
         private final boolean isAbstractEntity;
+        private final JavaType userType;
 
         public BuildContext(String metadataId, ItdBuilderHelper helper,
                 JpaAuditAnnotationValues annotationValues, JavaType entity,
@@ -1218,7 +1253,8 @@ public class JpaAuditMetadata extends
                 JavaSymbolName findRevisionsMethodName,
                 String revisonItemTypeName, JavaType entityListType,
                 JavaType revisonItemType, FieldMetadata identifier,
-                JavaType revisonItemListType, boolean isAbstractEntity) {
+                JavaType revisonItemListType, boolean isAbstractEntity,
+                JavaType userType) {
             super();
             this.metadataId = metadataId;
             this.helper = helper;
@@ -1237,133 +1273,121 @@ public class JpaAuditMetadata extends
             this.identifier = identifier;
             this.revisonItemListType = revisonItemListType;
             this.isAbstractEntity = isAbstractEntity;
+            this.userType = userType;
         }
 
-        /**
-         * @return the helper
-         */
+        /** {@inheritDoc} */
+        @Override
         public ItdBuilderHelper getHelper() {
             return helper;
         }
 
-        /**
-         * @return the annotationValues
-         */
+        /** {@inheritDoc} */
+        @Override
         public JpaAuditAnnotationValues getAnnotationValues() {
             return annotationValues;
         }
 
-        /**
-         * @return the entity
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaType getEntity() {
             return entity;
         }
 
-        /**
-         * @return the entityName
-         */
+        /** {@inheritDoc} */
+        @Override
         public String getEntityName() {
             return entityName;
         }
 
-        /**
-         * @return the entityPlural
-         */
+        /** {@inheritDoc} */
+        @Override
         public String getEntityPlural() {
             return entityPlural;
         }
 
-        /**
-         * @return the findAllMethodName
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaSymbolName getFindAllMethodName() {
             return findAllMethodName;
         }
 
-        /**
-         * @return the findMethodName
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaSymbolName getFindMethodName() {
             return findMethodName;
         }
 
-        /**
-         * @return the getRevisionsMethodName
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaSymbolName getGetRevisionsMethodName() {
             return getRevisionsMethodName;
         }
 
-        /**
-         * @return the findRevisionsByDatesMethodName
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaSymbolName getFindRevisionsByDatesMethodName() {
             return findRevisionsByDatesMethodName;
         }
 
-        /**
-         * @return the findRevisionsMethodName
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaSymbolName getFindRevisionsMethodName() {
             return findRevisionsMethodName;
         }
 
-        /**
-         * @return the revisonItemTypeName
-         */
+        /** {@inheritDoc} */
+        @Override
         public String getRevisonItemTypeName() {
             return revisonItemTypeName;
         }
 
-        /**
-         * @return entityListType
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaType getEntityListType() {
             return entityListType;
         }
 
-        /**
-         * @return RevisionItem javaType for this entity (XXXRevision)
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaType getRevisonItemType() {
             return revisonItemType;
         }
 
-        /**
-         * @return current metadata identifier (required for class artifacts
-         *         builders)
-         */
+        /** {@inheritDoc} */
+        @Override
         public String getMetadataId() {
             return metadataId;
         }
 
-        /**
-         * @return getRevisionNumberForDate method name
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaSymbolName getGetRevisionNumberForDate() {
             return GET_REVISON_NUMBER_FOR_DATE_METHOD;
         }
 
-        /**
-         * @return identifier field definition of current entity
-         */
+        /** {@inheritDoc} */
+        @Override
         public FieldMetadata getIdentifier() {
             return identifier;
         }
 
-        /**
-         * @return javaType of List<XXXRevsion>
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaType getRevisonItemListType() {
             return revisonItemListType;
         }
 
-        /**
-         * @return if entity is an abstract class
-         */
+        /** {@inheritDoc} */
+        @Override
         public boolean isAbstractEntity() {
             return isAbstractEntity;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public JavaType getUserType() {
+            return userType;
         }
     }
 }

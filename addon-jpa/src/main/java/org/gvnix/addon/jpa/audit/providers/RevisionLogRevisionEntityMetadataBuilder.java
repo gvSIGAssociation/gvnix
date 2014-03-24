@@ -80,6 +80,29 @@ public interface RevisionLogRevisionEntityMetadataBuilder {
          * @return entity
          */
         public JavaType getEntity();
+
+        /**
+         * @return class to use to store "user" information
+         */
+        public JavaType getUserType();
+
+        /**
+         * @return class which provider the current user
+         */
+        public JavaType getUserService();
+
+        /**
+         * @return if class which provider the current user is a application JPA
+         *         entity
+         */
+        public boolean getUserTypeIsEntity();
+
+        /**
+         * @return if class which provider the current user implements Spring
+         *         Security UserDetail interface
+         */
+        public boolean getUserTypeIsUserDetails();
+
     }
 
 }

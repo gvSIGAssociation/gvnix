@@ -319,6 +319,11 @@ public interface RevisionLogMetadataBuilder {
          * @return if entity is an abstract class
          */
         public boolean isAbstractEntity();
+
+        /**
+         * @return class to use to store "user" information
+         */
+        public JavaType getUserType();
     }
 
 }

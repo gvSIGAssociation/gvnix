@@ -38,9 +38,7 @@ import org.springframework.roo.classpath.itd.AbstractMemberDiscoveringItdMetadat
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.FeatureNames;
 import org.springframework.roo.project.LogicalPath;
-import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
@@ -63,7 +61,7 @@ public final class JpaAuditListenerMetadataProvider extends
     private JpaOrmEntityListenerRegistry entityListenerRegistry;
 
     @Reference
-    private ProjectOperations projectOperations;
+    private JpaAuditOperationsMetadata operations;
 
     private Map<JavaType, String> entityToAuditMidMap = new HashMap<JavaType, String>();
 
@@ -112,6 +110,11 @@ public final class JpaAuditListenerMetadataProvider extends
         final JpaAuditListenerAnnotationValues annotationValues = new JpaAuditListenerAnnotationValues(
                 governorPhysicalTypeMetadata);
 
+        if (operations.getUserType() == null) {
+            // No user type defined
+            return null;
+        }
+
         // get target entity class details
         final JavaType targetEntity = annotationValues.getEntity();
         if (!annotationValues.isAnnotationFound() || targetEntity == null) {
@@ -159,14 +162,11 @@ public final class JpaAuditListenerMetadataProvider extends
             return null;
         }
 
-        // Check if springSecurity is installed
-        boolean isSpringSecurityInstalled = projectOperations
-                .isFeatureInstalledInFocusedModule(FeatureNames.SECURITY);
-
         // Generate metadata
         return new JpaAuditListenerMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, annotationValues,
-                targetEntity, auditMetadata, isSpringSecurityInstalled);
+                targetEntity, auditMetadata, operations.getUserType(),
+                operations.getUserServiceType());
     }
 
     /**

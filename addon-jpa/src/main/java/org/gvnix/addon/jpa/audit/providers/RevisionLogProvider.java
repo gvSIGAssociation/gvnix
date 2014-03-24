@@ -21,6 +21,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.jpa.audit.GvNIXJpaAudit;
 import org.gvnix.addon.jpa.audit.JpaAuditMetadata;
+import org.gvnix.addon.jpa.audit.JpaAuditOperationsSPI;
 import org.gvnix.addon.jpa.audit.JpaAuditRevisionEntityAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 
@@ -69,17 +70,19 @@ public interface RevisionLogProvider {
      * Performs the requiered operation to setup this provider on current
      * project
      */
-    void setup();
+    void setup(JpaAuditOperationsSPI operations);
 
     /**
      * Create an instance of {@link RevisionLogMetadataBuilder} to generate
      * {@link JpaAuditMetadata} for <code>governorPhysicalTypeMetadata</code>
      * entity.
      * 
+     * @param operations
      * @param governorPhysicalTypeMetadata
      * @return
      */
     RevisionLogMetadataBuilder getMetadataBuilder(
+            JpaAuditOperationsSPI operations,
             PhysicalTypeMetadata governorPhysicalTypeMetadata);
 
     /**
@@ -87,10 +90,12 @@ public interface RevisionLogProvider {
      * generate {@link JpaAuditRevisionEntityAnnotationValues} in
      * <code>governorPhysicalTypeMetadata</code> class.
      * 
+     * @param operations
      * @param governorPhysicalTypeMetadata
      * @return
      */
     RevisionLogRevisionEntityMetadataBuilder getRevisonEntityMetadataBuilder(
+            JpaAuditOperationsSPI operations,
             PhysicalTypeMetadata governorPhysicalTypeMetadata);
 
 }

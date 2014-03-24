@@ -76,6 +76,11 @@ public class JpaAuditRevisionEntityMetadata extends
 
     private final JpaAuditRevisionEntityAnnotationValues annotationValues;
     private final RevisionLogRevisionEntityMetadataBuilder revisionLogBuilder;
+    private final JavaType userType;
+    private final JavaType userService;
+
+    private final boolean userTypeIsEntity;
+    private final boolean userTypeIsUserDetails;
 
     private Context buildContext;
 
@@ -83,7 +88,9 @@ public class JpaAuditRevisionEntityMetadata extends
             JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             JpaAuditRevisionEntityAnnotationValues annotationValues,
-            RevisionLogRevisionEntityMetadataBuilder revisionLogBuilder) {
+            RevisionLogRevisionEntityMetadataBuilder revisionLogBuilder,
+            JavaType userType, JavaType userService, boolean userTypeIsEntity,
+            boolean userTypeIsUserDetails) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -96,8 +103,18 @@ public class JpaAuditRevisionEntityMetadata extends
 
         this.revisionLogBuilder = revisionLogBuilder;
 
+        this.userType = userType;
+
+        this.userService = userService;
+
+        this.userTypeIsEntity = userTypeIsEntity;
+
+        this.userTypeIsUserDetails = userTypeIsUserDetails;
+
         this.buildContext = new BuildContext(getId(), helper,
-                this.annotationValues, governorPhysicalTypeMetadata.getType());
+                this.annotationValues, governorPhysicalTypeMetadata.getType(),
+                this.userType, this.userService, this.userTypeIsEntity,
+                this.userTypeIsUserDetails);
 
         this.revisionLogBuilder.initialize(builder, buildContext);
 
@@ -156,42 +173,75 @@ public class JpaAuditRevisionEntityMetadata extends
 
         private final JavaType entity;
 
+        private final JavaType userType;
+
+        private final JavaType userService;
+
+        private final boolean userTypeIsEntity;
+
+        private final boolean userTypeIsUserDetails;
+
         public BuildContext(String metadataId, ItdBuilderHelper helper,
                 JpaAuditRevisionEntityAnnotationValues annotationValues,
-                JavaType entity) {
+                JavaType entity, JavaType userType, JavaType userService,
+                boolean userTypeIsEntity, boolean userTypeIsUserDetails) {
             super();
             this.metadataId = metadataId;
             this.helper = helper;
             this.annotationValues = annotationValues;
             this.entity = entity;
+            this.userType = userType;
+            this.userService = userService;
+            this.userTypeIsEntity = userTypeIsEntity;
+            this.userTypeIsUserDetails = userTypeIsUserDetails;
         }
 
-        /**
-         * @return the helper
-         */
+        /** {@inheritDoc} */
+        @Override
         public ItdBuilderHelper getHelper() {
             return helper;
         }
 
-        /**
-         * @return the annotationValues
-         */
+        /** {@inheritDoc} */
+        @Override
         public JpaAuditRevisionEntityAnnotationValues getAnnotationValues() {
             return annotationValues;
         }
 
-        /**
-         * @return metadataId
-         */
+        /** {@inheritDoc} */
+        @Override
         public String getMetadataId() {
             return metadataId;
         }
 
-        /**
-         * @return entity
-         */
+        /** {@inheritDoc} */
+        @Override
         public JavaType getEntity() {
             return entity;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public JavaType getUserType() {
+            return userType;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public JavaType getUserService() {
+            return userService;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean getUserTypeIsEntity() {
+            return userTypeIsEntity;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean getUserTypeIsUserDetails() {
+            return userTypeIsUserDetails;
         }
     }
 

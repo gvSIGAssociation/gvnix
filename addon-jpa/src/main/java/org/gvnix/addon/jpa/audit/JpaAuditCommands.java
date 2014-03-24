@@ -46,6 +46,17 @@ public class JpaAuditCommands implements CommandMarker {
     private JpaAuditOperations operations;
 
     /**
+     * Informs if <code>jpa audit setup</code> command is available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator({ "jpa audit setup" })
+    public boolean isSetupCommandAvailable() {
+        return operations.isSetupCommandAvailable();
+    }
+
+    /**
      * Informs if <code>jpa audit</code> commands are available
      * 
      * @return true (default) if the command should be visible at this stage,
@@ -66,6 +77,24 @@ public class JpaAuditCommands implements CommandMarker {
     public boolean isProvidersAvailable() {
         return isCommandAvailable() && operations.isProvidersAvailable()
                 && operations.getActiveRevisionLogProvider() == null;
+    }
+
+    /**
+     * Initializes JPA audit support in this project
+     * <p/>
+     * Creates a class which will provide the user information for audit
+     * purpose.
+     * 
+     * @param service (optional) to create. If not set a AuditClienteService
+     *        will be created on lowest package were an entity is found
+     * @param userType (optional) to store as user information. If not set uses
+     *        {@link String}
+     */
+    @CliCommand(value = "jpa audit setup", help = "Initializes jpa audit support in this project.")
+    public void setup(
+            @CliOption(key = "service", mandatory = false, help = "Class which will provide the user information for audit purpose") JavaType service,
+            @CliOption(key = "userType", mandatory = false, help = "the java type of user information to store in aduit features. If not set, uses String") JavaType userType) {
+        operations.setup(service, userType);
     }
 
     /**

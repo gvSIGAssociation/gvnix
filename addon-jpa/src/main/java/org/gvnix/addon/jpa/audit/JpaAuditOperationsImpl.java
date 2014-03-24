@@ -17,11 +17,15 @@
  */
 package org.gvnix.addon.jpa.audit;
 
+import static org.springframework.roo.classpath.customdata.CustomDataKeys.PERSISTENT_TYPE;
+
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,16 +41,23 @@ import org.gvnix.addon.jpa.audit.providers.RevisionLogProvider;
 import org.gvnix.addon.jpa.audit.providers.RevisionLogProviderId;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.scanner.MemberDetails;
+import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.JdkJavaType;
 import org.springframework.roo.model.RooJavaType;
+import org.springframework.roo.project.FeatureNames;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
@@ -54,6 +65,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of {@link JpaAuditOperations}
+ * <p/>
+ * For {@link #getUserServiceType()} this class implements a simple cache system
+ * to store computed value. This is due to performance problems on
+ * look-for-an-annotated-class mechanism.
  * 
  * @author gvNIX Team
  * @since 1.3.0
@@ -61,13 +76,24 @@ import org.springframework.roo.support.logging.HandlerUtils;
 @Component
 @Service
 @Reference(name = "provider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = RevisionLogProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
-public class JpaAuditOperationsImpl implements JpaAuditOperations {
+public class JpaAuditOperationsImpl implements JpaAuditOperations,
+        JpaAuditOperationsMetadata, JpaAuditOperationsSPI {
 
     private static final JavaType AUDIT_ANNOTATION_TYPE = new JavaType(
             GvNIXJpaAudit.class.getName());
 
+    private static final JavaType AUDIT_USER_SERV_ANNOTATION_TYPE = new JavaType(
+            GvNIXJpaAuditUserService.class.getName());
+
+    private static final JavaType SEC_USER_DETAILS = new JavaType(
+            "org.springframework.security.core.userdetails.UserDetails");
+
+    private static final String DEFAULT_USER_SERVICE_NAME = "AuditUserService";
+
     private static final Logger LOGGER = HandlerUtils
             .getLogger(JpaAuditOperationsImpl.class);
+
+    private static final int EVICT_CACHE_MLSEC = 60 * 2 * 1000;
 
     @Reference
     private ProjectOperations projectOperations;
@@ -81,6 +107,24 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations {
     @Reference
     private PathResolver pathResolver;
 
+    @Reference
+    private MemberDetailsScanner memberDetailsScanner;
+
+    @Reference
+    private MetadataService metadataService;
+
+    // Cache user services
+    private JavaType userServiceType = null;
+
+    // User service cache timestamp
+    private Long userServiceTypeTimestamp = null;
+
+    // Cache revisionEntityJavaType services
+    private JavaType revisionEntityJavaType;
+
+    // revisionEntityJavaType cache timestamp
+    private Long revisionEntityJavaTypeTimestamp = null;
+
     /**
      * Registered providers
      */
@@ -90,6 +134,12 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations {
      * Current active provider
      */
     private RevisionLogProvider currentProvider = null;
+
+    private JavaType userType;
+
+    private Boolean userTypeIsUserDetails;
+
+    private Boolean userTypeIsEntity;
 
     /**
      * Bind a provider
@@ -112,10 +162,126 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations {
     }
 
     /** {@inheritDoc} */
+    @Override
+    public boolean isSetupCommandAvailable() {
+        return projectOperations
+                .isFeatureInstalledInFocusedModule(JpaOperations.FEATURE_NAME_GVNIX_JPA)
+                && !hasUserService();
+    }
+
+    /** {@inheritDoc} */
     public boolean isCommandAvailable() {
         // Check if gvNIX JPA dependencies installed
         return projectOperations
-                .isFeatureInstalledInFocusedModule(JpaOperations.FEATURE_NAME_GVNIX_JPA);
+                .isFeatureInstalledInFocusedModule(JpaOperations.FEATURE_NAME_GVNIX_JPA)
+                && hasUserService();
+    }
+
+    /**
+     * Clean the User service Cache data
+     */
+    private void cleanUserServiceCache() {
+        this.userServiceType = null;
+        this.userServiceTypeTimestamp = null;
+        this.userType = null;
+        this.userTypeIsEntity = null;
+        this.userTypeIsUserDetails = null;
+    }
+
+    /**
+     * Load userService and userType data if is needed (manage cache)
+     * */
+    public void loadUserServiceData() {
+        // Check cache
+        if (userServiceTypeTimestamp != null) {
+            // Check for valid cache
+            if (System.currentTimeMillis()
+                    - userServiceTypeTimestamp.longValue() < EVICT_CACHE_MLSEC) {
+                // return javaType cache
+                return;
+            }
+        }
+        // evict cache
+        cleanUserServiceCache();
+
+        // Look for user service class
+        Set<ClassOrInterfaceTypeDetails> classes = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(AUDIT_USER_SERV_ANNOTATION_TYPE);
+
+        if (classes != null && !classes.isEmpty()) {
+
+            // Check for multiple classes
+            if (classes.size() > 1) {
+                LOGGER.severe(String.format(
+                        "Only one class can be annotated with %s: found %s",
+                        AUDIT_USER_SERV_ANNOTATION_TYPE, classes.size()));
+            }
+            else {
+                // Store type of userService
+                ClassOrInterfaceTypeDetails cid = classes.iterator().next();
+                userServiceType = cid.getType();
+
+                // Get user type
+                JpaAuditUserServiceAnnotationValues annotationValue = new JpaAuditUserServiceAnnotationValues(
+                        cid);
+                userType = annotationValue.getUserType();
+
+                userTypeIsUserDetails = false;
+                userTypeIsEntity = false;
+                ClassOrInterfaceTypeDetails userTypeDetails = typeLocationService
+                        .getTypeDetails(userType);
+                if (userTypeDetails != null) {
+                    // Try to identify if userType implements UserDetails
+                    userTypeIsUserDetails = false;
+                    for (JavaType implementType : userTypeDetails
+                            .getImplementsTypes()) {
+                        if (SEC_USER_DETAILS.equals(implementType)) {
+                            userTypeIsUserDetails = true;
+                        }
+                    }
+
+                    // Try to determine if userType is an entity
+                    final MemberDetails userTypeMemberDetails = getMemberDetails(userTypeDetails);
+                    if (userTypeMemberDetails != null) {
+
+                        final MemberHoldingTypeDetails userTypeMemberHoldingTypeDetails = MemberFindingUtils
+                                .getMostConcreteMemberHoldingTypeDetailsWithTag(
+                                        userTypeMemberDetails, PERSISTENT_TYPE);
+                        if (userTypeMemberHoldingTypeDetails != null) {
+                            userTypeIsEntity = true;
+                        }
+
+                    }
+                }
+
+                userServiceTypeTimestamp = System.currentTimeMillis();
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * In order to solve possible performance problems when it tries to look for
+     * User-service class, a very simple cache mechanism has been implemented.
+     * */
+    @Override
+    public JavaType getUserServiceType() {
+        loadUserServiceData();
+        return userServiceType;
+    }
+
+    private boolean hasUserService() {
+        return getUserServiceType() != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isSpringSecurityInstalled() {
+        return projectOperations
+                .isFeatureInstalledInFocusedModule(FeatureNames.SECURITY);
+
     }
 
     /**
@@ -256,7 +422,7 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations {
                 .getTypeDetails(entity);
         if (cid == null) {
             throw new IllegalArgumentException("Cannot locate source for '"
-                    + entity.getFullyQualifiedTypeName() + "'");
+                    .concat(entity.getFullyQualifiedTypeName()).concat("'"));
         }
 
         // Check for @GvNIXJpaAudit annotation
@@ -389,7 +555,351 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations {
         }
 
         // Setup provider
-        toActive.setup();
+        toActive.setup(this);
     }
 
+    /**
+     * Create the class for entity which will hold the revision information for
+     * Hibernate Envers
+     * <p/>
+     * This use {@link #REVISION_LOG_ENTITY_NAME} as class name and look for
+     * <em>the first package which contains a entity</em> to place it.
+     * 
+     */
+    public void installRevisonEntity(JavaType revisionEntity) {
+
+        PathResolver pathResolver = projectOperations.getPathResolver();
+
+        JavaType target;
+        if (revisionEntity == null) {
+            target = generateRevionEntityJavaType();
+        }
+        else {
+            target = revisionEntity;
+        }
+
+        int modifier = Modifier.PUBLIC;
+
+        final String declaredByMetadataId = PhysicalTypeIdentifier
+                .createIdentifier(target,
+                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
+        File targetFile = new File(
+                typeLocationService
+                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
+        if (targetFile.exists()) {
+            Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
+                    target);
+        }
+
+        // Prepare class builder
+        final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                declaredByMetadataId, modifier, target,
+                PhysicalTypeCategory.CLASS);
+
+        // Prepare annotations array
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                1);
+
+        // Add @GvNIXJpaAuditListener annotation
+        AnnotationMetadataBuilder jpaAuditRevisionEntityAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(GvNIXJpaAuditRevisionEntity.class));
+        annotations.add(jpaAuditRevisionEntityAnnotation);
+
+        // Set annotations
+        cidBuilder.setAnnotations(annotations);
+
+        // Create Revision entity class
+        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
+    }
+
+    /**
+     * @return installed RevisonEntity JavaType
+     */
+    public JavaType getRevisionEntityJavaType() {
+        if (this.revisionEntityJavaType != null) {
+            if (System.currentTimeMillis()
+                    - revisionEntityJavaTypeTimestamp.longValue() < EVICT_CACHE_MLSEC) {
+                return this.revisionEntityJavaType;
+            }
+        }
+        Set<ClassOrInterfaceTypeDetails> found = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(JpaAuditOperationsSPI.GVNIX_REVION_ENTITY_ANNOTATION);
+
+        if (found.isEmpty()) {
+            throw new IllegalStateException(String.format(
+                    "Class with %s annotation is missing",
+                    JpaAuditOperationsSPI.GVNIX_REVION_ENTITY_ANNOTATION
+                            .getFullyQualifiedTypeName()));
+        }
+        else if (found.size() > 1) {
+            throw new IllegalStateException(String.format(
+                    "More than 1 classes with %s annotation",
+                    JpaAuditOperationsSPI.GVNIX_REVION_ENTITY_ANNOTATION
+                            .getFullyQualifiedTypeName()));
+        }
+        this.revisionEntityJavaType = found.iterator().next().getType();
+        this.revisionEntityJavaTypeTimestamp = System.currentTimeMillis();
+        return this.revisionEntityJavaType;
+    }
+
+    /**
+     * Clean cached revision entity javaType
+     */
+    void cleanRevisionEntityJavaType() {
+        this.revisionEntityJavaType = null;
+    }
+
+    /**
+     * Generates new a JavaType for revision log entity.
+     * <p/>
+     * Locates the early package which contains a entity and use it as domain
+     * package.
+     * 
+     * @return
+     */
+    private JavaType generateRevionEntityJavaType() {
+        JavaPackage targetPackage = getBaseDomainPackage();
+
+        if (targetPackage == null) {
+            throw new IllegalStateException(
+                    "No entities found on project: Can't identify package for revision entity.");
+        }
+
+        // Create JavaType with locate package
+        return new JavaType(targetPackage.getFullyQualifiedPackageName()
+                .concat(".")
+                .concat(JpaAuditOperationsSPI.REVISION_LOG_ENTITY_NAME));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JavaPackage getBaseDomainPackage() {
+        // Use the TypeLocationService to scan project for all types with entity
+        // annotation
+        Set<JavaPackage> packages = new HashSet<JavaPackage>();
+        for (JavaType entity : typeLocationService
+                .findTypesWithAnnotation(RooJavaType.ROO_JPA_ACTIVE_RECORD)) {
+            packages.add(entity.getPackage());
+        }
+
+        // Get the shorter (lowest deep level) package which contains an entity
+        JavaPackage targetPackage = null;
+        for (JavaPackage cur : packages) {
+            if (targetPackage == null
+                    || cur.getElements().size() < targetPackage.getElements()
+                            .size()) {
+                targetPackage = cur;
+            }
+        }
+        return targetPackage;
+    }
+
+    @Override
+    public void setup(JavaType serviceClass, JavaType userType) {
+        // Check parameters: get defaults
+        JavaType targetServiceClass;
+        if (serviceClass == null) {
+            targetServiceClass = generateUserServiceJavaType();
+        }
+        else {
+            targetServiceClass = serviceClass;
+        }
+        JavaType targetUserType;
+        if (userType == null) {
+            targetUserType = JavaType.STRING;
+        }
+        else {
+            targetUserType = userType;
+        }
+
+        Validate.isTrue(!JdkJavaType.isPartOfJavaLang(targetServiceClass
+                .getSimpleTypeName()),
+                "Target service class '%s' must not be part of java.lang",
+                targetServiceClass);
+
+        int modifier = Modifier.PUBLIC;
+
+        final String declaredByMetadataId = PhysicalTypeIdentifier
+                .createIdentifier(targetServiceClass,
+                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
+        File targetUserServiceFile = new File(
+                typeLocationService
+                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
+        if (targetUserServiceFile.exists()) {
+            Validate.isTrue(!targetUserServiceFile.exists(),
+                    "Type '%s' already exists", targetServiceClass);
+        }
+
+        // Prepare class builder
+        final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                declaredByMetadataId, modifier, targetServiceClass,
+                PhysicalTypeCategory.CLASS);
+
+        // Prepare annotations array
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                2);
+
+        // Add @GvNIXJpaAuditUserService annotation
+        AnnotationMetadataBuilder jpaAuditUserServiceAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(GvNIXJpaAuditUserService.class));
+        if (!JavaType.STRING.equals(targetUserType)) {
+            jpaAuditUserServiceAnnotation.addClassAttribute("userType",
+                    targetUserType);
+        }
+        annotations.add(jpaAuditUserServiceAnnotation);
+
+        // Set annotations
+        cidBuilder.setAnnotations(annotations);
+
+        // Create User Service class
+        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
+
+        refreshAuditedEntities();
+
+        // Show warning about UserType
+        if (isSpringSecurityInstalled()) {
+            if (JavaType.STRING.equals(targetUserType)) {
+                LOGGER.warning(String
+                        .format("Generating implemention of %s.%s() method which use UserDetails.getName() as user info. Customize it if is needed.",
+                                targetServiceClass,
+                                JpaAuditUserServiceMetadata.GET_USER_METHOD));
+            }
+            else if (!(isUserTypeSpringSecUserDetails() && isUserTypeEntity())) {
+                LOGGER.warning(String
+                        .format("You MUST customize %s.%s() method to provider user information for aduit. Addon can't identify how get %s instance.",
+                                targetServiceClass,
+                                JpaAuditUserServiceMetadata.GET_USER_METHOD,
+                                targetUserType));
+            }
+        }
+        else {
+            LOGGER.warning(String
+                    .format("You MUST implement %s.%s() method to provider user information for aduit.",
+                            targetServiceClass,
+                            JpaAuditUserServiceMetadata.GET_USER_METHOD));
+        }
+
+    }
+
+    private JavaType generateUserServiceJavaType() {
+        JavaPackage basePackage = getBaseDomainPackage();
+        return new JavaType(basePackage.getFullyQualifiedPackageName()
+                .concat(".").concat(DEFAULT_USER_SERVICE_NAME));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public JavaType getUserType() {
+        loadUserServiceData();
+        return userType;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isUserTypeSpringSecUserDetails() {
+        loadUserServiceData();
+        if (userTypeIsUserDetails == null) {
+            return false;
+        }
+        return userTypeIsUserDetails;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isUserTypeEntity() {
+        loadUserServiceData();
+        if (userTypeIsEntity == null) {
+            return false;
+        }
+        return userTypeIsEntity;
+    }
+
+    /**
+     * Returns details of the given class or interface type's members
+     * 
+     * @param cid the physical type for which to get the members (can be
+     *        <code>null</code>)
+     * @return <code>null</code> if the member details are unavailable
+     */
+    private MemberDetails getMemberDetails(final ClassOrInterfaceTypeDetails cid) {
+        if (cid == null) {
+            return null;
+        }
+        return memberDetailsScanner.getMemberDetails(getClass().getName(), cid);
+    }
+
+    /**
+     * Returns details of the given Java type's members
+     * 
+     * @param type the type for which to get the members (required)
+     * @return <code>null</code> if the member details are unavailable
+     */
+    @SuppressWarnings("unused")
+    private MemberDetails getMemberDetails(final JavaType type) {
+        final String physicalTypeIdentifier = typeLocationService
+                .getPhysicalTypeIdentifier(type);
+        if (physicalTypeIdentifier == null) {
+            return null;
+        }
+        // We need to lookup the metadata we depend on
+        final PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+                .get(physicalTypeIdentifier);
+        return getMemberDetails(physicalTypeMetadata);
+    }
+
+    /**
+     * Returns details of the given physical type's members
+     * 
+     * @param physicalTypeMetadata the physical type for which to get the
+     *        members (can be <code>null</code>)
+     * @return <code>null</code> if the member details are unavailable
+     */
+    protected MemberDetails getMemberDetails(
+            final PhysicalTypeMetadata physicalTypeMetadata) {
+        // We need to abort if we couldn't find dependent metadata
+        if (physicalTypeMetadata == null || !physicalTypeMetadata.isValid()) {
+            return null;
+        }
+
+        final ClassOrInterfaceTypeDetails cid = physicalTypeMetadata
+                .getMemberHoldingTypeDetails();
+        if (cid == null) {
+            // Abort if the type's class details aren't available (parse error
+            // etc)
+            return null;
+        }
+        return memberDetailsScanner.getMemberDetails(getClass().getName(), cid);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void refreshAuditedEntities() {
+        // Use the TypeLocationService to scan project for all types with
+        // jpaAudit and related annotation
+        String metadataId;
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        LogicalPath path = pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA);
+        for (JavaType entity : typeLocationService
+                .findTypesWithAnnotation(new JavaType(
+                        GvNIXJpaAuditUserService.class))) {
+            metadataId = JpaAuditUserServiceMetadata.createIdentifier(entity,
+                    path);
+            metadataService.evictAndGet(metadataId);
+        }
+        for (JavaType entity : typeLocationService
+                .findTypesWithAnnotation(new JavaType(GvNIXJpaAudit.class))) {
+            metadataId = JpaAuditMetadata.createIdentifier(entity, path);
+            metadataService.evictAndGet(metadataId);
+        }
+        for (JavaType entity : typeLocationService
+                .findTypesWithAnnotation(new JavaType(
+                        GvNIXJpaAuditListener.class))) {
+            metadataId = JpaAuditListenerMetadata
+                    .createIdentifier(entity, path);
+            metadataService.evictAndGet(metadataId);
+        }
+
+    }
 }

@@ -36,6 +36,13 @@ import org.springframework.roo.model.JavaType;
 public interface JpaAuditOperations {
 
     /**
+     * Indicate setup commands should be available
+     * 
+     * @return true if it should be available, otherwise false
+     */
+    boolean isSetupCommandAvailable();
+
+    /**
      * Indicate commands should be available
      * 
      * @return true if it should be available, otherwise false
@@ -118,4 +125,24 @@ public interface JpaAuditOperations {
      * @param provider
      */
     void activeRevisionLog(RevisionLogProviderId provider);
+
+    /**
+     * Creates the class which provides the object User for auditory
+     * <p/>
+     * This method shows a warning to developer that must provide the code to
+     * identify user data when:
+     * <ul>
+     * <li>Spring Security is not configure</li>
+     * <li>userType is not {@link String} nor implements Spring Security
+     * UserDetails interface</li>
+     * </ul>
+     * <p/>
+     * If userType is a JPA entity user properties will be a relation (annotated
+     * it with ManyToOne annotation)
+     * 
+     * @param serviceClass
+     * @param userType
+     */
+    void setup(JavaType serviceClass, JavaType userType);
+
 }
