@@ -45,5 +45,5 @@ field set --fieldName cars --type ~.domain.Car --cardinality ONE_TO_MANY --mappe
 web mvc setup
 web mvc all --package ~.web
 
-security setup
+jpa audit setup
 jpa audit all

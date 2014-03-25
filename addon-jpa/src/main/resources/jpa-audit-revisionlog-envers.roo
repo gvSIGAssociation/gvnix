@@ -6,6 +6,9 @@ jpa gvnix setup
 // Setup Spring Security
 security setup
 
+// Setup Audit
+jpa audit setup
+
 // Setup Audit on every entity
 jpa audit all --package ~.domain.audit
 
