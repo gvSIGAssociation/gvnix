@@ -107,10 +107,31 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
                             GvNIXJpaAuditRevisionEntity.class.getSimpleName()));
             return null;
         }
-        if (operations.getUserType() == null) {
+
+        LogicalPath path = JpaAuditRevisionEntityMetadata
+                .getPath(metadataIdentificationString);
+
+        JavaType userService = operations.getUserServiceType();
+        if (userService == null) {
             // No user type: do nothing
             return null;
         }
+
+        String userServiceId = JpaAuditUserServiceMetadata.createIdentifier(
+                userService, path);
+
+        JpaAuditUserServiceMetadata userServiceMetadata = (JpaAuditUserServiceMetadata) metadataService
+                .get(userServiceId);
+
+        if (userServiceMetadata == null) {
+            // No user type: do nothing
+            return null;
+        }
+
+        // Add dependency with UserService metadata
+        metadataDependencyRegistry.registerDependency(userServiceId,
+                metadataIdentificationString);
+
         RevisionLogRevisionEntityMetadataBuilder revisionLogBuilder = logProvider
                 .getRevisonEntityMetadataBuilder(operations,
                         governorPhysicalTypeMetadata);
@@ -118,9 +139,12 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
         // Pass dependencies required by the metadata in through its constructor
         return new JpaAuditRevisionEntityMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, annotationValues,
-                revisionLogBuilder, operations.getUserType(),
-                operations.getUserServiceType(), operations.isUserTypeEntity(),
-                operations.isUserTypeSpringSecUserDetails());
+                revisionLogBuilder, userServiceMetadata.userType(),
+                userService, userServiceMetadata.isUserTypeEntity(),
+                userServiceMetadata.isUserTypeSpringSecUserDetails(),
+                userServiceMetadata.usePatternForTimestamp(),
+                userServiceMetadata.getPatternForTimestamp(),
+                userServiceMetadata.getTimestampStyle());
     }
 
     /**

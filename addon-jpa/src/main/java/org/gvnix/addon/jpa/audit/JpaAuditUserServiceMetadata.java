@@ -98,12 +98,17 @@ public class JpaAuditUserServiceMetadata extends
     private final JpaAuditUserServiceAnnotationValues annotationValues;
     private final boolean isSpringSecurityInstalled;
     private final boolean isUserDetails;
+    private final boolean isUserEntity;
+    private final boolean usePatternForDate;
+    private final String dateTimePattern;
+    private final String dateTimeStyle;
 
     public JpaAuditUserServiceMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             JpaAuditUserServiceAnnotationValues annotationValues,
             JavaType userType, boolean isSpringSecurityInstalled,
-            boolean isUserDetails) {
+            boolean isUserDetails, boolean userTypeIsEntity,
+            boolean usePattern, String dateTimePattern, String dateTimeStyle) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -116,6 +121,10 @@ public class JpaAuditUserServiceMetadata extends
         this.userType = userType;
         this.isSpringSecurityInstalled = isSpringSecurityInstalled;
         this.isUserDetails = isUserDetails;
+        this.isUserEntity = userTypeIsEntity;
+        this.usePatternForDate = usePattern;
+        this.dateTimePattern = dateTimePattern;
+        this.dateTimeStyle = dateTimeStyle;
 
         // Add listener methods (only in non-abstract entities)
         builder.addMethod(getUserMethod());
@@ -258,6 +267,41 @@ public class JpaAuditUserServiceMetadata extends
      */
     public JavaType userType() {
         return userType;
+    }
+
+    /**
+     * @return the isUserDetails
+     */
+    public boolean isUserTypeSpringSecUserDetails() {
+        return isUserDetails;
+    }
+
+    /**
+     * @return the isUserEntity
+     */
+    public boolean isUserTypeEntity() {
+        return isUserEntity;
+    }
+
+    /**
+     * @return the usePatternForDate
+     */
+    public boolean usePatternForTimestamp() {
+        return usePatternForDate;
+    }
+
+    /**
+     * @return the dateTimePattern
+     */
+    public String getPatternForTimestamp() {
+        return dateTimePattern;
+    }
+
+    /**
+     * @return the dateTimeStyle
+     */
+    public String getTimestampStyle() {
+        return dateTimeStyle;
     }
 
 }

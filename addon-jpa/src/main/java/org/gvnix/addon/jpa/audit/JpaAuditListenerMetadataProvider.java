@@ -110,8 +110,24 @@ public final class JpaAuditListenerMetadataProvider extends
         final JpaAuditListenerAnnotationValues annotationValues = new JpaAuditListenerAnnotationValues(
                 governorPhysicalTypeMetadata);
 
-        if (operations.getUserType() == null) {
+        LogicalPath path = JpaAuditListenerMetadata
+                .getPath(metadataIdentificationString);
+
+        JavaType userService = operations.getUserServiceType();
+
+        if (userService == null) {
             // No user type defined
+            return null;
+        }
+
+        String userServiceId = JpaAuditUserServiceMetadata.createIdentifier(
+                userService, path);
+
+        JpaAuditUserServiceMetadata userServiceMetadata = (JpaAuditUserServiceMetadata) metadataService
+                .get(userServiceId);
+
+        if (userServiceMetadata == null) {
+            // No user type: do nothing
             return null;
         }
 
@@ -133,18 +149,12 @@ public final class JpaAuditListenerMetadataProvider extends
             return null;
         }
 
-        // get target entity class MID and Loginal path
+        // get target entity class MID and Logical path
         final String domainTypeMid = typeLocationService
                 .getPhysicalTypeIdentifier(targetEntity);
         if (domainTypeMid == null) {
             return null;
         }
-        LogicalPath path = JpaAuditListenerMetadata
-                .getPath(metadataIdentificationString);
-
-        // register downstream dependency (entity --> jpaAuditListener)
-        metadataDependencyRegistry.registerDependency(domainTypeMid,
-                metadataIdentificationString);
 
         // Create MID to get JpaAudit Metadata info for target entity
         String auditMetadataKey = JpaAuditMetadata.createIdentifier(
@@ -162,11 +172,15 @@ public final class JpaAuditListenerMetadataProvider extends
             return null;
         }
 
+        // register downstream dependency (JpaAudit --> JpaAuditListener)
+        metadataDependencyRegistry.registerDependency(auditMetadataKey,
+                metadataIdentificationString);
+
         // Generate metadata
         return new JpaAuditListenerMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, annotationValues,
-                targetEntity, auditMetadata, operations.getUserType(),
-                operations.getUserServiceType());
+                targetEntity, auditMetadata, userServiceMetadata.userType(),
+                userService);
     }
 
     /**

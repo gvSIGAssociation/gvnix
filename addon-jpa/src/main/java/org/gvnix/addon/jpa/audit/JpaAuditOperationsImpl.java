@@ -17,8 +17,6 @@
  */
 package org.gvnix.addon.jpa.audit;
 
-import static org.springframework.roo.classpath.customdata.CustomDataKeys.PERSISTENT_TYPE;
-
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -47,7 +45,6 @@ import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
@@ -85,15 +82,12 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
     private static final JavaType AUDIT_USER_SERV_ANNOTATION_TYPE = new JavaType(
             GvNIXJpaAuditUserService.class.getName());
 
-    private static final JavaType SEC_USER_DETAILS = new JavaType(
-            "org.springframework.security.core.userdetails.UserDetails");
-
     private static final String DEFAULT_USER_SERVICE_NAME = "AuditUserService";
 
     private static final Logger LOGGER = HandlerUtils
             .getLogger(JpaAuditOperationsImpl.class);
 
-    private static final int EVICT_CACHE_MLSEC = 60 * 2 * 1000;
+    private static final int EVICT_CACHE_MLSEC = 60 * 3 * 1000;
 
     @Reference
     private ProjectOperations projectOperations;
@@ -135,12 +129,6 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
      */
     private RevisionLogProvider currentProvider = null;
 
-    private JavaType userType;
-
-    private Boolean userTypeIsUserDetails;
-
-    private Boolean userTypeIsEntity;
-
     /**
      * Bind a provider
      * 
@@ -180,12 +168,9 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
     /**
      * Clean the User service Cache data
      */
-    private void cleanUserServiceCache() {
+    public void evictUserServiceInfoCache() {
         this.userServiceType = null;
         this.userServiceTypeTimestamp = null;
-        this.userType = null;
-        this.userTypeIsEntity = null;
-        this.userTypeIsUserDetails = null;
     }
 
     /**
@@ -202,7 +187,7 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
             }
         }
         // evict cache
-        cleanUserServiceCache();
+        evictUserServiceInfoCache();
 
         // Look for user service class
         Set<ClassOrInterfaceTypeDetails> classes = typeLocationService
@@ -217,43 +202,9 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
                         AUDIT_USER_SERV_ANNOTATION_TYPE, classes.size()));
             }
             else {
-                // Store type of userService
+                // load data from locate of userService
                 ClassOrInterfaceTypeDetails cid = classes.iterator().next();
                 userServiceType = cid.getType();
-
-                // Get user type
-                JpaAuditUserServiceAnnotationValues annotationValue = new JpaAuditUserServiceAnnotationValues(
-                        cid);
-                userType = annotationValue.getUserType();
-
-                userTypeIsUserDetails = false;
-                userTypeIsEntity = false;
-                ClassOrInterfaceTypeDetails userTypeDetails = typeLocationService
-                        .getTypeDetails(userType);
-                if (userTypeDetails != null) {
-                    // Try to identify if userType implements UserDetails
-                    userTypeIsUserDetails = false;
-                    for (JavaType implementType : userTypeDetails
-                            .getImplementsTypes()) {
-                        if (SEC_USER_DETAILS.equals(implementType)) {
-                            userTypeIsUserDetails = true;
-                        }
-                    }
-
-                    // Try to determine if userType is an entity
-                    final MemberDetails userTypeMemberDetails = getMemberDetails(userTypeDetails);
-                    if (userTypeMemberDetails != null) {
-
-                        final MemberHoldingTypeDetails userTypeMemberHoldingTypeDetails = MemberFindingUtils
-                                .getMostConcreteMemberHoldingTypeDetailsWithTag(
-                                        userTypeMemberDetails, PERSISTENT_TYPE);
-                        if (userTypeMemberHoldingTypeDetails != null) {
-                            userTypeIsEntity = true;
-                        }
-
-                    }
-                }
-
                 userServiceTypeTimestamp = System.currentTimeMillis();
             }
         }
@@ -757,6 +708,14 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
 
         refreshAuditedEntities();
 
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        LogicalPath path = pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA);
+        String metadataId = JpaAuditUserServiceMetadata.createIdentifier(
+                serviceClass, path);
+
+        JpaAuditUserServiceMetadata metadata = (JpaAuditUserServiceMetadata) metadataService
+                .get(metadataId);
+
         // Show warning about UserType
         if (isSpringSecurityInstalled()) {
             if (JavaType.STRING.equals(targetUserType)) {
@@ -765,7 +724,8 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
                                 targetServiceClass,
                                 JpaAuditUserServiceMetadata.GET_USER_METHOD));
             }
-            else if (!(isUserTypeSpringSecUserDetails() && isUserTypeEntity())) {
+            else if (!(metadata.isUserTypeSpringSecUserDetails() && metadata
+                    .isUserTypeEntity())) {
                 LOGGER.warning(String
                         .format("You MUST customize %s.%s() method to provider user information for aduit. Addon can't identify how get %s instance.",
                                 targetServiceClass,
@@ -786,47 +746,6 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
         JavaPackage basePackage = getBaseDomainPackage();
         return new JavaType(basePackage.getFullyQualifiedPackageName()
                 .concat(".").concat(DEFAULT_USER_SERVICE_NAME));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public JavaType getUserType() {
-        loadUserServiceData();
-        return userType;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isUserTypeSpringSecUserDetails() {
-        loadUserServiceData();
-        if (userTypeIsUserDetails == null) {
-            return false;
-        }
-        return userTypeIsUserDetails;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isUserTypeEntity() {
-        loadUserServiceData();
-        if (userTypeIsEntity == null) {
-            return false;
-        }
-        return userTypeIsEntity;
-    }
-
-    /**
-     * Returns details of the given class or interface type's members
-     * 
-     * @param cid the physical type for which to get the members (can be
-     *        <code>null</code>)
-     * @return <code>null</code> if the member details are unavailable
-     */
-    private MemberDetails getMemberDetails(final ClassOrInterfaceTypeDetails cid) {
-        if (cid == null) {
-            return null;
-        }
-        return memberDetailsScanner.getMemberDetails(getClass().getName(), cid);
     }
 
     /**
@@ -881,13 +800,6 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
         String metadataId;
         PathResolver pathResolver = projectOperations.getPathResolver();
         LogicalPath path = pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA);
-        for (JavaType entity : typeLocationService
-                .findTypesWithAnnotation(new JavaType(
-                        GvNIXJpaAuditUserService.class))) {
-            metadataId = JpaAuditUserServiceMetadata.createIdentifier(entity,
-                    path);
-            metadataService.evictAndGet(metadataId);
-        }
         for (JavaType entity : typeLocationService
                 .findTypesWithAnnotation(new JavaType(GvNIXJpaAudit.class))) {
             metadataId = JpaAuditMetadata.createIdentifier(entity, path);

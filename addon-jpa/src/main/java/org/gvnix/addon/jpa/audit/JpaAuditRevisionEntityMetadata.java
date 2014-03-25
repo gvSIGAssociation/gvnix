@@ -82,6 +82,12 @@ public class JpaAuditRevisionEntityMetadata extends
     private final boolean userTypeIsEntity;
     private final boolean userTypeIsUserDetails;
 
+    private final boolean usePattern;
+
+    private final String dateTimepattern;
+
+    private final String dateTimeStyle;
+
     private Context buildContext;
 
     public JpaAuditRevisionEntityMetadata(String identifier,
@@ -90,7 +96,8 @@ public class JpaAuditRevisionEntityMetadata extends
             JpaAuditRevisionEntityAnnotationValues annotationValues,
             RevisionLogRevisionEntityMetadataBuilder revisionLogBuilder,
             JavaType userType, JavaType userService, boolean userTypeIsEntity,
-            boolean userTypeIsUserDetails) {
+            boolean userTypeIsUserDetails, boolean usePattern,
+            String dateTimepattern, String dateTimeStyle) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -111,10 +118,15 @@ public class JpaAuditRevisionEntityMetadata extends
 
         this.userTypeIsUserDetails = userTypeIsUserDetails;
 
+        this.usePattern = usePattern;
+        this.dateTimepattern = dateTimepattern;
+        this.dateTimeStyle = dateTimeStyle;
+
         this.buildContext = new BuildContext(getId(), helper,
-                this.annotationValues, governorPhysicalTypeMetadata.getType(),
-                this.userType, this.userService, this.userTypeIsEntity,
-                this.userTypeIsUserDetails);
+                governorPhysicalTypeMetadata.getType(), this.userType,
+                this.userService, this.userTypeIsEntity,
+                this.userTypeIsUserDetails, this.usePattern,
+                this.dateTimepattern, this.dateTimeStyle);
 
         this.revisionLogBuilder.initialize(builder, buildContext);
 
@@ -167,8 +179,6 @@ public class JpaAuditRevisionEntityMetadata extends
 
         private final ItdBuilderHelper helper;
 
-        private final JpaAuditRevisionEntityAnnotationValues annotationValues;
-
         private final String metadataId;
 
         private final JavaType entity;
@@ -181,31 +191,33 @@ public class JpaAuditRevisionEntityMetadata extends
 
         private final boolean userTypeIsUserDetails;
 
+        private final boolean usePattern;
+
+        private final String dateTimepattern;
+
+        private final String dateTimeStyle;
+
         public BuildContext(String metadataId, ItdBuilderHelper helper,
-                JpaAuditRevisionEntityAnnotationValues annotationValues,
                 JavaType entity, JavaType userType, JavaType userService,
-                boolean userTypeIsEntity, boolean userTypeIsUserDetails) {
+                boolean userTypeIsEntity, boolean userTypeIsUserDetails,
+                boolean usePattern, String dateTimepattern, String dateTimeStyle) {
             super();
             this.metadataId = metadataId;
             this.helper = helper;
-            this.annotationValues = annotationValues;
             this.entity = entity;
             this.userType = userType;
             this.userService = userService;
             this.userTypeIsEntity = userTypeIsEntity;
             this.userTypeIsUserDetails = userTypeIsUserDetails;
+            this.usePattern = usePattern;
+            this.dateTimepattern = dateTimepattern;
+            this.dateTimeStyle = dateTimeStyle;
         }
 
         /** {@inheritDoc} */
         @Override
         public ItdBuilderHelper getHelper() {
             return helper;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public JpaAuditRevisionEntityAnnotationValues getAnnotationValues() {
-            return annotationValues;
         }
 
         /** {@inheritDoc} */
@@ -242,6 +254,24 @@ public class JpaAuditRevisionEntityMetadata extends
         @Override
         public boolean getUserTypeIsUserDetails() {
             return userTypeIsUserDetails;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean usePatternForTimestamp() {
+            return usePattern;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public String getPatternForTimestamp() {
+            return dateTimepattern;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public String getTimestampStyle() {
+            return dateTimeStyle;
         }
     }
 

@@ -19,7 +19,6 @@ package org.gvnix.addon.jpa.audit.providers;
 
 import java.util.List;
 
-import org.gvnix.addon.jpa.audit.JpaAuditAnnotationValues;
 import org.gvnix.addon.jpa.audit.JpaAuditMetadata;
 import org.gvnix.support.ItdBuilderHelper;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
@@ -235,11 +234,6 @@ public interface RevisionLogMetadataBuilder {
         public ItdBuilderHelper getHelper();
 
         /**
-         * @return the annotationValues
-         */
-        public JpaAuditAnnotationValues getAnnotationValues();
-
-        /**
          * @return the entity
          */
         public JavaType getEntity();
@@ -324,6 +318,35 @@ public interface RevisionLogMetadataBuilder {
          * @return class to use to store "user" information
          */
         public JavaType getUserType();
+
+        /**
+         * @return if class which provider the current user is a application JPA
+         *         entity
+         */
+        public boolean getUserTypeIsEntity();
+
+        /**
+         * @return if class which provider the current user implements Spring
+         *         Security UserDetail interface
+         */
+        public boolean getUserTypeIsUserDetails();
+
+        /**
+         * @return true if timestamp field uses date/time pattern or uses style
+         *         if false
+         */
+        public boolean usePatternForTimestamp();
+
+        /**
+         * @return timestamp field date/time pattern to use
+         */
+        public String getPatternForTimestamp();
+
+        /**
+         * @return timestamp field style to use
+         */
+        public String getTimestampStyle();
+
     }
 
 }

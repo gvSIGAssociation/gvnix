@@ -17,7 +17,6 @@
  */
 package org.gvnix.addon.jpa.audit;
 
-import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 
@@ -57,25 +56,9 @@ public interface JpaAuditOperationsSPI {
     JavaType getUserServiceType();
 
     /**
-     * @return class for audit user fields
-     */
-    JavaType getUserType();
-
-    /**
      * @return if Spring Security is installed
      */
     boolean isSpringSecurityInstalled();
-
-    /**
-     * @return informs is {@link #getUserType()} implements Spring Security
-     *         UserDetails interface
-     */
-    boolean isUserTypeSpringSecUserDetails();
-
-    /**
-     * @return informs if {@link #getUserType()} is an JPA entity
-     */
-    boolean isUserTypeEntity();
 
     /**
      * Performs a {@link MetadataService#evictAndGet(String)} of all entities
@@ -83,4 +66,9 @@ public interface JpaAuditOperationsSPI {
      * <em>.aj</em> files.
      */
     void refreshAuditedEntities();
+
+    /**
+     * Clean the User service Cache data
+     */
+    public void evictUserServiceInfoCache();
 }

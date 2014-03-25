@@ -17,14 +17,21 @@
  */
 package org.gvnix.addon.jpa.audit;
 
+import static org.springframework.roo.classpath.customdata.CustomDataKeys.PERSISTENT_TYPE;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 
@@ -40,6 +47,9 @@ import org.springframework.roo.project.LogicalPath;
 @Service
 public final class JpaAuditUserServiceMetadataProvider extends
         AbstractItdMetadataProvider {
+
+    private static final JavaType SEC_USER_DETAILS = new JavaType(
+            "org.springframework.security.core.userdetails.UserDetails");
 
     @Reference
     private JpaAuditOperationsMetadata operations;
@@ -94,11 +104,54 @@ public final class JpaAuditUserServiceMetadataProvider extends
             return null;
         }
 
+        // Manage date format
+        String dateTimePattern = annotationValues
+                .getAuditDateTimeFormatPattern();
+        String dateTimeStyle;
+        boolean usePattern = false;
+        if (StringUtils.isBlank(dateTimePattern)) {
+            dateTimeStyle = annotationValues.getAuditDateTimeFormatStyle();
+        }
+        else {
+            usePattern = true;
+            dateTimeStyle = null;
+        }
+
+        boolean userTypeIsUserDetails = false;
+        boolean userTypeIsEntity = false;
+        ClassOrInterfaceTypeDetails userTypeDetails = typeLocationService
+                .getTypeDetails(userType);
+        if (userTypeDetails != null) {
+            // Try to identify if userType implements UserDetails
+            userTypeIsUserDetails = false;
+            for (JavaType implementType : userTypeDetails.getImplementsTypes()) {
+                if (SEC_USER_DETAILS.equals(implementType)) {
+                    userTypeIsUserDetails = true;
+                }
+            }
+
+            // Try to determine if userType is an entity
+            final MemberDetails userTypeMemberDetails = getMemberDetails(userTypeDetails);
+            if (userTypeMemberDetails != null) {
+
+                final MemberHoldingTypeDetails userTypeMemberHoldingTypeDetails = MemberFindingUtils
+                        .getMostConcreteMemberHoldingTypeDetailsWithTag(
+                                userTypeMemberDetails, PERSISTENT_TYPE);
+                if (userTypeMemberHoldingTypeDetails != null) {
+                    userTypeIsEntity = true;
+                }
+
+            }
+        }
+
+        operations.evictUserServiceInfoCache();
+
         // Generate metadata
         return new JpaAuditUserServiceMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, annotationValues,
                 userType, operations.isSpringSecurityInstalled(),
-                operations.isUserTypeSpringSecUserDetails());
+                userTypeIsUserDetails, userTypeIsEntity, usePattern,
+                dateTimePattern, dateTimeStyle);
     }
 
     /**

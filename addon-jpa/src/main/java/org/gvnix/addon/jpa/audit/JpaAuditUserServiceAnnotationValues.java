@@ -17,6 +17,7 @@
  */
 package org.gvnix.addon.jpa.audit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
@@ -39,12 +40,23 @@ public class JpaAuditUserServiceAnnotationValues extends
     @AutoPopulate
     JavaType userType;
 
+    @AutoPopulate
+    String auditDateTimeFormatPattern;
+
+    @AutoPopulate
+    String auditDateTimeFormatStyle;
+
     public JpaAuditUserServiceAnnotationValues(
             final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {
         super(governorPhysicalTypeDetails, JPA_AUDIT_USER_SERV_ANNOTATION);
         AutoPopulationUtils.populate(this, annotationMetadata);
         if (userType == null) {
             userType = new JavaType(String.class);
+        }
+        if (StringUtils.isBlank(auditDateTimeFormatPattern)) {
+            if (StringUtils.isBlank(auditDateTimeFormatStyle)) {
+                auditDateTimeFormatStyle = "MM";
+            }
         }
     }
 
@@ -60,12 +72,31 @@ public class JpaAuditUserServiceAnnotationValues extends
         if (userType == null) {
             userType = new JavaType(String.class);
         }
+        if (StringUtils.isBlank(auditDateTimeFormatPattern)) {
+            if (StringUtils.isBlank(auditDateTimeFormatStyle)) {
+                auditDateTimeFormatStyle = "MM";
+            }
+        }
     }
 
     /**
-     * @return RevisionLog configuration
+     * @return User type to use
      */
     public JavaType getUserType() {
         return userType;
+    }
+
+    /**
+     * @return Date-time format style
+     */
+    public String getAuditDateTimeFormatStyle() {
+        return auditDateTimeFormatStyle;
+    }
+
+    /**
+     * @return date/time pattern
+     */
+    public String getAuditDateTimeFormatPattern() {
+        return auditDateTimeFormatPattern;
     }
 }

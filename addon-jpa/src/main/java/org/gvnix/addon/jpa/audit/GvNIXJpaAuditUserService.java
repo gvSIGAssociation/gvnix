@@ -28,11 +28,19 @@ import java.lang.annotation.Target;
  * Annotated class will provider the user to store on audited entities and
  * revision log.
  * <p/>
- * <em>Just one</em> class by project could be annotated whit this annotation.
+ * <em>Only one,</em> class by project could be annotated whit this annotation.
+ * <p/>
+ * To select timestamp format, you can choose two ways:
+ * <ul>
+ * <li>Set {@link #auditDateTimeFormatPattern()}</li>
+ * <li>Set {@link #auditDateTimeFormatStyle()}</li>
+ * </ul>
+ * By default will be used
  * 
  * 
  * @author gvNIX Team
  * @since 1.3.0
+ * @see org.springframework.format.annotation.DateTimeFormat
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
@@ -42,4 +50,19 @@ public @interface GvNIXJpaAuditUserService {
      * @return Return the type to store as <em>user</em> on audit information
      */
     Class<?> userType() default String.class;
+
+    /**
+     * @return format pattern to use in audit timestamp fields. If is set
+     *         {@link #auditDateFormat()} and {@link #auditTimeFormat()} will be
+     *         ignored
+     */
+    String auditDateTimeFormatPattern() default "";
+
+    /**
+     * @return format style of audit timestamp fields. Ignored if
+     *         {@link #auditDateTimeFormatPattern()} is specified.
+     * @see org.springframework.format.annotation.DateTimeFormat
+     */
+    String auditDateTimeFormatStyle() default "MM";
+
 }

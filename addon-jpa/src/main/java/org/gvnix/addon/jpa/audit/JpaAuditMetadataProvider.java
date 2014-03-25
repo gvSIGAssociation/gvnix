@@ -18,6 +18,7 @@
 package org.gvnix.addon.jpa.audit;
 
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
@@ -98,28 +99,38 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
         final JpaAuditAnnotationValues annotationValues = new JpaAuditAnnotationValues(
                 governorPhysicalTypeMetadata);
 
+        LogicalPath path = JpaAuditMetadata
+                .getPath(metadataIdentificationString);
+
         // Gets active revisionLog provider
         RevisionLogProvider logProvider = operations
                 .getActiveRevisionLogProvider();
 
-        if (operations.getUserType() == null) {
+        JavaType userService = operations.getUserServiceType();
+
+        if (userService == null) {
             // No user type defined
+            return null;
+        }
+
+        String userServiceId = JpaAuditUserServiceMetadata.createIdentifier(
+                userService, path);
+
+        JpaAuditUserServiceMetadata userServiceMetadata = (JpaAuditUserServiceMetadata) metadataService
+                .get(userServiceId);
+
+        if (userServiceMetadata == null) {
+            // No user type: do nothing
             return null;
         }
 
         // prepares entity information
         JavaType entity = JpaAuditMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath entityPath = JpaAuditMetadata
-                .getPath(metadataIdentificationString);
 
         // Gets entity JPA metadata
         String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
-                entityPath);
-
-        // Add dependency with JPA metadata
-        metadataDependencyRegistry.registerDependency(jpaMetadataId,
-                metadataIdentificationString);
+                path);
 
         JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
                 .get(jpaMetadataId);
@@ -137,6 +148,29 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
             // There is no JpaMetadata yet: return null
             return null;
         }
+
+        // Add dependency with JPA metadata
+        metadataDependencyRegistry.registerDependency(jpaMetadataId,
+                metadataIdentificationString);
+
+        // Makes all downstrean dependents of class dependents of it
+        Set<String> dependentsOfJpa = metadataDependencyRegistry
+                .getDownstream(getGovernorPhysicalTypeIdentifier(metadataIdentificationString));
+        for (String downstreamId : dependentsOfJpa) {
+            if (!metadataIdentificationString.equals(downstreamId)
+                    && !jpaMetadataId.equals(downstreamId)) {
+                metadataDependencyRegistry.registerDependency(
+                        metadataIdentificationString, downstreamId);
+                // Cleans metadata already generated from governor
+                // so it could generate taking account of JpaAudit
+                // ITD generation
+                metadataService.evict(downstreamId);
+            }
+        }
+
+        // Add dependency with UserService metadata
+        metadataDependencyRegistry.registerDependency(userServiceId,
+                metadataIdentificationString);
 
         // Gets the plural of current entity
         String plural = jpaMetadata.getPlural();
@@ -181,8 +215,13 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
         // Pass dependencies required by the metadata in through its constructor
         return new JpaAuditMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, plural,
-                revisionLogBuilder, identifiers, operations.getUserType(),
-                operations.isUserTypeEntity());
+                revisionLogBuilder, identifiers,
+                userServiceMetadata.userType(),
+                userServiceMetadata.isUserTypeEntity(),
+                userServiceMetadata.isUserTypeSpringSecUserDetails(),
+                userServiceMetadata.usePatternForTimestamp(),
+                userServiceMetadata.getPatternForTimestamp(),
+                userServiceMetadata.getTimestampStyle());
     }
 
     /**

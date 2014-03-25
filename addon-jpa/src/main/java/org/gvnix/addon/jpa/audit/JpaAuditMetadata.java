@@ -219,6 +219,14 @@ public class JpaAuditMetadata extends
      */
     private JavaType revisonItemListType;
 
+    private final boolean userTypeIsUserDetails;
+
+    private final boolean usePattern;
+
+    private final String dateTimepattern;
+
+    private final String dateTimeStyle;
+
     /**
      * Instance with all build information which can be required by revisionLog
      * builder to generate its artifacts
@@ -230,7 +238,8 @@ public class JpaAuditMetadata extends
             JpaAuditAnnotationValues annotationValues, String entityPlural,
             RevisionLogMetadataBuilder revisionLogBuilder,
             List<FieldMetadata> identifiers, JavaType userType,
-            boolean userTypeEntity) {
+            boolean userTypeIsEntity, boolean userTypeIsUserDetails,
+            boolean usePattern, String dateTimepattern, String dateTimeStyle) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -255,7 +264,13 @@ public class JpaAuditMetadata extends
 
         this.userType = userType;
 
-        this.userTypeEntity = userTypeEntity;
+        this.userTypeEntity = userTypeIsEntity;
+
+        this.userTypeIsUserDetails = userTypeIsUserDetails;
+
+        this.usePattern = usePattern;
+        this.dateTimepattern = dateTimepattern;
+        this.dateTimeStyle = dateTimeStyle;
 
         this.isAbstract = governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails().isAbstract();
@@ -330,12 +345,13 @@ public class JpaAuditMetadata extends
      * @return create a build context instance required by revision log builder
      */
     private Context createBuildContext() {
-        return new BuildContext(getId(), helper, this.annotationValues, entity,
-                entityName, this.entityPlural, findAllMethodName,
-                findMethodName, getRevisionsMethodName,
-                findRevisionsByDatesMethodName, findRevisionsMethodName,
-                revisonItemTypeName, entityListType, revisonItemType,
-                this.identifier, revisonItemListType, isAbstract, userType);
+        return new BuildContext(getId(), helper, entity, entityName,
+                this.entityPlural, findAllMethodName, findMethodName,
+                getRevisionsMethodName, findRevisionsByDatesMethodName,
+                findRevisionsMethodName, revisonItemTypeName, entityListType,
+                revisonItemType, identifier, revisonItemListType, isAbstract,
+                userType, userTypeEntity, userTypeIsUserDetails, usePattern,
+                dateTimepattern, dateTimeStyle);
     }
 
     /**
@@ -990,7 +1006,13 @@ public class JpaAuditMetadata extends
                 1);
         final AnnotationMetadataBuilder dateTimeFormatBuilder = new AnnotationMetadataBuilder(
                 DATE_TIME_FORMAT);
-        dateTimeFormatBuilder.addStringAttribute("style", "MM");
+        if (usePattern) {
+            dateTimeFormatBuilder
+                    .addStringAttribute("pattern", dateTimepattern);
+        }
+        else {
+            dateTimeFormatBuilder.addStringAttribute("style", dateTimeStyle);
+        }
         annotations.add(dateTimeFormatBuilder);
         return annotations;
     }
@@ -1225,7 +1247,6 @@ public class JpaAuditMetadata extends
 
         private final ItdBuilderHelper helper;
 
-        private final JpaAuditAnnotationValues annotationValues;
         private final JavaType entity;
         private final String entityName;
         private final String entityPlural;
@@ -1243,9 +1264,18 @@ public class JpaAuditMetadata extends
         private final boolean isAbstractEntity;
         private final JavaType userType;
 
+        private final boolean userTypeIsEntity;
+
+        private final boolean userTypeIsUserDetails;
+
+        private final boolean usePattern;
+
+        private final String dateTimepattern;
+
+        private final String dateTimeStyle;
+
         public BuildContext(String metadataId, ItdBuilderHelper helper,
-                JpaAuditAnnotationValues annotationValues, JavaType entity,
-                String entityName, String entityPlural,
+                JavaType entity, String entityName, String entityPlural,
                 JavaSymbolName findAllMethodName,
                 JavaSymbolName findMethodName,
                 JavaSymbolName getRevisionsMethodName,
@@ -1254,11 +1284,12 @@ public class JpaAuditMetadata extends
                 String revisonItemTypeName, JavaType entityListType,
                 JavaType revisonItemType, FieldMetadata identifier,
                 JavaType revisonItemListType, boolean isAbstractEntity,
-                JavaType userType) {
+                JavaType userType, boolean userTypeIsEntity,
+                boolean userTypeIsUserDetails, boolean usePattern,
+                String dateTimepattern, String dateTimeStyle) {
             super();
             this.metadataId = metadataId;
             this.helper = helper;
-            this.annotationValues = annotationValues;
             this.entity = entity;
             this.entityName = entityName;
             this.entityPlural = entityPlural;
@@ -1274,18 +1305,17 @@ public class JpaAuditMetadata extends
             this.revisonItemListType = revisonItemListType;
             this.isAbstractEntity = isAbstractEntity;
             this.userType = userType;
+            this.userTypeIsEntity = userTypeIsEntity;
+            this.userTypeIsUserDetails = userTypeIsUserDetails;
+            this.usePattern = usePattern;
+            this.dateTimepattern = dateTimepattern;
+            this.dateTimeStyle = dateTimeStyle;
         }
 
         /** {@inheritDoc} */
         @Override
         public ItdBuilderHelper getHelper() {
             return helper;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public JpaAuditAnnotationValues getAnnotationValues() {
-            return annotationValues;
         }
 
         /** {@inheritDoc} */
@@ -1388,6 +1418,36 @@ public class JpaAuditMetadata extends
         @Override
         public JavaType getUserType() {
             return userType;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean getUserTypeIsEntity() {
+            return userTypeIsEntity;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean getUserTypeIsUserDetails() {
+            return userTypeIsUserDetails;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean usePatternForTimestamp() {
+            return usePattern;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public String getPatternForTimestamp() {
+            return dateTimepattern;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public String getTimestampStyle() {
+            return dateTimeStyle;
         }
     }
 }
