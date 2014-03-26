@@ -711,7 +711,7 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
         PathResolver pathResolver = projectOperations.getPathResolver();
         LogicalPath path = pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA);
         String metadataId = JpaAuditUserServiceMetadata.createIdentifier(
-                serviceClass, path);
+                targetServiceClass, path);
 
         JpaAuditUserServiceMetadata metadata = (JpaAuditUserServiceMetadata) metadataService
                 .get(metadataId);
