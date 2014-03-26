@@ -64,7 +64,8 @@ remote service import ws --class org.gvnix.test.service.layer.project.services.C
 // [CORRECT] Transport HTTPS, Operations: 4, Bindings: SOAP, Use: Literal
 remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy06 --wsdl http://elasticmapreduce.amazonaws.com/doc/2009-03-31/ElasticMapReduce.wsdl
 
-remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy07 --wsdl http://footballpool.dataaccess.eu/data/info.wso?WSDL
+// Temporaly disabled because java.io.IOException: Server returned HTTP response code: 403
+//remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy07 --wsdl http://footballpool.dataaccess.eu/data/info.wso?WSDL
 
 // Temporaly disabled because java.io.IOException: Server returned HTTP response code: 403
 //remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy08 --wsdl http://ws2.fraudlabs.com/mailboxvalidator.asmx?wsdl
@@ -79,5 +80,6 @@ remote service import ws --class org.gvnix.test.service.layer.project.services.C
 
 remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy17 --wsdl http://www.unifiedsoftware.co.uk/freeibanvalidate.wsdl
 
+// Temporaly disable because java.net.ConnectException: Connection timed out
 // [CORRECT] Import WS from a non confident server
-remote service import ws --class ~.services.ServiciosMapProxy1 --wsdl https://sleipnir2.accv.es:8448/accv_map_gateway/services/ServiciosMap?wsdl
+//remote service import ws --class ~.services.ServiciosMapProxy1 --wsdl https://sleipnir2.accv.es:8448/accv_map_gateway/services/ServiciosMap?wsdl
