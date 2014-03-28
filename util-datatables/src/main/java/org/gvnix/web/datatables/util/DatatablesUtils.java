@@ -37,7 +37,6 @@ import org.gvnix.web.datatables.query.SearchResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.util.Assert;
@@ -68,7 +67,7 @@ import com.mysema.query.types.path.PathBuilder;
 public class DatatablesUtils {
 
     // Logger
-    private static Logger logger = LoggerFactory
+    private static Logger LOGGER = LoggerFactory
             .getLogger(DatatablesUtils.class);
 
     private static final String SEPARATOR_FIELDS = ".";
@@ -313,7 +312,6 @@ public class DatatablesUtils {
      * @param distinct use distinct query
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
             PathBuilder<T> entity,
             Map<String, List<String>> filterByAssociations,
@@ -359,38 +357,8 @@ public class DatatablesUtils {
 
         Map<String, PathBuilder<?>> associationMap = new HashMap<String, PathBuilder<?>>();
 
-        for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
-
-            // true if the search must include this column
-            boolean findInColumn = StringUtils.isNotEmpty(column.getSearch());
-
-            // If no joins given for this column, don't add the JOIN to query
-            // to improve performance
-            String associationName = unescapeDot(column.getName());
-            if (!filterByAssociations.containsKey(associationName)) {
-                continue;
-            }
-
-            // If column is not sortable and is not filterable, don't add the
-            // JOIN to query to improve performance
-            if (!column.isSortable() && !column.isFilterable()) {
-                continue;
-            }
-
-            // If column is not sortable and no search value provided,
-            // don't add the JOIN to query to improve performance
-            if (!column.isSortable() && !findInColumn && !findInAllColumns) {
-                continue;
-            }
-
-            // Here the column is sortable or it is filterable and column search
-            // value or all-column search value is provided
-            PathBuilder<?> associationPath = entity.get(associationName);
-            query = query.join(associationPath);
-
-            // Store join path for later use in where
-            associationMap.put(associationName, associationPath);
-        }
+        query = prepareQueryAssociationMap(entity, filterByAssociations,
+                datatablesCriterias, findInAllColumns, query, associationMap);
 
         // ----- Query WHERE clauses -----
 
@@ -406,129 +374,15 @@ public class DatatablesUtils {
             // Build the filters by column expression
             if (datatablesCriterias.hasOneFilteredColumn()) {
 
-                // Add filterable columns only
-                for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
-
-                    // Each column has its own search by value
-                    String searchStr = column.getSearch();
-
-                    // true if the search must include this column
-                    boolean findInColumn = column.isFilterable()
-                            && StringUtils.isNotEmpty(searchStr);
-
-                    if (findInColumn) {
-
-                        // Entity field name and type
-                        String fieldName = unescapeDot(column.getName());
-                        Class<?> fieldType = getFieldType(fieldName, entity);
-
-                        // On column search, connect where clauses together by
-                        // AND
-                        // because we want found the records which columns
-                        // match with column filters
-                        filtersByColumnPredicate = filtersByColumnPredicate
-                                .and(QuerydslUtils.createExpression(entity,
-                                        fieldName, fieldType, searchStr));
-
-                        // TODO: Este codigo se puede pasar a QuerydslUtils ?
-
-                        // If column is an association and there are given
-                        // join attributes, add those attributes to WHERE
-                        // predicates
-                        List<String> attributes = filterByAssociations
-                                .get(fieldName);
-                        if (attributes != null && attributes.size() > 0) {
-
-                            // Filters of associated entity properties
-                            BooleanBuilder filtersByAssociationPredicate = new BooleanBuilder();
-
-                            PathBuilder<?> associationPath = associationMap
-                                    .get(fieldName);
-                            List<String> associationFields = filterByAssociations
-                                    .get(fieldName);
-
-                            for (String associationFieldName : associationFields) {
-
-                                // Get associated entity field type
-                                Class<?> associationFieldType = BeanUtils
-                                        .findPropertyType(
-                                                associationFieldName,
-                                                ArrayUtils
-                                                        .<Class<?>> toArray(fieldType));
-
-                                // On association search, connect
-                                // associated entity where clauses by OR
-                                // because all assoc entity properties are
-                                // inside the same column and any of its
-                                // property value can match with given search
-                                // value
-                                filtersByAssociationPredicate = filtersByAssociationPredicate
-                                        .or(QuerydslUtils
-                                                .createExpression(
-                                                        associationPath,
-                                                        associationFieldName,
-                                                        associationFieldType,
-                                                        searchStr));
-                            }
-
-                            filtersByColumnPredicate = filtersByColumnPredicate
-                                    .and(filtersByAssociationPredicate
-                                            .getValue());
-                        }
-                    }
-                }
+                filtersByColumnPredicate = prepareQueryFilterPart(entity,
+                        filterByAssociations, datatablesCriterias,
+                        associationMap, filtersByColumnPredicate);
             }
 
             // Build the query to search the given value in all columns
-            String searchStr = datatablesCriterias.getSearch();
-            if (findInAllColumns) {
-
-                // Add filterable columns only
-                for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
-                    if (column.isFilterable()) {
-
-                        // Entity field name and type
-                        String fieldName = unescapeDot(column.getName());
-                        Class<?> fieldType = getFieldType(fieldName, entity);
-
-                        // Find in all columns means we want to find given
-                        // value in at least one entity property, so we must
-                        // join the where clauses by OR
-                        filtersByTablePredicate = filtersByTablePredicate
-                                .or(QuerydslUtils.createExpression(entity,
-                                        fieldName, fieldType, searchStr));
-
-                        // If column is an association and there are given
-                        // join attributes, add those attributes to WHERE
-                        // predicates
-                        List<String> attributes = filterByAssociations
-                                .get(fieldName);
-                        if (attributes != null && attributes.size() > 0) {
-                            PathBuilder<?> associationPath = associationMap
-                                    .get(fieldName);
-                            List<String> associationFields = filterByAssociations
-                                    .get(fieldName);
-
-                            for (String associationFieldName : associationFields) {
-
-                                // Get associated entity field type
-                                Class<?> associationFieldType = BeanUtils
-                                        .findPropertyType(
-                                                associationFieldName,
-                                                ArrayUtils
-                                                        .<Class<?>> toArray(fieldType));
-                                filtersByTablePredicate = filtersByTablePredicate
-                                        .or(QuerydslUtils
-                                                .createExpression(
-                                                        associationPath,
-                                                        associationFieldName,
-                                                        associationFieldType,
-                                                        searchStr));
-                            }
-                        }
-                    }
-                }
-            }
+            filtersByTablePredicate = prepareQuerySearchPart(entity,
+                    filterByAssociations, datatablesCriterias,
+                    findInAllColumns, associationMap, filtersByTablePredicate);
         }
         catch (Exception e) {
             SearchResults<T> searchResults = new SearchResults<T>(
@@ -540,72 +394,8 @@ public class DatatablesUtils {
 
         // ----- Query ORDER BY -----
 
-        List<OrderSpecifier<?>> orderSpecifiersList = new ArrayList<OrderSpecifier<?>>();
-
-        if (datatablesCriterias.hasOneSortedColumn()) {
-            for (ColumnDef column : datatablesCriterias.getSortingColumnDefs()) {
-
-                // If column is not sortable, don't add it to order by clauses
-                if (!column.isSortable()) {
-                    continue;
-                }
-
-                // If no sort direction provided, don't add this column to
-                // order by clauses
-                if (column.getSortDirection() == null) {
-                    continue;
-                }
-
-                // Convert Datatables sort direction to Querydsl order
-                Order order = Order.DESC;
-                if (column.getSortDirection() == SortDirection.ASC) {
-                    order = Order.ASC;
-                }
-
-                // Entity field name and type. Type must extend Comparable
-                // interface
-                String fieldName = unescapeDot(column.getName());
-                Class<E> fieldType = (Class<E>) getFieldType(fieldName, entity);
-
-                List<String> attributes = orderByAssociations.get(fieldName);
-                try {
-                    // If column is an association and there are given
-                    // order by attributes, add those attributes to ORDER BY
-                    // clauses
-                    if (attributes != null && attributes.size() > 0) {
-                        PathBuilder<?> associationPath = associationMap
-                                .get(fieldName);
-                        List<String> associationFields = orderByAssociations
-                                .get(fieldName);
-
-                        for (String associationFieldName : associationFields) {
-
-                            // Get associated entity field type
-                            Class<E> associationFieldType = (Class<E>) BeanUtils
-                                    .findPropertyType(
-                                            associationFieldName,
-                                            ArrayUtils
-                                                    .<Class<?>> toArray(fieldType));
-                            orderSpecifiersList.add(QuerydslUtils
-                                    .createOrderSpecifier(associationPath,
-                                            associationFieldName,
-                                            associationFieldType, order));
-                        }
-                    }
-                    // Otherwise column is an entity property
-                    else {
-                        orderSpecifiersList.add(QuerydslUtils
-                                .createOrderSpecifier(entity, fieldName,
-                                        fieldType, order));
-                    }
-                }
-                catch (Exception ex) {
-                    // Do nothing, on class cast exception order specifier will
-                    // be null
-                    continue;
-                }
-            }
-        }
+        List<OrderSpecifier<?>> orderSpecifiersList = prepareQueryOrder(entity,
+                orderByAssociations, datatablesCriterias, associationMap);
 
         // ----- Query results paging -----
 
@@ -685,6 +475,292 @@ public class DatatablesUtils {
     }
 
     /**
+     * Prepares associationMap for findByCriteria
+     * 
+     * @param entity
+     * @param filterByAssociations
+     * @param datatablesCriterias
+     * @param findInAllColumns
+     * @param query
+     * @param associationMap
+     * @return
+     */
+    private static <T> JPAQuery prepareQueryAssociationMap(
+            PathBuilder<T> entity,
+            Map<String, List<String>> filterByAssociations,
+            DatatablesCriterias datatablesCriterias, boolean findInAllColumns,
+            JPAQuery query, Map<String, PathBuilder<?>> associationMap) {
+        for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
+
+            // true if the search must include this column
+            boolean findInColumn = StringUtils.isNotEmpty(column.getSearch());
+
+            // If no joins given for this column, don't add the JOIN to query
+            // to improve performance
+            String associationName = unescapeDot(column.getName());
+            if (!filterByAssociations.containsKey(associationName)) {
+                continue;
+            }
+
+            // If column is not sortable and is not filterable, don't add the
+            // JOIN to query to improve performance
+            if (!column.isSortable() && !column.isFilterable()) {
+                continue;
+            }
+
+            // If column is not sortable and no search value provided,
+            // don't add the JOIN to query to improve performance
+            if (!column.isSortable() && !findInColumn && !findInAllColumns) {
+                continue;
+            }
+
+            // Here the column is sortable or it is filterable and column search
+            // value or all-column search value is provided
+            PathBuilder<?> associationPath = entity.get(associationName);
+            query = query.join(associationPath);
+
+            // Store join path for later use in where
+            associationMap.put(associationName, associationPath);
+        }
+        return query;
+    }
+
+    /**
+     * Prepares filter part for a query of findByCriteria
+     * 
+     * @param entity
+     * @param filterByAssociations
+     * @param datatablesCriterias
+     * @param associationMap
+     * @param filtersByColumnPredicate
+     * @return
+     */
+    private static <T> BooleanBuilder prepareQueryFilterPart(
+            PathBuilder<T> entity,
+            Map<String, List<String>> filterByAssociations,
+            DatatablesCriterias datatablesCriterias,
+            Map<String, PathBuilder<?>> associationMap,
+            BooleanBuilder filtersByColumnPredicate) {
+        // Add filterable columns only
+        for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
+
+            // Each column has its own search by value
+            String searchStr = column.getSearch();
+
+            // true if the search must include this column
+            boolean findInColumn = column.isFilterable()
+                    && StringUtils.isNotEmpty(searchStr);
+
+            if (findInColumn) {
+
+                // Entity field name and type
+                String fieldName = unescapeDot(column.getName());
+                Class<?> fieldType = getFieldType(fieldName, entity);
+
+                // On column search, connect where clauses together by
+                // AND
+                // because we want found the records which columns
+                // match with column filters
+                filtersByColumnPredicate = filtersByColumnPredicate
+                        .and(QuerydslUtils.createExpression(entity, fieldName,
+                                fieldType, searchStr));
+
+                // TODO: Este codigo se puede pasar a QuerydslUtils ?
+
+                // If column is an association and there are given
+                // join attributes, add those attributes to WHERE
+                // predicates
+                List<String> attributes = filterByAssociations.get(fieldName);
+                if (attributes != null && attributes.size() > 0) {
+
+                    // Filters of associated entity properties
+                    BooleanBuilder filtersByAssociationPredicate = new BooleanBuilder();
+
+                    PathBuilder<?> associationPath = associationMap
+                            .get(fieldName);
+                    List<String> associationFields = filterByAssociations
+                            .get(fieldName);
+
+                    for (String associationFieldName : associationFields) {
+
+                        // Get associated entity field type
+                        Class<?> associationFieldType = BeanUtils
+                                .findPropertyType(associationFieldName,
+                                        ArrayUtils
+                                                .<Class<?>> toArray(fieldType));
+
+                        // On association search, connect
+                        // associated entity where clauses by OR
+                        // because all assoc entity properties are
+                        // inside the same column and any of its
+                        // property value can match with given search
+                        // value
+                        filtersByAssociationPredicate = filtersByAssociationPredicate
+                                .or(QuerydslUtils.createExpression(
+                                        associationPath, associationFieldName,
+                                        associationFieldType, searchStr));
+                    }
+
+                    filtersByColumnPredicate = filtersByColumnPredicate
+                            .and(filtersByAssociationPredicate.getValue());
+                }
+            }
+        }
+        return filtersByColumnPredicate;
+    }
+
+    /**
+     * Prepare search part for a query of findByCriteria
+     * 
+     * @param entity
+     * @param filterByAssociations
+     * @param datatablesCriterias
+     * @param findInAllColumns
+     * @param associationMap
+     * @param filtersByTablePredicate
+     * @return
+     */
+    private static <T> BooleanBuilder prepareQuerySearchPart(
+            PathBuilder<T> entity,
+            Map<String, List<String>> filterByAssociations,
+            DatatablesCriterias datatablesCriterias, boolean findInAllColumns,
+            Map<String, PathBuilder<?>> associationMap,
+            BooleanBuilder filtersByTablePredicate) {
+        String searchStr = datatablesCriterias.getSearch();
+        if (findInAllColumns) {
+
+            // Add filterable columns only
+            for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
+                if (column.isFilterable()) {
+
+                    // Entity field name and type
+                    String fieldName = unescapeDot(column.getName());
+                    Class<?> fieldType = getFieldType(fieldName, entity);
+
+                    // Find in all columns means we want to find given
+                    // value in at least one entity property, so we must
+                    // join the where clauses by OR
+                    filtersByTablePredicate = filtersByTablePredicate
+                            .or(QuerydslUtils.createExpression(entity,
+                                    fieldName, fieldType, searchStr));
+
+                    // If column is an association and there are given
+                    // join attributes, add those attributes to WHERE
+                    // predicates
+                    List<String> attributes = filterByAssociations
+                            .get(fieldName);
+                    if (attributes != null && attributes.size() > 0) {
+                        PathBuilder<?> associationPath = associationMap
+                                .get(fieldName);
+                        List<String> associationFields = filterByAssociations
+                                .get(fieldName);
+
+                        for (String associationFieldName : associationFields) {
+
+                            // Get associated entity field type
+                            Class<?> associationFieldType = BeanUtils
+                                    .findPropertyType(
+                                            associationFieldName,
+                                            ArrayUtils
+                                                    .<Class<?>> toArray(fieldType));
+                            filtersByTablePredicate = filtersByTablePredicate
+                                    .or(QuerydslUtils.createExpression(
+                                            associationPath,
+                                            associationFieldName,
+                                            associationFieldType, searchStr));
+                        }
+                    }
+                }
+            }
+        }
+        return filtersByTablePredicate;
+    }
+
+    /**
+     * prepares order part for a query of findByCriteria
+     * 
+     * @param entity
+     * @param orderByAssociations
+     * @param datatablesCriterias
+     * @param associationMap
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private static <E extends Comparable<?>, T> List<OrderSpecifier<?>> prepareQueryOrder(
+            PathBuilder<T> entity,
+            Map<String, List<String>> orderByAssociations,
+            DatatablesCriterias datatablesCriterias,
+            Map<String, PathBuilder<?>> associationMap) {
+        List<OrderSpecifier<?>> orderSpecifiersList = new ArrayList<OrderSpecifier<?>>();
+
+        if (datatablesCriterias.hasOneSortedColumn()) {
+            for (ColumnDef column : datatablesCriterias.getSortingColumnDefs()) {
+
+                // If column is not sortable, don't add it to order by clauses
+                if (!column.isSortable()) {
+                    continue;
+                }
+
+                // If no sort direction provided, don't add this column to
+                // order by clauses
+                if (column.getSortDirection() == null) {
+                    continue;
+                }
+
+                // Convert Datatables sort direction to Querydsl order
+                Order order = Order.DESC;
+                if (column.getSortDirection() == SortDirection.ASC) {
+                    order = Order.ASC;
+                }
+
+                // Entity field name and type. Type must extend Comparable
+                // interface
+                String fieldName = unescapeDot(column.getName());
+                Class<E> fieldType = (Class<E>) getFieldType(fieldName, entity);
+
+                List<String> attributes = orderByAssociations.get(fieldName);
+                try {
+                    // If column is an association and there are given
+                    // order by attributes, add those attributes to ORDER BY
+                    // clauses
+                    if (attributes != null && attributes.size() > 0) {
+                        PathBuilder<?> associationPath = associationMap
+                                .get(fieldName);
+                        List<String> associationFields = orderByAssociations
+                                .get(fieldName);
+
+                        for (String associationFieldName : associationFields) {
+
+                            // Get associated entity field type
+                            Class<E> associationFieldType = (Class<E>) BeanUtils
+                                    .findPropertyType(
+                                            associationFieldName,
+                                            ArrayUtils
+                                                    .<Class<?>> toArray(fieldType));
+                            orderSpecifiersList.add(QuerydslUtils
+                                    .createOrderSpecifier(associationPath,
+                                            associationFieldName,
+                                            associationFieldType, order));
+                        }
+                    }
+                    // Otherwise column is an entity property
+                    else {
+                        orderSpecifiersList.add(QuerydslUtils
+                                .createOrderSpecifier(entity, fieldName,
+                                        fieldType, order));
+                    }
+                }
+                catch (Exception ex) {
+                    // Do nothing, on class cast exception order specifier will
+                    // be null
+                    continue;
+                }
+            }
+        }
+        return orderSpecifiersList;
+    }
+
+    /**
      * Populate a {@link DataSet} from given entity list.
      * <p/>
      * Field values will be converted to String using given
@@ -740,18 +816,24 @@ public class DatatablesUtils {
         // Date formatters
         DateFormat defaultFormat = SimpleDateFormat.getDateInstance();
 
+        BeanWrapperImpl entityBean = null;
         // Populate each row, note a row is a Map containing
         // fieldName = fieldValue
-        for (Object entity : entities) {
+        for (T entity : entities) {
             Map<String, String> row = new HashMap<String, String>(fields.size());
-            BeanWrapper entityBean = new BeanWrapperImpl(entity);
+            if (entityBean == null) {
+                entityBean = new BeanWrapperImpl(entity);
+            }
+            else {
+                entityBean.setWrappedInstance(entity);
+            }
             for (String fieldName : fields) {
 
                 String unescapedFieldName = unescapeDot(fieldName);
 
                 // check if property exists (trace it else)
                 if (!entityBean.isReadableProperty(unescapedFieldName)) {
-                    logger.debug("Property [".concat(unescapedFieldName)
+                    LOGGER.debug("Property [".concat(unescapedFieldName)
                             .concat("] not found in bean [")
                             .concat(entity.toString()).concat("]"));
                     continue;
@@ -790,7 +872,7 @@ public class DatatablesUtils {
                 catch (Exception ex) {
 
                     // debug getting value problem
-                    logger.error(
+                    LOGGER.error(
                             "Error getting value of field [".concat(fieldName)
                                     .concat("]").concat(" in bean [")
                                     .concat(entity.toString()).concat("]"), ex);
