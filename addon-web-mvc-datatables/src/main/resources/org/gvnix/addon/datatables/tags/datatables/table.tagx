@@ -448,6 +448,7 @@
 
       <!-- Add show functions to the script element before Datatables element -->
       <c:set target="${datatables_javaScript_elements_before}" property="${showColumnId}">
+        <![CDATA[
 	    function ${showColumnId}(data, type, full) {
 		    var result =
 	           '<a href="${urlPath}/'+full.${typeIdFieldName} + '?' + datatablesRedirect + '" alt="${show_label}" title="${show_label}" class="icon show_entity">'
@@ -455,6 +456,7 @@
 
 	        return result;
   		}
+  		]]>
   	  </c:set>
     </c:if><!-- /serverSide -->
   </c:if><!-- /show -->
@@ -470,6 +472,7 @@
 
     <!-- Add create functions to the script element before Datatables element -->
     <c:set target="${datatables_javaScript_elements_before}" property="${fnRenderCreateButton}">
+    <![CDATA[
       /* Add the create button to gvNIX toolbar */
       function ${fnRenderCreateButton}() {
         var result =
@@ -477,6 +480,7 @@
           + '</a>';
         jQuery('#${id}_gvnix_toolbar').append( result );
       }
+      ]]>
     </c:set>
 
     <!-- In Datatables initialization callback handler add call to
