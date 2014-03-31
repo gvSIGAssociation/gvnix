@@ -433,7 +433,11 @@ public class DatatablesMetadata extends
                 throw new IllegalArgumentException(
                         aspectName
                                 .getFullyQualifiedTypeName()
-                                .concat(". Inline editing requires update view uses. Run 'web mvc jquery add' command"));
+                                .concat(". Inline editing requires batch support. Run 'jpa batch add' command or 'web mvc batch add' command"));
+                /*throw new IllegalArgumentException(
+                        aspectName
+                                .getFullyQualifiedTypeName()
+                                .concat(". Inline editing requires update view uses. Run 'web mvc jquery add' command"));*/
             }
             builder.addMethod(getJsonFormsMethod(true));
             builder.addMethod(getJsonFormsMethod(false));
