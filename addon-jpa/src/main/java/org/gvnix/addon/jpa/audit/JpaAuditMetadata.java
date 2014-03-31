@@ -42,13 +42,16 @@ import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
+import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.JdkJavaType;
+import org.springframework.roo.model.JpaJavaType;
 import org.springframework.roo.project.LogicalPath;
 
 /**
@@ -956,9 +959,7 @@ public class JpaAuditMetadata extends
     private FieldMetadata getFieldAuditLastUpdatedBy() {
         List<AnnotationMetadataBuilder> annotations = null;
         if (userTypeEntity) {
-            annotations = new ArrayList<AnnotationMetadataBuilder>(1);
-            annotations.add(new AnnotationMetadataBuilder(
-                    AnnotationMetadataBuilder.JPA_MANY_TO_ONE_ANNOTATION));
+            annotations = generateManyToOneFieldAnnotation();
 
         }
         return helper.getField(LAST_UPDATED_BY_FIELD, Modifier.PRIVATE,
@@ -980,13 +981,27 @@ public class JpaAuditMetadata extends
     private FieldMetadata getFieldAuditCreatedBy() {
         List<AnnotationMetadataBuilder> annotations = null;
         if (userTypeEntity) {
-            annotations = new ArrayList<AnnotationMetadataBuilder>(1);
-            annotations.add(new AnnotationMetadataBuilder(
-                    AnnotationMetadataBuilder.JPA_MANY_TO_ONE_ANNOTATION));
+            annotations = generateManyToOneFieldAnnotation();
 
         }
         return helper.getField(CREATED_BY_FIELD, Modifier.PRIVATE, userType,
                 annotations, GET_FIELD_EXISTS_ACTION.RETURN_EXISTING);
+    }
+
+    /**
+     * @return annotations array with ManyToOne annotation for
+     *         created/updated-By fields
+     */
+    private List<AnnotationMetadataBuilder> generateManyToOneFieldAnnotation() {
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                1);
+        AnnotationMetadataBuilder annotationMetadataBuilder = new AnnotationMetadataBuilder(
+                AnnotationMetadataBuilder.JPA_MANY_TO_ONE_ANNOTATION);
+        annotationMetadataBuilder.addAttribute(new EnumAttributeValue(
+                new JavaSymbolName("fetch"), new EnumDetails(
+                        JpaJavaType.FETCH_TYPE, new JavaSymbolName("LAZY"))));
+        annotations.add(annotationMetadataBuilder);
+        return annotations;
     }
 
     /**
