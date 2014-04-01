@@ -1,0 +1,169 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+  <!--
+    Modal Dialog Box simulates a regular GUI dialog box.
+
+    Usage:
+
+    * Controller classes: Add error code request attribute
+        uiModel.addAttribute("MESSAGE_ERROR", "_error_code_");
+
+    * Exception handlers: Add error code parameter
+        /asuntos?exception=_error_code_
+
+    * Tags: Set error code attribute
+        <util:message-box code="_error_code_" .../>
+
+    The user can close the dialog box without acting by clicking on
+    the X button in the top-right corner.
+  -->
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="false" rtexprvalue="true" description="Message box identifier. Useful to have several message boxes in one page (default 'MessageBoxDialog')" />
+  <jsp:directive.attribute name="show" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the message box should be opened (default 'true')" />
+  <jsp:directive.attribute name="code" type="java.lang.String" required="false" rtexprvalue="true" description="The code (key) to use when looking up the message. Note code search order is: request attribute, then exception param and finally tag attribute." />
+
+  <!-- Default values -->
+  <c:if test="${empty id}">
+    <c:set var="id" value="MessageBoxDialog" />
+  </c:if>
+  <c:if test="${empty show}">
+    <c:set var="show" value="${true}" />
+  </c:if>
+
+  <!-- Default error message -->
+  <spring:message code="error_uncaughtexception_problemdescription"
+    var="default_message_error_desc" htmlEscape="false"/>
+
+  <!-- Highest precedence: Search message code by message type as request attribute -->
+  <c:choose>
+    <c:when test="${not empty MESSAGE_INFO}">
+      <c:set var="MsgDlgClass" value="MessageInfoBox" />
+      <c:if test="${empty title}">
+        <spring:message code="message_info_title" var="title" htmlEscape="false"/>
+        <spring:message code="${MESSAGE_INFO}" var="description" htmlEscape="false"/>
+      </c:if>
+    </c:when>
+    <c:when test="${not empty MESSAGE_ERROR}">
+      <c:set var="MsgDlgClass" value="MessageErrorBox" />
+      <c:if test="${empty title}">
+        <spring:message code="message_error_title" var="title" htmlEscape="false"/>
+        <spring:message code="${MESSAGE_ERROR}" var="description" htmlEscape="false"/>
+      </c:if>
+    </c:when>
+     <c:when test="${not empty MESSAGE_ALERT}">
+      <c:set var="MsgDlgClass" value="MessageAlertBox" />
+      <c:if test="${empty title}">
+        <spring:message code="message_alert_title" var="title" htmlEscape="false"/>
+        <spring:message code="${MESSAGE_ALERT}" var="description" htmlEscape="false"/>
+      </c:if>
+    </c:when>
+     <c:when test="${not empty MESSAGE_SUGGEST}">
+      <c:set var="MsgDlgClass" value="MessageSuggestBox" />
+      <c:if test="${empty title}">
+        <spring:message code="message_suggest_title" var="title" htmlEscape="false"/>
+        <spring:message code="${MESSAGE_SUGGEST}" var="description" htmlEscape="false"/>
+      </c:if>
+    </c:when>
+    <c:otherwise>
+
+      <c:choose>
+        <!-- Lower precedence: Use the message code given as tag attribute -->
+        <c:when test="${not empty code}">
+          <c:set var="MsgDlgClass" value="MessageAlertBox" />
+          <spring:message code="message_alert_title" var="title" htmlEscape="false"/>
+          <spring:message code="${code}" var="description"
+            text="${default_message_error_desc}" htmlEscape="false"/>
+        </c:when>
+      </c:choose>
+
+    </c:otherwise>
+  </c:choose>
+
+  <c:if test="${!empty sessionScope['dialogMessage']}">
+    <c:set scope="request" var="dialogMessage" value="${sessionScope['dialogMessage']}" />
+    <c:set scope="request" var="dialogPage" value="${dialogMessage.page}" />
+    <c:set scope="request" var="exception" value="${dialogMessage.exception}" />
+    <c:set scope="request" var="titleCode" value="${dialogMessage.title}" />
+    <spring:message code="${titleCode}" text="" var="title" htmlEscape="false" />
+    <c:set scope="request" var="descriptionCode" value="${dialogMessage.description}" />
+    <c:if test="${!empty descriptionCode}">
+      <spring:message code="${descriptionCode}" text="" var="description" htmlEscape="false" />
+    </c:if>
+    <!-- Use dialogParams as extra data container to use in the included JSPx -->
+    <c:set scope="request" var="dialogParams" value="${dialogMessage.params}" />
+    <c:set scope="request" var="MsgDlgClass" value="Message${dialogMessage.dialogType}Box" />
+    <c:set scope="request" var="dialogId" value="${id}" />
+    <c:remove var="dialogMessage" scope="session"/>
+  </c:if>
+
+  <c:if test="${not empty MsgDlgClass}">
+    <spring:message code="button_proceed" var="button_label" htmlEscape="false"/>
+
+    <div class="modal fade" id="${id}" role="dialog" aria-labelledby="ErrorMessage" aria-hidden="true">
+    <div class="modal-dialog">
+    	<div class="modal-content">
+
+    		<div class="avisocorto modal-header">
+    			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&amp;times;</button>
+          		<h4 class="modal-title">${title}</h4>
+    		</div>
+			<div class="modal-body">
+		    	<c:choose>
+		        <c:when test="${!empty dialogPage}">
+		          <div class="avisolargo"><jsp:include page="${dialogPage}" /></div>
+		        </c:when>
+		        <c:otherwise>
+		          <div class="avisolargo">
+		              ${description}
+			          <ul>
+			          <c:forEach var="dialogError" items="${dialogMessage.errors}">
+				          <li>
+					          <spring:message text="${dialogError.field}"/>:
+					          <spring:message text="${dialogError.defaultMessage}"/>
+				          </li>
+			          </c:forEach>
+			          </ul>
+		          </div>
+		        </c:otherwise>
+		      </c:choose>
+		     </div><!-- /modal-body -->
+    	</div><!-- /modal-content -->
+    </div><!-- /modal-dialog -->
+    </div><!-- /modal -->
+
+    <spring:message code="application_name" var="applicationName" htmlEscape="true"/>
+
+    <script type="text/javascript"><![CDATA[
+    	//init modal
+		$('#${id}').modal('toggle');
+		//add type error class
+		$('#${id}').addClass('${MsgDlgClass}');
+
+	]]></script>
+
+<!-- Dojo -->
+<!--   <script type="text/javascript"><![CDATA[
+        dojo.require("dijit.Dialog");
+
+        // Vars defined with concatenate id in order to avoid
+        // var names collision when this component is used
+        // more than once in the same jsp context.
+
+        var dlgContent${id} = dojo.byId('${id}');
+        var messageDlg${id};
+        dojo.addOnLoad(function() {
+          // create the dialog:
+           messageDlg${id} = new dijit.Dialog(
+           { 'class': "MessageBoxDialog ${MsgDlgClass}",",
+             'title': "${applicationName}",
+             'style': "width: 350px" }, dlgContent${id});
+
+          if(${show}) {
+            messageDlg${id}.show();
+          }
+        });
+    //]]></script>
+ -->
+
+  </c:if>
+</jsp:root>

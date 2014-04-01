@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes"/>
+
+  <!-- Datatables-Bootstrap -->
+  <spring:url value="/resources/styles/bootstrap/dataTables.bootstrap.css" var="css_datatables_bootstrap_url" />
+  <link href="${css_datatables_bootstrap_url}" media="screen" rel="stylesheet" type="text/css" />
+
+  <!-- Jquery-Bootstrap -->
+  <spring:url value="/resources/styles/bootstrap/jquery-ui.bootstrap.css" var="jquery_ui_bootstrap_css_url" />
+  <link href="${jquery_ui_bootstrap_css_url}" media="screen" rel="stylesheet" type="text/css" />
+  
+  <!-- Bootstrap -->
+  <spring:url value="/resources/scripts/bootstrap/bootstrap.min.js" var="bootstrap_min_url" />
+  <script src="${bootstrap_min_url}" type="text/javascript">
+    <!--required for FF3 and Opera-->
+  </script>
+
+  <!-- Datatables-Bootstrap -->
+  <spring:url
+    value="/resources/scripts/bootstrap/dataTables.bootstrap.js" var="datatables_bootstrap_js_url" />
+  <script src="${datatables_bootstrap_js_url}" type="text/javascript">
+    <!--required for FF3 and Opera-->
+  </script>
+
+  <!-- Custom styles for offcanvas template -->
+  <spring:url value="/resources/scripts/bootstrap/offcanvas.js" var="offcanvas_url" />
+  <script src="${offcanvas_url}" type="text/javascript">
+    <!--required for FF3 and Opera-->
+  </script>
+
+  <!-- for Bootstrap mediaqueries -->
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <spring:url value="/resources/scripts/bootstrap/assets/html5shiv.js" var="html5shiv_url"/>
+    <script src="${html5shiv_url}" type="text/javascript"></script>
+
+    <spring:url value="/resources/scripts/bootstrap/assets/respond.min.js" var="respond_min_url"/>
+    <script src="${respond_min_url}" type="text/javascript"></script>
+  <![endif]-->
+
+</jsp:root>

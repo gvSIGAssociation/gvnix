@@ -51,6 +51,7 @@
     <module>util-web-mvc-jackson-binder</module>
     <module>addon-jpa</module>
     <module>addon-web-mvc</module>
+    <module>addon-web-mvc-bootstrap</module>
     <module>addon-web-mvc-datatables</module>
     <module>addon-dynamic-configuration</module>
     <module>addon-web-i18n</module>

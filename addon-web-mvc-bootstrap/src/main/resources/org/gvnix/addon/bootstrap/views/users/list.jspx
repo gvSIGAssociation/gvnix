@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/jquery/form" xmlns:table="urn:jsptagdir:/WEB-INF/tags/jquery/form/fields" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:list id="pl_com_springsource_petclinic_domain_User" items="${users}" z="etUTA2lCn4IS0gecNYowEoSChFA=">
+        <table:table data="${users}" id="l_com_springsource_petclinic_domain_User" path="/users" z="SZHGwwjvloOyDKzn4MPyigTmnu8=">
+            <table:column id="c_com_springsource_petclinic_domain_User_firstName" property="firstName" z="M0gJ0Wp3wFYdnMfgotr+3m922Og="/>
+            <table:column id="c_com_springsource_petclinic_domain_User_lastName" property="lastName" z="adUx0BNP2DL6783rc33pULBOBkE="/>
+            <table:column id="c_com_springsource_petclinic_domain_User_emailAddress" property="emailAddress" z="dlx1zCwAgumOsnN7OtsTDN5f7BA="/>
+            <table:column id="c_com_springsource_petclinic_domain_User_password" property="password" z="m4g47M2fMgyN8UZyKYyEPK9sNao="/>
+            <table:column date="true" dateTimePattern="${user_activationdate_date_format}" id="c_com_springsource_petclinic_domain_User_activationDate" property="activationDate" z="/xqRQKTr0lurOKXLdkS86M/QQb4="/>
+            <table:column id="c_com_springsource_petclinic_domain_User_activationKey" property="activationKey" z="lOxpolosGRq+lsDm1HX80+5dfRE="/>
+        </table:table>
+    </page:list>
+</div>

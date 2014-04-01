@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <spring:message code="error_uncaughtexception_title" htmlEscape="false" var="title"/>
+    <util:panel id="title" title="${title}">
+        <!-- repeat <h2> in util/panel.tagx -->
+        <!-- <h2>${fn:escapeXml(title)}</h2> -->
+        <p>
+            <spring:message code="error_uncaughtexception_problemdescription"/>
+        </p>
+        <c:if test="${not empty exception}">
+            <p>
+                <h4>
+                    <spring:message code="exception_details"/>
+                </h4>
+                <spring:message code="exception_message" htmlEscape="false" var="message"/>
+                <util:panel id="_message" openPane="false" title="${message}">
+                    <c:out value="${exception.localizedMessage}"/>
+                </util:panel>
+                <spring:message code="exception_stacktrace" htmlEscape="false" var="stacktrace"/>
+                <util:panel id="_exception" openPane="false" title="${stacktrace}">
+                    <c:forEach items="${exception.stackTrace}" var="trace">
+                        <c:out value="${trace}"/>
+                        <br/>
+                    </c:forEach>
+                </util:panel>
+            </p>
+        </c:if>
+    </util:panel>
+</div>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes"/>
+
+	<!-- Bootstrap -->
+	<spring:url value="/resources/styles/bootstrap/bootstrap.min.css" var="bootstrap_min_css_url" />
+	<link href="${bootstrap_min_css_url}" media="screen" rel="stylesheet" type="text/css" />
+
+	<spring:url value="/resources/styles/bootstrap/docs.css" var="docs_css_url" />
+	<link href="${docs_css_url}" media="screen" rel="stylesheet" type="text/css" />
+
+	<spring:url value="/resources/styles/bootstrap/offcanvas.css" var="offcanvas_css_url" />
+	<link href="${offcanvas_css_url}" media="screen" rel="stylesheet" type="text/css" />
+
+</jsp:root>
