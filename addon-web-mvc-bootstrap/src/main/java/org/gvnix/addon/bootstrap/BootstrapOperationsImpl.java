@@ -96,9 +96,9 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         // Adding image resources
         addImageResources();
 
-        // Checking installed addons
-        checkAndUpdateDatatables();
-        checkAndUpdateSecurity();
+        // Launching update command to be sure
+        // that all tags and views are updated.
+        updateTags();
 
         // Showing finished task
         log.log(Level.INFO, "Done");
@@ -114,7 +114,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         checkAndUpdateSecurity();
 
         log.log(Level.INFO,
-                "*** All files updated to use JQuery and Bootstrap 3 ");
+                "*** All files are updated to use JQuery and Bootstrap 3 ");
     }
 
     /**
