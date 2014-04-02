@@ -1,11 +1,14 @@
 package org.gvnix.addon.bootstrap;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,6 +87,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         // Updating Views and jQuery elements
         updateViews();
+        updateJSPViewsToUseJQuery();
 
         // Adding image resources
         addImageResources();
@@ -98,10 +102,15 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /** {@inheritDoc} */
     public void updateTags() {
+        // Updating al views to use jQuery
+        updateJSPViewsToUseJQuery();
+
         // Checking installed addons
         checkAndUpdateDatatables();
         checkAndUpdateSecurity();
-        log.log(Level.INFO, "*** All files updated to works with Bootstrap 3 ");
+
+        log.log(Level.INFO,
+                "*** All files updated to use JQuery and Bootstrap 3 ");
     }
 
     /**
@@ -391,9 +400,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         viewsFolderFiles.add("footer.jspx");
         viewsFolderFiles.add("header.jspx");
         viewsFolderFiles.add("index.jspx");
-        if (isMenuInstalled()) {
-            viewsFolderFiles.add("menu.jspx");
-        }
         viewsFolderFiles.add("uncaughtException.jspx");
 
         Iterator<String> viewsFolderIterator = viewsFolderFiles.iterator();
@@ -469,7 +475,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /**
      * This method checks if datatables is installed. If is installed add
-     * necesary bootstrap javascript and css bootstrap styles
+     * necessary bootstrap javascript and css bootstrap styles
      */
     public void checkAndUpdateDatatables() {
         final String datatablesTagx = pathResolver.getFocusedIdentifier(
@@ -634,18 +640,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     }
 
     /**
-     * Check if {@code WEB-INF/tags/menu} exist
-     * 
-     * @return
-     */
-    public boolean isMenuInstalled() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
-        String dirPath = pathResolver.getIdentifier(getWebappPath(),
-                "WEB-INF/tags/menu/gvnixitem.tagx");
-        return fileManager.exists(dirPath);
-    }
-
-    /**
      * Check if {@code scripts/bootstrap} exist
      * 
      * @return
@@ -712,4 +706,72 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     public LogicalPath getWebappPath() {
         return WebProjectUtils.getWebappPath(projectOperations);
     }
+
+    /**
+     * Updates all JSP pages of target controller to use JQuery
+     * 
+     */
+    public void updateJSPViewsToUseJQuery() {
+
+        String path = "";
+        // Getting all views of the application
+        String viewsPath = pathResolver.getIdentifier(getWebappPath(),
+                "WEB-INF/views/");
+        File directory = new File(viewsPath);
+        File[] folders = directory.listFiles();
+
+        for (File folder : folders) {
+            if (folder.isDirectory()) {
+                path = folder.getName().concat("/");
+
+                // List of pages to update
+                // List of pages to update
+                List<String> pageList = new ArrayList<String>();
+
+                // Getting all jspx files inside the folder
+                File[] files = folder.listFiles();
+                for (File file : files) {
+                    if (file.isFile() && file.getName().contains("jspx")) {
+                        pageList.add(file.getName());
+                    }
+                }
+
+                // 3rd party add-ons could customize default Roo tags as gvNIX
+                // does,
+                // to avoid to overwrite them with jQuery namespaces we will
+                // update
+                // default Roo namespaces only
+                Map<String, String> rooUriMap = new HashMap<String, String>();
+                rooUriMap.put("xmlns:field",
+                        "urn:jsptagdir:/WEB-INF/tags/form/fields");
+                rooUriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/form");
+                rooUriMap.put("xmlns:table",
+                        "urn:jsptagdir:/WEB-INF/tags/form/fields");
+                rooUriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/form");
+                rooUriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util");
+
+                // new jQuery namespaces
+                Map<String, String> uriMap = new HashMap<String, String>();
+                uriMap.put("xmlns:field",
+                        "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
+                uriMap.put("xmlns:form",
+                        "urn:jsptagdir:/WEB-INF/tags/jquery/form");
+                uriMap.put("xmlns:table",
+                        "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
+                uriMap.put("xmlns:page",
+                        "urn:jsptagdir:/WEB-INF/tags/jquery/form");
+                uriMap.put("xmlns:util",
+                        "urn:jsptagdir:/WEB-INF/tags/jquery/util");
+
+                // do the update
+                for (String jspxName : pageList) {
+                    String tagxFile = "WEB-INF/views/".concat(path).concat(
+                            jspxName);
+                    WebProjectUtils.updateTagxUriInJspx(tagxFile, rooUriMap,
+                            uriMap, projectOperations, fileManager);
+                }
+            }
+        }
+    }
+
 }
