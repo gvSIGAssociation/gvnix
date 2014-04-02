@@ -1,6 +1,6 @@
 package org.gvnix.addon.bootstrap;
 
-import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Feature;
 
 /**
  * Interface of operations this add-on offers. Typically used by a command type
@@ -8,7 +8,13 @@ import org.springframework.roo.project.LogicalPath;
  * 
  * @since 1.1
  */
-public interface BootstrapOperations {
+public interface BootstrapOperations extends Feature {
+
+    /**
+     * Feature name. Use to know if gvNIX Bootstrap has been setup in this
+     * project
+     */
+    public static final String FEATURE_NAME_GVNIX_BOOTSTRAP = "gvnix-bootstrap";
 
     /**
      * Indicate commands should be available
@@ -33,20 +39,5 @@ public interface BootstrapOperations {
      * Update all Bootstrap tags (css, js, etc.. )
      */
     void updateTags();
-
-    /**
-     * Check if {@code WEB-INF/tags/jquery} and
-     * {@code scripts/jquery/jquery-min.js} exist
-     * 
-     * @return true if is installed
-     */
-    boolean hasJQueryTags();
-
-    /**
-     * Check if {@code scripts/bootstrap} exist
-     * 
-     * @return
-     */
-    boolean isBootstrapInstalled();
 
 }

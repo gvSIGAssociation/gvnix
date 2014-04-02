@@ -58,14 +58,18 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * If JQuery is installed, the command is available
      */
     public boolean isSetupCommandAvailable() {
-        return hasJQueryTags() && !isBootstrapInstalled();
+        return projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-jquery")
+                && !projectOperations
+                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_BOOTSTRAP);
     }
 
     /**
      * if bootstrap is installed, the command is available
      */
     public boolean isUpdateCommandAvailable() {
-        return isBootstrapInstalled();
+        return projectOperations
+                .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_BOOTSTRAP);
     }
 
     /** {@inheritDoc} */
@@ -625,33 +629,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     }
 
     /**
-     * Check if {@code WEB-INF/tags/jquery} and
-     * {@code scripts/jquery/jquery-min.js} exist
-     * 
-     * @return
-     */
-    public boolean hasJQueryTags() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
-        String dirPath = pathResolver.getIdentifier(getWebappPath(),
-                "WEB-INF/tags/jquery");
-        String jsPath = pathResolver.getIdentifier(getWebappPath(),
-                "scripts/jquery/jquery-min.js");
-        return fileManager.exists(dirPath) && fileManager.exists(jsPath);
-    }
-
-    /**
-     * Check if {@code scripts/bootstrap} exist
-     * 
-     * @return
-     */
-    public boolean isBootstrapInstalled() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
-        String dirPath = pathResolver.getIdentifier(getWebappPath(),
-                "scripts/bootstrap/bootstrap.min.js");
-        return fileManager.exists(dirPath);
-    }
-
-    /**
      * Check if load-scripts-bootstrap.tagx was modified and include datatables
      * 
      * @return
@@ -779,6 +756,29 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                 }
             }
         }
+    }
+
+    // Feature methods -----
+
+    /**
+     * Gets the feature name managed by this operations class.
+     * 
+     * @return feature name
+     */
+    @Override
+    public String getName() {
+        return FEATURE_NAME_GVNIX_BOOTSTRAP;
+    }
+
+    /**
+     * Returns true if bootstrap is installed
+     */
+    @Override
+    public boolean isInstalledInModule(String moduleName) {
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+                "scripts/bootstrap/bootstrap.min.js");
+        return fileManager.exists(dirPath);
     }
 
 }
