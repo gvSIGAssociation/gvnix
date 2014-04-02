@@ -28,21 +28,25 @@ public class BootstrapCommands implements CommandMarker {
     private BootstrapOperations operations;
 
     /**
-     * This method is optional. It allows automatic command hiding in situations
-     * when the command should not be visible. For example the 'entity' command
-     * will not be made available before the user has defined his persistence
-     * settings in the Roo shell or directly in the project.
-     * 
-     * You can define multiple methods annotated with
-     * {@link CliAvailabilityIndicator} if your commands have differing
-     * visibility requirements.
+     * This method checks if the setup method is available
      * 
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
-    @CliAvailabilityIndicator({ "web mvc bootstrap setup" })
-    public boolean isCommandAvailable() {
-        return operations.isCommandAvailable();
+    @CliAvailabilityIndicator("web mvc bootstrap setup")
+    public boolean isSetupCommandAvailable() {
+        return operations.isSetupCommandAvailable();
+    }
+
+    /**
+     * This method checks if the update method is available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator("web mvc bootstrap update")
+    public boolean isUpdateAvailable() {
+        return operations.isUpdateCommandAvailable();
     }
 
     /**
@@ -51,9 +55,20 @@ public class BootstrapCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc bootstrap setup", help = "Setup Bootstrap3 in your project")
+    @CliCommand(value = "web mvc bootstrap setup", help = "Setup Bootstrap 3 in your project.")
     public void setup() {
         operations.setup();
+    }
+
+    /**
+     * This method registers a command with the Roo shell. It also offers a
+     * mandatory command attribute.
+     * 
+     * @param type
+     */
+    @CliCommand(value = "web mvc bootstrap update", help = "Update Bootstrap 3 tags in your project. Use this if you installed menu, datatables or security after bootstrap setup.")
+    public void update() {
+        operations.updateTags();
     }
 
 }

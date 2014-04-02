@@ -52,10 +52,6 @@
 
       	</div>
 
-      <div class="text-center">
-      &lt;a href ="/petclinic/forgotpassword/index"&gt;Forgot Password&lt;/a&gt; | Not a User Yet? &lt;a href ="/petclinic/signup?form"&gt;Sign Up&lt;/a&gt;
-      </div>
-
       </form>
 
 </div>

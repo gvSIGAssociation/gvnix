@@ -1,0 +1,26 @@
+// Executing clinic.roo and creating project
+script --file clinic.roo
+
+// Adding jQuery to project
+web mvc jquery setup
+
+// Installing Bootstrap
+web mvc bootstrap setup
+
+// Installing datatables
+web mvc datatables setup 
+
+// Setting JQuery to all files
+web mvc jquery all
+
+// Creating datatables
+web mvc datatables all
+
+// Updating bootstrap to import datatables resources
+web mvc bootstrap update
+
+//Installing security
+security setup
+
+// Updating bootstrap to import security resources
+web mvc bootstrap update
