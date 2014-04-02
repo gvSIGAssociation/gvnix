@@ -24,10 +24,10 @@
         <spring:escapeBody javaScriptEscape="true">${id}</spring:escapeBody>
       </c:set>
       
-      <div class="submit" id="${fn:escapeXml(id)}_submit">
-	      <spring:message code="button_cancel" var="button_cancel" htmlEscape="false" />
-		  <input id="datatablesRedirect" value="${fn:escapeXml(button_cancel)}" type="button" onclick="javascript: window.location = '${param['datatablesRedirect']}'" />
-	  </div>
+       <div class="submit" id="${fn:escapeXml(id)}_submit">
+          <spring:message code="button_cancel" var="button_cancel" htmlEscape="false" />
+          <input class="btn btn-primary btn-block" id="datatablesRedirect" value="${fn:escapeXml(button_cancel)}" type="button" onclick="javascript: window.location = '${param['datatablesRedirect']}'" />
+      </div>
   
 	  <script type="text/javascript">
 	  jQuery(document).ready(function() {
