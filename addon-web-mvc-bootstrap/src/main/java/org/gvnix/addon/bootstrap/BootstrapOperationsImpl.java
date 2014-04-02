@@ -731,7 +731,14 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                 // Getting all jspx files inside the folder
                 File[] files = folder.listFiles();
                 for (File file : files) {
-                    if (file.isFile() && file.getName().contains("jspx")) {
+                    String fileName = file.getName();
+                    if (file.isFile()
+                            && fileName.contains("jspx")
+                            && (fileName.contains("create")
+                                    || fileName.contains("update")
+                                    || fileName.contains("show")
+                                    || fileName.contains("list") || fileName
+                                        .contains("find"))) {
                         pageList.add(file.getName());
                     }
                 }
