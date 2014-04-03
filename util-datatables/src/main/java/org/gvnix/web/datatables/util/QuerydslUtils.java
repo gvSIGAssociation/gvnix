@@ -935,7 +935,7 @@ public class QuerydslUtils {
      * @return BooleanExpression
      */
     public static <T, E> BooleanExpression createCollectionExpression(
-            PathBuilder<T> entityPath, String fieldName, Set<E> values) {
+            PathBuilder<T> entityPath, String fieldName, Collection<E> values) {
         if (StringUtils.isEmpty(fieldName) || values.isEmpty()) {
             return null;
         }
