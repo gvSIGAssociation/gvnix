@@ -14,7 +14,7 @@ public interface BootstrapOperations extends Feature {
      * Feature name. Use to know if gvNIX Bootstrap has been setup in this
      * project
      */
-    public static final String FEATURE_NAME_GVNIX_BOOTSTRAP = "gvnix-bootstrap";
+    static final String FEATURE_NAME_GVNIX_BOOTSTRAP = "gvnix-bootstrap";
 
     /**
      * Indicate commands should be available

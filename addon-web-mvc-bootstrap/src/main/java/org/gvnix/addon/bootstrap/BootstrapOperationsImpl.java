@@ -1,14 +1,12 @@
 package org.gvnix.addon.bootstrap;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,6 +16,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.WebProjectUtils;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.FeatureNames;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
@@ -29,17 +28,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Implementation of operations this add-on offers.
+ * Implementation of Bootstrap Addon operations
  * 
  * @since 1.1
  */
 @Component
-// Use these Apache Felix annotations to register your commands class in the Roo
-// container
 @Service
 public class BootstrapOperationsImpl implements BootstrapOperations {
-
-    private Logger log = Logger.getLogger(getClass().getName());
 
     @Reference
     private FileManager fileManager;
@@ -54,6 +49,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     @Reference
     private ProjectOperations projectOperations;
 
+    private final Logger LOGGER = Logger.getLogger(getClass().getName());
+
     /**
      * If JQuery is installed, the command is available
      */
@@ -65,7 +62,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     }
 
     /**
-     * if bootstrap is installed, the command is available
+     * If bootstrap is installed, the command is available
      */
     public boolean isUpdateCommandAvailable() {
         return projectOperations
@@ -91,7 +88,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         // Updating Views and jQuery elements
         updateViews();
-        updateJSPViewsToUseJQuery();
 
         // Adding image resources
         addImageResources();
@@ -101,19 +97,20 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         updateTags();
 
         // Showing finished task
-        log.log(Level.INFO, "Done");
+        LOGGER.log(Level.INFO, "Done");
     }
 
     /** {@inheritDoc} */
     public void updateTags() {
-        // Updating al views to use jQuery
-        updateJSPViewsToUseJQuery();
+        // Updating all views to use jQuery
+        BootstrapUtils.updateJSPViewsToUseJQuery(pathResolver, getWebappPath(),
+                projectOperations, fileManager);
 
         // Checking installed addons
         checkAndUpdateDatatables();
         checkAndUpdateSecurity();
 
-        log.log(Level.INFO,
+        LOGGER.log(Level.INFO,
                 "*** All files are updated to use JQuery and Bootstrap 3 ");
     }
 
@@ -122,16 +119,10 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
     public void addBootstrapScriptsLibraries() {
 
-        /**
-         * Adding all documents on scripts folders
-         * 
-         */
         List<String> scriptsFolderFiles = new ArrayList<String>();
-        scriptsFolderFiles.add("bootstrap.min.js");
-        scriptsFolderFiles.add("offcanvas.js");
-        scriptsFolderFiles.add("README.txt");
-        scriptsFolderFiles.add("assets/html5shiv.js");
-        scriptsFolderFiles.add("assets/respond.min.js");
+        Collections.addAll(scriptsFolderFiles, "bootstrap.min.js",
+                "offcanvas.js", "README.txt", "assets/html5shiv.js",
+                "assets/respond.min.js");
 
         Iterator<String> scriptsFolderIterator = scriptsFolderFiles.iterator();
 
@@ -141,24 +132,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                     .getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
                             "scripts/bootstrap/".concat(fileName));
 
-            if (!fileManager.exists(scriptFile)) {
-                InputStream inputStream = null;
-                OutputStream outputStream = null;
-                try {
-                    inputStream = FileUtils.getInputStream(getClass(),
-                            "scripts/bootstrap/".concat(fileName));
-                    outputStream = fileManager.createFile(scriptFile)
-                            .getOutputStream();
-                    IOUtils.copy(inputStream, outputStream);
-                }
-                catch (final IOException ioe) {
-                    throw new IllegalStateException(ioe);
-                }
-                finally {
-                    IOUtils.closeQuietly(inputStream);
-                    IOUtils.closeQuietly(outputStream);
-                }
-            }
+            BootstrapUtils.createFilesInLocationIfNotExists(fileManager,
+                    getClass(), scriptFile, fileName, "scripts/bootstrap/");
         }
     }
 
@@ -167,26 +142,17 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
     public void addBootstrapStyles() {
 
-        /**
-         * Adding all documents on styles folders
-         * 
-         */
         List<String> stylesFolderFiles = new ArrayList<String>();
-        stylesFolderFiles.add("bootstrap/bootstrap.min.css");
-        stylesFolderFiles.add("bootstrap/docs.css");
-        stylesFolderFiles.add("bootstrap/jquery-ui.bootstrap.css");
-        stylesFolderFiles.add("bootstrap/offcanvas.css");
-        stylesFolderFiles
-                .add("bootstrap/images/ui-bg_glass_75_ffffff_1x400.png");
-        stylesFolderFiles.add("bootstrap/images/ui-icons_222222_256x240.png");
-
-        stylesFolderFiles.add("fonts/glyphicons-halflings-regular.eot");
-        stylesFolderFiles.add("fonts/glyphicons-halflings-regular.svg");
-        stylesFolderFiles.add("fonts/glyphicons-halflings-regular.ttf");
-        stylesFolderFiles.add("fonts/glyphicons-halflings-regular.woff");
-        stylesFolderFiles.add("fonts/README.txt");
-        stylesFolderFiles.add("images/sort_asc.png");
-        stylesFolderFiles.add("images/sort_both.png");
+        Collections.addAll(stylesFolderFiles, "bootstrap/bootstrap.min.css",
+                "bootstrap/docs.css", "bootstrap/jquery-ui.bootstrap.css",
+                "bootstrap/offcanvas.css",
+                "bootstrap/images/ui-bg_glass_75_ffffff_1x400.png",
+                "bootstrap/images/ui-icons_222222_256x240.png",
+                "fonts/glyphicons-halflings-regular.eot",
+                "fonts/glyphicons-halflings-regular.svg",
+                "fonts/glyphicons-halflings-regular.ttf",
+                "fonts/glyphicons-halflings-regular.woff", "fonts/README.txt",
+                "images/sort_asc.png", "images/sort_both.png");
 
         Iterator<String> stylesFolderIterator = stylesFolderFiles.iterator();
 
@@ -195,24 +161,9 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
             final String styleFile = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "styles/".concat(fileName));
 
-            if (!fileManager.exists(styleFile)) {
-                InputStream inputStream = null;
-                OutputStream outputStream = null;
-                try {
-                    inputStream = FileUtils.getInputStream(getClass(),
-                            "styles/".concat(fileName));
-                    outputStream = fileManager.createFile(styleFile)
-                            .getOutputStream();
-                    IOUtils.copy(inputStream, outputStream);
-                }
-                catch (final IOException ioe) {
-                    throw new IllegalStateException(ioe);
-                }
-                finally {
-                    IOUtils.closeQuietly(inputStream);
-                    IOUtils.closeQuietly(outputStream);
-                }
-            }
+            BootstrapUtils.createFilesInLocationIfNotExists(fileManager,
+                    getClass(), styleFile, fileName, "styles/");
+
         }
     }
 
@@ -225,28 +176,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         final String styleFile = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "styles/standard.css");
 
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
-        try {
-            inputStream = FileUtils.getInputStream(getClass(),
-                    "styles/standard.css");
-            if (!fileManager.exists(styleFile)) {
-                outputStream = fileManager.createFile(styleFile)
-                        .getOutputStream();
-            }
-            else {
-                outputStream = fileManager.updateFile(styleFile)
-                        .getOutputStream();
-            }
-            IOUtils.copy(inputStream, outputStream);
-        }
-        catch (final IOException ioe) {
-            throw new IllegalStateException(ioe);
-        }
-        finally {
-            IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(outputStream);
-        }
+        BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
+                fileManager, getClass(), styleFile, "standard.css", "styles/");
     }
 
     /**
@@ -254,31 +185,25 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
     public void addBootstrapTags() {
 
-        /**
-         * Adding all documents on tags folders
-         * 
-         */
         List<String> tagsFolderFiles = new ArrayList<String>();
-        tagsFolderFiles.add("bootstrap/dialog/modal/message-box.tagx");
+        Collections.addAll(tagsFolderFiles,
+                "bootstrap/dialog/modal/message-box.tagx",
+                "bootstrap/util/load-styles-bootstrap.tagx",
+                "menu/category.tagx", "menu/menu.tagx",
+                "jquery/util/panel.tagx", "jquery/form/create.tagx",
+                "jquery/form/find.tagx", "jquery/form/show.tagx",
+                "jquery/form/update.tagx", "jquery/form/fields/checkbox.tagx",
+                "jquery/form/fields/datetime.tagx",
+                "jquery/form/fields/display.tagx",
+                "jquery/form/fields/editor.tagx",
+                "jquery/form/fields/input.tagx",
+                "jquery/form/fields/reference.tagx",
+                "jquery/form/fields/select.tagx",
+                "jquery/form/fields/simple.tagx",
+                "jquery/form/fields/textarea.tagx");
+
         // Adding load scripts no datatable
         addLoadScriptsNoDatatables();
-        tagsFolderFiles.add("bootstrap/util/load-styles-bootstrap.tagx");
-        tagsFolderFiles.add("menu/category.tagx");
-        tagsFolderFiles.add("menu/menu.tagx");
-        tagsFolderFiles.add("jquery/util/panel.tagx");
-        tagsFolderFiles.add("jquery/form/create.tagx");
-        tagsFolderFiles.add("jquery/form/find.tagx");
-        tagsFolderFiles.add("jquery/form/show.tagx");
-        tagsFolderFiles.add("jquery/form/update.tagx");
-        tagsFolderFiles.add("jquery/form/fields/checkbox.tagx");
-        tagsFolderFiles.add("jquery/form/fields/datetime.tagx");
-        tagsFolderFiles.add("jquery/form/fields/display.tagx");
-        tagsFolderFiles.add("jquery/form/fields/editor.tagx");
-        tagsFolderFiles.add("jquery/form/fields/input.tagx");
-        tagsFolderFiles.add("jquery/form/fields/reference.tagx");
-        tagsFolderFiles.add("jquery/form/fields/select.tagx");
-        tagsFolderFiles.add("jquery/form/fields/simple.tagx");
-        tagsFolderFiles.add("jquery/form/fields/textarea.tagx");
 
         Iterator<String> tagsFolderIterator = tagsFolderFiles.iterator();
 
@@ -287,28 +212,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
             final String tagFile = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/".concat(fileName));
 
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-            try {
-                inputStream = FileUtils.getInputStream(getClass(),
-                        "tags/".concat(fileName));
-                if (!fileManager.exists(tagFile)) {
-                    outputStream = fileManager.createFile(tagFile)
-                            .getOutputStream();
-                }
-                else {
-                    outputStream = fileManager.updateFile(tagFile)
-                            .getOutputStream();
-                }
-                IOUtils.copy(inputStream, outputStream);
-            }
-            catch (final IOException ioe) {
-                throw new IllegalStateException(ioe);
-            }
-            finally {
-                IOUtils.closeQuietly(inputStream);
-                IOUtils.closeQuietly(outputStream);
-            }
+            BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
+                    fileManager, getClass(), tagFile, fileName, "tags/");
 
         }
     }
@@ -322,26 +227,10 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                 Path.SRC_MAIN_WEBAPP,
                 "WEB-INF/tags/bootstrap/util/load-scripts-bootstrap.tagx");
 
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
-        try {
-            inputStream = FileUtils
-                    .getInputStream(getClass(),
-                            "tags/bootstrap/util/load-scripts-bootstrap-no-datatables.tagx");
-            if (!fileManager.exists(tagFile)) {
-                outputStream = fileManager.createFile(tagFile)
-                        .getOutputStream();
-            }
-            IOUtils.copy(inputStream, outputStream);
-        }
-        catch (final IOException ioe) {
-            throw new IllegalStateException(ioe);
-        }
-        finally {
-            IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(outputStream);
-        }
-
+        BootstrapUtils.createFilesInLocationIfNotExists(fileManager,
+                getClass(), tagFile,
+                "load-scripts-bootstrap-no-datatables.tagx",
+                "tags/bootstrap/util/");
     }
 
     /**
@@ -349,13 +238,10 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * bootsrap
      */
     public void updateGvNIXLayouts() {
-        /**
-         * Adding and replacing layouts
-         * 
-         */
+
         List<String> layoutsFolderFiles = new ArrayList<String>();
-        layoutsFolderFiles.add("default-menu-cols.jspx");
-        layoutsFolderFiles.add("default.jspx");
+        Collections.addAll(layoutsFolderFiles, "default-menu-cols.jspx",
+                "default.jspx");
 
         Iterator<String> layoutsFolderIterator = layoutsFolderFiles.iterator();
 
@@ -364,28 +250,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
             final String layoutFile = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "WEB-INF/layouts/".concat(fileName));
 
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-            try {
-                inputStream = FileUtils.getInputStream(getClass(),
-                        "layouts/".concat(fileName));
-                if (!fileManager.exists(layoutFile)) {
-                    outputStream = fileManager.createFile(layoutFile)
-                            .getOutputStream();
-                }
-                else {
-                    outputStream = fileManager.updateFile(layoutFile)
-                            .getOutputStream();
-                }
-                IOUtils.copy(inputStream, outputStream);
-            }
-            catch (final IOException ioe) {
-                throw new IllegalStateException(ioe);
-            }
-            finally {
-                IOUtils.closeQuietly(inputStream);
-                IOUtils.closeQuietly(outputStream);
-            }
+            BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
+                    fileManager, getClass(), layoutFile, fileName, "layouts/");
 
         }
     }
@@ -396,15 +262,9 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
     public void updateViews() {
 
-        /**
-         * Adding and replacing gvNIX views
-         * 
-         */
         List<String> viewsFolderFiles = new ArrayList<String>();
-        viewsFolderFiles.add("footer.jspx");
-        viewsFolderFiles.add("header.jspx");
-        viewsFolderFiles.add("index.jspx");
-        viewsFolderFiles.add("uncaughtException.jspx");
+        Collections.addAll(viewsFolderFiles, "footer.jspx", "header.jspx",
+                "index.jspx", "uncaughtException.jspx");
 
         Iterator<String> viewsFolderIterator = viewsFolderFiles.iterator();
 
@@ -413,27 +273,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
             final String viewFile = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "WEB-INF/views/".concat(fileName));
 
-            if (fileManager.exists(viewFile)) {
-                InputStream inputStream = null;
-                OutputStream outputStream = null;
-                try {
-                    inputStream = FileUtils.getInputStream(getClass(),
-                            "views/".concat(fileName));
-
-                    outputStream = fileManager.updateFile(viewFile)
-                            .getOutputStream();
-
-                    IOUtils.copy(inputStream, outputStream);
-                }
-                catch (final IOException ioe) {
-                    throw new IllegalStateException(ioe);
-                }
-                finally {
-                    IOUtils.closeQuietly(inputStream);
-                    IOUtils.closeQuietly(outputStream);
-                }
-            }
-
+            BootstrapUtils.updateFilesInLocationIfExists(fileManager,
+                    getClass(), viewFile, fileName, "views/");
         }
     }
 
@@ -441,13 +282,9 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * This method copies images resources to gvNIX application
      */
     public void addImageResources() {
-        /**
-         * Adding and replacing images
-         * 
-         */
+
         List<String> imageFolderFiles = new ArrayList<String>();
-        imageFolderFiles.add("logo_roo.png");
-        imageFolderFiles.add("logo_spring.png");
+        Collections.addAll(imageFolderFiles, "logo_roo.png", "logo_spring.png");
 
         Iterator<String> imageFolderIterator = imageFolderFiles.iterator();
 
@@ -455,25 +292,9 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
             String fileName = imageFolderIterator.next();
             final String imageFile = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "images/".concat(fileName));
-            if (!fileManager.exists(imageFile)) {
-                InputStream inputStream = null;
-                OutputStream outputStream = null;
-                try {
-                    inputStream = FileUtils.getInputStream(getClass(),
-                            "images/".concat(fileName));
 
-                    outputStream = fileManager.createFile(imageFile)
-                            .getOutputStream();
-                    IOUtils.copy(inputStream, outputStream);
-                }
-                catch (final IOException ioe) {
-                    throw new IllegalStateException(ioe);
-                }
-                finally {
-                    IOUtils.closeQuietly(inputStream);
-                    IOUtils.closeQuietly(outputStream);
-                }
-            }
+            BootstrapUtils.createFilesInLocationIfNotExists(fileManager,
+                    getClass(), imageFile, fileName, "images/");
         }
     }
 
@@ -482,11 +303,10 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * necessary bootstrap javascript and css bootstrap styles
      */
     public void checkAndUpdateDatatables() {
-        final String datatablesTagx = pathResolver.getFocusedIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/datatables/table.tagx");
 
-        // Checking if the addon is installed
-        if (fileManager.exists(datatablesTagx)) {
+        // Checking if the addon is installed using FEATURES
+        if (projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-datatables")) {
 
             /**
              * Installing script datatables files
@@ -495,24 +315,9 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                     Path.SRC_MAIN_WEBAPP,
                     "scripts/bootstrap/dataTables.bootstrap.js");
 
-            if (!fileManager.exists(scriptFile)) {
-                InputStream inputStream = null;
-                OutputStream outputStream = null;
-                try {
-                    inputStream = FileUtils.getInputStream(getClass(),
-                            "scripts/bootstrap/dataTables.bootstrap.js");
-                    outputStream = fileManager.createFile(scriptFile)
-                            .getOutputStream();
-                    IOUtils.copy(inputStream, outputStream);
-                }
-                catch (final IOException ioe) {
-                    throw new IllegalStateException(ioe);
-                }
-                finally {
-                    IOUtils.closeQuietly(inputStream);
-                    IOUtils.closeQuietly(outputStream);
-                }
-            }
+            BootstrapUtils.createFilesInLocationIfNotExists(fileManager,
+                    getClass(), scriptFile, "dataTables.bootstrap.js",
+                    "scripts/bootstrap/");
 
             /**
              * Installing css datatable styles
@@ -520,24 +325,10 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
             final String styleFile = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP,
                     "styles/bootstrap/dataTables.bootstrap.css");
-            if (!fileManager.exists(styleFile)) {
-                InputStream inputStream = null;
-                OutputStream outputStream = null;
-                try {
-                    inputStream = FileUtils.getInputStream(getClass(),
-                            "styles/bootstrap/dataTables.bootstrap.css");
-                    outputStream = fileManager.createFile(styleFile)
-                            .getOutputStream();
-                    IOUtils.copy(inputStream, outputStream);
-                }
-                catch (final IOException ioe) {
-                    throw new IllegalStateException(ioe);
-                }
-                finally {
-                    IOUtils.closeQuietly(inputStream);
-                    IOUtils.closeQuietly(outputStream);
-                }
-            }
+
+            BootstrapUtils.createFilesInLocationIfNotExists(fileManager,
+                    getClass(), styleFile, "dataTables.bootstrap.css",
+                    "styles/bootstrap/");
 
             /**
              * Adding references to load-scripts-bootsrap.tagx
@@ -573,6 +364,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                 if (outputStream != null) {
                     IOUtils.closeQuietly(outputStream);
                 }
+
             }
         }
     }
@@ -582,17 +374,15 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * to use bootstrap
      */
     public void checkAndUpdateSecurity() {
-        final String loginFile = pathResolver.getFocusedIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/views/login.jspx");
 
-        // Checking if the addon is installed
-        if (fileManager.exists(loginFile)) {
+        // Checking if the addon is installed using features
+        if (projectOperations
+                .isFeatureInstalledInFocusedModule(FeatureNames.SECURITY)) {
 
             /**
-             * Adding and replacing typical security views
+             * Adding and replacing security views
              * 
              */
-
             final String viewFile = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "WEB-INF/views/login.jspx");
 
@@ -682,80 +472,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
     public LogicalPath getWebappPath() {
         return WebProjectUtils.getWebappPath(projectOperations);
-    }
-
-    /**
-     * Updates all JSP pages of target controller to use JQuery
-     * 
-     */
-    public void updateJSPViewsToUseJQuery() {
-
-        String path = "";
-        // Getting all views of the application
-        String viewsPath = pathResolver.getIdentifier(getWebappPath(),
-                "WEB-INF/views/");
-        File directory = new File(viewsPath);
-        File[] folders = directory.listFiles();
-
-        for (File folder : folders) {
-            if (folder.isDirectory()) {
-                path = folder.getName().concat("/");
-
-                // List of pages to update
-                // List of pages to update
-                List<String> pageList = new ArrayList<String>();
-
-                // Getting all jspx files inside the folder
-                File[] files = folder.listFiles();
-                for (File file : files) {
-                    String fileName = file.getName();
-                    if (file.isFile()
-                            && fileName.contains("jspx")
-                            && (fileName.contains("create")
-                                    || fileName.contains("update")
-                                    || fileName.contains("show")
-                                    || fileName.contains("list") || fileName
-                                        .contains("find"))) {
-                        pageList.add(file.getName());
-                    }
-                }
-
-                // 3rd party add-ons could customize default Roo tags as gvNIX
-                // does,
-                // to avoid to overwrite them with jQuery namespaces we will
-                // update
-                // default Roo namespaces only
-                Map<String, String> rooUriMap = new HashMap<String, String>();
-                rooUriMap.put("xmlns:field",
-                        "urn:jsptagdir:/WEB-INF/tags/form/fields");
-                rooUriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/form");
-                rooUriMap.put("xmlns:table",
-                        "urn:jsptagdir:/WEB-INF/tags/form/fields");
-                rooUriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/form");
-                rooUriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util");
-
-                // new jQuery namespaces
-                Map<String, String> uriMap = new HashMap<String, String>();
-                uriMap.put("xmlns:field",
-                        "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
-                uriMap.put("xmlns:form",
-                        "urn:jsptagdir:/WEB-INF/tags/jquery/form");
-                uriMap.put("xmlns:table",
-                        "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
-                uriMap.put("xmlns:page",
-                        "urn:jsptagdir:/WEB-INF/tags/jquery/form");
-                uriMap.put("xmlns:util",
-                        "urn:jsptagdir:/WEB-INF/tags/jquery/util");
-
-                // do the update
-                for (String jspxName : pageList) {
-                    String tagxFile = "WEB-INF/views/".concat(path).concat(
-                            jspxName);
-                    WebProjectUtils.updateTagxUriInJspx(tagxFile, rooUriMap,
-                            uriMap, projectOperations, fileManager);
-                }
-            }
-        }
     }
 
     // Feature methods -----
