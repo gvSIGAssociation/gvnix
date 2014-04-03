@@ -109,6 +109,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         // Checking installed addons
         checkAndUpdateDatatables();
         checkAndUpdateSecurity();
+        checkAndUpdateTypicalSecurity();
 
         LOGGER.log(Level.INFO,
                 "*** All files are updated to use JQuery and Bootstrap 3 ");
@@ -377,43 +378,61 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         // Checking if the addon is installed using features
         if (projectOperations
-                .isFeatureInstalledInFocusedModule(FeatureNames.SECURITY)) {
+                .isFeatureInstalledInFocusedModule(FeatureNames.SECURITY)
+                && !isTypicalSecurityInstalled() && !isLoginModified()) {
 
-            /**
-             * Adding and replacing security views
-             * 
-             */
             final String viewFile = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "WEB-INF/views/login.jspx");
 
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-            try {
-                inputStream = FileUtils.getInputStream(getClass(),
-                        "views/login.jspx");
-                if (!fileManager.exists(viewFile)) {
-                    outputStream = fileManager.createFile(viewFile)
-                            .getOutputStream();
-                }
-                else if (fileManager.exists(viewFile) && !isLoginModified()) {
-                    outputStream = fileManager.updateFile(viewFile)
-                            .getOutputStream();
-                }
-                if (outputStream != null) {
-                    IOUtils.copy(inputStream, outputStream);
-                }
-            }
-            catch (final IOException ioe) {
-                throw new IllegalStateException(ioe);
-            }
-            finally {
-                IOUtils.closeQuietly(inputStream);
-                if (outputStream != null) {
-                    IOUtils.closeQuietly(outputStream);
-                }
+            BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
+                    fileManager, getClass(), viewFile, "login.jspx", "views/");
 
+        }
+
+    }
+
+    /**
+     * This method checks if typical security is installed. If is installed
+     * update views to use bootstrap
+     */
+
+    public void checkAndUpdateTypicalSecurity() {
+        // Checking if the addon is installed using features
+        if (projectOperations
+                .isFeatureInstalledInFocusedModule(FeatureNames.SECURITY)
+                && isTypicalSecurityInstalled() && !isLoginModified()) {
+
+            List<String> viewsFolderFiles = new ArrayList<String>();
+            Collections.addAll(viewsFolderFiles, "changepassword/index.jspx",
+                    "changepassword/thanks.jspx", "forgotpassword/index.jspx",
+                    "forgotpassword/thanks.jspx", "signup/error.jspx",
+                    "signup/index.jspx", "signup/thanks.jspx",
+                    "roles/create.jspx", "roles/list.jspx", "roles/show.jspx",
+                    "roles/update.jspx", "userroles/create.jspx",
+                    "userroles/list.jspx", "userroles/show.jspx",
+                    "userroles/update.jspx", "users/create.jspx",
+                    "users/list.jspx", "users/show.jspx", "users/update.jspx");
+
+            Iterator<String> viewsFolderIterator = viewsFolderFiles.iterator();
+
+            while (viewsFolderIterator.hasNext()) {
+                String fileName = viewsFolderIterator.next();
+                final String viewFile = pathResolver
+                        .getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
+                                "WEB-INF/views/".concat(fileName));
+
+                BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
+                        fileManager, getClass(), viewFile, fileName, "views/");
             }
 
+            // Copying typical-security login
+
+            final String loginView = pathResolver.getFocusedIdentifier(
+                    Path.SRC_MAIN_WEBAPP, "WEB-INF/views/login.jspx");
+
+            BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
+                    fileManager, getClass(), loginView, "login-typical.jspx",
+                    "views/");
         }
 
     }
@@ -494,6 +513,17 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         PathResolver pathResolver = projectOperations.getPathResolver();
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
                 "scripts/bootstrap/bootstrap.min.js");
+        return fileManager.exists(dirPath);
+    }
+
+    /**
+     * Check if typical security is installed
+     */
+
+    public boolean isTypicalSecurityInstalled() {
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+                "WEB-INF/views/changepassword/index.jspx");
         return fileManager.exists(dirPath);
     }
 

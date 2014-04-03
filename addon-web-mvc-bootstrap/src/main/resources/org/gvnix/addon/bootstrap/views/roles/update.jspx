@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/jquery/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/jquery/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <form:update id="fu_com_springsource_petclinic_domain_Role" modelAttribute="role" path="/roles" versionField="Version" z="7P03P1j03mJPHYhyui3nvCx99YE=">
+        <field:input field="roleName" id="c_com_springsource_petclinic_domain_Role_roleName" min="1" required="true" z="fP5ELL4lYSdtD/tGI2LDirgxHvY="/>
+        <field:textarea field="roleDescription" id="c_com_springsource_petclinic_domain_Role_roleDescription" required="true" z="JKdE4exdzT7SdRi4GvUk8cxVExk="/>
+    </form:update>
+</div>
