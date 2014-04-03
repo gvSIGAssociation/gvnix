@@ -437,24 +437,26 @@ public class DatatablesUtils {
                 filtersByColumnPredicate.getValue()).and(
                 filtersByTablePredicate.getValue()));
 
+        query.restrict(queryModifiers);
+
+        // Calculate the total amount of rows taking in account datatables
+        // search and paging criterias. When results are paginated we
+        // must execute a count query, otherwise the size of matched rows List
+        // is the total amount of rows
+        long totalResultCount = 0;
+        if (isPaged) {
+            totalResultCount = query.count();
+        }
+
         // List ordered and paginated results. An empty list is returned for no
         // results.
         elements = query
                 .orderBy(
                         orderSpecifiersList
                                 .toArray(new OrderSpecifier[orderSpecifiersList
-                                        .size()])).restrict(queryModifiers)
-                .list(entity);
+                                        .size()])).list(entity);
 
-        // Calculate the total amount of rows taking in account datatables
-        // search and paging criterias. When results are paginated we
-        // must execute a count query, otherwise the size of matched rows List
-        // is the total amount of rows
-        long totalResultCount;
-        if (isPaged) {
-            totalResultCount = query.count();
-        }
-        else {
+        if (!isPaged) {
             totalResultCount = elements.size();
         }
 
