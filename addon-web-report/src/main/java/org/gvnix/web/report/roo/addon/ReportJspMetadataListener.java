@@ -235,45 +235,84 @@ public final class ReportJspMetadataListener implements MetadataProvider,
                                 .addAttribute("omit-xml-declaration", "yes")
                                 .build()).build());
 
-        // Add spring-message definition
-        Element h3title = (Element) new XmlElementBuilder("h3", document)
-                .build();
-        Element titleMessage = (Element) new XmlElementBuilder(
-                "spring:message", document)
-                .addAttribute("code",
-                        "label_report_" + controllerPath + "_" + reportName)
-                .addAttribute("htmlEscape", "false").build();
-        // Add the message error to the application.properties
-        properties.put("label_report_" + controllerPath + "_" + reportName,
-                "Report " + reportName);
-        h3title.appendChild(titleMessage);
+        // Add div panel
+        Element divPanel = (Element) new XmlElementBuilder("div", document)
+                .addAttribute("class", "panel panel-default").build();
 
-        // Add a conditional error message
-        Element ciferror = (Element) new XmlElementBuilder("c:if", document)
-                .addAttribute("test", "${not empty error}").build();
-        Element h3error = (Element) new XmlElementBuilder("h3", document)
-                .build();
-        Element errorMessage = (Element) new XmlElementBuilder(
-                "spring:message", document).addAttribute("code", "${error}")
-                .addAttribute("htmlEscape", "false").build();
-        h3error.appendChild(errorMessage);
-        ciferror.appendChild(h3error);
+        // Add div header
+        Element divPanelHeader = (Element) new XmlElementBuilder("div",
+                document).addAttribute("class", "panel-heading").build();
 
-        // Add form create element
-        Element formForm = new XmlElementBuilder("form:form", document)
+        // Add h3 title with content
+        Element h3PanelTitle = (Element) new XmlElementBuilder("h3", document)
+                .addAttribute("class", "panel-title")
+                .addChild(
+                        new XmlElementBuilder("spring:message", document)
+                                .addAttribute(
+                                        "code",
+                                        "label_report_" + controllerPath + "_"
+                                                + reportName)
+                                .addAttribute("htmlEscape", "false").build())
+                .build();
+
+        // Adding title panel to panel header
+        divPanelHeader.appendChild(h3PanelTitle);
+
+        // Adding panel header to div panel
+        divPanel.appendChild(divPanelHeader);
+
+        // Add div panel body
+        Element divPanelBody = (Element) new XmlElementBuilder("div", document)
+                .addAttribute("class", "panel-body").build();
+
+        // Add if not empty error
+        Element ifNotEmptyError = (Element) new XmlElementBuilder("c:if",
+                document).addAttribute("test", "${not empty error}").build();
+
+        // Add h3 title with error message
+        Element h3ErrorMessage = (Element) new XmlElementBuilder("h3", document)
+                .addAttribute("class", "panel-title")
+                .addChild(
+                        new XmlElementBuilder("spring:message", document)
+                                .addAttribute("code", "${error}")
+                                .addAttribute("htmlEscape", "false").build())
+                .build();
+
+        // Adding h3 message to if empty error
+        ifNotEmptyError.appendChild(h3ErrorMessage);
+
+        // Adding if not empty error to divPanelBody
+        divPanelBody.appendChild(ifNotEmptyError);
+
+        // Add form element
+        Element formElement = (Element) new XmlElementBuilder("form:form",
+                document)
+                .addAttribute("class", "form-horizontal")
+                .addAttribute("role", "form")
+                .addAttribute("action", reportName)
                 .addAttribute(
                         "id",
                         XmlUtils.convertId("fr_"
                                 + formbackingObject.getFullyQualifiedTypeName()))
-                .addAttribute("action", reportName)
                 .addAttribute("method", "GET").build();
+
+        // Add div control group
+        Element divControlGroup = (Element) new XmlElementBuilder("div",
+                document).addAttribute("class", "control-group form-group")
+                .build();
+
+        // Add div controls col
+        Element divControlsCol = (Element) new XmlElementBuilder("div",
+                document).addAttribute("class",
+                "controls col-xs-7 col-sm-8 col-md-12 col-lg-12").build();
 
         // Add a drop-down select
         Element cifSelectFormat = (Element) new XmlElementBuilder("c:if",
                 document).addAttribute("test", "${not empty report_formats}")
                 .build();
         Element selectFormat = (Element) new XmlElementBuilder("select",
-                document).addAttribute("id", "_select_format")
+                document).addAttribute("class", "form-control input-sm")
+                .addAttribute("id", "_select_format")
                 .addAttribute("name", "format").build();
         Element cforEach = (Element) new XmlElementBuilder("c:forEach",
                 document).addAttribute("items", "${report_formats}")
@@ -287,21 +326,34 @@ public final class ReportJspMetadataListener implements MetadataProvider,
         cforEach.appendChild(optionFormat);
         selectFormat.appendChild(cforEach);
         cifSelectFormat.appendChild(selectFormat);
-        // Two <br/> putting a blank space between drop-down select and submit
-        // button
-        cifSelectFormat.appendChild(new XmlElementBuilder("br", document)
-                .build());
-        cifSelectFormat.appendChild(new XmlElementBuilder("br", document)
-                .build());
 
-        formForm.appendChild(cifSelectFormat);
+        // Add input element
+        Element inputElement = (Element) new XmlElementBuilder("input",
+                document).addAttribute("class", "btn btn-primary btn-block")
+                .addAttribute("type", "submit").build();
 
-        formForm.appendChild(new XmlElementBuilder("input", document)
-                .addAttribute("type", "submit").build());
+        // Adding elements to divControlsCol
+        divControlsCol.appendChild(cifSelectFormat);
+        divControlsCol.appendChild(inputElement);
 
-        div.appendChild(h3title);
-        div.appendChild(ciferror);
-        div.appendChild(formForm);
+        // Adding controls col to div control group
+        divControlGroup.appendChild(divControlsCol);
+
+        // Adding control group to form
+        formElement.appendChild(divControlGroup);
+
+        // Adding form to Panel Body
+        divPanelBody.appendChild(formElement);
+
+        // Adding Panel Body to Main Panel
+        divPanel.appendChild(divPanelBody);
+
+        // Adding Main Panel to general div
+        div.appendChild(divPanel);
+
+        // Add the message error to the application.properties
+        properties.put("label_report_" + controllerPath + "_" + reportName,
+                "Report " + reportName);
 
         propFileOperations
                 .addProperties(

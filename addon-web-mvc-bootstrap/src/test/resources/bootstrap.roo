@@ -24,3 +24,9 @@ security setup
 
 // Updating bootstrap to import security resources
 web mvc bootstrap update
+
+// Installing reports in project
+web report setup
+
+// Creating report 
+web report add --controller ~.web.PetController --reportName petreport
