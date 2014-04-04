@@ -437,8 +437,6 @@ public class DatatablesUtils {
                 filtersByColumnPredicate.getValue()).and(
                 filtersByTablePredicate.getValue()));
 
-        query.restrict(queryModifiers);
-
         // Calculate the total amount of rows taking in account datatables
         // search and paging criterias. When results are paginated we
         // must execute a count query, otherwise the size of matched rows List
@@ -454,7 +452,8 @@ public class DatatablesUtils {
                 .orderBy(
                         orderSpecifiersList
                                 .toArray(new OrderSpecifier[orderSpecifiersList
-                                        .size()])).list(entity);
+                                        .size()])).restrict(queryModifiers)
+                .list(entity);
 
         if (!isPaged) {
             totalResultCount = elements.size();
