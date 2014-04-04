@@ -28,7 +28,7 @@
     <para xml:lang="es">Para instalarlo, hay que utilizar el comando <link
     linkend="apendice-comandos_addon-web-mvc-bootstrap_setup">web mvc
     bootstrap setup</link>, el cual solo estará disponible después de instalar el 
-    <link linked="addon-web-mvc_jquery">add-on JQuery</ns:link> en nuestro proyecto.
+    <link linked="addon-web-mvc_jquery">add-on JQuery</link> en nuestro proyecto.
     </para>
   </section>
   

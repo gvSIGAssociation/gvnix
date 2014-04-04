@@ -217,6 +217,25 @@ public class Pet {
     quíen y cuándo se crea o modifica un resigtro) de entidades y, opcionalmente, registrar
     cada uno de los cambios de las modificaciones sufridas por los registros de la
     entidad.</para>
+    
+    <section xml:id="addon-jpa_audit-setup">
+      <title>Configurar detalles de usuario</title>
+      <para xml:lang="es">Es posible configurar la clase que proveerá
+      el nombre de usuario que realiza un cambio. Para ello se ejecuta el siguiente comando:</para>
+      <variablelist>
+      
+        <varlistentry>
+          <term><command><link
+          linkend="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-setup">
+          jpa audit setup</link></command></term>
+          <listitem>
+            <para xml:lang="es">Configura la auditoría de historico creando la clase que proveerá del
+             nombre de usuario que realiza el cambio. Sólo se puede ejecutar una vez. </para>
+          </listitem>
+        </varlistentry>
+        
+       </variablelist>
+    </section>
 
     <section xml:id="addon-jpa_audit-basic">
       <title>Auditoría básica de entidades</title>
@@ -242,6 +261,21 @@ public class Pet {
           <listitem>
             <para xml:lang="es">Añade auditoría para todas
             las entidades de la aplicación.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+      
+      <para xml:lang="es">Al instalar la auditoría en un proyecto gvNIX se creará una clase (con el nombre
+      facilitado en el parámetro <emphasis>--service</emphasis>) anotada con <emphasis>@GvNIXJpaAuditUserService</emphasis>, se incluirá 
+      el siguiente método (en su correspondiente fichero <emphasis>.aj</emphasis>) para obtener los 
+      datos del Usuario:</para>
+      
+      <variablelist>
+        <varlistentry>
+          <term>getUser()</term>
+          <listitem>
+            <para xml:lang="es">Devolverá el tipo facilitado en el parámetro <emphasis>--userType</emphasis>.
+            En caso de no definir ninguno, devolverá un tipo <emphasis>String</emphasis></para>
           </listitem>
         </varlistentry>
       </variablelist>
@@ -323,19 +357,6 @@ public class Pet {
             modificaciones en sus datos</emphasis>.</note>
           </listitem>
         </varlistentry>
-        <varlistentry>
-          <term>getUserName</term>
-          <listitem>
-            <para xml:lang="es">Devuelve el nombre de usuario actual.</para>
-            <note>Este método <emphasis>sólo será implementado por el add-on</emphasis>
-            en caso de que el proyecto tenga configura la seguridad usando la librería
-            <emphasis>Spring Security</emphasis>, de lo contrarío <emphasis>será el
-            desarrollador el responsable de obtener dicha información</emphasis> (haciendo
-            <emphasis>push-in</emphasis> del método e implementándolo). Si
-            no se establece, los campos de auditoría relativos al usuario se almacenarán
-            al valor <emphasis>null</emphasis></note>
-          </listitem>
-        </varlistentry>
       </variablelist>
 
       <para xml:lang="es">
@@ -355,6 +376,11 @@ public class Pet {
         linkend="addon-jpa_audit-basic">
         Auditoría básica de entidades</link>)
       </para>
+      
+      <note>En caso de <emphasis>actualizar</emphasis> o <emphasis>eliminar</emphasis> registros
+      mediante el uso de <emphasis>executeQuery</emphasis> no se almacenarán los cambios sufridos
+      por las entidades auditadas. Esto se debe a que no se dispararán los <emphasis>listeners</emphasis>
+      necesarios para llevar a cabo este proceso.</note>
 
       <para xml:lang="es">
       Ya que esta funcionalidad puede implementarse de distinta forma, incluso dependiendo

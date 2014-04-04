@@ -48,6 +48,13 @@
         </row>
         <row>
           <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-setup">jpa audit setup</link></entry>
+
+          <entry xml:lang="es">Configura la auditoría de historico creando la clase que proveera del nombre de usuario
+           que realiza el cambio. Sólo se puede ejecutar una vez. </entry>
+        </row>
+        <row>
+          <entry><link
           linkend="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-add">jpa audit add</link></entry>
 
           <entry xml:lang="es">Añade el soporte de auditoría a una entidad.</entry>
@@ -128,6 +135,48 @@
           </varlistentry>
         </variablelist>
     </para>
+  </section>
+  
+  <section xml:id="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-setup">
+    <title>jpa audit setup</title>
+
+    <para xml:lang="es">Configura la auditoría de historico creando la clase que proveera del nombre 
+    de usuario que realiza el cambio. Sólo se puede ejecutar una vez. </para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--service</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido] [Clase]</emphasis></para>
+
+              <para xml:lang="es">Nombre de la clase a crear para hacer de proveedor del objeto usuario.</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>--userType</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Opcional] [Clase] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Clase a usar como usuario. Por defecto ``String``.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    </para>
+    <note>Lanzará un warning informando que tiene que ajustar la implementación de
+     la clase en dos circunstancias:
+     <variablelist>
+          <varlistentry>
+            <term>Si no está configurado Spring Security</term>
+          </varlistentry>
+          <varlistentry>
+            <term>Si la clase ``userType`` no es String y no implementa ``UserDetails``.</term>
+          </varlistentry>
+       </variablelist>
+     
+     </note>
   </section>
 
   <section xml:id="apendice-comandos_addon-jpa_jpa-audit_jpa-audit-add">
