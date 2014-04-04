@@ -185,12 +185,14 @@
     </partintro>
 
     <xi:include href="addon-theme-manager.xml"/>
-
+    
     <xi:include href="addon-web-menu.xml"/>
 
     <xi:include href="addon-jpa.xml"/>
 
     <xi:include href="addon-web-mvc.xml"/>
+    
+    <xi:include href="addon-web-mvc-bootstrap.xml"/>
 
     <xi:include href="addon-web-mvc-datatables.xml"/>
 

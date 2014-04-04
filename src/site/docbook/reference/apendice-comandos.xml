@@ -20,6 +20,8 @@
   <xi:include href="apendice-comandos_addon-web-menu.xml" />
 
   <xi:include href="apendice-comandos_addon-web-screen-pattern.xml" />
+  
+  <xi:include href="apendice-comandos_addon-gva-security.xml" />
 
   <xi:include href="apendice-comandos_addon-cit-security.xml" />
 
@@ -34,6 +36,8 @@
   <xi:include href="apendice-comandos_addon-web-mvc-binding.xml" />
 
   <xi:include href="apendice-comandos_addon-web-mvc.xml" />
+  
+  <xi:include href="apendice-comandos_addon-web-mvc-bootstrap.xml" />
 
   <xi:include href="apendice-comandos_addon-web-mvc-datatables.xml" />
 </chapter>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_addon-web-mvc-bootstrap"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+
+  <title xml:lang="es">Comandos del add-on Bootstrap</title>
+
+  <para xml:lang="es">Para una descripción detallada de las características
+  del add-on consultar la documentación del <link linkend="addon-web-mvc-bootstrap">
+  add-on Bootstrap</link>.</para>
+
+  <table>
+    <title xml:lang="es">Comandos de Addo-on Bootstrap</title>
+
+    <tgroup cols="2">
+      <colspec colwidth="145" />
+      <colspec colwidth="300" />
+      <thead>
+        <row>
+          <entry xml:lang="es" align="center">Comando</entry>
+
+          <entry xml:lang="es" align="center">Descripción</entry>
+        </row>
+      </thead>
+
+      <tbody>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc-bootstrap_setup">web mvc bootstrap
+          setup</link></entry>
+
+          <entry xml:lang="es">Este comando importará e instalará todos los recursos necesarios para 
+    	  utilizar bootstrap. Además, modificará la estructura de algunos tagx existentes para que funcionen
+    	  correctamente con Bootstrap y modificará todas las vistas de la aplicación para que utilicen los
+    	  tags de JQuery.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc-bootstrap_update">web mvc bootstrap
+          update</link></entry>
+
+          <entry xml:lang="es">Este comando se debe ejecutar después de añadir nuevas vistas a la aplicación, 
+          tanto si se han generado manualmente como automáticamente después de instalar otro add-on.
+          Al ejecutar este comando se modifican todas las vistas de la aplicación para que utilicen los 
+          tags de JQuery (create, update, show, list, finders). En caso de haber instalado el componenete
+          Datatable en el proyecto, importará los recursos necesarios para su correcta visualización. En caso
+          de haber aplicado seguridad al proyecto (security setup, typical security), también  se modificarán 
+          las vistas generadas.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+  
+  <section xml:id="apendice-comandos_addon-web-mvc-bootstrap_setup">
+    <title>web mvc bootstrap setup</title>
+
+    <para xml:lang="es">Este comando importará e instalará todos los recursos necesarios para 
+    	  utilizar bootstrap. Además, modificará la estructura de algunos tagx existentes para que funcionen
+    	  correctamente con Bootstrap y modificará todas las vistas de la aplicación para que utilicen los
+    	  tags de JQuery.</para>
+  </section>
+  
+  <section xml:id="apendice-comandos_addon-web-mvc-bootstrap_update">
+    <title>web mvc bootstrap update</title>
+
+    <para xml:lang="es">Este comando se debe ejecutar después de añadir nuevas vistas a la aplicación, 
+          tanto si se han generado manualmente como automáticamente después de instalar otro add-on.
+          Al ejecutar este comando se modifican todas las vistas de la aplicación para que utilicen los 
+          tags de JQuery (create, update, show, list, finders). En caso de haber instalado el componenete
+          Datatable en el proyecto, importará los recursos necesarios para su correcta visualización. En caso
+          de haber aplicado seguridad al proyecto (security setup, typical security), también  se modificarán 
+          las vistas generadas.</para>
+  </section>
+  
+  
+</section>

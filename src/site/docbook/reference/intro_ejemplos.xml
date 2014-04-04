@@ -232,6 +232,15 @@ project ...
     </varlistentry>
     
     <varlistentry>
+      <term>bootstrap.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo modificando la apariencia para que utilice
+        Bootstrap 3</para>
+      </listitem>
+    </varlistentry>
+    
+    <varlistentry>
       <term>datatables.roo</term>
 
       <listitem>
