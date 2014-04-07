@@ -153,7 +153,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                 "fonts/glyphicons-halflings-regular.svg",
                 "fonts/glyphicons-halflings-regular.ttf",
                 "fonts/glyphicons-halflings-regular.woff", "fonts/README.txt",
-                "images/sort_asc.png", "images/sort_both.png");
+                "images/sort_asc.png", "images/sort_both.png",
+                "images/sort_desc.png");
 
         Iterator<String> stylesFolderIterator = stylesFolderFiles.iterator();
 
