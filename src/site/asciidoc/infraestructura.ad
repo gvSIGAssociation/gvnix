@@ -25,8 +25,11 @@ operativos: desarrollo, preproducción y producción.
 
 * *Desarrollo*: Sobre el que se realizará la primera integración y el 
 desarrollo del aplicativo.
-* *Preproducción*: Sobre el que se realizarán los ensayos de instalación del 
-aplicativo y las pruebas de usuario.
+* *Calidad*: Entorno se ejecutan integraciones automáticas de los proyectos 
+a menudo para así poder detectar fallos cuanto antes. También se evalúa la
+calidad del código fuente.
+* *Preproducción*: Se realizarán los ensayos de instalación del aplicativo y 
+las pruebas de usuario.
 * *Producción*: Entorno productivo final en el que se ejecutará la aplicación 
 con los usuarios finales y los datos reales.
 
@@ -41,27 +44,35 @@ muestran a continuación:
 * *Repositorio y control de versiones*: Servidor para gestionar y controlar 
   las distintas versiones de las distintas aplicaciones. Recomendado:
   _Subversion_.
-* *Acceso al repositorio y control de versiones*: Aplicación cliente para
-  interactar con el repositorio de control de versiones. Recomendado:
-  _TortoiseSVN_ (Windows) y _subversion_ (Linux).
-* *Entorno de desarrollo integrado*: IDE para el desarrollo de aplicaciones y 
-  sistemas. Recomendado: _STS_.
-* *Validación integración aplicaciones*: Herramienta encargada de realizar un 
-  proceso de construcción automático para detectar errores de integración tan 
-  rápido como sea posible, originando una reducción significativa de los 
-  problemas de integración del software y permitiendo desarrollar las 
-  aplicaciones y sus módulos con un alto grado de cohesión de forma mucho más 
-  rápida. Recomendado: _Jenkins_.
-* *Auditoría de calidad de código*: Herramienta para la medición de métricas 
-  de la codificación de cada una de las aplicaciones denominada Sonar, 
-  que permite la evaluación periódica de estas métricas y que, además, guarda 
-  las estadísticas de cómo evolucionan éstas, de forma que será posible 
-  realizar evaluaciones periódicas que indiquen el modo en el que están
-  evolucionando las violaciones de las métricas en la plataforma y, en
-  definitiva, la calidad del código generado. Recomendado: _Sonar_.
 * *Seguimiento de errores e incidencias*: Registro, control y seguimiento de 
   incidencias y errores de desarrollo. Recomendado: _JIRA_.
-* *Ejecución de pruebas automáticas*: Herramienta para automatizar las
-  pruebas de las aplicaciones: funcionales, de rendimiento, etc. Recomendado:
-  _Selenium_, _JMeter_, etc.
-
+* *Entorno Desarrollo*
+** *Acceso al repositorio y control de versiones*: Aplicación cliente para
+interactar con el repositorio de control de versiones.
+Recomendado:_TortoiseSVN_ (Windows) y _subversion_ (Linux).
+** *Entorno de desarrollo integrado*: IDE para el desarrollo de aplicaciones y sistemas. Recomendado: _STS_
+** *Compilador Java*. Recomendado: _JDK 1.6+_
+** *Construcción de proyectos*. Recomendado: _Maven 3_
+* *Entorno Calidad*
+** *Validación integración aplicaciones*: Herramienta encargada de realizar un
+proceso de construcción automático para detectar errores de integración tan
+rápido como sea posible, originando una reducción significativa de los
+problemas de integración del software y permitiendo desarrollar las
+aplicaciones y sus módulos con un alto grado de cohesión de forma mucho más
+rápida. Recomendado: _Jenkins_.
+** *Auditoría de calidad de código*: Herramienta para la medición de métricas
+de la codificación de cada una de las aplicaciones denominada Sonar, que
+permite la evaluación periódica de estas métricas y que, además, guarda las
+estadísticas de cómo evolucionan éstas, de forma que será posible realizar
+evaluaciones periódicas que indiquen el modo en el que están evolucionando las
+violaciones de las métricas en la plataforma y, en definitiva, la calidad del
+código generado. Recomendado: _Sonar_.
+** *Ejecución de pruebas automáticas*: Herramienta para automatizar las
+pruebas de las aplicaciones: funcionales, de rendimiento, etc. Recomendado:
+_Selenium_, _JMeter_, etc.
+* *Entorno Producción* y *Preproducción*
+** *Runtime Java*. Recomendado: _JDK 1.6+_
+** *Gestor de base de datos*. Recomendado: _Cualquier base de datos que
+proporcione drivers JDBC_
+** *Contenedor de servlets*. Recomendado: _Tomcat 6+_
+** *Servidor HTTP*. Recomendado: _Apache HTTP 2.2+_ (opcional).
