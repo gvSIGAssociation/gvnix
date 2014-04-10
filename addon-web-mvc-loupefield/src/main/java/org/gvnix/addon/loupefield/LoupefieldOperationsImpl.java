@@ -89,14 +89,14 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     public void addTagx() {
 
         final String filePath = pathResolver.getFocusedIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/loupefield/loupe.tagx");
+                Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/loupefield/select.tagx");
 
         if (!fileManager.exists(filePath)) {
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {
                 inputStream = FileUtils.getInputStream(getClass(),
-                        "tag/loupe.tagx");
+                        "tag/select.tagx");
                 outputStream = fileManager.createFile(filePath)
                         .getOutputStream();
                 IOUtils.copy(inputStream, outputStream);
