@@ -1,17 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
@@ -24,7 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.jpa.audit.JpaAuditMetadata;
+import org.gvnix.addon.jpa.entitylistener.JpaOrmEntityListenerOperations;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.jpa.activerecord.JpaCrudAnnotationValues;
@@ -53,6 +56,9 @@ import org.springframework.roo.project.LogicalPath;
 @Service
 public final class JpaBatchMetadataProvider extends
         AbstractMemberDiscoveringItdMetadataProvider {
+
+    @Reference
+    private JpaOrmEntityListenerOperations entityListenerOperations;
 
     private Map<JavaType, String> entityToBatchMidMap = new HashMap<JavaType, String>();
 
@@ -126,22 +132,38 @@ public final class JpaBatchMetadataProvider extends
 
         String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(
                 targetEntity, path);
-        // register downstream dependency (entity --> jpaBatch)
-        metadataDependencyRegistry.registerDependency(domainTypeMid,
-                metadataIdentificationString);
+
         List<FieldMetadata> identifiers = persistenceMemberLocator
                 .getIdentifierFields(targetEntity);
 
         JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService
                 .get(entityMetadataKey);
 
+        // register downstream dependency (entityActiveRecord --> jpaBatch)
+        metadataDependencyRegistry.registerDependency(entityMetadataKey,
+                metadataIdentificationString);
+
         JpaCrudAnnotationValues crudAnnotationValues = new JpaCrudAnnotationValues(
                 entityMetadata);
+
+        // check if entity use audit
+        String auditMetatadaKey = JpaAuditMetadata.createIdentifier(
+                targetEntity, path);
+        JpaAuditMetadata auditMetada = (JpaAuditMetadata) metadataService
+                .get(auditMetatadaKey);
+
+        // Register dependency with audit metadata
+        metadataDependencyRegistry.registerDependency(auditMetatadaKey,
+                metadataIdentificationString);
+
+        boolean hasEntityListeners = entityListenerOperations
+                .hasAnyListener(targetEntity);
 
         // TODO get more data
         return new JpaBatchMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, identifiers,
-                entityMetadata, crudAnnotationValues);
+                entityMetadata, crudAnnotationValues, auditMetada,
+                hasEntityListeners);
     }
 
     /**

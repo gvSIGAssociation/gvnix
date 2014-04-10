@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.gvnix.addon.jpa.audit.JpaAuditMetadata;
 import org.gvnix.support.ItdBuilderHelper;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.jpa.activerecord.JpaCrudAnnotationValues;
@@ -68,6 +69,8 @@ public class JpaBatchMetadata extends
             "deleteNotIn");
     public static final JavaSymbolName DELETE_IN_METHOD = new JavaSymbolName(
             "deleteIn");
+    public static final JavaSymbolName DELETE_METHOD = new JavaSymbolName(
+            "delete");
     public static final JavaSymbolName UPDATE_METHOD = new JavaSymbolName(
             "update");
     public static final JavaSymbolName CREATE_METHOD = new JavaSymbolName(
@@ -137,12 +140,22 @@ public class JpaBatchMetadata extends
     /** Related entity plural */
     private final String entityPlural;
 
+    /** Audit metadata information (if any) **/
+    private final JpaAuditMetadata auditMetadata;
+
+    /** If target entity has any EntityListener registered **/
+    private final boolean hasEntityListeners;
+
+    /** use or not UPDATE/DELETE bulk statements for operations **/
+    private final boolean useBulkStatements;
+
     public JpaBatchMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             JpaBatchAnnotationValues annotationValues,
             List<FieldMetadata> identifiers,
             JpaActiveRecordMetadata entityActiveRecordMetadata,
-            JpaCrudAnnotationValues crudAnnotationValues) {
+            JpaCrudAnnotationValues crudAnnotationValues,
+            JpaAuditMetadata auditMetada, boolean hasEntityListeners) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -161,6 +174,17 @@ public class JpaBatchMetadata extends
 
         // Store jpa ActiveRecord info
         this.activeRecordMetadata = entityActiveRecordMetadata;
+
+        // Store auditMetadata
+        this.auditMetadata = auditMetada;
+
+        // Store if entity has any listeners
+        this.hasEntityListeners = hasEntityListeners;
+
+        // Use bulk statements only for entities with no audit set and haven't
+        // any entityListener registered
+        this.useBulkStatements = this.auditMetadata == null
+                && !this.hasEntityListeners;
 
         // Get entity name
         this.entityName = StringUtils.isBlank(this.activeRecordMetadata
@@ -184,6 +208,7 @@ public class JpaBatchMetadata extends
         builder.addMethod(getUpdateMethod());
         builder.addMethod(getFindByValuesMethod());
         builder.addMethod(getDeleteByValuesMethod());
+        builder.addMethod(getDeleteMethod());
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
@@ -248,79 +273,101 @@ public class JpaBatchMetadata extends
      */
     private void buildDeleteByValuesMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        //
-        bodyBuilder.appendFormalLine("");
-        //
-        // // if there no is a filter
-        bodyBuilder.appendFormalLine("// if there no is a filter");
-        // if (propertyValues == null || propertyValues.isEmpty()) {
-        bodyBuilder
-                .appendFormalLine("if (propertyValues == null || propertyValues.isEmpty()) {");
-        bodyBuilder.indent();
+        if (useBulkStatements) {
+            //
+            bodyBuilder.appendFormalLine("");
+            //
+            // // if there no is a filter
+            bodyBuilder.appendFormalLine("// if there no is a filter");
+            // if (propertyValues == null || propertyValues.isEmpty()) {
+            bodyBuilder
+                    .appendFormalLine("if (propertyValues == null || propertyValues.isEmpty()) {");
+            bodyBuilder.indent();
 
-        // throw new IllegalArgumentException("Missing property values");
-        bodyBuilder
-                .appendFormalLine("throw new IllegalArgumentException(\"Missing property values\");");
+            // throw new IllegalArgumentException("Missing property values");
+            bodyBuilder
+                    .appendFormalLine("throw new IllegalArgumentException(\"Missing property values\");");
 
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
+            bodyBuilder.indentRemove();
+            bodyBuilder.appendFormalLine("}");
 
-        // // Prepare a predicate
-        bodyBuilder.appendFormalLine("// Prepare a predicate");
-        // BooleanBuilder baseFilterPredicate = new BooleanBuilder();
-        bodyBuilder.appendFormalLine(String.format(
-                "%s baseFilterPredicate = new %s();",
-                helper.getFinalTypeName(QDSL_BOOLEAN_BUILDER),
-                helper.getFinalTypeName(QDSL_BOOLEAN_BUILDER)));
-        bodyBuilder.appendFormalLine("");
-        // // Base filter. Using BooleanBuilder, a cascading builder for
-        bodyBuilder
-                .appendFormalLine("// Base filter. Using BooleanBuilder, a cascading builder for");
-        // // Predicate expressions
-        bodyBuilder.appendFormalLine("// Predicate expressions");
-        // PathBuilder<Visit> entity = new PathBuilder<Visit>(Visit.class,
-        // "entity");
-        bodyBuilder.appendFormalLine(String.format(
-                "%s<%s> entity = new %s<%s>(%s.class, \"entity\");",
-                helper.getFinalTypeName(QDSL_PATH_BUILDER),
-                helper.getFinalTypeName(entity),
-                helper.getFinalTypeName(QDSL_PATH_BUILDER),
-                helper.getFinalTypeName(entity),
-                helper.getFinalTypeName(entity)));
+            // // Prepare a predicate
+            bodyBuilder.appendFormalLine("// Prepare a predicate");
+            // BooleanBuilder baseFilterPredicate = new BooleanBuilder();
+            bodyBuilder.appendFormalLine(String.format(
+                    "%s baseFilterPredicate = new %s();",
+                    helper.getFinalTypeName(QDSL_BOOLEAN_BUILDER),
+                    helper.getFinalTypeName(QDSL_BOOLEAN_BUILDER)));
+            bodyBuilder.appendFormalLine("");
+            // // Base filter. Using BooleanBuilder, a cascading builder for
+            bodyBuilder
+                    .appendFormalLine("// Base filter. Using BooleanBuilder, a cascading builder for");
+            // // Predicate expressions
+            bodyBuilder.appendFormalLine("// Predicate expressions");
+            // PathBuilder<Visit> entity = new PathBuilder<Visit>(Visit.class,
+            // "entity");
+            bodyBuilder.appendFormalLine(String.format(
+                    "%s<%s> entity = new %s<%s>(%s.class, \"entity\");",
+                    helper.getFinalTypeName(QDSL_PATH_BUILDER),
+                    helper.getFinalTypeName(entity),
+                    helper.getFinalTypeName(QDSL_PATH_BUILDER),
+                    helper.getFinalTypeName(entity),
+                    helper.getFinalTypeName(entity)));
 
-        bodyBuilder.appendFormalLine("");
-        //
-        // // Build base filter
-        bodyBuilder.appendFormalLine("// Build base filter");
-        // for (String key : propertyMap.keySet()) {
-        bodyBuilder
-                .appendFormalLine("for (String key : propertyValues.keySet()) {");
-        bodyBuilder.indent();
-        // baseFilterPredicate.and(entity.get(key).eq(propertyMap.get(key)));
-        bodyBuilder
-                .appendFormalLine("baseFilterPredicate.and(entity.get(key).eq(propertyValues.get(key)));");
-        // }
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
+            bodyBuilder.appendFormalLine("");
+            //
+            // // Build base filter
+            bodyBuilder.appendFormalLine("// Build base filter");
+            // for (String key : propertyMap.keySet()) {
+            bodyBuilder
+                    .appendFormalLine("for (String key : propertyValues.keySet()) {");
+            bodyBuilder.indent();
+            // baseFilterPredicate.and(entity.get(key).eq(propertyMap.get(key)));
+            bodyBuilder
+                    .appendFormalLine("baseFilterPredicate.and(entity.get(key).eq(propertyValues.get(key)));");
+            // }
+            bodyBuilder.indentRemove();
+            bodyBuilder.appendFormalLine("}");
 
-        bodyBuilder.appendFormalLine("");
-        //
-        // // Create a query with filter
-        bodyBuilder.appendFormalLine("// Create a query with filter");
-        // JPADeleteClause delete = new
-        // JPADeleteClause(Visit.entityManager(),entity);
-        bodyBuilder.appendFormalLine(String.format(
-                "%s delete = new %s(%s.entityManager(),entity);",
-                helper.getFinalTypeName(QDSL_JPA_DELETE_CLAUSE),
-                helper.getFinalTypeName(QDSL_JPA_DELETE_CLAUSE),
-                helper.getFinalTypeName(entity)));
-        //
-        bodyBuilder.appendFormalLine("");
-        // // execute delete
-        bodyBuilder.appendFormalLine("// execute delete");
-        // return delete.where(baseFilterPredicate).execute();
-        bodyBuilder
-                .appendFormalLine("return delete.where(baseFilterPredicate).execute();");
+            bodyBuilder.appendFormalLine("");
+            //
+
+            // // Create a query with filter
+            bodyBuilder.appendFormalLine("// Create a query with filter");
+            // JPADeleteClause delete = new
+            // JPADeleteClause(Visit.entityManager(),entity);
+            bodyBuilder.appendFormalLine(String.format(
+                    "%s delete = new %s(%s.entityManager(),entity);",
+                    helper.getFinalTypeName(QDSL_JPA_DELETE_CLAUSE),
+                    helper.getFinalTypeName(QDSL_JPA_DELETE_CLAUSE),
+                    helper.getFinalTypeName(entity)));
+            //
+            bodyBuilder.appendFormalLine("");
+            // // execute delete
+            bodyBuilder.appendFormalLine("// execute delete");
+            // return delete.where(baseFilterPredicate).execute();
+            bodyBuilder
+                    .appendFormalLine("return delete.where(baseFilterPredicate).execute();");
+        }
+        else {
+
+            // List<Visit> visits = findByValues(propertyValues);
+            bodyBuilder.appendFormalLine(String.format(
+                    "%s %s = %s(propertyValues);",
+                    helper.getFinalTypeName(listOfEntitiesType),
+                    StringUtils.uncapitalize(entityPlural),
+                    FIND_BY_VALUES_METHOD));
+
+            // delete(visits);
+            bodyBuilder.appendFormalLine(String.format("%s(%s);",
+                    DELETE_METHOD, StringUtils.uncapitalize(entityPlural)));
+
+            // return (long)visits.size();
+            bodyBuilder.appendFormalLine(String.format(
+                    "return (long)%s.size();",
+                    StringUtils.uncapitalize(entityPlural)));
+
+        }
 
     }
 
@@ -583,10 +630,7 @@ public class JpaBatchMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("return entityManager().createQuery(\"DELETE FROM %s\").executeUpdate();",
-                                entityName));
+        buildDeleteAllMethodBody(bodyBuilder);
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -597,6 +641,45 @@ public class JpaBatchMetadata extends
 
         return methodBuilder.build(); // Build and return a MethodMetadata
         // instance
+    }
+
+    /**
+     * Build delete all method body
+     * 
+     * @param bodyBuilder
+     */
+    private void buildDeleteAllMethodBody(InvocableMemberBodyBuilder bodyBuilder) {
+        if (useBulkStatements) {
+            bodyBuilder
+                    .appendFormalLine(String
+                            .format("return entityManager().createQuery(\"DELETE FROM %s\").executeUpdate();",
+                                    entityName));
+        }
+        else {
+            // TypedQuery<Owner> query =
+            // entityManager().createQuery("Select o FROM Owner o",
+            // Owner.class);
+            bodyBuilder
+                    .appendFormalLine(String
+                            .format("%s<%s> query = entityManager().createQuery(\"Select o FROM %s o\", %s.class);",
+                                    helper.getFinalTypeName(JpaJavaType.TYPED_QUERY),
+                                    entityName, entityName, entityName));
+            // List<Owner> owners = query.getResultList();
+            bodyBuilder.appendFormalLine(String.format(
+                    "%s %s = query.getResultList();",
+                    helper.getFinalTypeName(listOfEntitiesType),
+                    StringUtils.uncapitalize(entityPlural)));
+
+            // delete(owners);
+            bodyBuilder.appendFormalLine(String.format("%s(%s);",
+                    DELETE_METHOD, StringUtils.uncapitalize(entityPlural)));
+
+            // return owners.size();
+            bodyBuilder.appendFormalLine(String.format("return %s.size();",
+                    StringUtils.uncapitalize(entityPlural)));
+
+        }
+
     }
 
     /**
@@ -654,28 +737,7 @@ public class JpaBatchMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String aliasName = entity.getSimpleTypeName().toLowerCase()
-                .substring(0, 1);
-
-        // Query query =
-        // entityManager().createQuery("DELETE FROM Pet AS p WHERE p.id IN (:idList)");
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("%s query = entityManager().createQuery(\"DELETE FROM %s as %s WHERE %s.%s %s (:idList)\");",
-                                getFinalTypeName(JpaJavaType.QUERY),
-                                entityName,
-                                aliasName,
-                                aliasName,
-                                entityIdentifier.getFieldName().getSymbolName(),
-                                condition));
-
-        // query.setParameter("list", ids);
-        bodyBuilder.appendFormalLine(String.format(
-                "query.setParameter(\"idList\", %s);",
-                parameterName.getSymbolName()));
-
-        // return query.executeUpdate();
-        bodyBuilder.appendFormalLine("return query.executeUpdate();");
+        buildDeleteByIdListMethod(condition, parameterName, bodyBuilder);
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -686,6 +748,69 @@ public class JpaBatchMetadata extends
 
         return methodBuilder.build(); // Build and return a MethodMetadata
                                       // instance
+    }
+
+    /**
+     * Build method body for delete method filter by element's id list
+     * 
+     * @param condition
+     * @param parameterName
+     * @param bodyBuilder
+     */
+    private void buildDeleteByIdListMethod(String condition,
+            JavaSymbolName parameterName, InvocableMemberBodyBuilder bodyBuilder) {
+
+        if (useBulkStatements) {
+            String aliasName = entity.getSimpleTypeName().toLowerCase()
+                    .substring(0, 1);
+            // Query query =
+            // entityManager().createQuery("DELETE FROM Pet AS p WHERE p.id IN (:idList)");
+            bodyBuilder
+                    .appendFormalLine(String
+                            .format("%s query = entityManager().createQuery(\"DELETE FROM %s as %s WHERE %s.%s %s (:idList)\");",
+                                    getFinalTypeName(JpaJavaType.QUERY),
+                                    entityName, aliasName, aliasName,
+                                    entityIdentifier.getFieldName()
+                                            .getSymbolName(), condition));
+
+            // query.setParameter("list", ids);
+            bodyBuilder.appendFormalLine(String.format(
+                    "query.setParameter(\"idList\", %s);",
+                    parameterName.getSymbolName()));
+
+            // return query.executeUpdate();
+            bodyBuilder.appendFormalLine("return query.executeUpdate();");
+        }
+        else {
+            // TypedQuery<Owner> query =
+            // entityManager().createQuery("Select o FROM Owner o WHERE o.id IN (:idList)",
+            // Owner.class);
+            bodyBuilder
+                    .appendFormalLine(String
+                            .format("%s<%s> query = entityManager().createQuery(\"SELECT o FROM %s o WHERE o.%s %s (:idList)\", %s.class);",
+                                    getFinalTypeName(JpaJavaType.TYPED_QUERY),
+                                    entityName, entityName, entityIdentifier
+                                            .getFieldName().getSymbolName(),
+                                    condition, entityName));
+
+            // query.setParameter("list", ids);
+            bodyBuilder.appendFormalLine(String.format(
+                    "query.setParameter(\"idList\", %s);",
+                    parameterName.getSymbolName()));
+
+            // List<Owner> owners = query.getResultList();
+            bodyBuilder.appendFormalLine(String.format(
+                    "%s %s = query.getResultList();",
+                    helper.getFinalTypeName(listOfEntitiesType),
+                    StringUtils.uncapitalize(entityPlural)));
+
+            // delete(owners);
+            bodyBuilder.appendFormalLine(String.format("delete(%s);",
+                    StringUtils.uncapitalize(entityPlural)));
+            // return owners.size();
+            bodyBuilder.appendFormalLine(String.format("return %s.size();",
+                    StringUtils.uncapitalize(entityPlural)));
+        }
     }
 
     private MethodMetadata methodExists(JavaSymbolName methodName,
@@ -725,7 +850,7 @@ public class JpaBatchMetadata extends
 
         // Define method parameter names (none in this case)
         JavaSymbolName parameterName = new JavaSymbolName(
-                entityPlural.toLowerCase());
+                StringUtils.uncapitalize(entityPlural));
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(parameterName);
 
@@ -797,14 +922,13 @@ public class JpaBatchMetadata extends
         List<JavaType> typeParams = new ArrayList<JavaType>();
         typeParams.add(entity);
 
-        JavaType list = new JavaType("java.util.List", 0, DataType.TYPE, null,
-                typeParams);
         JavaType arrayList = new JavaType("java.util.ArrayList", 0,
                 DataType.TYPE, null, typeParams);
 
         // List<Vet> merged = new ArrayList<Vet>();
         bodyBuilder.appendFormalLine(String.format("%s merged = new %s();",
-                getFinalTypeName(list), getFinalTypeName(arrayList)));
+                getFinalTypeName(listOfEntitiesType),
+                getFinalTypeName(arrayList)));
 
         // for(Vet vet : vets) {
         // merged.add( vet.merge() );
@@ -820,10 +944,73 @@ public class JpaBatchMetadata extends
         bodyBuilder.appendFormalLine("return merged;");
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
-        JavaType returnType = list;
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, UPDATE_METHOD, returnType,
+                getId(), Modifier.PUBLIC, UPDATE_METHOD, listOfEntitiesType,
                 parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    /**
+     * Return method to delete a list of entities
+     * 
+     * @return
+     */
+    private MethodMetadata getDeleteMethod() {
+
+        // Define parameters types
+
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(listOfEntitiesType);
+
+        // Check if a method exist in type
+        final MethodMetadata method = methodExists(DELETE_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method
+            return method;
+        }
+
+        // Define method annotations (none in this case)
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(new AnnotationMetadataBuilder(
+                SpringJavaType.TRANSACTIONAL));
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names (none in this case)
+        JavaSymbolName parameterName = new JavaSymbolName(
+                entityPlural.toLowerCase());
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(parameterName);
+
+        // --- Create the method body ---
+
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        List<JavaType> typeParams = new ArrayList<JavaType>();
+        typeParams.add(entity);
+
+        // for(Vet vet : vets) {
+        // vet.remove() );
+        // }
+        bodyBuilder.appendFormalLine(String.format("for( %s %s : %s) {",
+                entityName, entityName.toLowerCase(), parameterName));
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine(String.format("%s.remove();",
+                entityName.toLowerCase()));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, DELETE_METHOD,
+                JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
 
@@ -908,6 +1095,13 @@ public class JpaBatchMetadata extends
      */
     public JavaSymbolName getDeleteByValuesMethodName() {
         return DELETE_BY_VALUES_METHOD;
+    }
+
+    /**
+     * @return if bulk JPA statements will be used
+     */
+    public boolean isUseBulkStatements() {
+        return useBulkStatements;
     }
 
 }

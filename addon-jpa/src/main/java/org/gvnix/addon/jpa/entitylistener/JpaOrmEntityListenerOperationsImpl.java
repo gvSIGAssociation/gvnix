@@ -21,7 +21,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
@@ -77,6 +79,8 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
 
     @Reference
     private JpaOrmEntityListenerRegistry registry;
+
+    private final Set<JavaType> entitiesWithListenersRegistered = new HashSet<JavaType>();
 
     /**
      * {@inheritDoc}
@@ -136,12 +140,14 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
 
         // If there is more than one listeners
         if (entityElement.getElementsByTagName(ENTITY_LISTENER_TAG).getLength() > 1) {
+            entitiesWithListenersRegistered.add(entityClass);
             // check listeners order
             modified = adjustEntityListenerOrder(ormXml, entityListenerElement,
                     entityListenerElements) || modified;
         }
 
         if (modified) {
+            entitiesWithListenersRegistered.add(entityClass);
             // If there is any changes on orm.xml save it
             XmlUtils.writeXml(ormXmlMutableFile.getOutputStream(), ormXml);
         }
@@ -468,7 +474,7 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
      * This compares instances of {@link Pair} which left (or key) element is
      * listener class and right (or value) is the metadataProviderId.
      * 
-     * @author jmvivo
+     * @author gvNIX Team
      * 
      */
     private class ListenerOrderComparator implements
@@ -519,6 +525,7 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
 
         if (modified) {
             // entity element do not exists on orm.xml: nothing to clean up
+            entitiesWithListenersRegistered.remove(entity);
             return;
         }
 
@@ -531,6 +538,7 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
         if (modified) {
             // entity-listeners element do not exists on orm.xml: nothing to
             // clean up
+            entitiesWithListenersRegistered.remove(entity);
             return;
         }
 
@@ -540,6 +548,7 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
 
         if (entityListenerElements == null || entityListenerElements.isEmpty()) {
             // no entity-listener element found on orm.xml: nothing to clean up
+            entitiesWithListenersRegistered.remove(entity);
             return;
         }
 
@@ -555,6 +564,14 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
         }
 
         if (modified) {
+            // Update cache of entities with listeners:
+            if (XmlUtils.findElements(ENTITY_LISTENER_TAG,
+                    entityListenerElement).isEmpty()) {
+                entitiesWithListenersRegistered.remove(entity);
+            }
+            else {
+                entitiesWithListenersRegistered.add(entity);
+            }
             // If there is any changes on orm.xml save it
             XmlUtils.writeXml(ormXmlMutableFile.getOutputStream(), ormXml);
         }
@@ -592,5 +609,13 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
 
         return new ImmutablePair<MutableFile, Document>(ormXmlMutableFile,
                 ormXml);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasAnyListener(JavaType entity) {
+        return entitiesWithListenersRegistered.contains(entity);
     }
 }

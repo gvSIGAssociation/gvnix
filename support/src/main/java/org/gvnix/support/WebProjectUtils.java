@@ -1,17 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
@@ -277,16 +277,23 @@ public class WebProjectUtils {
 
                 if (StringUtils.isEmpty(oldNsUri)
                         || oldNsUri.equalsIgnoreCase(currentUri)) {
-                    divMain.setAttribute(nsName, nsUri);
-                    modified = true;
+                    // Compares new value with current before change
+                    if (!StringUtils.equalsIgnoreCase(currentUri, nsUri)) {
+                        divMain.setAttribute(nsName, nsUri);
+                        modified = true;
+                    }
                 }
             }
 
             // Namespace name is not in oldUriMap and namespace name is in
             // given file
             if (!oldUriMap.containsKey(nsName) && divMain.hasAttribute(nsName)) {
-                divMain.setAttribute(nsName, nsUri);
-                modified = true;
+                // Compares new value with current before change
+                if (!StringUtils.equalsIgnoreCase(divMain.getAttribute(nsName),
+                        nsUri)) {
+                    divMain.setAttribute(nsName, nsUri);
+                    modified = true;
+                }
             }
         }
 
@@ -510,18 +517,18 @@ public class WebProjectUtils {
      * 
      * <pre>
      * {@code
-     * <c:set var="VAR_NAME"> 
-     *   <!-- Get the user local from the page context (it was set by 
-     *        Spring MVC's locale resolver) --> 
-     *   <c:set var="jqlocale">${pageContext.response.locale}</c:set> 
-     *   <c:if test="${fn:length(jqlocale) eq 2}"> 
-     *     <c:out value="${jqlocale}" /> 
+     * <c:set var="VAR_NAME">
+     *   <!-- Get the user local from the page context (it was set by
+     *        Spring MVC's locale resolver) -->
+     *   <c:set var="jqlocale">${pageContext.response.locale}</c:set>
+     *   <c:if test="${fn:length(jqlocale) eq 2}">
+     *     <c:out value="${jqlocale}" />
      *   </c:if>
-     *   <c:if test="${fn:length(jqlocale) gt 2}"> 
-     *     <c:out value="${fn:substringBefore(jqlocale, '_')}" default="en" /> 
+     *   <c:if test="${fn:length(jqlocale) gt 2}">
+     *     <c:out value="${fn:substringBefore(jqlocale, '_')}" default="en" />
      *   </c:if>
-     *   <c:if test="${fn:length(jqlocale) lt 2}"> 
-     *     <c:out value="en" /> 
+     *   <c:if test="${fn:length(jqlocale) lt 2}">
+     *     <c:out value="en" />
      *   </c:if>
      * </c:set>
      * }

@@ -50,4 +50,12 @@ public interface JpaOrmEntityListenerOperations {
      */
     public void cleanUpEntityListeners(JavaType entity);
 
+    /**
+     * Informs if entity has any entity-listener registered
+     * 
+     * @param entity
+     * @return
+     */
+    public boolean hasAnyListener(JavaType entity);
+
 }
