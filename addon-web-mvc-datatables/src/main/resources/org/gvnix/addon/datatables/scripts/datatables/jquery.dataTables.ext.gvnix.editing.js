@@ -862,6 +862,44 @@ var GvNIX_Editing;
 			},this));
 			return true;
 		},
+		
+		/**
+		 * Hide toolbar (ONLY HIDES)
+		 */
+		"fnHideToolbar" : function() {
+			// Hidding Toolbar
+			var sTableId = this._data.oSettings.sTableId;
+			setTimeout(function(){
+				var toolBarLinks = $("#"+ sTableId + "_gvnix_toolbar a");
+				toolBarLinks.hide();
+			},100);
+		},
+		
+		/**
+		 * Hide util buttons
+		 */
+		"fnHideUtils" : function(){
+			var sTableId = this._data.oSettings.sTableId;
+			setTimeout(function(){
+				// Hidding td
+				$("#"+ sTableId + " .utilbox").hide();
+				// Hidding th
+				$("#"+ sTableId + "_wrapper .dataTables_scroll .dataTables_scrollHead th.utilbox").hide();
+				
+			},100);
+		},
+		
+		/** 
+		 * Hide Details (ONLY HIDES)
+		 */
+		
+		"fnHideDetails": function() {
+			var sTableId = this._data.oSettings.sTableId;
+			var details = $("div[id$="+sTableId+"_detail]");
+			details.each(function(index, detail){
+				$("#"+detail.id).hide();
+			});
+		},
 
 		/**
 		 * Begin create rows
@@ -1285,6 +1323,30 @@ var GvNIX_Editing;
 		},
 
 		// UI components ---
+		
+		/**
+		 * This method sets Datatable as no editable
+		 * hidding all editable elements
+		 * 
+		 * <b>Note:</b> Not works on Datatable
+		 * mode show
+		 * 
+		 */
+		"fnSetNoEditableDatatable" : function(delay) {
+			var oTable = this._data.oSettings.oInstance;
+			var eTable = oTable.fnEditing();
+			// Used to works with DOM and AJAX Datatables
+			if(delay){
+				oTable.on('draw',function(){
+					eTable.fnHideToolbar();
+					eTable.fnHideUtils();
+					eTable.fnHideDetails();
+				});
+			}else{
+				eTable.fnHideToolbar();
+				eTable.fnHideDetails();
+			}
+		},
 
 		/**
 		 * Show editing buttons in given toolbar panel
@@ -2206,7 +2268,7 @@ var GvNIX_Editing;
 	 * @type String
 	 * @default See code
 	 */
-	GvNIX_Editing.VERSION = "${gvnix.version}";
+	GvNIX_Editing.VERSION = "1.3.0-SNAPSHOT";
 	GvNIX_Editing.prototype.VERSION = GvNIX_Editing.VERSION;
 
 	/** TODO Add as datatable feature * */

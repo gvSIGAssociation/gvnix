@@ -23,6 +23,12 @@ var options = {
     debug : false
 };
 
+/* Creating Callbacks
+ ================================================= */
+
+var functionCallbacks = jQuery.Callbacks("unique");
+var callbackFunctionsNames = [];
+
 /* JS Utilities
 ================================================== */
 
@@ -249,7 +255,6 @@ function jQueryInitializeComponents(context) {
 	if (!context || context === undefined) {
 		context = document;
 	}
-	
     // Notes:
     // * About jQuery .data() vs .attr() performance : http://jsperf.com/jquery-data-vs-attr
 
@@ -348,6 +353,19 @@ function jQueryInitializeComponents(context) {
       });
     });
 
+    //Calling all callback functions
+    callbackFunctionsNames.forEach(function(name){
+    	functionCallbacks.fire(name,[context]);
+    });
+}
+
+
+/**
+ * Function to add callbacks
+ */
+function fnRegisterFunctionsToCallBack(callback){
+	functionCallbacks.add(callback);
+	callbackFunctionsNames.push(callback.name);
 }
 
 !function ($) {
