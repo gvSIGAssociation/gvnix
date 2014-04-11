@@ -3,8 +3,11 @@ package org.gvnix.addon.loupefield;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
@@ -20,6 +23,14 @@ import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
@@ -28,6 +39,7 @@ import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -65,6 +77,15 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     @Reference
     private TypeManagementService typeManagementService;
 
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(LoupefieldOperationsImpl.class);
+
+    private static final JavaSymbolName PATH = new JavaSymbolName("path");
+    private static final JavaSymbolName VALUE = new JavaSymbolName("value");
+
+    private static final JavaType LOUPE_FIELD_ENTITY_ANNOTATION = new JavaType(
+            "org.gvnix.addon.loupefield.LoupeFieldEntity");
+
     /** {@inheritDoc} */
     public boolean isSetupCommandAvailable() {
         // If jQuery is installed, setup command is available
@@ -101,9 +122,14 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /** {@inheritDoc} */
-    public void setLoupeFields(JavaType controller, JavaType backingType,
+    public void setLoupeFields(JavaType controller, JavaType entity,
             JavaSymbolName field) {
-        // TODO Auto-generated method stub
+        Validate.notNull(controller, "Controller Java Type required");
+        Validate.notNull(entity, "Entity Java Type required");
+        Validate.notNull(field, "Valid Field required");
+
+        // Adding annotation to Entity
+        doAddLoupeFieldEntityToEntity(entity, field);
 
     }
 
@@ -326,6 +352,79 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
                 "scripts/loupefield/loupe-functions.js");
         return fileManager.exists(dirPath);
+    }
+
+    /**
+     * Annotations methods
+     */
+    private AnnotationMetadataBuilder getLoupeFieldEntityAnnotation(
+            JavaType entity, JavaSymbolName field) {
+        final List<AnnotationAttributeValue<?>> loupFieldAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        loupFieldAttributes.add(new StringAttributeValue(field, field
+                .getSymbolName()));
+
+        return new AnnotationMetadataBuilder(LOUPE_FIELD_ENTITY_ANNOTATION,
+                loupFieldAttributes);
+    }
+
+    /**
+     * Annotates given entity of its parent with LoupeFieldEntity
+     * 
+     * @param entity
+     * @param fieldName
+     */
+    private void doAddLoupeFieldEntityToEntity(JavaType entity,
+            JavaSymbolName field) {
+
+        // Load class details. If class not found an exception will be raised.
+        ClassOrInterfaceTypeDetails tmpDetails = typeLocationService
+                .getTypeDetails(entity);
+
+        // Checks if it's mutable
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class, tmpDetails,
+                "Can't modify " + tmpDetails.getName());
+
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                (ClassOrInterfaceTypeDetails) tmpDetails);
+
+        List<? extends AnnotationMetadata> entityAnnotations = mutableTypeDetailsBuilder
+                .build().getAnnotations();
+
+        AnnotationMetadata loupeFieldAnnotation = MemberFindingUtils
+                .getAnnotationOfType(entityAnnotations, new JavaType(
+                        GvNIXLoupeFieldEntity.class.getName()));
+
+        if (loupeFieldAnnotation != null) {
+            // Already set annotation. Nothing to do
+            LOGGER.info("Entity ".concat(entity.getFullyQualifiedTypeName()
+                    .concat(" is already annotated with "
+                            .concat(GvNIXLoupeFieldEntity.class.getName()))));
+            return;
+        }
+
+
+        final List<AnnotationAttributeValue<?>> fieldValues = new ArrayList<AnnotationAttributeValue<?>>();
+
+        fieldValues.add(new StringAttributeValue(new JavaSymbolName(
+                "java.lang.String"), field.getSymbolName()));
+
+        final List<AnnotationAttributeValue<?>> loupeFieldAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        loupeFieldAttributes
+                .add(new ArrayAttributeValue<AnnotationAttributeValue<?>>(
+                        new JavaSymbolName("fields"), fieldValues));
+
+
+        // Creates GvNIXLoupeFieldEntity
+        loupeFieldAnnotation = new AnnotationMetadataBuilder(new JavaType(
+                GvNIXLoupeFieldEntity.class.getName()), loupeFieldAttributes)
+                .build();
+
+        // Adds GvNIXLoupeFieldEntity to the entity
+        mutableTypeDetailsBuilder.addAnnotation(loupeFieldAnnotation);
+
+        typeManagementService
+                .createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
+
     }
 
 }
