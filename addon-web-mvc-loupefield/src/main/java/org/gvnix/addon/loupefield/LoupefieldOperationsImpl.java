@@ -20,6 +20,8 @@ import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.LogicalPath;
@@ -67,7 +69,23 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     public boolean isSetupCommandAvailable() {
         // If jQuery is installed, setup command is available
         return projectOperations
-                .isFeatureInstalledInFocusedModule("gvnix-jquery");
+                .isFeatureInstalledInFocusedModule("gvnix-jquery")
+                && !projectOperations
+                        .isFeatureInstalledInFocusedModule("gvnix-loupe");
+    }
+
+    /** {@inheritDoc} */
+    public boolean isSetCommandAvailable() {
+        // If loupefields addon is installed, set command is available
+        return projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-loupe");
+    }
+
+    /** {@inheritDoc} */
+    public boolean isUpdateCommandAvailable() {
+        // If loupefields addon is installed, update command is available
+        return projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-loupe");
     }
 
     /** {@inheritDoc} */
@@ -76,6 +94,25 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         addTagx();
         // Adding scripts/loupefield/loupe-functions.js
         addLoupeFunctions();
+        // Add necessary properties to messages.properties
+        addI18nProperties();
+        // Include loupe-functions.js into load-scripts.tagx
+        addToLoadScripts();
+    }
+
+    /** {@inheritDoc} */
+    public void setLoupeFields(JavaType controller, JavaType backingType,
+            JavaSymbolName field) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /** {@inheritDoc} */
+    public void update() {
+        // Adding tags/loupefield/select.tagx
+        updateTagx();
+        // Adding scripts/loupefield/loupe-functions.js
+        updateLoupeFunctions();
         // Add necessary properties to messages.properties
         addI18nProperties();
         // Include loupe-functions.js into load-scripts.tagx
@@ -112,6 +149,39 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
+     * This method update <code>tags/loupefield/select.tagx</code> with the
+     * current tagx version
+     */
+    public void updateTagx() {
+
+        final String filePath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/loupefield/select.tagx");
+
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            inputStream = FileUtils.getInputStream(getClass(),
+                    "tag/select.tagx");
+            if (!fileManager.exists(filePath)) {
+                outputStream = fileManager.createFile(filePath)
+                        .getOutputStream();
+            }
+            else {
+                outputStream = fileManager.updateFile(filePath)
+                        .getOutputStream();
+            }
+            IOUtils.copy(inputStream, outputStream);
+        }
+        catch (final IOException ioe) {
+            throw new IllegalStateException(ioe);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
+        }
+    }
+
+    /**
      * This method adds <code>scripts/loupefield/loupe-functions.js</code> to
      * the scripts folder
      */
@@ -136,6 +206,38 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
                 IOUtils.closeQuietly(inputStream);
                 IOUtils.closeQuietly(outputStream);
             }
+        }
+    }
+
+    /**
+     * This method updates <code>scripts/loupefield/loupe-functions.js</code>
+     * with the current version
+     */
+    public void updateLoupeFunctions() {
+        final String filePath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, "scripts/loupefield/loupe-functions.js");
+
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            inputStream = FileUtils.getInputStream(getClass(),
+                    "scripts/loupe-functions.js");
+            if (!fileManager.exists(filePath)) {
+                outputStream = fileManager.createFile(filePath)
+                        .getOutputStream();
+            }
+            else {
+                outputStream = fileManager.updateFile(filePath)
+                        .getOutputStream();
+            }
+            IOUtils.copy(inputStream, outputStream);
+        }
+        catch (final IOException ioe) {
+            throw new IllegalStateException(ioe);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
     }
 
@@ -208,4 +310,22 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     private LogicalPath getWebappPath() {
         return WebProjectUtils.getWebappPath(projectOperations);
     }
+
+    /***
+     * FEATURE METHODS
+     */
+
+    @Override
+    public String getName() {
+        return FEATURE_NAME_GVNIX_LOUPEFIELDS;
+    }
+
+    @Override
+    public boolean isInstalledInModule(String moduleName) {
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+                "scripts/loupefield/loupe-functions.js");
+        return fileManager.exists(dirPath);
+    }
+
 }
