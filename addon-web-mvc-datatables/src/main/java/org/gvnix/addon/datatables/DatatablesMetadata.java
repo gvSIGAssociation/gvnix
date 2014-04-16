@@ -153,6 +153,12 @@ import org.springframework.roo.support.logging.HandlerUtils;
 public class DatatablesMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static final JavaSymbolName EXPORT_METHOD_NAME = new JavaSymbolName(
+            "export");
+
+    private static final JavaSymbolName RETRIEVE_DATA_METHOD_NAME = new JavaSymbolName(
+            "retrieveData");
+
     @SuppressWarnings("unused")
     private static final Logger LOGGER = HandlerUtils
             .getLogger(DatatablesMetadata.class);
@@ -3604,10 +3610,13 @@ public class DatatablesMetadata extends
         parameterTypes.add(AnnotatedJavaType
                 .convertFromJavaType(HTTP_SERVLET_RESPONSE));
 
+        // Building method name
+        JavaSymbolName methodName = new JavaSymbolName(
+                "export".concat(exportTypeCapitalized));
+
         // Check if a method with the same signature already exists in the
         // target type
-        final MethodMetadata method = methodExists(findAllMethodName,
-                parameterTypes);
+        final MethodMetadata method = methodExists(methodName, parameterTypes);
         if (method != null) {
             // If it already exists, just return the method and omit its
             // generation via the ITD
@@ -3661,10 +3670,8 @@ public class DatatablesMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, new JavaSymbolName(
-                        "export".concat(exportTypeCapitalized)),
-                JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
-                bodyBuilder);
+                getId(), Modifier.PUBLIC, methodName, JavaType.VOID_PRIMITIVE,
+                parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
 
@@ -3707,7 +3714,7 @@ public class DatatablesMetadata extends
 
         // Check if a method with the same signature already exists in the
         // target type
-        final MethodMetadata method = methodExists(findAllMethodName,
+        final MethodMetadata method = methodExists(EXPORT_METHOD_NAME,
                 parameterTypes);
         if (method != null) {
             // If it already exists, just return the method and omit its
@@ -3788,7 +3795,7 @@ public class DatatablesMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PRIVATE, new JavaSymbolName("export"),
+                getId(), Modifier.PRIVATE, EXPORT_METHOD_NAME,
                 JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
                 bodyBuilder);
         methodBuilder.setThrowsTypes(throwsTypes);
@@ -3811,6 +3818,7 @@ public class DatatablesMetadata extends
         *          ...
         * }
         */
+
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
         parameterTypes.add(AnnotatedJavaType
@@ -3821,7 +3829,7 @@ public class DatatablesMetadata extends
 
         // Check if a method with the same signature already exists in the
         // target type
-        final MethodMetadata method = methodExists(findAllMethodName,
+        final MethodMetadata method = methodExists(RETRIEVE_DATA_METHOD_NAME,
                 parameterTypes);
         if (method != null) {
             // If it already exists, just return the method and omit its
@@ -3892,7 +3900,7 @@ public class DatatablesMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PRIVATE, new JavaSymbolName("retrieveData"),
+                getId(), Modifier.PRIVATE, RETRIEVE_DATA_METHOD_NAME,
                 LIST_MAP_STRING_STRING, parameterTypes, parameterNames,
                 bodyBuilder);
 
