@@ -208,7 +208,12 @@ Documentation index
   * td-module.rst: Technical design
   * ug-module.rst: User guide
 
-* gvNIX work guides are placed at src/site/docbook/ in docbook format and Spanish:
+* gvNIX work guides are placed at src/site/docbook/ in docbook format and Spanish (deprecated):
+
+  * reference: Working guide about projects development with gvNIX.
+  * developer: Working guide about gvNIX project development.
+
+* gvNIX work guides are placed at src/site/asciidoc/ in AsciiDoc format and Spanish:
 
   * reference: Working guide about projects development with gvNIX.
   * developer: Working guide about gvNIX project development.
@@ -222,7 +227,7 @@ Contact us ?
 * https://gvnix.googlecode.com
 * http://listserv.gva.es/cgi-bin/mailman/listinfo/gvNIX_soporte
 * http://www.gvpontis.gva.es/cast/gvnix
-* If you use Twitter, you're encouraged to follow @gvnix and we appreciate youur mentions.
+* If you use Twitter, you are encouraged to follow @gvnix and we appreciate your mentions.
 
 Need more info ?
 ----------------
@@ -263,3 +268,7 @@ Write doc
 
 * Download and install XMLmind XML Editor Personal Edition ( http://www.xmlmind.com/xmleditor/download.shtml )
 * Use the previous editor to open ``src/site/docbook/developer/index.xml`` and contribute with your knowledge.
+
+gvNIX documentation is moving to AsciiDoc. These docs have the suffix .ad, .adoc or .asciidoc. To learn more about how to convert AsciiDoc to PDF, HTML5, etc go to http://asciidoc.org/ or http://asciidoctor.org/
+
+
