@@ -3,6 +3,8 @@ package org.gvnix.addon.loupefield;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -14,6 +16,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.WebProjectUtils;
+import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
@@ -26,6 +29,7 @@ import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
@@ -33,6 +37,8 @@ import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.Property;
+import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
@@ -70,6 +76,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     @Reference
     private TypeManagementService typeManagementService;
+
+    @Reference
+    private MetadataService metadataService;
 
     private static final Logger LOGGER = HandlerUtils
             .getLogger(LoupefieldOperationsImpl.class);
@@ -110,15 +119,15 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         addI18nProperties();
         // Include loupe-functions.js into load-scripts.tagx
         addToLoadScripts();
+        // Add Necessary Dependencies
+        setupProjectPom();
     }
 
     /** {@inheritDoc} */
     public void setLoupeController(JavaType controller) {
         Validate.notNull(controller, "Controller Java Type required");
-
         // Adding annotation to Controller
         doAddControllerAnnotation(controller);
-
     }
 
     /** {@inheritDoc} */
@@ -131,6 +140,8 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         addI18nProperties();
         // Include loupe-functions.js into load-scripts.tagx
         addToLoadScripts();
+        // Add Necessary Dependencies
+        setupProjectPom();
     }
 
     /**
@@ -169,13 +180,13 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     public void updateTagx() {
 
         final String filePath = pathResolver.getFocusedIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/loupefield/select.tagx");
+                Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/loupefield/loupe.tagx");
 
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
-            inputStream = FileUtils.getInputStream(getClass(),
-                    "tag/select.tagx");
+            inputStream = FileUtils
+                    .getInputStream(getClass(), "tag/loupe.tagx");
             if (!fileManager.exists(filePath)) {
                 outputStream = fileManager.createFile(filePath)
                         .getOutputStream();
@@ -313,7 +324,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
         // Add loupe-functions.js
         modified = WebProjectUtils.addJSToTag(docTagx, root, "loupe_js_url",
-                "/resources/scripts/loupe-functions.js") || modified;
+                "/resources/scripts/loupefield/loupe-functions.js") || modified;
 
         if (modified) {
             XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
@@ -366,6 +377,38 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
                             .build());
         }
 
+    }
+
+    /**
+     * Update project pom: install repositories and dependencies
+     */
+    private void setupProjectPom() {
+        // Get add-on configuration file
+        Element configuration = XmlUtils.getConfiguration(getClass());
+
+        // Install the add-on repository needed
+        List<Element> repos = XmlUtils.findElements(
+                "/configuration/gvnix/repositories/repository", configuration);
+        for (Element repo : repos) {
+            projectOperations.addRepositories(
+                    projectOperations.getFocusedModuleName(),
+                    Collections.singleton(new Repository(repo)));
+        }
+
+        // Install properties
+        List<Element> properties = XmlUtils.findElements(
+                "/configuration/gvnix/properties/*", configuration);
+        for (Element property : properties) {
+            projectOperations.addProperty(projectOperations
+                    .getFocusedModuleName(), new Property(property));
+        }
+
+        // Install dependencies
+        List<Element> depens = XmlUtils.findElements(
+                "/configuration/gvnix/dependencies/dependency", configuration);
+
+        DependenciesVersionManager.manageDependencyVersion(metadataService,
+                projectOperations, depens);
     }
 
     /***

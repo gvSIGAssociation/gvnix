@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<gvnix>
+		<repositories>
+			<repository>
+				<id>gvNIX Add-on repository</id>
+				<name>gvNIX Add-on repository</name>
+				<url>https://gvnix.googlecode.com/svn/repo</url>
+			</repository>
+		</repositories>
+		<dependencies>
+			<dependency>
+				<groupId>org.gvnix</groupId>
+				<artifactId>org.gvnix.addon.loupefield</artifactId>
+				<version>${gvnix.version}</version>
+				<type>jar</type>
+			</dependency>
+		</dependencies>
+	</gvnix>
+</configuration>

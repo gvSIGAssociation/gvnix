@@ -80,12 +80,12 @@ public final class LoupefieldMetadataProvider extends
             String metadataIdentificationString, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
-    	
-    	JavaType javaType = LoupefieldMetadata
+
+        JavaType javaType = LoupefieldMetadata
                 .getJavaType(metadataIdentificationString);
         LogicalPath path = LoupefieldMetadata
                 .getPath(metadataIdentificationString);
-        
+
         // Get webScaffoldMetadata
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
                 javaType, path);
@@ -94,17 +94,16 @@ public final class LoupefieldMetadataProvider extends
         // register dependency to Roo Web Scaffold
         metadataDependencyRegistry.registerDependency(webScaffoldMetadataId,
                 metadataIdentificationString);
-        
+
         if (webScaffoldMetadata == null) {
             return null;
         }
 
         WebScaffoldAnnotationValues webScaffoldAnnotationValues = webScaffoldMetadata
                 .getAnnotationValues();
-        
+
         // Get formBackingObject
         JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
-
 
         return new LoupefieldMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, entity);

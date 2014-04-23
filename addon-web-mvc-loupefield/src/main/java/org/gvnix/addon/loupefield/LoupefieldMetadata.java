@@ -130,8 +130,6 @@ public class LoupefieldMetadata extends
         this.helper = new ItdBuilderHelper(this, governorPhysicalTypeMetadata,
                 builder.getImportRegistrationResolver());
 
-        JavaType controller = governorPhysicalTypeMetadata.getType();
-
         // Adding AUTOWIRED annotation
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
                 1);
@@ -365,7 +363,7 @@ public class LoupefieldMetadata extends
 
         // return "forward:/WEB-INF/views/" + listPath + ".jspx";
         bodyBuilder
-                .appendFormalLine("return \"forward:/WEB-INF/views/\" + listPath + \".jspx\"");
+                .appendFormalLine("return \"forward:/WEB-INF/views/\" + listPath + \".jspx\";");
 
     }
 
@@ -382,12 +380,12 @@ public class LoupefieldMetadata extends
 
         // List<Map<String, String>> errorList = new
         // ArrayList<Map<String,String>>();
-        bodyBuilder.appendFormalLine(String.format("%s errorList = new %s;",
+        bodyBuilder.appendFormalLine(String.format("%s errorList = new %s();",
                 helper.getFinalTypeName(RESPONSE_LIST),
                 helper.getFinalTypeName(ARRAY_LIST_MAP_STRING)));
 
         // Map<String, String> error = new HashMap<String, String>();
-        bodyBuilder.appendFormalLine(String.format("%s error = new %s;",
+        bodyBuilder.appendFormalLine(String.format("%s error = new %s();",
                 helper.getFinalTypeName(RESPONSE_LIST_MAP),
                 helper.getFinalTypeName(HASHMAP_STRING)));
 
@@ -405,7 +403,7 @@ public class LoupefieldMetadata extends
 
         // BeanWrapper xxxxBean = new BeanWrapperImpl(XXX.class);
         bodyBuilder.appendFormalLine(String.format(
-                "%s %sBean = new %s(%s.class)", helper
+                "%s %sBean = new %s(%s.class);", helper
                         .getFinalTypeName(new JavaType(
                                 "org.springframework.beans.BeanWrapper")),
                 helper.getFinalTypeName(entity).toLowerCase(), helper
@@ -437,7 +435,8 @@ public class LoupefieldMetadata extends
 
         // Iterator<String> iter = request.getParameterNames();
         bodyBuilder.appendFormalLine(String.format(
-                "%s iter = request.getParameterNames();", ITERATOR_STRING));
+                "%s iter = request.getParameterNames();",
+                helper.getFinalTypeName(ITERATOR_STRING)));
 
         // while (iter.hasNext()) {
         bodyBuilder.appendFormalLine("while (iter.hasNext()) {");
