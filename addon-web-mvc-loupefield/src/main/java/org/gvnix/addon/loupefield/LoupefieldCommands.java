@@ -99,32 +99,9 @@ public class LoupefieldCommands implements CommandMarker { // All command types
      */
     @CliCommand(value = "web mvc loupefield set", help = "Set Loupe field to an entity property")
     public void set(
-            @CliOption(key = { "class", "" }, mandatory = true, help = "The path and name of the controller object to annotate") final JavaType controller,
-            @CliOption(key = "backingType", mandatory = true, optionContext = PROJECT, unspecifiedDefaultValue = "*", help = "The name of the entity") final JavaType backingType,
-            @CliOption(key = "field", mandatory = true, help = "The field to apply loupe") JavaSymbolName field) {
+            @CliOption(key = { "controller", "" }, mandatory = true, help = "The path and name of the controller object to annotate") final JavaType controller) {
 
-        final ClassOrInterfaceTypeDetails cid = typeLocationService
-                .getTypeDetails(backingType);
-        if (cid == null) {
-            LOGGER.warning("The specified entity can not be resolved to a type in your project");
-            return;
-        }
-
-        List<? extends FieldMetadata> fieldList = cid.getDeclaredFields();
-        Iterator<? extends FieldMetadata> it = fieldList.iterator();
-        boolean exists = false;
-        while (it.hasNext()) {
-            FieldMetadata currentField = it.next();
-            if (field.equals(currentField.getFieldName())) {
-                exists = true;
-            }
-        }
-        if (!exists) {
-            LOGGER.warning("The field '" + field.getSymbolName()
-                    + "' can not be resolved as field of your entity");
-            return;
-        }
-        operations.setLoupeFields(controller, backingType, field);
+        operations.setLoupeController(controller);
     }
 
     /**

@@ -25,15 +25,13 @@ import java.lang.annotation.Target;
 import org.springframework.roo.model.JavaSymbolName;
 
 /**
- * Trigger annotation for Entities with loupe fields
+ * Trigger annotation for Controllers with Loupe Fields
  * 
  * @author gvNIX Team
  * @since 1.3
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface GvNIXLoupeFieldEntity {
-
-    String[] fields() default "";
+public @interface GvNIXLoupeController {
 
 }

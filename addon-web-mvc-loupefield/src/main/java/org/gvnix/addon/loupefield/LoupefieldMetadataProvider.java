@@ -1,21 +1,41 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ */
 package org.gvnix.addon.loupefield;
 
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.ProjectOperations;
 
 /**
- * Provides {@link LoupefieldMetadata}. This type is called by Roo to retrieve
- * the metadata for this add-on. Use this type to reference external types and
- * services needed by the metadata type. Register metadata triggers and
- * dependencies here. Also define the unique add-on ITD identifier.
+ * Provides {@link DatatablesMetadata}.
  * 
+ * @author gvNIX Team
  * @since 1.1
  */
 @Component
@@ -23,28 +43,34 @@ import org.springframework.roo.project.LogicalPath;
 public final class LoupefieldMetadataProvider extends
         AbstractItdMetadataProvider {
 
+    @Reference
+    private WebMetadataService webMetadataService;
+
+    @Reference
+    protected ProjectOperations projectOperations;
+
     /**
-     * The activate method for this OSGi component, this will be called by the
-     * OSGi container upon bundle activation (result of the 'addon install'
-     * command)
+     * Register itself into metadataDependencyRegister and add metadata trigger
      * 
-     * @param context the component context can be used to get access to the
-     *        OSGi container (ie find out if certain bundles are active)
+     * @param context the component context
      */
     protected void activate(ComponentContext context) {
-
+        metadataDependencyRegistry.registerDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        addMetadataTrigger(new JavaType(GvNIXLoupeController.class.getName()));
     }
 
     /**
-     * The deactivate method for this OSGi component, this will be called by the
-     * OSGi container upon bundle deactivation (result of the 'addon uninstall'
-     * command)
+     * Unregister this provider
      * 
-     * @param context the component context can be used to get access to the
-     *        OSGi container (ie find out if certain bundles are active)
+     * @param context the component context
      */
     protected void deactivate(ComponentContext context) {
-
+        metadataDependencyRegistry.deregisterDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        removeMetadataTrigger(new JavaType(GvNIXLoupeController.class.getName()));
     }
 
     /**
@@ -54,17 +80,42 @@ public final class LoupefieldMetadataProvider extends
             String metadataIdentificationString, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
-        // Pass dependencies required by the metadata in through its constructor
+    	
+    	JavaType javaType = LoupefieldMetadata
+                .getJavaType(metadataIdentificationString);
+        LogicalPath path = LoupefieldMetadata
+                .getPath(metadataIdentificationString);
+        
+        // Get webScaffoldMetadata
+        String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
+                javaType, path);
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+                .get(webScaffoldMetadataId);
+        // register dependency to Roo Web Scaffold
+        metadataDependencyRegistry.registerDependency(webScaffoldMetadataId,
+                metadataIdentificationString);
+        
+        if (webScaffoldMetadata == null) {
+            return null;
+        }
+
+        WebScaffoldAnnotationValues webScaffoldAnnotationValues = webScaffoldMetadata
+                .getAnnotationValues();
+        
+        // Get formBackingObject
+        JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
+
+
         return new LoupefieldMetadata(metadataIdentificationString, aspectName,
-                governorPhysicalTypeMetadata);
+                governorPhysicalTypeMetadata, entity);
     }
 
     /**
      * Define the unique ITD file name extension, here the resulting file name
-     * will be **_ROO_Loupefield.aj
+     * will be **_ROO_GvNIXLoupeController.aj
      */
     public String getItdUniquenessFilenameSuffix() {
-        return "Loupefield";
+        return "GvNIXLoupeController";
     }
 
     protected String getGovernorPhysicalTypeIdentifier(

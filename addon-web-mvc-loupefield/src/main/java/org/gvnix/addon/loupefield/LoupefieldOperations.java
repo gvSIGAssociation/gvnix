@@ -45,11 +45,10 @@ public interface LoupefieldOperations extends Feature {
     void setup();
 
     /**
-     * Set property as Loupe Field
+     * Set Controller as Loupe Controller
      */
 
-    void setLoupeFields(JavaType controller, JavaType backingType,
-            JavaSymbolName field);
+    void setLoupeController(JavaType controller);
 
     /**
      * Update all add-on artifacts
