@@ -45,14 +45,21 @@ public interface LoupefieldOperations extends Feature {
     void setup();
 
     /**
+     * Update all add-on artifacts
+     */
+    void update();
+
+    /**
      * Set Controller as Loupe Controller
      */
 
     void setLoupeController(JavaType controller);
 
     /**
-     * Update all add-on artifacts
+     * Set Field as Loupe Element
      */
-    void update();
+    void setLoupeField(JavaType controller, JavaSymbolName field,
+            String additionalFields, String caption, String baseFilter,
+            String listPath, String max);
 
 }

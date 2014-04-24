@@ -5,13 +5,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -29,9 +32,12 @@ import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
+import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
@@ -42,10 +48,14 @@ import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.logging.HandlerUtils;
+import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Implementation of operations this add-on offers.
@@ -126,17 +136,6 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /** {@inheritDoc} */
-    public void setLoupeController(JavaType controller) {
-        Validate.notNull(controller, "Controller Java Type required");
-
-        // Adding annotation to Controller
-        doAddControllerAnnotation(controller);
-
-        // Adding uri to create.jspx and update.jspx views
-        updateCreateAndUpdateViews(controller);
-    }
-
-    /** {@inheritDoc} */
     public void update() {
         // Adding tags/loupefield/select.tagx
         updateTagx();
@@ -148,6 +147,110 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         addToLoadScripts();
         // Add Necessary Dependencies
         setupProjectPom();
+    }
+
+    /** {@inheritDoc} */
+    public void setLoupeController(JavaType controller) {
+        Validate.notNull(controller, "Controller Java Type required");
+
+        // Adding annotation to Controller
+        doAddControllerAnnotation(controller);
+
+        // Adding uri to create.jspx and update.jspx views
+        updateCreateAndUpdateViews(controller);
+    }
+
+    /** {@inheritDoc} */
+    public void setLoupeField(JavaType controller, JavaSymbolName field,
+            String additionalFields, String caption, String baseFilter,
+            String listPath, String max) {
+        Validate.notNull(controller, "Controller Java Type required");
+
+        // Getting existing controller and webscaffold annotation values
+        ClassOrInterfaceTypeDetails existingController = typeLocationService
+                .getTypeDetails(controller);
+        WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
+                existingController);
+
+        // Checks if controller is annotated with GvNIXLoupeController
+        if (!isControllerAnnotated(existingController)) {
+            LOGGER.log(
+                    Level.INFO,
+                    "Controller "
+                            .concat(controller.getSimpleTypeName())
+                            .concat(" must be annoted with @GvNIXLoupeController. Use 'web mvc loupe set' to annote controller and update views."));
+        }
+
+        // Checks if field exists and gets type
+        JavaType fieldType = existsField(existingController, annotationValues,
+                field);
+        if (fieldType == null) {
+            return;
+        }
+
+        // Getting Related entity and its fields
+        ClassOrInterfaceTypeDetails relatedEntity = typeLocationService
+                .getTypeDetails(fieldType);
+
+        if (relatedEntity == null) {
+            LOGGER.log(Level.INFO, String.format(
+                    "Field '%s' could not implements Loupe Field.",
+                    StringUtils.uncapitalize(field.getReadableSymbolName())));
+            return;
+        }
+
+        List<? extends FieldMetadata> relatedFields = relatedEntity
+                .getDeclaredFields();
+        if (relatedFields == null) {
+            LOGGER.log(Level.INFO, String.format(
+                    "Field '%s' could not implements Loupe Field.",
+                    StringUtils.uncapitalize(field.getReadableSymbolName())));
+            return;
+        }
+
+        // Checks if additional fields exists as fields in related entity
+        if (StringUtils.isNotBlank(additionalFields)) {
+            String[] additionalFieldsList = additionalFields.split(",");
+            for (int i = 0; i < additionalFieldsList.length; i++) {
+                boolean exists = false;
+                Iterator<? extends FieldMetadata> it = relatedFields.iterator();
+                while (it.hasNext()) {
+                    FieldMetadata relatedField = it.next();
+                    String additionalField = additionalFieldsList[i];
+                    String relatedFieldName = StringUtils
+                            .uncapitalize(relatedField.getFieldName()
+                                    .getSymbolName());
+                    if (relatedFieldName.equals(additionalField)) {
+                        exists = true;
+                    }
+                }
+                if (!exists) {
+                    LOGGER.log(
+                            Level.INFO,
+                            String.format(
+                                    "Additional field '%s' doesn't exists in related entity '%s'",
+                                    additionalFieldsList[i], relatedEntity
+                                            .getName().getSimpleTypeName()));
+                    return;
+                }
+            }
+        }
+
+        // TODO: Checks if caption field exists as field in related entity
+
+        // Checks if listPath view exists in project
+        if (StringUtils.isNotBlank(listPath)) {
+            if (!existsView(listPath)) {
+                return;
+            }
+        }
+
+        // Update field in views create and update
+        updateViews(annotationValues.getPath(), field, additionalFields,
+                caption, baseFilter, listPath, max, "create");
+        updateViews(annotationValues.getPath(), field, additionalFields,
+                caption, baseFilter, listPath, max, "update");
+
     }
 
     /**
@@ -451,9 +554,165 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
                         + controller.getSimpleTypeName() + "'");
 
         if (controllerPath != null) {
-            WebProjectUtils.createTagxUriInJspx(controllerPath, jspxName,
-                    uriMap, projectOperations, fileManager);
+            WebProjectUtils.addTagxUriInJspx(controllerPath, jspxName, uriMap,
+                    projectOperations, fileManager);
         }
+    }
+
+    /**
+     * This method checks if a view exists in the project
+     * 
+     * @param path
+     * @return
+     */
+    private boolean existsView(String path) {
+        String viewFileName = path.concat(".jspx");
+        final String filePath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, "WEB-INF/views/".concat(viewFileName));
+        if (!fileManager.exists(filePath)) {
+            LOGGER.log(
+                    Level.INFO,
+                    "View '".concat(viewFileName).concat(
+                            "' doesn't exists in proyect."));
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 
+     * This method checks if controller is annotated with @GvNIXLoupeController
+     * 
+     * @param controller
+     * @return
+     */
+    private boolean isControllerAnnotated(ClassOrInterfaceTypeDetails controller) {
+        AnnotationMetadata annotations = controller.getAnnotation(new JavaType(
+                GvNIXLoupeController.class));
+        if (annotations == null) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * This method checks if field exists in the Controller related entity
+     * 
+     * @param controller
+     * @return
+     */
+    private JavaType existsField(ClassOrInterfaceTypeDetails controller,
+            WebScaffoldAnnotationValues annotationValues, JavaSymbolName field) {
+        JavaType entity = annotationValues.getFormBackingObject();
+
+        final ClassOrInterfaceTypeDetails cid = typeLocationService
+                .getTypeDetails(entity);
+
+        if (cid == null) {
+            LOGGER.log(Level.INFO,
+                    "Controller Entity cannnot be resolved to a type in your project");
+            return null;
+        }
+
+        List<? extends FieldMetadata> fieldList = cid.getDeclaredFields();
+        Iterator<? extends FieldMetadata> it = fieldList.iterator();
+
+        JavaType fieldType = null;
+
+        boolean exists = false;
+
+        while (it.hasNext()) {
+            FieldMetadata currentField = it.next();
+            if (field.getReadableSymbolName().equals(
+                    currentField.getFieldName().getReadableSymbolName())) {
+                fieldType = currentField.getFieldType();
+                exists = true;
+            }
+        }
+        if (!exists) {
+            LOGGER.log(Level.INFO, "The field '" + field.getSymbolName()
+                    + "' can not be resolved as field of your entity.");
+            return null;
+        }
+
+        return fieldType;
+    }
+
+    /**
+     * 
+     * This method update field in view to use loupe element
+     * 
+     * @param controller
+     * @param path
+     * @param field
+     * @param additionalFields
+     * @param caption
+     * @param baseFilter
+     * @param listPath
+     * @param max
+     */
+    private void updateViews(String path, JavaSymbolName field,
+            String additionalFields, String caption, String baseFilter,
+            String listPath, String max, String viewName) {
+
+        String relativePath = "WEB-INF/views/".concat(path).concat("/")
+                .concat(viewName).concat(".jspx");
+
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        String docJspx = pathResolver.getIdentifier(
+                WebProjectUtils.getWebappPath(projectOperations), relativePath);
+
+        Document docJspXml = WebProjectUtils.loadXmlDocument(docJspx,
+                fileManager);
+        if (docJspXml == null) {
+            LOGGER.log(Level.INFO,
+                    "Could not locate file '".concat(relativePath).concat("'"));
+            return;
+        }
+
+        Element docRoot = docJspXml.getDocumentElement();
+        Element element = XmlUtils.findFirstElement(String.format(
+                "/div/%s/*[@field='%s']", viewName,
+                StringUtils.uncapitalize(field.getReadableSymbolName())),
+                docRoot);
+
+        // Changing z value
+        element.setAttribute("z", "user-managed");
+
+        // Adding controllerPath
+        element.setAttribute("controllerPath", path);
+
+        // Adding additionalFields attribute
+        if (StringUtils.isNotBlank(additionalFields)) {
+
+            element.setAttribute("additionalFields", additionalFields);
+
+        }
+
+        // Adding caption Attribute
+        if (StringUtils.isNotBlank(caption)) {
+            element.setAttribute("caption", caption);
+        }
+
+        // Adding baseFilter
+        if (StringUtils.isNotBlank(baseFilter)) {
+            element.setAttribute("baseFilter", baseFilter);
+        }
+
+        // Adding listPath
+        if (StringUtils.isNotBlank(listPath)) {
+            element.setAttribute("listPath", listPath);
+        }
+        else {
+            // TODO: Build entity list.jspx path
+            String entityPath = "/list";
+            element.setAttribute("listPath", entityPath);
+        }
+
+        DomUtils.removeTextNodes(docJspXml);
+        fileManager.createOrUpdateTextFileIfRequired(docJspx,
+                XmlUtils.nodeToString(docJspXml), true);
+
     }
 
     /***

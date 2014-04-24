@@ -127,10 +127,9 @@ public class WebProjectUtils {
      * @param fileManager
      * @param metadataService
      */
-    public static void createTagxUriInJspx(JavaType controller,
-            String jspxName, Map<String, String> uriMap,
-            ProjectOperations projectOperations, FileManager fileManager,
-            MetadataService metadataService) {
+    public static void addTagxUriInJspx(JavaType controller, String jspxName,
+            Map<String, String> uriMap, ProjectOperations projectOperations,
+            FileManager fileManager, MetadataService metadataService) {
 
         WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
                 .get(WebScaffoldMetadata.createIdentifier(controller,
@@ -140,9 +139,8 @@ public class WebProjectUtils {
                 "Can't get RooWebScaffold metada for type: %s",
                 controller.getFullyQualifiedTypeName());
 
-        createTagxUriInJspx(
-                webScaffoldMetadata.getAnnotationValues().getPath(), jspxName,
-                uriMap, projectOperations, fileManager);
+        addTagxUriInJspx(webScaffoldMetadata.getAnnotationValues().getPath(),
+                jspxName, uriMap, projectOperations, fileManager);
     }
 
     /**
@@ -157,10 +155,10 @@ public class WebProjectUtils {
      * @param projectOperations
      * @param fileManager
      */
-    public static void createTagxUriInJspx(String controllerPath,
-            String jspxName, Map<String, String> newUriMap,
-            ProjectOperations projectOperations, FileManager fileManager) {
-        createTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
+    public static void addTagxUriInJspx(String controllerPath, String jspxName,
+            Map<String, String> newUriMap, ProjectOperations projectOperations,
+            FileManager fileManager) {
+        addTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
                 .concat(jspxName).concat(".jspx"), (Map<String, String>) null,
                 newUriMap, projectOperations, fileManager);
     }
@@ -181,11 +179,10 @@ public class WebProjectUtils {
      * @param projectOperations
      * @param fileManager
      */
-    public static void createTagxUriInJspx(String controllerPath,
-            String jspxName, Map<String, String> oldUriMap,
-            Map<String, String> newUriMap, ProjectOperations projectOperations,
-            FileManager fileManager) {
-        createTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
+    public static void addTagxUriInJspx(String controllerPath, String jspxName,
+            Map<String, String> oldUriMap, Map<String, String> newUriMap,
+            ProjectOperations projectOperations, FileManager fileManager) {
+        addTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
                 .concat(jspxName).concat(".jspx"), oldUriMap, newUriMap,
                 projectOperations, fileManager);
     }
@@ -207,7 +204,7 @@ public class WebProjectUtils {
      * @param projectOperations
      * @param fileManager
      */
-    public static void createTagxUriInJspx(String relativePath,
+    public static void addTagxUriInJspx(String relativePath,
             Map<String, String> oldUriMap, Map<String, String> newUriMap,
             ProjectOperations projectOperations, FileManager fileManager) {
 
