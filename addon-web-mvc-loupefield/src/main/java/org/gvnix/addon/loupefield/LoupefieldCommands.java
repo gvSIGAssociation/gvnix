@@ -61,17 +61,6 @@ public class LoupefieldCommands implements CommandMarker { // All command types
     }
 
     /**
-     * Check if setup is available
-     * 
-     * @return true (default) if the command should be visible at this stage,
-     *         false otherwise
-     */
-    @CliAvailabilityIndicator({ "web mvc loupefield set" })
-    public boolean isSetAvailable() {
-        return operations.isSetCommandAvailable();
-    }
-
-    /**
      * Check if update is available
      * 
      * @return true (default) if the command should be visible at this stage,
@@ -80,6 +69,17 @@ public class LoupefieldCommands implements CommandMarker { // All command types
     @CliAvailabilityIndicator({ "web mvc loupefield update" })
     public boolean isUpdatetAvailable() {
         return operations.isUpdateCommandAvailable();
+    }
+
+    /**
+     * Check if setup is available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator({ "web mvc loupefield controller set" })
+    public boolean isSetAvailable() {
+        return operations.isSetCommandAvailable();
     }
 
     /**
@@ -93,18 +93,6 @@ public class LoupefieldCommands implements CommandMarker { // All command types
     }
 
     /**
-     * Set Loupe field to an entity property
-     * 
-     * @param type
-     */
-    @CliCommand(value = "web mvc loupefield set", help = "Set Loupe field to an entity property")
-    public void set(
-            @CliOption(key = { "controller", "" }, mandatory = true, help = "The path and name of the controller object to annotate") final JavaType controller) {
-
-        operations.setLoupeController(controller);
-    }
-
-    /**
      * Update loupe fields
      * 
      * @param type
@@ -112,6 +100,17 @@ public class LoupefieldCommands implements CommandMarker { // All command types
     @CliCommand(value = "web mvc loupefield update", help = "Update Loupe tags")
     public void update() {
         operations.update();
+    }
+
+    /**
+     * Set Loupe field to an entity property
+     * 
+     * @param type
+     */
+    @CliCommand(value = "web mvc loupefield controller set", help = "Set Loupe field to an entity property")
+    public void set(
+            @CliOption(key = { "controller", "" }, mandatory = true, help = "The path and name of the controller object to annotate") final JavaType controller) {
+        operations.setLoupeController(controller);
     }
 
 }

@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -126,8 +128,12 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     /** {@inheritDoc} */
     public void setLoupeController(JavaType controller) {
         Validate.notNull(controller, "Controller Java Type required");
+
         // Adding annotation to Controller
         doAddControllerAnnotation(controller);
+
+        // Adding uri to create.jspx and update.jspx views
+        updateCreateAndUpdateViews(controller);
     }
 
     /** {@inheritDoc} */
@@ -409,6 +415,45 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
         DependenciesVersionManager.manageDependencyVersion(metadataService,
                 projectOperations, depens);
+    }
+
+    /**
+     * This method updates create and update views adding loupefield uri
+     * 
+     * @param controller
+     */
+    private void updateCreateAndUpdateViews(JavaType controller) {
+        Map<String, String> uriMap = new HashMap<String, String>(1);
+        uriMap.put("xmlns:loupefield", "urn:jsptagdir:/WEB-INF/tags/loupefield");
+
+        ClassOrInterfaceTypeDetails existingController = typeLocationService
+                .getTypeDetails(controller);
+        WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
+                existingController);
+
+        updateJspx(controller, annotationValues.getPath(), uriMap, "create");
+        updateJspx(controller, annotationValues.getPath(), uriMap, "update");
+    }
+
+    /**
+     * @param controller
+     * @param controllerPath
+     * @param uriMap
+     * @param jspxName
+     */
+    private void updateJspx(JavaType controller, String controllerPath,
+            Map<String, String> uriMap, String jspxName) {
+        Validate.notBlank(controllerPath,
+                "Path is not specified in the @RooWebScaffold annotation for '"
+                        + controller.getSimpleTypeName() + "'");
+        Validate.isTrue(controllerPath != null && !controllerPath.isEmpty(),
+                "Path is not specified in the @RooWebScaffold annotation for '"
+                        + controller.getSimpleTypeName() + "'");
+
+        if (controllerPath != null) {
+            WebProjectUtils.createTagxUriInJspx(controllerPath, jspxName,
+                    uriMap, projectOperations, fileManager);
+        }
     }
 
     /***

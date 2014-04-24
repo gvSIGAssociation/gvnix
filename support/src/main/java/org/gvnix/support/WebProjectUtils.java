@@ -116,6 +116,142 @@ public class WebProjectUtils {
     }
 
     /**
+     * Create all namespaces occurrences in given {@relativePath} file with
+     * namespaces occurrences contained in {@code newUriMap}.
+     * 
+     * @param controllerPath {@link RooWebScaffold#path()} value
+     * @param jspxName view name, for example: "show", "list", "update"
+     * @param uriMap where key attribute name (ex "xmlns:page") and the value
+     *        the new uri (ex: "urn:jsptagdir:/WEB-INF/tags/datatables")
+     * @param projectOperations
+     * @param fileManager
+     * @param metadataService
+     */
+    public static void createTagxUriInJspx(JavaType controller,
+            String jspxName, Map<String, String> uriMap,
+            ProjectOperations projectOperations, FileManager fileManager,
+            MetadataService metadataService) {
+
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+                .get(WebScaffoldMetadata.createIdentifier(controller,
+                        getJavaPath(projectOperations)));
+
+        Validate.notNull(webScaffoldMetadata,
+                "Can't get RooWebScaffold metada for type: %s",
+                controller.getFullyQualifiedTypeName());
+
+        createTagxUriInJspx(
+                webScaffoldMetadata.getAnnotationValues().getPath(), jspxName,
+                uriMap, projectOperations, fileManager);
+    }
+
+    /**
+     * Create all namespaces occurrences in given {@relativePath} file with
+     * namespaces occurrences contained in {@code newUriMap}.
+     * 
+     * @param controllerPath {@link RooWebScaffold#path()} value
+     * @param jspxName view name, for example: "show", "list", "update"
+     * @param newUriMap Keys are namespace names (ex: "xmlns:page") and values
+     *        are the new namespace URI (ex:
+     *        "urn:jsptagdir:/WEB-INF/tags/datatables")
+     * @param projectOperations
+     * @param fileManager
+     */
+    public static void createTagxUriInJspx(String controllerPath,
+            String jspxName, Map<String, String> newUriMap,
+            ProjectOperations projectOperations, FileManager fileManager) {
+        createTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
+                .concat(jspxName).concat(".jspx"), (Map<String, String>) null,
+                newUriMap, projectOperations, fileManager);
+    }
+
+    /**
+     * Create all namespaces occurrences in given {@relativePath} file with
+     * namespaces occurrences contained in {@code newUriMap}.
+     * 
+     * @param controllerPath {@link RooWebScaffold#path()} value
+     * @param jspxName view name, for example: "show", "list", "update"
+     * @param oldUriMap (optional) Keys are namespace names (ex: "xmlns:page")
+     *        and values are the old namespace URI (ex:
+     *        "urn:jsptagdir:/WEB-INF/tags/form") that must match with the
+     *        namespace URI in the XML
+     * @param newUriMap Keys are namespace names (ex: "xmlns:page") and values
+     *        are the new namespace URI (ex:
+     *        "urn:jsptagdir:/WEB-INF/tags/datatables")
+     * @param projectOperations
+     * @param fileManager
+     */
+    public static void createTagxUriInJspx(String controllerPath,
+            String jspxName, Map<String, String> oldUriMap,
+            Map<String, String> newUriMap, ProjectOperations projectOperations,
+            FileManager fileManager) {
+        createTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
+                .concat(jspxName).concat(".jspx"), oldUriMap, newUriMap,
+                projectOperations, fileManager);
+    }
+
+    /**
+     * Create namespaces in given {@relativePath} file with namespaces
+     * occurrences contained in {@code newUriMap}.
+     * 
+     * @param relativePath XML file to update. The path must be relative to
+     *        {@code src/main/webapp} (cannot be null, but may be empty if
+     *        referring to the path itself)
+     * @param oldUriMap (optional) Keys are namespace names (ex: "xmlns:page")
+     *        and values are the old namespace URI (ex:
+     *        "urn:jsptagdir:/WEB-INF/tags/form") that must match with the
+     *        namespace URI in the XML
+     * @param newUriMap Keys are namespace names (ex: "xmlns:page") and values
+     *        are the new namespace URI (ex:
+     *        "urn:jsptagdir:/WEB-INF/tags/datatables")
+     * @param projectOperations
+     * @param fileManager
+     */
+    public static void createTagxUriInJspx(String relativePath,
+            Map<String, String> oldUriMap, Map<String, String> newUriMap,
+            ProjectOperations projectOperations, FileManager fileManager) {
+
+        // If null, create default oldUriMap causing jspx will be updated with
+        // all URIs in newUriMap
+        if (oldUriMap == null) {
+            oldUriMap = new HashMap<String, String>();
+        }
+
+        // Get jspx file path
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        String docJspx = pathResolver.getIdentifier(
+                getWebappPath(projectOperations), relativePath);
+
+        // Parse XML document
+        Document docJspXml = loadXmlDocument(docJspx, fileManager);
+        if (docJspXml == null) {
+            // file not found: do nothing
+            return;
+        }
+
+        // Get main div
+        Element docRoot = docJspXml.getDocumentElement();
+        Element divMain = XmlUtils.findFirstElement("/div", docRoot);
+        boolean modified = false;
+
+        // Create namespace URIs
+        for (Entry<String, String> newUriEntry : newUriMap.entrySet()) {
+            String nsName = newUriEntry.getKey();
+            String nsUri = newUriEntry.getValue();
+
+            divMain.setAttribute(nsName, nsUri);
+            modified = true;
+        }
+
+        // If modified, update the jspx file
+        if (modified) {
+            DomUtils.removeTextNodes(docJspXml);
+            fileManager.createOrUpdateTextFileIfRequired(docJspx,
+                    XmlUtils.nodeToString(docJspXml), true);
+        }
+    }
+
+    /**
      * Replaces all namespaces occurrences in given {@relativePath} file with
      * namespaces occurrences contained in {@code newUriMap}.
      * <p/>
