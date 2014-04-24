@@ -870,7 +870,7 @@ var GvNIX_Editing;
 			// Hidding Toolbar
 			var sTableId = this._data.oSettings.sTableId;
 			setTimeout(function(){
-				var toolBarLinks = $("#"+ sTableId + "_gvnix_toolbar a");
+				var toolBarLinks = jQuery("#"+ sTableId + "_gvnix_toolbar a");
 				toolBarLinks.hide();
 			},100);
 		},
@@ -882,10 +882,9 @@ var GvNIX_Editing;
 			var sTableId = this._data.oSettings.sTableId;
 			setTimeout(function(){
 				// Hidding td
-				$("#"+ sTableId + " .utilbox").hide();
+				jQuery("#"+ sTableId + " .utilbox").hide();
 				// Hidding th
-				$("#"+ sTableId + "_wrapper .dataTables_scroll .dataTables_scrollHead th.utilbox").hide();
-				
+				jQuery("#"+ sTableId + "_wrapper .dataTables_scroll .dataTables_scrollHead th.utilbox").hide();
 			},100);
 		},
 		
@@ -895,9 +894,9 @@ var GvNIX_Editing;
 		
 		"fnHideDetails": function() {
 			var sTableId = this._data.oSettings.sTableId;
-			var details = $("div[id$="+sTableId+"_detail]");
+			var details = jQuery("div[id$="+sTableId+"_detail]");
 			details.each(function(index, detail){
-				$("#"+detail.id).hide();
+				jQuery("#"+detail.id).hide();
 			});
 		},
 
