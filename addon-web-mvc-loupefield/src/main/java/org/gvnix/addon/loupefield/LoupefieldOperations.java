@@ -30,14 +30,14 @@ public interface LoupefieldOperations extends Feature {
      * 
      * @return true if it should be available, otherwise false
      */
-    boolean isSetCommandAvailable();
+    boolean isUpdateCommandAvailable();
 
     /**
      * Indicate commands should be available
      * 
      * @return true if it should be available, otherwise false
      */
-    boolean isUpdateCommandAvailable();
+    boolean isSetCommandAvailable();
 
     /**
      * Setup all add-on artifacts

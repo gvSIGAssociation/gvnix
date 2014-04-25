@@ -72,12 +72,12 @@ public class LoupefieldCommands implements CommandMarker { // All command types
     }
 
     /**
-     * Check if setup is available
+     * Check if set is available
      * 
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
-    @CliAvailabilityIndicator({ "web mvc loupe set", "web mvc loupe field " })
+    @CliAvailabilityIndicator({ "web mvc loupe set", "web mvc loupe field" })
     public boolean isSetAvailable() {
         return operations.isSetCommandAvailable();
     }

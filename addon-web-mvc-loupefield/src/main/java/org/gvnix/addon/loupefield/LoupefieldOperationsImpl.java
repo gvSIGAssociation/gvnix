@@ -23,11 +23,13 @@ import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.WebProjectUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
+import org.springframework.roo.addon.plural.PluralMetadata;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -36,6 +38,7 @@ import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.persistence.PersistenceMemberLocator;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -51,11 +54,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Implementation of operations this add-on offers.
@@ -92,6 +94,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     @Reference
     private MetadataService metadataService;
 
+    @Reference
+    private PersistenceMemberLocator persistenceMemberLocator;
+
     private static final Logger LOGGER = HandlerUtils
             .getLogger(LoupefieldOperationsImpl.class);
 
@@ -108,15 +113,15 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /** {@inheritDoc} */
-    public boolean isSetCommandAvailable() {
-        // If loupefields addon is installed, set command is available
+    public boolean isUpdateCommandAvailable() {
+        // If loupefields addon is installed, update command is available
         return projectOperations
                 .isFeatureInstalledInFocusedModule("gvnix-loupe");
     }
 
     /** {@inheritDoc} */
-    public boolean isUpdateCommandAvailable() {
-        // If loupefields addon is installed, update command is available
+    public boolean isSetCommandAvailable() {
+        // If loupefields addon is installed, set command is available
         return projectOperations
                 .isFeatureInstalledInFocusedModule("gvnix-loupe");
     }
@@ -209,34 +214,15 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         }
 
         // Checks if additional fields exists as fields in related entity
-        if (StringUtils.isNotBlank(additionalFields)) {
-            String[] additionalFieldsList = additionalFields.split(",");
-            for (int i = 0; i < additionalFieldsList.length; i++) {
-                boolean exists = false;
-                Iterator<? extends FieldMetadata> it = relatedFields.iterator();
-                while (it.hasNext()) {
-                    FieldMetadata relatedField = it.next();
-                    String additionalField = additionalFieldsList[i];
-                    String relatedFieldName = StringUtils
-                            .uncapitalize(relatedField.getFieldName()
-                                    .getSymbolName());
-                    if (relatedFieldName.equals(additionalField)) {
-                        exists = true;
-                    }
-                }
-                if (!exists) {
-                    LOGGER.log(
-                            Level.INFO,
-                            String.format(
-                                    "Additional field '%s' doesn't exists in related entity '%s'",
-                                    additionalFieldsList[i], relatedEntity
-                                            .getName().getSimpleTypeName()));
-                    return;
-                }
-            }
+        if (!checkIfAdditionalFieldsExists(relatedEntity, relatedFields,
+                additionalFields)) {
+            return;
         }
 
-        // TODO: Checks if caption field exists as field in related entity
+        // Checks if caption field exists as field in related entity
+        if (!checkIfCaptionExists(relatedEntity, relatedFields, caption)) {
+            return;
+        }
 
         // Checks if listPath view exists in project
         if (StringUtils.isNotBlank(listPath)) {
@@ -245,11 +231,33 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
             }
         }
 
+        // Getting identifiers
+        List<FieldMetadata> identifiers = persistenceMemberLocator
+                .getIdentifierFields(fieldType);
+
+        if (identifiers.isEmpty()) {
+            LOGGER.log(
+                    Level.INFO,
+                    String.format(
+                            "Could not locate any field annoted with @Id for entity '%s'",
+                            fieldType.getSimpleTypeName()));
+            return;
+        }
+
+        // Getting plural
+        final PluralMetadata pluralMetadata = (PluralMetadata) metadataService
+                .get(PluralMetadata.createIdentifier(fieldType,
+                        PhysicalTypeIdentifier.getPath(relatedEntity
+                                .getDeclaredByMetadataId())));
+        String plural = pluralMetadata.getPlural().toLowerCase();
+
         // Update field in views create and update
-        updateViews(annotationValues.getPath(), field, additionalFields,
-                caption, baseFilter, listPath, max, "create");
-        updateViews(annotationValues.getPath(), field, additionalFields,
-                caption, baseFilter, listPath, max, "update");
+        updateViews(relatedEntity, identifiers, plural,
+                annotationValues.getPath(), field, additionalFields, caption,
+                baseFilter, listPath, max, "create");
+        updateViews(relatedEntity, identifiers, plural,
+                annotationValues.getPath(), field, additionalFields, caption,
+                baseFilter, listPath, max, "update");
 
     }
 
@@ -640,6 +648,81 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * 
+     * This method checks if all additionalField exists
+     * 
+     * @param entity
+     * @param relatedFields
+     * @param additionalFields
+     */
+    private boolean checkIfAdditionalFieldsExists(
+            ClassOrInterfaceTypeDetails entity,
+            List<? extends FieldMetadata> relatedFields, String additionalFields) {
+        if (StringUtils.isNotBlank(additionalFields)) {
+            String[] additionalFieldsList = additionalFields.split(",");
+            for (int i = 0; i < additionalFieldsList.length; i++) {
+                boolean exists = false;
+                Iterator<? extends FieldMetadata> it = relatedFields.iterator();
+                while (it.hasNext()) {
+                    FieldMetadata relatedField = it.next();
+                    String additionalField = additionalFieldsList[i];
+                    String relatedFieldName = StringUtils
+                            .uncapitalize(relatedField.getFieldName()
+                                    .getSymbolName());
+                    if (relatedFieldName.equals(additionalField)) {
+                        exists = true;
+                    }
+                }
+                if (!exists) {
+                    LOGGER.log(
+                            Level.INFO,
+                            String.format(
+                                    "Additional field '%s' doesn't exists in related entity '%s'",
+                                    additionalFieldsList[i], entity.getName()
+                                            .getSimpleTypeName()));
+                    return false;
+                }
+
+            }
+        }
+        return true;
+    }
+
+    /**
+     * This method checks if caption exists as a related field
+     * 
+     * @param entity
+     * @param relatedFields
+     * @param caption
+     * @return
+     */
+    private boolean checkIfCaptionExists(ClassOrInterfaceTypeDetails entity,
+            List<? extends FieldMetadata> relatedFields, String caption) {
+        if (StringUtils.isNotBlank(caption)) {
+            boolean exists = false;
+            Iterator<? extends FieldMetadata> it = relatedFields.iterator();
+            while (it.hasNext()) {
+                FieldMetadata relatedField = it.next();
+                String relatedFieldName = StringUtils.uncapitalize(relatedField
+                        .getFieldName().getSymbolName());
+                if (relatedFieldName.equals(caption)) {
+                    exists = true;
+                }
+            }
+            if (!exists) {
+                LOGGER.log(
+                        Level.INFO,
+                        String.format(
+                                "Caption field '%s' doesn't exists in related entity '%s'",
+                                caption, entity.getName().getSimpleTypeName()));
+                return false;
+            }
+
+        }
+        return true;
+    }
+
+    /**
+     * 
      * This method update field in view to use loupe element
      * 
      * @param controller
@@ -651,9 +734,10 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      * @param listPath
      * @param max
      */
-    private void updateViews(String path, JavaSymbolName field,
-            String additionalFields, String caption, String baseFilter,
-            String listPath, String max, String viewName) {
+    private void updateViews(ClassOrInterfaceTypeDetails entity,
+            List<FieldMetadata> identifiers, String entityPlural, String path,
+            JavaSymbolName field, String additionalFields, String caption,
+            String baseFilter, String listPath, String max, String viewName) {
 
         String relativePath = "WEB-INF/views/".concat(path).concat("/")
                 .concat(viewName).concat(".jspx");
@@ -671,43 +755,72 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         }
 
         Element docRoot = docJspXml.getDocumentElement();
-        Element element = XmlUtils.findFirstElement(String.format(
-                "/div/%s/*[@field='%s']", viewName,
-                StringUtils.uncapitalize(field.getReadableSymbolName())),
+        Element form = XmlUtils.findFirstElement(
+                String.format("/div/%s", viewName), docRoot);
+        Element element = XmlUtils.findFirstElement(
+                String.format("/div/%s/*[@field='%s']", viewName,
+                        StringUtils.uncapitalize(field.getSymbolName())),
                 docRoot);
 
+        if (element == null) {
+            LOGGER.log(Level.INFO, String.format(
+                    "Could not locate field '%s' on '%s/%s'",
+                    StringUtils.uncapitalize(field.getSymbolName()), path,
+                    viewName));
+            return;
+        }
+
+        // Creating loupe element
+        Element loupe = docJspXml.createElement("loupefield:loupe");
+
+        // Copying element attributes to new loupe element
+        NamedNodeMap elementAttributes = element.getAttributes();
+        for (int i = 0; i < elementAttributes.getLength(); i++) {
+            Node attr = elementAttributes.item(i);
+            loupe.setAttribute(attr.getNodeName(), attr.getNodeValue());
+        }
+
         // Changing z value
-        element.setAttribute("z", "user-managed");
+        loupe.setAttribute("z", "user-managed");
+
+        // Adding pkField
+        String pkField = identifiers.get(0).getFieldName().getSymbolName();
+        loupe.setAttribute("pkField", pkField);
 
         // Adding controllerPath
-        element.setAttribute("controllerPath", path);
+        loupe.setAttribute("controllerPath", path);
 
         // Adding additionalFields attribute
         if (StringUtils.isNotBlank(additionalFields)) {
 
-            element.setAttribute("additionalFields", additionalFields);
+            loupe.setAttribute("additionalFields", additionalFields);
 
         }
 
         // Adding caption Attribute
         if (StringUtils.isNotBlank(caption)) {
-            element.setAttribute("caption", caption);
+            loupe.setAttribute("caption", caption);
         }
 
         // Adding baseFilter
         if (StringUtils.isNotBlank(baseFilter)) {
-            element.setAttribute("baseFilter", baseFilter);
+            loupe.setAttribute("baseFilter", baseFilter);
         }
 
         // Adding listPath
         if (StringUtils.isNotBlank(listPath)) {
-            element.setAttribute("listPath", listPath);
+            loupe.setAttribute("listPath", listPath);
         }
         else {
-            // TODO: Build entity list.jspx path
-            String entityPath = "/list";
-            element.setAttribute("listPath", entityPath);
+            String entityPath = entityPlural.concat("/list");
+            loupe.setAttribute("listPath", entityPath);
         }
+
+        // Append new loupe element to view
+        form.appendChild(loupe);
+
+        // Remove old element
+        form.removeChild(element);
 
         DomUtils.removeTextNodes(docJspXml);
         fileManager.createOrUpdateTextFileIfRequired(docJspx,
