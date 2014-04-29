@@ -89,13 +89,13 @@ public class WebJpaBatchMetadata extends
     private static final JavaSymbolName ALL_PARAM = new JavaSymbolName("all");
 
     private static final JavaSymbolName DELETE_METHOD = new JavaSymbolName(
-            "delete");
+            "deleteBatch");
 
     private static final JavaSymbolName UPDATE_METHOD = new JavaSymbolName(
-            "update");
+            "updateBatch");
 
     private static final JavaSymbolName CREATE_METHOD = new JavaSymbolName(
-            "create");
+            "createBatch");
 
     private static final JavaSymbolName GET_REQUEST_PROPERTY_VALUES_METHOD = new JavaSymbolName(
             "getRequestPropertyValues");
