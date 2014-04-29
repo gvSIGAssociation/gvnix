@@ -25,7 +25,10 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -36,12 +39,15 @@ import org.gvnix.support.WebItdBuilderHelper;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
@@ -53,6 +59,7 @@ import org.springframework.roo.model.JdkJavaType;
 import org.springframework.roo.model.Jsr303JavaType;
 import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * ITD generator for {@link GvNIXWebJpaBatch} annotation.
@@ -62,6 +69,11 @@ import org.springframework.roo.project.LogicalPath;
  */
 public class WebJpaBatchMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
+
+    private static final String REQUEST_METHOD_WITHOUT_TYPE = "org.springframework.web.bind.annotation.RequestMethod.";
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(WebJpaBatchMetadata.class);
 
     private static final JavaSymbolName BINDING_RESULT_NAME = new JavaSymbolName(
             StringUtils.uncapitalize(SpringJavaType.BINDING_RESULT
@@ -248,8 +260,173 @@ public class WebJpaBatchMetadata extends
         builder.addMethod(getCreateMethod());
         builder.addMethod(getGetRequestPropertyValuesMethod());
 
+        // Check if deleteBatch, createBatch or updateBatch are duplicated with
+        // different name.
+        checkIfExistsCUDMethods(governorTypeDetails);
+
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
+    }
+
+    private void checkIfExistsCUDMethods(
+            ClassOrInterfaceTypeDetails governorTypeDetails) {
+        // If deleteBatch method is duplicated (with different name), show an
+        // alert!
+        final List<AnnotatedJavaType> deleteParameterTypes = Arrays.asList(
+                helper.createRequestParam(JavaType.BOOLEAN_PRIMITIVE,
+                        ALL_PARAM.getSymbolName(), false, null), helper
+                        .createRequestParam(JavaType.BOOLEAN_OBJECT,
+                                DELETE_IN_PARAM.getSymbolName(), false, null),
+                helper.createRequestParam(listOfIdentifiersType, ID_LIST_PARAM
+                        .getSymbolName().concat("[]"), false, null),
+                new AnnotatedJavaType(entity, new AnnotationMetadataBuilder(
+                        SpringJavaType.MODEL_ATTRIBUTE).build()),
+                new AnnotatedJavaType(WEB_REQUEST));
+
+        MethodMetadata deleteMethod = checkExistsDeleteBatchMethod(
+                governorTypeDetails, deleteParameterTypes);
+        if (deleteMethod != null) {
+            LOGGER.log(
+                    Level.INFO,
+                    String.format(
+                            "WARNING: deleteBatch method was generated in %s. Remove %s method or rename it to deleteBatch",
+                            aspectName.getSimpleTypeName(), deleteMethod
+                                    .getMethodName().getSymbolName()));
+        }
+
+        // If updateBatch method is duplicated (with different name), show an
+        // alert!
+        final List<AnnotatedJavaType> updateParameterTypes = Arrays.asList(
+                new AnnotatedJavaType(listOfEntityType, Arrays.asList(
+                        AnnotationMetadataBuilder
+                                .getInstance(SpringJavaType.REQUEST_BODY),
+                        AnnotationMetadataBuilder
+                                .getInstance(Jsr303JavaType.VALID))),
+                AnnotatedJavaType
+                        .convertFromJavaType(SpringJavaType.BINDING_RESULT),
+                AnnotatedJavaType.convertFromJavaType(HTTP_SERVLET_REQUEST));
+
+        MethodMetadata updateMethod = checkExistsCUBatchMethod(
+                governorTypeDetails, updateParameterTypes, "PUT");
+        if (updateMethod != null) {
+            LOGGER.log(
+                    Level.INFO,
+                    String.format(
+                            "WARNING: updateBatch method was generated in %s. Remove %s method or rename it to updateBatch",
+                            aspectName.getSimpleTypeName(), updateMethod
+                                    .getMethodName().getSymbolName()));
+        }
+
+        // If createBatch method is duplicated (with different name), show an
+        // alert!
+        final List<AnnotatedJavaType> createParameterTypes = Arrays.asList(
+                new AnnotatedJavaType(listOfEntityType, Arrays.asList(
+                        AnnotationMetadataBuilder
+                                .getInstance(SpringJavaType.REQUEST_BODY),
+                        AnnotationMetadataBuilder
+                                .getInstance(Jsr303JavaType.VALID))),
+                AnnotatedJavaType
+                        .convertFromJavaType(SpringJavaType.BINDING_RESULT),
+                AnnotatedJavaType.convertFromJavaType(HTTP_SERVLET_REQUEST));
+
+        MethodMetadata createMethod = checkExistsCUBatchMethod(
+                governorTypeDetails, createParameterTypes, "POST");
+        if (createMethod != null) {
+            LOGGER.log(
+                    Level.INFO,
+                    String.format(
+                            "WARNING: createBatch method was generated in %s. Remove %s method or rename it to createBatch",
+                            aspectName.getSimpleTypeName(), createMethod
+                                    .getMethodName().getSymbolName()));
+        }
+
+    }
+
+    /**
+     * This method check if another delete method exists to the current
+     * controller
+     * 
+     * @param governorTypeDetails
+     * @param parameterTypes
+     * @return
+     */
+    private MethodMetadata checkExistsDeleteBatchMethod(
+            ClassOrInterfaceTypeDetails governorTypeDetails,
+            List<AnnotatedJavaType> parameterTypes) {
+
+        // Getting all methods
+        List<? extends MethodMetadata> methods = governorTypeDetails
+                .getDeclaredMethods();
+        Iterator<? extends MethodMetadata> it = methods.iterator();
+        while (it.hasNext()) {
+            MethodMetadata method = it.next();
+            // Getting request
+            AnnotationMetadata requestAnnotation = method
+                    .getAnnotation(SpringJavaType.REQUEST_MAPPING);
+            if (requestAnnotation != null) {
+                // Getting request value
+                AnnotationAttributeValue<?> request = requestAnnotation
+                        .getAttribute(new JavaSymbolName("value"));
+                String value = request.getValue().toString();
+                // Getting method parameterTypes
+                final List<JavaType> methodParameters = AnnotatedJavaType
+                        .convertFromAnnotatedJavaTypes(method
+                                .getParameterTypes());
+                // If method exists with same params, return method
+                if (value.equals("/delete")
+                        && AnnotatedJavaType.convertFromAnnotatedJavaTypes(
+                                parameterTypes).equals(methodParameters)) {
+                    return method;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * This method check if another update method exists to the current
+     * controller
+     * 
+     * @param governorTypeDetails
+     * @param parameterTypes
+     * @return
+     */
+    private MethodMetadata checkExistsCUBatchMethod(
+            ClassOrInterfaceTypeDetails governorTypeDetails,
+            List<AnnotatedJavaType> parameterTypes, String requestMethodType) {
+
+        // Getting all methods
+        List<? extends MethodMetadata> methods = governorTypeDetails
+                .getDeclaredMethods();
+        Iterator<? extends MethodMetadata> it = methods.iterator();
+        while (it.hasNext()) {
+            MethodMetadata method = it.next();
+            // Getting request and response body
+            AnnotationMetadata requestAnnotation = method
+                    .getAnnotation(SpringJavaType.REQUEST_MAPPING);
+            AnnotationMetadata responseAnnotation = method
+                    .getAnnotation(SpringJavaType.RESPONSE_BODY);
+            if (requestAnnotation != null && responseAnnotation != null) {
+                // Getting request value
+                AnnotationAttributeValue<?> methodParamAnnotation = requestAnnotation
+                        .getAttribute(new JavaSymbolName("method"));
+                String value = methodParamAnnotation.getValue().toString();
+                // Getting method parameterTypes
+                final List<JavaType> methodParameters = AnnotatedJavaType
+                        .convertFromAnnotatedJavaTypes(method
+                                .getParameterTypes());
+                // If method exists with same params, return method
+                if (value.equals(REQUEST_METHOD_WITHOUT_TYPE
+                        .concat(requestMethodType))
+                        && AnnotatedJavaType.convertFromAnnotatedJavaTypes(
+                                parameterTypes).equals(methodParameters)) {
+                    return method;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
