@@ -208,12 +208,6 @@ public class WebProjectUtils {
             Map<String, String> oldUriMap, Map<String, String> newUriMap,
             ProjectOperations projectOperations, FileManager fileManager) {
 
-        // If null, create default oldUriMap causing jspx will be updated with
-        // all URIs in newUriMap
-        if (oldUriMap == null) {
-            oldUriMap = new HashMap<String, String>();
-        }
-
         // Get jspx file path
         PathResolver pathResolver = projectOperations.getPathResolver();
         String docJspx = pathResolver.getIdentifier(
