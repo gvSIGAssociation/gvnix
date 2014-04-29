@@ -1,5 +1,29 @@
-// Executing bootstrap.roo and creating project
-script --file bootstrap.roo
+// Executing clinic.roo and creating project
+script --file clinic.roo
+
+// Adding jQuery to project
+web mvc jquery setup
+
+// Installing Bootstrap
+web mvc bootstrap setup
+
+// Installing datatables
+web mvc datatables setup 
+
+// Setting JQuery to all files
+web mvc jquery all
+
+// Creating datatables
+web mvc datatables all
+
+// Updating bootstrap to import datatables resources
+web mvc bootstrap update
+
+// Installing reports in project
+web report setup
+
+// Creating report 
+web report add --controller ~.web.PetController --reportName petreport
 
 // Setup loupe
 web mvc loupe setup

@@ -221,6 +221,22 @@
 	echo datatables-pkc end
 
 ##
+## gvNIX loupe add-on
+##
+	
+	## loupefield
+	echo loupefield start
+	mkdir loupefield
+	cd loupefield
+	$1/gvnix.sh script --file $2/code/addon-web-mvc-loupefield/src/main/resources/loupe.roo --lineNumbers true
+	mkdir target
+    # Get page with loupe fields
+	wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits?form
+	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	cd ..
+	echo loupefield end
+
+##
 ## gvNIX dialog add-on
 ##
 	
