@@ -57,6 +57,7 @@ import com.mysema.query.QueryModifiers;
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.Order;
 import com.mysema.query.types.OrderSpecifier;
+import com.mysema.query.types.Predicate;
 import com.mysema.query.types.path.PathBuilder;
 
 /**
@@ -629,7 +630,7 @@ public class DatatablesUtils {
             BooleanBuilder filtersByTablePredicate) {
         String searchStr = datatablesCriterias.getSearch();
         if (findInAllColumns) {
-
+            boolean expressionExists = false;
             // Add filterable columns only
             for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
                 if (column.isFilterable()) {
@@ -641,9 +642,13 @@ public class DatatablesUtils {
                     // Find in all columns means we want to find given
                     // value in at least one entity property, so we must
                     // join the where clauses by OR
-                    filtersByTablePredicate = filtersByTablePredicate
-                            .or(QuerydslUtils.createExpression(entity,
-                                    fieldName, fieldType, searchStr));
+                    Predicate expression = QuerydslUtils.createExpression(
+                            entity, fieldName, fieldType, searchStr);
+                    if (expression != null) {
+                        filtersByTablePredicate = filtersByTablePredicate
+                                .or(expression);
+                        expressionExists = true;
+                    }
 
                     // If column is an association and there are given
                     // join attributes, add those attributes to WHERE
@@ -672,6 +677,11 @@ public class DatatablesUtils {
                         }
                     }
                 }
+            }
+            // If expression is null returns error to returns an empty
+            // DataSource
+            if (!expressionExists) {
+                throw new RuntimeException("Expression cannot be null");
             }
         }
         return filtersByTablePredicate;
