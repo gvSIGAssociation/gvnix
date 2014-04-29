@@ -52,7 +52,14 @@ import org.springframework.roo.project.LogicalPath;
 public class LoupefieldMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static final String REQUIRED_LABEL = "required";
+
+    private static final String VALUE_LABEL = "value";
+
     // Constants
+    private static final JavaType JAVA_TYPE_STRING = new JavaType(
+            "java.lang.String");
+
     private static final String PROVIDES_TYPE_STRING = LoupefieldMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
@@ -66,8 +73,7 @@ public class LoupefieldMetadata extends
 
     private static final JavaType RESPONSE_LIST_MAP = new JavaType(
             "java.util.Map", 0, DataType.TYPE, null, Arrays.asList(
-                    new JavaType("java.lang.String"), new JavaType(
-                            "java.lang.String")));
+                    JAVA_TYPE_STRING, JAVA_TYPE_STRING));
 
     private static final JavaType RESPONSE_LIST = new JavaType(
             "java.util.List", 0, DataType.TYPE, null,
@@ -83,22 +89,19 @@ public class LoupefieldMetadata extends
 
     private static final JavaType HASHMAP_STRING = new JavaType(
             "java.util.HashMap", 0, DataType.TYPE, null, Arrays.asList(
-                    new JavaType("java.lang.String"), new JavaType(
-                            "java.lang.String")));
+                    JAVA_TYPE_STRING, JAVA_TYPE_STRING));
 
     private static final JavaType MAP_STRING_OBJECT = new JavaType(
             "java.util.Map", 0, DataType.TYPE, null, Arrays.asList(
-                    new JavaType("java.lang.String"), new JavaType(
-                            "java.lang.Object")));
+                    JAVA_TYPE_STRING, new JavaType("java.lang.Object")));
 
     private static final JavaType HASHMAP_STRING_OBJECT = new JavaType(
             "java.util.HashMap", 0, DataType.TYPE, null, Arrays.asList(
-                    new JavaType("java.lang.String"), new JavaType(
-                            "java.lang.Object")));
+                    JAVA_TYPE_STRING, new JavaType("java.lang.Object")));
 
     private static final JavaType ITERATOR_STRING = new JavaType(
             "java.util.Iterator", 0, DataType.TYPE, null,
-            Arrays.asList(new JavaType("java.lang.String")));
+            Arrays.asList(JAVA_TYPE_STRING));
 
     private static final JavaType LIST_COLUMNDEF = new JavaType(
             "java.util.List", 0, DataType.TYPE, null,
@@ -113,14 +116,13 @@ public class LoupefieldMetadata extends
     private static final JavaType DATASET_MAP_STRING = new JavaType(
             "com.github.dandelion.datatables.core.ajax.DataSet", 0,
             DataType.TYPE, null, Arrays.asList(new JavaType("java.util.Map", 0,
-                    DataType.TYPE, null, Arrays.asList(new JavaType(
-                            "java.lang.String"), new JavaType(
-                            "java.lang.String")))));
+                    DataType.TYPE, null, Arrays.asList(JAVA_TYPE_STRING,
+                            JAVA_TYPE_STRING))));
 
     /**
      * Itd builder helper
      */
-    private ItdBuilderHelper helper;
+    private final ItdBuilderHelper helper;
 
     public LoupefieldMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata, JavaType entity) {
@@ -166,7 +168,7 @@ public class LoupefieldMetadata extends
 
         AnnotationMetadataBuilder pathMetadataBuilder = new AnnotationMetadataBuilder(
                 SpringJavaType.REQUEST_PARAM);
-        pathMetadataBuilder.addStringAttribute("value", "path");
+        pathMetadataBuilder.addStringAttribute(VALUE_LABEL, "path");
 
         parameterTypes.add(new AnnotatedJavaType(JavaType.STRING,
                 pathMetadataBuilder.build()));
@@ -232,44 +234,44 @@ public class LoupefieldMetadata extends
         // Adding search param
         AnnotationMetadataBuilder searchMetadataBuilder = new AnnotationMetadataBuilder(
                 SpringJavaType.REQUEST_PARAM);
-        searchMetadataBuilder.addStringAttribute("value", "_search_");
-        searchMetadataBuilder.addBooleanAttribute("required", false);
+        searchMetadataBuilder.addStringAttribute(VALUE_LABEL, "_search_");
+        searchMetadataBuilder.addBooleanAttribute(REQUIRED_LABEL, false);
 
         // Adding id param
         AnnotationMetadataBuilder idMetadataBuilder = new AnnotationMetadataBuilder(
                 SpringJavaType.REQUEST_PARAM);
-        idMetadataBuilder.addStringAttribute("value", "_id_");
-        idMetadataBuilder.addBooleanAttribute("required", false);
+        idMetadataBuilder.addStringAttribute(VALUE_LABEL, "_id_");
+        idMetadataBuilder.addBooleanAttribute(REQUIRED_LABEL, false);
 
         // Adding pkField param
         AnnotationMetadataBuilder pkFieldMetadataBuilder = new AnnotationMetadataBuilder(
                 SpringJavaType.REQUEST_PARAM);
-        pkFieldMetadataBuilder.addStringAttribute("value", "_pkField_");
+        pkFieldMetadataBuilder.addStringAttribute(VALUE_LABEL, "_pkField_");
 
         // Adding max param
         AnnotationMetadataBuilder maxMetadataBuilder = new AnnotationMetadataBuilder(
                 SpringJavaType.REQUEST_PARAM);
-        maxMetadataBuilder.addStringAttribute("value", "_max_");
-        maxMetadataBuilder.addBooleanAttribute("required", false);
+        maxMetadataBuilder.addStringAttribute(VALUE_LABEL, "_max_");
+        maxMetadataBuilder.addBooleanAttribute(REQUIRED_LABEL, false);
         maxMetadataBuilder.addStringAttribute("defaultValue", "3");
 
         // Adding caption param
         AnnotationMetadataBuilder captionMetadataBuilder = new AnnotationMetadataBuilder(
                 SpringJavaType.REQUEST_PARAM);
-        captionMetadataBuilder.addStringAttribute("value", "_caption_");
-        captionMetadataBuilder.addBooleanAttribute("required", false);
+        captionMetadataBuilder.addStringAttribute(VALUE_LABEL, "_caption_");
+        captionMetadataBuilder.addBooleanAttribute(REQUIRED_LABEL, false);
 
         // Adding additionalFields param
-        AnnotationMetadataBuilder additionalFieldsMetadataBuilder = new AnnotationMetadataBuilder(
+        AnnotationMetadataBuilder additionalFieldsMB = new AnnotationMetadataBuilder(
                 SpringJavaType.REQUEST_PARAM);
-        additionalFieldsMetadataBuilder.addStringAttribute("value",
-                "_additionalFields_");
-        additionalFieldsMetadataBuilder.addBooleanAttribute("required", false);
+        additionalFieldsMB
+                .addStringAttribute(VALUE_LABEL, "_additionalFields_");
+        additionalFieldsMB.addBooleanAttribute(REQUIRED_LABEL, false);
 
         // Adding field param
         AnnotationMetadataBuilder fieldMetadataBuilder = new AnnotationMetadataBuilder(
                 SpringJavaType.REQUEST_PARAM);
-        fieldMetadataBuilder.addStringAttribute("value", "_field_");
+        fieldMetadataBuilder.addStringAttribute(VALUE_LABEL, "_field_");
 
         parameterTypes.add(new AnnotatedJavaType(JavaType.STRING,
                 searchMetadataBuilder.build()));
@@ -282,7 +284,7 @@ public class LoupefieldMetadata extends
         parameterTypes.add(new AnnotatedJavaType(JavaType.STRING,
                 captionMetadataBuilder.build()));
         parameterTypes.add(new AnnotatedJavaType(JavaType.STRING,
-                additionalFieldsMetadataBuilder.build()));
+                additionalFieldsMB.build()));
         parameterTypes.add(new AnnotatedJavaType(JavaType.STRING,
                 fieldMetadataBuilder.build()));
 
@@ -781,17 +783,6 @@ public class LoupefieldMetadata extends
         builder.append("governor", governorPhysicalTypeMetadata.getId());
         builder.append("itdTypeDetails", itdTypeDetails);
         return builder.toString();
-    }
-
-    /**
-     * Gets final names to use of a type in method body after import resolver.
-     * 
-     * @param type
-     * @return name to use in method body
-     */
-    private String getFinalTypeName(JavaType type) {
-        return type.getNameIncludingTypeParameters(false,
-                builder.getImportRegistrationResolver());
     }
 
     public static final String getMetadataIdentiferType() {
