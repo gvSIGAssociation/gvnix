@@ -374,9 +374,11 @@ public class WebJpaBatchMetadata extends
                             .convertFromAnnotatedJavaTypes(method
                                     .getParameterTypes());
                     // If method exists with same params, return method
+                    String methodName = method.getMethodName().getSymbolName();
                     if (value.equals("/delete")
                             && AnnotatedJavaType.convertFromAnnotatedJavaTypes(
-                                    parameterTypes).equals(methodParameters)) {
+                                    parameterTypes).equals(methodParameters)
+                            && !methodName.equals("deleteBatch")) {
                         return method;
                     }
                 }
@@ -420,10 +422,16 @@ public class WebJpaBatchMetadata extends
                             .convertFromAnnotatedJavaTypes(method
                                     .getParameterTypes());
                     // If method exists with same params, return method
+                    String methodName = method.getMethodName().getSymbolName();
+                    String validMethodName = "createBatch";
+                    if (requestMethodType.equals("PUT")) {
+                        validMethodName = "updateBatch";
+                    }
                     if (value.equals(REQUEST_METHOD_WITHOUT_TYPE
                             .concat(requestMethodType))
                             && AnnotatedJavaType.convertFromAnnotatedJavaTypes(
-                                    parameterTypes).equals(methodParameters)) {
+                                    parameterTypes).equals(methodParameters)
+                            && !methodName.equals(validMethodName)) {
                         return method;
                     }
                 }
