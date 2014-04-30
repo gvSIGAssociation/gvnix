@@ -367,16 +367,18 @@ public class WebJpaBatchMetadata extends
                 // Getting request value
                 AnnotationAttributeValue<?> request = requestAnnotation
                         .getAttribute(new JavaSymbolName("value"));
-                String value = request.getValue().toString();
-                // Getting method parameterTypes
-                final List<JavaType> methodParameters = AnnotatedJavaType
-                        .convertFromAnnotatedJavaTypes(method
-                                .getParameterTypes());
-                // If method exists with same params, return method
-                if (value.equals("/delete")
-                        && AnnotatedJavaType.convertFromAnnotatedJavaTypes(
-                                parameterTypes).equals(methodParameters)) {
-                    return method;
+                if (request != null) {
+                    String value = request.getValue().toString();
+                    // Getting method parameterTypes
+                    final List<JavaType> methodParameters = AnnotatedJavaType
+                            .convertFromAnnotatedJavaTypes(method
+                                    .getParameterTypes());
+                    // If method exists with same params, return method
+                    if (value.equals("/delete")
+                            && AnnotatedJavaType.convertFromAnnotatedJavaTypes(
+                                    parameterTypes).equals(methodParameters)) {
+                        return method;
+                    }
                 }
             }
         }
@@ -411,17 +413,19 @@ public class WebJpaBatchMetadata extends
                 // Getting request value
                 AnnotationAttributeValue<?> methodParamAnnotation = requestAnnotation
                         .getAttribute(new JavaSymbolName("method"));
-                String value = methodParamAnnotation.getValue().toString();
-                // Getting method parameterTypes
-                final List<JavaType> methodParameters = AnnotatedJavaType
-                        .convertFromAnnotatedJavaTypes(method
-                                .getParameterTypes());
-                // If method exists with same params, return method
-                if (value.equals(REQUEST_METHOD_WITHOUT_TYPE
-                        .concat(requestMethodType))
-                        && AnnotatedJavaType.convertFromAnnotatedJavaTypes(
-                                parameterTypes).equals(methodParameters)) {
-                    return method;
+                if (methodParamAnnotation != null) {
+                    String value = methodParamAnnotation.getValue().toString();
+                    // Getting method parameterTypes
+                    final List<JavaType> methodParameters = AnnotatedJavaType
+                            .convertFromAnnotatedJavaTypes(method
+                                    .getParameterTypes());
+                    // If method exists with same params, return method
+                    if (value.equals(REQUEST_METHOD_WITHOUT_TYPE
+                            .concat(requestMethodType))
+                            && AnnotatedJavaType.convertFromAnnotatedJavaTypes(
+                                    parameterTypes).equals(methodParameters)) {
+                        return method;
+                    }
                 }
             }
         }
