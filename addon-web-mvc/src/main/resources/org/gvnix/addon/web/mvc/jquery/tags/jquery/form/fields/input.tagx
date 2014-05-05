@@ -17,6 +17,8 @@
   <jsp:directive.attribute name="disableFormBinding" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Set to true to disable Spring form binding" />
   <jsp:directive.attribute name="type" type="java.lang.String" required="false" rtexprvalue="true" description="Set field type (default 'text', or 'password')" />
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
+  <jsp:directive.attribute name="size" type="java.lang.String" required="false" rtexprvalue="true" description="Size attribute of the input element. (Not Length)" />
+  <jsp:directive.attribute name="value" type="java.lang.String" required="false" rtexprvalue="true" description="Default input value" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
   
   <c:if test="${empty render or render}">
@@ -27,6 +29,14 @@
     
     <c:if test="${empty disabled}">
       <c:set value="false" var="disabled" />
+    </c:if>
+    
+    <c:if test="${empty size}">
+    	<c:set value="" var="size"/>
+    </c:if>
+    
+    <c:if test="${empty value}">
+    	<c:set value="" var="value"/>
     </c:if>
     
     <c:if test="${empty label}">
@@ -93,19 +103,19 @@
             title="${sec_field_validation}" data-required="${required}"  
             data-invalid="${sec_field_invalid}" data-missing="${sec_field_required}" 
             data-regex="${validationRegex}" data-minlength="${min}" data-maxlength="${max}" 
-            data-mindecimal="${decimalMin}" data-maxdecimal="${decimalMax}" />
+            data-mindecimal="${decimalMin}" data-maxdecimal="${decimalMax}" size="${size}" value="${value}" />
         </c:when>
         <c:otherwise>
           <c:choose>
             <c:when test="${type eq 'password'}">
-              <form:password id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}" />
+              <form:password id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}" size="${size}"/>
             </c:when>
             <c:otherwise>
               <form:input id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}" 
                 title="${sec_field_validation}" data-required="${required}"  
                 data-invalid="${sec_field_invalid}" data-missing="${sec_field_required}" 
                 data-regex="${validationRegex}" data-minlength="${min}" data-maxlength="${max}" 
-                data-mindecimal="${decimalMin}" data-maxdecimal="${decimalMax}" />
+                data-mindecimal="${decimalMin}" data-maxdecimal="${decimalMax}" size="${size}" value="${value}"/>
             </c:otherwise>
           </c:choose>
           <form:errors cssClass="errors" id="_${sec_field}_error_id" path="${sec_field}" />
