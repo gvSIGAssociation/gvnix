@@ -125,6 +125,7 @@
   <jsp:useBean id="datatables_javaScript_elements_before" class="java.util.HashMap" scope="request"/>
   <jsp:useBean id="datatables_javaScript_elements_after" class="java.util.HashMap" scope="request"/>
   <jsp:useBean id="datatables_javaScript_elements_init" class="java.util.HashMap" scope="request"/>
+  <jsp:useBean id="datatables_callback_elements" class="java.util.HashMap" scope="request"/>
   <jsp:useBean id="datatables_export_columns" class="java.util.HashMap" scope="request"/>
   <jsp:useBean id="datatables_export_columns_title" class="java.util.HashMap" scope="request"/>
 
@@ -881,7 +882,63 @@
 		<!-- data columns will be inserted here -->
         <jsp:doBody />
 
-    <!-- Add action column with show row details button -->
+		<!-- Register datatables callbacks -->
+		<c:forEach var="entry" items="${datatables_callback_elements}">
+			<c:choose>
+				<c:when test="${entry.key eq 'cookie'}">
+					<c:forEach var="function" items="${entry.value}">
+						<datatables:callback type="cookie" function="${function}" />
+					</c:forEach>
+				</c:when>
+				<c:when test="${entry.key eq 'createdRow'}">
+					<c:forEach var="function" items="${entry.value}">
+						<datatables:callback type="createdRow" function="${function}" />
+					</c:forEach>
+				</c:when>
+				<c:when test="${entry.key eq 'draw'}">
+					<c:forEach var="function" items="${entry.value}">
+						<datatables:callback type="draw" function="${function}" />
+					</c:forEach>
+				</c:when>
+				<c:when test="${entry.key eq 'footer'}">
+					<c:forEach var="function" items="${entry.value}">
+						<datatables:callback type="footer" function="${function}" />
+					</c:forEach>
+				</c:when>
+				<c:when test="${entry.key eq 'format'}">
+					<c:forEach var="function" items="${entry.value}">
+						<datatables:callback type="format" function="${function}" />
+					</c:forEach>
+				</c:when>
+				<c:when test="${entry.key eq 'header'}">
+					<c:forEach var="function" items="${entry.value}">
+						<datatables:callback type="header" function="${function}" />
+					</c:forEach>
+				</c:when>
+				<c:when test="${entry.key eq 'info'}">
+					<c:forEach var="function" items="${entry.value}">
+						<datatables:callback type="info" function="${function}" />
+					</c:forEach>
+				</c:when>
+				<c:when test="${entry.key eq 'init'}">
+					<c:forEach var="function" items="${entry.value}">
+						<datatables:callback type="init" function="${function}" />
+					</c:forEach>
+				</c:when>
+				<c:when test="${entry.key eq 'predraw'}">
+					<c:forEach var="function" items="${entry.value}">
+						<datatables:callback type="predraw" function="${function}" />
+					</c:forEach>
+				</c:when>
+				<c:when test="${entry.key eq 'row'}">
+					<c:forEach var="function" items="${entry.value}">
+						<datatables:callback type="row" function="${function}" />
+					</c:forEach>
+				</c:when>
+			</c:choose>
+		</c:forEach>
+
+		<!-- Add action column with show row details button -->
     <c:if test="${show}">
       <c:choose>
 

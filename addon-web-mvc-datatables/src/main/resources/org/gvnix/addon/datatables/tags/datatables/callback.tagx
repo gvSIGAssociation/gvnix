@@ -1,0 +1,10 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixddt="http://www.gvnix.org/gvnix-datatables" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="type" type="java.lang.String" required="false" rtexprvalue="true" description="The type of the callback, can be: cookie, createdRow, draw, footer, format, header, info, init, predraw or row (check http://dandelion.github.io/datatables/tutorials/advanced/using-callbacks.html)" />
+  <jsp:directive.attribute name="function" type="java.lang.String" required="false" rtexprvalue="true" description="A CSV of strings with the names of the functions. They have to be defined in the JSPX" />
+
+	<c:set target="${datatables_callback_elements}" property="${type}"
+		value="${fn:split(function, ',')}" />
+
+</jsp:root>
