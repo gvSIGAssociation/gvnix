@@ -572,7 +572,12 @@ var GvNIX_Loupe;
 						if(onSetNameFunction !== ""){
 							callbackFunctions = {};
 							callbackFunctions[onSetNameFunction] = function(){
-								window[onSetNameFunction](input.attr('id'),instance,object);
+								if(typeof window[onSetNameFunction] == "function"){
+									window[onSetNameFunction](input.attr('id'),instance,object);
+								}else if ( window.console && console.log ){
+									console.log( onSetNameFunction + "is not defined" );
+								}
+								
 							}
 							instance._fnSetItemCallback.add(callbackFunctions[onSetNameFunction]);
 						}

@@ -130,12 +130,13 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     public void setup() {
         // Adding tags/loupefield/select.tagx
         addTagx();
-        // Adding scripts/loupefield/loupe-functions.js
+        // Adding scripts/loupefield/jquery.loupeField.ext.gvnix.js
         addLoupeFunctions();
         // Add necessary properties to messages.properties
         addI18nProperties();
-        // Include loupe-functions.js into load-scripts.tagx
-        addToLoadScripts();
+        // Include jquery.loupeField.ext.gvnix.js into load-scripts.tagx
+        addToLoadScripts("loupe_js_url",
+                "/resources/scripts/loupefield/jquery.loupeField.ext.gvnix.js");
         // Add Necessary Dependencies
         setupProjectPom();
     }
@@ -144,12 +145,13 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     public void update() {
         // Adding tags/loupefield/select.tagx
         updateTagx();
-        // Adding scripts/loupefield/loupe-functions.js
+        // Adding scripts/loupefield/jquery.loupeField.ext.gvnix.js
         updateLoupeFunctions();
         // Add necessary properties to messages.properties
         addI18nProperties();
-        // Include loupe-functions.js into load-scripts.tagx
-        addToLoadScripts();
+        // Include jquery.loupeField.ext.gvnix.js into load-scripts.tagx
+        addToLoadScripts("loupe_js_url",
+                "/resources/scripts/loupefield/jquery.loupeField.ext.gvnix.js");
         // Add Necessary Dependencies
         setupProjectPom();
     }
@@ -259,6 +261,31 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
                 annotationValues.getPath(), field, additionalFields, caption,
                 baseFilter, listPath, max, "update");
 
+        // Alert if additionalFields is empty, only can search by id
+        if (additionalFields == null) {
+            LOGGER.log(
+                    Level.INFO,
+                    String.format(
+                            "INFO: You don't specify additionalFields, so you can filter by '%s' only",
+                            identifiers.get(0).getFieldName().getSymbolName()));
+        }
+
+        // Creates loupe-callbacks.js and add to load-script.js if not
+        // exists
+        addCallbacksFile();
+
+        // Show message to developer with callbacks configuration
+        LOGGER.log(
+                Level.INFO,
+                String.format(
+                        "INFO: You can configure callbacks functions for field '%s' editing '%s'. You can add onDraw%s%s function and onSet%s%s function.",
+                        field.getSymbolName(),
+                        "scripts/loupefield/loupe-callbacks.js", field
+                                .getReadableSymbolName(), annotationValues
+                                .getFormBackingObject().getSimpleTypeName(),
+                        field.getReadableSymbolName(), annotationValues
+                                .getFormBackingObject().getSimpleTypeName()));
+
     }
 
     /**
@@ -324,19 +351,21 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
-     * This method adds <code>scripts/loupefield/loupe-functions.js</code> to
-     * the scripts folder
+     * This method adds
+     * <code>scripts/loupefield/jquery.loupeField.ext.gvnix.js</code> to the
+     * scripts folder
      */
     public void addLoupeFunctions() {
         final String filePath = pathResolver.getFocusedIdentifier(
-                Path.SRC_MAIN_WEBAPP, "scripts/loupefield/loupe-functions.js");
+                Path.SRC_MAIN_WEBAPP,
+                "scripts/loupefield/jquery.loupeField.ext.gvnix.js");
 
         if (!fileManager.exists(filePath)) {
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {
                 inputStream = FileUtils.getInputStream(getClass(),
-                        "scripts/loupe-functions.js");
+                        "scripts/jquery.loupeField.ext.gvnix.js");
                 outputStream = fileManager.createFile(filePath)
                         .getOutputStream();
                 IOUtils.copy(inputStream, outputStream);
@@ -352,18 +381,52 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
-     * This method updates <code>scripts/loupefield/loupe-functions.js</code>
-     * with the current version
+     * This method adds <code>scripts/loupefield/loupe-callbacks.js</code> to
+     * the scripts folder and add to load-scripts.js to load in all pages
+     */
+    public void addCallbacksFile() {
+        // Adding callbacks .js file
+        final String filePath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, "scripts/loupefield/loupe-callbacks.js");
+        if (!fileManager.exists(filePath)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = FileUtils.getInputStream(getClass(),
+                        "scripts/loupe-callbacks.js");
+                outputStream = fileManager.createFile(filePath)
+                        .getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            }
+            catch (final IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+            // Adding to load-scripts
+            addToLoadScripts("loupe_callbacks_js_url",
+                    "/resources/scripts/loupefield/loupe-callbacks.js");
+
+        }
+    }
+
+    /**
+     * This method updates
+     * <code>scripts/loupefield/jquery.loupeField.ext.gvnix.js</code> with the
+     * current version
      */
     public void updateLoupeFunctions() {
         final String filePath = pathResolver.getFocusedIdentifier(
-                Path.SRC_MAIN_WEBAPP, "scripts/loupefield/loupe-functions.js");
+                Path.SRC_MAIN_WEBAPP,
+                "scripts/loupefield/jquery.loupeField.ext.gvnix.js");
 
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
             inputStream = FileUtils.getInputStream(getClass(),
-                    "scripts/loupe-functions.js");
+                    "scripts/jquery.loupeField.ext.gvnix.js");
             if (!fileManager.exists(filePath)) {
                 outputStream = fileManager.createFile(filePath)
                         .getOutputStream();
@@ -413,9 +476,10 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
-     * This method adds reference in laod-script.tagx to use loupe-functions.js
+     * This method adds reference in laod-script.tagx to use
+     * jquery.loupeField.ext.gvnix.js
      */
-    public void addToLoadScripts() {
+    public void addToLoadScripts(String varName, String url) {
         // Modify Roo load-scripts.tagx
         PathResolver pathResolver = projectOperations.getPathResolver();
         String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
@@ -439,9 +503,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
         boolean modified = false;
 
-        // Add loupe-functions.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root, "loupe_js_url",
-                "/resources/scripts/loupefield/loupe-functions.js") || modified;
+        // Add jquery.loupeField.ext.gvnix.js
+        modified = WebProjectUtils.addJSToTag(docTagx, root, varName, url)
+                || modified;
 
         if (modified) {
             XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
@@ -841,7 +905,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     public boolean isInstalledInModule(String moduleName) {
         PathResolver pathResolver = projectOperations.getPathResolver();
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
-                "scripts/loupefield/loupe-functions.js");
+                "scripts/loupefield/jquery.loupeField.ext.gvnix.js");
         return fileManager.exists(dirPath);
     }
 }
