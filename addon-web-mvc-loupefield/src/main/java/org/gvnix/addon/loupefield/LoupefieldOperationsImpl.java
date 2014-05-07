@@ -278,7 +278,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         LOGGER.log(
                 Level.INFO,
                 String.format(
-                        "INFO: You can configure callbacks functions for field '%s' editing '%s'. You can add onDraw%s%s function and onSet%s%s function.",
+                        "INFO: You can configure callbacks functions for field '%s' editing '%s'. You can add onDraw%s%s function and onSet%s%s function if not exists yet.",
                         field.getSymbolName(),
                         "scripts/loupefield/loupe-callbacks.js", field
                                 .getReadableSymbolName(), annotationValues

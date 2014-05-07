@@ -575,7 +575,7 @@ var GvNIX_Loupe;
 								if(typeof window[onSetNameFunction] == "function"){
 									window[onSetNameFunction](input.attr('id'),instance,object);
 								}else if ( window.console && console.log ){
-									console.log( onSetNameFunction + "is not defined" );
+									console.log("[ERROR] : " + onSetNameFunction + " is not defined at 'loupe-callbacks.js'" );
 								}
 								
 							}
@@ -698,7 +698,11 @@ var GvNIX_Loupe;
 				callbackFunctions = {};
 				if(onSetNameFunction !== ""){
 					callbackFunctions[onSetNameFunction] = function(functionName, item){
-						window[onSetNameFunction](input.attr('id'),instance,data[item]);
+						if(typeof window[onSetNameFunction] == "function"){
+							window[onSetNameFunction](input.attr('id'),instance,data[item]);
+						}else if ( window.console && console.log ){
+							console.log("[ERROR] : " + onSetNameFunction + " is not defined at 'loupe-callbacks.js'" );
+						}
 					}
 					instance._fnSetItemCallback.add(callbackFunctions[onSetNameFunction]);
 				}
@@ -706,7 +710,11 @@ var GvNIX_Loupe;
 				if(onDrawNameFunction !== ""){
 					var itemToDraw = "";
 					callbackFunctions[onDrawNameFunction] = function(functionName, item){
-						itemToDraw = window[onDrawNameFunction](data[item]);
+						if(typeof window[onDrawNameFunction] == "function"){
+							itemToDraw = window[onDrawNameFunction](data[item]);
+						}else if ( window.console && console.log ){
+							console.log("[ERROR] : " + onDrawNameFunction + " is not defined at 'loupe-callbacks.js'" );
+						}
 					}
 					instance._fnDrawItemCallback.add(callbackFunctions[onDrawNameFunction]);
 				}
