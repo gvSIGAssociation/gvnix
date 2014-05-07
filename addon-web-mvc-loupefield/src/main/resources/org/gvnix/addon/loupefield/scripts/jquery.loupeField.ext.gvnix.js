@@ -889,22 +889,43 @@ var GvNIX_Loupe;
 	}
 	
 	/**
-	 * Function to get Loupe Instance
+	 * Function to get Loupe Instance using field and current instance
 	 */
-	GvNIX_Loupe.fnGetInstance = function(id){
-		//Getting real id
-		var compositeId = "_"+id+"_loupe_input_id";
-
-		//Getting all instances
-		var instances = GvNIX_Loupe._aInstances;
-		
-		// Iterating instances and returning the correct one
-		for(i in instances){
-			var instance = instances[i];
-			var settings = instance.s;
-			if(settings.id == compositeId){
-				return instances[i];
+	GvNIX_Loupe.fnGetInstance = function(currentFieldId, field){
+		//Getting current form
+		var form = $("#" + currentFieldId).closest("form");
+		if(form !== null){
+			// Getting related field in the current form
+			var relatedField = form.find("input[data-field='"+field+"']");
+			if(relatedField !== null && relatedField.data() !== null){
+				// Getting related field data
+				var relatedFieldData = relatedField.data();
+				// Getting related field id
+				var relatedFieldId = relatedFieldData.inputid;
+				
+				// Adding sufix
+				if(currentFieldId.search("_create") !== -1){
+					relatedFieldId += currentFieldId.substr(currentFieldId.search("_create"));
+				}else if(currentFieldId.search("_update") !== -1){
+					relatedFieldId += currentFieldId.substr(currentFieldId.search("_update"));
+				}
+				
+				//Getting all instances
+				var instances = GvNIX_Loupe._aInstances;
+				
+				// Iterating instances and returning the correct one
+				for(i in instances){
+					var instance = instances[i];
+					var settings = instance.s;
+					if(settings.id == relatedFieldId){
+						return instances[i];
+					}
+				}
+			}else if ( window.console && console.log ){
+				console.log("[ERROR] Cannot locate loupe field '"+field+"' in current form.");
 			}
+		}else if ( window.console && console.log ){
+			console.log("[ERROR] Can not locate current form.");
 		}
 	}
 	
