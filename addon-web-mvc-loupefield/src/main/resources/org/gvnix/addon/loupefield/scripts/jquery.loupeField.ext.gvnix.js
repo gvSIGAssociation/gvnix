@@ -584,6 +584,7 @@ var GvNIX_Loupe;
 						
 						input.val(object.__caption__);
 						$("#" + data.name + "_loupe_hidden").val(object[data.pkfield]);
+						$("#" + data.name + "_loupe_hidden").trigger('change');
 						// Hidding dropdown div
 						$("#" + data.name + "_dropdown_div").html("");
 						
@@ -748,7 +749,8 @@ var GvNIX_Loupe;
 								+ "('click'," + "function(e){" 
 									+ "$('#" + inputId + "').val('"+ item.__caption__ + "');" 
 									+ "$('#" + inputData.name+ "_dropdown_div').html('');" 
-									+ "$('#" + inputData.name+ "_loupe_hidden').val(" + item[pkField] + ");" 
+									+ "$('#" + inputData.name+ "_loupe_hidden').val(" + item[pkField] + ");"
+									+ "$('#" + inputData.name+ "_loupe_hidden').trigger('change');"
 									+ "GvNIX_Loupe.prototype._fnSetItemCallback.fire('" + onSetNameFunction + "',['" + i +"']);"
 									+ "GvNIX_Loupe.prototype._fnSetItemCallback.empty();"
 									+ "});"

@@ -964,18 +964,6 @@ var GvNIX_Editing;
 							continue;
 						}
 
-						var value = fnVal($input);
-						
-						// Store value received from server in array of values by column index
-						oCreateRow.aCreatingData.push(value);
-
-						// Store value received from server in Map of values by property name
-						oCreateRow.oCreatingData[property] = value;
-						
-						// Store current value to be able to recover when redraw the create form
-						oCreateRow.aOriginalData.push(value);
-						oCreateRow.oOriginalData[property] = value;
-						
 						// Store property name in array of values by column index
 						_d.aCreateColumnField.push(property);
 						
@@ -1024,7 +1012,7 @@ var GvNIX_Editing;
 				// We need all values in received from to complete the
 				// request to send to server (by example: version, other
 				// required fields, etc...)
-				jQuery.each($createForm.find(":input"), function (index, input) {
+				jQuery.each($createForm.find("form").children("input"), function (index, input) {
 					var $input = jQuery(input);
 					var name = $input.attr('name');
 					if (name !== undefined && name) {
@@ -1052,8 +1040,6 @@ var GvNIX_Editing;
 				// Display createPanel
 				createPanel.show();
 				
-				// Bind events for create inputs, focus cursor and initialize components
-				this._fnBindCreateRowEvents(this.fnGetCreationRowById(oCreateRow.sRowId));
 				jQueryInitializeComponents(_d.oCreatePanel);
 				
 				// Handler submit button
@@ -1061,6 +1047,33 @@ var GvNIX_Editing;
 					jQuery('#' + id).dataTable().fnEditing().fnSendCreationForm(rowId);
 					return false;
 				});
+				
+				// When all items are generated, build aCreatingData
+				
+				// Getting new created form and fields
+				var newCreatedForm = $("#" + $form.attr('id')+"CreateForm");
+				var fieldsWithName = newCreatedForm.find("div.controls :input[name]");
+				
+				for (var colIdx = 0; colIdx < fieldsWithName.length; colIdx++) {
+					var property = fieldsWithName[colIdx].name;
+
+					// Getting field value
+					var value = fieldsWithName[colIdx].value
+					
+					// Store value received from server in array of values by column index
+					oCreateRow.aCreatingData.push(value);
+					
+					// Store value received from server in Map of values by property name
+					oCreateRow.oCreatingData[property] = value;
+					
+					// Store current value to be able to recover when redraw the create form
+					oCreateRow.aOriginalData.push(value);
+					oCreateRow.oOriginalData[property] = value;
+				}
+				
+				// Bind events for create inputs, focus cursor and initialize components
+				this._fnBindCreateRowEvents(this.fnGetCreationRowById(oCreateRow.sRowId));
+				
 			}, this));
 			
 			return true;
