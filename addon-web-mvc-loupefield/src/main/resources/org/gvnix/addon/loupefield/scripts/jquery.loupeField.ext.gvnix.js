@@ -465,11 +465,11 @@ var GvNIX_Loupe;
 						setTimeout(function() {
 							var text = input.val();
 							if (text != "") {
-								$("#" + data.idlabel + sufix).html("");
 								GvNIX_Loupe.prototype._fnFindRecordByAll(text, instance, sufix);
 							} else {
-								$("#" + data.idlabel + sufix).html("");
 								$("#" + data.name + "_dropdown_div" + sufix).html('');
+								// White Background
+								$("#" + data.inputid + sufix).css("background","#ffffff");
 							}
 							timeOutClear = true;
 						}, 500)
