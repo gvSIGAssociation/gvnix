@@ -661,7 +661,7 @@ var GvNIX_Loupe;
 			"_fnUseBindingElementsIfNecessary": function(sufix) {
 				var instance = this;
 				var data = this._data;
-				var bindElement = $(":input[id^='"+data.name+"_loupe_hidden_bind']");
+				var bindElement = $(":input[id='"+data.name+"_loupe_hidden_bind"+sufix+"']");
 				if(bindElement.length > 0){
 					var bindValue = bindElement.val();
 					// If not has value, remove element

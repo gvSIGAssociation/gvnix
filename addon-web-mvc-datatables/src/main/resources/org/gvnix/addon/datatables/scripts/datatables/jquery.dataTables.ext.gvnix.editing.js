@@ -585,26 +585,26 @@ var GvNIX_Editing;
 								continue;
 							}
 
-							for(var i = 0; i < $inputCtrl.length; i++){
+							for(var k = 0; k < $inputCtrl.length; k++){
 								
 								// Update input class
-								if (jQuery($inputCtrl[i]).attr('type') == 'checkbox') {
+								if (jQuery($inputCtrl[k]).attr('type') == 'checkbox') {
 									$editCtrls.attr('class', $editCtrls.attr('class') + ' checkbox');
 								} else {
-									var inputClass = jQuery($inputCtrl[i]).attr('class');
+									var inputClass = jQuery($inputCtrl[k]).attr('class');
 									if (inputClass !== undefined && inputClass) {
 										inputClass = inputClass + ' form-control input-sm';
 									} else {
 										inputClass = 'form-control input-sm';
 									}
-									jQuery($inputCtrl[i]).attr('class', inputClass);
+									jQuery($inputCtrl[k]).attr('class', inputClass);
 								}
 								
 								// Make a new unique ID for the input to avoid
 								// collisions with other elements with same ID
-								jQuery($inputCtrl[i]).attr('id', jQuery($inputCtrl[i]).attr('id') + '_edit_' + rowId);
+								jQuery($inputCtrl[k]).attr('id', jQuery($inputCtrl[k]).attr('id') + '_edit_' + rowId);
 								
-								var value = fnVal( jQuery($inputCtrl[i]) );
+								var value = fnVal( jQuery($inputCtrl[k]) );
 								
 								// Store current value to be able to recover if user
 								// cancels editing
