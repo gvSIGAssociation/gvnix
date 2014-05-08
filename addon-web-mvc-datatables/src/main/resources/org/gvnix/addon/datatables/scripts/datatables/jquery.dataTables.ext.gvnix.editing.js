@@ -580,49 +580,51 @@ var GvNIX_Editing;
 							var $ctrlGroup = $updateForm.find("div[id $= '_" + property + "_id'].control-group");
 							var $editCtrls = $ctrlGroup.find("div.controls");
 							var $inputCtrl = $editCtrls.find(":input");
-							
-							// Update input class
-							if ($inputCtrl.attr('type') == 'checkbox') {
-								$editCtrls.attr('class', $editCtrls.attr('class') + ' checkbox');
-							} else {
-								var inputClass = $inputCtrl.attr('class');
-								if (inputClass !== undefined && inputClass) {
-									inputClass = inputClass + ' form-control input-sm';
-								} else {
-									inputClass = 'form-control input-sm';
-								}
-								$inputCtrl.attr('class', inputClass);
-							}
-							
 							if ($inputCtrl.length == 0) {
 								this.error("[fnEditRows] Input control for property '" + property + "' not found.");
 								continue;
 							}
 
-							// Make a new unique ID for the input to avoid
-							// collisions with other elements with same ID
-							$inputCtrl.attr('id', $inputCtrl.attr('id') + '_edit_' + rowId);
-							
-							var value = fnVal( $inputCtrl );
+							for(var i = 0; i < $inputCtrl.length; i++){
+								
+								// Update input class
+								if (jQuery($inputCtrl[i]).attr('type') == 'checkbox') {
+									$editCtrls.attr('class', $editCtrls.attr('class') + ' checkbox');
+								} else {
+									var inputClass = jQuery($inputCtrl[i]).attr('class');
+									if (inputClass !== undefined && inputClass) {
+										inputClass = inputClass + ' form-control input-sm';
+									} else {
+										inputClass = 'form-control input-sm';
+									}
+									jQuery($inputCtrl[i]).attr('class', inputClass);
+								}
+								
+								// Make a new unique ID for the input to avoid
+								// collisions with other elements with same ID
+								jQuery($inputCtrl[i]).attr('id', jQuery($inputCtrl[i]).attr('id') + '_edit_' + rowId);
+								
+								var value = fnVal( jQuery($inputCtrl[i]) );
+								
+								// Store current value to be able to recover if user
+								// cancels editing
+								var originalData = aRowData[property];
+								if (originalData !== undefined) {
+									oEditRow.aOriginalData[ colIdx ] = originalData;
+								}
+								
+								// Store value received from server in array of
+								// values by column index
+								oEditRow.aEditingData[ colIdx ] = value;
 
-							// Store current value to be able to recover if user
-							// cancels editing
-							var originalData = aRowData[property];
-							if (originalData !== undefined) {
-								oEditRow.aOriginalData[ colIdx ] = originalData;
+								// Store value received from server in Map of
+								// values by property name
+								oEditRow.oEditingData[ property ] = value;
+								
+								// Store edit controls
+								oEditRow.aEditingControls[ colIdx ] = fnOuterHTML($editCtrls); // node HTML
 							}
-
-							// Store value received from server in array of
-							// values by column index
-							oEditRow.aEditingData[ colIdx ] = value;
-
-							// Store value received from server in Map of
-							// values by property name
-							oEditRow.oEditingData[ property ] = value;
-
-							// Store edit controls
-							oEditRow.aEditingControls[ colIdx ] = fnOuterHTML($editCtrls); // node HTML
-
+							
 						} else {
 							// Store non-property values using index
 							oEditRow.aOriginalData[ colIdx ] = aRowData[ colIdx ];
@@ -635,7 +637,7 @@ var GvNIX_Editing;
 
 					// We need all values in received from to complete the
 					// the request to send to server (by example: version, other required fields, etc...)
-					jQuery.each($updateForm.find(":input"), function (index, input) {
+					jQuery.each($updateForm.find("form").children("input"), function (index, input) {
 						var $input = jQuery(input);
 						var name = $input.attr('name');
 						if (name !== undefined && name) {
@@ -648,7 +650,19 @@ var GvNIX_Editing;
 				this.fnRedrawVisibleRows();
 
 				this.fnUpdateEditingTools();
-
+				
+				setTimeout(function(){
+					oTable.find(".loupe_control").each(function(index) {
+						new GvNIX_Loupe($(this));
+					});
+					oTable.find(".row_editing").each(function(index){
+						// Bind events for update inputs, focus cursor and initialize components
+						this.editing_binded = false;
+						oTable.fnEditing()._fnBindRowEvents(this);
+					});
+					
+				},100);
+				
 			}, this) );
 
 			return true;
@@ -971,28 +985,35 @@ var GvNIX_Editing;
 						var headerCell = '<th>' + _d.oSettings.aoColumns[colIdx].sTitle + '</th>';
 						aHeaderCells.push(headerCell);
 
-						// Create form cell
-						
-						// Add proper CSS classes to contained and input
-						var divClass = 'controls';
-						if ($input.attr('type') == 'checkbox') {
-							divClass = divClass + ' checkbox';
-						} else {
-							var inputClass = $input.attr('class');
-							if (inputClass !== undefined && inputClass) {
-								inputClass = inputClass + ' form-control input-sm';
-							} else {
-								inputClass = 'form-control input-sm';
+						for(var i = 0; i < $input.length; i++){
+							// Create header cell
+							if(i !== 0){
+								var headerCell = '<th></th>';
+								aHeaderCells.push(headerCell);
 							}
-							$input.attr('class', inputClass);
-						}
+							
+							// Add proper CSS classes to contained and input
+							var divClass = 'controls';
+							if (jQuery($input[i]).attr('type') == 'checkbox') {
+								divClass = divClass + ' checkbox';
+							} else {
+								var inputClass = jQuery($input[i]).attr('class');
+								if (inputClass !== undefined && inputClass) {
+									inputClass = inputClass + ' form-control input-sm';
+								} else {
+									inputClass = 'form-control input-sm';
+								}
+								jQuery($input[i]).attr('class', inputClass);
+							}
 
-						// Make a new unique ID for the input to avoid
-						// collisions with other elements with same ID
-						$input.attr('id', $input.attr('id') + '_create_' + rowId);
-						
-						var formCell = '<td><div class="' + divClass + '">' + fnOuterHTML($input) + '</div></td>';
-						aFormCells.push(formCell);
+							// Make a new unique ID for the input to avoid
+							// collisions with other elements with same ID
+							jQuery($input[i]).attr('id', jQuery($input[i]).attr('id') + '_create_' + rowId);
+							
+							var formCell = '<td><div class="' + divClass + '">' + fnOuterHTML(jQuery($input[i])) + '</div></td>';
+							aFormCells.push(formCell);
+							
+						}
 					}
 				}
 				
@@ -1051,7 +1072,7 @@ var GvNIX_Editing;
 				// When all items are generated, build aCreatingData
 				
 				// Getting new created form and fields
-				var newCreatedForm = $("#" + $form.attr('id')+"CreateForm");
+				var newCreatedForm = jQuery("#" + $form.attr('id')+"CreateForm");
 				var fieldsWithName = newCreatedForm.find("div.controls :input[name]");
 				
 				for (var colIdx = 0; colIdx < fieldsWithName.length; colIdx++) {

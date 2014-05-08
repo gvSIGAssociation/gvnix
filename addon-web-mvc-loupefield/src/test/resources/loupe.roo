@@ -10,3 +10,9 @@ web mvc loupe set --controller ~.web.VisitController
 // Modifying fields to use loupe component
 web mvc loupe field --controller ~.web.VisitController --field pet --additionalFields name,weight --caption name
 web mvc loupe field --controller ~.web.VisitController --field vet
+
+// Adding batch
+jpa gvnix setup
+jpa batch all
+web mvc batch setup
+web mvc batch all
