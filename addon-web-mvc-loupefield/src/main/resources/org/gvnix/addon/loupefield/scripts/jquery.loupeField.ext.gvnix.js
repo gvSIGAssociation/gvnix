@@ -373,9 +373,6 @@ var GvNIX_Loupe;
 								input.parent().remove("#" + data.listselectorid);
 								selectorDialog.dialog('destroy');
 
-								// Remove Errors
-								$("#" + data.idlabel).html("");
-
 								// FindById to show label
 								instance._fnFindRecordById(idLastClicked, instance, sufix);
 							};
@@ -524,6 +521,8 @@ var GvNIX_Loupe;
 					url : data.controllerurl + "?findUsingAjax",
 					data : params,
 					success : function(object) {
+						$("#" + data.inputid + sufix).css("background", "#ffffff");
+						
 						instance._fnCreateDropDownList(input, object, data.pkfield, instance, sufix);
 					},
 					error : function(object) {
@@ -531,8 +530,7 @@ var GvNIX_Loupe;
 
 						$("#" + data.name + "_dropdown_div" + sufix).html("");
 
-						$("#" + data.idlabel + sufix).css("color", "red");
-						$("#" + data.idlabel + sufix).html(error);
+						$("#" + data.inputid + sufix).css("background", "#FA6161");
 					}
 				});
 			},
@@ -589,6 +587,8 @@ var GvNIX_Loupe;
 						$("#" + data.name + "_loupe_hidden" + sufix).trigger('change');
 						// Hidding dropdown div
 						$("#" + data.name + "_dropdown_div" + sufix).html("");
+						// Background white
+						$("#" + data.inputid + sufix).css("background", "#ffffff");
 						
 						// Fire Callback function
 						instance._fnSetItemCallback.fire(onSetNameFunction);
@@ -602,11 +602,12 @@ var GvNIX_Loupe;
 
 						$("#" + data.name + "_dropdown_div").html("");
 
-						$("#" + data.label).css("color", "red");
-						$("#" + data.label).html(error);
-						
 						// Removing callbacks
 						instance._fnSetItemCallback.empty();
+						
+						// Background red
+						$("#" + data.inputid + sufix).css("background", "#FA6161");
+						
 					}
 				});
 			},
@@ -620,7 +621,7 @@ var GvNIX_Loupe;
 				// Adding button search if not exists
 				var buttonSearch = $("#" + data.searchbuttonid + sufix);
 				if (buttonSearch.length == 0) {
-					input.css("width", "40%");
+					input.css("width", "80%");
 					$('<span style="cursor: pointer; margin-left:10px;" id="'+ data.searchbuttonid + sufix + '" class="glyphicon glyphicon-search" />').insertAfter(input);
 				}
 				
@@ -629,21 +630,13 @@ var GvNIX_Loupe;
 					$("#" + data.searchbuttonid + sufix).hide();
 				}
 
-				// Adding label errors span
-				var label = $("#" + data.idlabel + sufix);
-				if (label.length == 0) {
-					$('<label id="' + data.idlabel + sufix + '" style="margin-left:20px;"></label>')
-							.insertAfter($("#" + data.searchbuttonid + sufix));
-				}
-
 				// Adding DropDown list div
 
 				var dropDownDiv = $("#" + data.name + "_dropdown_div" + sufix);
 				if (dropDownDiv.length == 0) {
 					$(
-							"<div style='position:absolute;width:38%;z-index:1;' id='"
-									+ data.name + "_dropdown_div"+ sufix +"'></div>").insertAfter(
-							$("#" + data.idlabel + sufix));
+							"<div style='position:absolute;z-index:1;' id='"
+									+ data.name + "_dropdown_div"+ sufix +"'></div>").insertAfter($("#" + data.searchbuttonid + sufix));
 				}
 
 				// Adding hidden input
@@ -654,6 +647,10 @@ var GvNIX_Loupe;
 									+ '_loupe_hidden'+ sufix +'" type="hidden" name="' + data.name
 									+ '">').insertBefore(input);
 				}
+				
+				setTimeout(function(){
+					$("#" + data.name + "_dropdown_div"+ sufix).width(input.width() + 50);
+				},100);
 			},
 			
 			/**
@@ -758,11 +755,11 @@ var GvNIX_Loupe;
 									+ "});"
 							+ "$('#" + inputData.name + "_dropdown_div_itemid_"+ item[pkField] + "').mouseover" +
 									"(" + "function(e){"
-										+ " $(this).css('background-color','#91B9DB');" + 
+										+ " $(this).css('border-left','4px solid #428BCA');" + 
 								"});"
 							+ "$('#" + inputData.name + "_dropdown_div_itemid_"+ item[pkField] + "').mouseout" +
 									"(" + "function(e){"
-										+ "$(this).css('background-color','#ffffff');" 
+										+ "$(this).css('border-left','1px solid #CCCCCC');" 
 								+ "});"
 						+ "</script>";
 				}
@@ -785,11 +782,11 @@ var GvNIX_Loupe;
 									 + "});" 
 							+ "$('#" + inputData.name + "_dropdown_div_itemid_view_more').mouseover" +
 									"(function(e){"
-										+ " $(this).css('background-color','#91B9DB');" + 
+										+ " $(this).css('border-bottom','4px solid #428BCA');" + 
 									"});" 
 							+ "$('#"+ inputData.name + "_dropdown_div_itemid_view_more').mouseout" +
 									"(function(e){" 
-										+ "$(this).css('background-color','#ffffff');" +
+										+ "$(this).css('border-bottom','1px solid #CCCCCC');" +
 									"});" +
 						"</script>";
 				$("#" + inputData.name + "_dropdown_div" + sufix).html(htmlToAdd);
