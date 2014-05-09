@@ -80,6 +80,7 @@ import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_PARAM_NAME;
 import static org.gvnix.addon.datatables.DatatablesConstants.RESPONSE_PARAM_NAME;
 import static org.gvnix.addon.datatables.DatatablesConstants.SEARCH_RESULTS;
 import static org.gvnix.addon.datatables.DatatablesConstants.SERVLET_EXCEPTION;
+import static org.gvnix.addon.datatables.DatatablesConstants.SET_STRING;
 import static org.gvnix.addon.datatables.DatatablesConstants.STRING_UTILS;
 import static org.gvnix.addon.datatables.DatatablesConstants.STRING_WRITER;
 import static org.gvnix.addon.datatables.DatatablesConstants.UI_MODEL;
@@ -152,6 +153,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 public class DatatablesMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
+
+    private static final JavaSymbolName SET_BASE_FILTER_METHOD = new JavaSymbolName(
+            "setDatatablesBaseFilter");
 
     private static final JavaSymbolName EXPORT_METHOD_NAME = new JavaSymbolName(
             "export");
@@ -382,6 +386,8 @@ public class DatatablesMetadata extends
         builder.addMethod(getListRooRequestMethod());
         builder.addMethod(getPopulateParameterMapMethod());
         builder.addMethod(getGetPropertyMapMethod());
+        builder.addMethod(getGetPropertyMapUrlMethod());
+        builder.addMethod(getSetDatatablesBaseFilterMethod());
 
         // Detail methods
         builder.addMethod(getListDatatablesDetailMethod());
@@ -440,10 +446,12 @@ public class DatatablesMetadata extends
                         aspectName
                                 .getFullyQualifiedTypeName()
                                 .concat(". Inline editing requires batch support. Run 'jpa batch add' command or 'web mvc batch add' command"));
-                /*throw new IllegalArgumentException(
-                        aspectName
-                                .getFullyQualifiedTypeName()
-                                .concat(". Inline editing requires update view uses. Run 'web mvc jquery add' command"));*/
+                /*
+                 * throw new IllegalArgumentException( aspectName
+                 * .getFullyQualifiedTypeName() .concat(
+                 * ". Inline editing requires update view uses. Run 'web mvc jquery add' command"
+                 * ));
+                 */
             }
             builder.addMethod(getJsonFormsMethod(true));
             builder.addMethod(getJsonFormsMethod(false));
@@ -1350,6 +1358,101 @@ public class DatatablesMetadata extends
     }
 
     /**
+     * Gets <code>getPropertyMap</code> method. <br>
+     * This method returns a Map with bean properties which appears on a
+     * Enumeration (usually from httpRequest.getParametersNames())
+     * 
+     * @return
+     */
+    private MethodMetadata getGetPropertyMapUrlMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(entity, HTTP_SERVLET_REQUEST);
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(GET_PROPERTY_MAP,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName(entityName));
+        parameterNames.add(new JavaSymbolName("request"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetPropertyMapUrlMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, GET_PROPERTY_MAP, MAP_STRING_OBJECT,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>setDatatablesBaseFilter</code> method. <br>
+     * This method is used to set baseFilters into datatables
+     * 
+     * @return
+     */
+    private MethodMetadata getSetDatatablesBaseFilterMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(MAP_STRING_OBJECT);
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(SET_BASE_FILTER_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName("propertyMap"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildSetDatatablesBaseFilterMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, SET_BASE_FILTER_METHOD,
+                JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
      * Returns <code>listDatatablesDetail</code> method <br>
      * This method is default list request handler for detail datatables
      * controllers
@@ -1912,6 +2015,89 @@ public class DatatablesMetadata extends
 
         // return propertyValuesMap;
         bodyBuilder.appendFormalLine("return propertyValuesMap;");
+    }
+
+    /**
+     * Build body method <code>getPropertyMap</code> method. <br>
+     * This method returns a Map with bean properties which appears on a
+     * Enumeration (usually from httpRequest.getParametersNames())
+     * 
+     * @return
+     */
+    private void buildGetPropertyMapUrlMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+
+        // URL parameters are used as base search filters
+        bodyBuilder
+                .appendFormalLine("// URL parameters are used as base search filters");
+
+        /*
+         * @SuppressWarnings("unchecked") Map<String, Object> propertyValuesMap
+         * = getPropertyMap(visit, request.getParameterNames());
+         */
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("@SuppressWarnings(\"unchecked\") %s propertyValuesMap = getPropertyMap(%s, request.getParameterNames());",
+                                helper.getFinalTypeName(MAP_STRING_OBJECT),
+                                entityName));
+
+        /*
+         * // Add to the property map the parameters used as query operators
+         * Map<String, String> params = populateParametersMap(request);
+         * Set<String> keySet = params.keySet();
+         */
+        bodyBuilder
+                .appendFormalLine("// Add to the property map the parameters used as query operators");
+        bodyBuilder.appendFormalLine(String.format(
+                "%s params = populateParametersMap(request);",
+                helper.getFinalTypeName(MAP_STRING_STRING)));
+        bodyBuilder.appendFormalLine(String.format(
+                "%s keySet = params.keySet();",
+                helper.getFinalTypeName(SET_STRING)));
+
+        /*
+         * for (String key : keySet) { if
+         * (key.startsWith(QuerydslUtils.OPERATOR_PREFIX)) {
+         * propertyValuesMap.put(key, params.get(key)); } }
+         */
+        bodyBuilder.appendFormalLine("for (String key : keySet) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine(String.format(
+                "if (key.startsWith(%s.OPERATOR_PREFIX)) {", new JavaType(
+                        "org.gvnix.web.datatables.util.QuerydslUtils")));
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("propertyValuesMap.put(key, params.get(key));");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // return propertyValuesMap;
+        bodyBuilder.appendFormalLine("return propertyValuesMap;");
+
+    }
+
+    /**
+     * Build body method <code>setDatatablesBaseFilter</code> method. <br>
+     * This method returns a Map with bean properties which appears on a
+     * Enumeration (usually from httpRequest.getParametersNames())
+     * 
+     * @return
+     */
+    private void buildSetDatatablesBaseFilterMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+
+        /*
+         * // todo: Add here your baseFilters to propertyMap. // This code will
+         * be generated by gvNIX commands/annotation // on future.
+         */
+
+        bodyBuilder
+                .appendFormalLine("// TODO: Add here your baseFilters to propertyMap.");
+        bodyBuilder
+                .appendFormalLine("//		 This code will be generated by gvNIX commands/annotation");
+        bodyBuilder.appendFormalLine("//		 on future.");
     }
 
     /**
@@ -3291,20 +3477,17 @@ public class DatatablesMetadata extends
 
                 bodyBuilder
                         .appendFormalLine("// URL parameters are used as base search filters");
-                // Enumeration<String> parameterNames =
-                // (Enumeration<String>)request.getParameterNames();
-                bodyBuilder.appendFormalLine(String.format(
-                        "%s parameterNames = (%s) %s.getParameterNames();",
-                        helper.getFinalTypeName(ENUMERATION_STRING),
-                        helper.getFinalTypeName(ENUMERATION_STRING),
-                        REQUEST_PARAM_NAME.getSymbolName()));
                 // Map<String, Object> baseSearchValuesMap = getPropertyMap(pet,
-                // parameterNames);
+                // request);
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s baseSearchValuesMap = getPropertyMap(%s, parameterNames);",
+                                .format("%s baseSearchValuesMap = getPropertyMap(%s, request);",
                                         helper.getFinalTypeName(MAP_STRING_OBJECT),
                                         entityName));
+
+                // setVisitFilters(baseSearchValuesMap);
+                bodyBuilder
+                        .appendFormalLine("setDatatablesBaseFilter(baseSearchValuesMap);");
 
                 bodyBuilder
                         .appendFormalLine(String
@@ -3339,20 +3522,17 @@ public class DatatablesMetadata extends
 
                 bodyBuilder
                         .appendFormalLine("// URL parameters are used as base search filters");
-                // Enumeration<String> parameterNames =
-                // (Enumeration<String>)request.getParameterNames();
-                bodyBuilder.appendFormalLine(String.format(
-                        "%s parameterNames = (%s) %s.getParameterNames();",
-                        helper.getFinalTypeName(ENUMERATION_STRING),
-                        helper.getFinalTypeName(ENUMERATION_STRING),
-                        REQUEST_PARAM_NAME.getSymbolName()));
                 // Map<String, Object> baseSearchValuesMap = getPropertyMap(pet,
-                // parameterNames);
+                // request);
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s baseSearchValuesMap = getPropertyMap(%s, parameterNames);",
+                                .format("%s baseSearchValuesMap = getPropertyMap(%s, request);",
                                         helper.getFinalTypeName(MAP_STRING_OBJECT),
                                         entityName));
+
+                // setVisitFilters(baseSearchValuesMap);
+                bodyBuilder
+                        .appendFormalLine("setDatatablesBaseFilter(baseSearchValuesMap);");
 
                 bodyBuilder
                         .appendFormalLine(String
@@ -3590,15 +3770,15 @@ public class DatatablesMetadata extends
         String exportTypeCapitalized = StringUtils.capitalize(exportType);
 
         /*
-        * @RequestMapping(value = "/exportcsv", produces = "text/csv")
-        * public void PetController.exportCsv(
-        * 		@DatatablesParams DatatablesCriterias criterias,
-        * 		@ModelAttribute Pet pet, HttpServletRequest request,
-        * 		HttpServletResponse response) throws ServletException, IOException,
-        * 		ExportException {
-        * 	...
-        * }
-        */
+         * @RequestMapping(value = "/exportcsv", produces = "text/csv") public
+         * void PetController.exportCsv(
+         * 
+         * @DatatablesParams DatatablesCriterias criterias,
+         * 
+         * @ModelAttribute Pet pet, HttpServletRequest request,
+         * HttpServletResponse response) throws ServletException, IOException,
+         * ExportException { ... }
+         */
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
         parameterTypes.add(new AnnotatedJavaType(DATATABLES_CRITERIA_TYPE,
@@ -3691,13 +3871,11 @@ public class DatatablesMetadata extends
     private MethodMetadata getExportMethod() {
 
         /*
-        * private void export(DatatablesCriterias criterias, Pet pet,
-        * 		 ExportType exportType, DatatablesExport datatablesExport,
-        * 		 HttpServletRequest request, HttpServletResponse response)
-        * 		 throws ExportException {
-        * 	   ...
-        * }
-        */
+         * private void export(DatatablesCriterias criterias, Pet pet,
+         * ExportType exportType, DatatablesExport datatablesExport,
+         * HttpServletRequest request, HttpServletResponse response) throws
+         * ExportException { ... }
+         */
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
         parameterTypes.add(AnnotatedJavaType
@@ -3740,9 +3918,11 @@ public class DatatablesMetadata extends
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
         /*
-         * // Does the export process as is explained in http://dandelion.github.io/datatables/tutorials/export/controller-based-exports.html
-           // 1. Retrieve the data
-           List<Map<String, String>> data = retrieveData(criterias, pet, request);
+         * // Does the export process as is explained in
+         * http://dandelion.github.
+         * io/datatables/tutorials/export/controller-based-exports.html // 1.
+         * Retrieve the data List<Map<String, String>> data =
+         * retrieveData(criterias, pet, request);
          */
         bodyBuilder
                 .appendFormalLine("// Does the export process as is explained in http://dandelion.github.io/datatables/tutorials/export/controller-based-exports.html");
@@ -3754,10 +3934,10 @@ public class DatatablesMetadata extends
                 .getSymbolName(), REQUEST_PARAM_NAME.getSymbolName()));
 
         /*
-         * // 2. Build an instance of "ExportConf".
-           ExportConf exportConf = new ExportConf.Builder(exportType).header(true)
-                           .exportClass(datatablesExport).autoSize(true)
-                           .fileName(pet.getClass().getSimpleName()).build();
+         * // 2. Build an instance of "ExportConf". ExportConf exportConf = new
+         * ExportConf.Builder(exportType).header(true)
+         * .exportClass(datatablesExport).autoSize(true)
+         * .fileName(pet.getClass().getSimpleName()).build();
          */
         bodyBuilder
                 .appendFormalLine("// 2. Build an instance of \"ExportConf\"");
@@ -3770,9 +3950,8 @@ public class DatatablesMetadata extends
                 entityNameParam.getSymbolName()));
 
         /*
-         * // 3. Build an instance of "HtmlTable"
-           HtmlTable table = DatatablesUtils.makeHtmlTable(data, criterias,
-                exportConf, request);
+         * // 3. Build an instance of "HtmlTable" HtmlTable table =
+         * DatatablesUtils.makeHtmlTable(data, criterias, exportConf, request);
          */
         bodyBuilder
                 .appendFormalLine("// 3. Build an instance of \"HtmlTable\"");
@@ -3785,7 +3964,7 @@ public class DatatablesMetadata extends
 
         /*
          * // 4. Render the generated export file
-           ExportUtils.renderExport(table, exportConf, response);
+         * ExportUtils.renderExport(table, exportConf, response);
          */
         bodyBuilder.appendFormalLine("// 4. Render the generated export file");
         format = "%s.renderExport(table, exportConf, %s);";
@@ -3813,11 +3992,9 @@ public class DatatablesMetadata extends
     private MethodMetadata getRetrieveDataMethod() {
 
         /*
-        * private List<Map<String, String>> retrieveData(
-            DatatablesCriterias criterias, Pet pet, HttpServletRequest request) {
-        *          ...
-        * }
-        */
+         * private List<Map<String, String>> retrieveData( DatatablesCriterias
+         * criterias, Pet pet, HttpServletRequest request) { ... }
+         */
 
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
@@ -3848,10 +4025,9 @@ public class DatatablesMetadata extends
 
         /*
          * // Cloned criteria in order to not paginate the results
-           DatatablesCriterias noPaginationCriteria = new DatatablesCriterias(
-                criterias.getSearch(), 0, null, criterias.getColumnDefs(),
-                criterias.getSortingColumnDefs(),
-                criterias.getInternalCounter());
+         * DatatablesCriterias noPaginationCriteria = new DatatablesCriterias(
+         * criterias.getSearch(), 0, null, criterias.getColumnDefs(),
+         * criterias.getSortingColumnDefs(), criterias.getInternalCounter());
          */
         bodyBuilder
                 .appendFormalLine("// Cloned criteria in order to not paginate the results");
@@ -3865,30 +4041,40 @@ public class DatatablesMetadata extends
                 criteriaParamName));
 
         /*
-         * // Do the search to obtain the data
-           @SuppressWarnings("unchecked")
-           SearchResults<Pet> searchResult = DatatablesUtils.findByCriteria(
-                   Pet.class, Pet.entityManager(), noPaginationCriteria,
-                   getPropertyMap(pet, request.getParameterNames()));
+         * // Do the search to obtain the data Map<String, Object>
+         * baseSearchValuesMap = getPropertyMap(XXX, request);
+         * setDatatablesBaseFilter(baseSearchValuesMap);
          */
         bodyBuilder.appendFormalLine("// Do the search to obtain the data");
-        format = "@SuppressWarnings(\"unchecked\") %s searchResult = %s.findByCriteria(%s.class, %s.entityManager(), noPaginationCriteria, getPropertyMap(%s, %s.getParameterNames()));";
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("Map<String, Object> baseSearchValuesMap = getPropertyMap(%s, %s);",
+                                new JavaSymbolName(entityName),
+                                REQUEST_PARAM_NAME));
+        bodyBuilder
+                .appendFormalLine("setDatatablesBaseFilter(baseSearchValuesMap);");
+
+        /*
+         * SearchResults<Visit> searchResult = DatatablesUtils.findByCriteria(
+         * Visit.class, Visit.entityManager(), noPaginationCriteria,
+         * baseSearchValuesMap); org.springframework.ui.Model uiModel = new
+         * org.springframework.ui.ExtendedModelMap();
+         */
+        format = "%s searchResult = %s.findByCriteria(%s.class, %s.entityManager(), noPaginationCriteria, baseSearchValuesMap);";
         String entityTypeName = helper.getFinalTypeName(entity);
         bodyBuilder.appendFormalLine(String.format(format, new JavaType(
                 SEARCH_RESULTS.getFullyQualifiedTypeName(), 0, DataType.TYPE,
                 null, Arrays.asList(entity)), helper
                 .getFinalTypeName(DATATABLES_UTILS), entityTypeName,
-                entityTypeName, new JavaSymbolName(entityName).getSymbolName(),
-                REQUEST_PARAM_NAME.getSymbolName()));
+                entityTypeName));
 
         String dateFormatVarName = getCodeToAddDateTimeFormatPatterns(bodyBuilder);
 
         /*
-         * // Use ConversionService with the obtained data
-           return DatatablesUtils.populateDataSet(searchResult.getResults(), "id",
-                   searchResult.getTotalCount(), searchResult.getResultsCount(),
-                   criterias.getColumnDefs(), null, conversionService_dtt)
-                   .getRows();
+         * // Use ConversionService with the obtained data return
+         * DatatablesUtils.populateDataSet(searchResult.getResults(), "id",
+         * searchResult.getTotalCount(), searchResult.getResultsCount(),
+         * criterias.getColumnDefs(), null, conversionService_dtt) .getRows();
          */
         bodyBuilder
                 .appendFormalLine("// Use ConversionService with the obtained data");
