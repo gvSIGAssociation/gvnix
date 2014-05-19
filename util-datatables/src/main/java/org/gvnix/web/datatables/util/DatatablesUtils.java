@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -814,6 +815,8 @@ public class DatatablesUtils {
         if (CollectionUtils.isEmpty(datePatterns)) {
             datePatterns = new HashMap<String, Object>();
         }
+        Map<String, SimpleDateFormat> dateFormatters = new HashMap<String, SimpleDateFormat>(
+                datePatterns.size());
 
         // Prepare required fields
         Set<String> fields = new HashSet<String>();
@@ -824,10 +827,8 @@ public class DatatablesUtils {
             fields.add(colum.getName());
         }
 
-        // Date formatters
-        DateFormat defaultFormat = SimpleDateFormat.getDateInstance();
-
         BeanWrapperImpl entityBean = null;
+        String valueStr = null;
         // Populate each row, note a row is a Map containing
         // fieldName = fieldValue
         for (T entity : entities) {
@@ -849,45 +850,11 @@ public class DatatablesUtils {
                             .concat(entity.toString()).concat("]"));
                     continue;
                 }
-                Object value = null;
-                String valueStr = null;
 
                 // Convert field value to string
-                try {
-                    value = entityBean.getPropertyValue(unescapedFieldName);
-                    if (value != null) {
-                        if (Calendar.class.isAssignableFrom(value.getClass())) {
-                            value = ((Calendar) value).getTime();
-                        }
-                        if (Date.class.isAssignableFrom(value.getClass())) {
-                            String pattern = getPattern(datePatterns,
-                                    entityBean.getWrappedClass(),
-                                    unescapedFieldName);
-                            DateFormat format = StringUtils.isEmpty(pattern) ? defaultFormat
-                                    : new SimpleDateFormat(pattern);
-                            valueStr = format.format(value);
-                        }
-                        else if (conversionService.canConvert(value.getClass(),
-                                String.class)) {
-                            valueStr = conversionService.convert(value,
-                                    String.class);
-                        }
-                        else {
-                            valueStr = ObjectUtils.getDisplayString(value);
-                        }
-                    }
-                    else {
-                        valueStr = "";
-                    }
-                }
-                catch (Exception ex) {
-
-                    // debug getting value problem
-                    LOGGER.error(
-                            "Error getting value of field [".concat(fieldName)
-                                    .concat("]").concat(" in bean [")
-                                    .concat(entity.toString()).concat("]"), ex);
-                }
+                valueStr = convertFieldValueToString(datePatterns,
+                        dateFormatters, conversionService, entityBean, entity,
+                        fieldName, unescapedFieldName);
                 row.put(fieldName, valueStr);
 
                 // Set PK value as DT_RowId
@@ -908,7 +875,68 @@ public class DatatablesUtils {
     }
 
     /**
-     * Get Date pattern by field name
+     * Convert a field value to string
+     * 
+     * @param datePatterns
+     * @param dateFormatters
+     * @param conversionService
+     * @param entityBean
+     * @param entity
+     * @param fieldName
+     * @param unescapedFieldName
+     * @return
+     */
+    private static <T> String convertFieldValueToString(
+            Map<String, Object> datePatterns,
+            Map<String, SimpleDateFormat> dateFormatters,
+            ConversionService conversionService, BeanWrapperImpl entityBean,
+            T entity, String fieldName, String unescapedFieldName) {
+        try {
+            Object value = null;
+            TypeDescriptor fieldDesc = entityBean
+                    .getPropertyTypeDescriptor(unescapedFieldName);
+            TypeDescriptor strDesc = TypeDescriptor.valueOf(String.class);
+            value = entityBean.getPropertyValue(unescapedFieldName);
+            if (value == null) {
+                return "";
+            }
+
+            // For dates
+            if (Date.class.isAssignableFrom(value.getClass())
+                    || Calendar.class.isAssignableFrom(value.getClass())) {
+                SimpleDateFormat formatter = getDateFormatter(datePatterns,
+                        dateFormatters, entityBean.getWrappedClass(),
+                        unescapedFieldName);
+                if (formatter != null) {
+                    if (Calendar.class.isAssignableFrom(value.getClass())) {
+                        // Gets Date instance as SimpleDateFormat
+                        // doesn't works with Calendar
+                        value = ((Calendar) value).getTime();
+                    }
+                    return formatter.format(value);
+                }
+            }
+            // Try to use conversion service (uses field descrition
+            // to handle field format annotations)
+            if (conversionService.canConvert(fieldDesc, strDesc)) {
+                return (String) conversionService.convert(value, fieldDesc,
+                        strDesc);
+            }
+            else {
+                return ObjectUtils.getDisplayString(value);
+            }
+        }
+        catch (Exception ex) {
+            // debug getting value problem
+            LOGGER.error("Error getting value of field [".concat(fieldName)
+                    .concat("]").concat(" in bean [").concat(entity.toString())
+                    .concat("]"), ex);
+            return "";
+        }
+    }
+
+    /**
+     * Get Date formatter by field name
      * <p/>
      * If no pattern found, try standard Roo key
      * {@code uncapitalize( ENTITY ) + "_" + lower_case( FIELD ) + "_date_format"}
@@ -918,22 +946,38 @@ public class DatatablesUtils {
      * @param fieldName Field to search pattern
      * @return
      */
-    private static String getPattern(Map<String, Object> datePatterns,
-            Class<?> entityClass, String fieldName) {
+    private static SimpleDateFormat getDateFormatter(
+            Map<String, Object> datePatterns,
+            Map<String, SimpleDateFormat> dateFormatters, Class<?> entityClass,
+            String fieldName) {
 
-        // Get pattern by field name
-        String pattern = (String) datePatterns.get(fieldName.toLowerCase());
-        if (!StringUtils.isEmpty(pattern)) {
-            return pattern;
+        SimpleDateFormat result = null;
+        String lowerCaseFieldName = fieldName.toLowerCase();
+        result = dateFormatters.get(lowerCaseFieldName);
+        if (result != null) {
+            return result;
+        }
+        else if (dateFormatters.containsKey(lowerCaseFieldName)) {
+            return null;
         }
 
-        // Otherwise get pattern by Roo key
-        String rooKey = StringUtils.uncapitalize(entityClass.getSimpleName())
-                .concat("_").concat(fieldName.toLowerCase())
-                .concat("_date_format");
+        // Get pattern by field name
+        String pattern = (String) datePatterns.get(lowerCaseFieldName);
+        if (StringUtils.isEmpty(pattern)) {
+            // Try to get the name of entity class (without javassit suffix)
+            String baseClass = StringUtils.substringBefore(
+                    entityClass.getSimpleName(), "$");// );"_$");
+            // try to get pattern by Roo key
+            String rooKey = StringUtils.uncapitalize(baseClass).concat("_")
+                    .concat(lowerCaseFieldName).concat("_date_format");
 
-        pattern = (String) datePatterns.get(rooKey);
-        return pattern;
+            pattern = (String) datePatterns.get(rooKey);
+        }
+        if (!StringUtils.isEmpty(pattern)) {
+            result = new SimpleDateFormat(pattern);
+        }
+        dateFormatters.put(lowerCaseFieldName, result);
+        return result;
     }
 
     /**
