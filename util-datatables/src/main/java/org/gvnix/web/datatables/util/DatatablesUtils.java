@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.context.MessageSource;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.util.Assert;
@@ -85,9 +86,47 @@ public class DatatablesUtils {
      * @return
      */
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            ConversionService conversionService, MessageSource messageSource) {
+        return findByCriteria(entityClass, null, null, entityManager,
+                datatablesCriterias, (BooleanBuilder) null, false,
+                conversionService, messageSource);
+    }
+
+    /**
+     * Execute a select query on entityClass using {@code DatatablesCriterias}
+     * information for filter, sort and paginate result.
+     * 
+     * @param entityClass entity to use in search
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @return
+     */
+    public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
             EntityManager entityManager, DatatablesCriterias datatablesCriterias) {
         return findByCriteria(entityClass, null, null, entityManager,
-                datatablesCriterias, (BooleanBuilder) null, false);
+                datatablesCriterias, (BooleanBuilder) null, false, null, null);
+    }
+
+    /**
+     * Execute a select query on entityClass using {@code DatatablesCriterias}
+     * information for filter, sort and paginate result.
+     * 
+     * @param entityClass entity to use in search
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param baseSearchValuesMap (optional) base filter values
+     * @return
+     */
+    public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            Map<String, Object> baseSearchValuesMap,
+            ConversionService conversionService, MessageSource messageSource) {
+        return findByCriteria(entityClass, null, null, entityManager,
+                datatablesCriterias, baseSearchValuesMap, false,
+                conversionService, messageSource);
     }
 
     /**
@@ -105,7 +144,34 @@ public class DatatablesUtils {
             DatatablesCriterias datatablesCriterias,
             Map<String, Object> baseSearchValuesMap) {
         return findByCriteria(entityClass, null, null, entityManager,
-                datatablesCriterias, baseSearchValuesMap, false);
+                datatablesCriterias, baseSearchValuesMap, false, null, null);
+    }
+
+    /**
+     * Execute a select query on entityClass using {@code DatatablesCriterias}
+     * information for filter, sort and paginate result.
+     * 
+     * @param entityClass entity to use in search
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @return
+     */
+    public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            ConversionService conversionService, MessageSource messageSource) {
+        return findByCriteria(entityClass, filterByAssociations,
+                orderByAssociations, entityManager, datatablesCriterias,
+                (Map<String, Object>) null, false, conversionService,
+                messageSource);
     }
 
     /**
@@ -129,7 +195,35 @@ public class DatatablesUtils {
             EntityManager entityManager, DatatablesCriterias datatablesCriterias) {
         return findByCriteria(entityClass, filterByAssociations,
                 orderByAssociations, entityManager, datatablesCriterias,
-                (Map<String, Object>) null, false);
+                (Map<String, Object>) null, false, null, null);
+    }
+
+    /**
+     * Execute a select query on entityClass using {@code DatatablesCriterias}
+     * information for filter, sort and paginate result.
+     * 
+     * @param entityClass entity to use in search
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param baseSearchValuesMap (optional) base filter values
+     * @return
+     */
+    public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            Map<String, Object> baseSearchValuesMap,
+            ConversionService conversionService, MessageSource messageSource) {
+        return findByCriteria(entityClass, filterByAssociations,
+                orderByAssociations, entityManager, datatablesCriterias,
+                baseSearchValuesMap, false, conversionService, messageSource);
     }
 
     /**
@@ -156,7 +250,7 @@ public class DatatablesUtils {
             Map<String, Object> baseSearchValuesMap) {
         return findByCriteria(entityClass, filterByAssociations,
                 orderByAssociations, entityManager, datatablesCriterias,
-                baseSearchValuesMap, false);
+                baseSearchValuesMap, false, null, null);
     }
 
     /**
@@ -186,6 +280,39 @@ public class DatatablesUtils {
             Map<String, Object> baseSearchValuesMap, boolean distinct)
             throws IllegalArgumentException {
 
+        return findByCriteria(entityClass, filterByAssociations,
+                orderByAssociations, entityManager, datatablesCriterias,
+                baseSearchValuesMap, distinct, null, null);
+    }
+
+    /**
+     * Execute a select query on entityClass using <a
+     * href="http://www.querydsl.com/">Querydsl</a> which enables the
+     * construction of type-safe SQL-like queries.
+     * 
+     * @param entityClass entity to use in search
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param baseSearchValuesMap (optional) base filter values
+     * @param distinct use distinct query
+     * @return
+     */
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            Class<T> entityClass,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            Map<String, Object> baseSearchValuesMap, boolean distinct,
+            ConversionService conversionService, MessageSource messageSource)
+            throws IllegalArgumentException {
+
         Assert.notNull(entityClass);
 
         // Query DSL builder
@@ -203,7 +330,7 @@ public class DatatablesUtils {
 
         return findByCriteria(entityClass, filterByAssociations,
                 orderByAssociations, entityManager, datatablesCriterias,
-                basePredicate, distinct);
+                basePredicate, distinct, conversionService, messageSource);
     }
 
     /**
@@ -233,6 +360,39 @@ public class DatatablesUtils {
             BooleanBuilder basePredicate, boolean distinct)
             throws IllegalArgumentException {
 
+        return findByCriteria(entityClass, filterByAssociations,
+                orderByAssociations, entityManager, datatablesCriterias,
+                basePredicate, distinct, null, null);
+    }
+
+    /**
+     * Execute a select query on entityClass using <a
+     * href="http://www.querydsl.com/">Querydsl</a> which enables the
+     * construction of type-safe SQL-like queries.
+     * 
+     * @param entityClass entity to use in search
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param basePredicate (optional) base filter conditions
+     * @param distinct use distinct query
+     * @return
+     */
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            Class<T> entityClass,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            BooleanBuilder basePredicate, boolean distinct,
+            ConversionService conversionService, MessageSource messageSource)
+            throws IllegalArgumentException {
+
         Assert.notNull(entityClass);
 
         // Query DSL builder
@@ -240,7 +400,39 @@ public class DatatablesUtils {
 
         return findByCriteria(entity, filterByAssociations,
                 orderByAssociations, entityManager, datatablesCriterias,
-                basePredicate, distinct);
+                basePredicate, distinct, conversionService, messageSource);
+    }
+
+    /**
+     * Execute a select query on entityClass using <a
+     * href="http://www.querydsl.com/">Querydsl</a> which enables the
+     * construction of type-safe SQL-like queries.
+     * 
+     * @param entity builder for entity to use in search. Represents the entity
+     *        and gives access to its properties for query purposes
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param basePredicate (optional) base filter conditions
+     * @param distinct use distinct query
+     * @return
+     */
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            PathBuilder<T> entity,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            BooleanBuilder basePredicate, ConversionService conversionService,
+            MessageSource messageSource) throws IllegalArgumentException {
+        return findByCriteria(entity, filterByAssociations,
+                orderByAssociations, entityManager, datatablesCriterias,
+                basePredicate, false, conversionService, messageSource);
     }
 
     /**
@@ -271,7 +463,30 @@ public class DatatablesUtils {
             BooleanBuilder basePredicate) throws IllegalArgumentException {
         return findByCriteria(entity, filterByAssociations,
                 orderByAssociations, entityManager, datatablesCriterias,
-                basePredicate, false);
+                basePredicate, false, null, null);
+    }
+
+    /**
+     * Execute a select query on entityClass using <a
+     * href="http://www.querydsl.com/">Querydsl</a> which enables the
+     * construction of type-safe SQL-like queries.
+     * 
+     * @param entity builder for entity to use in search. Represents the entity
+     *        and gives access to its properties for query purposes
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param basePredicate (optional) base filter conditions
+     * @param distinct use distinct query
+     * @return
+     */
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            PathBuilder<T> entity, EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            BooleanBuilder basePredicate, ConversionService conversionService,
+            MessageSource messageSource) throws IllegalArgumentException {
+        return findByCriteria(entity, null, null, entityManager,
+                datatablesCriterias, basePredicate, false, conversionService,
+                messageSource);
     }
 
     /**
@@ -292,7 +507,7 @@ public class DatatablesUtils {
             DatatablesCriterias datatablesCriterias,
             BooleanBuilder basePredicate) throws IllegalArgumentException {
         return findByCriteria(entity, null, null, entityManager,
-                datatablesCriterias, basePredicate, false);
+                datatablesCriterias, basePredicate, false, null, null);
     }
 
     /**
@@ -320,7 +535,8 @@ public class DatatablesUtils {
             Map<String, List<String>> orderByAssociations,
             EntityManager entityManager,
             DatatablesCriterias datatablesCriterias,
-            BooleanBuilder basePredicate, boolean distinct)
+            BooleanBuilder basePredicate, boolean distinct,
+            ConversionService conversionService, MessageSource messageSource)
             throws IllegalArgumentException {
 
         // Check arguments aren't null
@@ -378,7 +594,8 @@ public class DatatablesUtils {
 
                 filtersByColumnPredicate = prepareQueryFilterPart(entity,
                         filterByAssociations, datatablesCriterias,
-                        associationMap, filtersByColumnPredicate);
+                        associationMap, filtersByColumnPredicate,
+                        conversionService, messageSource);
             }
 
             // Build the query to search the given value in all columns
@@ -543,7 +760,8 @@ public class DatatablesUtils {
             Map<String, List<String>> filterByAssociations,
             DatatablesCriterias datatablesCriterias,
             Map<String, PathBuilder<?>> associationMap,
-            BooleanBuilder filtersByColumnPredicate) {
+            BooleanBuilder filtersByColumnPredicate,
+            ConversionService conversionService, MessageSource messageSource) {
         // Add filterable columns only
         for (ColumnDef column : datatablesCriterias.getColumnDefs()) {
 
@@ -566,7 +784,8 @@ public class DatatablesUtils {
                 // match with column filters
                 filtersByColumnPredicate = filtersByColumnPredicate
                         .and(QuerydslUtils.createExpression(entity, fieldName,
-                                fieldType, searchStr));
+                                fieldType, searchStr, conversionService,
+                                messageSource));
 
                 // TODO: Este codigo se puede pasar a QuerydslUtils ?
 

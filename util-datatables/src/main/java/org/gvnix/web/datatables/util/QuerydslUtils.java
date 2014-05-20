@@ -19,7 +19,9 @@ package org.gvnix.web.datatables.util;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -28,11 +30,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.convert.ConversionService;
 
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.Order;
@@ -184,7 +191,7 @@ public class QuerydslUtils {
      * Utility for constructing where clause expressions.
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
      *        {@code name} in {@code Pet} entity, {@code firstName} in
      *        {@code Pet.owner} entity.
@@ -195,7 +202,6 @@ public class QuerydslUtils {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate createExpression(PathBuilder<T> entityPath,
             String fieldName, Class<?> fieldType, String searchStr) {
-
         // Check for field type in order to delegate in custom-by-type
         // create expression method
         if (String.class == fieldType) {
@@ -211,8 +217,63 @@ public class QuerydslUtils {
         }
         else if (Date.class.isAssignableFrom(fieldType)
                 || Calendar.class.isAssignableFrom(fieldType)) {
-            return createDateExpression(entityPath, fieldName,
-                    (Class<Date>) fieldType, searchStr);
+            BooleanExpression expression = createDateExpression(entityPath,
+                    fieldName, (Class<Date>) fieldType, searchStr);
+            return expression;
+        }
+
+        else if (fieldType.isEnum()) {
+            return createEnumExpression(entityPath, fieldName, searchStr,
+                    (Class<? extends Enum>) fieldType);
+        }
+        return null;
+    }
+
+    /**
+     * Utility for constructing where clause expressions.
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet} , {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code name} in {@code Pet} entity, {@code firstName} in
+     *        {@code Pet.owner} entity.
+     * @param fieldType Property value {@code Class}
+     * @param searchStr the value to find, may be null
+     * @return Predicate
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static <T> Predicate createExpression(PathBuilder<T> entityPath,
+            String fieldName, Class<?> fieldType, String searchStr,
+            ConversionService conversionService, MessageSource messageSource) {
+
+        // Check for field type in order to delegate in custom-by-type
+        // create expression method
+        if (String.class == fieldType) {
+            return createStringExpressionWithOperators(entityPath, fieldName,
+                    searchStr, conversionService, messageSource);
+        }
+        else if (Boolean.class == fieldType || boolean.class == fieldType) {
+            return createBooleanExpressionWithOperators(entityPath, fieldName,
+                    searchStr, conversionService, messageSource);
+        }
+        else if (Number.class.isAssignableFrom(fieldType)
+                || NUMBER_PRIMITIVES.contains(fieldType)) {
+            return createNumberExpressionGenericsWithOperators(entityPath,
+                    fieldName, fieldType, searchStr, conversionService,
+                    messageSource);
+        }
+        else if (Date.class.isAssignableFrom(fieldType)
+                || Calendar.class.isAssignableFrom(fieldType)) {
+            String datePattern = "dd/MM/yyyy";
+            if (messageSource != null) {
+                datePattern = messageSource.getMessage(
+                        "global.filters.operations.date.pattern", null,
+                        LocaleContextHolder.getLocale());
+            }
+            BooleanExpression expression = createDateExpressionWithOperators(
+                    entityPath, fieldName, (Class<Date>) fieldType, searchStr,
+                    conversionService, messageSource, datePattern);
+            return expression;
         }
 
         else if (fieldType.isEnum()) {
@@ -269,13 +330,118 @@ public class QuerydslUtils {
         return numberExpression;
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> Predicate createNumberExpressionGenericsWithOperators(
+            PathBuilder<T> entityPath, String fieldName, Class<?> fieldType,
+            String searchStr, ConversionService conversionService,
+            MessageSource messageSource) {
+        Predicate numberExpression = null;
+        if (NumberUtils.isNumber(searchStr)) {
+            if (BigDecimal.class.isAssignableFrom(fieldType)) {
+                numberExpression = createNumberExpressionEqual(entityPath,
+                        fieldName, (Class<BigDecimal>) fieldType, searchStr,
+                        conversionService);
+            }
+            if (BigInteger.class.isAssignableFrom(fieldType)) {
+                numberExpression = createNumberExpressionEqual(entityPath,
+                        fieldName, (Class<BigInteger>) fieldType, searchStr,
+                        conversionService);
+            }
+            if (Byte.class.isAssignableFrom(fieldType)) {
+                numberExpression = createNumberExpressionEqual(entityPath,
+                        fieldName, (Class<Byte>) fieldType, searchStr,
+                        conversionService);
+            }
+            if (Double.class.isAssignableFrom(fieldType)
+                    || double.class == fieldType) {
+                numberExpression = createNumberExpressionEqual(entityPath,
+                        fieldName, (Class<Double>) fieldType, searchStr,
+                        conversionService);
+            }
+            if (Float.class.isAssignableFrom(fieldType)
+                    || float.class == fieldType) {
+                numberExpression = createNumberExpressionEqual(entityPath,
+                        fieldName, (Class<Float>) fieldType, searchStr,
+                        conversionService);
+            }
+            if (Integer.class.isAssignableFrom(fieldType)
+                    || int.class == fieldType) {
+                numberExpression = createNumberExpressionEqual(entityPath,
+                        fieldName, (Class<Integer>) fieldType, searchStr,
+                        conversionService);
+            }
+            if (Long.class.isAssignableFrom(fieldType)
+                    || long.class == fieldType) {
+                numberExpression = createNumberExpressionEqual(entityPath,
+                        fieldName, (Class<Long>) fieldType, searchStr,
+                        conversionService);
+            }
+            if (Short.class.isAssignableFrom(fieldType)
+                    || short.class == fieldType) {
+                numberExpression = createNumberExpressionEqual(entityPath,
+                        fieldName, (Class<Short>) fieldType, searchStr,
+                        conversionService);
+            }
+        }
+        else {
+            // If is not a number, can be possible that exists a filter
+            // expression.
+            if (BigDecimal.class.isAssignableFrom(fieldType)) {
+                numberExpression = getNumericFilterExpression(entityPath,
+                        fieldName, (Class<BigDecimal>) fieldType, searchStr,
+                        conversionService, messageSource);
+            }
+            if (BigInteger.class.isAssignableFrom(fieldType)) {
+                numberExpression = getNumericFilterExpression(entityPath,
+                        fieldName, (Class<BigInteger>) fieldType, searchStr,
+                        conversionService, messageSource);
+            }
+            if (Byte.class.isAssignableFrom(fieldType)) {
+                numberExpression = getNumericFilterExpression(entityPath,
+                        fieldName, (Class<Byte>) fieldType, searchStr,
+                        conversionService, messageSource);
+            }
+            if (Double.class.isAssignableFrom(fieldType)
+                    || double.class == fieldType) {
+                numberExpression = getNumericFilterExpression(entityPath,
+                        fieldName, (Class<Double>) fieldType, searchStr,
+                        conversionService, messageSource);
+            }
+            if (Float.class.isAssignableFrom(fieldType)
+                    || float.class == fieldType) {
+                numberExpression = getNumericFilterExpression(entityPath,
+                        fieldName, (Class<Float>) fieldType, searchStr,
+                        conversionService, messageSource);
+            }
+            if (Integer.class.isAssignableFrom(fieldType)
+                    || int.class == fieldType) {
+                numberExpression = getNumericFilterExpression(entityPath,
+                        fieldName, (Class<Integer>) fieldType, searchStr,
+                        conversionService, messageSource);
+            }
+            if (Long.class.isAssignableFrom(fieldType)
+                    || long.class == fieldType) {
+                numberExpression = getNumericFilterExpression(entityPath,
+                        fieldName, (Class<Long>) fieldType, searchStr,
+                        conversionService, messageSource);
+            }
+            if (Short.class.isAssignableFrom(fieldType)
+                    || short.class == fieldType) {
+                numberExpression = getNumericFilterExpression(entityPath,
+                        fieldName, (Class<Short>) fieldType, searchStr,
+                        conversionService, messageSource);
+            }
+        }
+        return numberExpression;
+    }
+
     /**
      * Return equal expression for {@code entityPath.fieldName}.
      * <p/>
      * Expr: {@code entityPath.fieldName eq searchObj}
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
      *        {@code name} in {@code Pet} entity, {@code firstName} in
      *        {@code Pet.owner} entity.
@@ -294,7 +460,7 @@ public class QuerydslUtils {
      * Expr: {@code entityPath.fieldName eq searchObj}
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
      *        {@code name} in {@code Pet} entity, {@code firstName} in
      *        {@code Pet.owner} entity.
@@ -303,10 +469,10 @@ public class QuerydslUtils {
      *        operators:
      *        <ul>
      *        <li>For all types: {@code eq}, {@code in}, {@code ne},
-     *        {@code notIn}, {@code isNull} and {@code isNotNull}.</li> <li>For
+     *        {@code notIn}, {@code isNull} and {@code isNotNull}.</li> <li> For
      *        strings and numbers: {@code goe}, {@code gt}, {@code loe},
      *        {@code lt} and {@code like}.</li> <li> For booleans: {@code goe},
-     *        {@code gt}, {@code loe} and {@code lt}.</li> <li>For dates:
+     *        {@code gt}, {@code loe} and {@code lt}.</li> <li> For dates:
      *        {@code goe}, {@code gt}, {@code before}, {@code loe}, {@code lt}
      *        and {@code after}. </li>
      *        </ul>
@@ -566,7 +732,7 @@ public class QuerydslUtils {
      * Equal operation is case insensitive.
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
      *        {@code name} in {@code Pet} entity, {@code firstName} in
      *        {@code Pet.owner} entity.
@@ -591,7 +757,7 @@ public class QuerydslUtils {
      * Like operation is case insensitive.
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
      *        {@code name} in {@code Pet} entity, {@code firstName} in
      *        {@code Pet.owner} entity.
@@ -610,6 +776,156 @@ public class QuerydslUtils {
     }
 
     /**
+     * Return like expression for {@code entityPath.fieldName}.
+     * <p/>
+     * Expr: {@code entityPath.fieldName like ('%' + searchStr + '%')}
+     * <p/>
+     * Like operation is case insensitive.
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet} , {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code name} in {@code Pet} entity, {@code firstName} in
+     *        {@code Pet.owner} entity.
+     * @param searchStr the value to find, may be null
+     * @return BooleanExpression
+     */
+    public static <T> BooleanExpression createStringExpressionWithOperators(
+            PathBuilder<T> entityPath, String fieldName, String searchStr,
+            ConversionService conversionService, MessageSource messageSource) {
+        if (StringUtils.isEmpty(searchStr)) {
+            return null;
+        }
+
+        // All operations
+        String endsOperation = "ENDS";
+        String startsOperation = "STARTS";
+        String containsOperation = "CONTAINS";
+        String isEmptyOperation = "ISEMPTY";
+        String isNotEmptyOperation = "ISNOTEMPTY";
+        String isNullOperation = "ISNULL";
+        String isNotNullOperation = "NOTNULL";
+
+        if (messageSource != null) {
+            endsOperation = messageSource.getMessage(
+                    "global.filters.operations.string.ends", null,
+                    LocaleContextHolder.getLocale());
+            startsOperation = messageSource.getMessage(
+                    "global.filters.operations.string.starts", null,
+                    LocaleContextHolder.getLocale());
+            containsOperation = messageSource.getMessage(
+                    "global.filters.operations.string.contains", null,
+                    LocaleContextHolder.getLocale());
+            isEmptyOperation = messageSource.getMessage(
+                    "global.filters.operations.string.isempty", null,
+                    LocaleContextHolder.getLocale());
+            isNotEmptyOperation = messageSource.getMessage(
+                    "global.filters.operations.string.isnotempty", null,
+                    LocaleContextHolder.getLocale());
+            isNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.isnull", null,
+                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.notnull", null,
+                    LocaleContextHolder.getLocale());
+        }
+
+        // If written expression is ENDS operation
+        Pattern endsOperator = Pattern.compile(String.format(
+                "%s[(]([a-zA-Z\\s\\d]*)[)]", endsOperation));
+        Matcher endsMatcher = endsOperator.matcher(searchStr);
+
+        if (endsMatcher.matches()) {
+            // Getting value
+            String value = endsMatcher.group(1);
+
+            String str = "%".concat(value.toLowerCase());
+            return entityPath.getString(fieldName).lower().like(str);
+        }
+
+        // If written expression is STARTS operation
+        Pattern startsOperator = Pattern.compile(String.format(
+                "%s[(]([a-zA-Z\\s\\d]*)[)]", startsOperation));
+        Matcher startsMatcher = startsOperator.matcher(searchStr);
+
+        if (startsMatcher.matches()) {
+            // Getting value
+            String value = startsMatcher.group(1);
+
+            String str = value.toLowerCase().concat("%");
+            return entityPath.getString(fieldName).lower().like(str);
+        }
+
+        // If written expression is CONTAINS operation
+        Pattern containsOperator = Pattern.compile(String.format(
+                "%s[(]([a-zA-Z\\s\\d]*)[)]", containsOperation));
+        Matcher containsMatcher = containsOperator.matcher(searchStr);
+
+        if (containsMatcher.matches()) {
+            // Getting value
+            String value = containsMatcher.group(1);
+
+            String str = "%".concat(value.toLowerCase()).concat("%");
+            return entityPath.getString(fieldName).lower().like(str);
+        }
+
+        // If written expression is ISEMPTY operation
+        Pattern isEmptyOperator = Pattern.compile(String.format("%s",
+                isEmptyOperation));
+        Matcher isEmptyMatcher = isEmptyOperator.matcher(searchStr);
+        if (isEmptyMatcher.matches()) {
+            return entityPath.getString(fieldName).isEmpty()
+                    .or(entityPath.getString(fieldName).isNull());
+
+        }
+
+        // If written expression is ISNOTEMPTY operation
+        Pattern isNotEmptyOperator = Pattern.compile(String.format("%s",
+                isNotEmptyOperation));
+        Matcher isNotEmptyMatcher = isNotEmptyOperator.matcher(searchStr);
+        if (isNotEmptyMatcher.matches()) {
+            return entityPath.getString(fieldName).isNotEmpty()
+                    .and(entityPath.getString(fieldName).isNotNull());
+
+        }
+
+        // If written expression is ISNULL operation
+        Pattern isNullOperator = Pattern.compile(String.format("%s",
+                isNullOperation));
+        Matcher isNullMatcher = isNullOperator.matcher(searchStr);
+        if (isNullMatcher.matches()) {
+            return entityPath.getString(fieldName).isNull();
+
+        }
+
+        // If written expression is ISNOTNULL operation
+        Pattern isNotNullOperator = Pattern.compile(String.format("%s",
+                isNotNullOperation));
+        Matcher isNotNullMatcher = isNotNullOperator.matcher(searchStr);
+        if (isNotNullMatcher.matches()) {
+            return entityPath.getString(fieldName).isNotNull();
+
+        }
+
+        // If written expression is a symbol operation expression
+
+        // Getting expressions with symbols
+        Pattern symbolOperator = Pattern.compile("[=]?([a-zA-Z\\s\\d]*)");
+        Matcher symbolMatcher = symbolOperator.matcher(searchStr);
+
+        if (symbolMatcher.matches()) {
+
+            String value = symbolMatcher.group(1);
+
+            // operator is not necessary. Always is =
+            return entityPath.getString(fieldName).lower()
+                    .eq(value.toLowerCase());
+        }
+
+        return null;
+    }
+
+    /**
      * Return where clause expression for number properties by casting it to
      * string before check its value.
      * <p/>
@@ -621,7 +937,7 @@ public class QuerydslUtils {
      * Like operation is case sensitive.
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
      *        {@code weight} in {@code Pet} entity, {@code age} in
      *        {@code Pet.owner} entity.
@@ -639,6 +955,46 @@ public class QuerydslUtils {
         BooleanExpression expression = numberExpression.stringValue().like(
                 "%".concat(searchStr).concat("%"));
         return expression;
+    }
+
+/**
+     * Return where clause expression for number properties by casting it to
+     * string before check its value.
+     * <p/>
+     * Querydsl Expr:
+     * {@code entityPath.fieldName.stringValue() eq searchStr
+     * Database operation:
+     * {@code str(entity.fieldName) = searchStr 
+     * <p/>
+     * Like operation is case sensitive.
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet} , {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code weight} in {@code Pet} entity, {@code age} in
+     *        {@code Pet.owner} entity.
+     * @param searchStr the value to find, may be null
+     * @return PredicateOperation
+     */
+    public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression createNumberExpressionEqual(
+            PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
+            String searchStr, ConversionService conversionService) {
+        if (StringUtils.isEmpty(searchStr)) {
+            return null;
+        }
+        NumberPath<N> numberExpression = entityPath.getNumber(fieldName,
+                fieldType);
+        if (conversionService != null) {
+            return numberExpression.eq(conversionService.convert(searchStr,
+                    fieldType));
+        }
+        else {
+            numberExpression.stringValue().like(
+                    "%".concat(searchStr).concat("%"));
+        }
+
+        return null;
+
     }
 
     /**
@@ -810,6 +1166,228 @@ public class QuerydslUtils {
     }
 
     /**
+     * Return where clause expression for date properties, trying to parse the
+     * value to find to date and comparing it to the value of the date; if the
+     * value to find cannot be parsed to date, then try to cast the value to
+     * string before check it.
+     * <p/>
+     * <ul>
+     * <li>
+     * If value to find {@code searchStr} can be parsed using the patterns
+     * <em>dd-MM-yyyy HH:mm:ss</em> or <em>dd-MM-yyyy HH:mm</em> or
+     * <em>dd-MM-yyyy</em> to {@code searchDate}, then search by specific date:
+     * <p/>
+     * - Querydsl Expr: {@code entityPath.fieldName = searchDate}
+     * <p/>
+     * - Database operation: {@code entity.fieldName = searchDate}</li>
+     * <li>
+     * If value to find {@code searchStr} can be parsed using the pattern
+     * <em>dd-MM</em> to {@code searchDate}, then search by specific day and
+     * month:
+     * <p/>
+     * - Querydsl Expr:
+     * {@code entityPath.fieldName.dayOfMonth() = searchDate.day and entityPath.fieldName.month() = searchDate.month}
+     * <p/>
+     * - Database operation:
+     * {@code dayofmonth(entity.fieldName) = searchDate.day && month(entity.fieldName) = searchDate.month}
+     * </li>
+     * <li>
+     * If value to find {@code searchStr} can be parsed using the pattern
+     * <em>MM-aaaa</em> to {@code searchDate}, then obtain the first day of the
+     * month for that year and the last day of the month for that year and check
+     * that value is into between theses values:
+     * <p/>
+     * - Querydsl Expr:
+     * {@code entityPath.fieldName.between(searchDate.firstDayOfMonth, searchDate.lastDayOfMonth)}
+     * <p/>
+     * - Database operation:
+     * {@code entity.fieldName between searchDate.firstDayOfMonth and searchDate.lastDayOfMonth}
+     * </li>
+     * <li>
+     * If value to find cannot be parsed as date, then try to cast the value to
+     * string before check it:
+     * <p/>
+     * - Querydsl Expr:
+     * {@code entityPath.fieldName.stringValue() like ('%' + searchStr + '%')}
+     * <p/>
+     * - Database operation:
+     * {@code str(entity.fieldName) like ('%' + searchStr + '%')}
+     * <p/>
+     * Note that like operation is case sensitive.</li>
+     * </ul>
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet} , {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code weight} in {@code Pet} entity, {@code age} in
+     *        {@code Pet.owner} entity.
+     * @param searchStr the value to find, may be null
+     * @return PredicateOperation
+     */
+    public static <T, C extends java.lang.Comparable<?>> BooleanExpression createDateExpressionWithOperators(
+            PathBuilder<T> entityPath, String fieldName, Class<C> fieldType,
+            String searchStr, ConversionService conversionService,
+            MessageSource messageSource, String datePattern) {
+        if (StringUtils.isEmpty(searchStr)) {
+            return null;
+        }
+
+        DatePath<C> dateExpression = entityPath.getDate(fieldName, fieldType);
+
+        BooleanExpression expression;
+
+        // Getting simpleDateFormat
+        DateFormat dateFormat = new SimpleDateFormat(datePattern);
+
+        // All possible operations
+        String date = "DATE";
+        String year = "YEAR";
+        String month = "MONTH";
+        String day = "DAY";
+        String between = "BETWEEN";
+        String isNullOperation = "ISNULL";
+        String isNotNullOperation = "NOTNULL";
+
+        if (messageSource != null) {
+            date = messageSource.getMessage(
+                    "global.filters.operations.date.date", null,
+                    LocaleContextHolder.getLocale());
+            year = messageSource.getMessage(
+                    "global.filters.operations.date.year", null,
+                    LocaleContextHolder.getLocale());
+            month = messageSource.getMessage(
+                    "global.filters.operations.date.month", null,
+                    LocaleContextHolder.getLocale());
+            day = messageSource.getMessage(
+                    "global.filters.operations.date.day", null,
+                    LocaleContextHolder.getLocale());
+            between = messageSource.getMessage(
+                    "global.filters.operations.date.between", null,
+                    LocaleContextHolder.getLocale());
+            isNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.isnull", null,
+                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.notnull", null,
+                    LocaleContextHolder.getLocale());
+        }
+
+        // If written expression is ISNULL operation
+        Pattern isNullOperator = Pattern.compile(String.format("%s",
+                isNullOperation));
+        Matcher isNullMatcher = isNullOperator.matcher(searchStr);
+        if (isNullMatcher.matches()) {
+            return dateExpression.isNull();
+
+        }
+
+        // If written expression is ISNOTNULL operation
+        Pattern isNotNullOperator = Pattern.compile(String.format("%s",
+                isNotNullOperation));
+        Matcher isNotNullMatcher = isNotNullOperator.matcher(searchStr);
+        if (isNotNullMatcher.matches()) {
+            return dateExpression.isNotNull();
+
+        }
+
+        // Creating regex to get DATE operator
+        Pattern dateOperator = Pattern.compile(String.format(
+                "%s[(]([\\d\\/]*)[)]", date));
+        Matcher dateMatcher = dateOperator.matcher(searchStr);
+
+        if (dateMatcher.matches()) {
+            try {
+                String dateValue = dateMatcher.group(1);
+                Date dateToFilter = dateFormat.parse(dateValue);
+
+                Calendar searchCal = Calendar.getInstance();
+                searchCal.setTime(dateToFilter);
+
+                return dateExpression.eq(conversionService.convert(searchCal,
+                        fieldType));
+
+            }
+            catch (ParseException e) {
+                return null;
+            }
+        }
+
+        // Creating regex to get YEAR operator
+        Pattern yearOperator = Pattern.compile(String.format(
+                "%s[(]([\\d]*)[)]", year));
+        Matcher yearMatcher = yearOperator.matcher(searchStr);
+
+        if (yearMatcher.matches()) {
+
+            String value = yearMatcher.group(1);
+
+            return dateExpression.year().eq(Integer.parseInt(value));
+        }
+
+        // Creating regex to get MONTH operator
+        Pattern monthOperator = Pattern.compile(String.format(
+                "%s[(]([\\d]*)[)]", month));
+        Matcher monthMatcher = monthOperator.matcher(searchStr);
+
+        if (monthMatcher.matches()) {
+
+            String value = monthMatcher.group(1);
+
+            return dateExpression.month().eq(Integer.parseInt(value));
+        }
+
+        // Creating regex to get DAY operator
+        Pattern dayOperator = Pattern.compile(String.format("%s[(]([\\d]*)[)]",
+                day));
+        Matcher dayMatcher = dayOperator.matcher(searchStr);
+
+        if (dayMatcher.matches()) {
+
+            String value = dayMatcher.group(1);
+
+            return dateExpression.dayOfMonth().eq(Integer.parseInt(value));
+        }
+
+        // Creating regex to get BETWEEN operator
+        Pattern betweenOperator = Pattern.compile(String.format(
+                "%s[(]([\\d\\/]*);([\\d\\/]*)[)]", between));
+        Matcher betweenMatcher = betweenOperator.matcher(searchStr);
+
+        if (betweenMatcher.matches()) {
+
+            String valueFrom = betweenMatcher.group(1);
+            String valueTo = betweenMatcher.group(2);
+
+            if (StringUtils.isNotBlank(valueFrom)
+                    && StringUtils.isNotBlank(valueTo)) {
+
+                try {
+
+                    Date dateFrom = dateFormat.parse(valueFrom);
+                    Date dateTo = dateFormat.parse(valueTo);
+
+                    Calendar dateFromCal = Calendar.getInstance();
+                    dateFromCal.setTime(dateFrom);
+
+                    Calendar dateToCal = Calendar.getInstance();
+                    dateToCal.setTime(dateTo);
+
+                    return dateExpression.between(
+                            conversionService.convert(dateFromCal, fieldType),
+                            conversionService.convert(dateToCal, fieldType));
+
+                }
+                catch (Exception e) {
+                    return null;
+                }
+            }
+
+        }
+
+        return null;
+    }
+
+    /**
      * Return where clause expression for non-String
      * {@code entityPath.fieldName} by transforming it to text before check its
      * value.
@@ -820,7 +1398,7 @@ public class QuerydslUtils {
      * Like operation is case insensitive.
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
      *        {@code weight} in {@code Pet} entity, {@code age} in
      *        {@code Pet.owner} entity.
@@ -887,7 +1465,7 @@ public class QuerydslUtils {
      * Expr: {@code entityPath.fieldName eq (TRUE | FALSE)}
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
      *        {@code weight} in {@code Pet} entity, {@code age} in
      *        {@code Pet.owner} entity.
@@ -922,12 +1500,84 @@ public class QuerydslUtils {
     }
 
     /**
+     * Return where clause expression for {@code Boolean} fields by transforming
+     * the given {@code searchStr} to {@code Boolean} before check its value.
+     * <p/>
+     * Expr: {@code entityPath.fieldName eq (TRUE | FALSE)}
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet} , {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code weight} in {@code Pet} entity, {@code age} in
+     *        {@code Pet.owner} entity.
+     * @param searchStr the boolean value to find, may be null. Supported string
+     *        are: si, yes, true, on, no, false, off
+     * @return BooleanExpression
+     */
+    public static <T> BooleanExpression createBooleanExpressionWithOperators(
+            PathBuilder<T> entityPath, String fieldName, String searchStr,
+            ConversionService conversionService, MessageSource messageSource) {
+        if (StringUtils.isBlank(searchStr)) {
+            return null;
+        }
+
+        Boolean value = null;
+
+        // Getting all operations
+        String trueOperation = "TRUE";
+        String falseOperation = "FALSE";
+        if (messageSource != null) {
+            trueOperation = messageSource.getMessage(
+                    "global.filters.operations.boolean.true", null,
+                    LocaleContextHolder.getLocale());
+            falseOperation = messageSource.getMessage(
+                    "global.filters.operations.boolean.false", null,
+                    LocaleContextHolder.getLocale());
+        }
+
+        // If written function is TRUE
+        Pattern trueOperator = Pattern.compile(String.format("%s",
+                trueOperation));
+        Matcher trueMatcher = trueOperator.matcher(searchStr);
+
+        if (trueMatcher.matches()) {
+            return entityPath.getBoolean(fieldName).eq(Boolean.TRUE);
+        }
+
+        // If written function is FALSE
+        Pattern falseOperator = Pattern.compile(String.format("%s",
+                falseOperation));
+        Matcher falseMatcher = falseOperator.matcher(searchStr);
+
+        if (falseMatcher.matches()) {
+            return entityPath.getBoolean(fieldName).eq(Boolean.FALSE);
+        }
+
+        // I18N: Spanish (normalize search value: trim start-end and lower case)
+        if ("si".equals(StringUtils.trim(searchStr).toLowerCase())) {
+            value = Boolean.TRUE;
+        }
+        else {
+            value = BooleanUtils.toBooleanObject(searchStr);
+        }
+
+        // if cannot parse to boolean or null input
+        if (value == null) {
+            return null;
+        }
+
+        BooleanExpression expression = entityPath.getBoolean(fieldName).eq(
+                value);
+        return expression;
+    }
+
+    /**
      * Return IN expression for {@code entityPath.fieldName}.
      * <p/>
      * Expr: {@code entityPath.fieldName IN ( values )}
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
      *        {@code name} in {@code Pet} entity, {@code firstName} in
      *        {@code Pet.owner} entity.
@@ -948,7 +1598,7 @@ public class QuerydslUtils {
      * Create an order-by-element in a Query instance
      * 
      * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet}, {@code Pet.owner}
+     *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
      *        {@code weight} in {@code Pet} entity, {@code age} in
      *        {@code Pet.owner} entity.
@@ -970,5 +1620,124 @@ public class QuerydslUtils {
             orderBy = entityPath.getComparable(fieldName, fieldType).desc();
         }
         return orderBy;
+    }
+
+    /**
+     * This method returns the query expression based on String expression
+     * user-written.
+     * 
+     * Expression can be "=", ">", "<", ">=", "<=", "<>", "!=",
+     * "ENTRENUMERO(n1;n2)"
+     * 
+     * @param searchStr
+     * @return
+     */
+    public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression getNumericFilterExpression(
+            PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
+            String searchStr, ConversionService conversionService,
+            MessageSource messageSource) {
+
+        if (StringUtils.isEmpty(searchStr)) {
+            return null;
+        }
+        NumberPath<N> numberExpression = entityPath.getNumber(fieldName,
+                fieldType);
+
+        // If written expression is a symbol operation expression
+
+        // Getting expressions with symbols
+        Pattern symbolOperator = Pattern.compile("([!=><][=>]?)([-]?[\\d.,]*)");
+        Matcher symbolMatcher = symbolOperator.matcher(searchStr);
+
+        if (symbolMatcher.matches()) {
+
+            String symbolExpression = symbolMatcher.group(1);
+            String value = symbolMatcher.group(2);
+
+            if (!StringUtils.isBlank(value)) {
+                if (symbolExpression.equals("=")
+                        || symbolExpression.equals("==")) {
+                    return numberExpression.eq(conversionService.convert(value,
+                            fieldType));
+                }
+                else if (symbolExpression.equals(">")
+                        || symbolExpression.equals(">>")) {
+                    return numberExpression.gt(conversionService.convert(value,
+                            fieldType));
+                }
+                else if (symbolExpression.equals("<")) {
+                    return numberExpression.lt(conversionService.convert(value,
+                            fieldType));
+                }
+                else if (symbolExpression.equals(">=")) {
+                    return numberExpression.goe(conversionService.convert(
+                            value, fieldType));
+                }
+                else if (symbolExpression.equals("<=")) {
+                    return numberExpression.loe(conversionService.convert(
+                            value, fieldType));
+                }
+                else if (symbolExpression.equals("!=")
+                        || symbolExpression.equals("<>")) {
+                    return numberExpression.ne(conversionService.convert(value,
+                            fieldType));
+                }
+            }
+        }
+
+        // Get all operations
+        String isNullOperation = "ISNULL";
+        String isNotNullOperation = "NOTNULL";
+        String betweenOperation = "BETWEEN";
+
+        if (messageSource != null) {
+            isNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.isnull", null,
+                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.notnull", null,
+                    LocaleContextHolder.getLocale());
+            betweenOperation = messageSource.getMessage(
+                    "global.filters.operations.number.between", null,
+                    LocaleContextHolder.getLocale());
+        }
+
+        // If written function is BETWEEN function
+        Pattern betweenFunctionOperator = Pattern.compile(String.format(
+                "%s[(]([-]?[\\d.,]*);([-]?[\\d.,]*)[)]", betweenOperation));
+        Matcher betweenFunctionMatcher = betweenFunctionOperator
+                .matcher(searchStr);
+
+        if (betweenFunctionMatcher.matches()) {
+            // Getting valueFrom and valueTo
+            String valueFrom = betweenFunctionMatcher.group(1);
+            String valueTo = betweenFunctionMatcher.group(2);
+            if (!StringUtils.isBlank(valueFrom)
+                    && !StringUtils.isBlank(valueTo)) {
+                return numberExpression.between(
+                        conversionService.convert(valueFrom, fieldType),
+                        conversionService.convert(valueTo, fieldType));
+            }
+        }
+
+        // If written expression is ISNULL operation
+        Pattern isNullOperator = Pattern.compile(String.format("%s",
+                isNullOperation));
+        Matcher isNullMatcher = isNullOperator.matcher(searchStr);
+        if (isNullMatcher.matches()) {
+            return numberExpression.isNull();
+
+        }
+
+        // If written expression is ISNOTNULL operation
+        Pattern isNotNullOperator = Pattern.compile(String.format("%s",
+                isNotNullOperation));
+        Matcher isNotNullMatcher = isNotNullOperator.matcher(searchStr);
+        if (isNotNullMatcher.matches()) {
+            return numberExpression.isNotNull();
+
+        }
+
+        return null;
     }
 }
