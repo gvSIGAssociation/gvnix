@@ -1173,7 +1173,6 @@ var GvNIX_Editing;
 				// this function.
 				if (response.status == 'SUCCESS') {
 					var oCreateRow = oCreatingRows[trId];
-					
 					// Set original values
 					var aOriginalData = oCreateRow.aOriginalData;
 					var aCreatingData = oCreateRow.aCreatingData;
@@ -1198,7 +1197,11 @@ var GvNIX_Editing;
 					$tds.each(function(index) {
 						var $input = jQuery($tds[index]);
 						var originalValue = oCreateRow.aOriginalData[index];
-						$input.val(originalValue);
+						if($input.prop("type") !== "checkbox"){
+							$input.val(originalValue);
+						}else{
+							$input.prop("checked", false); // Not the same for checkbox inputs
+						}
 						
 						// Focus on the first input
 						if (index === 0) {
@@ -2009,7 +2012,6 @@ var GvNIX_Editing;
 				$input.change( /* Event params*/ {'colIdx': i, 'rowId': rowId, 'property' : property},
 						jQuery.proxy( function(event){
 					var _d = this._data;
-
 					// prepare values needed
 					var oEventParams = event.data;
 					var $input = jQuery(event.currentTarget);
