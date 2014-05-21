@@ -831,8 +831,8 @@ public class QuerydslUtils {
         }
 
         // If written expression is ENDS operation
-        Pattern endsOperator = Pattern.compile(String.format(
-                "%s[(]([a-zA-Z\\s\\d]*)[)]", endsOperation));
+        Pattern endsOperator = Pattern.compile(String.format("%s[(](.+)[)]$",
+                endsOperation));
         Matcher endsMatcher = endsOperator.matcher(searchStr);
 
         if (endsMatcher.matches()) {
@@ -844,8 +844,8 @@ public class QuerydslUtils {
         }
 
         // If written expression is STARTS operation
-        Pattern startsOperator = Pattern.compile(String.format(
-                "%s[(]([a-zA-Z\\s\\d]*)[)]", startsOperation));
+        Pattern startsOperator = Pattern.compile(String.format("%s[(](.+)[)]$",
+                startsOperation));
         Matcher startsMatcher = startsOperator.matcher(searchStr);
 
         if (startsMatcher.matches()) {
@@ -858,7 +858,7 @@ public class QuerydslUtils {
 
         // If written expression is CONTAINS operation
         Pattern containsOperator = Pattern.compile(String.format(
-                "%s[(]([a-zA-Z\\s\\d]*)[)]", containsOperation));
+                "%s[(](.+)[)]$", containsOperation));
         Matcher containsMatcher = containsOperator.matcher(searchStr);
 
         if (containsMatcher.matches()) {
@@ -910,7 +910,7 @@ public class QuerydslUtils {
         // If written expression is a symbol operation expression
 
         // Getting expressions with symbols
-        Pattern symbolOperator = Pattern.compile("[=]?([a-zA-Z\\s\\d]*)");
+        Pattern symbolOperator = Pattern.compile("[=]?(.+)");
         Matcher symbolMatcher = symbolOperator.matcher(searchStr);
 
         if (symbolMatcher.matches()) {
@@ -1526,12 +1526,21 @@ public class QuerydslUtils {
         // Getting all operations
         String trueOperation = "TRUE";
         String falseOperation = "FALSE";
+        String isNullOperation = "ISNULL";
+        String isNotNullOperation = "NOTNULL";
+
         if (messageSource != null) {
             trueOperation = messageSource.getMessage(
                     "global.filters.operations.boolean.true", null,
                     LocaleContextHolder.getLocale());
             falseOperation = messageSource.getMessage(
                     "global.filters.operations.boolean.false", null,
+                    LocaleContextHolder.getLocale());
+            isNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.isnull", null,
+                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.notnull", null,
                     LocaleContextHolder.getLocale());
         }
 
@@ -1553,22 +1562,25 @@ public class QuerydslUtils {
             return entityPath.getBoolean(fieldName).eq(Boolean.FALSE);
         }
 
-        // I18N: Spanish (normalize search value: trim start-end and lower case)
-        if ("si".equals(StringUtils.trim(searchStr).toLowerCase())) {
-            value = Boolean.TRUE;
-        }
-        else {
-            value = BooleanUtils.toBooleanObject(searchStr);
+        // If written expression is ISNULL operation
+        Pattern isNullOperator = Pattern.compile(String.format("%s",
+                isNullOperation));
+        Matcher isNullMatcher = isNullOperator.matcher(searchStr);
+        if (isNullMatcher.matches()) {
+            return entityPath.getBoolean(fieldName).isNull();
+
         }
 
-        // if cannot parse to boolean or null input
-        if (value == null) {
-            return null;
+        // If written expression is ISNOTNULL operation
+        Pattern isNotNullOperator = Pattern.compile(String.format("%s",
+                isNotNullOperation));
+        Matcher isNotNullMatcher = isNotNullOperator.matcher(searchStr);
+        if (isNotNullMatcher.matches()) {
+            return entityPath.getBoolean(fieldName).isNotNull();
+
         }
 
-        BooleanExpression expression = entityPath.getBoolean(fieldName).eq(
-                value);
-        return expression;
+        return null;
     }
 
     /**

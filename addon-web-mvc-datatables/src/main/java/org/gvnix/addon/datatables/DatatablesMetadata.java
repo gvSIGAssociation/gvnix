@@ -25,6 +25,8 @@ import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_PROPERTY_BINDI
 import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_WRAPPER;
 import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_WRAPPER_IMP;
 import static org.gvnix.addon.datatables.DatatablesConstants.BINDING_RESULT;
+import static org.gvnix.addon.datatables.DatatablesConstants.CHECK_FILTERS_RETURN;
+import static org.gvnix.addon.datatables.DatatablesConstants.CHECK_FILTER_EXPRESSIONS;
 import static org.gvnix.addon.datatables.DatatablesConstants.COLLECTIONS;
 import static org.gvnix.addon.datatables.DatatablesConstants.COLLECTION_UTILS;
 import static org.gvnix.addon.datatables.DatatablesConstants.CONVERSION_SERVICE;
@@ -65,6 +67,7 @@ import static org.gvnix.addon.datatables.DatatablesConstants.LIST_ROO;
 import static org.gvnix.addon.datatables.DatatablesConstants.LIST_STRING;
 import static org.gvnix.addon.datatables.DatatablesConstants.MAP_STRING_OBJECT;
 import static org.gvnix.addon.datatables.DatatablesConstants.MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.MESSAGE_SOURCE;
 import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_DATATABLES_CONFIG;
 import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_ITEM_FOR_RENDER;
 import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_PARAMETERS_MAP;
@@ -85,6 +88,7 @@ import static org.gvnix.addon.datatables.DatatablesConstants.STRING_UTILS;
 import static org.gvnix.addon.datatables.DatatablesConstants.STRING_WRITER;
 import static org.gvnix.addon.datatables.DatatablesConstants.UI_MODEL;
 import static org.gvnix.addon.datatables.DatatablesConstants.UPDATE_JSON_FORMS_METHOD;
+import static org.gvnix.addon.datatables.DatatablesConstants.WEB_REQUEST;
 import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.SpringJavaType.MODEL;
 import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
@@ -255,6 +259,16 @@ public class DatatablesMetadata extends
     private FieldMetadata conversionService;
 
     /**
+     * Field which holds messageSource
+     */
+    private FieldMetadata messageSource;
+
+    /**
+     * Field which holds beanWrapper
+     */
+    private FieldMetadata beanWrapper;
+
+    /**
      * Itd builder herlper
      */
     private WebItdBuilderHelper helper;
@@ -379,6 +393,8 @@ public class DatatablesMetadata extends
 
         // Adding field definition
         builder.addField(getConversionServiceField());
+        builder.addField(getMessageSourceField());
+        builder.addField(getBeanWrapperField());
 
         // Adding methods
         builder.addMethod(getListDatatablesRequestMethod());
@@ -399,6 +415,8 @@ public class DatatablesMetadata extends
         if (isAjax()) {
             if (isStantardMode()) {
                 builder.addMethod(getFindAllMethod());
+                // Adding filters methods
+                builder.addMethod(getCheckFilterExpressionsMethod());
             }
             else {
                 if (isInlineEditing()) {
@@ -2721,6 +2739,69 @@ public class DatatablesMetadata extends
     }
 
     /**
+     * Gets <code>checkFilterExpressions</code> method <br>
+     * This methods checks if the current filter expression is appropieta for
+     * the property type.
+     * 
+     * @return If is correct, return true, if not, return false,
+     */
+    private MethodMetadata getCheckFilterExpressionsMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        parameterTypes.add(AnnotatedJavaType.convertFromJavaType(WEB_REQUEST));
+        parameterTypes.add(helper.createRequestParam(JavaType.STRING,
+                "property", false, null));
+        parameterTypes.add(helper.createRequestParam(JavaType.STRING,
+                "expression", false, null));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(CHECK_FILTER_EXPRESSIONS,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
+        methodAnnotation.setAnnotationType(REQUEST_MAPPING);
+        methodAnnotation.addStringAttribute("headers",
+                "Accept=application/json");
+        methodAnnotation.addStringAttribute("params", "checkFilters");
+        annotations.add(methodAnnotation);
+        annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(REQUEST_PARAM_NAME);
+        parameterNames.add(new JavaSymbolName("property"));
+        parameterNames.add(new JavaSymbolName("expression"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildCheckFilterExpressionMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, CHECK_FILTER_EXPRESSIONS,
+                CHECK_FILTERS_RETURN, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
      * Build standard body method for <code>populateItemForRender</code> method <br>
      * This methods prepares request attributes to render a entity item in
      * non-standard render mode. User can make push-in of this method to
@@ -2832,6 +2913,56 @@ public class DatatablesMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
+    }
+
+    /**
+     * Build standard body method for <code>checkFilterExpression</code> method <br>
+     * This methods checks if the current filter expression is appropieta for
+     * the property type.
+     * 
+     * @param bodyBuilder
+     */
+    private void buildCheckFilterExpressionMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        // HttpHeaders headers = new HttpHeaders();
+        // headers.add("Content-Type", "application/json; charset=utf-8");
+
+        bodyBuilder.appendFormalLine(String.format("%s headers = new %s();",
+                helper.getFinalTypeName(SpringJavaType.HTTP_HEADERS),
+                helper.getFinalTypeName(SpringJavaType.HTTP_HEADERS)));
+        bodyBuilder
+                .appendFormalLine("headers.add(\"Content-Type\", \"application/json; charset=utf-8\");");
+
+        // if(beanWrapper == null){
+        bodyBuilder.appendFormalLine("if(beanWrapper == null){");
+        bodyBuilder.indent();
+
+        // beanWrapper = new BeanWrapperImpl(XXX.class);
+        bodyBuilder.appendFormalLine(String.format(
+                "beanWrapper = new %s(%s.class);", helper
+                        .getFinalTypeName(new JavaType(
+                                "org.springframework.beans.BeanWrapperImpl")),
+                helper.getFinalTypeName(entity)));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // Class type = beanWrapper.getPropertyType(property);
+        bodyBuilder
+                .appendFormalLine("Class type = beanWrapper.getPropertyType(property);");
+
+        // boolean response = DatatablesUtils.checkFilterExpressions(type,
+        // expression, messageSource_dtt);
+        bodyBuilder
+                .appendFormalLine("boolean response = DatatablesUtils.checkFilterExpressions(type,expression, messageSource_dtt);");
+
+        // return new ResponseEntity<String>(
+        // String.format("{ \"response\": %s, \"property\": \"%s\"}",
+        // response, property), headers, HttpStatus.OK);
+
+        String returnStatement = "return new ResponseEntity<String>(String.format(\"{ \\\"response\\\": %s, \\\"property\\\": \\\"%s\\\"}\",response, property), headers, ";
+
+        bodyBuilder.appendFormalLine(returnStatement.concat(String.format(
+                "%s.OK);", SpringJavaType.HTTP_STATUS)));
     }
 
     /**
@@ -3491,7 +3622,7 @@ public class DatatablesMetadata extends
 
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.%s(), %s, baseSearchValuesMap);",
+                                .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.%s(), %s, baseSearchValuesMap, conversionService_dtt, messageSource_dtt);",
                                         helper.getFinalTypeName(serachResult),
                                         helper.getFinalTypeName(DATATABLES_UTILS),
                                         entityTypeName, filterByInfo,
@@ -3536,7 +3667,7 @@ public class DatatablesMetadata extends
 
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s searchResult = %s.findByCriteria(%s.class, %s.%s(), %s, baseSearchValuesMap);",
+                                .format("%s searchResult = %s.findByCriteria(%s.class, %s.%s(), %s, baseSearchValuesMap, conversionService_dtt, messageSource_dtt);",
                                         helper.getFinalTypeName(serachResult),
                                         helper.getFinalTypeName(DATATABLES_UTILS),
                                         entityTypeName, entityTypeName,
@@ -3659,9 +3790,109 @@ public class DatatablesMetadata extends
         return conversionService;
     }
 
+    /**
+     * Create metadata for auto-wired messageSource field.
+     * 
+     * @return a FieldMetadata object
+     */
+    public FieldMetadata getMessageSourceField() {
+        if (messageSource == null) {
+            JavaSymbolName curName = new JavaSymbolName("messageSource_dtt");
+            // Check if field exist
+            FieldMetadata currentField = governorTypeDetails
+                    .getDeclaredField(curName);
+            if (currentField != null && !isMessageSourceField(currentField)) {
+                // No compatible field: look for new name
+                currentField = null;
+                JavaSymbolName newName = new JavaSymbolName("messageSource_dt");
+                currentField = governorTypeDetails.getDeclaredField(newName);
+                while (currentField != null
+                        && !isConversionServiceField(currentField)) {
+                    newName = new JavaSymbolName(newName.getSymbolName()
+                            .concat("_"));
+                    currentField = governorTypeDetails
+                            .getDeclaredField(newName);
+                }
+                curName = newName;
+            }
+            if (currentField != null) {
+                messageSource = currentField;
+            }
+            else {
+                // create field
+                List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                        1);
+                annotations.add(new AnnotationMetadataBuilder(AUTOWIRED));
+                // Using the FieldMetadataBuilder to create the field
+                // definition.
+                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                        getId(), Modifier.PUBLIC, annotations, curName, // Field
+                        MESSAGE_SOURCE); // Field type
+                messageSource = fieldBuilder.build(); // Build and return a
+                                                      // FieldMetadata
+                // instance
+            }
+        }
+        return messageSource;
+    }
+
+    /**
+     * Create metadata for beanWrapper field.
+     * 
+     * @return a FieldMetadata object
+     */
+    public FieldMetadata getBeanWrapperField() {
+        if (beanWrapper == null) {
+            JavaSymbolName curName = new JavaSymbolName("beanWrapper");
+            // Check if field exist
+            FieldMetadata currentField = governorTypeDetails
+                    .getDeclaredField(curName);
+            if (currentField != null && !isBeanWrapperField(currentField)) {
+                // No compatible field: look for new name
+                currentField = null;
+                JavaSymbolName newName = new JavaSymbolName("beanWrapper_dtt");
+                currentField = governorTypeDetails.getDeclaredField(newName);
+                while (currentField != null
+                        && !isConversionServiceField(currentField)) {
+                    newName = new JavaSymbolName(newName.getSymbolName()
+                            .concat("_"));
+                    currentField = governorTypeDetails
+                            .getDeclaredField(newName);
+                }
+                curName = newName;
+            }
+            if (currentField != null) {
+                beanWrapper = currentField;
+            }
+            else {
+                // create field
+                List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                        1);
+                // Using the FieldMetadataBuilder to create the field
+                // definition.
+                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                        getId(), Modifier.PUBLIC, annotations, curName, // Field
+                        BEAN_WRAPPER); // Field type
+                messageSource = fieldBuilder.build(); // Build and return a
+                                                      // FieldMetadata
+                // instance
+            }
+        }
+        return messageSource;
+    }
+
     private boolean isConversionServiceField(FieldMetadata field) {
         return field != null && field.getAnnotation(AUTOWIRED) != null
                 && field.getFieldType().equals(CONVERSION_SERVICE);
+    }
+
+    private boolean isMessageSourceField(FieldMetadata field) {
+        return field != null && field.getAnnotation(AUTOWIRED) != null
+                && field.getFieldType().equals(MESSAGE_SOURCE);
+    }
+
+    private boolean isBeanWrapperField(FieldMetadata field) {
+        return field != null && field.getFieldType().equals(BEAN_WRAPPER);
     }
 
     /**

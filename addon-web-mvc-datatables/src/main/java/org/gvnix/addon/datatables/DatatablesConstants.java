@@ -35,6 +35,7 @@ import java.util.Locale;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.SpringJavaType;
 
 /**
  * Constants used in classes
@@ -49,6 +50,9 @@ public class DatatablesConstants {
 
     static final JavaType CONVERSION_SERVICE = new JavaType(
             "org.springframework.core.convert.ConversionService");
+
+    static final JavaType MESSAGE_SOURCE = new JavaType(
+            "org.springframework.context.MessageSource");
 
     static final JavaType AUTOWIRED = new JavaType(
             "org.springframework.beans.factory.annotation.Autowired");
@@ -112,6 +116,10 @@ public class DatatablesConstants {
             DATATABLES_RESPONSE.getFullyQualifiedTypeName(), 0, DataType.TYPE,
             null, Arrays.asList(MAP_STRING_STRING));
 
+    static final JavaType CHECK_FILTERS_RETURN = new JavaType(
+            SpringJavaType.RESPONSE_ENTITY.getFullyQualifiedTypeName(), 0,
+            DataType.TYPE, null, Arrays.asList(JavaType.STRING));
+
     static final JavaType SET_STRING = new JavaType(
             SET.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING));
@@ -154,6 +162,8 @@ public class DatatablesConstants {
             "getPropertyMap");
     static final JavaSymbolName POPULATE_ITEM_FOR_RENDER = new JavaSymbolName(
             "populateItemForRender");
+    static final JavaSymbolName CHECK_FILTER_EXPRESSIONS = new JavaSymbolName(
+            "checkFilterExpressions");
 
     static final JavaType DATA_SET = new JavaType(
             "com.github.dandelion.datatables.core.ajax.DataSet");
@@ -172,6 +182,9 @@ public class DatatablesConstants {
             "javax.servlet.RequestDispatcher");
     static final JavaType SERVLET_EXCEPTION = new JavaType(
             "javax.servlet.ServletException");
+
+    static final JavaType WEB_REQUEST = new JavaType(
+            "org.springframework.web.context.request.WebRequest");
 
     static final JavaType EXTENDED_MODEL_MAP = new JavaType(
             "org.springframework.ui.ExtendedModelMap");

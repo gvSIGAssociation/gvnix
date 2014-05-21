@@ -17,6 +17,7 @@
 package org.gvnix.web.datatables.util;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,18 +28,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.gvnix.web.datatables.query.SearchResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.util.Assert;
@@ -1333,5 +1338,454 @@ public class DatatablesUtils {
         }
 
         return BeanUtils.findPropertyType(fieldNameToFindType, classArray);
+    }
+
+    /**
+     * 
+     * Check if filter expression is correct for the input type
+     * 
+     * @param type
+     * @param expression
+     * @param messageSource
+     * @return
+     */
+    public static boolean checkFilterExpressions(Class type, String expression,
+            MessageSource messageSource) {
+        // By default filter is not correct
+
+        Set<Class<?>> numberPrimitives = new HashSet<Class<?>>(
+                Arrays.asList(new Class<?>[] { int.class, long.class,
+                        double.class, float.class, short.class }));
+
+        // Checking String filters
+        if (String.class == type) {
+            return checkStringFilters(expression, messageSource);
+        }
+        else if (Boolean.class == type || boolean.class == type) {
+            return checkBooleanFilters(expression, messageSource);
+        }
+        else if (Number.class.isAssignableFrom(type)
+                || numberPrimitives.contains(type)) {
+            return checkNumericFilters(expression, messageSource);
+        }
+        else if (Date.class.isAssignableFrom(type)
+                || Calendar.class.isAssignableFrom(type)) {
+            return checkDateFilters(expression, messageSource);
+        }
+        return false;
+    }
+
+    public static boolean checkStringFilters(String expression,
+            MessageSource messageSource) {
+        // All operations
+        String endsOperation = "ENDS";
+        String startsOperation = "STARTS";
+        String containsOperation = "CONTAINS";
+        String isEmptyOperation = "ISEMPTY";
+        String isNotEmptyOperation = "ISNOTEMPTY";
+        String isNullOperation = "ISNULL";
+        String isNotNullOperation = "NOTNULL";
+
+        if (messageSource != null) {
+            endsOperation = messageSource.getMessage(
+                    "global.filters.operations.string.ends", null,
+                    LocaleContextHolder.getLocale());
+            startsOperation = messageSource.getMessage(
+                    "global.filters.operations.string.starts", null,
+                    LocaleContextHolder.getLocale());
+            containsOperation = messageSource.getMessage(
+                    "global.filters.operations.string.contains", null,
+                    LocaleContextHolder.getLocale());
+            isEmptyOperation = messageSource.getMessage(
+                    "global.filters.operations.string.isempty", null,
+                    LocaleContextHolder.getLocale());
+            isNotEmptyOperation = messageSource.getMessage(
+                    "global.filters.operations.string.isnotempty", null,
+                    LocaleContextHolder.getLocale());
+            isNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.isnull", null,
+                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.notnull", null,
+                    LocaleContextHolder.getLocale());
+        }
+
+        // If written expression is ENDS operation
+        Pattern endsOperator = Pattern.compile(String.format(
+                "%s[(]([a-zA-Z\\s\\d]*)[)]", endsOperation));
+        Matcher endsMatcher = endsOperator.matcher(expression);
+
+        if (endsMatcher.matches()) {
+            return true;
+        }
+
+        // If written expression is STARTS operation
+        Pattern startsOperator = Pattern.compile(String.format("%s[(](.+)[)]$",
+                startsOperation));
+        Matcher startsMatcher = startsOperator.matcher(expression);
+
+        if (startsMatcher.matches()) {
+            return true;
+        }
+
+        // If written expression is CONTAINS operation
+        Pattern containsOperator = Pattern.compile(String.format(
+                "%s[(](.+)[)]$", containsOperation));
+        Matcher containsMatcher = containsOperator.matcher(expression);
+
+        if (containsMatcher.matches()) {
+            return true;
+        }
+
+        // If written expression is ISEMPTY operation
+        Pattern isEmptyOperator = Pattern.compile(String.format("%s",
+                isEmptyOperation));
+        Matcher isEmptyMatcher = isEmptyOperator.matcher(expression);
+        if (isEmptyMatcher.matches()) {
+            return true;
+
+        }
+
+        // If written expression is ISNOTEMPTY operation
+        Pattern isNotEmptyOperator = Pattern.compile(String.format("%s",
+                isNotEmptyOperation));
+        Matcher isNotEmptyMatcher = isNotEmptyOperator.matcher(expression);
+        if (isNotEmptyMatcher.matches()) {
+            return true;
+
+        }
+
+        // If written expression is ISNULL operation
+        Pattern isNullOperator = Pattern.compile(String.format("%s",
+                isNullOperation));
+        Matcher isNullMatcher = isNullOperator.matcher(expression);
+        if (isNullMatcher.matches()) {
+            return true;
+
+        }
+
+        // If written expression is ISNOTNULL operation
+        Pattern isNotNullOperator = Pattern.compile(String.format("%s",
+                isNotNullOperation));
+        Matcher isNotNullMatcher = isNotNullOperator.matcher(expression);
+        if (isNotNullMatcher.matches()) {
+            return true;
+
+        }
+
+        // If written expression is a symbol operation expression
+
+        // Getting expressions with symbols
+        Pattern symbolOperator = Pattern.compile("[=]?(.+)");
+        Matcher symbolMatcher = symbolOperator.matcher(expression);
+
+        if (symbolMatcher.matches()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean checkBooleanFilters(String expression,
+            MessageSource messageSource) {
+        // Getting all operations
+        String trueOperation = "TRUE";
+        String falseOperation = "FALSE";
+        String isNullOperation = "ISNULL";
+        String isNotNullOperation = "NOTNULL";
+
+        if (messageSource != null) {
+            trueOperation = messageSource.getMessage(
+                    "global.filters.operations.boolean.true", null,
+                    LocaleContextHolder.getLocale());
+            falseOperation = messageSource.getMessage(
+                    "global.filters.operations.boolean.false", null,
+                    LocaleContextHolder.getLocale());
+            isNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.isnull", null,
+                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.notnull", null,
+                    LocaleContextHolder.getLocale());
+        }
+
+        // If written function is TRUE
+        Pattern trueOperator = Pattern.compile(String.format("%s",
+                trueOperation));
+        Matcher trueMatcher = trueOperator.matcher(expression);
+
+        if (trueMatcher.matches()) {
+            return true;
+        }
+
+        // If written function is FALSE
+        Pattern falseOperator = Pattern.compile(String.format("%s",
+                falseOperation));
+        Matcher falseMatcher = falseOperator.matcher(expression);
+
+        if (falseMatcher.matches()) {
+            return true;
+        }
+
+        // If written expression is ISNULL operation
+        Pattern isNullOperator = Pattern.compile(String.format("%s",
+                isNullOperation));
+        Matcher isNullMatcher = isNullOperator.matcher(expression);
+        if (isNullMatcher.matches()) {
+            return true;
+
+        }
+
+        // If written expression is ISNOTNULL operation
+        Pattern isNotNullOperator = Pattern.compile(String.format("%s",
+                isNotNullOperation));
+        Matcher isNotNullMatcher = isNotNullOperator.matcher(expression);
+        if (isNotNullMatcher.matches()) {
+            return true;
+
+        }
+
+        return false;
+    }
+
+    public static boolean checkNumericFilters(String expression,
+            MessageSource messageSource) {
+        if (NumberUtils.isNumber(expression)) {
+            return true;
+        }
+        else {
+            // Getting expressions with symbols
+            Pattern symbolOperator = Pattern
+                    .compile("([!=><][=>]?)([-]?[\\d.,]*)");
+            Matcher symbolMatcher = symbolOperator.matcher(expression);
+
+            if (symbolMatcher.matches()) {
+
+                String symbolExpression = symbolMatcher.group(1);
+                String value = symbolMatcher.group(2);
+
+                if (!StringUtils.isBlank(value)) {
+                    if (symbolExpression.equals("=")
+                            || symbolExpression.equals("==")) {
+                        return true;
+                    }
+                    else if (symbolExpression.equals(">")
+                            || symbolExpression.equals(">>")) {
+                        return true;
+                    }
+                    else if (symbolExpression.equals("<")) {
+                        return true;
+                    }
+                    else if (symbolExpression.equals(">=")) {
+                        return true;
+                    }
+                    else if (symbolExpression.equals("<=")) {
+                        return true;
+                    }
+                    else if (symbolExpression.equals("!=")
+                            || symbolExpression.equals("<>")) {
+                        return true;
+                    }
+                }
+            }
+
+            // Get all operations
+            String isNullOperation = "ISNULL";
+            String isNotNullOperation = "NOTNULL";
+            String betweenOperation = "BETWEEN";
+
+            if (messageSource != null) {
+                isNullOperation = messageSource.getMessage(
+                        "global.filters.operations.all.isnull", null,
+                        LocaleContextHolder.getLocale());
+                isNotNullOperation = messageSource.getMessage(
+                        "global.filters.operations.all.notnull", null,
+                        LocaleContextHolder.getLocale());
+                betweenOperation = messageSource.getMessage(
+                        "global.filters.operations.number.between", null,
+                        LocaleContextHolder.getLocale());
+            }
+
+            // If written function is BETWEEN function
+            Pattern betweenFunctionOperator = Pattern.compile(String.format(
+                    "%s[(]([-]?[\\d.,]*);([-]?[\\d.,]*)[)]", betweenOperation));
+            Matcher betweenFunctionMatcher = betweenFunctionOperator
+                    .matcher(expression);
+
+            if (betweenFunctionMatcher.matches()) {
+                // Getting valueFrom and valueTo
+                String valueFrom = betweenFunctionMatcher.group(1);
+                String valueTo = betweenFunctionMatcher.group(2);
+                if (!StringUtils.isBlank(valueFrom)
+                        && !StringUtils.isBlank(valueTo)) {
+                    return true;
+                }
+            }
+
+            // If written expression is ISNULL operation
+            Pattern isNullOperator = Pattern.compile(String.format("%s",
+                    isNullOperation));
+            Matcher isNullMatcher = isNullOperator.matcher(expression);
+            if (isNullMatcher.matches()) {
+                return true;
+
+            }
+
+            // If written expression is ISNOTNULL operation
+            Pattern isNotNullOperator = Pattern.compile(String.format("%s",
+                    isNotNullOperation));
+            Matcher isNotNullMatcher = isNotNullOperator.matcher(expression);
+            if (isNotNullMatcher.matches()) {
+                return true;
+
+            }
+        }
+        return false;
+    }
+
+    public static boolean checkDateFilters(String expression,
+            MessageSource messageSource) {
+
+        // All possible operations
+        String date = "DATE";
+        String year = "YEAR";
+        String month = "MONTH";
+        String day = "DAY";
+        String between = "BETWEEN";
+        String isNullOperation = "ISNULL";
+        String isNotNullOperation = "NOTNULL";
+
+        String datePattern = "dd/MM/yyyy";
+
+        if (messageSource != null) {
+            date = messageSource.getMessage(
+                    "global.filters.operations.date.date", null,
+                    LocaleContextHolder.getLocale());
+            year = messageSource.getMessage(
+                    "global.filters.operations.date.year", null,
+                    LocaleContextHolder.getLocale());
+            month = messageSource.getMessage(
+                    "global.filters.operations.date.month", null,
+                    LocaleContextHolder.getLocale());
+            day = messageSource.getMessage(
+                    "global.filters.operations.date.day", null,
+                    LocaleContextHolder.getLocale());
+            between = messageSource.getMessage(
+                    "global.filters.operations.date.between", null,
+                    LocaleContextHolder.getLocale());
+            isNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.isnull", null,
+                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(
+                    "global.filters.operations.all.notnull", null,
+                    LocaleContextHolder.getLocale());
+            datePattern = messageSource.getMessage(
+                    "global.filters.operations.date.pattern", null,
+                    LocaleContextHolder.getLocale());
+        }
+
+        // Getting simpleDateFormat
+        DateFormat dateFormat = new SimpleDateFormat(datePattern);
+
+        // If written expression is ISNULL operation
+        Pattern isNullOperator = Pattern.compile(String.format("%s",
+                isNullOperation));
+        Matcher isNullMatcher = isNullOperator.matcher(expression);
+        if (isNullMatcher.matches()) {
+            return true;
+
+        }
+
+        // If written expression is ISNOTNULL operation
+        Pattern isNotNullOperator = Pattern.compile(String.format("%s",
+                isNotNullOperation));
+        Matcher isNotNullMatcher = isNotNullOperator.matcher(expression);
+        if (isNotNullMatcher.matches()) {
+            return true;
+
+        }
+
+        // Creating regex to get DATE operator
+        Pattern dateOperator = Pattern.compile(String.format(
+                "%s[(]([\\d\\/]*)[)]", date));
+        Matcher dateMatcher = dateOperator.matcher(expression);
+
+        if (dateMatcher.matches()) {
+            try {
+                String dateValue = dateMatcher.group(1);
+                Date dateToFilter = dateFormat.parse(dateValue);
+
+                Calendar searchCal = Calendar.getInstance();
+                searchCal.setTime(dateToFilter);
+
+                return true;
+            }
+            catch (ParseException e) {
+                return false;
+            }
+        }
+
+        // Creating regex to get YEAR operator
+        Pattern yearOperator = Pattern.compile(String.format(
+                "%s[(]([\\d]*)[)]", year));
+        Matcher yearMatcher = yearOperator.matcher(expression);
+
+        if (yearMatcher.matches()) {
+            return true;
+        }
+
+        // Creating regex to get MONTH operator
+        Pattern monthOperator = Pattern.compile(String.format(
+                "%s[(]([\\d]*)[)]", month));
+        Matcher monthMatcher = monthOperator.matcher(expression);
+
+        if (monthMatcher.matches()) {
+            return true;
+        }
+
+        // Creating regex to get DAY operator
+        Pattern dayOperator = Pattern.compile(String.format("%s[(]([\\d]*)[)]",
+                day));
+        Matcher dayMatcher = dayOperator.matcher(expression);
+
+        if (dayMatcher.matches()) {
+            return true;
+        }
+
+        // Creating regex to get BETWEEN operator
+        Pattern betweenOperator = Pattern.compile(String.format(
+                "%s[(]([\\d\\/]*);([\\d\\/]*)[)]", between));
+        Matcher betweenMatcher = betweenOperator.matcher(expression);
+
+        if (betweenMatcher.matches()) {
+
+            String valueFrom = betweenMatcher.group(1);
+            String valueTo = betweenMatcher.group(2);
+
+            if (StringUtils.isNotBlank(valueFrom)
+                    && StringUtils.isNotBlank(valueTo)) {
+
+                try {
+
+                    Date dateFrom = dateFormat.parse(valueFrom);
+                    Date dateTo = dateFormat.parse(valueTo);
+
+                    Calendar dateFromCal = Calendar.getInstance();
+                    dateFromCal.setTime(dateFrom);
+
+                    Calendar dateToCal = Calendar.getInstance();
+                    dateToCal.setTime(dateTo);
+
+                    return true;
+
+                }
+                catch (Exception e) {
+                    return false;
+                }
+            }
+
+        }
+
+        return false;
     }
 }

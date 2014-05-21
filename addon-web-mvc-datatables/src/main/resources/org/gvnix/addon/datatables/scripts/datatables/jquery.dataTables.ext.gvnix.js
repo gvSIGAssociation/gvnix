@@ -98,6 +98,18 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 		// If delay loading adjust column size
 		$table.fnAdjustColumnSizing();
 	}
+	
+	var st = $table.fnSettings();
+	
+	// Register Footer callback
+	st.oApi._fnCallbackReg(st, 'aoFooterCallback', 
+			function(row, data, start, end, display){
+		$table.fnFooterCallback(row, data, start, end, display);
+	});
+	
+	// Calling at first time Footer Callback
+	$table.fnFooterCallback();
+	
 }
 
 /**
@@ -233,6 +245,44 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function(oSettings, iDelay) {
 				return this;
 			});
 	return this;
+};
+
+/**
+ * This function checks filters on footerCallback
+ */
+jQuery.fn.dataTableExt.oApi.fnFooterCallback = function(row, data, start, end, display){
+	var _that = this;
+	var filters = _that.fnSettings().aoPreSearchCols;
+	var footer = $(_that.fnSettings().aoFooter)[0];
+	
+	for ( var i=0, iLen=filters.length ; i<iLen ; i++ )
+    {
+		var property = $(footer[i].cell).data().property;
+		var filterExpression = filters[i].sSearch;
+		
+		if(filterExpression != "")	{
+			$.ajax({
+				  url: "?checkFilters",
+				  data: {property: property, expression: filterExpression},
+				  type: "post",
+				  success: function(jsonResponse) {
+					  for(var i=0;i<footer.length;i++){
+						  if($(footer[i].cell).data().property == jsonResponse.property){
+							  if(!jsonResponse.response){
+								  $(footer[i].cell).find('input').css("background-color","#FA5858");
+							  }else{
+								  $(footer[i].cell).find('input').css("background-color","#ffffff");
+							  }
+						  }
+					  }
+				  },
+				  error:function (xhr, ajaxOptions, thrownError) {
+				  }
+			});
+		}else{
+			$(footer[i].cell).find('input').css("background-color","#ffffff");
+		}
+    }
 };
 
 /**
