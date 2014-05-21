@@ -986,13 +986,9 @@ var GvNIX_Editing;
 						var headerCell = '<th>' + _d.oSettings.aoColumns[colIdx].sTitle + '</th>';
 						aHeaderCells.push(headerCell);
 
+						aFormCells.push("<td>");
+						
 						for(var i = 0; i < $input.length; i++){
-							// Create header cell
-							if(i !== 0){
-								var headerCell = '<th></th>';
-								aHeaderCells.push(headerCell);
-							}
-							
 							// Add proper CSS classes to contained and input
 							var divClass = 'controls';
 							if (jQuery($input[i]).attr('type') == 'checkbox') {
@@ -1011,10 +1007,24 @@ var GvNIX_Editing;
 							// collisions with other elements with same ID
 							jQuery($input[i]).attr('id', jQuery($input[i]).attr('id') + '_create_' + rowId);
 							
-							var formCell = '<td><div class="' + divClass + '">' + fnOuterHTML(jQuery($input[i])) + '</div></td>';
+							var formCell = "";
+							
+							if(i == 0){
+								formCell = '<div class="' + divClass + '">';
+							}
+							
+							formCell+= fnOuterHTML(jQuery($input[i]));
+							
+							if(i == $input.length){
+								formCell+= '</div>';
+							}
+							
 							aFormCells.push(formCell);
 							
+							formCell = "";
 						}
+						
+						aFormCells.push("</td>");
 					}
 				}
 				
@@ -1080,7 +1090,11 @@ var GvNIX_Editing;
 					var property = fieldsWithName[colIdx].name;
 
 					// Getting field value
-					var value = fieldsWithName[colIdx].value
+					if($(fieldsWithName[colIdx]).prop("type") !== "checkbox"){
+						var value = fieldsWithName[colIdx].value; 
+					}else{
+						var value = $(fieldsWithName[colIdx]).prop("checked"); // Not the same for checkboxes
+					}
 					
 					// Store value received from server in array of values by column index
 					oCreateRow.aCreatingData.push(value);
@@ -1180,9 +1194,9 @@ var GvNIX_Editing;
 					
 					// Set original values, stored in 'aOriginalData', in each
 					// cell of given row
-					var $tds = jQuery('>td', nRow);
+					var $tds = jQuery(':input', nRow);
 					$tds.each(function(index) {
-						var $input = jQuery(':input', $tds[index]);
+						var $input = jQuery($tds[index]);
 						var originalValue = oCreateRow.aOriginalData[index];
 						$input.val(originalValue);
 						
@@ -1192,7 +1206,7 @@ var GvNIX_Editing;
 						}
 						
 						// Remove error messages from cells
-						var $div = jQuery("div", $tds[index]);
+						var $div = jQuery("div", $input.parent().parent());
 						var $span = jQuery("span.errors", $div);
 						if ($span.length) {
 							$span.remove();
@@ -1999,7 +2013,11 @@ var GvNIX_Editing;
 					// prepare values needed
 					var oEventParams = event.data;
 					var $input = jQuery(event.currentTarget);
-					var value = $input.val(); // Use .val() to get new value
+					if($input.prop("type") !== "checkbox"){
+						var value = $input.val(); // Use .val() to get new value
+					}else{
+						var value = $input.prop("checked"); // val is not correct for checkbox inputs
+					}
 					var property = oEventParams.property;
 					var oCreatRow = _d.oCreatingRows[oEventParams.rowId];
 					var previousValue = oCreatRow.oCreatingData[property];
