@@ -255,34 +255,38 @@ jQuery.fn.dataTableExt.oApi.fnFooterCallback = function(row, data, start, end, d
 	var filters = _that.fnSettings().aoPreSearchCols;
 	var footer = $(_that.fnSettings().aoFooter)[0];
 	
-	for ( var i=0, iLen=filters.length ; i<iLen ; i++ )
-    {
-		var property = $(footer[i].cell).data().property;
-		var filterExpression = filters[i].sSearch;
+	// If footer is defined
+	if(footer !== undefined){
 		
-		if(filterExpression != "")	{
-			$.ajax({
-				  url: "?checkFilters",
-				  data: {property: property, expression: filterExpression},
-				  type: "post",
-				  success: function(jsonResponse) {
-					  for(var i=0;i<footer.length;i++){
-						  if($(footer[i].cell).data().property == jsonResponse.property){
-							  if(!jsonResponse.response){
-								  $(footer[i].cell).find('input').css("background-color","#FA5858");
-							  }else{
-								  $(footer[i].cell).find('input').css("background-color","#ffffff");
+		for ( var i=0, iLen=filters.length ; i<iLen ; i++ )
+	    {
+			var property = $(footer[i].cell).data().property;
+			var filterExpression = filters[i].sSearch;
+			
+			if(filterExpression != "")	{
+				$.ajax({
+					  url: "?checkFilters",
+					  data: {property: property, expression: filterExpression},
+					  type: "post",
+					  success: function(jsonResponse) {
+						  for(var i=0;i<footer.length;i++){
+							  if($(footer[i].cell).data().property == jsonResponse.property){
+								  if(!jsonResponse.response){
+									  $(footer[i].cell).find('input').css("background-color","#FA5858");
+								  }else{
+									  $(footer[i].cell).find('input').css("background-color","#ffffff");
+								  }
 							  }
 						  }
+					  },
+					  error:function (xhr, ajaxOptions, thrownError) {
 					  }
-				  },
-				  error:function (xhr, ajaxOptions, thrownError) {
-				  }
-			});
-		}else{
-			$(footer[i].cell).find('input').css("background-color","#ffffff");
-		}
-    }
+				});
+			}else{
+				$(footer[i].cell).find('input').css("background-color","#ffffff");
+			}
+	    }
+	}
 };
 
 /**

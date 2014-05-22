@@ -1090,10 +1090,10 @@ var GvNIX_Editing;
 					var property = fieldsWithName[colIdx].name;
 
 					// Getting field value
-					if($(fieldsWithName[colIdx]).prop("type") !== "checkbox"){
+					if(jQuery(fieldsWithName[colIdx]).prop("type") !== "checkbox"){
 						var value = fieldsWithName[colIdx].value; 
 					}else{
-						var value = $(fieldsWithName[colIdx]).prop("checked"); // Not the same for checkboxes
+						var value = jQuery(fieldsWithName[colIdx]).prop("checked"); // Not the same for checkboxes
 					}
 					
 					// Store value received from server in array of values by column index
