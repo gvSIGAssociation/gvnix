@@ -458,6 +458,27 @@
       </attribute>
       <dynamic-attributes>true</dynamic-attributes>
    </tag>
+   
+   <!-- ====================================== -->
+   <!-- Extra conf -->
+   <!-- ====================================== -->
+   <tag>
+       <description>Allow to specify the location of a file containing
+           a
+           JSON-formatted DataTables configuration to merge with the
+           generated one.</description>
+       <name>extraConf</name>
+       <tag-class>org.gvnix.datatables.tags.RooExtraConfTag</tag-class>
+       <body-content>empty</body-content>
+       <attribute>
+           <description>Location of the file containing the extra
+               DataTables configuration</description>
+           <name>src</name>
+          <required>true</required>
+          <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
+   
 
    <!-- ====================================== -->
    <!-- Colum Tag -->

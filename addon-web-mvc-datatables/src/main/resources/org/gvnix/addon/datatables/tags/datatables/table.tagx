@@ -835,6 +835,11 @@
 
       colReorder="${colReorder}"
     >
+    
+    <!-- Adding extra configuration into Datatables -->
+    <spring:url var="extraConf_var" value="" />
+    <datatables:extraConf src="${extraConf_var}/resources/scripts/datatables/jquery.dataTables.extraConf.js"/>
+    
 			<c:choose>
 
             <!-- On register view mode add a datatables column only, checkbox,
