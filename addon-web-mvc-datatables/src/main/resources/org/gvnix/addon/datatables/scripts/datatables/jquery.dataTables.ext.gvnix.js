@@ -110,6 +110,12 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 	// Calling at first time Footer Callback
 	$table.fnFooterCallback();
 	
+	// Displaying always the clicked row
+	if($table.find(".row_clicked").length > 0){
+		var rowSelected = $table.find(".row_clicked");
+		$table.parent(".dataTables_scrollBody").animate({scrollTop: rowSelected.offset().top });
+	}
+	
 }
 
 /**

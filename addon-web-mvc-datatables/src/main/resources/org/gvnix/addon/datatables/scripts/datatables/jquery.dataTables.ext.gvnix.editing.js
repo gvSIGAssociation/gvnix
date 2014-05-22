@@ -2005,9 +2005,9 @@ var GvNIX_Editing;
 				var $input = jQuery(':input', anTd[i]);
 				
 				// Focus cursor
-				if (i == 0) {
+				/*if (i == 0) {
 					$input.focus();
-				}
+				}*/
 				
 				$input.change( /* Event params*/ {'colIdx': i, 'rowId': rowId, 'property' : property},
 						jQuery.proxy( function(event){
