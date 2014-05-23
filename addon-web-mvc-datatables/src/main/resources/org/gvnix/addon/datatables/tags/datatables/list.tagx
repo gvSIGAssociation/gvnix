@@ -70,14 +70,8 @@
 
 					function callbackFunct${datatablesId} (selection, trId){
 						if (trId){
-							// Get 'tr' node from the affected row
-							var trNode = selection.fnGetRowById(trId);
-							if (trNode){
-								// Redraw detail
-								loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", trId));
-							} else {
-								// 'tr' node not reachable (AJAX mode and register in other page)
-							}
+							// Load details when exists a clicked row
+							loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", trId));
 						}
 					}
 
