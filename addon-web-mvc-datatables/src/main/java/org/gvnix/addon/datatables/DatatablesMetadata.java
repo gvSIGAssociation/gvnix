@@ -118,7 +118,6 @@ import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDe
 import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -157,6 +156,18 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 public class DatatablesMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
+
+    private static final String HEADERS = "headers";
+
+    private static final String SIZE_VAR = "size";
+
+    private static final String PAGE_VAR = "page";
+
+    private static final String PARAMS_VAR = "params";
+
+    private static final String METHOD_VAR = "method";
+
+    private static final String ACCEPT_APPLICATION_JSON = "Accept=application/json";
 
     private static final JavaSymbolName SET_BASE_FILTER_METHOD = new JavaSymbolName(
             "setDatatablesBaseFilter");
@@ -271,7 +282,7 @@ public class DatatablesMetadata extends
     /**
      * Itd builder herlper
      */
-    private WebItdBuilderHelper helper;
+    private final WebItdBuilderHelper helper;
 
     private final WebScaffoldAnnotationValues webScaffoldAnnotationValues;
 
@@ -307,11 +318,11 @@ public class DatatablesMetadata extends
 
     private final ProjectOperations projectOperations;
 
-    private JavaType entityIdentifierType;
+    private final JavaType entityIdentifierType;
 
-    private JavaType entityIdArrayType;
+    private final JavaType entityIdArrayType;
 
-    private String entityList;
+    private final String entityList;
 
     public DatatablesMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -464,12 +475,6 @@ public class DatatablesMetadata extends
                         aspectName
                                 .getFullyQualifiedTypeName()
                                 .concat(". Inline editing requires batch support. Run 'jpa batch add' command or 'web mvc batch add' command"));
-                /*
-                 * throw new IllegalArgumentException( aspectName
-                 * .getFullyQualifiedTypeName() .concat(
-                 * ". Inline editing requires update view uses. Run 'web mvc jquery add' command"
-                 * ));
-                 */
             }
             builder.addMethod(getJsonFormsMethod(true));
             builder.addMethod(getJsonFormsMethod(false));
@@ -527,7 +532,7 @@ public class DatatablesMetadata extends
         }
         AnnotationMetadataBuilder requestMappingAnnotation = helper
                 .getRequestMappingAnnotation(requestMappingValue, null, null,
-                        "application/json", null, "Accept=application/json");
+                        "application/json", null, ACCEPT_APPLICATION_JSON);
         annotations.add(requestMappingAnnotation);
         // @ResponseBody
         AnnotationMetadataBuilder responseBodyAnnotation = new AnnotationMetadataBuilder();
@@ -1630,9 +1635,9 @@ public class DatatablesMetadata extends
                         null,
                         DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
                         null, null);
-        requestMappingAnnotation.addEnumAttribute("method", REQUEST_METHOD,
+        requestMappingAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD,
                 "POST");
-        requestMappingAnnotation.addStringAttribute("params",
+        requestMappingAnnotation.addStringAttribute(PARAMS_VAR,
                 "datatablesRedirect");
         annotations.add(requestMappingAnnotation);
 
@@ -1742,9 +1747,9 @@ public class DatatablesMetadata extends
                         null,
                         DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
                         null, null);
-        requestMappingAnnotation.addEnumAttribute("method", REQUEST_METHOD,
+        requestMappingAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD,
                 "PUT");
-        requestMappingAnnotation.addStringAttribute("params",
+        requestMappingAnnotation.addStringAttribute(PARAMS_VAR,
                 "datatablesRedirect");
         annotations.add(requestMappingAnnotation);
 
@@ -1835,9 +1840,9 @@ public class DatatablesMetadata extends
                 "org.springframework.web.bind.annotation.PathVariable"),
                 annotationAttributes).build()));
         parameterTypes.add(helper.createRequestParam(JavaType.INT_OBJECT,
-                "page", false, null));
+                PAGE_VAR, false, null));
         parameterTypes.add(helper.createRequestParam(JavaType.INT_OBJECT,
-                "size", false, null));
+                SIZE_VAR, false, null));
         parameterTypes.addAll(AnnotatedJavaType.convertFromJavaTypes(MODEL));
 
         // Check if a method with the same signature already exists in the
@@ -1862,9 +1867,9 @@ public class DatatablesMetadata extends
                         null,
                         DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
                         null, null);
-        requestMappingAnnotation.addEnumAttribute("method", REQUEST_METHOD,
+        requestMappingAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD,
                 "DELETE");
-        requestMappingAnnotation.addStringAttribute("params",
+        requestMappingAnnotation.addStringAttribute(PARAMS_VAR,
                 "datatablesRedirect");
         requestMappingAnnotation.addStringAttribute("value", "/{id}");
         annotations.add(requestMappingAnnotation);
@@ -1875,7 +1880,7 @@ public class DatatablesMetadata extends
         // Define method parameter names
         final List<JavaSymbolName> parameterNames = Arrays.asList(
                 new JavaSymbolName("redirect"), new JavaSymbolName("id"),
-                new JavaSymbolName("page"), new JavaSymbolName("size"),
+                new JavaSymbolName(PAGE_VAR), new JavaSymbolName(SIZE_VAR),
                 UI_MODEL);
 
         // Add method javadoc (not generated to disk because #10229)
@@ -2305,13 +2310,12 @@ public class DatatablesMetadata extends
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
-        methodAnnotation.addStringAttribute("headers",
-                "Accept=application/json");
+        methodAnnotation.addStringAttribute(HEADERS, ACCEPT_APPLICATION_JSON);
         methodAnnotation
                 .addStringAttribute(
                         DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
                         "/datatables/ajax");
-        methodAnnotation.addStringAttribute("params",
+        methodAnnotation.addStringAttribute(PARAMS_VAR,
                 "ajax_find=".concat(finderNameValue));
         methodAnnotation
                 .addStringAttribute(
@@ -2770,9 +2774,8 @@ public class DatatablesMetadata extends
 
         AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
-        methodAnnotation.addStringAttribute("headers",
-                "Accept=application/json");
-        methodAnnotation.addStringAttribute("params", "checkFilters");
+        methodAnnotation.addStringAttribute(HEADERS, ACCEPT_APPLICATION_JSON);
+        methodAnnotation.addStringAttribute(PARAMS_VAR, "checkFilters");
         annotations.add(methodAnnotation);
         annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
 
@@ -3001,7 +3004,7 @@ public class DatatablesMetadata extends
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
 
         // @RequestMapping(method = RequestMethod.GET...
-        methodAnnotation.addEnumAttribute("method", REQUEST_METHOD, "GET");
+        methodAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD, "GET");
 
         // @RequestMapping(... produces = "text/html")
         methodAnnotation
@@ -3312,10 +3315,10 @@ public class DatatablesMetadata extends
         // Model uiModel) {
 
         // Define method parameter types
-        final List<AnnotatedJavaType> parameterTypes = Arrays.asList(helper
-                .createRequestParam(JavaType.INT_OBJECT, "page", false, null),
-                helper.createRequestParam(JavaType.INT_OBJECT, "size", false,
-                        null), new AnnotatedJavaType(MODEL));
+        final List<AnnotatedJavaType> parameterTypes = Arrays.asList(
+                helper.createRequestParam(JavaType.INT_OBJECT, PAGE_VAR, false,
+                        null), helper.createRequestParam(JavaType.INT_OBJECT,
+                        SIZE_VAR, false, null), new AnnotatedJavaType(MODEL));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -3344,7 +3347,7 @@ public class DatatablesMetadata extends
 
         // Define method parameter names
         final List<JavaSymbolName> parameterNames = Arrays.asList(
-                new JavaSymbolName("page"), new JavaSymbolName("size"),
+                new JavaSymbolName(PAGE_VAR), new JavaSymbolName(SIZE_VAR),
                 UI_MODEL);
 
         // Create the method body
@@ -3409,8 +3412,7 @@ public class DatatablesMetadata extends
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
-        methodAnnotation.addStringAttribute("headers",
-                "Accept=application/json");
+        methodAnnotation.addStringAttribute(HEADERS, ACCEPT_APPLICATION_JSON);
         methodAnnotation
                 .addStringAttribute(
                         DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
@@ -3481,8 +3483,7 @@ public class DatatablesMetadata extends
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
-        methodAnnotation.addStringAttribute("headers",
-                "Accept=application/json");
+        methodAnnotation.addStringAttribute(HEADERS, ACCEPT_APPLICATION_JSON);
         methodAnnotation
                 .addStringAttribute(
                         DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
