@@ -107,13 +107,24 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 		$table.fnFooterCallback(row, data, start, end, display);
 	});
 	
+	// Register Draw callback
+	st.oApi._fnCallbackReg(st, 'aoDrawCallback', function( oSettings ) {
+		$table.fnDrawCallback(oSettings);
+	});
+	
 	// Calling at first time Footer Callback
 	$table.fnFooterCallback();
 	
 	// Displaying always the clicked row
 	if($table.find(".row_clicked").length > 0){
-		var rowSelected = $table.find(".row_clicked");
-		$table.parent(".dataTables_scrollBody").animate({scrollTop: rowSelected.offset().top });
+		if($table.find(".row_clicked").length > 0){
+			var rowSelected = $table.find(".row_clicked");
+			var scrollHeight = $table.parent(".dataTables_scrollBody").height();
+			var rowSelectedPosition = rowSelected.offset().top;
+			if(rowSelectedPosition > scrollHeight){
+				$table.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
+			}
+		}
 	}
 	
 }
@@ -251,6 +262,23 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function(oSettings, iDelay) {
 				return this;
 			});
 	return this;
+};
+
+/**
+ * This function is executed after draw
+ * datatable element
+ */
+
+jQuery.fn.dataTableExt.oApi.fnDrawCallback = function(oSettings){
+	// Displaying always the clicked row
+	if(this.find(".row_clicked").length > 0){
+		var rowSelected = this.find(".row_clicked");
+		var scrollHeight = this.parent(".dataTables_scrollBody").height();
+		var rowSelectedPosition = rowSelected.offset().top;
+		if(rowSelectedPosition > scrollHeight){
+			this.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
+		}
+	}
 };
 
 /**

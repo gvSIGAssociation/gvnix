@@ -324,10 +324,19 @@ var GvNIX_RowClick;
 		 */
 		"fnLoadState" : function(force) {
 			var dt = this._data.dt;
-
-			var id = dt.oApi._fnReadCookie("gvnixRowclk-"+dt.nTable.id);
-			if (id) {
-				this.fnSetLastClicked(id, true,true);
+			
+			var sName = "gvnixRowclk-"+dt.nTable.id;
+			
+			if(!window.localStorage){
+				var id = dt.oApi._fnReadCookie(sName);
+				if (id) {
+					this.fnSetLastClicked(id, true,true);
+				}
+			}else{
+				var id = window.localStorage.getItem(sName);
+				if (id) {
+					this.fnSetLastClicked(id, true,true);
+				}
 			}
 		},
 
@@ -338,14 +347,20 @@ var GvNIX_RowClick;
 		 */
 		"fnSaveState" : function() {
 			var _d = this._data, dt = _d.dt;
-
-			dt.oApi._fnCreateCookie("gvnixRowclk-"+dt.nTable.id,
-					_d.lastClickedId,
-					10*60, // 10 minutes
-					"gvnixRowclk-",
-					null
-					);
-
+			
+			var sName = "gvnixRowclk-"+dt.nTable.id;
+			var sValue = _d.lastClickedId
+			
+			if(!window.localStorage){
+				dt.oApi._fnCreateCookie(sName,
+						sValue,
+						10*60, // 10 minutes
+						"gvnixRowclk-",
+						null
+						);
+			}else{
+				window.localStorage.setItem(sName,sValue);
+			}
 		},
 
 
