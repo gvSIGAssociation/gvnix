@@ -1,25 +1,14 @@
 package org.gvnix.addon.loupefield;
 
-import static org.springframework.roo.shell.OptionContexts.PROJECT;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Logger;
-
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.addon.web.mvc.controller.ControllerCommands;
-import org.springframework.roo.classpath.TypeLocationService;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
 import org.springframework.roo.shell.CommandMarker;
-import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Sample of a command class. The command class is registered by the Roo shell
@@ -42,12 +31,6 @@ public class LoupefieldCommands implements CommandMarker { // All command types
 
     @Reference
     private LoupefieldOperations operations;
-
-    @Reference
-    private TypeLocationService typeLocationService;
-
-    private static Logger LOGGER = HandlerUtils
-            .getLogger(LoupefieldCommands.class);
 
     /**
      * Check if setup is available

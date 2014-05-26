@@ -481,7 +481,6 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      */
     public void addToLoadScripts(String varName, String url) {
         // Modify Roo load-scripts.tagx
-        PathResolver pathResolver = projectOperations.getPathResolver();
         String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
                 "WEB-INF/tags/util/load-scripts.tagx");
 
@@ -542,20 +541,18 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
                         ANNOTATION_LOUPE_CONTROLLER) != null;
 
         if (!isAlreadyAnnotated) {
-            ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+            ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                     existingController);
 
             AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                     ANNOTATION_LOUPE_CONTROLLER);
 
             // Add annotation to target type
-            classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder
-                    .build());
+            detailsBuilder.addAnnotation(annotationBuilder.build());
 
             // Save changes to disk
-            typeManagementService
-                    .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
-                            .build());
+            typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder
+                    .build());
         }
 
     }
@@ -806,7 +803,6 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         String relativePath = "WEB-INF/views/".concat(path).concat("/")
                 .concat(viewName).concat(".jspx");
 
-        PathResolver pathResolver = projectOperations.getPathResolver();
         String docJspx = pathResolver.getIdentifier(
                 WebProjectUtils.getWebappPath(projectOperations), relativePath);
 
@@ -903,7 +899,6 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     @Override
     public boolean isInstalledInModule(String moduleName) {
-        PathResolver pathResolver = projectOperations.getPathResolver();
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
                 "scripts/loupefield/jquery.loupeField.ext.gvnix.js");
         return fileManager.exists(dirPath);

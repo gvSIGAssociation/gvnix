@@ -18,10 +18,8 @@
 package org.gvnix.addon.loupefield;
 
 import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -30,7 +28,6 @@ import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
-import org.springframework.roo.project.ProjectOperations;
 
 /**
  * Provides {@link DatatablesMetadata}.
@@ -42,12 +39,6 @@ import org.springframework.roo.project.ProjectOperations;
 @Service
 public final class LoupefieldMetadataProvider extends
         AbstractItdMetadataProvider {
-
-    @Reference
-    private WebMetadataService webMetadataService;
-
-    @Reference
-    protected ProjectOperations projectOperations;
 
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
