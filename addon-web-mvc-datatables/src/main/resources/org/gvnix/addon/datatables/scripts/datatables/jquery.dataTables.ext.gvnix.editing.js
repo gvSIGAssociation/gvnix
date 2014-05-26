@@ -123,7 +123,13 @@ var GvNIX_Editing;
 			 * @type string
 			 * @default null
 			 */
-			"toolbarId" : null
+			"toolbarId" : null,
+
+			/**
+			 * Show last created row at first row on first
+			 * table refresh (true by default)
+			 */
+			"showCreatedRowFirst": true
 		};
 
 		/**
@@ -186,7 +192,7 @@ var GvNIX_Editing;
 
 			/**
 			 * The panel that contains the create table
-			 * 
+			 *
 			 * @type object
 			 * @default empty
 			 */
@@ -194,7 +200,7 @@ var GvNIX_Editing;
 
 			/**
 			 * The create table
-			 * 
+			 *
 			 * @type object
 			 * @default empty
 			 */
@@ -575,9 +581,10 @@ var GvNIX_Editing;
 
 						// property is undefined for action columns
 						if(property !== undefined) {
+							property = this._fnUnscapePropertyName(property);
 
 							// Roo property id has the pattern "... _Vet_firstName_id"
-							var $ctrlGroup = $updateForm.find("div[id $= '_" + property + "_id'].control-group");
+							var $ctrlGroup = $updateForm.find("div[id $= '_" + property.replace(".","_") + "_id'].control-group");
 							var $editCtrls = $ctrlGroup.find("div.controls");
 							var $inputCtrl = $editCtrls.find(":input");
 							if ($inputCtrl.length == 0) {
@@ -969,9 +976,10 @@ var GvNIX_Editing;
 
 					// property is undefined for action columns
 					if (property !== undefined) {
+						property = this._fnUnscapePropertyName(property);
 						
 						// Roo property id has the pattern "... _Entity_propertyName_id"
-						var $ctrlGroup = $createForm.find("div[id $= '_" + property + "_id'].control-group");
+						var $ctrlGroup = $createForm.find("div[id $= '_" + property.replace(".","_") + "_id'].control-group");
 						var $createCtrls = $ctrlGroup.find("div.controls");
 						var $input = $createCtrls.find(":input");
 						if ($input.length == 0) {
@@ -1168,6 +1176,7 @@ var GvNIX_Editing;
 			jqxhr.done(jQuery.proxy(function(response) {
 				var _d = this._data, oCreatingRows = _d.oCreatingRows;
 				var oTable = _d.oSettings.oInstance;
+				var _o = this._options;
 				
 				// With proxy(), 'this' refers to the object encapsulates
 				// this function.
@@ -1216,8 +1225,15 @@ var GvNIX_Editing;
 						}
 					});
 
-					// Redraw table
-					oTable.fnDraw();
+					// handle showCreatedRowFirst
+					if (_o.showCreatedRowFirst && oTable.fnHasRowOnTop()) {
+						// fnSetRowsOnTop will refresh the table, so we shouldn't redraw the table
+						oTable.fnRowOnTop().fnSetRowsOnTop(response.oid,true);
+					} else {
+						// Redraw table
+						oTable.fnDraw();
+					}
+
 				} else {
 					
 					// there are errors
@@ -1499,6 +1515,16 @@ var GvNIX_Editing;
 
 		// Private methods (they are of course public in JS, but recommended as
 		// private) * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+		/**
+		 * Unscape nested property chars on property names:
+		 * replaces "_~~_" by "."
+		 *
+		 * @para propertyName to unscape
+		 */
+		"_fnUnscapePropertyName" : function(propertyName) {
+			return propertyName.replace("_~~_",".");
+		},
 
 		/**
 		 * Prepares an array of data to send to server

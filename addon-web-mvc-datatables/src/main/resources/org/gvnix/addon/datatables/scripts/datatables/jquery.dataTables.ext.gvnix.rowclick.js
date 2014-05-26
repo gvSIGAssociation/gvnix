@@ -324,9 +324,9 @@ var GvNIX_RowClick;
 		 */
 		"fnLoadState" : function(force) {
 			var dt = this._data.dt;
-			
+
 			var sName = "gvnixRowclk-"+dt.nTable.id;
-			
+
 			if(!window.localStorage){
 				var id = dt.oApi._fnReadCookie(sName);
 				if (id) {
@@ -347,10 +347,10 @@ var GvNIX_RowClick;
 		 */
 		"fnSaveState" : function() {
 			var _d = this._data, dt = _d.dt;
-			
+
 			var sName = "gvnixRowclk-"+dt.nTable.id;
 			var sValue = _d.lastClickedId
-			
+
 			if(!window.localStorage){
 				dt.oApi._fnCreateCookie(sName,
 						sValue,
@@ -710,7 +710,7 @@ jQuery.fn.dataTableExt.oApi.fnRowClick = function(oSettings,
 
 	var rowClickSupport = oSettings.GvNIX_RowClick_support;
 
-	if (oSettings.GvNIX_RowClick_support === undefined) {
+	if (rowClickSupport === undefined) {
 		rowClickSupport = new GvNIX_RowClick(oSettings, iSettings);
 	} else {
 		// TODO adjust settings on already initialized selection support
@@ -719,4 +719,25 @@ jQuery.fn.dataTableExt.oApi.fnRowClick = function(oSettings,
 	oSettings.GvNIX_RowClick_support = rowClickSupport;
 
 	return rowClickSupport;
+};
+
+/**
+*
+* Checks if  gvnix RowClick support is initialized on a datatables
+*
+* @param oSettings
+* @param iSettings
+* @return GvNIX_RowClick object
+* @author gvNIX Team
+*/
+jQuery.fn.dataTableExt.oApi.fnHasRowClick = function(oSettings,
+		iSettings) {
+
+	var rowClickSupport = oSettings.GvNIX_RowClick_support;
+
+	if (rowClickSupport === undefined) {
+		return false;
+	} else {
+		return true;
+	}
 };

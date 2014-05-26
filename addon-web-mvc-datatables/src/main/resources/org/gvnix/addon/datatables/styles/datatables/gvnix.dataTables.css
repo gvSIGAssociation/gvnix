@@ -170,11 +170,16 @@ a.cancel_entity {
 	background: url("../../images/datatables/cancel.png") no-repeat scroll center center transparent;
 }
 
+/** RowClick and RowOnTop **/
 table.dataTable tr.row_clicked td[class*="sorting_"],
-table.dataTable tr.row_clicked td {
+table.dataTable tr.row_clicked td,
+table.dataTable tr.row_on_top td[class*="sorting_"],
+table.dataTable tr.row_on_top td
+ {
 	background-color: #baffb4;
 }
 
+/** RowEditing **/
 table.dataTable tr.row_editing_error td[class*="sorting_"],
 table.dataTable tr.row_editing_error td,
 table.table tr.row_editing_error td {

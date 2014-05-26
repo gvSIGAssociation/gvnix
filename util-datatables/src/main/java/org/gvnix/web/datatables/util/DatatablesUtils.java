@@ -32,6 +32,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.SingularAttribute;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -65,6 +67,7 @@ import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.Order;
 import com.mysema.query.types.OrderSpecifier;
 import com.mysema.query.types.Predicate;
+import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.path.PathBuilder;
 
 /**
@@ -78,6 +81,7 @@ public class DatatablesUtils {
     private static Logger LOGGER = LoggerFactory
             .getLogger(DatatablesUtils.class);
 
+    public static final String ROWS_ON_TOP_IDS_PARAM = "dtt_row_on_top_ids";
     private static final String SEPARATOR_FIELDS = ".";
     private static final String SEPARATOR_FIELDS_ESCAPED = "_~~_";
 
@@ -89,6 +93,8 @@ public class DatatablesUtils {
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(Class, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
             EntityManager entityManager,
@@ -96,7 +102,7 @@ public class DatatablesUtils {
             ConversionService conversionService, MessageSource messageSource) {
         return findByCriteria(entityClass, null, null, entityManager,
                 datatablesCriterias, (BooleanBuilder) null, false,
-                conversionService, messageSource);
+                conversionService, messageSource, null);
     }
 
     /**
@@ -107,11 +113,14 @@ public class DatatablesUtils {
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(Class, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
             EntityManager entityManager, DatatablesCriterias datatablesCriterias) {
         return findByCriteria(entityClass, null, null, entityManager,
-                datatablesCriterias, (BooleanBuilder) null, false, null, null);
+                datatablesCriterias, (BooleanBuilder) null, false, null, null,
+                null);
     }
 
     /**
@@ -122,6 +131,10 @@ public class DatatablesUtils {
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param baseSearchValuesMap (optional) base filter values
+     * @param conversionService required by filter-by-expression and rows-on-top
+     *        (otherwise optional)
+     * @param messageSource required by filter-by-expression (otherwise
+     *        optional)
      * @return
      */
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
@@ -143,6 +156,8 @@ public class DatatablesUtils {
      * @param datatablesCriterias datatables parameters for query
      * @param baseSearchValuesMap (optional) base filter values
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(Class, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
             EntityManager entityManager,
@@ -165,7 +180,13 @@ public class DatatablesUtils {
      *        of related entity fields to order by
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
+     * @param conversionService required by filter-by-expression and rows-on-top
+     *        (otherwise optional)
+     * @param messageSource required by filter-by-expression (otherwise
+     *        optional)
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(Class, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
             Map<String, List<String>> filterByAssociations,
@@ -174,9 +195,8 @@ public class DatatablesUtils {
             DatatablesCriterias datatablesCriterias,
             ConversionService conversionService, MessageSource messageSource) {
         return findByCriteria(entityClass, filterByAssociations,
-                orderByAssociations, entityManager, datatablesCriterias,
-                (Map<String, Object>) null, false, conversionService,
-                messageSource);
+                orderByAssociations, entityManager, datatablesCriterias, null,
+                false, conversionService, messageSource, null);
     }
 
     /**
@@ -193,19 +213,25 @@ public class DatatablesUtils {
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(Class, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
             Map<String, List<String>> filterByAssociations,
             Map<String, List<String>> orderByAssociations,
             EntityManager entityManager, DatatablesCriterias datatablesCriterias) {
         return findByCriteria(entityClass, filterByAssociations,
-                orderByAssociations, entityManager, datatablesCriterias,
-                (Map<String, Object>) null, false, null, null);
+                orderByAssociations, entityManager, datatablesCriterias, null,
+                false, null, null, null);
     }
 
     /**
      * Execute a select query on entityClass using {@code DatatablesCriterias}
      * information for filter, sort and paginate result.
+     * <p/>
+     * This method can receive rows-on-top as parameter on
+     * <code>baseSearchValueMap</code> using {@link #ROWS_ON_TOP_IDS_PARAM}
+     * name.
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations (optional) for each related entity to join
@@ -217,6 +243,10 @@ public class DatatablesUtils {
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param baseSearchValuesMap (optional) base filter values
+     * @param conversionService required by filter-by-expression and rows-on-top
+     *        (otherwise optional)
+     * @param messageSource required by filter-by-expression (otherwise
+     *        optional)
      * @return
      */
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
@@ -246,6 +276,8 @@ public class DatatablesUtils {
      * @param datatablesCriterias datatables parameters for query
      * @param baseSearchValuesMap (optional) base filter values
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(Class, EntityManager, DatatablesCriterias, Map, ConversionService, MessageSource)}
      */
     public static <T> SearchResults<T> findByCriteria(Class<T> entityClass,
             Map<String, List<String>> filterByAssociations,
@@ -275,6 +307,8 @@ public class DatatablesUtils {
      * @param baseSearchValuesMap (optional) base filter values
      * @param distinct use distinct query
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(Class, EntityManager, DatatablesCriterias, Map,boolean, ConversionService, MessageSource)}
      */
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
             Class<T> entityClass,
@@ -294,6 +328,10 @@ public class DatatablesUtils {
      * Execute a select query on entityClass using <a
      * href="http://www.querydsl.com/">Querydsl</a> which enables the
      * construction of type-safe SQL-like queries.
+     * <p/>
+     * This method can receive rows-on-top as parameter on
+     * <code>baseSearchValueMap</code> using {@link #ROWS_ON_TOP_IDS_PARAM}
+     * name.
      * 
      * @param entityClass entity to use in search
      * @param filterByAssociations (optional) for each related entity to join
@@ -306,6 +344,10 @@ public class DatatablesUtils {
      * @param datatablesCriterias datatables parameters for query
      * @param baseSearchValuesMap (optional) base filter values
      * @param distinct use distinct query
+     * @param conversionService required by filter-by-expression and rows-on-top
+     *        (otherwise optional)
+     * @param messageSource required by filter-by-expression (otherwise
+     *        optional)
      * @return
      */
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
@@ -323,11 +365,31 @@ public class DatatablesUtils {
         // Query DSL builder
         PathBuilder<T> entity = new PathBuilder<T>(entityClass, "entity");
 
+        Object[] rowsOnTopIds = null;
         // Predicate for base query
         BooleanBuilder basePredicate;
         if (baseSearchValuesMap != null) {
-            basePredicate = QuerydslUtils.createPredicateByAnd(entity,
-                    baseSearchValuesMap);
+            // Handle ROWS_ON_TOP_IDS_PARAM param
+            Object tmpObject = baseSearchValuesMap.get(ROWS_ON_TOP_IDS_PARAM);
+
+            if (tmpObject != null) {
+                // Check if value is an array, otherwise
+                if (tmpObject.getClass().isArray()) {
+                    rowsOnTopIds = (Object[]) tmpObject;
+                }
+                else {
+                    rowsOnTopIds = new Object[] { tmpObject };
+                }
+                Map<String, Object> newBaseSearch = new HashMap<String, Object>(
+                        baseSearchValuesMap);
+                newBaseSearch.remove(ROWS_ON_TOP_IDS_PARAM);
+                basePredicate = QuerydslUtils.createPredicateByAnd(entity,
+                        newBaseSearch);
+            }
+            else {
+                basePredicate = QuerydslUtils.createPredicateByAnd(entity,
+                        baseSearchValuesMap);
+            }
         }
         else {
             basePredicate = new BooleanBuilder();
@@ -335,7 +397,8 @@ public class DatatablesUtils {
 
         return findByCriteria(entityClass, filterByAssociations,
                 orderByAssociations, entityManager, datatablesCriterias,
-                basePredicate, distinct, conversionService, messageSource);
+                basePredicate, distinct, conversionService, messageSource,
+                rowsOnTopIds);
     }
 
     /**
@@ -355,6 +418,7 @@ public class DatatablesUtils {
      * @param basePredicate (optional) base filter conditions
      * @param distinct use distinct query
      * @return
+     * @deprecated {@link #findByCriteria(Class, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
             Class<T> entityClass,
@@ -367,7 +431,7 @@ public class DatatablesUtils {
 
         return findByCriteria(entityClass, filterByAssociations,
                 orderByAssociations, entityManager, datatablesCriterias,
-                basePredicate, distinct, null, null);
+                basePredicate, distinct, null, null, null);
     }
 
     /**
@@ -387,6 +451,8 @@ public class DatatablesUtils {
      * @param basePredicate (optional) base filter conditions
      * @param distinct use distinct query
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(Class, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
             Class<T> entityClass,
@@ -405,7 +471,55 @@ public class DatatablesUtils {
 
         return findByCriteria(entity, filterByAssociations,
                 orderByAssociations, entityManager, datatablesCriterias,
-                basePredicate, distinct, conversionService, messageSource);
+                basePredicate, distinct, conversionService, messageSource, null);
+    }
+
+    /**
+     * Execute a select query on entityClass using {@code DatatablesCriterias}
+     * information for filter, sort and paginate result.
+     * <p/>
+     * This method can receive rows-on-top as parameter on
+     * <code>baseSearchValueMap</code> using {@link #ROWS_ON_TOP_IDS_PARAM}
+     * name.
+     * 
+     * @param entityClass entity to use in search
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param basePredicate (optional) base filter
+     * @param conversionService required by filter-by-expression and rows-on-top
+     *        (otherwise optional)
+     * @param messageSource required by filter-by-expression (otherwise
+     *        optional)
+     * @param rowsOnTopIds (optional) array with id of rows to show on top of
+     *        result list
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            Class<T> entityClass,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            BooleanBuilder basePredicate, boolean distinct,
+            ConversionService conversionService, MessageSource messageSource,
+            Object[] rowsOnTopIds) throws IllegalArgumentException {
+
+        Assert.notNull(entityClass);
+
+        // Query DSL builder
+        PathBuilder<T> entity = new PathBuilder<T>(entityClass, "entity");
+
+        return findByCriteria(entity, filterByAssociations,
+                orderByAssociations, entityManager, datatablesCriterias,
+                basePredicate, distinct, conversionService, messageSource,
+                rowsOnTopIds);
     }
 
     /**
@@ -424,8 +538,12 @@ public class DatatablesUtils {
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
+     * @param conversionService required by filter-by-expression and rows-on-top
+     *        (otherwise optional)
      * @param distinct use distinct query
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(Class, EntityManager, DatatablesCriterias, Map, ConversionService, MessageSource)}
      */
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
             PathBuilder<T> entity,
@@ -437,7 +555,7 @@ public class DatatablesUtils {
             MessageSource messageSource) throws IllegalArgumentException {
         return findByCriteria(entity, filterByAssociations,
                 orderByAssociations, entityManager, datatablesCriterias,
-                basePredicate, false, conversionService, messageSource);
+                basePredicate, false, conversionService, messageSource, null);
     }
 
     /**
@@ -456,8 +574,9 @@ public class DatatablesUtils {
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
-     * @param distinct use distinct query
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(PathBuilder, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
             PathBuilder<T> entity,
@@ -468,7 +587,7 @@ public class DatatablesUtils {
             BooleanBuilder basePredicate) throws IllegalArgumentException {
         return findByCriteria(entity, filterByAssociations,
                 orderByAssociations, entityManager, datatablesCriterias,
-                basePredicate, false, null, null);
+                basePredicate, false, null, null, null);
     }
 
     /**
@@ -481,8 +600,13 @@ public class DatatablesUtils {
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
-     * @param distinct use distinct query
+     * @param conversionService required by filter-by-expression and rows-on-top
+     *        (otherwise optional)
+     * @param messageSource required by filter-by-expression (otherwise
+     *        optional)
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(PathBuilder, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
             PathBuilder<T> entity, EntityManager entityManager,
@@ -491,7 +615,7 @@ public class DatatablesUtils {
             MessageSource messageSource) throws IllegalArgumentException {
         return findByCriteria(entity, null, null, entityManager,
                 datatablesCriterias, basePredicate, false, conversionService,
-                messageSource);
+                messageSource, null);
     }
 
     /**
@@ -504,15 +628,46 @@ public class DatatablesUtils {
      * @param entityManager {@code entityClass} {@link EntityManager}
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
-     * @param distinct use distinct query
+     * @param conversionService required by filter-by-expression and rows-on-top
+     *        (otherwise optional)
+     * @param messageSource required by filter-by-expression (otherwise
+     *        optional)
+     * @param rowsOnTopIds (optional) array with id of rows to show on top of
+     *        result list
      * @return
+     * @throws IllegalArgumentException
+     */
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            PathBuilder<T> entity, EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            BooleanBuilder basePredicate, ConversionService conversionService,
+            MessageSource messageSource, Object[] rowsOnTopIds)
+            throws IllegalArgumentException {
+        return findByCriteria(entity, null, null, entityManager,
+                datatablesCriterias, basePredicate, false, conversionService,
+                messageSource, rowsOnTopIds);
+    }
+
+    /**
+     * Execute a select query on entityClass using <a
+     * href="http://www.querydsl.com/">Querydsl</a> which enables the
+     * construction of type-safe SQL-like queries.
+     * 
+     * @param entity builder for entity to use in search. Represents the entity
+     *        and gives access to its properties for query purposes
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param basePredicate (optional) base filter conditions
+     * @return
+     * @deprecated see
+     *             {@link #findByCriteria(PathBuilder, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
             PathBuilder<T> entity, EntityManager entityManager,
             DatatablesCriterias datatablesCriterias,
             BooleanBuilder basePredicate) throws IllegalArgumentException {
         return findByCriteria(entity, null, null, entityManager,
-                datatablesCriterias, basePredicate, false, null, null);
+                datatablesCriterias, basePredicate, false, null, null, null);
     }
 
     /**
@@ -532,7 +687,13 @@ public class DatatablesUtils {
      * @param datatablesCriterias datatables parameters for query
      * @param basePredicate (optional) base filter conditions
      * @param distinct use distinct query
+     * @param conversionService required by filter-by-expression and rows-on-top
+     *        (otherwise optional)
+     * @param messageSource required by filter-by-expression (otherwise
+     *        optional)
      * @return
+     * @deprecated see
+     *             {@link #findByCriteria(PathBuilder, Map, Map, EntityManager, DatatablesCriterias, BooleanBuilder, boolean, ConversionService, MessageSource, Object[])}
      */
     public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
             PathBuilder<T> entity,
@@ -544,6 +705,45 @@ public class DatatablesUtils {
             ConversionService conversionService, MessageSource messageSource)
             throws IllegalArgumentException {
 
+        return findByCriteria(entity, null, null, entityManager,
+                datatablesCriterias, basePredicate, false, null, null, null);
+    }
+
+    /**
+     * Execute a select query on entityClass using <a
+     * href="http://www.querydsl.com/">Querydsl</a> which enables the
+     * construction of type-safe SQL-like queries.
+     * 
+     * @param entity builder for entity to use in search. Represents the entity
+     *        and gives access to its properties for query purposes
+     * @param filterByAssociations (optional) for each related entity to join
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to filter by
+     * @param orderByAssociations (optional) for each related entity to order
+     *        contain as key the name of the association and as value the List
+     *        of related entity fields to order by
+     * @param entityManager {@code entityClass} {@link EntityManager}
+     * @param datatablesCriterias datatables parameters for query
+     * @param basePredicate (optional) base filter conditions
+     * @param distinct use distinct query
+     * @param conversionService required by filter-by-expression and rows-on-top
+     *        (otherwise optional)
+     * @param messageSource required by filter-by-expression (otherwise
+     *        optional)
+     * @param rowsOnTopIds (optional) array with id of rows to show on top of
+     *        result list
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public static <T, E extends Comparable<?>> SearchResults<T> findByCriteria(
+            PathBuilder<T> entity,
+            Map<String, List<String>> filterByAssociations,
+            Map<String, List<String>> orderByAssociations,
+            EntityManager entityManager,
+            DatatablesCriterias datatablesCriterias,
+            BooleanBuilder basePredicate, boolean distinct,
+            ConversionService conversionService, MessageSource messageSource,
+            Object[] rowsOnTopIds) throws IllegalArgumentException {
         // Check arguments aren't null
         Assert.notNull(entityManager);
         Assert.notNull(datatablesCriterias);
@@ -634,6 +834,55 @@ public class DatatablesUtils {
             offset = new Long(datatablesCriterias.getDisplayStart());
         }
 
+        // ------- manage Rows-on-top ----
+
+        List<T> firstRows = null;
+
+        // Decrease limits if firstRowsIds is used
+        if (rowsOnTopIds != null) {
+
+            // Coherce row-on-top ids types
+            Object[] cohercedRowsOnTopId = new Object[rowsOnTopIds.length];
+
+            EntityType entityMetamodel = entityManager.getMetamodel().entity(
+                    entity.getType());
+            // We always have just one id. This id can be an Embedded Id
+            Class idType = entityMetamodel.getIdType().getJavaType();
+            SingularAttribute idAttr = (SingularAttribute) entityMetamodel
+                    .getId(idType);
+
+            Object curId;
+            for (int i = 0; i < rowsOnTopIds.length; i++) {
+                curId = rowsOnTopIds[i];
+                if (curId.getClass() != idType) {
+                    cohercedRowsOnTopId[i] = conversionService.convert(curId,
+                            idType);
+                }
+                else {
+                    cohercedRowsOnTopId[i] = curId;
+                }
+            }
+
+            // Create expression for rows-on-top
+            BooleanExpression firstRowsInExpression = QuerydslUtils
+                    .createCollectionExpression(entity, idAttr.getName(),
+                            Arrays.asList(cohercedRowsOnTopId));
+
+            // Exclude firstRows from base query
+            basePredicate = basePredicate.and(firstRowsInExpression.not());
+
+            // Gets rows on top
+            JPAQuery firstRowsQuery = new JPAQuery(entityManager);
+            firstRows = firstRowsQuery.from(entity)
+                    .where(firstRowsInExpression).list(entity);
+
+            // Adjust limit with rows-on-top found
+            if (limit != null) {
+                limit = limit - firstRows.size();
+            }
+
+        }
+
         // QueryModifiers combines limit and offset
         QueryModifiers queryModifiers = new QueryModifiers(limit, offset);
 
@@ -685,6 +934,13 @@ public class DatatablesUtils {
 
         // Calculate the total amount of entities including base filters only
         long totalBaseCount = baseQuery.count();
+
+        if (firstRows != null) {
+            // Adjust result with rows-on-top
+            totalResultCount = totalResultCount + firstRows.size();
+            totalBaseCount = totalBaseCount + firstRows.size();
+            elements.addAll(0, firstRows);
+        }
 
         // Create a new SearchResults instance
         if (offset == null) {

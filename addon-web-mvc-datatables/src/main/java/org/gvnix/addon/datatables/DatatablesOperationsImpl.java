@@ -663,7 +663,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 "js_jquery_datatables_selection_url",
                 "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.selection.js"));
 
-        // Add jquery.dataTables.ext.gvnix.selection.js
+        // Add jquery.dataTables.ext.gvnix.editing.js
         jsList.add(new ImmutablePair<String, String>(
                 "js_jquery_datatables_edit_url",
                 "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.editing.js"));
@@ -672,6 +672,11 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         jsList.add(new ImmutablePair<String, String>(
                 "js_jquery_datatables_rowclik_url",
                 "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.rowclick.js"));
+
+        // Add jquery.dataTables.ext.gvnix.rowontop.js
+        jsList.add(new ImmutablePair<String, String>(
+                "js_jquery_datatables_rowontop_url",
+                "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.rowontop.js"));
 
         // Add jquery.dataTables.ext.gvnix.detail.js
         jsList.add(new ImmutablePair<String, String>(

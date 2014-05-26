@@ -81,6 +81,12 @@ public class WebJpaBatchMetadata extends
     private static final JavaSymbolName REQUEST_NAME = new JavaSymbolName(
             "request");
 
+    private static final JavaType CONVERSION_SERVICE = new JavaType(
+            "org.springframework.core.convert.ConversionService");
+
+    private static final JavaType AUTOWIRED = new JavaType(
+            "org.springframework.beans.factory.annotation.Autowired");
+
     private static final JavaType JSON_RESPONSE = new JavaType(
             "org.gvnix.web.json.JsonResponse");
 
@@ -109,6 +115,9 @@ public class WebJpaBatchMetadata extends
     private static final JavaSymbolName CREATE_METHOD = new JavaSymbolName(
             "createBatch");
 
+    private static final JavaSymbolName GET_OID_LIST_METHOD = new JavaSymbolName(
+            "getOIDList");
+
     private static final JavaSymbolName GET_REQUEST_METHOD = new JavaSymbolName(
             "getRequestPropertyValues");
 
@@ -122,18 +131,11 @@ public class WebJpaBatchMetadata extends
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    private static final JavaType MAP_STRING_STRING = new JavaType(
-            MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-            Arrays.asList(JavaType.STRING, JavaType.STRING));
-
     private static final JavaType MAP_STRING_OBJECT = new JavaType(
             MAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, JavaType.OBJECT));
 
     private static final JavaType HASHMAP = new JavaType(HashMap.class);
-    private static final JavaType HASHMAP_STRING_STRING = new JavaType(
-            HASHMAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
-            Arrays.asList(JavaType.STRING, JavaType.STRING));
     private static final JavaType HASHMAP_STRING_OBJECT = new JavaType(
             HASHMAP.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, JavaType.OBJECT));
@@ -194,11 +196,14 @@ public class WebJpaBatchMetadata extends
     private final JavaSymbolName listOfEntityName;
     private final JavaType jsonResponseList;
     private final WebItdBuilderHelper helper;
+    private final FieldMetadata entityIdentifier;
 
     private FieldMetadata serviceFiled;
 
     private FieldMetadata loggerFiled;
     private final String entityName;
+
+    private FieldMetadata conversionService;
 
     public WebJpaBatchMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -233,6 +238,8 @@ public class WebJpaBatchMetadata extends
         this.entityName = JavaSymbolName.getReservedWordSafeName(entity)
                 .getSymbolName();
 
+        this.entityIdentifier = jpaBatchMetadata.getEntityIdentifier();
+
         listOfEntityName = new JavaSymbolName(
                 StringUtils.uncapitalize(jpaBatchMetadata.getEntityPlural()));
 
@@ -252,12 +259,16 @@ public class WebJpaBatchMetadata extends
                         "Service batch entity and Controller formBackingObject no match in %s",
                         governorPhysicalTypeMetadata.getType()
                                 .getFullyQualifiedTypeName()));
-
+        // Adding field definition
+        builder.addField(getConversionServiceField());
         builder.addField(getLoggerField());
+
+        // Adding methods
         builder.addField(getServiceField());
         builder.addMethod(getDeleteMethod());
         builder.addMethod(getUpdateMethod());
         builder.addMethod(getCreateMethod());
+        builder.addMethod(getGetOIDListMethod());
         builder.addMethod(getGetRequestPropertyValuesMethod());
 
         // Check if deleteBatch, createBatch or updateBatch are duplicated with
@@ -728,7 +739,9 @@ public class WebJpaBatchMetadata extends
         builder.appendFormalLine(String.format("%s jsonResponse = new %s();",
                 helper.getFinalTypeName(jsonResponseList),
                 helper.getFinalTypeName(jsonResponseList)));
-
+        // jsonResponse.setValue(vets);
+        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
+                listOfEntityName.getSymbolName()));
         // if (bindingResult.hasErrors()) {
         builder.appendFormalLine(String.format("if (%s.hasErrors()) {",
                 BINDING_RESULT_NAME.getSymbolName()));
@@ -738,9 +751,7 @@ public class WebJpaBatchMetadata extends
         builder.appendFormalLine(String.format(
                 "jsonResponse.setBindingResult(%s);",
                 BINDING_RESULT_NAME.getSymbolName()));
-        // jsonResponse.setValue(vets);
-        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
-                listOfEntityName.getSymbolName()));
+
         // jsonResponse.setStatus("ERROR");
         builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
         // return jsonResponse
@@ -767,9 +778,6 @@ public class WebJpaBatchMetadata extends
         builder.appendFormalLine("catch(Exception ex) {");
         builder.indent();
 
-        // jsonResponse.setValue(vets);
-        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
-                listOfEntityName.getSymbolName()));
         // jsonResponse.setStatus("ERROR");
         builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
         // jsonResponse.setExceptionMessage(ex.getLocalizedMessage());
@@ -784,6 +792,9 @@ public class WebJpaBatchMetadata extends
         // jsonResponse.setValue(vets);
         builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
                 listOfEntityName.getSymbolName()));
+        // jsonResponse.setOid(getOIDList(vets));
+        builder.appendFormalLine(String.format("jsonResponse.setOid(%s(%s));",
+                GET_OID_LIST_METHOD, listOfEntityName.getSymbolName()));
         // jsonResponse.setStatus("SUCCESS");
         builder.appendFormalLine("jsonResponse.setStatus(\"SUCCESS\");");
         // return jsonResponse
@@ -866,7 +877,9 @@ public class WebJpaBatchMetadata extends
         builder.appendFormalLine(String.format("%s jsonResponse = new %s();",
                 helper.getFinalTypeName(jsonResponseList),
                 helper.getFinalTypeName(jsonResponseList)));
-
+        // jsonResponse.setValue(vets);
+        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
+                listOfEntityName.getSymbolName()));
         // if (bindingResult.hasErrors()) {
         builder.appendFormalLine(String.format("if (%s.hasErrors()) {",
                 BINDING_RESULT_NAME.getSymbolName()));
@@ -876,9 +889,6 @@ public class WebJpaBatchMetadata extends
         builder.appendFormalLine(String.format(
                 "jsonResponse.setBindingResult(%s);",
                 BINDING_RESULT_NAME.getSymbolName()));
-        // jsonResponse.setValue(vets);
-        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
-                listOfEntityName.getSymbolName()));
         // jsonResponse.setStatus("ERROR");
         builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
         // return jsonResponse
@@ -904,9 +914,6 @@ public class WebJpaBatchMetadata extends
         builder.appendFormalLine("catch(Exception ex) {");
         builder.indent();
 
-        // jsonResponse.setValue(vets);
-        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
-                listOfEntityName.getSymbolName()));
         // jsonResponse.setStatus("ERROR");
         builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
         // jsonResponse.setExceptionMessage(ex.getLocalizedMessage());
@@ -918,9 +925,9 @@ public class WebJpaBatchMetadata extends
         builder.indentRemove();
         builder.appendFormalLine("}");
 
-        // jsonResponse.setValue(vets);
-        builder.appendFormalLine(String.format("jsonResponse.setValue(%s);",
-                listOfEntityName.getSymbolName()));
+        // jsonResponse.setOid(getOIDList(vets));
+        builder.appendFormalLine(String.format("jsonResponse.setOid(%s(%s));",
+                GET_OID_LIST_METHOD, listOfEntityName.getSymbolName()));
         // jsonResponse.setStatus("SUCCESS");
         builder.appendFormalLine("jsonResponse.setStatus(\"SUCCESS\");");
         // return jsonResponse
@@ -1231,4 +1238,145 @@ public class WebJpaBatchMetadata extends
         // return propertyValuesMap;
         bodyBuilder.appendFormalLine("return propertyValuesMap;");
     }
+
+    /**
+     * Gets <code>getRequestPropertyValues</code> method. <br>
+     * This method returns a Map with bean properties which appears on a String
+     * Iterator (usually from webRequest.getParametersNames())
+     * 
+     * @return
+     */
+    private MethodMetadata getGetOIDListMethod() {
+
+        JavaSymbolName methodName = GET_OID_LIST_METHOD;
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
+                .convertFromJavaTypes(listOfEntityType);
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(methodName, parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(listOfEntityName);
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetOIDListBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, LIST_STRING,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Build method body for getOIDList method
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetOIDListBody(InvocableMemberBodyBuilder bodyBuilder) {
+        // List<String> result = new ArrayList<String>(list.size());
+        bodyBuilder.appendFormalLine(String.format(
+                "%s result = new %s(%s.size());",
+                helper.getFinalTypeName(LIST_STRING),
+                helper.getFinalTypeName(ARRAYLIST_STRING), listOfEntityName));
+        // for (Pet pet :list) {
+        bodyBuilder.appendFormalLine(String.format("for (%s %s : %s) {",
+                helper.getFinalTypeName(entity), entityName, listOfEntityName));
+        bodyBuilder.indent();
+
+        // result.add(conversionService_batch.convert(pet.getId(),
+        // String.class));
+        bodyBuilder.appendFormalLine(String.format(
+                "result.add(%s.convert(%s.%s(), %s.class));",
+                getConversionServiceField().getFieldName(), entityName, helper
+                        .getGetterMethodNameForField(entityIdentifier
+                                .getFieldName()), helper
+                        .getFinalTypeName(JavaType.STRING)));
+
+        // }
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // return result;
+        bodyBuilder.appendFormalLine("return result;");
+    }
+
+    /**
+     * Create metadata for auto-wired convertionService field.
+     * 
+     * @return a FieldMetadata object
+     */
+    public FieldMetadata getConversionServiceField() {
+        if (conversionService == null) {
+            JavaSymbolName curName = new JavaSymbolName(
+                    "conversionService_batch");
+            // Check if field exist
+            FieldMetadata currentField = governorTypeDetails
+                    .getDeclaredField(curName);
+            if (currentField != null && !isConversionServiceField(currentField)) {
+                // No compatible field: look for new name
+                currentField = null;
+                JavaSymbolName newName = new JavaSymbolName(
+                        "conversionService_batch_");
+                currentField = governorTypeDetails.getDeclaredField(newName);
+                while (currentField != null
+                        && !isConversionServiceField(currentField)) {
+                    newName = new JavaSymbolName(newName.getSymbolName()
+                            .concat("_"));
+                    currentField = governorTypeDetails
+                            .getDeclaredField(newName);
+                }
+                curName = newName;
+            }
+            if (currentField != null) {
+                conversionService = currentField;
+            }
+            else {
+                // create field
+                List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                        1);
+                annotations.add(new AnnotationMetadataBuilder(AUTOWIRED));
+                // Using the FieldMetadataBuilder to create the field
+                // definition.
+                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                        getId(), Modifier.PUBLIC, annotations, curName, // Field
+                        CONVERSION_SERVICE); // Field type
+                conversionService = fieldBuilder.build(); // Build and return a
+                                                          // FieldMetadata
+                // instance
+            }
+        }
+        return conversionService;
+    }
+
+    /**
+     * Check if filed is a valid conversion service
+     * 
+     * @param field
+     * @return
+     */
+    private boolean isConversionServiceField(FieldMetadata field) {
+        return field != null && field.getAnnotation(AUTOWIRED) != null
+                && field.getFieldType().equals(CONVERSION_SERVICE);
+    }
+
 }

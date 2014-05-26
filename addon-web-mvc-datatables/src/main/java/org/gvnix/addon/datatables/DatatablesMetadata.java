@@ -17,78 +17,7 @@
  */
 package org.gvnix.addon.datatables;
 
-import static org.gvnix.addon.datatables.DatatablesConstants.ARRAYLIST_MAP_STRING_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.ARRAYLIST_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.ARRAY_UTILS;
-import static org.gvnix.addon.datatables.DatatablesConstants.AUTOWIRED;
-import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_PROPERTY_BINDING_RESULT;
-import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_WRAPPER;
-import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_WRAPPER_IMP;
-import static org.gvnix.addon.datatables.DatatablesConstants.BINDING_RESULT;
-import static org.gvnix.addon.datatables.DatatablesConstants.CHECK_FILTERS_RETURN;
-import static org.gvnix.addon.datatables.DatatablesConstants.CHECK_FILTER_EXPRESSIONS;
-import static org.gvnix.addon.datatables.DatatablesConstants.COLLECTIONS;
-import static org.gvnix.addon.datatables.DatatablesConstants.COLLECTION_UTILS;
-import static org.gvnix.addon.datatables.DatatablesConstants.CONVERSION_SERVICE;
-import static org.gvnix.addon.datatables.DatatablesConstants.CREATE_JSON_FORM_METHOD;
-import static org.gvnix.addon.datatables.DatatablesConstants.CRITERIA_PARAM_NAME;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_CRITERIA_TYPE;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_CSV_EXPORT;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_CONF;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_EXCEPTION;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_NAME;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_TYPE;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_TYPE_NAME;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_UTILS;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_HTML_TABLE;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_PARAMS;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_PDF_EXPORT;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_RESPONSE;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_UTILS;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_XLSX_EXPORT;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_XLS_EXPORT;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_XML_EXPORT;
-import static org.gvnix.addon.datatables.DatatablesConstants.DATA_SET_MAP_STRING_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.ENUMERATION_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.EXTENDED_MODEL_MAP;
-import static org.gvnix.addon.datatables.DatatablesConstants.FIND_ALL_RETURN;
-import static org.gvnix.addon.datatables.DatatablesConstants.GET_PROPERTY_MAP;
-import static org.gvnix.addon.datatables.DatatablesConstants.HASHMAP_STRING_OBJECT;
-import static org.gvnix.addon.datatables.DatatablesConstants.HASHMAP_STRING_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.HTTP_SERVLET_REQUEST;
-import static org.gvnix.addon.datatables.DatatablesConstants.HTTP_SERVLET_RESPONSE;
-import static org.gvnix.addon.datatables.DatatablesConstants.HTTP_SERVLET_RESPONSE_WRAPPER;
-import static org.gvnix.addon.datatables.DatatablesConstants.IDS_PARAM_NAME;
-import static org.gvnix.addon.datatables.DatatablesConstants.IO_EXCEPTION;
-import static org.gvnix.addon.datatables.DatatablesConstants.LIST_DATATABLES;
-import static org.gvnix.addon.datatables.DatatablesConstants.LIST_MAP_STRING_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.LIST_ROO;
-import static org.gvnix.addon.datatables.DatatablesConstants.LIST_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.MAP_STRING_OBJECT;
-import static org.gvnix.addon.datatables.DatatablesConstants.MAP_STRING_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.MESSAGE_SOURCE;
-import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_DATATABLES_CONFIG;
-import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_ITEM_FOR_RENDER;
-import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_PARAMETERS_MAP;
-import static org.gvnix.addon.datatables.DatatablesConstants.PRINT_WRITER;
-import static org.gvnix.addon.datatables.DatatablesConstants.QDSL_BOOLEAN_BUILDER;
-import static org.gvnix.addon.datatables.DatatablesConstants.QDSL_JPA_QUERY;
-import static org.gvnix.addon.datatables.DatatablesConstants.QDSL_PATH_BUILDER;
-import static org.gvnix.addon.datatables.DatatablesConstants.QUERYDSL_UTILS;
-import static org.gvnix.addon.datatables.DatatablesConstants.RENDER_UPDATE_FORMS_METHOD;
-import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_DISPATCHER;
-import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_METHOD;
-import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_PARAM_NAME;
-import static org.gvnix.addon.datatables.DatatablesConstants.RESPONSE_PARAM_NAME;
-import static org.gvnix.addon.datatables.DatatablesConstants.SEARCH_RESULTS;
-import static org.gvnix.addon.datatables.DatatablesConstants.SERVLET_EXCEPTION;
-import static org.gvnix.addon.datatables.DatatablesConstants.SET_STRING;
-import static org.gvnix.addon.datatables.DatatablesConstants.STRING_UTILS;
-import static org.gvnix.addon.datatables.DatatablesConstants.STRING_WRITER;
-import static org.gvnix.addon.datatables.DatatablesConstants.UI_MODEL;
-import static org.gvnix.addon.datatables.DatatablesConstants.UPDATE_JSON_FORMS_METHOD;
-import static org.gvnix.addon.datatables.DatatablesConstants.WEB_REQUEST;
+import static org.gvnix.addon.datatables.DatatablesConstants.*;
 import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.SpringJavaType.MODEL;
 import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
@@ -556,10 +485,10 @@ public class DatatablesMetadata extends
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         if (isCreateJsonForm) {
-            buildCreateJsonFormMethod(bodyBuilder);
+            buildCreateJsonFormMethodBody(bodyBuilder);
         }
         else {
-            buildUpdateJsonFormsMethod(bodyBuilder);
+            buildUpdateJsonFormsMethodBody(bodyBuilder);
         }
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
@@ -578,7 +507,7 @@ public class DatatablesMetadata extends
      * 
      * @param bodyBuilder the InvocableMemberBodyBuilder
      */
-    private void buildUpdateJsonFormsMethod(
+    private void buildUpdateJsonFormsMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
         // if (ArrayUtils.isEmpty(ids)) {
         bodyBuilder.appendFormalLine(String.format("if (%s.isEmpty(ids)) {",
@@ -667,7 +596,7 @@ public class DatatablesMetadata extends
      * 
      * @param bodyBuilder the InvocableMemberBodyBuilder
      */
-    private void buildCreateJsonFormMethod(
+    private void buildCreateJsonFormMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
 
         // // Prepare result
@@ -859,7 +788,7 @@ public class DatatablesMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildRenderUpdateFormsMethod(bodyBuilder);
+        buildRenderUpdateFormsMethodBody(bodyBuilder);
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -872,7 +801,7 @@ public class DatatablesMetadata extends
         // instance
     }
 
-    private void buildRenderUpdateFormsMethod(
+    private void buildRenderUpdateFormsMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
         // // Prepare result
         bodyBuilder.appendFormalLine("// Prepare result");
@@ -1607,11 +1536,10 @@ public class DatatablesMetadata extends
         parameterTypes.add(helper.createRequestParam(JavaType.STRING,
                 "datatablesRedirect", true, null));
         parameterTypes.add(new AnnotatedJavaType(entity,
-                new AnnotationMetadataBuilder(new JavaType(
-                        "javax.validation.Valid")).build()));
+                new AnnotationMetadataBuilder(VALID).build()));
         parameterTypes.addAll(AnnotatedJavaType.convertFromJavaTypes(
                 new JavaType("org.springframework.validation.BindingResult"),
-                MODEL, HTTP_SERVLET_REQUEST));
+                REDIRECT_ATTRIBUTES, HTTP_SERVLET_REQUEST));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -1659,13 +1587,35 @@ public class DatatablesMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildCreateDatatablesDetailMethodBody(bodyBuilder);
 
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, new JavaSymbolName(
+                        "createDatatablesDetail"), JavaType.STRING,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+        methodBuilder.setCommentStructure(comments);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    /**
+     * Build method body for createDatatablesDetails
+     * 
+     * @param bodyBuilder
+     */
+    private void buildCreateDatatablesDetailMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        String entityParamName = entity.getSimpleTypeName().toLowerCase();
         bodyBuilder
                 .appendFormalLine("// Do common create operations (check errors, populate, persist, ...)");
         // String view = create(pet, bindingResult, uiModel,
         // httpServletRequest);
         bodyBuilder.appendFormalLine("String view = create(".concat(
-                entity.getSimpleTypeName().toLowerCase()).concat(
+                entityParamName).concat(
                 ", bindingResult, uiModel, httpServletRequest);"));
         // if (bindingResult.hasErrors() || redirect == null ||
         // redirect.trim().isEmpty()) {
@@ -1679,22 +1629,21 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("return view;");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
+
+        // uiModel.addFlashAttribute(DatatablesUtils.ROWS_ON_TOP_IDS_PARAM,
+        // pet.getId());
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("uiModel.addFlashAttribute(%s.ROWS_ON_TOP_IDS_PARAM, %s.%s());",
+                                helper.getFinalTypeName(DATATABLES_UTILS),
+                                entityParamName,
+                                helper.getGetterMethodNameForField(entityIdentifier
+                                        .getFieldName())));
+
         bodyBuilder
                 .appendFormalLine("// If create success, redirect to given URL: master datatables");
         // return "redirect:".concat(redirect);
         bodyBuilder.appendFormalLine("return \"redirect:\".concat(redirect);");
-
-        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
-        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, new JavaSymbolName(
-                        "createDatatablesDetail"), JavaType.STRING,
-                parameterTypes, parameterNames, bodyBuilder);
-        methodBuilder.setAnnotations(annotations);
-        methodBuilder.setThrowsTypes(throwsTypes);
-        methodBuilder.setCommentStructure(comments);
-
-        return methodBuilder.build(); // Build and return a MethodMetadata
-                                      // instance
     }
 
     /**
@@ -1719,11 +1668,9 @@ public class DatatablesMetadata extends
         parameterTypes.add(helper.createRequestParam(JavaType.STRING,
                 "datatablesRedirect", true, null));
         parameterTypes.add(new AnnotatedJavaType(entity,
-                new AnnotationMetadataBuilder(new JavaType(
-                        "javax.validation.Valid")).build()));
+                new AnnotationMetadataBuilder(VALID).build()));
         parameterTypes.addAll(AnnotatedJavaType.convertFromJavaTypes(
-                new JavaType("org.springframework.validation.BindingResult"),
-                MODEL, HTTP_SERVLET_REQUEST));
+                BINDING_RESULT, REDIRECT_ATTRIBUTES, HTTP_SERVLET_REQUEST));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -1772,12 +1719,30 @@ public class DatatablesMetadata extends
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
+        buildUpdateDatatablesDetailMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, new JavaSymbolName(
+                        "updateDatatablesDetail"), JavaType.STRING,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+        methodBuilder.setCommentStructure(comments);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+                                      // instance
+    }
+
+    private void buildUpdateDatatablesDetailMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        String entityParamName = entity.getSimpleTypeName().toLowerCase();
         bodyBuilder
                 .appendFormalLine("// Do common update operations (check errors, populate, merge, ...)");
         // String view = update(pet, bindingResult, uiModel,
         // httpServletRequest);
         bodyBuilder.appendFormalLine("String view = update(".concat(
-                entity.getSimpleTypeName().toLowerCase()).concat(
+                entityParamName).concat(
                 ", bindingResult, uiModel, httpServletRequest);"));
         // if (bindingResult.hasErrors() || redirect == null ||
         // redirect.trim().isEmpty()) {
@@ -1791,22 +1756,21 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("return view;");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
+
+        // uiModel.addFlashAttribute(DatatablesUtils.ROWS_ON_TOP_IDS_PARAM,
+        // pet.getId());
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("uiModel.addFlashAttribute(%s.ROWS_ON_TOP_IDS_PARAM, %s.%s());",
+                                helper.getFinalTypeName(DATATABLES_UTILS),
+                                entityParamName,
+                                helper.getGetterMethodNameForField(entityIdentifier
+                                        .getFieldName())));
+
         bodyBuilder
                 .appendFormalLine("// If update success, redirect to given URL: master datatables");
         // return "redirect:".concat(redirect);
         bodyBuilder.appendFormalLine("return \"redirect:\".concat(redirect);");
-
-        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
-        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, new JavaSymbolName(
-                        "updateDatatablesDetail"), JavaType.STRING,
-                parameterTypes, parameterNames, bodyBuilder);
-        methodBuilder.setAnnotations(annotations);
-        methodBuilder.setThrowsTypes(throwsTypes);
-        methodBuilder.setCommentStructure(comments);
-
-        return methodBuilder.build(); // Build and return a MethodMetadata
-                                      // instance
     }
 
     /**
@@ -2066,31 +2030,43 @@ public class DatatablesMetadata extends
 
         /*
          * // Add to the property map the parameters used as query operators
-         * Map<String, String> params = populateParametersMap(request);
+         * Map<String, Object> params = new HashMap<String,Object>(populateParametersMap(request));
          * Set<String> keySet = params.keySet();
          */
         bodyBuilder
                 .appendFormalLine("// Add to the property map the parameters used as query operators");
         bodyBuilder.appendFormalLine(String.format(
-                "%s params = populateParametersMap(request);",
-                helper.getFinalTypeName(MAP_STRING_STRING)));
+                "%s params = new %s(populateParametersMap(request));",
+                helper.getFinalTypeName(MAP_STRING_OBJECT),
+                helper.getFinalTypeName(HASHMAP_STRING_OBJECT)));
         bodyBuilder.appendFormalLine(String.format(
                 "%s keySet = params.keySet();",
                 helper.getFinalTypeName(SET_STRING)));
 
         /*
-         * for (String key : keySet) { if
-         * (key.startsWith(QuerydslUtils.OPERATOR_PREFIX)) {
-         * propertyValuesMap.put(key, params.get(key)); } }
+         * for (String key : keySet) {
+         * if (key.startsWith(QuerydslUtils.OPERATOR_PREFIX)) {
+         *     propertyValuesMap.put(key, params.get(key));
+         * } else if (DatatablesUtils.ROWS_ON_TOP_IDS_PARAM.equals(key)) {
+         *     propertyValuesMap.put(key, request.getParams().get(key));
+         * }
+         * }
          */
         bodyBuilder.appendFormalLine("for (String key : keySet) {");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine(String.format(
-                "if (key.startsWith(%s.OPERATOR_PREFIX)) {", new JavaType(
-                        "org.gvnix.web.datatables.util.QuerydslUtils")));
+                "if (key.startsWith(%s.OPERATOR_PREFIX)) {",
+                helper.getFinalTypeName(QUERYDSL_UTILS)));
         bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("propertyValuesMap.put(key, params.get(key));");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine(String.format(
+                "} else if (%s.ROWS_ON_TOP_IDS_PARAM.equals(key)) {",
+                helper.getFinalTypeName(DATATABLES_UTILS)));
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("propertyValuesMap.put(key, request.getParameterMap().get(key));");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
         bodyBuilder.indentRemove();
@@ -2396,21 +2372,22 @@ public class DatatablesMetadata extends
 
         // Build code to generate QueryDsl predicate to include base filter
         // on Datatables.findByCriteria
-        buildFinderAjaxBaseSearch(bodyBuilder, finderMethod, queryHolder);
+        buildFinderAjaxBaseSearchMethodBody(bodyBuilder, finderMethod,
+                queryHolder);
 
         bodyBuilder.appendFormalLine("");
 
         // Build Datatables.findByCriteria call code
-        buildFindByCriteriaCall(bodyBuilder, true);
+        buildFindByCriteriaCallMethodBody(bodyBuilder, true);
 
         // Build code for response based on SearchResult
         if (isStantardMode()) {
             // Build code to delegate on Datatables.populateDataSearch
-            buildPopulateDataSearchCall(bodyBuilder);
+            buildPopulateDataSearchCallMethodBody(bodyBuilder);
         }
         else {
             // Build code to call RenderItem method
-            buildPopulateDataSearchCallRenderMode(bodyBuilder);
+            buildPopulateDataSearchCallRenderModeMethodBody(bodyBuilder);
         }
     }
 
@@ -2422,7 +2399,7 @@ public class DatatablesMetadata extends
      * @param finderMethod
      * @param queryHolder
      */
-    private void buildFinderAjaxBaseSearch(
+    private void buildFinderAjaxBaseSearchMethodBody(
             InvocableMemberBodyBuilder bodyBuilder,
             FinderMetadataDetails finderMethod, QueryHolderTokens queryHolder) {
 
@@ -3186,7 +3163,7 @@ public class DatatablesMetadata extends
                             .equals(fieldName)) {
                         found = true;
 
-                        buildFieldDetailInfo(bodyBuilder, entityField);
+                        buildFieldDetailInfoMethodBody(bodyBuilder, entityField);
                     }
                 }
                 if (!found) {
@@ -3211,8 +3188,8 @@ public class DatatablesMetadata extends
      * @param bodyBuilder
      * @param entityField
      */
-    private void buildFieldDetailInfo(InvocableMemberBodyBuilder bodyBuilder,
-            FieldMetadata entityField) {
+    private void buildFieldDetailInfoMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder, FieldMetadata entityField) {
         AnnotationMetadata entityFieldOneToManyAnnotation = entityField
                 .getAnnotation(new JavaType("javax.persistence.OneToMany"));
 
@@ -3531,9 +3508,9 @@ public class DatatablesMetadata extends
     private void buildFindAllMethodBodyRenderMode(
             InvocableMemberBodyBuilder bodyBuilder) {
         // Build call to FindByCriteria
-        buildFindByCriteriaCall(bodyBuilder, false);
+        buildFindByCriteriaCallMethodBody(bodyBuilder, false);
 
-        buildPopulateDataSearchCallRenderMode(bodyBuilder);
+        buildPopulateDataSearchCallRenderModeMethodBody(bodyBuilder);
     }
 
     /**
@@ -3541,7 +3518,7 @@ public class DatatablesMetadata extends
      * 
      * @param bodyBuilder
      */
-    private void buildPopulateDataSearchCallRenderMode(
+    private void buildPopulateDataSearchCallRenderModeMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
         bodyBuilder.appendFormalLine(String.format(
                 "%s rows = %s(searchResult, %s, %s);",
@@ -3575,7 +3552,7 @@ public class DatatablesMetadata extends
      * @param baseSearch
      * @return
      */
-    private String buildFindByCriteriaCall(
+    private String buildFindByCriteriaCallMethodBody(
             InvocableMemberBodyBuilder bodyBuilder, boolean baseSearch) {
         final String entityTypeName = helper.getFinalTypeName(entity);
         JavaType serachResult = new JavaType(
@@ -3699,9 +3676,9 @@ public class DatatablesMetadata extends
             InvocableMemberBodyBuilder bodyBuilder) {
 
         // Build call to FindByCriteria
-        buildFindByCriteriaCall(bodyBuilder, false);
+        buildFindByCriteriaCallMethodBody(bodyBuilder, false);
 
-        buildPopulateDataSearchCall(bodyBuilder);
+        buildPopulateDataSearchCallMethodBody(bodyBuilder);
     }
 
     /**
@@ -3709,7 +3686,7 @@ public class DatatablesMetadata extends
      * 
      * @param bodyBuilder
      */
-    private void buildPopulateDataSearchCall(
+    private void buildPopulateDataSearchCallMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
         bodyBuilder.appendFormalLine("");
         bodyBuilder.appendFormalLine("// Entity pk field name");
@@ -4004,9 +3981,9 @@ public class DatatablesMetadata extends
         /*
          * @RequestMapping(value = "/exportcsv", produces = "text/csv") public
          * void PetController.exportCsv(
-         * 
+         *
          * @DatatablesParams DatatablesCriterias criterias,
-         * 
+         *
          * @ModelAttribute Pet pet, HttpServletRequest request,
          * HttpServletResponse response) throws ServletException, IOException,
          * ExportException { ... }

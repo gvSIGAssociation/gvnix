@@ -1,10 +1,13 @@
 /**
  * gvNIX Datatables extended initialization
  *
- * @param datatable settings
+ * @param datatable
+ *            settings
  * @param tableId
- * @param options to initialize
- * @param count of tries-to-delay-initialize
+ * @param options
+ *            to initialize
+ * @param count
+ *            of tries-to-delay-initialize
  */
 function fnDatatablesExtInit(oSettings, tableId, options, count) {
 
@@ -12,7 +15,7 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 	var atables = $.fn.dataTable.fnTables(true);
 	for (i = 0; i < atables.length; i++) {
 		$table = jQuery(atables[i]).dataTable();
-		if ($table.fnSettings().sTableId == tableId){
+		if ($table.fnSettings().sTableId == tableId) {
 			break;
 		}
 		$table = null;
@@ -22,7 +25,9 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 		if (count) {
 			// Check number of tries
 			if (count > 12) {
-				log("Datatables " + tableId + " gvnix init ext is not loaded because it's currently not available (not visible tab)");
+				log("Datatables "
+						+ tableId
+						+ " gvnix init ext is not loaded because it's currently not available (not visible tab)");
 				return;
 			}
 			// increase tries count
@@ -32,8 +37,9 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 			count = 1;
 		}
 		// Try to load it delayed
-		log("Delay loading of '"+ tableId+"':"+count);
-		window.setTimeout(fnDatatablesExtInit, 100, oSettings, tableId, options,count);
+		log("Delay loading of '" + tableId + "':" + count);
+		window.setTimeout(fnDatatablesExtInit, 100, oSettings, tableId,
+				options, count);
 		return;
 	}
 	if (options.filterOnReturn) {
@@ -94,6 +100,17 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 		}
 	}
 
+	// Init gvNIX rowOnTop support. Note this function is in file
+	// 'jquery.dataTables.ext.gvnix.rowontop.js', so we must check if
+	// init function has been loaded
+	if (options.rowsOnTop && typeof ($table.fnRowOnTop) === "function") {
+		if (typeof options.rowsOnTop == "object") {
+			$table.fnRowOnTop(options.rowsOnTop);
+		} else {
+			$table.fnRowOnTop();
+		}
+	}
+
 	if (count) {
 		// If delay loading adjust column size
 		$table.fnAdjustColumnSizing();
@@ -137,7 +154,7 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 function fnDisplayCreateForm(sTableId) {
 	var oTable = jQuery('#' + sTableId);
 	if (oTable.length == 0) {
-		throw "fnDisplayCreateForm : id not found '"+ sTableId + "'";
+		throw "fnDisplayCreateForm : id not found '" + sTableId + "'";
 	}
 	oTable.dataTable().fnEditing().fnBeginCreate(sTableId);
 }
@@ -151,7 +168,7 @@ function fnDisplayCreateForm(sTableId) {
 function fnEditDatatableRow(sTableId, sRowId) {
 	var oTable = jQuery('#' + sTableId);
 	if (oTable.length == 0) {
-		throw "fnEditDatatableRow : id not found '"+ sTableId + "'";
+		throw "fnEditDatatableRow : id not found '" + sTableId + "'";
 	}
 	oTable.dataTable().fnEditing().fnEditRows(sRowId);
 }
@@ -406,6 +423,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
 
 	// Server-side processing should just call fnDraw
 	if (oSettings.oFeatures.bServerSide) {
+		oSettings.bAjaxDataGet = true; // force perform ajax call
 		this.fnDraw();
 		return;
 	}
@@ -427,7 +445,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
 						._fnGetObjectDataFn(oSettings.sAjaxDataProp)(json)
 						: json;
 
-				for ( var i = 0; i < aData.length; i++) {
+				for (var i = 0; i < aData.length; i++) {
 					that.oApi._fnAddData(oSettings, aData[i]);
 				}
 
@@ -448,4 +466,27 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
 					fnCallback(oSettings);
 				}
 			}, oSettings);
+};
+
+/**
+ * Redraw the table (i.e. fnDraw) to take account of sorting and filtering, but
+ * retain the current pagination settings.
+ *
+ * from http://datatables.net/plug-ins/api#fnStandingRedraw
+ */
+$.fn.dataTableExt.oApi.fnStandingRedraw = function(oSettings) {
+	if (oSettings.oFeatures.bServerSide === false) {
+		var before = oSettings._iDisplayStart;
+
+		oSettings.oApi._fnReDraw(oSettings);
+
+		// iDisplayStart has been reset to zero - so lets change it back
+		oSettings._iDisplayStart = before;
+		oSettings.oApi._fnCalculateEnd(oSettings);
+	} else {
+		oSettings.bAjaxDataGet = true; // force perform ajax call
+	}
+
+	// draw the 'current' page
+	oSettings.oApi._fnDraw(oSettings);
 };

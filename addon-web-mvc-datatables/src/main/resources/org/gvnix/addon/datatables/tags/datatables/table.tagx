@@ -763,6 +763,16 @@
             <c:if test="${not empty detailsInfo and datatablesStandardMode}">
                 , 'rowclick' : {persistState: true}
             </c:if>
+            <c:if test="${update || update || (not empty dtt_row_on_top_ids)}">
+                <c:choose>
+                  <c:when test="${not empty dtt_row_on_top_ids}">
+                , 'rowsOnTop': { 'asRowOnTopIds' : ${dtt_row_on_top_ids} }
+                  </c:when>
+                  <c:otherwise>
+                , 'rowsOnTop': true
+                  </c:otherwise>
+                </c:choose>
+            </c:if>
 	    	});
 
 			<c:forEach var="entry" items="${datatables_javaScript_elements_init}">

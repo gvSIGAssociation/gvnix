@@ -142,6 +142,11 @@ public class DatatablesConstants {
     static final JavaType SIMPLE_DATE_FORMAT = new JavaType(
             "java.text.SimpleDateFormat");
 
+    static final JavaType REDIRECT_ATTRIBUTES = new JavaType(
+            "org.springframework.web.servlet.mvc.support.RedirectAttributes");
+
+    static final JavaType VALID = new JavaType("javax.validation.Valid");
+
     static final JavaSymbolName CRITERIA_PARAM_NAME = new JavaSymbolName(
             "criterias");
     static final JavaSymbolName ITEM_LIST_PARAM_NAME = new JavaSymbolName(

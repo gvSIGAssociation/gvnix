@@ -1,5 +1,5 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,9 +33,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * JSON example (when <em>T</em> is a List):
  * 
  * <pre>
- *   { 
- *     OBJECT_INDEX : { FIELD1_NAME : FIELD_ERROR_MSG, FIELD2_NAME : FIELD_ERROR_MSG, ...}, 
- *     OBJECT_INDEX2 : { FIELD1_NAME : FIELD_ERROR_MSG, 
+ *   {
+ *     OBJECT_INDEX : { FIELD1_NAME : FIELD_ERROR_MSG, FIELD2_NAME : FIELD_ERROR_MSG, ...},
+ *     OBJECT_INDEX2 : { FIELD1_NAME : FIELD_ERROR_MSG,
  *         FIELD_OBJECT_NAME : { SUBOBJECT_FIELD: FIELD_ERROR_MSG, ... }
  *         FIELD_LIST_NAME: {
  *              OBJECT_FIELD_ITEM_INDEX : {ITEM_LIST_FIELD: FIELD_ERROR_MSG, ... },
@@ -43,14 +43,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
  *         },
  *         ...
  *     },
- *     ... 
+ *     ...
  *   }
  * </pre>
  * 
  * JSON example (when <em>T</em> is a Object):
  * 
  * <pre>
- * { FIELD1_NAME : FIELD_ERROR_MSG, 
+ * { FIELD1_NAME : FIELD_ERROR_MSG,
  *      FIELD_OBJECT_NAME : { SUBOBJECT_FIELD: FIELD_ERROR_MSG, ... }
  *      FIELD_LIST_NAME: {
  *              OBJECT_FIELD_ITEM_INDEX : {ITEM_LIST_FIELD: FIELD_ERROR_MSG, ... },
@@ -86,6 +86,11 @@ public class JsonResponse<T> {
      * Request values result
      */
     private T value;
+
+    /**
+     * OID of {@link #value}
+     */
+    private Object oid;
 
     /**
      * @return request status result
@@ -149,5 +154,13 @@ public class JsonResponse<T> {
      */
     public void setBindingResult(BindingResult bindingResult) {
         this.bindingResult = bindingResult;
+    }
+
+    public Object getOid() {
+        return oid;
+    }
+
+    public void setOid(Object oid) {
+        this.oid = oid;
     }
 }
