@@ -80,8 +80,26 @@ public class WebExceptionHandlerOperationsImpl implements
 
     private static final String FOLDER_SEPARATOR = "/";
 
-    private static Logger LOGGER = HandlerUtils
+    private static final Logger LOGGER = HandlerUtils
             .getLogger(WebModalDialogOperationsImpl.class);
+
+    private static final String WEB_MVC_CONFIG = "WEB-INF/spring/webmvc-config.xml";
+
+    private static final String WEB_MVC_CONFIG_NOT_FOUND = "webmvc-config.xml not found";
+
+    private static final String RESOLVER_BEAN_MESSAGE = "/beans/bean[@id='messageMappingExceptionResolverBean']";
+
+    private static final String JSPX_EXTENSION = ".jspx";
+
+    private static final String ERROR = "error.";
+
+    private static final String TITLE = ".title";
+
+    private static final String PROBLEM_DESCRIPTION = ".problemdescription";
+
+    private static final String IMP_IDENTIFIER_GENERATION_EXCEPTION = "org.hibernate.id.IdentifierGenerationException";
+
+    private static final String IDENTIFIER_GENERATION_EXCEPTION = "IdentifierGenerationException";
 
     @Reference
     private ProjectOperations projectOperations;
@@ -109,9 +127,9 @@ public class WebExceptionHandlerOperationsImpl implements
 
         String webXmlPath = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/spring/webmvc-config.xml");
+                WEB_MVC_CONFIG);
         Validate.isTrue(fileManager.exists(webXmlPath),
-                "webmvc-config.xml not found");
+                WEB_MVC_CONFIG_NOT_FOUND);
 
         MutableFile webXmlMutableFile = null;
         Document webXml;
@@ -126,18 +144,16 @@ public class WebExceptionHandlerOperationsImpl implements
         }
         Element root = webXml.getDocumentElement();
 
-        List<Element> simpleMappingExceptionResolverProps = null;
-        simpleMappingExceptionResolverProps = XmlUtils.findElements(
-                "/beans/bean[@id='messageMappingExceptionResolverBean']"
-                        + "/property[@name='exceptionMappings']/props/prop",
-                root);
+        List<Element> simpleMappingException = null;
+        simpleMappingException = XmlUtils.findElements(RESOLVER_BEAN_MESSAGE
+                + "/property[@name='exceptionMappings']/props/prop", root);
 
-        Validate.notNull(simpleMappingExceptionResolverProps,
+        Validate.notNull(simpleMappingException,
                 "There aren't Exceptions handled by the application.");
 
         StringBuilder exceptionList = new StringBuilder("Handled Exceptions:\n");
 
-        for (Element element : simpleMappingExceptionResolverProps) {
+        for (Element element : simpleMappingException) {
             exceptionList.append(element.getAttribute("key") + "\n");
         }
 
@@ -274,9 +290,9 @@ public class WebExceptionHandlerOperationsImpl implements
     private void existException(String exceptionName) {
         String webXmlPath = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/spring/webmvc-config.xml");
+                WEB_MVC_CONFIG);
         Validate.isTrue(fileManager.exists(webXmlPath),
-                "webmvc-config.xml not found");
+                WEB_MVC_CONFIG_NOT_FOUND);
 
         MutableFile webXmlMutableFile = null;
         Document webXml;
@@ -291,13 +307,13 @@ public class WebExceptionHandlerOperationsImpl implements
         }
         Element root = webXml.getDocumentElement();
 
-        Element simpleMappingExceptionResolverProp = XmlUtils
+        Element exceptionResolver = XmlUtils
                 .findFirstElement(
-                        "/beans/bean[@id='messageMappingExceptionResolverBean']"
+                        RESOLVER_BEAN_MESSAGE
                                 + "/property[@name='exceptionMappings']/props/prop[@key='"
                                 + exceptionName + "']", root);
 
-        Validate.isTrue(simpleMappingExceptionResolverProp != null,
+        Validate.isTrue(exceptionResolver != null,
                 "There isn't a Exception Handled with the name:\t"
                         + exceptionName);
     }
@@ -312,9 +328,9 @@ public class WebExceptionHandlerOperationsImpl implements
 
         String webXmlPath = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/spring/webmvc-config.xml");
+                WEB_MVC_CONFIG);
         Validate.isTrue(fileManager.exists(webXmlPath),
-                "webmvc-config.xml not found");
+                WEB_MVC_CONFIG_NOT_FOUND);
 
         MutableFile webXmlMutableFile = null;
         Document webXml;
@@ -329,15 +345,13 @@ public class WebExceptionHandlerOperationsImpl implements
         }
         Element root = webXml.getDocumentElement();
 
-        Element simpleMappingExceptionResolverProps = XmlUtils
-                .findFirstElement(
-                        "/beans/bean[@id='messageMappingExceptionResolverBean']"
-                                + "/property[@name='exceptionMappings']/props",
-                        root);
+        Element simpleMappingException = XmlUtils.findFirstElement(
+                RESOLVER_BEAN_MESSAGE
+                        + "/property[@name='exceptionMappings']/props", root);
 
-        Element simpleMappingExceptionResolverProp = XmlUtils
+        Element exceptionResolver = XmlUtils
                 .findFirstElement(
-                        "/beans/bean[@id='messageMappingExceptionResolverBean']"
+                        RESOLVER_BEAN_MESSAGE
                                 + "/property[@name='exceptionMappings']/props/prop[@key='"
                                 + exceptionName + "']", root);
 
@@ -347,9 +361,8 @@ public class WebExceptionHandlerOperationsImpl implements
         // View name for this Exception.
         String exceptionViewName;
 
-        if (simpleMappingExceptionResolverProp != null) {
-            exceptionViewName = simpleMappingExceptionResolverProp
-                    .getTextContent();
+        if (exceptionResolver != null) {
+            exceptionViewName = exceptionResolver.getTextContent();
         }
         else {
             updateMappings = true;
@@ -369,8 +382,7 @@ public class WebExceptionHandlerOperationsImpl implements
         newExceptionMapping.setTextContent(exceptionViewName);
 
         if (updateMappings) {
-            simpleMappingExceptionResolverProps
-                    .appendChild(newExceptionMapping);
+            simpleMappingException.appendChild(newExceptionMapping);
         }
 
         // Exception Controller
@@ -410,7 +422,7 @@ public class WebExceptionHandlerOperationsImpl implements
     private String getExceptionViewName(String exceptionName) {
 
         // View name for this Exception.
-        int index = exceptionName.lastIndexOf(".");
+        int index = exceptionName.lastIndexOf('.');
         String exceptionViewName = exceptionName;
 
         if (index >= 0) {
@@ -429,7 +441,8 @@ public class WebExceptionHandlerOperationsImpl implements
             exceptionNameExists = fileManager.exists(pathResolver
                     .getIdentifier(
                             LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                            "WEB-INF/views/" + tmpExceptionViewName + ".jspx"));
+                            "WEB-INF/views/" + tmpExceptionViewName
+                                    + JSPX_EXTENSION));
 
             if (exceptionNameExists) {
                 tmpExceptionViewName = exceptionViewName.concat(Integer
@@ -450,9 +463,9 @@ public class WebExceptionHandlerOperationsImpl implements
 
         String webXmlPath = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/spring/webmvc-config.xml");
+                WEB_MVC_CONFIG);
         Validate.isTrue(fileManager.exists(webXmlPath),
-                "webmvc-config.xml not found");
+                WEB_MVC_CONFIG_NOT_FOUND);
 
         MutableFile webXmlMutableFile = null;
         Document webXml;
@@ -467,22 +480,20 @@ public class WebExceptionHandlerOperationsImpl implements
         }
         Element root = webXml.getDocumentElement();
 
-        Element simpleMappingExceptionResolverProp = XmlUtils
+        Element exceptionResolver = XmlUtils
                 .findFirstElement(
-                        "/beans/bean[@id='messageMappingExceptionResolverBean']"
+                        RESOLVER_BEAN_MESSAGE
                                 + "/property[@name='exceptionMappings']/props/prop[@key='"
                                 + exceptionName + "']", root);
 
-        Validate.isTrue(simpleMappingExceptionResolverProp != null,
+        Validate.isTrue(exceptionResolver != null,
                 "There isn't a Handled Exception with the name:\t"
                         + exceptionName);
 
         // Remove Mapping
-        simpleMappingExceptionResolverProp.getParentNode().removeChild(
-                simpleMappingExceptionResolverProp);
+        exceptionResolver.getParentNode().removeChild(exceptionResolver);
 
-        String exceptionViewName = simpleMappingExceptionResolverProp
-                .getTextContent();
+        String exceptionViewName = exceptionResolver.getTextContent();
 
         Validate.isTrue(exceptionViewName != null,
                 "Can't remove the view for the:\t" + exceptionName
@@ -515,7 +526,8 @@ public class WebExceptionHandlerOperationsImpl implements
                 "WEB-INF/views/views.xml");
         Validate.isTrue(fileManager.exists(webXmlPath), "views.xml not found");
 
-        String jspxPath = "/WEB-INF/views/" + exceptionViewName + ".jspx";
+        String jspxPath = "/WEB-INF/views/" + exceptionViewName
+                + JSPX_EXTENSION;
 
         tilesOperations.addViewDefinition("",
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
@@ -559,14 +571,14 @@ public class WebExceptionHandlerOperationsImpl implements
 
         Map<String, String> params = new HashMap<String, String>(10);
         // Parameters
-        params.put("error.uncaughtexception.title", "error."
-                + exceptionNameUncapitalize + ".title");
-        params.put("error.uncaughtexception.problemdescription", "error."
-                + exceptionNameUncapitalize + ".problemdescription");
+        params.put("error.uncaughtexception.title", ERROR
+                + exceptionNameUncapitalize + TITLE);
+        params.put("error.uncaughtexception.problemdescription", ERROR
+                + exceptionNameUncapitalize + PROBLEM_DESCRIPTION);
 
         String exceptionFilename = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/views/" + exceptionViewName + ".jspx");
+                "WEB-INF/views/" + exceptionViewName + JSPX_EXTENSION);
         String template;
         try {
 
@@ -645,7 +657,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
         String exceptionFilename = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/views/" + exceptionViewName + ".jspx");
+                "WEB-INF/views/" + exceptionViewName + JSPX_EXTENSION);
 
         fileManager.delete(exceptionFilename);
 
@@ -685,10 +697,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
         Map<String, String> params = new HashMap<String, String>(10);
         // Parameters
-        params.put("error." + exceptionNameUncapitalize + ".title",
-                exceptionTitle);
-        params.put(
-                "error." + exceptionNameUncapitalize + ".problemdescription",
+        params.put(ERROR + exceptionNameUncapitalize + TITLE, exceptionTitle);
+        params.put(ERROR + exceptionNameUncapitalize + PROBLEM_DESCRIPTION,
                 exceptionDescription);
 
         String propertyFilePath = "/WEB-INF/i18n/";
@@ -757,10 +767,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
         Map<String, String> params = new HashMap<String, String>(10);
         // Parameters
-        params.put("error." + exceptionNameUncapitalize + ".title",
-                exceptionTitle);
-        params.put(
-                "error." + exceptionNameUncapitalize + ".problemdescription",
+        params.put(ERROR + exceptionNameUncapitalize + TITLE, exceptionTitle);
+        params.put(ERROR + exceptionNameUncapitalize + PROBLEM_DESCRIPTION,
                 exceptionDescription);
 
         for (Entry<String, String> entry : params.entrySet()) {
@@ -798,10 +806,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
         Map<String, String> params = new HashMap<String, String>(10);
         // Parameters
-        params.put("error." + exceptionNameUncapitalize + ".title", "");
-        params.put(
-                "error." + exceptionNameUncapitalize + ".problemdescription",
-                "");
+        params.put(ERROR + exceptionNameUncapitalize + TITLE, "");
+        params.put(ERROR + exceptionNameUncapitalize + PROBLEM_DESCRIPTION, "");
 
         String propertyFilePath = "/WEB-INF/i18n/";
         String fileName;
@@ -944,39 +950,39 @@ public class WebExceptionHandlerOperationsImpl implements
 
         // org.hibernate.id.IdentifierGenerationException
         addNewHandledException(
-                "org.hibernate.id.IdentifierGenerationException",
-                "IdentifierGenerationException",
+                IMP_IDENTIFIER_GENERATION_EXCEPTION,
+                IDENTIFIER_GENERATION_EXCEPTION,
                 "No se puede crear porque alguno de los campos que que conforman el identificador del registro no ha sido informado.",
                 "es");
 
         languageExceptionHandled(
-                "org.hibernate.id.IdentifierGenerationException",
-                "IdentifierGenerationException",
+                IMP_IDENTIFIER_GENERATION_EXCEPTION,
+                IDENTIFIER_GENERATION_EXCEPTION,
                 "No es pot crear perque algun dels camps que conformen l'identificador del registre no ha estat informat.",
                 "ca");
 
         languageExceptionHandled(
-                "org.hibernate.id.IdentifierGenerationException",
-                "IdentifierGenerationException",
+                IMP_IDENTIFIER_GENERATION_EXCEPTION,
+                IDENTIFIER_GENERATION_EXCEPTION,
                 "Can not create the record because any of the field comprising the identifier of the record has not been informed.",
                 "en");
 
         // org.hibernate.id.IdentifierGenerationException
         addNewHandledException(
-                "org.hibernate.id.IdentifierGenerationException",
-                "IdentifierGenerationException",
+                IMP_IDENTIFIER_GENERATION_EXCEPTION,
+                IDENTIFIER_GENERATION_EXCEPTION,
                 "No se puede crear porque alguno de los campos que que conforman el identificador del registro no ha sido informado.",
                 "es");
 
         languageExceptionHandled(
-                "org.hibernate.id.IdentifierGenerationException",
-                "IdentifierGenerationException",
+                IMP_IDENTIFIER_GENERATION_EXCEPTION,
+                IDENTIFIER_GENERATION_EXCEPTION,
                 "No es pot crear perque algun dels camps que conformen l'identificador del registre no ha estat informat.",
                 "ca");
 
         languageExceptionHandled(
-                "org.hibernate.id.IdentifierGenerationException",
-                "IdentifierGenerationException",
+                IMP_IDENTIFIER_GENERATION_EXCEPTION,
+                IDENTIFIER_GENERATION_EXCEPTION,
                 "Can not create the record because any of the field comprising the identifier of the record has not been informed.",
                 "en");
 
@@ -1008,7 +1014,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
         String webXmlPath = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/spring/webmvc-config.xml");
+                WEB_MVC_CONFIG);
 
         if (!fileManager.exists(webXmlPath)) {
             return false;
@@ -1027,13 +1033,13 @@ public class WebExceptionHandlerOperationsImpl implements
         }
         Element root = webXml.getDocumentElement();
 
-        Element simpleMappingExceptionResolverProp = XmlUtils
+        Element exceptionResolver = XmlUtils
                 .findFirstElement(
                         "/beans/bean[@class='org.springframework.web.servlet.handler.SimpleMappingExceptionResolver']"
                                 + "/property[@name='exceptionMappings']/props/prop",
                         root);
 
-        boolean isExceptionAvailable = (simpleMappingExceptionResolverProp != null) ? true
+        boolean isExceptionAvailable = (exceptionResolver != null) ? true
                 : false;
 
         return isExceptionAvailable;
@@ -1050,7 +1056,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
         String webXmlPath = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/spring/webmvc-config.xml");
+                WEB_MVC_CONFIG);
 
         if (!fileManager.exists(webXmlPath)) {
             return false;
@@ -1069,12 +1075,12 @@ public class WebExceptionHandlerOperationsImpl implements
         }
         Element root = webXml.getDocumentElement();
 
-        Element simpleMappingExceptionResolverProp = XmlUtils.findFirstElement(
-                "/beans/bean[@id='messageMappingExceptionResolverBean']"
+        Element exceptionResolver = XmlUtils.findFirstElement(
+                RESOLVER_BEAN_MESSAGE
                         + "/property[@name='exceptionMappings']/props/prop",
                 root);
 
-        boolean isExceptionAvailable = (simpleMappingExceptionResolverProp != null) ? true
+        boolean isExceptionAvailable = (exceptionResolver != null) ? true
                 : false;
 
         return isExceptionAvailable;

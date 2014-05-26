@@ -34,7 +34,7 @@ public class DynConfiguration {
 
     private Boolean active;
 
-    private DynComponentList components;
+    private final DynComponentList components;
 
     public DynConfiguration() {
         super();

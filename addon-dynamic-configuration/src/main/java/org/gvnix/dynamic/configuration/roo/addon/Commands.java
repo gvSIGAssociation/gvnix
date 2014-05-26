@@ -46,7 +46,8 @@ import org.springframework.roo.shell.CommandMarker;
 @Service
 public class Commands implements CommandMarker {
 
-    private static Logger logger = Logger.getLogger(Commands.class.getName());
+    private static final Logger logger = Logger.getLogger(Commands.class
+            .getName());
 
     @Reference
     private Operations operations;

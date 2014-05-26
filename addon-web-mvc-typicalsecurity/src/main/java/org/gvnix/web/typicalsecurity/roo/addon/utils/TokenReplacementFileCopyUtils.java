@@ -16,7 +16,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class TokenReplacementFileCopyUtils {
 
-    private static int BUFFER_SIZE = 8192;
+    private static final int BUFFER_SIZE = 8192;
 
     public static int replaceAndCopy(InputStream in, OutputStream out,
             Properties replacement) throws IOException {

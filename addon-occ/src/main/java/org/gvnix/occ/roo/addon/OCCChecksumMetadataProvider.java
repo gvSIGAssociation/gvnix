@@ -74,24 +74,24 @@ public class OCCChecksumMetadataProvider implements
             .getLogger(FinderOperationsImpl.class);
 
     // From AbstractItdMetadataProvider
-    private boolean dependsOnGovernorTypeDetailAvailability = true;
-    private boolean dependsOnGovernorBeingAClass = true;
+    private boolean governorTypeDetail = true;
+    private boolean governorBeingAClass = true;
     @Reference
-    protected MetadataService metadataService;
+    private MetadataService metadataService;
     @Reference
-    protected MetadataDependencyRegistry metadataDependencyRegistry;
+    private MetadataDependencyRegistry metadataDependencyRegistry;
     @Reference
-    protected FileManager fileManager;
+    private FileManager fileManager;
 
     // DiSiD: Used to get the type members
     @Reference
-    protected MemberDetailsScanner memberDetailsScanner;
+    private MemberDetailsScanner memberDetailsScanner;
 
     @Reference
-    protected PersistenceMemberLocator persistenceMemberLocator;
+    private PersistenceMemberLocator persistenceMemberLocator;
 
     @Reference
-    protected TypeManagementService typeManagementService;
+    private TypeManagementService typeManagementService;
 
     /**
      * The annotations which, if present on a class or interface, will cause
@@ -113,7 +113,7 @@ public class OCCChecksumMetadataProvider implements
     }
 
     protected void deactivate(ComponentContext context) {
-
+        // TODO:
     }
 
     /*
@@ -368,13 +368,13 @@ public class OCCChecksumMetadataProvider implements
 
         // Cancel production if the governor type details are required, but
         // aren't available
-        if (dependsOnGovernorTypeDetailAvailability && cid == null) {
+        if (governorTypeDetail && cid == null) {
             produceMetadata = false;
         }
 
         // Cancel production if the governor is not a class, and the subclass
         // only wants to know about classes
-        if (cid != null && dependsOnGovernorBeingAClass
+        if (cid != null && governorBeingAClass
                 && cid.getPhysicalTypeCategory() != PhysicalTypeCategory.CLASS) {
             produceMetadata = false;
         }
@@ -500,12 +500,12 @@ public class OCCChecksumMetadataProvider implements
      * If set to true (default is true), ensures subclass not called unless the
      * governor type details are available.
      * 
-     * @param dependsOnGovernorTypeDetailAvailability true means governor type
-     *        details must be available
+     * @param governorTypeDetail true means governor type details must be
+     *        available
      */
     public void setDependsOnGovernorTypeDetailAvailability(
-            boolean dependsOnGovernorTypeDetailAvailability) {
-        this.dependsOnGovernorTypeDetailAvailability = dependsOnGovernorTypeDetailAvailability;
+            boolean governorTypeDetail) {
+        this.governorTypeDetail = governorTypeDetail;
     }
 
     /**
@@ -514,12 +514,11 @@ public class OCCChecksumMetadataProvider implements
      * {@link #setDependsOnGovernorTypeDetailAvailability(boolean)} must also be
      * true to ensure this can be relied upon.
      * 
-     * @param dependsOnGovernorBeingAClass true means governor type detail must
-     *        represent a class
+     * @param governorBeingAClass true means governor type detail must represent
+     *        a class
      */
-    public void setDependsOnGovernorBeingAClass(
-            boolean dependsOnGovernorBeingAClass) {
-        this.dependsOnGovernorBeingAClass = dependsOnGovernorBeingAClass;
+    public void setDependsOnGovernorBeingAClass(boolean governorBeingAClass) {
+        this.governorBeingAClass = governorBeingAClass;
     }
 
 }

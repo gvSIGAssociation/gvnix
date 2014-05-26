@@ -78,7 +78,7 @@ import org.springframework.roo.support.logging.HandlerUtils;
 public class OCCChecksumMetadata extends AbstractMetadataItem implements
         ItdTypeDetailsProvidingMetadataItem {
 
-    private final Logger LOGGER = HandlerUtils
+    private static final Logger LOGGER = HandlerUtils
             .getLogger(OCCChecksumMetadata.class);
 
     // From AbstractItdTypeDetailsProvidingMetadataItem
@@ -96,12 +96,12 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     // Template portions to create *_Roo_GvNIXRelatedPattern.aj when replacing
     // vars with values and concatenated in order
     private static final String ITD_TEMPLATE_CLASS_START = "Entity_gvnix_persistence_occ.aj_template1";
-    private static final String ITD_TEMPLATE_METHODGET_MESSAGE_DIGEST = "Entity_gvnix_persistence_occ.aj_template2";
+    private static final String METHOD_GET_MESSAGE_DIGEST = "Entity_gvnix_persistence_occ.aj_template2";
     private static final String ITD_TEMPLATE_METHOD_REMOVE = "Entity_gvnix_persistence_occ.aj_template3";
     private static final String ITD_TEMPLATE_METHOD_MERGE = "Entity_gvnix_persistence_occ.aj_template4";
-    private static final String ITD_TEMPLATE_METHOD_CHECK_CONCURRENCY = "Entity_gvnix_persistence_occ.aj_template5";
-    private static final String ITD_TEMPLATE_METHOD_LOAD_CHECKSUM = "Entity_gvnix_persistence_occ.aj_template6";
-    private static final String ITD_TEMPLATE_METHOD_CHECKSUM_DIGEST = "Entity_gvnix_persistence_occ.aj_template7";
+    private static final String METHOD_CHECK_CONCURRENCY = "Entity_gvnix_persistence_occ.aj_template5";
+    private static final String METHOD_LOAD_CHECKSUM = "Entity_gvnix_persistence_occ.aj_template6";
+    private static final String METHOD_CHECKSUM_DIGEST = "Entity_gvnix_persistence_occ.aj_template7";
     private static final String ITD_TEMPLATE_CLASS_END = "Entity_gvnix_persistence_occ.aj_template8";
 
     private static final String PROPERTY_KEY = "${property}";
@@ -123,7 +123,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     private final MemberDetailsScanner memberDetailsScanner;
 
     // Used to get related persistence object
-    private PersistenceMemberLocator persistenceMemberLocator;
+    private final PersistenceMemberLocator persistenceMemberLocator;
 
     private String itdFileContents = null;
 
@@ -222,9 +222,8 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                 checksumField, persistenceMemberLocator));
         if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
                 new JavaSymbolName("getMessageDigest"), null) == null) {
-            contents.append(generateITDContent(
-                    ITD_TEMPLATE_METHODGET_MESSAGE_DIGEST, checksumField,
-                    persistenceMemberLocator));
+            contents.append(generateITDContent(METHOD_GET_MESSAGE_DIGEST,
+                    checksumField, persistenceMemberLocator));
         }
         if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
                 new JavaSymbolName("remove"), null) == null) {
@@ -241,21 +240,18 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                 .getSimpleTypeName()));
         if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
                 new JavaSymbolName("checkConcurrency")) == null) {
-            contents.append(generateITDContent(
-                    ITD_TEMPLATE_METHOD_CHECK_CONCURRENCY, checksumField,
-                    persistenceMemberLocator));
+            contents.append(generateITDContent(METHOD_CHECK_CONCURRENCY,
+                    checksumField, persistenceMemberLocator));
         }
         if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
                 new JavaSymbolName("loadChecksum"), null) == null) {
-            contents.append(generateITDContent(
-                    ITD_TEMPLATE_METHOD_LOAD_CHECKSUM, checksumField,
-                    persistenceMemberLocator));
+            contents.append(generateITDContent(METHOD_LOAD_CHECKSUM,
+                    checksumField, persistenceMemberLocator));
         }
         if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails,
                 new JavaSymbolName("checksumDigest"), null) == null) {
-            contents.append(generateITDContent(
-                    ITD_TEMPLATE_METHOD_CHECKSUM_DIGEST, checksumField,
-                    persistenceMemberLocator));
+            contents.append(generateITDContent(METHOD_CHECKSUM_DIGEST,
+                    checksumField, persistenceMemberLocator));
         }
         contents.append(generateITDContent(ITD_TEMPLATE_CLASS_END,
                 checksumField, persistenceMemberLocator));

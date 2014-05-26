@@ -74,8 +74,8 @@ public class Jackson2RequestMappingHandlerAdapter extends
         RequestMappingHandlerAdapter {
 
     private ObjectMapper objectMapper;
-    private ConversionService conversionService;
-    private Validator validator;
+    private final ConversionService conversionService;
+    private final Validator validator;
 
     /**
      * Default constructor.

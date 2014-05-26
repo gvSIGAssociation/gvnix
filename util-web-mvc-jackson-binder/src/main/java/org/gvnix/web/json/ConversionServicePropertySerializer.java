@@ -37,9 +37,9 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  */
 public class ConversionServicePropertySerializer extends StdSerializer<Object> {
 
-    private ConversionService conversionService;
-    private TypeDescriptor sourceType;
-    private TypeDescriptor targetType;
+    private final ConversionService conversionService;
+    private final TypeDescriptor sourceType;
+    private final TypeDescriptor targetType;
 
     public ConversionServicePropertySerializer(
             ConversionService conversionService, TypeDescriptor sourceType,

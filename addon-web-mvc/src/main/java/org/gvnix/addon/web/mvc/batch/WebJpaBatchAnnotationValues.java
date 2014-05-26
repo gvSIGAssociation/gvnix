@@ -35,7 +35,7 @@ public class WebJpaBatchAnnotationValues extends AbstractAnnotationValues {
             GvNIXWebJpaBatch.class);
 
     @AutoPopulate
-    JavaType service;
+    private JavaType service;
 
     public WebJpaBatchAnnotationValues(
             final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {

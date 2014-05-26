@@ -76,8 +76,10 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  */
 public class BindingResultSerializer extends JsonSerializer<Object> {
 
-    private final Logger LOGGER = Logger
+    private static final Logger LOGGER = Logger
             .getLogger(BindingResultSerializer.class.getCanonicalName());
+
+    private static final String ERROR_WRITTING_BINDING = "Error writting BindingResult";
 
     /**
      * {@inheritDoc}
@@ -116,16 +118,16 @@ public class BindingResultSerializer extends JsonSerializer<Object> {
             jgen.writeObject(allErrorsMessages);
         }
         catch (JsonProcessingException e) {
-            LOGGER.log(Level.SEVERE, "Error writting BindingResult", e);
+            LOGGER.log(Level.SEVERE, ERROR_WRITTING_BINDING, e);
             throw e;
         }
         catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error writting BindingResult", e);
+            LOGGER.log(Level.SEVERE, ERROR_WRITTING_BINDING, e);
             throw e;
         }
         catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error writting BindingResult", e);
-            throw new IOException("Error writting BindingResult", e);
+            LOGGER.log(Level.SEVERE, ERROR_WRITTING_BINDING, e);
+            throw new IOException(ERROR_WRITTING_BINDING, e);
         }
 
     }

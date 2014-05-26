@@ -41,8 +41,8 @@ import org.springframework.roo.project.ProjectOperations;
  * @since 0.8.0
  */
 public class MessageBundleUtils {
-    private static Logger logger = Logger.getLogger(MessageBundleUtils.class
-            .getName());
+    private static final Logger logger = Logger
+            .getLogger(MessageBundleUtils.class.getName());
 
     /**
      * Creates if it doesn't exist the messages_xx.properties file for the given
@@ -132,7 +132,7 @@ public class MessageBundleUtils {
                 webappPath, targetFilePath);
 
         try {
-            if (language == "en") {
+            if (language.equals("en")) {
                 sourcePropertyFile = sourcePropertyFile
                         .concat("/messages.properties");
                 properties.load(invokingClass

@@ -38,9 +38,9 @@ import org.springframework.roo.project.PathResolver;
 public abstract class FileDynamicConfiguration {
 
     @Reference
-    protected PathResolver pathResolver;
+    PathResolver pathResolver;
     @Reference
-    protected FileManager fileManager;
+    FileManager fileManager;
 
     /**
      * Get the dynamic configuration file path.

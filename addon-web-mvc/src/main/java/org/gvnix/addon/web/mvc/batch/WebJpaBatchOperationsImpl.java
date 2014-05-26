@@ -343,7 +343,7 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
 
         // Test if the annotation already exists on the target type
         if (!isAlreadyAnnotated) {
-            ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+            ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                     existing);
 
             AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
@@ -352,13 +352,11 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
             annotationBuilder.addClassAttribute("service", service);
 
             // Add annotation to target type
-            classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder
-                    .build());
+            detailsBuilder.addAnnotation(annotationBuilder.build());
 
             // Save changes to disk
-            typeManagementService
-                    .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
-                            .build());
+            typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder
+                    .build());
         }
     }
 

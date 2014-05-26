@@ -109,7 +109,7 @@ public class WebJpaBatchMetadata extends
     private static final JavaSymbolName CREATE_METHOD = new JavaSymbolName(
             "createBatch");
 
-    private static final JavaSymbolName GET_REQUEST_PROPERTY_VALUES_METHOD = new JavaSymbolName(
+    private static final JavaSymbolName GET_REQUEST_METHOD = new JavaSymbolName(
             "getRequestPropertyValues");
 
     private static final JavaType RESPONSE_ENTITY_OBJECT = new JavaType(
@@ -198,7 +198,7 @@ public class WebJpaBatchMetadata extends
     private FieldMetadata serviceFiled;
 
     private FieldMetadata loggerFiled;
-    private String entityName;
+    private final String entityName;
 
     public WebJpaBatchMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -375,10 +375,10 @@ public class WebJpaBatchMetadata extends
                                     .getParameterTypes());
                     // If method exists with same params, return method
                     String methodName = method.getMethodName().getSymbolName();
-                    if (value.equals("/delete")
+                    if ("/delete".equals(value)
                             && AnnotatedJavaType.convertFromAnnotatedJavaTypes(
                                     parameterTypes).equals(methodParameters)
-                            && !methodName.equals("deleteBatch")) {
+                            && !"deleteBatch".equals(methodName)) {
                         return method;
                     }
                 }
@@ -536,7 +536,7 @@ public class WebJpaBatchMetadata extends
         builder.appendFormalLine(String.format(
                 "%s baseFilter = %s(%s,%s.getParameterNames());",
                 helper.getFinalTypeName(MAP_STRING_OBJECT),
-                GET_REQUEST_PROPERTY_VALUES_METHOD.getSymbolName(), entityName,
+                GET_REQUEST_METHOD.getSymbolName(), entityName,
                 REQUEST_NAME.getSymbolName()));
         // if (baseFilter == null || baseFilter.isEmpty()){
         builder.appendFormalLine("if (baseFilter == null || baseFilter.isEmpty()) {");
@@ -1084,8 +1084,8 @@ public class WebJpaBatchMetadata extends
 
         // Check if a method with the same signature already exists in the
         // target type
-        final MethodMetadata method = methodExists(
-                GET_REQUEST_PROPERTY_VALUES_METHOD, parameterTypes);
+        final MethodMetadata method = methodExists(GET_REQUEST_METHOD,
+                parameterTypes);
         if (method != null) {
             // If it already exists, just return the method and omit its
             // generation via the ITD
@@ -1109,7 +1109,7 @@ public class WebJpaBatchMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, GET_REQUEST_PROPERTY_VALUES_METHOD,
+                getId(), Modifier.PUBLIC, GET_REQUEST_METHOD,
                 MAP_STRING_OBJECT, parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);

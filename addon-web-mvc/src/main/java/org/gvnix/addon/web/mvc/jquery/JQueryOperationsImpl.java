@@ -67,6 +67,22 @@ import org.w3c.dom.Element;
 public class JQueryOperationsImpl extends AbstractOperations implements
         JQueryOperations {
 
+    private static final String PATH_IS_NOT_SPECIFIED = "Path is not specified in the @RooWebScaffold annotation for '";
+
+    private static final String JQUERY_FORM_PATH = "urn:jsptagdir:/WEB-INF/tags/jquery/form";
+
+    private static final String FORM_FIELDS_PATH = "urn:jsptagdir:/WEB-INF/tags/form/fields";
+
+    private static final String XMLNS_UTIL = "xmlns:util";
+
+    private static final String XMLNS_PAGE = "xmlns:page";
+
+    private static final String XMLNS_TABLE = "xmlns:table";
+
+    private static final String XMLNS_FORM = "xmlns:form";
+
+    private static final String XMLNS_FIELD = "xmlns:field";
+
     private static final JavaType SCAFFOLD_ANNOTATION = new JavaType(
             RooWebScaffold.class.getName());
 
@@ -144,20 +160,17 @@ public class JQueryOperationsImpl extends AbstractOperations implements
             return;
         }
 
-        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+        ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                 existing);
 
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 JQUERY_ANNOTATION);
 
         // Add annotation to target type
-        classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder
-                .build());
+        detailsBuilder.addAnnotation(annotationBuilder.build());
 
         // Save changes to disk
-        typeManagementService
-                .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
-                        .build());
+        typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder.build());
     }
 
     /**
@@ -177,21 +190,21 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         // to avoid to overwrite them with jQuery namespaces we will update
         // default Roo namespaces only
         Map<String, String> rooUriMap = new HashMap<String, String>();
-        rooUriMap.put("xmlns:field", "urn:jsptagdir:/WEB-INF/tags/form/fields");
-        rooUriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/form");
-        rooUriMap.put("xmlns:table", "urn:jsptagdir:/WEB-INF/tags/form/fields");
-        rooUriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/form");
-        rooUriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util");
+        rooUriMap.put(XMLNS_FIELD, FORM_FIELDS_PATH);
+        rooUriMap.put(XMLNS_FORM, "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put(XMLNS_TABLE, FORM_FIELDS_PATH);
+        rooUriMap.put(XMLNS_PAGE, "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put(XMLNS_UTIL, "urn:jsptagdir:/WEB-INF/tags/util");
 
         // new jQuery namespaces
         Map<String, String> uriMap = new HashMap<String, String>();
-        uriMap.put("xmlns:field",
+        uriMap.put(XMLNS_FIELD,
                 "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
-        uriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/jquery/form");
-        uriMap.put("xmlns:table",
+        uriMap.put(XMLNS_FORM, JQUERY_FORM_PATH);
+        uriMap.put(XMLNS_TABLE,
                 "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
-        uriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/jquery/form");
-        uriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/jquery/util");
+        uriMap.put(XMLNS_PAGE, JQUERY_FORM_PATH);
+        uriMap.put(XMLNS_UTIL, "urn:jsptagdir:/WEB-INF/tags/jquery/util");
 
         // do the update
         for (String jspxName : pageList) {
@@ -214,11 +227,11 @@ public class JQueryOperationsImpl extends AbstractOperations implements
                 .getPath();
 
         Validate.notBlank(controllerPath,
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        .concat(controller.getSimpleTypeName()).concat("'"));
+                PATH_IS_NOT_SPECIFIED.concat(controller.getSimpleTypeName())
+                        .concat("'"));
         Validate.isTrue(controllerPath != null && !controllerPath.isEmpty(),
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        .concat(controller.getSimpleTypeName()).concat("'"));
+                PATH_IS_NOT_SPECIFIED.concat(controller.getSimpleTypeName())
+                        .concat("'"));
         if (controllerPath != null && !controllerPath.startsWith("/")) {
             controllerPath = "/".concat(controllerPath);
         }
@@ -231,21 +244,21 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         // to avoid to overwrite them with jQuery namespaces we will update
         // default Roo namespaces only
         Map<String, String> rooUriMap = new HashMap<String, String>();
-        rooUriMap.put("xmlns:field", "urn:jsptagdir:/WEB-INF/tags/form/fields");
-        rooUriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/form");
-        rooUriMap.put("xmlns:table", "urn:jsptagdir:/WEB-INF/tags/form/fields");
-        rooUriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/form");
-        rooUriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util");
+        rooUriMap.put(XMLNS_FIELD, FORM_FIELDS_PATH);
+        rooUriMap.put(XMLNS_FORM, "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put(XMLNS_TABLE, FORM_FIELDS_PATH);
+        rooUriMap.put(XMLNS_PAGE, "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put(XMLNS_UTIL, "urn:jsptagdir:/WEB-INF/tags/util");
 
         // new jQuery namespaces
         Map<String, String> uriMap = new HashMap<String, String>();
-        uriMap.put("xmlns:field",
+        uriMap.put(XMLNS_FIELD,
                 "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
-        uriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/jquery/form");
-        uriMap.put("xmlns:table",
+        uriMap.put(XMLNS_FORM, JQUERY_FORM_PATH);
+        uriMap.put(XMLNS_TABLE,
                 "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
-        uriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/jquery/form");
-        uriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/jquery/util");
+        uriMap.put(XMLNS_PAGE, JQUERY_FORM_PATH);
+        uriMap.put(XMLNS_UTIL, "urn:jsptagdir:/WEB-INF/tags/jquery/util");
 
         // do the update
         for (String jspxName : pageList) {
@@ -270,11 +283,11 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         // Get view path for success file access in "WEB-INF/views/"
         String controllerPath = annotationValues.getPath();
         Validate.notBlank(controllerPath,
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        .concat(controller.getSimpleTypeName()).concat("'"));
+                PATH_IS_NOT_SPECIFIED.concat(controller.getSimpleTypeName())
+                        .concat("'"));
         Validate.isTrue(controllerPath != null && !controllerPath.isEmpty(),
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        .concat(controller.getSimpleTypeName()).concat("'"));
+                PATH_IS_NOT_SPECIFIED.concat(controller.getSimpleTypeName())
+                        .concat("'"));
 
         // Get Java type details
         JavaType formBackingType = annotationValues.getFormBackingObject();
@@ -295,21 +308,21 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         // to avoid to overwrite them with jQuery namespaces we will update
         // default Roo namespaces only
         Map<String, String> rooUriMap = new HashMap<String, String>();
-        rooUriMap.put("xmlns:field", "urn:jsptagdir:/WEB-INF/tags/form/fields");
-        rooUriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/form");
-        rooUriMap.put("xmlns:table", "urn:jsptagdir:/WEB-INF/tags/form/fields");
-        rooUriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/form");
-        rooUriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util");
+        rooUriMap.put(XMLNS_FIELD, FORM_FIELDS_PATH);
+        rooUriMap.put(XMLNS_FORM, "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put(XMLNS_TABLE, FORM_FIELDS_PATH);
+        rooUriMap.put(XMLNS_PAGE, "urn:jsptagdir:/WEB-INF/tags/form");
+        rooUriMap.put(XMLNS_UTIL, "urn:jsptagdir:/WEB-INF/tags/util");
 
         // new jQuery namespaces
         Map<String, String> uriMap = new HashMap<String, String>();
-        uriMap.put("xmlns:field",
+        uriMap.put(XMLNS_FIELD,
                 "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
-        uriMap.put("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/jquery/form");
-        uriMap.put("xmlns:table",
+        uriMap.put(XMLNS_FORM, JQUERY_FORM_PATH);
+        uriMap.put(XMLNS_TABLE,
                 "urn:jsptagdir:/WEB-INF/tags/jquery/form/fields");
-        uriMap.put("xmlns:page", "urn:jsptagdir:/WEB-INF/tags/jquery/form");
-        uriMap.put("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/jquery/util");
+        uriMap.put(XMLNS_PAGE, JQUERY_FORM_PATH);
+        uriMap.put(XMLNS_UTIL, "urn:jsptagdir:/WEB-INF/tags/jquery/util");
 
         // do the update
         for (final FinderMetadataDetails finderDetails : finderMethodsDetails) {

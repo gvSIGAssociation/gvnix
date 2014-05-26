@@ -63,7 +63,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
      * @Reference private ClasspathOperations classpathOperations;
      */
 
-    public static char SEPARATOR = File.separatorChar;
+    private static final char SEPARATOR = File.separatorChar;
 
     public boolean isCommandAvailable() {
         /*

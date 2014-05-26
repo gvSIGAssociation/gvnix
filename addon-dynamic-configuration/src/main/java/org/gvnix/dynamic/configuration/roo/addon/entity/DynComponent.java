@@ -67,7 +67,7 @@ public class DynComponent {
             return name;
         }
 
-        return id.substring(id.lastIndexOf(".") + 1, id.length());
+        return id.substring(id.lastIndexOf('.') + 1, id.length());
     }
 
     public void setName(String name) {

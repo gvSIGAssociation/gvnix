@@ -53,10 +53,10 @@ import org.springframework.roo.model.JavaType;
  */
 public class ItdBuilderHelper {
 
-    protected final AbstractItdTypeDetailsProvidingMetadataItem metadata;
-    protected final ImportRegistrationResolver importResolver;
-    protected final ClassOrInterfaceTypeDetails governorTypeDetails;
-    protected final MemberDetails memberDetails;
+    private final AbstractItdTypeDetailsProvidingMetadataItem metadata;
+    private final ImportRegistrationResolver importResolver;
+    private final ClassOrInterfaceTypeDetails governorTypeDetails;
+    private final MemberDetails memberDetails;
 
     public ItdBuilderHelper(
             AbstractItdTypeDetailsProvidingMetadataItem metadata,

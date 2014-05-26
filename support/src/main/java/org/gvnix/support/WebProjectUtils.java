@@ -50,6 +50,12 @@ import org.w3c.dom.Element;
  */
 public class WebProjectUtils {
 
+    private static final String WEB_INF_VIEWS = "WEB-INF/views/";
+
+    private static final String JSPX_EXT = ".jspx";
+
+    private static final String VALUE = "value";
+
     /**
      * Check if current project is a Spring MVC one
      * <p/>
@@ -158,8 +164,8 @@ public class WebProjectUtils {
     public static void addTagxUriInJspx(String controllerPath, String jspxName,
             Map<String, String> newUriMap, ProjectOperations projectOperations,
             FileManager fileManager) {
-        addTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
-                .concat(jspxName).concat(".jspx"), (Map<String, String>) null,
+        addTagxUriInJspx(WEB_INF_VIEWS.concat(controllerPath).concat("/")
+                .concat(jspxName).concat(JSPX_EXT), (Map<String, String>) null,
                 newUriMap, projectOperations, fileManager);
     }
 
@@ -182,8 +188,8 @@ public class WebProjectUtils {
     public static void addTagxUriInJspx(String controllerPath, String jspxName,
             Map<String, String> oldUriMap, Map<String, String> newUriMap,
             ProjectOperations projectOperations, FileManager fileManager) {
-        addTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
-                .concat(jspxName).concat(".jspx"), oldUriMap, newUriMap,
+        addTagxUriInJspx(WEB_INF_VIEWS.concat(controllerPath).concat("/")
+                .concat(jspxName).concat(JSPX_EXT), oldUriMap, newUriMap,
                 projectOperations, fileManager);
     }
 
@@ -299,8 +305,8 @@ public class WebProjectUtils {
     public static void updateTagxUriInJspx(String controllerPath,
             String jspxName, Map<String, String> newUriMap,
             ProjectOperations projectOperations, FileManager fileManager) {
-        updateTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
-                .concat(jspxName).concat(".jspx"), (Map<String, String>) null,
+        updateTagxUriInJspx(WEB_INF_VIEWS.concat(controllerPath).concat("/")
+                .concat(jspxName).concat(JSPX_EXT), (Map<String, String>) null,
                 newUriMap, projectOperations, fileManager);
     }
 
@@ -330,8 +336,8 @@ public class WebProjectUtils {
             String jspxName, Map<String, String> oldUriMap,
             Map<String, String> newUriMap, ProjectOperations projectOperations,
             FileManager fileManager) {
-        updateTagxUriInJspx("WEB-INF/views/".concat(controllerPath).concat("/")
-                .concat(jspxName).concat(".jspx"), oldUriMap, newUriMap,
+        updateTagxUriInJspx(WEB_INF_VIEWS.concat(controllerPath).concat("/")
+                .concat(jspxName).concat(JSPX_EXT), oldUriMap, newUriMap,
                 projectOperations, fileManager);
     }
 
@@ -544,7 +550,7 @@ public class WebProjectUtils {
         if (urlElement == null) {
             urlElement = docTagx.createElement("spring:url");
             urlElement.setAttribute("var", varName);
-            urlElement.setAttribute("value", location);
+            urlElement.setAttribute(VALUE, location);
             root.appendChild(urlElement);
             return true;
         }
@@ -689,7 +695,7 @@ public class WebProjectUtils {
             ifElement.setAttribute("test", "${fn:length(jqlocale) eq 2}");
 
             Element outElement = docTagx.createElement("c:out");
-            outElement.setAttribute("value", "${jqlocale}");
+            outElement.setAttribute(VALUE, "${jqlocale}");
             ifElement.appendChild(outElement);
             varElement.appendChild(ifElement);
 
@@ -697,7 +703,7 @@ public class WebProjectUtils {
             ifElement.setAttribute("test", "${fn:length(jqlocale) gt 2}");
 
             outElement = docTagx.createElement("c:out");
-            outElement.setAttribute("value",
+            outElement.setAttribute(VALUE,
                     "${fn:substringBefore(jqlocale, '_')}");
             outElement.setAttribute("default", "en");
             ifElement.appendChild(outElement);
@@ -707,7 +713,7 @@ public class WebProjectUtils {
             ifElement.setAttribute("test", "${fn:length(jqlocale) lt 2}");
 
             outElement = docTagx.createElement("c:out");
-            outElement.setAttribute("value", "en");
+            outElement.setAttribute(VALUE, "en");
             ifElement.appendChild(outElement);
             varElement.appendChild(ifElement);
 

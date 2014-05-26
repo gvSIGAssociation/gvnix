@@ -52,11 +52,11 @@ public class OperationsImpl implements Operations {
     @Reference
     private Configurations configurations;
     @Reference
-    ProjectOperations projectOperations;
+    private ProjectOperations projectOperations;
     @Reference
-    FileManager fileManager;
+    private FileManager fileManager;
     @Reference
-    PomManager pomManager;
+    private PomManager pomManager;
 
     public boolean isProjectAvailable() {
 

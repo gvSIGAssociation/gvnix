@@ -47,7 +47,7 @@ import org.springframework.roo.project.LogicalPath;
 public final class WebJpaBatchMetadataProvider extends
         AbstractMemberDiscoveringItdMetadataProvider {
 
-    private Map<JavaType, String> entityToBatchMidMap = new HashMap<JavaType, String>();
+    private final Map<JavaType, String> entityToBatchMidMap = new HashMap<JavaType, String>();
 
     /**
      * The activate method for this OSGi component, this will be called by the

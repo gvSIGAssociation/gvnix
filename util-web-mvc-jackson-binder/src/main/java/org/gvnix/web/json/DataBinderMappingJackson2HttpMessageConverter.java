@@ -58,8 +58,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DataBinderMappingJackson2HttpMessageConverter extends
         MappingJackson2HttpMessageConverter {
 
-    private ConversionService conversionService;
-    private Validator validator;
+    private final ConversionService conversionService;
+    private final Validator validator;
 
     /**
      * Default constructor

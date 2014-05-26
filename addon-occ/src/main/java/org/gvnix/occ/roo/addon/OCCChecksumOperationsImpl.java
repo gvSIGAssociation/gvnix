@@ -82,11 +82,11 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
     private TypeManagementService typeManagementService;
 
     protected void activate(ComponentContext context) {
-
+        // TODO:
     }
 
     protected void deactivate(ComponentContext context) {
-
+        // TODO:
     }
 
     /*

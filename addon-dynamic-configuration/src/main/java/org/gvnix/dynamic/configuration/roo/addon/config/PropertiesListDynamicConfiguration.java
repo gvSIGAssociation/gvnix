@@ -252,7 +252,7 @@ public abstract class PropertiesListDynamicConfiguration extends
 
         String sufix = key.substring(getPropertyTargetPrefix().length(),
                 key.length());
-        return sufix.substring(0, sufix.indexOf("."));
+        return sufix.substring(0, sufix.indexOf('.'));
     }
 
     /**
@@ -289,7 +289,7 @@ public abstract class PropertiesListDynamicConfiguration extends
      */
     protected String getFileName(String path) {
 
-        return path.substring(path.lastIndexOf("/") + 1);
+        return path.substring(path.lastIndexOf('/') + 1);
     }
 
     public abstract String getFileSufix();

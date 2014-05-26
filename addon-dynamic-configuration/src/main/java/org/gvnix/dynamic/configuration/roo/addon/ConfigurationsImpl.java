@@ -57,9 +57,9 @@ import org.xml.sax.SAXException;
 @Service
 public class ConfigurationsImpl implements Configurations {
 
-    private static final String DYNAMIC_CONFIGURATION_TEMPLATE_NAME = "dynamic-configuration-template.xml";
-    private static final String DYNAMIC_CONFIGURATION_FILE_NAME = "dynamic-configuration.xml";
-    private static final String DYNAMIC_CONFIGURATION_ELEMENT_NAME = "dynamic-configuration";
+    private static final String TAMPLATE_NAME = "dynamic-configuration-template.xml";
+    private static final String FILE_NAME = "dynamic-configuration.xml";
+    private static final String ELEMENT_NAME = "dynamic-configuration";
     private static final String CONFIGURATION_ELEMENT_NAME = "configuration";
     private static final String COMPONENT_ELEMENT_NAME = "component";
     private static final String PROPERTY_ELEMENT_NAME = "property";
@@ -69,13 +69,12 @@ public class ConfigurationsImpl implements Configurations {
     private static final String BASE_ELEMENT_NAME = "base";
     private static final String ID_ATTRIBUTE_NAME = "id";
     private static final String NAME_ATTRIBUTE_NAME = "name";
-    private static final String CONFIGURATION_XPATH = "/"
-            + DYNAMIC_CONFIGURATION_ELEMENT_NAME + "/"
+    private static final String CONFIGURATION_XPATH = "/" + ELEMENT_NAME + "/"
             + CONFIGURATION_ELEMENT_NAME;
-    private static final String ACTIVE_CONFIGURATION_XPATH = "/"
-            + DYNAMIC_CONFIGURATION_ELEMENT_NAME + "/" + ACTIVE_ELEMENT_NAME;
-    private static final String BASE_CONFIGURATION_XPATH = "/"
-            + DYNAMIC_CONFIGURATION_ELEMENT_NAME + "/" + BASE_ELEMENT_NAME;
+    private static final String ACTIVE_CONFIGURATION_XPATH = "/" + ELEMENT_NAME
+            + "/" + ACTIVE_ELEMENT_NAME;
+    private static final String BASE_CONFIGURATION_XPATH = "/" + ELEMENT_NAME
+            + "/" + BASE_ELEMENT_NAME;
 
     @Reference
     private PathResolver pathResolver;
@@ -515,17 +514,19 @@ public class ConfigurationsImpl implements Configurations {
      */
     private String getConfigurationFilePath() {
 
-        String path = pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
-                DYNAMIC_CONFIGURATION_FILE_NAME);
+        String path = pathResolver
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
+                        FILE_NAME);
         if (!fileManager.exists(path)) {
 
             OutputStream outputStream = null;
             try {
 
                 outputStream = fileManager.createFile(path).getOutputStream();
-                IOUtils.copy(FileUtils.getInputStream(getClass(),
-                        DYNAMIC_CONFIGURATION_TEMPLATE_NAME), outputStream);
+                IOUtils.copy(
+                        FileUtils.getInputStream(getClass(), TAMPLATE_NAME),
+                        outputStream);
 
             }
             catch (IOException ioe) {

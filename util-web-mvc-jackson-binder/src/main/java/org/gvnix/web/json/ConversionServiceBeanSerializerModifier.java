@@ -55,8 +55,8 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 public class ConversionServiceBeanSerializerModifier extends
         BeanSerializerModifier {
 
-    private ConversionService conversionService;
-    private BindingResultSerializer bindingResultSerializer;
+    private final ConversionService conversionService;
+    private final BindingResultSerializer bindingResultSerializer;
 
     public ConversionServiceBeanSerializerModifier(
             ConversionService conversionService) {
