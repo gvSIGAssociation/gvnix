@@ -36,6 +36,8 @@ import org.w3c.dom.Element;
 @Service
 public class BootstrapOperationsImpl implements BootstrapOperations {
 
+    private static final String VIEWS = "views/";
+
     @Reference
     private FileManager fileManager;
 
@@ -49,7 +51,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     @Reference
     private ProjectOperations projectOperations;
 
-    private final Logger LOGGER = Logger.getLogger(getClass().getName());
+    private static final Logger LOGGER = Logger
+            .getLogger(BootstrapOperationsImpl.class.getName());
 
     /**
      * If JQuery is installed, the command is available
@@ -276,7 +279,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                     Path.SRC_MAIN_WEBAPP, "WEB-INF/views/".concat(fileName));
 
             BootstrapUtils.updateFilesInLocationIfExists(fileManager,
-                    getClass(), viewFile, fileName, "views/");
+                    getClass(), viewFile, fileName, VIEWS);
         }
     }
 
@@ -386,7 +389,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                     Path.SRC_MAIN_WEBAPP, "WEB-INF/views/login.jspx");
 
             BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
-                    fileManager, getClass(), viewFile, "login.jspx", "views/");
+                    fileManager, getClass(), viewFile, "login.jspx", VIEWS);
 
         }
 
@@ -423,7 +426,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                                 "WEB-INF/views/".concat(fileName));
 
                 BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
-                        fileManager, getClass(), viewFile, fileName, "views/");
+                        fileManager, getClass(), viewFile, fileName, VIEWS);
             }
 
             // Copying typical-security login
@@ -433,7 +436,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
             BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
                     fileManager, getClass(), loginView, "login-typical.jspx",
-                    "views/");
+                    VIEWS);
         }
 
     }
@@ -444,7 +447,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * @return
      */
     public boolean isLoadScriptsModified() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
                 "WEB-INF/tags/bootstrap/util/load-scripts-bootstrap.tagx");
         final Document document = XmlUtils.readXml(fileManager
@@ -453,12 +455,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         final Element urlElement = DomUtils.findFirstElementByName(
                 "spring:url", config);
         String value = urlElement.getAttribute("value");
-        if (value.contains("dataTables.bootstrap.css")) {
-            return true;
-        }
-        else {
-            return false;
-        }
+
+        return value.contains("dataTables.bootstrap.css");
     }
 
     /**
@@ -467,7 +465,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * @return
      */
     public boolean isLoginModified() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
                 "WEB-INF/views/login.jspx");
         final Document document = XmlUtils.readXml(fileManager
@@ -476,12 +473,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         final Element urlElement = DomUtils.findFirstElementByName("div",
                 config);
         String value = urlElement.getAttribute("class");
-        if (value.contains("alert alert-danger")) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return value.contains("alert alert-danger");
     }
 
     /**
@@ -511,7 +503,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
     @Override
     public boolean isInstalledInModule(String moduleName) {
-        PathResolver pathResolver = projectOperations.getPathResolver();
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
                 "scripts/bootstrap/bootstrap.min.js");
         return fileManager.exists(dirPath);
@@ -522,7 +513,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
 
     public boolean isTypicalSecurityInstalled() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
                 "WEB-INF/views/changepassword/index.jspx");
         return fileManager.exists(dirPath);
