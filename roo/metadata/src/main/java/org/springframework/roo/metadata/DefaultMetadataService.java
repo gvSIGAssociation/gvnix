@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.felix.scr.annotations.Component;
@@ -24,7 +25,7 @@ import org.springframework.roo.metadata.internal.AbstractMetadataCache;
  * This implementation is not thread safe. It should only be accessed by a
  * single thread at a time. This is enforced by the process manager semantics,
  * so we avoid the cost of re-synchronization here.
- * 
+ *
  * @author Ben Alex
  * @since 1.0
  */
@@ -273,6 +274,12 @@ public class DefaultMetadataService extends AbstractMetadataCache implements
                             if (metadataLogger.getTraceLevel() > 0) {
                                 metadataLogger.log("Retrying " + retryMid);
                             }
+                            // DISID #13495 Avoid infinite recursion loop
+                            if (ObjectUtils.equals(retryMid, metadataIdentificationString)) {
+                                continue;
+                            }
+                            // /DISID #13495 Avoid infinite recursion loop
+
                             getInternal(retryMid, false, false);
                         }
                         if (metadataLogger.getTraceLevel() > 0
