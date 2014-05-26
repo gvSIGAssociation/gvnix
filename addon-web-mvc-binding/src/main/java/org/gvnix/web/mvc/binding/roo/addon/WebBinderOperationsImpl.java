@@ -142,13 +142,11 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
                     stringTrimmerBinder, attributes);
 
             // Add annotation to target type and save changes to disk
-            ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+            ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                     mutableTypeDetails);
-            classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder
+            detailsBuilder.addAnnotation(annotationBuilder.build());
+            typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder
                     .build());
-            typeManagementService
-                    .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
-                            .build());
         }
     }
 

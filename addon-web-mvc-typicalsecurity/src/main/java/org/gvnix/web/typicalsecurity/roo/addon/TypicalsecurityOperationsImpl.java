@@ -45,6 +45,9 @@ import org.w3c.dom.Element;
 @Component
 @Service
 public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations {
+    private static final String SIGNUP = "signup";
+    private static final String INTERCEPT_URL = "intercept-url";
+    private static final String COULD_NOT_ACQUIRE = "Could not acquire ";
     @Reference
     private FileManager fileManager;
     @Reference
@@ -60,7 +63,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
      * @Reference private ClasspathOperations classpathOperations;
      */
 
-    private static char SEPARATOR = File.separatorChar;
+    public static char SEPARATOR = File.separatorChar;
 
     public boolean isCommandAvailable() {
         /*
@@ -196,12 +199,12 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
         // Inject database based authentication provider into
         // applicationContext-security.xml
         // ----------------------------------------------------------------------
-        injectDatabasebasedAuthProviderInXml(entityPackage);
+        injectDatabasebasedAuthProviderInXml();
 
         // ----------------------------------------------------------------------
         // Autowire MessageDigestPasswordEncoder in applicationContext.xml
         // ----------------------------------------------------------------------
-        autowireMessageDigestPasswordEncoder(entityPackage);
+        autowireMessageDigestPasswordEncoder();
 
         createMailSender();
         addForgotPasswordRegisterUserToLoginPage();
@@ -217,9 +220,8 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
      * Inject database based authentication provider into
      * applicationContext-security.xml
      * 
-     * @param entityPackage
      */
-    private void injectDatabasebasedAuthProviderInXml(String entityPackage) {
+    private void injectDatabasebasedAuthProviderInXml() {
         String springSecurity = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES,
                 "META-INF/spring/applicationContext-security.xml");
@@ -234,7 +236,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
             }
             else {
                 throw new IllegalStateException(
-                        "Could not acquire ".concat(springSecurity));
+                        COULD_NOT_ACQUIRE.concat(springSecurity));
             }
         }
         catch (Exception e) {
@@ -242,24 +244,24 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
         }
 
         Element firstInterceptUrl = XmlUtils.findFirstElementByName(
-                "intercept-url", webConfigDoc.getDocumentElement());
+                INTERCEPT_URL, webConfigDoc.getDocumentElement());
         assert firstInterceptUrl != null : "Could not find intercept-url in "
                 + springSecurity;
 
         firstInterceptUrl.getParentNode().insertBefore(
-                new XmlElementBuilder("intercept-url", webConfigDoc)
+                new XmlElementBuilder(INTERCEPT_URL, webConfigDoc)
                         .addAttribute("pattern", "/forgotpassword/**")
                         .addAttribute("access", "permitAll").build(),
                 firstInterceptUrl);
 
         firstInterceptUrl.getParentNode().insertBefore(
-                new XmlElementBuilder("intercept-url", webConfigDoc)
+                new XmlElementBuilder(INTERCEPT_URL, webConfigDoc)
                         .addAttribute("pattern", "/signup/**")
                         .addAttribute("access", "permitAll").build(),
                 firstInterceptUrl);
 
         firstInterceptUrl.getParentNode().insertBefore(
-                new XmlElementBuilder("intercept-url", webConfigDoc)
+                new XmlElementBuilder(INTERCEPT_URL, webConfigDoc)
                         .addAttribute("pattern", "/")
                         .addAttribute("access", "isAuthenticated()").build(),
                 firstInterceptUrl);
@@ -271,8 +273,8 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
                 .getFullyQualifiedPackageName()
                 + ".provider.DatabaseAuthenticationProvider";
 
-        Element databaseAuthenticationProviderBean = new XmlElementBuilder(
-                "beans:bean", webConfigDoc)
+        Element dbProviderBean = new XmlElementBuilder("beans:bean",
+                webConfigDoc)
                 .addAttribute("id", "databaseAuthenticationProvider")
                 .addAttribute("class", authenticationProviderClass)
                 .addChild(
@@ -289,8 +291,8 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
         Element authenticationManager = XmlUtils.findFirstElementByName(
                 "authentication-manager", webConfigDoc.getDocumentElement());
 
-        authenticationManager.getParentNode().insertBefore(
-                databaseAuthenticationProviderBean, authenticationManager);
+        authenticationManager.getParentNode().insertBefore(dbProviderBean,
+                authenticationManager);
 
         Element oldAuthProvider = XmlUtils.findFirstElementByName(
                 "authentication-provider", webConfigDoc.getDocumentElement());
@@ -320,9 +322,8 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
     /**
      * Inject MessageDigestPasswordEncoder bean in applicationContext.xml
      * 
-     * @param entityPackage
      */
-    private void autowireMessageDigestPasswordEncoder(String entityPackage) {
+    private void autowireMessageDigestPasswordEncoder() {
         String applicationContextSecurity = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES,
                 "META-INF/spring/applicationContext-security.xml");
@@ -337,7 +338,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
                         mutableConfigXml.getInputStream());
             }
             else {
-                throw new IllegalStateException("Could not acquire "
+                throw new IllegalStateException(COULD_NOT_ACQUIRE
                         + applicationContextSecurity);
             }
         }
@@ -439,14 +440,13 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
         final String prefix = SEPARATOR + "WEB-INF/views";
 
         map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
-                joinPath(prefix, "signup", "index.jspx")), "signup/index.jspx");
+                joinPath(prefix, SIGNUP, "index.jspx")), "signup/index.jspx");
         map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
-                joinPath(prefix, "signup", "thanks.jspx")),
-                "signup/thanks.jspx");
+                joinPath(prefix, SIGNUP, "thanks.jspx")), "signup/thanks.jspx");
         map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
-                joinPath(prefix, "signup", "error.jspx")), "signup/error.jspx");
+                joinPath(prefix, SIGNUP, "error.jspx")), "signup/error.jspx");
         map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
-                joinPath(prefix, "signup", "views.xml")), "signup/views.xml");
+                joinPath(prefix, SIGNUP, "views.xml")), "signup/views.xml");
 
         map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
                 joinPath(prefix, "forgotpassword", "index.jspx")),
@@ -558,7 +558,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
             }
             else {
                 throw new IllegalStateException(
-                        "Could not acquire ".concat(footerJspx));
+                        COULD_NOT_ACQUIRE.concat(footerJspx));
             }
         }
         catch (Exception e) {
@@ -607,8 +607,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
             }
             else {
-                throw new IllegalStateException("Could not acquire "
-                        + loginJspx);
+                throw new IllegalStateException(COULD_NOT_ACQUIRE + loginJspx);
             }
         }
         catch (Exception e) {
@@ -659,7 +658,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
             }
             else {
                 throw new IllegalStateException(
-                        "Could not acquire ".concat(applicationProperties));
+                        COULD_NOT_ACQUIRE.concat(applicationProperties));
             }
         }
         catch (Exception e) {

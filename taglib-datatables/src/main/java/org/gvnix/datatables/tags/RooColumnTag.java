@@ -53,7 +53,8 @@ public class RooColumnTag extends ColumnTag {
 
     // Logger
     @SuppressWarnings("unused")
-    private static Logger logger = LoggerFactory.getLogger(RooColumnTag.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(RooColumnTag.class);
 
     /** Max displayed text length (default '-1'). Unlimited if negative. */
     private Integer maxLength = Integer.valueOf(-1);
@@ -89,7 +90,7 @@ public class RooColumnTag extends ColumnTag {
      */
     private String conversionServiceId = "applicationConversionService";
 
-    private SpringContextHelper helper = new SpringContextHelper();
+    private final SpringContextHelper helper = new SpringContextHelper();
 
     private static final String SEPARATOR_FIELDS = ".";
     private static final String SEPARATOR_FIELDS_ESCAPED = "_~~_";

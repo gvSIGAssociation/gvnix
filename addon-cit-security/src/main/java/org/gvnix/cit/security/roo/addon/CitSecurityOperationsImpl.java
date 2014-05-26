@@ -18,7 +18,12 @@
  */
 package org.gvnix.cit.security.roo.addon;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -35,7 +40,14 @@ import org.springframework.roo.addon.security.SecurityOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.*;
+import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.DependencyScope;
+import org.springframework.roo.project.DependencyType;
+import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -52,6 +64,10 @@ import org.w3c.dom.Element;
 @Component
 @Service
 public class CitSecurityOperationsImpl implements CitSecurityOperations {
+
+    private static final String JAVA_SRC_TEMPLATES = "java-src-templates";
+
+    private static final String CLASS = "class";
 
     /**
      * Installed classes package
@@ -103,7 +119,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             "org.mockito", "mockito-all", "1.9.5", DependencyType.JAR,
             DependencyScope.TEST);
 
-    private static Logger logger = Logger
+    private static final Logger logger = Logger
             .getLogger(CitSecurityOperationsImpl.class.getName());
 
     @Reference
@@ -435,14 +451,14 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             Element root = secXmlDoc.getDocumentElement();
             Element bean = XmlUtils.findFirstElement(
                     "/beans/bean[@id='wscitAuthenticationProvider']", root);
-            String clazz = bean.getAttribute("class");
-            bean.setAttribute("class",
+            String clazz = bean.getAttribute(CLASS);
+            bean.setAttribute(CLASS,
                     clazz.replace("__TARGET_PACKAGE__", getClassesPackage()));
 
             bean = XmlUtils.findFirstElement(
                     "/beans/bean[@id='serverWSAuthPortProxy']", root);
-            clazz = bean.getAttribute("class");
-            bean.setAttribute("class",
+            clazz = bean.getAttribute(CLASS);
+            bean.setAttribute(CLASS,
                     clazz.replace("__TARGET_PACKAGE__", getClassesPackage()));
 
         }
@@ -507,27 +523,27 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
         // Copiamos los ficheros del cliente del servicio WSAuth
         for (String className : JAVA_WS_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className,
-                    getClassesPackage(), projectMetadata, null, false, false);
+            installTemplate(JAVA_SRC_TEMPLATES, className, getClassesPackage(),
+                    projectMetadata, null, false, false);
         }
 
         // Copiamos los ficheros del Provider, usuarios y el cliente del
         // servicio WSAuth
         for (String className : JAVA_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className,
-                    getClassesPackage(), projectMetadata, null, false, false);
+            installTemplate(JAVA_SRC_TEMPLATES, className, getClassesPackage(),
+                    projectMetadata, null, false, false);
         }
 
         // Copiamos los ficheros de los xsd del servicio WSAuth
         for (String className : JAVA_XSD_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className,
-                    getClassesPackage(), projectMetadata, null, false, false);
+            installTemplate(JAVA_SRC_TEMPLATES, className, getClassesPackage(),
+                    projectMetadata, null, false, false);
         }
 
         // Copiamos los ficheros de los test
         for (String className : JAVA_TEST_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className,
-                    getClassesPackage(), projectMetadata, null, false, true);
+            installTemplate(JAVA_SRC_TEMPLATES, className, getClassesPackage(),
+                    projectMetadata, null, false, true);
         }
     }
 

@@ -189,8 +189,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         }
 
         // Checks if field exists and gets type
-        JavaType fieldType = existsField(existingController, annotationValues,
-                field);
+        JavaType fieldType = existsField(annotationValues, field);
         if (fieldType == null) {
             return;
         }
@@ -254,12 +253,10 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         String plural = pluralMetadata.getPlural().toLowerCase();
 
         // Update field in views create and update
-        updateViews(relatedEntity, identifiers, plural,
-                annotationValues.getPath(), field, additionalFields, caption,
-                baseFilter, listPath, max, "create");
-        updateViews(relatedEntity, identifiers, plural,
-                annotationValues.getPath(), field, additionalFields, caption,
-                baseFilter, listPath, max, "update");
+        updateViews(identifiers, plural, annotationValues.getPath(), field,
+                additionalFields, caption, baseFilter, listPath, "create");
+        updateViews(identifiers, plural, annotationValues.getPath(), field,
+                additionalFields, caption, baseFilter, listPath, "update");
 
         // Alert if additionalFields is empty, only can search by id
         if (additionalFields == null) {
@@ -670,8 +667,8 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      * @param controller
      * @return
      */
-    private JavaType existsField(ClassOrInterfaceTypeDetails controller,
-            WebScaffoldAnnotationValues annotationValues, JavaSymbolName field) {
+    private JavaType existsField(WebScaffoldAnnotationValues annotationValues,
+            JavaSymbolName field) {
         JavaType entity = annotationValues.getFormBackingObject();
 
         final ClassOrInterfaceTypeDetails cid = typeLocationService
@@ -795,10 +792,10 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      * @param listPath
      * @param max
      */
-    private void updateViews(ClassOrInterfaceTypeDetails entity,
-            List<FieldMetadata> identifiers, String entityPlural, String path,
-            JavaSymbolName field, String additionalFields, String caption,
-            String baseFilter, String listPath, String max, String viewName) {
+    private void updateViews(List<FieldMetadata> identifiers,
+            String entityPlural, String path, JavaSymbolName field,
+            String additionalFields, String caption, String baseFilter,
+            String listPath, String viewName) {
 
         String relativePath = "WEB-INF/views/".concat(path).concat("/")
                 .concat(viewName).concat(".jspx");

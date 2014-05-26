@@ -101,15 +101,14 @@ public final class StringTrimmerBinderMetadataProvider extends
             String itdFilename) {
 
         // We know governor type details are non-null and can be safely cast
-        ClassOrInterfaceTypeDetails controllerClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
+        ClassOrInterfaceTypeDetails controllerDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
         Validate.notNull(
-                controllerClassOrInterfaceDetails,
+                controllerDetails,
                 "Governor failed to provide class type details, in violation of superclass contract");
 
         AnnotationMetadata stringTrimmerAnnotation = MemberFindingUtils
-                .getAnnotationOfType(
-                        controllerClassOrInterfaceDetails.getAnnotations(),
+                .getAnnotationOfType(controllerDetails.getAnnotations(),
                         GVNIX_STRING_TRIMMER_BINDER);
 
         boolean emptyAsNull = ((BooleanAttributeValue) stringTrimmerAnnotation

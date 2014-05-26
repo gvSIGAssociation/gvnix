@@ -56,7 +56,7 @@ public class RooTableTag extends TableTag {
 
     public static final String TABLE_TAG_VARIABLE = "__datatables_table_tag_instance__";
 
-    private SpringContextHelper helper = new SpringContextHelper();
+    private final SpringContextHelper helper = new SpringContextHelper();
 
     /** The identifier field name for the type (defaults to 'id'). */
     private String typeIdFieldName = "id";
