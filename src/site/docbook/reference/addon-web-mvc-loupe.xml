@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-web-mvc-loupe" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+         
+  <title xml:lang="es">Add-on Campos Lupa</title>
+  
+  <para xml:lang="es">Implementación de campos lupa en el proyecto gvNIX.</para>
+
+  <section xml:id="addon-web-mvc-loupe_descripcion">
+    <title xml:lang="es">Descripción</title>
+    
+    <para xml:lang="es">Este add-on permite utilizar componentes de tipo lupa en aplicaciones gvNIX.
+    Gracias a estos componentes, podemos buscar registros de forma sencilla de
+    campos relacionados sin tener que visualizar todos los datos en un desplegable.</para>
+
+  </section>
+  
+  <section xml:id="addon-web-mvc-loupe_instalacion">
+    <title xml:lang="es">Instalación del componente lupa</title>
+    
+    <para xml:lang="es">Para instalarlo, hay que utilizar el comando <link
+    linkend="apendice-comandos_addon-web-mvc-loupe_setup">web mvc
+    loupe setup</link>, el cual solo estará disponible después de instalar el 
+    <link linked="addon-web-mvc_jquery">add-on JQuery</link> en nuestro proyecto.
+    </para>
+  </section>
+  
+  <section xml:id="addon-web-mvc-loupe_set">
+    <title xml:lang="es">Permitiendo a una entidad utilizar el campo lupa</title>
+    
+    <para xml:lang="es">Una vez instalados todos los componentes, es necesario generar una 
+    serie de métodos para realizar las búsquedas y la visualización de los resultados. Para que el
+    controlador disponga de estos métodos, utilizaremos el comando <link
+    linkend="apendice-comandos_addon-web-mvc-loupe_set">web mvc
+    loupe set</link> sobre el controlador seleccionado.
+    </para>
+    
+  </section>
+  
+    <section xml:id="addon-web-mvc-loupe_field">
+    <title xml:lang="es">Utilizando componentes lupa</title>
+    
+    <para xml:lang="es">Ahora que el Controlador ya dispone de los métodos necesarios, ejecutaremos
+    el comando <link linkend="apendice-comandos_addon-web-mvc-loupe_field">web mvc
+    loupe field</link> sobre el field de la entidad a la que pertenece el controlador con los métodos
+    generados. 
+    Una vez ejecutado este comando, transformaremos el campo indicado a un campo de tipo lupa en la capa
+    web de nuestra aplicación.
+    </para>
+    
+  <section xml:id="addon-web-mvc-loupe_update">
+    <title xml:lang="es">Actualizando componentes lupa</title>
+    
+    <para xml:lang="es">Para mantener actualizados los componentes importados mediante el comando de
+    instalación, podemos ejecutar el comando <link linkend="apendice-comandos_addon-web-mvc-loupe_update">
+    web mvc loupe update</link>.
+    </para>
+    
+  </section>
+  
+  
+  <section xml:id="addon-web-mvc-loupe_apendice_comandos">
+    <title xml:lang="es">Apendice de comandos</title>
+    
+    <para xml:lang="es">Para ver con mas detalle el comando que proporciona el add-on
+    consultar la sección de <link linkend="apendice-comandos_addon-web-mvc-loupe">
+    comandos del add-on Lupa</link>.</para>
+  </section>
+  
+</chapter>
