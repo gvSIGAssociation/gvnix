@@ -52,6 +52,7 @@
     Una vez ejecutado este comando, transformaremos el campo indicado a un campo de tipo lupa en la capa
     web de nuestra aplicación.
     </para>
+    </section>
     
   <section xml:id="addon-web-mvc-loupe_update">
     <title xml:lang="es">Actualizando componentes lupa</title>

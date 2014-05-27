@@ -339,6 +339,136 @@
     en la etiqueta <classname>table:column</classname> correspondiente a la columna
     en el fichero <filename>list.jspx</filename></para>
   </section>
+  
+   <section xml:id="addon-web-mvc-datatables_filtros-simples">
+    <title xml:lang="es">Filtros Simples</title>
+    	<para xml:lang="es">Los filtros por columna llevan predefinidas unas operaciones
+	    dependiendo del tipo de campo de la columna. Los nombres de estas operaciones
+	    son multidioma y pueden ser configuradas por el desarrollador. Por defecto se instalan
+	    las siguientes operaciones:</para>
+	    
+	    <para xml:lang="es"><ns:emphasis>Campos de Tipo Texto</ns:emphasis></para>
+	    
+        <itemizedlist>
+        	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>cadena</ns:emphasis>: Buscará la cadena de texto introducida</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>=cadena</ns:emphasis>: Buscará la cadena de texto introducida después del
+		   		simbolo igual</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>CONTIENE(cadena)</ns:emphasis>: Buscará todos los registros que para esa columna contengan
+		   		la cadena de texto introducida</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>EMPIEZA(cadena)</ns:emphasis>: Buscará todos los registros que para esa columna empiecen por
+		   		la cadena de texto introducida</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>TERMINA(cadena)</ns:emphasis>: Buscará todos los registros que para esa columna terminen por
+		   		la cadena de texto introducida</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>ESVACIO</ns:emphasis>: Buscará todos los registros que para esa columna estén vacios o sean nulos</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>NOESVACIO</ns:emphasis>: Buscará todos los registros que para esa columna no estén vacios y no sean nulos</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>ESNULO</ns:emphasis>: Buscará todos los registros que para esa columna sean nulos</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>NONULO</ns:emphasis>: Buscará todos los registros que para esa columna no sean nulos</para>
+		   	</listitem>
+        </itemizedlist>
+        
+        
+        <para xml:lang="es"><ns:emphasis>Campos de Tipo Numérico</ns:emphasis></para>
+	    
+        <itemizedlist>
+        	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>número</ns:emphasis>: Buscará el valor numérico exacto en la columna actual</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>=número</ns:emphasis>: Buscará el valor numérico exacto en la columna actual</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>>número</ns:emphasis>: Buscará todos los registros cuyo valor sea mayor que el indicado</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>>=número</ns:emphasis>: Buscará todos los registros cuyo valor sea mayor o igual que el indicado</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>&lt;número</ns:emphasis>: Buscará todos los registros cuyo valor sea menor que el indicado</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>&lt;=número</ns:emphasis>: Buscará todos los registros cuyo valor sea menor o igual que el indicado</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>&lt;>número</ns:emphasis>: Buscará todos los registros cuyo valor sea distinto que el indicado</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>!=número</ns:emphasis>: Buscará todos los registros cuyo valor sea distinto que el indicado</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>ENTRENUMERO(n1;n2)</ns:emphasis>: Buscará todos los registros cuyo valor se encuentre entre el primer
+		   		número indicado y el segundo</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>ESNULO</ns:emphasis>: Buscará todos los registros que para esa columna sean nulos</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>NONULO</ns:emphasis>: Buscará todos los registros que para esa columna no sean nulos</para>
+		   	</listitem>
+        </itemizedlist>
+        
+        <para xml:lang="es"><ns:emphasis>Campos de Tipo Fecha</ns:emphasis></para>
+	    
+        <itemizedlist>
+        	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>FECHA(fecha)</ns:emphasis>: Buscará todos los registros con la fecha introducida para la columna del filtro</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>ESANYO(año)</ns:emphasis>: Buscará todos los registros que contengan el año en la fecha de la columna del filtro</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>ESMES(mes)</ns:emphasis>: Buscará todos los registros que contengan el mes en la fecha de la columna del filtro</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>ESDIA(dia)</ns:emphasis>: Buscará todos los registros que contengan el día en la fecha de la columna del filtro</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>ENTREFECHA(fecha1;fecha2)</ns:emphasis>: Buscará todos los registros cuyas fechas se encuentren entre la primera fecha y la segunda</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>ESNULO</ns:emphasis>: Buscará todos los registros que para esa columna sean nulos</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>NONULO</ns:emphasis>: Buscará todos los registros que para esa columna no sean nulos</para>
+		   	</listitem>
+        </itemizedlist>
+        
+        
+        <para xml:lang="es"><ns:emphasis>Campos de Tipo Boolean</ns:emphasis></para>
+	    
+        <itemizedlist>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>VERDADERO</ns:emphasis>: Buscará todos los registros cuyo valor para la columna sea true</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>FALSO</ns:emphasis>: Buscará todos los registros cuyo valor para la columna sea false</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>ESNULO</ns:emphasis>: Buscará todos los registros que para esa columna sean nulos</para>
+		   	</listitem>
+		   	<listitem>
+		   		<para xml:lang="es"><ns:emphasis>NONULO</ns:emphasis>: Buscará todos los registros que para esa columna no sean nulos</para>
+		   	</listitem>
+        </itemizedlist>
+        
+        
+    </section>
 
 
   <section xml:id="addon-web-mvc-datatables_register-mode">
@@ -516,5 +646,30 @@
     <classname>@GvNIXDatatables</classname> y añadirle el atributo
     <literal>inlineEditing = true</literal>.</para>
 
+  </section>
+  
+    <section xml:id="addon-web-mvc-datatables_create_top">
+    <title xml:lang="es">Registro creado en primera posición</title>
+        <para xml:lang="es">Al crear un nuevo registro, se colocará automáticamente en la
+        primera posición del listado sin tener en cuenta los filtros u ordenación del Datatable.</para>
+        <para xml:lang="es">Gracias a esto tendremos siempre visible el registro que se ha editado.</para>
+        <para xml:lang="es">Al recargar la página, se ordenará el registro de forma correcta siguiendo la ordenación 
+        y los filtros establecidos en el Datatable.</para>
+  </section>
+  
+  <section xml:id="addon-web-mvc-datatables_update_top">
+    <title xml:lang="es">Registro editado en primera posición</title>
+        <para xml:lang="es">Al actualizar un registro, se colocará automáticamente en la
+        primera posición sin tener en cuenta los filtros u ordenación del Datatable.</para>
+        <para xml:lang="es">Gracias a esto tendremos siempre visible el registro que se ha editado.</para>
+  		<para xml:lang="es">Al recargar la página, se ordenará el registro de forma correcta siguiendo la ordenación 
+        y los filtros establecidos en el Datatable.</para>
+  </section>
+  
+  <section xml:id="addon-web-mvc-datatables_clicked_row_visible">
+    <title xml:lang="es">Registro seleccionado siempre visible</title>
+        <para xml:lang="es">Al acceder a una página del listado Datatable que contenga un registro seleccionado
+        por el usuario, se navegará de forma automática hasta este registro. </para>
+        <para xml:lang="es">Gracias a esto tendremos siempre posicionado en pantalla el registro que se ha seleccionado.</para>
   </section>
 </chapter>
