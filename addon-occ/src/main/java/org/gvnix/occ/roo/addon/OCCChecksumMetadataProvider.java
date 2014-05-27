@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -118,7 +118,7 @@ public class OCCChecksumMetadataProvider implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
      * createLocalIdentifier(org.springframework.roo.model.JavaType,
      * org.springframework.roo.project.Path)
@@ -129,7 +129,7 @@ public class OCCChecksumMetadataProvider implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.springframework.roo.classpath.itd.ItdMetadataProvider#
      * getItdUniquenessFilenameSuffix()
      */
@@ -139,7 +139,7 @@ public class OCCChecksumMetadataProvider implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
      */
     public String getProvidesType() {
@@ -148,7 +148,7 @@ public class OCCChecksumMetadataProvider implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
      * getGovernorPhysicalTypeIdentifier(java.lang.String)
      */
@@ -172,9 +172,10 @@ public class OCCChecksumMetadataProvider implements
 
         // We know governor type details are non-null and can be safely cast
         // We get govenor's EntityMetadata
+        JavaType entityType = governorPhysicalTypeMetadata
+                .getMemberHoldingTypeDetails().getName();
         String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(
-                governorPhysicalTypeMetadata.getMemberHoldingTypeDetails()
-                        .getName(), LogicalPath.getInstance(path, ""));
+                entityType, LogicalPath.getInstance(path, ""));
 
         // We get governor's Entity
         JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService
@@ -184,8 +185,7 @@ public class OCCChecksumMetadataProvider implements
         }
 
         FieldMetadata versionField = persistenceMemberLocator
-                .getVersionField(governorPhysicalTypeMetadata
-                        .getMemberHoldingTypeDetails().getName());
+                .getVersionField(entityType);
 
         if (versionField != null) {
             String declaredByType = entityMetadataKey
@@ -202,11 +202,21 @@ public class OCCChecksumMetadataProvider implements
             }
         }
 
+        List<FieldMetadata> idFields = persistenceMemberLocator
+                .getIdentifierFields(entityType);
+
+        if (idFields.isEmpty()) {
+            // Can't create metadata yet
+            return null;
+        }
+
+        FieldMetadata idField = idFields.get(0);
+
         OCCChecksumMetadata metadata = new OCCChecksumMetadata(
                 metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, entityMetadata,
                 memberDetailsScanner, typeManagementService,
-                persistenceMemberLocator);
+                persistenceMemberLocator, idField, versionField);
 
         return metadata;
     }
@@ -297,10 +307,10 @@ public class OCCChecksumMetadataProvider implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * TODO Overwritted method required because in old Roo versions can't use
      * builder to include AJs precedence. Used a template instead.
-     * 
+     *
      * @see
      * org.springframework.roo.metadata.MetadataProvider#get(java.lang.String)
      */
