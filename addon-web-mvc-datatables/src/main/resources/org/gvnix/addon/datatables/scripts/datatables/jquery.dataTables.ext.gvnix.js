@@ -287,6 +287,7 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function(oSettings, iDelay) {
  */
 
 jQuery.fn.dataTableExt.oApi.fnDrawCallback = function(oSettings){
+	this.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
 	// Displaying always the clicked row
 	if(this.find(".row_clicked").length > 0){
 		var rowSelected = this.find(".row_clicked");
