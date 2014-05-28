@@ -122,12 +122,12 @@
   <!-- Prepare default values -->
   <!-- ====================== -->
 
-  <jsp:useBean id="datatables_javaScript_elements_before" class="java.util.HashMap" scope="request"/>
-  <jsp:useBean id="datatables_javaScript_elements_after" class="java.util.HashMap" scope="request"/>
-  <jsp:useBean id="datatables_javaScript_elements_init" class="java.util.HashMap" scope="request"/>
-  <jsp:useBean id="datatables_callback_elements" class="java.util.HashMap" scope="request"/>
-  <jsp:useBean id="datatables_export_columns" class="java.util.HashMap" scope="request"/>
-  <jsp:useBean id="datatables_export_columns_title" class="java.util.HashMap" scope="request"/>
+  <jsp:useBean id="datatables_javaScript_elements_before" class="java.util.LinkedHashMap" scope="request"/>
+  <jsp:useBean id="datatables_javaScript_elements_after" class="java.util.LinkedHashMap" scope="request"/>
+  <jsp:useBean id="datatables_javaScript_elements_init" class="java.util.LinkedHashMap" scope="request"/>
+  <jsp:useBean id="datatables_callback_elements" class="java.util.LinkedHashMap" scope="request"/>
+  <jsp:useBean id="datatables_export_columns" class="java.util.LinkedHashMap" scope="request"/>
+  <jsp:useBean id="datatables_export_columns_title" class="java.util.LinkedHashMap" scope="request"/>
 
   <!-- typeIdFieldName -->
   <c:if test="${empty typeIdFieldName}">
