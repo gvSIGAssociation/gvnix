@@ -191,7 +191,7 @@ var GvNIX_RowOnTop;
 		 */
 		"_fnToStringArray" : function(aObject) {
 			var result = [];
-			for (var i;i<aObject.length;i++) {
+			for (var i = 0;i<aObject.length;i++) {
 				result.push(aObject[i]+"");
 			}
 			return result;
