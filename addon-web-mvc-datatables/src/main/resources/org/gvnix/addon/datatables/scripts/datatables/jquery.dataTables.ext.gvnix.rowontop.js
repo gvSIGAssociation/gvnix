@@ -191,7 +191,7 @@ var GvNIX_RowOnTop;
 		 */
 		"_fnToStringArray" : function(aObject) {
 			var result = [];
-			for (var i = 0;i<aObject.length;i++) {
+			for (var i=0;i<aObject.length;i++) {
 				result.push(aObject[i]+"");
 			}
 			return result;
@@ -205,8 +205,9 @@ var GvNIX_RowOnTop;
 		 */
 		"_fnRegisterDrawRowCallback" : function() {
 
-			var _d = this._data, dt = _d.dt;
+			var that = this, _d = this._data, dt = _d.dt;
 			var sClassToAdd = this.s.classForRowOnTop;
+			var oTable = dt.oInstance;
 
 			dt.oApi._fnCallbackReg(dt, 'aoRowCallback', jQuery.proxy(function(nRow, aData,
 					iDisplayIndex) {
@@ -225,7 +226,8 @@ var GvNIX_RowOnTop;
 				var $Row =jQuery(nRow);
 				// update row style if it's a row-on-top and css class is set
 				if (_d.asRowOnTopIds && _d.asRowOnTopIds.length
-						&& sClassToAdd) {
+						&& sClassToAdd && !(that.s.doRowClickOnCreatedRow &&
+						oTable.fnHasRowClick())) {
 					if (jQuery.inArray(nRow.id, _d.asRowOnTopIds) >-1) {
 						$Row.addClass(sClassToAdd);
 					}
@@ -412,7 +414,7 @@ var GvNIX_RowOnTop;
 	 * @type String
 	 * @default See code
 	 */
-	GvNIX_RowOnTop.VERSION = "1.3.0-SNAPSHOT";
+	GvNIX_RowOnTop.VERSION = "1.3.0-RELEASE";
 	GvNIX_RowOnTop.prototype.VERSION = GvNIX_RowOnTop.VERSION;
 
 	/** TODO Add as datatable feature * */

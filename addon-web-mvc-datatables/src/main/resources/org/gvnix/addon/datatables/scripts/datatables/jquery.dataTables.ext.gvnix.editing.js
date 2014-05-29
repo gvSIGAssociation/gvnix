@@ -609,7 +609,7 @@ var GvNIX_Editing;
 								
 								// Make a new unique ID for the input to avoid
 								// collisions with other elements with same ID
-								jQuery($inputCtrl[k]).attr('id', jQuery($inputCtrl[k]).attr('id') + '_edit_' + rowId);
+								jQuery($inputCtrl[k]).attr('id', '_' + $form.attr('id') + jQuery($inputCtrl[k]).attr('id') + '_edit_' + rowId);
 								
 								var value = fnVal( jQuery($inputCtrl[k]) );
 								
@@ -1013,7 +1013,9 @@ var GvNIX_Editing;
 
 							// Make a new unique ID for the input to avoid
 							// collisions with other elements with same ID
-							jQuery($input[i]).attr('id', jQuery($input[i]).attr('id') + '_create_' + rowId);
+							jQuery($input[i]).attr('id', '_' + $form.attr('id') + jQuery($input[i]).attr('id') + '_create_' + rowId);
+							
+							
 							
 							var formCell = "";
 							
@@ -2348,7 +2350,7 @@ var GvNIX_Editing;
 	 * @type String
 	 * @default See code
 	 */
-	GvNIX_Editing.VERSION = "1.3.0-SNAPSHOT";
+	GvNIX_Editing.VERSION = "1.3.0-RELEASE";
 	GvNIX_Editing.prototype.VERSION = GvNIX_Editing.VERSION;
 
 	/** TODO Add as datatable feature * */

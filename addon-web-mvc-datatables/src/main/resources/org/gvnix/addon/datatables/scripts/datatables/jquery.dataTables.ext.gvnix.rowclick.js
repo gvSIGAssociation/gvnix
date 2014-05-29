@@ -281,6 +281,8 @@ var GvNIX_RowClick;
 			if (this.s.persistState) {
 				this.fnSaveState();
 			}
+			this.fnScrollDatatableBodyToClicked();
+			
 			return true;
 		},
 
@@ -361,6 +363,29 @@ var GvNIX_RowClick;
 			}else{
 				window.localStorage.setItem(sName,sValue);
 			}
+		},
+		
+		/**
+		 * This functions scrolls datatable scroll body 
+		 * to clicked record
+		 */
+		"fnScrollDatatableBodyToClicked": function() {
+			var _d = this._data;
+			var s = this.s;
+			
+			var $table = jQuery(_d.dt.nTable);
+			var clickedClassSelector = "." + s.classForClickedRow;
+			$table.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
+		    // Displaying always the clicked row
+		    if($table.find(clickedClassSelector).length > 0){
+		        var rowSelected = $table.find(clickedClassSelector);
+		        var scrollHeight = $table.parent(".dataTables_scrollBody").height();
+		        var rowHeight = rowSelected.height();
+		        var rowSelectedPosition = rowSelected[0].offsetTop + rowHeight + (scrollHeight / 2);
+		        if(rowSelectedPosition > scrollHeight){
+		        	$table.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight}, 0);
+		        }
+		    }
 		},
 
 

@@ -133,11 +133,14 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 	$table.fnFooterCallback();
 	
 	// Displaying always the clicked row
-	if($table.find(".row_clicked").length > 0){
-		if($table.find(".row_clicked").length > 0){
-			var rowSelected = $table.find(".row_clicked");
+    $table.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
+    var rowClickedClassSelector = "." + $table.DataTable().fnRowClick().s.classForClickedRow;
+	if($table.find(rowClickedClassSelector).length > 0){
+		if($table.find(rowClickedClassSelector).length > 0){
+			var rowSelected = $table.find(rowClickedClassSelector);
 			var scrollHeight = $table.parent(".dataTables_scrollBody").height();
-			var rowSelectedPosition = rowSelected.offset().top;
+			var rowHeight = rowSelected.height();
+			var rowSelectedPosition = rowSelected[0].offsetTop + rowHeight + (scrollHeight / 2);
 			if(rowSelectedPosition > scrollHeight){
 				$table.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
 			}
@@ -287,15 +290,21 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function(oSettings, iDelay) {
  */
 
 jQuery.fn.dataTableExt.oApi.fnDrawCallback = function(oSettings){
-	this.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
-	// Displaying always the clicked row
-	if(this.find(".row_clicked").length > 0){
-		var rowSelected = this.find(".row_clicked");
-		var scrollHeight = this.parent(".dataTables_scrollBody").height();
-		var rowSelectedPosition = rowSelected.offset().top;
-		if(rowSelectedPosition > scrollHeight){
-			this.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
-		}
+	var rowClickedClassSelector = "." + this.DataTable().fnRowClick().s.classForClickedRow;
+    var rowEditingClassSelector = "." + this.DataTable().fnEditing()._options.classForEditingRow;
+    
+	if(!this.find(rowEditingClassSelector).length > 0){
+		this.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
+	    // Displaying always the clicked row
+	    if(this.find(rowClickedClassSelector).length > 0){
+	        var rowSelected = this.find(rowClickedClassSelector);
+	        var scrollHeight = this.parent(".dataTables_scrollBody").height();
+	        var rowHeight = rowSelected.height();
+	        var rowSelectedPosition = rowSelected[0].offsetTop + rowHeight + (scrollHeight / 2);
+	        if(rowSelectedPosition > scrollHeight){
+	            this.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
+	        }
+	    }
 	}
 };
 
