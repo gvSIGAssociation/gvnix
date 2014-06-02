@@ -133,6 +133,8 @@ Package gvNIX
 
    roo/shell/src/main/java/org/springframework/roo/shell/AbstractShell.java
 
+* Modify and commit gvNIX version from pom.xml on every addons. Modify version and SNAPSHOT to RELEASE
+
 * Update if necessary the Roo source code version (tag or head) into 'roo' folder with git
 
 * Update Roo version reference into gvNIX parent pom.xml (roo.version)
@@ -141,43 +143,27 @@ Package gvNIX
 
 * Modify and commit the appropriate gvNIX version in docbook documentacion (releaseinfo property) at src/site/docbook/reference/index.xml and at src/site/docbook/developer/index.xml
 
-* Create the tag for the gvNIX version we want to build using the following command::
+* Create the tag for the gvNIX version we want to build using STS
 
-   bash:~/gvnix/trunk/code$ svn update
-   bash:~/gvnix/trunk/code$ mvn release:prepare -Dtag={version}
+* Config your maven file conf/settings.xml to deploy to google code.
 
-  Version formats:
-
-   * Snapshot: X.Y.Z-SNAPSHOT
-   * Release: X.Y.Z-RELEASE
-
-* If all ok, clean packaging information on the trunk code directory::
-
-   bash:~/gvnix/trunk/code$ mvn release:perform
-   bash:~/gvnix/trunk/code$ mvn release:clean
-
-  If some errors, revert the changes::
-
-   bash:~/gvnix/trunk/code$ mvn release:rollback
-  
-  If release don't work whit this method, do manually replace old version with new one searching in text mode into all project.
-  Then do tag manually and iterate to new SNAPSHOT version manually replacing too.
-
-* To package the binary release use the following commands::
-
-   bash:~/gvnix/tags/$ svn update
-   bash:~/gvnix/tags/{version}$ ./build.sh -d
-
-  The ``-d`` option deploy to google code, can be used only by commiters.
-  This requires next configuration in maven configuration file at conf/settings.xml::
-
+  []
     <server>
       <id>Google Code</id>
       <username>gvnixscm@gmail.com</username>
       <password>XXXXXXXXXXX</password>
     </server>
-
+  []
+  
   Get password from redmine project wiki.
+  
+* Copy your conf/settings.xml to .m2/ folder 
+
+* To package gvNIX use the following commands:
+
+   bash: ./build.sh -d
+
+  The ``-d`` option deploy to google code, can be used only by commiters.
 
   Check if all add-ons are published correctly at http://gvnix.googlecode.com/svn/repo/repository.xml for RooBoot.
   This will create the ZIP file ``target/gvnix-dist/gvNIX-{version}.zip``.
@@ -186,9 +172,13 @@ Package gvNIX
 
 * Test uncompress ZIP file, start it, execute some script and check in STS.
 
-* Publish into gvnix.googlecode.com the gvNIX binary zip.
+* Publish into http://sourceforge.net/projects/gvnix (Get password from redmine project wiki)
 
-* Notify to the communication department the new version. 
+* Add release notes to https://code.google.com/p/gvnix/
+
+* Update http://gvnix.org 
+
+* Notify to the communication department the new version and attach the new version reference documentation.
 
 Branch
 ------
