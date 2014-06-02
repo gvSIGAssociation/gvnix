@@ -2350,7 +2350,7 @@ var GvNIX_Editing;
 	 * @type String
 	 * @default See code
 	 */
-	GvNIX_Editing.VERSION = "1.3.0-RELEASE";
+	GvNIX_Editing.VERSION = "${gvnix.version}";
 	GvNIX_Editing.prototype.VERSION = GvNIX_Editing.VERSION;
 
 	/** TODO Add as datatable feature * */
