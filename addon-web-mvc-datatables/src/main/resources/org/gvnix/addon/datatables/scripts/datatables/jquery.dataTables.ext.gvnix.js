@@ -136,14 +136,12 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
     $table.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
     var rowClickedClassSelector = "." + $table.DataTable().fnRowClick().s.classForClickedRow;
 	if($table.find(rowClickedClassSelector).length > 0){
-		if($table.find(rowClickedClassSelector).length > 0){
-			var rowSelected = $table.find(rowClickedClassSelector);
-			var scrollHeight = $table.parent(".dataTables_scrollBody").height();
-			var rowHeight = rowSelected.height();
-			var rowSelectedPosition = rowSelected[0].offsetTop + rowHeight + (scrollHeight / 2);
-			if(rowSelectedPosition > scrollHeight){
-				$table.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
-			}
+		var rowSelected = $table.find(rowClickedClassSelector);
+		var scrollHeight = $table.parent(".dataTables_scrollBody").height();
+		var rowHeight = rowSelected.height();
+		var rowSelectedPosition = rowSelected[0].offsetTop + rowHeight + (scrollHeight / 2);
+		if(rowSelectedPosition > scrollHeight){
+			$table.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
 		}
 	}
 	
@@ -321,30 +319,32 @@ jQuery.fn.dataTableExt.oApi.fnFooterCallback = function(row, data, start, end, d
 		
 		for ( var i=0, iLen=filters.length ; i<iLen ; i++ )
 	    {
-			var property = $(footer[i].cell).data().property;
-			var filterExpression = filters[i].sSearch;
-			
-			if(filterExpression != "")	{
-				$.ajax({
-					  url: "?checkFilters",
-					  data: {property: property, expression: filterExpression},
-					  type: "post",
-					  success: function(jsonResponse) {
-						  for(var i=0;i<footer.length;i++){
-							  if($(footer[i].cell).data().property == jsonResponse.property){
-								  if(!jsonResponse.response){
-									  $(footer[i].cell).find('input').css("background-color","#FA5858");
-								  }else{
-									  $(footer[i].cell).find('input').css("background-color","#ffffff");
+			if(footer[i] !== null){
+				var property = $(footer[i].cell).data().property;
+				var filterExpression = filters[i].sSearch;
+				
+				if(filterExpression != "")	{
+					$.ajax({
+						  url: "?checkFilters",
+						  data: {property: property, expression: filterExpression},
+						  type: "post",
+						  success: function(jsonResponse) {
+							  for(var i=0;i<footer.length;i++){
+								  if($(footer[i].cell).data().property == jsonResponse.property){
+									  if(!jsonResponse.response){
+										  $(footer[i].cell).find('input').css("background-color","#FA5858");
+									  }else{
+										  $(footer[i].cell).find('input').css("background-color","#ffffff");
+									  }
 								  }
 							  }
+						  },
+						  error:function (xhr, ajaxOptions, thrownError) {
 						  }
-					  },
-					  error:function (xhr, ajaxOptions, thrownError) {
-					  }
-				});
-			}else{
-				$(footer[i].cell).find('input').css("background-color","#ffffff");
+					});
+				}else{
+					$(footer[i].cell).find('input').css("background-color","#ffffff");
+				}
 			}
 	    }
 	}
