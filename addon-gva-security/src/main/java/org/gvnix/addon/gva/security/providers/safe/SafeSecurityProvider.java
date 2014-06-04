@@ -18,6 +18,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.gva.security.providers.SecurityProvider;
+import org.gvnix.support.WebProjectUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
@@ -30,6 +31,8 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
@@ -43,6 +46,7 @@ import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * <b>SAFE</b> Security Provider
@@ -60,6 +64,10 @@ import org.w3c.dom.Node;
 @Component
 @Service
 public class SafeSecurityProvider implements SecurityProvider {
+
+    private static final String SAFE_CERTIFICATE_JS = "scripts/safe/safe_certificate.js";
+
+    private static final String LOGIN_VIEW_PATH = "WEB-INF/views/login.jspx";
 
     private static final String POR_APLICACION_VALUE = "${security.SAFE.autorizacion.poraplicacion}";
 
@@ -128,6 +136,8 @@ public class SafeSecurityProvider implements SecurityProvider {
     private static final String SAFE_BEAN_ID = "wsSafeProvider";
 
     private static final String SAFE_BEAN_CLASS = ".SafeProvider";
+
+    private static final String SAFE_AUTHENTICATION_FILTER = ".SafeAuthenticationFilter";
 
     private static final String ID = "id";
 
@@ -202,14 +212,24 @@ public class SafeSecurityProvider implements SecurityProvider {
         if (!fileExists("SafeProvider", targetPackage)) {
             generateSafeProvider(targetPackage);
         }
+        if (!fileExists("SafeAuthenticationFilter", targetPackage)) {
+            generateSafeAuthenticationFilter(targetPackage);
+        }
         // Copying properties file
         copySafeClientPropertiesFile();
         // Copying wsdl files
         copySafeWSDLFiles();
+        // Copying safe_certificate.js
+        copySafeCertificateJS();
+        // Adding safe_certificate.js to load scripts
+        addToLoadScripts("safe_certificate",
+                "/resources/scripts/safe/safe_certificate.js");
         // Modifying Application Context
         modifyApplicationContext();
         // Modifying Application Context Security
         modifyApplicationContextSecurity(targetPackage);
+        // Modifying login.jspx
+        modifyLoginView();
         // Showing next steps
         showNextSteps();
 
@@ -502,6 +522,56 @@ public class SafeSecurityProvider implements SecurityProvider {
     }
 
     /**
+     * This method generates the file SafeAuthenticationFilter.java with the
+     * annotation <code>@GvNIXAuthenticationFilter</code>
+     * 
+     */
+    public void generateSafeAuthenticationFilter(JavaPackage targetPackage) {
+        JavaType entity = new JavaType(String.format(
+                "%s.SafeAuthenticationFilter",
+                targetPackage.getFullyQualifiedPackageName()));
+
+        Validate.notNull(entity, "Entity required");
+
+        int modifier = Modifier.PUBLIC;
+
+        final String declaredByMetadataId = PhysicalTypeIdentifier
+                .createIdentifier(entity,
+                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
+
+        File targetFile = new File(
+                typeLocationService
+                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
+        Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
+                entity);
+
+        // Prepare class builder
+        final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                declaredByMetadataId, modifier, entity,
+                PhysicalTypeCategory.CLASS);
+
+        // Prepare annotations array
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                1);
+
+        // Add @GvNIXAuthenticationFilter annotation
+        AnnotationMetadataBuilder gvnixAuthenticationFilterAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(GvNIXSafeAuthenticationFilter.class));
+        annotations.add(gvnixAuthenticationFilterAnnotation);
+
+        // Add Extends Type
+        cidBuilder
+                .addExtendsTypes(new JavaType(
+                        "org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter"));
+
+        // Set annotations
+        cidBuilder.setAnnotations(annotations);
+
+        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
+
+    }
+
+    /**
      * This method copy the file safe_client_sign.properties to the correct
      * location of the project.
      * 
@@ -575,6 +645,68 @@ public class SafeSecurityProvider implements SecurityProvider {
                 IOUtils.closeQuietly(outputStream);
             }
         }
+    }
+
+    /**
+     * This method copy safe certificate if necessary allowing user to login
+     * using SAFE certificate
+     * 
+     */
+    public void copySafeCertificateJS() {
+        final String propertiesFile = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, SAFE_CERTIFICATE_JS);
+
+        if (!fileManager.exists(propertiesFile)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = FileUtils.getInputStream(getClass(),
+                        SAFE_CERTIFICATE_JS);
+                outputStream = fileManager.createFile(propertiesFile)
+                        .getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            }
+            catch (final IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
+
+    }
+
+    /**
+     * This method modify login if exists and copy to project if not.
+     * 
+     */
+    public void modifyLoginView() {
+        final String propertiesFile = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, LOGIN_VIEW_PATH);
+
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            inputStream = FileUtils.getInputStream(getClass(), LOGIN_VIEW_PATH);
+            if (!fileManager.exists(propertiesFile)) {
+                outputStream = fileManager.createFile(propertiesFile)
+                        .getOutputStream();
+            }
+            else {
+                outputStream = fileManager.updateFile(propertiesFile)
+                        .getOutputStream();
+            }
+            IOUtils.copy(inputStream, outputStream);
+        }
+        catch (final IOException ioe) {
+            throw new IllegalStateException(ioe);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
+        }
+
     }
 
     /**
@@ -661,8 +793,6 @@ public class SafeSecurityProvider implements SecurityProvider {
      * This method modifies the applicationContext-security.xml file to
      * configure the authentication using SAFE.
      * 
-     * TODO: Improve this method
-     * 
      */
     public void modifyApplicationContextSecurity(JavaPackage targetPackage) {
 
@@ -697,6 +827,23 @@ public class SafeSecurityProvider implements SecurityProvider {
 
         fileManager.createOrUpdateTextFileIfRequired(applicationContextPath,
                 XmlUtils.nodeToString(document), false);
+
+        // Updating http tag
+        Element httpTag = DomUtils.getChildElementByTagName(config, "http");
+        httpTag.setAttribute("entry-point-ref",
+                "loginUrlAuthenticationEntryPoint");
+        httpTag.setAttribute("auto-config", "false");
+
+        NodeList formLoginTag = httpTag.getElementsByTagName("form-login");
+        if (formLoginTag.getLength() > 0) {
+            httpTag.removeChild(formLoginTag.item(0));
+        }
+
+        Element customFilterTag = document.createElement("custom-filter");
+        customFilterTag.setAttribute("position", "FORM_LOGIN_FILTER");
+        customFilterTag.setAttribute(REF, "authenticationFilter");
+
+        httpTag.appendChild(customFilterTag);
 
         // Creating new authenticationManager
 
@@ -789,10 +936,125 @@ public class SafeSecurityProvider implements SecurityProvider {
 
         parent.appendChild(newSaltSourceBean);
 
+        // Adding Login Entry Point
+        Element loginEntryUrlBean = document.createElement(BEANS_BEAN);
+        loginEntryUrlBean
+                .setAttribute(
+                        CLASS,
+                        "org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint");
+        loginEntryUrlBean.setAttribute(ID, "loginUrlAuthenticationEntryPoint");
+
+        Element loginFormUrlProperty = document.createElement(BEANS_PROPERTY);
+        loginFormUrlProperty.setAttribute(NAME_PROPERTY, "loginFormUrl");
+        loginFormUrlProperty.setAttribute(VALUE_PROPERTY, "/login");
+
+        loginEntryUrlBean.appendChild(loginFormUrlProperty);
+        parent.appendChild(loginEntryUrlBean);
+
+        // Adding authenticationFilter
+        Element authenticationFilterBean = document.createElement(BEANS_BEAN);
+        authenticationFilterBean.setAttribute(
+                CLASS,
+                targetPackage.getFullyQualifiedPackageName().concat(
+                        SAFE_AUTHENTICATION_FILTER));
+        authenticationFilterBean.setAttribute(ID, "authenticationFilter");
+
+        Element authenticationManagerProperty = document
+                .createElement(BEANS_PROPERTY);
+        authenticationManagerProperty.setAttribute(NAME_PROPERTY,
+                "authenticationManager");
+        authenticationManagerProperty
+                .setAttribute(REF, "authenticationManager");
+
+        Element authenticationFailureProperty = document
+                .createElement(BEANS_PROPERTY);
+        authenticationFailureProperty.setAttribute(NAME_PROPERTY,
+                "authenticationFailureHandler");
+        authenticationFailureProperty.setAttribute(REF, "failureHandler");
+
+        Element authenticationSuccesProperty = document
+                .createElement(BEANS_PROPERTY);
+        authenticationSuccesProperty.setAttribute(NAME_PROPERTY,
+                "authenticationSuccessHandler");
+        authenticationSuccesProperty.setAttribute(REF, "successHandler");
+
+        authenticationFilterBean.appendChild(authenticationManagerProperty);
+        authenticationFilterBean.appendChild(authenticationFailureProperty);
+        authenticationFilterBean.appendChild(authenticationSuccesProperty);
+
+        parent.appendChild(authenticationFilterBean);
+
+        // Adding success handler
+        Element successHandlerBean = document.createElement(BEANS_BEAN);
+        successHandlerBean
+                .setAttribute(
+                        CLASS,
+                        "org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler");
+        successHandlerBean.setAttribute(ID, "successHandler");
+
+        Element defaultTargetProperty = document.createElement(BEANS_PROPERTY);
+        defaultTargetProperty.setAttribute(NAME_PROPERTY, "defaultTargetUrl");
+        defaultTargetProperty.setAttribute(VALUE_PROPERTY, "/login");
+
+        successHandlerBean.appendChild(defaultTargetProperty);
+        parent.appendChild(successHandlerBean);
+
+        // Adding failure handler
+        Element failureHandlerBean = document.createElement(BEANS_BEAN);
+        failureHandlerBean
+                .setAttribute(
+                        CLASS,
+                        "org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler");
+        failureHandlerBean.setAttribute(ID, "failureHandler");
+
+        Element defaultFailureProperty = document.createElement(BEANS_PROPERTY);
+        defaultFailureProperty.setAttribute(NAME_PROPERTY, "defaultFailureUrl");
+        defaultFailureProperty.setAttribute(VALUE_PROPERTY,
+                "/login?login_error=t");
+
+        failureHandlerBean.appendChild(defaultFailureProperty);
+        parent.appendChild(failureHandlerBean);
+
         parent.normalize();
 
         fileManager.createOrUpdateTextFileIfRequired(applicationContextPath,
                 XmlUtils.nodeToString(document), false);
+    }
+
+    /**
+     * This method adds reference in laod-script.tagx to use safe_certificate.js
+     */
+    public void addToLoadScripts(String varName, String url) {
+        // Modify Roo load-scripts.tagx
+        String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
+                "WEB-INF/tags/util/load-scripts.tagx");
+
+        Validate.isTrue(fileManager.exists(docTagxPath),
+                "load-script.tagx not found: ".concat(docTagxPath));
+
+        MutableFile docTagxMutableFile = null;
+        Document docTagx;
+
+        try {
+            docTagxMutableFile = fileManager.updateFile(docTagxPath);
+            docTagx = XmlUtils.getDocumentBuilder().parse(
+                    docTagxMutableFile.getInputStream());
+        }
+        catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        Element root = docTagx.getDocumentElement();
+
+        boolean modified = false;
+
+        // Add safe_certificate.js
+        modified = WebProjectUtils.addJSToTag(docTagx, root, varName, url)
+                || modified;
+
+        if (modified) {
+            XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
+        }
+
     }
 
     /**
@@ -824,6 +1086,8 @@ public class SafeSecurityProvider implements SecurityProvider {
         log.log(Level.INFO,
                 "    - security.SAFE.autorizacion.poraplicacion  (** Get Authorization Roles Filtering by applicationId. Default: true)");
         log.log(Level.INFO,
+                "    - security.SAFE.applet.location  (** URL del applet de SAFE para acceso con certificado (Ej: 'https://pretramitaext.gva.es/SAFE/applet'))");
+        log.log(Level.INFO,
                 "    - wsdl.SAFE.location  (** Authentication endpoint URL)");
         log.log(Level.INFO,
                 "    - wsdl.SAFEAutorizacion.location  (** Authorization endpoint URL)");
@@ -832,6 +1096,10 @@ public class SafeSecurityProvider implements SecurityProvider {
                 "*** Use the configuration commands to set this parameters (configuration property add --name XXX)");
         log.log(Level.INFO, "");
         log.log(Level.INFO, "");
+    }
+
+    private LogicalPath getWebappPath() {
+        return WebProjectUtils.getWebappPath(projectOperations);
     }
 
 }

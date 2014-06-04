@@ -83,8 +83,6 @@ public class SafeSecurityProviderMetadata extends
     public SafeSecurityProviderMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
-        /*Validate.isTrue(isValid(identifier), "Metadata identification string '"
-                + identifier + "' does not appear to be a valid");*/
 
         // Helper itd generation
         this.helper = new ItdBuilderHelper(this, governorPhysicalTypeMetadata,
@@ -276,7 +274,7 @@ public class SafeSecurityProviderMetadata extends
 
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-        parameterNames.add(new JavaSymbolName("username"));
+        parameterNames.add(new JavaSymbolName("userTokenized"));
         parameterNames.add(new JavaSymbolName("authentication"));
 
         // Create the method body
@@ -608,24 +606,36 @@ public class SafeSecurityProviderMetadata extends
      */
     private void buildRetrieveUserMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine("// Getting username or token");
+        // String[] requestParts = userTokenized.split("::");
+        bodyBuilder
+                .appendFormalLine("String[] requestParts = userTokenized.split(\"::\");");
+        // String username = "";
+        bodyBuilder.appendFormalLine("String username = \"\";");
+        // String token = "";
+        bodyBuilder.appendFormalLine("String token = \"\";");
+        // if(requestParts.length > 0){
+        bodyBuilder.appendFormalLine("if(requestParts.length > 0){");
+        bodyBuilder.indent();
+        // username = requestParts[0];
+        bodyBuilder.appendFormalLine("username = requestParts[0];");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        // if(requestParts.length > 1){
+        bodyBuilder.appendFormalLine("if(requestParts.length > 1){");
+        bodyBuilder.indent();
+        // token = requestParts[1];
+        bodyBuilder.appendFormalLine("token = requestParts[1];");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
         bodyBuilder.appendFormalLine("if(getActive()){");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.appendFormalLine("");
         bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("String presentedPassword = authentication.getCredentials().toString();");
-
-        // AutenticaUsuarioLDAPWSRequest aut = new
-        // AutenticaUsuarioLDAPWSRequest();
-        bodyBuilder
-                .appendFormalLine(String.format(
-                        "%s aut = new %s();",
-                        helper.getFinalTypeName(new JavaType(
-                                "es.gva.dgm.ayf.war.definitions.v2u00.AutenticaUsuarioLDAPWSRequest")),
-                        helper.getFinalTypeName(new JavaType(
-                                "es.gva.dgm.ayf.war.definitions.v2u00.AutenticaUsuarioLDAPWSRequest"))));
-        bodyBuilder.appendFormalLine("aut.setUsuarioLDAP(username);");
-        bodyBuilder.appendFormalLine("aut.setPwdLDAP(presentedPassword);");
-        bodyBuilder.appendFormalLine("try {");
-        bodyBuilder.indent();
 
         // AutenticacionArangiService autService = new
         // AutenticacionArangiService(
@@ -662,16 +672,43 @@ public class SafeSecurityProviderMetadata extends
                         .getFinalTypeName(new JavaType(
                                 "org.apache.cxf.frontend.ClientProxy"))));
         bodyBuilder.appendFormalLine("setSecurity(client);");
+        bodyBuilder.appendFormalLine("");
+
+        // If token is not defined, get token using username and password
+        bodyBuilder
+                .appendFormalLine("// If token is not defined, get token using username and password");
+        // if(StringUtils.isBlank(token)){
+        bodyBuilder.appendFormalLine(String.format("if(%s.isBlank(token)){",
+                helper.getFinalTypeName(new JavaType(
+                        "org.apache.commons.lang3.StringUtils"))));
+        bodyBuilder.appendFormalLine("");
+        bodyBuilder.indent();
+
+        // AutenticaUsuarioLDAPWSRequest aut = new
+        // AutenticaUsuarioLDAPWSRequest();
+        bodyBuilder
+                .appendFormalLine(String.format(
+                        "%s aut = new %s();",
+                        helper.getFinalTypeName(new JavaType(
+                                "es.gva.dgm.ayf.war.definitions.v2u00.AutenticaUsuarioLDAPWSRequest")),
+                        helper.getFinalTypeName(new JavaType(
+                                "es.gva.dgm.ayf.war.definitions.v2u00.AutenticaUsuarioLDAPWSRequest"))));
+        bodyBuilder.appendFormalLine("aut.setUsuarioLDAP(username);");
+        bodyBuilder.appendFormalLine("aut.setPwdLDAP(presentedPassword);");
+        bodyBuilder.appendFormalLine("");
 
         // AutenticaUsuarioLDAPWSResponse response1 = port
         bodyBuilder
-                .appendFormalLine(String.format(
-                        "%s response1 = port",
-                        helper.getFinalTypeName(new JavaType(
-                                "es.gva.dgm.ayf.war.definitions.v2u00.AutenticaUsuarioLDAPWSResponse"))));
-        bodyBuilder.indent();
-        bodyBuilder.appendFormalLine(".autenticaUsuarioLDAPWS(aut);");
+                .appendFormalLine(String
+                        .format("%s response1 = port.autenticaUsuarioLDAPWS(aut);",
+                                helper.getFinalTypeName(new JavaType(
+                                        "es.gva.dgm.ayf.war.definitions.v2u00.AutenticaUsuarioLDAPWSResponse"))));
+
+        // token = response1.getToken();
+        bodyBuilder.appendFormalLine("token = response1.getToken();");
         bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine("");
 
         // GetInformacionWSRequest getInformacionWSRequest = new
         // GetInformacionWSRequest();
@@ -683,7 +720,7 @@ public class SafeSecurityProviderMetadata extends
                         helper.getFinalTypeName(new JavaType(
                                 "es.gva.dgm.ayf.war.definitions.v2u00.GetInformacionWSRequest"))));
         bodyBuilder
-                .appendFormalLine("getInformacionWSRequest.setToken(response1.getToken());");
+                .appendFormalLine("getInformacionWSRequest.setToken(token);");
 
         // GetInformacionWSResponse getInformacionWSResponse = port
         bodyBuilder
