@@ -847,7 +847,7 @@ var GvNIX_Editing;
 
 					// Redraw table
 					// XXX Redraw table or not (updated rows already are updated)
-					oTable.fnDraw();
+					oTable.fnStandingRedraw();
 
 					try {
 						_d.finishEditingCallbacks.fireWith(this, [ this ]);
@@ -1233,7 +1233,7 @@ var GvNIX_Editing;
 						oTable.fnRowOnTop().fnSetRowsOnTop(response.oid,true);
 					} else {
 						// Redraw table
-						oTable.fnDraw();
+						oTable.fnStandingRedraw();
 					}
 
 				} else {
@@ -2383,4 +2383,29 @@ jQuery.fn.dataTableExt.oApi.fnEditing = function(oSettings, iSettings) {
 	oSettings.GvNIX_Editing_support = editing;
 
 	return editing;
+};
+
+/**
+*
+* Checks if gvnix Editing support is initialized on a datatables
+*
+* @param oSettings
+* @param iSettings
+* @return boolean
+* @author gvNIX Team
+*/
+jQuery.fn.dataTableExt.oApi.fnHasEditing = function(oSettings,
+		iSettings) {
+	
+	if (!oSettings) {
+		return false;
+	}
+	
+	var editing = oSettings.GvNIX_Editing_support;
+	
+	if (editing === undefined) {
+		return false;
+	} else {
+		return true;
+	}
 };

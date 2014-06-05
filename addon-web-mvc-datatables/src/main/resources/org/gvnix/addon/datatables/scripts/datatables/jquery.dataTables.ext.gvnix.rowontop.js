@@ -178,7 +178,7 @@ var GvNIX_RowOnTop;
 				_d.asRowOnTopIds = [atrId];
 			}
 			if (redraw) {
-				oTable.fnDraw();
+				oTable.fnStandingRedraw();
 			}
 		},
 
@@ -459,6 +459,10 @@ jQuery.fn.dataTableExt.oApi.fnRowOnTop = function(oSettings,
 */
 jQuery.fn.dataTableExt.oApi.fnHasRowOnTop = function(oSettings,
 		iSettings) {
+	
+	if (!oSettings) {
+		return false;
+	}
 
 	var rowOnTopSupport = oSettings.GvNIX_RowOnTop_support;
 

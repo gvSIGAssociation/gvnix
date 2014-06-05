@@ -649,7 +649,7 @@
 		        			}
 		        			<c:choose>
 			        			<c:when test="${serverSide}">
-			        			  $table.fnDraw();
+			        			  $table.fnStandingRedraw();
 			        			</c:when>
 			        			<c:otherwise>
 			        				// TODO optimize it (remove lines instead reload page)

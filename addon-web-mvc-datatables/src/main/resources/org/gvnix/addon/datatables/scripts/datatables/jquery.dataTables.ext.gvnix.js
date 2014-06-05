@@ -121,16 +121,16 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 	// Register Footer callback
 	st.oApi._fnCallbackReg(st, 'aoFooterCallback', 
 			function(row, data, start, end, display){
-		$table.fnFooterCallback(row, data, start, end, display);
+		this.fnFooterCallback(row, data, start, end, display);
 	});
 	
 	// Register Draw callback
 	st.oApi._fnCallbackReg(st, 'aoDrawCallback', function( oSettings ) {
-		$table.fnDrawCallback(oSettings);
+		this.fnDrawCallback(oSettings);
 	});
 	
 	// Calling at first time Footer Callback
-	$table.fnFooterCallback();
+	updateDatatablesFilters($table.fnSettings());
 	
 	// Displaying always the clicked row
     $table.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
@@ -288,8 +288,12 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function(oSettings, iDelay) {
  */
 
 jQuery.fn.dataTableExt.oApi.fnDrawCallback = function(oSettings){
-	var rowClickedClassSelector = "." + this.DataTable().fnRowClick().s.classForClickedRow;
-    var rowEditingClassSelector = "." + this.DataTable().fnEditing()._options.classForEditingRow;
+	if (!this.fnHasEditing()) {
+		return false;
+	}
+	var rowClickedClassSelector = "." + this.fnRowClick().s.classForClickedRow;
+    var rowEditingClassSelector = "." + this.fnEditing()._options.classForEditingRow;
+
     
 	if(!this.find(rowEditingClassSelector).length > 0){
 		this.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
@@ -309,10 +313,21 @@ jQuery.fn.dataTableExt.oApi.fnDrawCallback = function(oSettings){
 /**
  * This function checks filters on footerCallback
  */
-jQuery.fn.dataTableExt.oApi.fnFooterCallback = function(row, data, start, end, display){
+jQuery.fn.dataTableExt.oApi.fnFooterCallback = function(nFoot, data, start, end, display){
 	var _that = this;
-	var filters = _that.fnSettings().aoPreSearchCols;
-	var footer = $(_that.fnSettings().aoFooter)[0];
+	var oSettings = _that.fnSettings();
+
+	if (!oSettings) {
+		return;
+	}
+	updateDatatablesFilters(oSettings);
+	
+}
+
+function updateDatatablesFilters(oSettings) {
+
+	var filters = oSettings.aoPreSearchCols;
+	var footer = jQuery(oSettings.aoFooter)[0];
 	
 	// If footer is defined
 	if(footer !== undefined){
@@ -320,21 +335,23 @@ jQuery.fn.dataTableExt.oApi.fnFooterCallback = function(row, data, start, end, d
 		for ( var i=0, iLen=filters.length ; i<iLen ; i++ )
 	    {
 			if(footer[i] !== null){
-				var property = $(footer[i].cell).data().property;
+				var $cell = jQuery(footer[i].cell);
+				var property = $cell.data().property;
 				var filterExpression = filters[i].sSearch;
 				
 				if(filterExpression != "")	{
-					$.ajax({
+
+					jQuery.ajax({
 						  url: "?checkFilters",
 						  data: {property: property, expression: filterExpression},
 						  type: "post",
 						  success: function(jsonResponse) {
 							  for(var i=0;i<footer.length;i++){
-								  if($(footer[i].cell).data().property == jsonResponse.property){
+								  if(property == jsonResponse.property){
 									  if(!jsonResponse.response){
-										  $(footer[i].cell).find('input').css("background-color","#FA5858");
+										  $cell.find('input').css("background-color","#FA5858");
 									  }else{
-										  $(footer[i].cell).find('input').css("background-color","#ffffff");
+										  $cell.find('input').css("background-color","#ffffff");
 									  }
 								  }
 							  }
@@ -343,7 +360,7 @@ jQuery.fn.dataTableExt.oApi.fnFooterCallback = function(row, data, start, end, d
 						  }
 					});
 				}else{
-					$(footer[i].cell).find('input').css("background-color","#ffffff");
+					$cell.find('input').css("background-color","#ffffff");
 				}
 			}
 	    }

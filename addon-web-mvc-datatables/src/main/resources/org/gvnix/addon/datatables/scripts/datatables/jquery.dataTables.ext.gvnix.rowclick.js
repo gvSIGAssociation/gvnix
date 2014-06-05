@@ -757,6 +757,10 @@ jQuery.fn.dataTableExt.oApi.fnRowClick = function(oSettings,
 */
 jQuery.fn.dataTableExt.oApi.fnHasRowClick = function(oSettings,
 		iSettings) {
+	
+	if (!oSettings) {
+		return false;
+	}
 
 	var rowClickSupport = oSettings.GvNIX_RowClick_support;
 
