@@ -644,7 +644,7 @@ var GvNIX_Editing;
 
 					// We need all values in received from to complete the
 					// the request to send to server (by example: version, other required fields, etc...)
-					jQuery.each($updateForm.find("form").children("input"), function (index, input) {
+					jQuery.each($updateForm.find("form").find(":input"), function (index, input) {
 						var $input = jQuery(input);
 						var name = $input.attr('name');
 						if (name !== undefined && name) {
@@ -1054,7 +1054,7 @@ var GvNIX_Editing;
 				// We need all values in received from to complete the
 				// request to send to server (by example: version, other
 				// required fields, etc...)
-				jQuery.each($createForm.find("form").children("input"), function (index, input) {
+				jQuery.each($createForm.find("form").find(":input"), function (index, input) {
 					var $input = jQuery(input);
 					var name = $input.attr('name');
 					if (name !== undefined && name) {
