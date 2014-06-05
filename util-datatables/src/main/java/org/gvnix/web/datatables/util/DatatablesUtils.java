@@ -1325,9 +1325,11 @@ public class DatatablesUtils {
 
                 // check if property exists (trace it else)
                 if (!entityBean.isReadableProperty(unescapedFieldName)) {
-                    LOGGER.debug("Property [".concat(unescapedFieldName)
+                    LOGGER.debug("Property ["
+                            .concat(unescapedFieldName)
                             .concat("] not found in bean [")
-                            .concat(entity.toString()).concat("]"));
+                            .concat(StringUtils.defaultString(
+                                    entity.toString(), "{null}")).concat("]"));
                     continue;
                 }
 

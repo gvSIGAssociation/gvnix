@@ -263,7 +263,7 @@ var GvNIX_RowClick;
 		 *            force to execute callbacks
 		 * @returns true if selection has been change
 		 */
-		"fnSetLastClicked" : function(trId, redraw, force) {
+		"fnSetLastClicked" : function(trId, redraw, force, showNextDetail) {
 			var _d = this._data;
 			if ((trId == _d.lastClickedId) && !force) {
 				// is the same row: do nothing
@@ -282,6 +282,7 @@ var GvNIX_RowClick;
 				this.fnSaveState();
 			}
 			this.fnScrollDatatableBodyToClicked();
+			this.fnScrollToNextDetail(showNextDetail);
 			
 			return true;
 		},
@@ -387,6 +388,28 @@ var GvNIX_RowClick;
 		        }
 		    }
 		},
+		
+		/**
+		 * This function scrolls page to next detail when
+		 * the user click a row
+		 * 
+		 */
+		"fnScrollToNextDetail": function(showDetails) {
+			if(showDetails){
+				var _d = this._data;
+				var s = this.s;
+			
+				var $table = jQuery(_d.dt.nTable);
+				var tableId = $table.attr("id");
+			
+				var divDetails = jQuery("div[id^="+tableId+"_][id$=detail]");
+
+				if(divDetails.length > 0){
+					jQuery('html, body').animate({ scrollTop: divDetails.offset().top });
+				}
+			}
+			
+		},
 
 
 		// Private methods (they are of course public in JS, but recommended as
@@ -484,8 +507,8 @@ var GvNIX_RowClick;
 			var aTds = jQuery(sQuery,nRow);
 			// bind row click
 			jQuery.each(aTds, function (index,ntd){
-				jQuery(ntd).click(function() {
-					that.fnSetLastClicked(this.parentNode.id, true);
+				jQuery(ntd).dblclick(function() {
+					that.fnSetLastClicked(this.parentNode.id, true, undefined, true);
 				});
 			});
 			nRow.rowClick_binded = true;
