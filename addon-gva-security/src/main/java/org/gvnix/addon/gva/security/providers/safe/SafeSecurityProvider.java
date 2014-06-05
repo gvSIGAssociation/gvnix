@@ -30,6 +30,7 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadataB
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.LogicalPath;
@@ -215,6 +216,9 @@ public class SafeSecurityProvider implements SecurityProvider {
         if (!fileExists("SafeAuthenticationFilter", targetPackage)) {
             generateSafeAuthenticationFilter(targetPackage);
         }
+        if (!fileExists("SafeLoginController", targetPackage)) {
+            generateSafeLoginController(targetPackage);
+        }
         // Copying properties file
         copySafeClientPropertiesFile();
         // Copying wsdl files
@@ -226,6 +230,8 @@ public class SafeSecurityProvider implements SecurityProvider {
                 "/resources/scripts/safe/safe_certificate.js");
         // Modifying Application Context
         modifyApplicationContext();
+        // Modifying webmvc-config.xml to get Context
+        modifyWebMvcConfig();
         // Modifying Application Context Security
         modifyApplicationContextSecurity(targetPackage);
         // Modifying login.jspx
@@ -572,6 +578,54 @@ public class SafeSecurityProvider implements SecurityProvider {
     }
 
     /**
+     * This method generates the file SafeLoginController.java with the
+     * annotation <code>@GvNIXSafeLoginController</code>
+     * 
+     */
+    public void generateSafeLoginController(JavaPackage targetPackage) {
+        JavaType entity = new JavaType(String.format("%s.SafeLoginController",
+                targetPackage.getFullyQualifiedPackageName()));
+
+        Validate.notNull(entity, "Entity required");
+
+        int modifier = Modifier.PUBLIC;
+
+        final String declaredByMetadataId = PhysicalTypeIdentifier
+                .createIdentifier(entity,
+                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
+
+        File targetFile = new File(
+                typeLocationService
+                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
+        Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
+                entity);
+
+        // Prepare class builder
+        final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                declaredByMetadataId, modifier, entity,
+                PhysicalTypeCategory.CLASS);
+
+        // Prepare annotations array
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Add @GvNIXSafeLoginController annotation
+        AnnotationMetadataBuilder gvnixSafeLoginControllerAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(GvNIXSafeLoginController.class));
+        annotations.add(gvnixSafeLoginControllerAnnotation);
+
+        // Add @Controller annotation
+        AnnotationMetadataBuilder controllerAnnotation = new AnnotationMetadataBuilder(
+                SpringJavaType.CONTROLLER);
+        annotations.add(controllerAnnotation);
+
+        // Set annotations
+        cidBuilder.setAnnotations(annotations);
+
+        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
+
+    }
+
+    /**
      * This method copy the file safe_client_sign.properties to the correct
      * location of the project.
      * 
@@ -787,6 +841,48 @@ public class SafeSecurityProvider implements SecurityProvider {
 
         fileManager.createOrUpdateTextFileIfRequired(applicationContextPath,
                 XmlUtils.nodeToString(document), false);
+    }
+
+    /**
+     * This method modifies the webmvc-config.xml file to configure the
+     * properties files that SAFE use.
+     * 
+     */
+    public void modifyWebMvcConfig() {
+
+        final String applicationContextPath = pathResolver
+                .getFocusedIdentifier(Path.SRC_MAIN_RESOURCES,
+                        APPLICATION_CONTEXT);
+        final Document document = XmlUtils.readXml(fileManager
+                .getInputStream(applicationContextPath));
+        final Element config = document.getDocumentElement();
+        final Element placeHolderElement = DomUtils.findFirstElementByName(
+                PLACEHOLDER_ELEMENT, config);
+
+        final String webMvcConfigPath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml");
+        final Document webMvcDocument = XmlUtils.readXml(fileManager
+                .getInputStream(webMvcConfigPath));
+        final Element mvcConfig = webMvcDocument.getDocumentElement();
+        final Element placeHolderElementMvc = DomUtils.findFirstElementByName(
+                PLACEHOLDER_ELEMENT, mvcConfig);
+
+        String currentLocation = placeHolderElement.getAttribute("location");
+        if (placeHolderElementMvc != null) {
+            placeHolderElementMvc.setAttribute("location", currentLocation);
+        }
+        else {
+            Element beansTag = DomUtils.getChildElementByTagName(mvcConfig,
+                    "mvc:view-controller");
+            Node parent = beansTag.getParentNode();
+            Element newPlaceHolderElement = webMvcDocument
+                    .createElement(PLACEHOLDER_ELEMENT);
+            newPlaceHolderElement.setAttribute("location", currentLocation);
+            parent.appendChild(newPlaceHolderElement);
+        }
+
+        fileManager.createOrUpdateTextFileIfRequired(webMvcConfigPath,
+                XmlUtils.nodeToString(webMvcDocument), false);
     }
 
     /**

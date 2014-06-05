@@ -3,19 +3,19 @@
   <jsp:directive.page contentType="text/html;charset=UTF-8"/>
   <jsp:output omit-xml-declaration="yes"/>
   
-  <c:if test="${not empty security.SAFE.applet.location}">
+  <c:if test="${not empty security_SAFE_applet_location}">
   
-  	<spring:url value="${security.SAFE.applet.location}/js/installer_aut_simple.js" var="installer_aut_simple"/>
+  	<spring:url value="${security_SAFE_applet_location}/js/installer_aut_simple.js" var="installer_aut_simple"/>
 	<script src="${installer_aut_simple}" type="text/javascript">
 	
 	<!--required for FF3 and Opera-->
 	</script>
-	 <spring:url value="${security.SAFE.applet.location}/js/installer_aut_completa.js" var="installer_aut_completa"/>
+	 <spring:url value="${security_SAFE_applet_location}/js/installer_aut_completa.js" var="installer_aut_completa"/>
 	<script src="${installer_aut_completa}" type="text/javascript">
 	
 	<!--required for FF3 and Opera-->
 	</script>
-	 <spring:url value="${security.SAFE.applet.location}/js/deployJava.js" var="deploy_java"/>
+	 <spring:url value="${security_SAFE_applet_location}/js/deployJava.js" var="deploy_java"/>
 	<script src="${deploy_java}" type="text/javascript">
 	
 	<!--required for FF3 and Opera-->
@@ -121,7 +121,7 @@
 	</div>
 </c:if>
 
-<c:if test="${empty security.SAFE.applet.location}">
+<c:if test="${empty security_SAFE_applet_location}">
 	
 	<c:if test="${not empty param.login_error}">
       <div class="alert alert-danger">
