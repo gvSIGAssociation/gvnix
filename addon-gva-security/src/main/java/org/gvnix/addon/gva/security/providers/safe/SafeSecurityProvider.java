@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,8 +20,14 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.gva.security.providers.SecurityProvider;
+import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.WebProjectUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
+import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
+import org.springframework.roo.addon.propfiles.PropFileOperations;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -186,6 +194,12 @@ public class SafeSecurityProvider implements SecurityProvider {
     @Reference
     private MetadataService metadataService;
 
+    @Reference
+    private I18nSupport i18nSupport;
+
+    @Reference
+    private PropFileOperations propFileOperations;
+
     @Override
     public String getName() {
         return NAME;
@@ -236,6 +250,8 @@ public class SafeSecurityProvider implements SecurityProvider {
         modifyApplicationContextSecurity(targetPackage);
         // Modifying login.jspx
         modifyLoginView();
+        // Adding messages
+        addI18nProperties();
         // Showing next steps
         showNextSteps();
 
@@ -1151,6 +1167,35 @@ public class SafeSecurityProvider implements SecurityProvider {
             XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
         }
 
+    }
+
+    /**
+     * This method add necessary properties to messages.properties
+     */
+    public void addI18nProperties() {
+        // Check if Valencian_Catalan language is supported and add properties
+        // if so
+        Set<I18n> supportedLanguages = i18nSupport.getSupportedLanguages();
+        for (I18n i18n : supportedLanguages) {
+            if (i18n.getLocale().equals(new Locale("ca"))) {
+                MessageBundleUtils.installI18nMessages(
+                        new ValencianCatalanLanguage(), projectOperations,
+                        fileManager);
+                MessageBundleUtils.addPropertiesToMessageBundle("ca",
+                        getClass(), propFileOperations, projectOperations,
+                        fileManager);
+                break;
+            }
+        }
+        // Add properties to Spanish messageBundle
+        MessageBundleUtils.installI18nMessages(new SpanishLanguage(),
+                projectOperations, fileManager);
+        MessageBundleUtils.addPropertiesToMessageBundle("es", getClass(),
+                propFileOperations, projectOperations, fileManager);
+
+        // Add properties to default messageBundle
+        MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
+                propFileOperations, projectOperations, fileManager);
     }
 
     /**

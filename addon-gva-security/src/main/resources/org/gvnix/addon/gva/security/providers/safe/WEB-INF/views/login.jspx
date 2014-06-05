@@ -38,8 +38,8 @@
   
   	<div id="tabs">
 		<ul>
-			<li><a href="#tabs-1">Acceso con Usuario y Contraseña</a></li>
-			<li><a href="#tabs-2">Acceso con certificado</a></li>
+			<li><a href="#tabs-1"><spring:message code="safe_user_and_password_access"/></a></li>
+			<li><a href="#tabs-2"><spring:message code="safe_certificate_access"/></a></li>
 		</ul>
 		<div id="tabs-1">
 			<c:if test="${not empty param.login_error}">
@@ -62,7 +62,7 @@
 		
 			<form action="j_spring_security_check" method="POST" name="f" class="form-signin" id="form-signin">
 		
-		    	<h2 class="form-signin-heading" style="text-align:center;">Spring Security Login</h2>
+		    	<h2 class="form-signin-heading" style="text-align:center;"><spring:message code="security_login_title"/></h2>
 		
 				<spring:message code="security_login_form_name" var="name" />
 				<spring:message code="security_login_form_name_message" htmlEscape="false" var="name_msg"/>
@@ -102,7 +102,7 @@
 		
 			<form action="j_spring_security_check" method="POST" name="f" class="form-signin" id="form-signin-certificate">
 		
-		    	<h2 class="form-signin-heading" style="text-align:center;">Spring Security Login</h2>
+		    	<h2 class="form-signin-heading" style="text-align:center;"><spring:message code="security_login_title"/></h2>
 		
 				<spring:message code="security_login_form_name" var="name" />
 				<spring:message code="security_login_form_name_message" htmlEscape="false" var="name_msg"/>
@@ -143,7 +143,7 @@
 
 	<form action="j_spring_security_check" method="POST" name="f" class="form-signin" id="form-signin">
 
-    	<h2 class="form-signin-heading" style="text-align:center;">Spring Security Login</h2>
+    	<h2 class="form-signin-heading" style="text-align:center;"><spring:message code="security_login_title"/></h2>
 
 		<spring:message code="security_login_form_name" var="name" />
 		<spring:message code="security_login_form_name_message" htmlEscape="false" var="name_msg"/>
