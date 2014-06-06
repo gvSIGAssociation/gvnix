@@ -755,10 +755,18 @@ public class SafeSecurityProvider implements SecurityProvider {
         final String propertiesFile = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, LOGIN_VIEW_PATH);
 
+        String loginToUse = LOGIN_VIEW_PATH;
+
+        // If bootstrap is not installed, we need to use another login page
+        if (!projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+            loginToUse = "WEB-INF/views/login_no_bootstrap.jspx";
+        }
+
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
-            inputStream = FileUtils.getInputStream(getClass(), LOGIN_VIEW_PATH);
+            inputStream = FileUtils.getInputStream(getClass(), loginToUse);
             if (!fileManager.exists(propertiesFile)) {
                 outputStream = fileManager.createFile(propertiesFile)
                         .getOutputStream();
