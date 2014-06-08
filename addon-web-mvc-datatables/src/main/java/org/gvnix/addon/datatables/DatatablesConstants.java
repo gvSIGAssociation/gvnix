@@ -159,6 +159,8 @@ public class DatatablesConstants {
             "listDatatables");
     static final JavaSymbolName LIST_ROO = new JavaSymbolName("list");
     static final JavaSymbolName UI_MODEL = new JavaSymbolName("uiModel");
+    static final JavaSymbolName REDIRECT_MODEL = new JavaSymbolName(
+            "redirectModel");
     static final JavaSymbolName POPULATE_DATATABLES_CONFIG = new JavaSymbolName(
             "populateDatatablesConfig");
     static final JavaSymbolName POPULATE_PARAMETERS_MAP = new JavaSymbolName(

@@ -1539,7 +1539,7 @@ public class DatatablesMetadata extends
                 new AnnotationMetadataBuilder(VALID).build()));
         parameterTypes.addAll(AnnotatedJavaType.convertFromJavaTypes(
                 new JavaType("org.springframework.validation.BindingResult"),
-                REDIRECT_ATTRIBUTES, HTTP_SERVLET_REQUEST));
+                MODEL, REDIRECT_ATTRIBUTES, HTTP_SERVLET_REQUEST));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -1576,7 +1576,7 @@ public class DatatablesMetadata extends
         final List<JavaSymbolName> parameterNames = Arrays.asList(
                 new JavaSymbolName("redirect"), new JavaSymbolName(entity
                         .getSimpleTypeName().toLowerCase()),
-                new JavaSymbolName("bindingResult"), UI_MODEL,
+                new JavaSymbolName("bindingResult"), UI_MODEL, REDIRECT_MODEL,
                 new JavaSymbolName("httpServletRequest"));
 
         // Add method javadoc (not generated to disk because #10229)
@@ -1632,13 +1632,12 @@ public class DatatablesMetadata extends
 
         // uiModel.addFlashAttribute(DatatablesUtils.ROWS_ON_TOP_IDS_PARAM,
         // pet.getId());
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("uiModel.addFlashAttribute(%s.ROWS_ON_TOP_IDS_PARAM, %s.%s());",
-                                helper.getFinalTypeName(DATATABLES_UTILS),
-                                entityParamName,
-                                helper.getGetterMethodNameForField(entityIdentifier
-                                        .getFieldName())));
+        bodyBuilder.appendFormalLine(String.format(
+                "%s.addFlashAttribute(%s.ROWS_ON_TOP_IDS_PARAM, %s.%s());",
+                REDIRECT_MODEL.getSymbolName(), helper
+                        .getFinalTypeName(DATATABLES_UTILS), entityParamName,
+                helper.getGetterMethodNameForField(entityIdentifier
+                        .getFieldName())));
 
         bodyBuilder
                 .appendFormalLine("// If create success, redirect to given URL: master datatables");
@@ -1670,7 +1669,8 @@ public class DatatablesMetadata extends
         parameterTypes.add(new AnnotatedJavaType(entity,
                 new AnnotationMetadataBuilder(VALID).build()));
         parameterTypes.addAll(AnnotatedJavaType.convertFromJavaTypes(
-                BINDING_RESULT, REDIRECT_ATTRIBUTES, HTTP_SERVLET_REQUEST));
+                BINDING_RESULT, MODEL, REDIRECT_ATTRIBUTES,
+                HTTP_SERVLET_REQUEST));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -1707,7 +1707,7 @@ public class DatatablesMetadata extends
         final List<JavaSymbolName> parameterNames = Arrays.asList(
                 new JavaSymbolName("redirect"), new JavaSymbolName(entity
                         .getSimpleTypeName().toLowerCase()),
-                new JavaSymbolName("bindingResult"), UI_MODEL,
+                new JavaSymbolName("bindingResult"), UI_MODEL, REDIRECT_MODEL,
                 new JavaSymbolName("httpServletRequest"));
 
         // Add method javadoc (not generated to disk because #10229)
@@ -1759,13 +1759,12 @@ public class DatatablesMetadata extends
 
         // uiModel.addFlashAttribute(DatatablesUtils.ROWS_ON_TOP_IDS_PARAM,
         // pet.getId());
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("uiModel.addFlashAttribute(%s.ROWS_ON_TOP_IDS_PARAM, %s.%s());",
-                                helper.getFinalTypeName(DATATABLES_UTILS),
-                                entityParamName,
-                                helper.getGetterMethodNameForField(entityIdentifier
-                                        .getFieldName())));
+        bodyBuilder.appendFormalLine(String.format(
+                "%s.addFlashAttribute(%s.ROWS_ON_TOP_IDS_PARAM, %s.%s());",
+                REDIRECT_MODEL.getSymbolName(), helper
+                        .getFinalTypeName(DATATABLES_UTILS), entityParamName,
+                helper.getGetterMethodNameForField(entityIdentifier
+                        .getFieldName())));
 
         bodyBuilder
                 .appendFormalLine("// If update success, redirect to given URL: master datatables");
