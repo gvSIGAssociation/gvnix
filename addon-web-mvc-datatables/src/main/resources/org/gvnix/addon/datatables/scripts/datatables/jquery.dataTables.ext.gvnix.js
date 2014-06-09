@@ -132,19 +132,20 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 	// Calling at first time Footer Callback
 	updateDatatablesFilters($table.fnSettings());
 	
-	// Displaying always the clicked row
+	// Displaying always the clicked row if row click exists
     $table.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
-    var rowClickedClassSelector = "." + $table.DataTable().fnRowClick().s.classForClickedRow;
-	if($table.find(rowClickedClassSelector).length > 0){
-		var rowSelected = $table.find(rowClickedClassSelector);
-		var scrollHeight = $table.parent(".dataTables_scrollBody").height();
-		var rowHeight = rowSelected.height();
-		var rowSelectedPosition = rowSelected[0].offsetTop + rowHeight + (scrollHeight / 2);
-		if(rowSelectedPosition > scrollHeight){
-			$table.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
-		}
-	}
-	
+    if($table.fnHasRowClick()){
+    	var rowClickedClassSelector = "." + $table.fnRowClick().s.classForClickedRow;
+    	if($table.find(rowClickedClassSelector).length > 0){
+    		var rowSelected = $table.find(rowClickedClassSelector);
+    		var scrollHeight = $table.parent(".dataTables_scrollBody").height();
+    		var rowHeight = rowSelected.height();
+    		var rowSelectedPosition = rowSelected[0].offsetTop + rowHeight + (scrollHeight / 2);
+    		if(rowSelectedPosition > scrollHeight){
+    			$table.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
+    		}
+    	}
+    }
 }
 
 /**
@@ -289,6 +290,9 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function(oSettings, iDelay) {
 
 jQuery.fn.dataTableExt.oApi.fnDrawCallback = function(oSettings){
 	if (!this.fnHasEditing()) {
+		return false;
+	}
+	if(!this.fnHasRowClick()){
 		return false;
 	}
 	var rowClickedClassSelector = "." + this.fnRowClick().s.classForClickedRow;
