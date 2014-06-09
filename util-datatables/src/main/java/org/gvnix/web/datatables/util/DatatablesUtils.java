@@ -883,9 +883,6 @@ public class DatatablesUtils {
 
         }
 
-        // QueryModifiers combines limit and offset
-        QueryModifiers queryModifiers = new QueryModifiers(limit, offset);
-
         // ----- Execute the query -----
         List<T> elements = null;
 
@@ -918,6 +915,15 @@ public class DatatablesUtils {
         if (isPaged) {
             totalResultCount = query.count();
         }
+
+        // If offset value is bigger than total results,
+        // offset needs start on 0
+        if (offset > totalResultCount) {
+            offset = new Long(0);
+        }
+
+        // QueryModifiers combines limit and offset
+        QueryModifiers queryModifiers = new QueryModifiers(limit, offset);
 
         // List ordered and paginated results. An empty list is returned for no
         // results.
