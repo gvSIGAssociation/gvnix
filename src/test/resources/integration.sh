@@ -38,7 +38,7 @@
 	mkdir clinic
 	cd clinic
 	$1/gvnix.sh script --file clinic.roo --lineNumbers true
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo clinic end
 
@@ -114,7 +114,7 @@
 	mkdir binding
 	cd binding
 	$1/gvnix.sh script --file $2/code/addon-web-mvc-binding/src/main/resources/binding.roo --lineNumbers true
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo binding end
 
@@ -130,9 +130,9 @@
 	mvn test tomcat:run &
 	mkdir target
 	# Get login page when accessing a not allowed page and login in es and en languages
-	wget --retry-connrefused -O target/loginredirect.html http://localhost:8080/petclinic/pets
-	wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login?lang=es
-	wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login?lang=en
+	#wget --retry-connrefused -O target/loginredirect.html http://localhost:8080/petclinic/pets
+	#wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login?lang=es
+	#wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login?lang=en
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -148,8 +148,8 @@
 	cd configuration
 	$1/gvnix.sh script --file $2/code/addon-dynamic-configuration/src/main/resources/configuration.roo --lineNumbers true
 	# Start application with both configurations
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true -Pdev
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true -Ppro -Ddatabase.password=
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true -Pdev
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true -Ppro -Ddatabase.password=
 	cd ..
 	echo configuration end
 
@@ -164,11 +164,11 @@
 	$1/gvnix.sh script --file $2/code/addon-web-mvc-datatables/src/main/resources/datatables.roo --lineNumbers true
 	mkdir target
     # Get datatable list pages
-	wget --retry-connrefused -O target/pets.html http://localhost:8080/petclinic/pets &
-	wget --retry-connrefused -O target/owners.html http://localhost:8080/petclinic/owners &
-	wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits &
-	wget --retry-connrefused -O target/vets.html http://localhost:8080/petclinic/vets &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/pets.html http://localhost:8080/petclinic/pets &
+	#wget --retry-connrefused -O target/owners.html http://localhost:8080/petclinic/owners &
+	#wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits &
+	#wget --retry-connrefused -O target/vets.html http://localhost:8080/petclinic/vets &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo datatables end
 
@@ -180,10 +180,10 @@
 	mvn test tomcat:run &
 	mkdir target
     # Get datatable list pages
-	wget --retry-connrefused -O target/pets.html http://localhost:8080/mvc/pets
-	wget --retry-connrefused -O target/owners.html http://localhost:8080/mvc/owners
-	wget --retry-connrefused -O target/visits.html http://localhost:8080/mvc/visits
-	wget --retry-connrefused -O target/vets.html http://localhost:8080/mvc/vets
+	#wget --retry-connrefused -O target/pets.html http://localhost:8080/mvc/pets
+	#wget --retry-connrefused -O target/owners.html http://localhost:8080/mvc/owners
+	#wget --retry-connrefused -O target/visits.html http://localhost:8080/mvc/visits
+	#wget --retry-connrefused -O target/vets.html http://localhost:8080/mvc/vets
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -196,11 +196,11 @@
 	$1/gvnix.sh script --file $2/code/addon-web-mvc-datatables/src/test/resources/datatables-test.roo --lineNumbers true
 	mkdir target
     # Get datatable list pages
-	wget --retry-connrefused -O target/pets.html http://localhost:8080/petclinic/pets &
-	wget --retry-connrefused -O target/owners.html http://localhost:8080/petclinic/owners &
-	wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits &
-	wget --retry-connrefused -O target/vets.html http://localhost:8080/petclinic/vets &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/pets.html http://localhost:8080/petclinic/pets &
+	#wget --retry-connrefused -O target/owners.html http://localhost:8080/petclinic/owners &
+	#wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits &
+	#wget --retry-connrefused -O target/vets.html http://localhost:8080/petclinic/vets &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo datatables-test end
 
@@ -212,9 +212,9 @@
 	mvn test tomcat:run &
 	mkdir target
     # Get datatable list pages
-	wget --retry-connrefused -O target/cars.html http://localhost:8080/displayRelationsTable/cars
-	wget --retry-connrefused -O target/people.html http://localhost:8080/displayRelationsTable/people
-	wget --retry-connrefused -O target/horses.html http://localhost:8080/displayRelationsTable/horses
+	#wget --retry-connrefused -O target/cars.html http://localhost:8080/displayRelationsTable/cars
+	#wget --retry-connrefused -O target/people.html http://localhost:8080/displayRelationsTable/people
+	#wget --retry-connrefused -O target/horses.html http://localhost:8080/displayRelationsTable/horses
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -231,7 +231,7 @@
 	$1/gvnix.sh script --file $2/code/addon-web-mvc-loupefield/src/main/resources/loupe.roo --lineNumbers true
 	mkdir target
     # Get page with loupe fields
-	wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits?form
+	#wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits?form
 	cd ..
 	echo loupefield end
 
@@ -246,9 +246,9 @@
 	$1/gvnix.sh script --file $2/code/addon-web-dialog/src/main/resources/dialog.roo --lineNumbers true
 	mkdir target
     # Get no entities dialog message in es and en languages
-	wget --retry-connrefused -O target/petses.html http://localhost:8080/petclinic/pets?lang=es&page=1&size=10 &
-	wget --retry-connrefused -O target/petsen.html http://localhost:8080/petclinic/pets?lang=en&page=1&size=10 &	
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/petses.html http://localhost:8080/petclinic/pets?lang=es&page=1&size=10 &
+	#wget --retry-connrefused -O target/petsen.html http://localhost:8080/petclinic/pets?lang=en&page=1&size=10 &	
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo dialog end
 
@@ -264,7 +264,7 @@
 	mvn test tomcat:run &
 	mkdir target
 	# Request the main html with the flash 
-	wget --retry-connrefused -O target/flexrocks_scaffold.html http://localhost:8080/flexrocks/flexrocks_scaffold.html
+	#wget --retry-connrefused -O target/flexrocks_scaffold.html http://localhost:8080/flexrocks/flexrocks_scaffold.html
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -278,7 +278,7 @@
 	mvn test tomcat:run &
 	mkdir target
 	# Request the main html with the flash 
-	wget --retry-connrefused -O target/flexrocks_scaffold.html http://localhost:8080/flexrocks/flexrocks_scaffold.html
+	#wget --retry-connrefused -O target/flexrocks_scaffold.html http://localhost:8080/flexrocks/flexrocks_scaffold.html
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -292,7 +292,7 @@
 	mvn test tomcat:run &
 	mkdir target
 	# Request the main html with the flash 
-	wget --retry-connrefused -O target/flexrocks_scaffold.html http://localhost:8080/flexrocks/flexrocks_scaffold.html
+	#wget --retry-connrefused -O target/flexrocks_scaffold.html http://localhost:8080/flexrocks/flexrocks_scaffold.html
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -306,7 +306,7 @@
 	mvn test tomcat:run &
 	mkdir target
 	# Request the main html with the flash 
-	wget --retry-connrefused -O target/rootunes_scaffold.html http://localhost:8080/rootunes/rootunes_scaffold.html
+	#wget --retry-connrefused -O target/rootunes_scaffold.html http://localhost:8080/rootunes/rootunes_scaffold.html
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -323,15 +323,15 @@
 	$1/gvnix.sh script --file $2/code/addon-web-i18n/src/main/resources/es-i18n.roo --lineNumbers true
 	mkdir target
 	# Request the main pages in ca and es languages (home, create, list and find)
-	wget --retry-connrefused -O target/langca.html http://localhost:8080/petclinic/?lang=ca &
-	wget --retry-connrefused -O target/petsformca.html http://localhost:8080/petclinic/pets?form&lang=ca &
-	wget --retry-connrefused -O target/ownersca.html http://localhost:8080/petclinic/owners?lang=ca&page=1&size=10 &
-	wget --retry-connrefused -O target/visitsfindca.html http://localhost:8080/petclinic/visits?form&find=ByDescriptionAndVisitDate&lang=ca &
-	wget --retry-connrefused -O target/langes.html http://localhost:8080/petclinic/?lang=es &
-	wget --retry-connrefused -O target/petsformes.html http://localhost:8080/petclinic/pets?form&lang=es &
-	wget --retry-connrefused -O target/ownerses.html http://localhost:8080/petclinic/owners?lang=es&page=1&size=10 &
-	wget --retry-connrefused -O target/visitsfindes.html http://localhost:8080/petclinic/visits?form&find=ByDescriptionAndVisitDate&lang=es &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/langca.html http://localhost:8080/petclinic/?lang=ca &
+	#wget --retry-connrefused -O target/petsformca.html http://localhost:8080/petclinic/pets?form&lang=ca &
+	#wget --retry-connrefused -O target/ownersca.html http://localhost:8080/petclinic/owners?lang=ca&page=1&size=10 &
+	#wget --retry-connrefused -O target/visitsfindca.html http://localhost:8080/petclinic/visits?form&find=ByDescriptionAndVisitDate&lang=ca &
+	#wget --retry-connrefused -O target/langes.html http://localhost:8080/petclinic/?lang=es &
+	#wget --retry-connrefused -O target/petsformes.html http://localhost:8080/petclinic/pets?form&lang=es &
+	#wget --retry-connrefused -O target/ownerses.html http://localhost:8080/petclinic/owners?lang=es&page=1&size=10 &
+	#wget --retry-connrefused -O target/visitsfindes.html http://localhost:8080/petclinic/visits?form&find=ByDescriptionAndVisitDate&lang=es &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo es-i18n end
 
@@ -344,7 +344,7 @@
 	mkdir menu
 	cd menu
 	$1/gvnix.sh script --file $2/code/addon-web-menu/src/main/resources/menu.roo --lineNumbers true
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo menu end
 	
@@ -353,7 +353,7 @@
 	mkdir base
 	cd base
 	$1/gvnix.sh script --file $2/code/addon-web-menu/src/test/resources/base.roo --lineNumbers true
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo base end
 
@@ -367,8 +367,8 @@
 	cd occ
 	$1/gvnix.sh script --file $2/code/addon-occ/src/main/resources/occ.roo --lineNumbers true
 	# Create new pet
-	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/petclinic/pets --post-data 'name=a&weight=1&type=Dog' &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/petcreate.html http://localhost:8080/petclinic/pets --post-data 'name=a&weight=1&type=Dog' &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo occ end
 
@@ -382,8 +382,8 @@
 	cd jpa-audit
 	$1/gvnix.sh script --file $2/code/addon-jpa/src/test/resources/jpa-audit-test.roo --lineNumbers true
 	# Create new pet
-	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/petclinic/pets --post-data 'name=a&weight=1&type=Dog' &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/petcreate.html http://localhost:8080/petclinic/pets --post-data 'name=a&weight=1&type=Dog' &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo jpa-audit-test end
 
@@ -393,8 +393,8 @@
 	cd jpa-audit-envers
 	$1/gvnix.sh script --file $2/code/addon-jpa/src/test/resources/jpa-audit-envers.roo --lineNumbers true
 	# Create new pet
-	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/petclinic/pets --post-data 'name=a&weight=1&type=Dog' &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/petcreate.html http://localhost:8080/petclinic/pets --post-data 'name=a&weight=1&type=Dog' &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo jpa-audit-envers end
 
@@ -411,7 +411,7 @@
 	$1/gvnix.sh hint
 	mvn test tomcat:run & 
 	sleep 30
-	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
+	#mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -426,7 +426,7 @@
 	$1/gvnix.sh hint
 	mvn test tomcat:run &
 	sleep 30
-	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
+	#mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -441,7 +441,7 @@
 	$1/gvnix.sh hint
 	mvn test tomcat:run &
 	sleep 30
-	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -456,7 +456,7 @@
 	$1/gvnix.sh hint
 	mvn test tomcat:run &
 	sleep 30
-	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
+	#mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -471,7 +471,7 @@
 	$1/gvnix.sh hint
 	mvn test tomcat:run &
 	sleep 30
-	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -489,19 +489,19 @@
 	# Start tomcat, wait to start and execute selenium tests to insert data
 	mvn test tomcat:run &
 	sleep 30
-	mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
+	#mvn selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true
 	mkdir target
 	# Request report form and report generation URLs for en and es languages
-	wget --retry-connrefused -O target/reportformen.html "http://localhost:8080/petclinic/pets/reports/petlist?form&lang=en"
-	wget --retry-connrefused -O target/reporten.pdf "http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=en"
-	wget --retry-connrefused -O target/reporten.xls "http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=en"
-	wget --retry-connrefused -O target/reporten.html "http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=en"
-	wget --retry-connrefused -O target/reporten.csv "http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=en"
-	wget --retry-connrefused -O target/reportformes.html "http://localhost:8080/petclinic/pets/reports/petlist?form&lang=es"
-	wget --retry-connrefused -O target/reportes.pdf "http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=es"
-	wget --retry-connrefused -O target/reportes.xls "http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=es"
-	wget --retry-connrefused -O target/reportes.html "http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=es"
-	wget --retry-connrefused -O target/reportes.csv "http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=es"
+	#wget --retry-connrefused -O target/reportformen.html "http://localhost:8080/petclinic/pets/reports/petlist?form&lang=en"
+	#wget --retry-connrefused -O target/reporten.pdf "http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=en"
+	#wget --retry-connrefused -O target/reporten.xls "http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=en"
+	#wget --retry-connrefused -O target/reporten.html "http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=en"
+	#wget --retry-connrefused -O target/reporten.csv "http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=en"
+	#wget --retry-connrefused -O target/reportformes.html "http://localhost:8080/petclinic/pets/reports/petlist?form&lang=es"
+	#wget --retry-connrefused -O target/reportes.pdf "http://localhost:8080/petclinic/pets/reports/petlist?format=pdf&lang=es"
+	#wget --retry-connrefused -O target/reportes.xls "http://localhost:8080/petclinic/pets/reports/petlist?format=xls&lang=es"
+	#wget --retry-connrefused -O target/reportes.html "http://localhost:8080/petclinic/pets/reports/petlist?format=html&lang=es"
+	#wget --retry-connrefused -O target/reportes.csv "http://localhost:8080/petclinic/pets/reports/petlist?format=csv&lang=es"
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -514,9 +514,9 @@
 	$1/gvnix.sh script --file $2/code/addon-web-report/src/test/resources/gvnix-test-report.roo --lineNumbers true
 	mkdir target
 	# Request report form and report generation URLs (en language by default)
-	wget --retry-connrefused -O target/reportform.html http://localhost:8080/webreport-test/people/reports/personlist?form &
-	wget --retry-connrefused -O target/report.html http://localhost:8080/webreport-test/people/reports/personlist?format=pdf &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/reportform.html http://localhost:8080/webreport-test/people/reports/personlist?form &
+	#wget --retry-connrefused -O target/report.html http://localhost:8080/webreport-test/people/reports/personlist?format=pdf &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-report end
 
@@ -539,9 +539,9 @@
 	cd service
 	$1/gvnix.sh script --file $2/code/addon-service/src/main/resources/service.roo --lineNumbers true
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused -O target/services.html http://localhost:8080/petclinic/services/ &
-	wget --retry-connrefused -O target/petservice.wsdl http://localhost:8080/petclinic/services/PetService?wsdl &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/services.html http://localhost:8080/petclinic/services/ &
+	#wget --retry-connrefused -O target/petservice.wsdl http://localhost:8080/petclinic/services/PetService?wsdl &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo service end
 
@@ -579,9 +579,9 @@
 	cd gvnix-test
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test.roo --lineNumbers true
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused -O target/services.html http://localhost:8080/service-layer-test/services/ &
-	wget --retry-connrefused -O target/clase.wsdl http://localhost:8080/service-layer-test/services/Clase?wsdl &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/services.html http://localhost:8080/service-layer-test/services/ &
+	#wget --retry-connrefused -O target/clase.wsdl http://localhost:8080/service-layer-test/services/Clase?wsdl &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test end
 
@@ -602,10 +602,10 @@
 	$1/gvnix.sh script --file $2/code/addon-service/src/test/resources/gvnix-test-entity.roo --lineNumbers true
 	mkdir target
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused -O target/services.html http://localhost:8080/petclinic/services/ &
-	wget --retry-connrefused -O target/pet.wsdl http://localhost:8080/petclinic/services/Pet?wsdl &
-	wget --retry-connrefused -O target/visit.wsdl http://localhost:8080/petclinic/services/Visit?wsdl &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/services.html http://localhost:8080/petclinic/services/ &
+	#wget --retry-connrefused -O target/pet.wsdl http://localhost:8080/petclinic/services/Pet?wsdl &
+	#wget --retry-connrefused -O target/visit.wsdl http://localhost:8080/petclinic/services/Visit?wsdl &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-entity end
 
@@ -621,18 +621,18 @@
 	mvn test tomcat:run &
 	mkdir target
 	# Get login page when accessing a not allowed page and login in es and en languages
-	wget --retry-connrefused -O target/loginredirect.html http://localhost:8080/petclinic/pets
-	wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login?lang=es
-	wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login?lang=en
+	#wget --retry-connrefused -O target/loginredirect.html http://localhost:8080/petclinic/pets
+	#wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login?lang=es
+	#wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login?lang=en
 	# Get forgotpassword and signup pages in es and en languages
-	wget --retry-connrefused -O target/forgotpasswordes.html http://localhost:8080/petclinic/forgotpassword/index?lang=es
-	wget --retry-connrefused -O target/signupes.html http://localhost:8080/petclinic/signup?form&lang=es
-	wget --retry-connrefused -O target/forgotpassworden.html http://localhost:8080/petclinic/forgotpassword/index?lang=en
-	wget --retry-connrefused -O target/signupen.html http://localhost:8080/petclinic/signup?form&lang=en
+	#wget --retry-connrefused -O target/forgotpasswordes.html http://localhost:8080/petclinic/forgotpassword/index?lang=es
+	#wget --retry-connrefused -O target/signupes.html http://localhost:8080/petclinic/signup?form&lang=es
+	#wget --retry-connrefused -O target/forgotpassworden.html http://localhost:8080/petclinic/forgotpassword/index?lang=en
+	#wget --retry-connrefused -O target/signupen.html http://localhost:8080/petclinic/signup?form&lang=en
 	# Log in with default user
-	wget --retry-connrefused -O target/loged.html http://localhost:8080/petclinic/resources/j_spring_security_check --post-data 'j_username=admin&j_password=admin'
+	#wget --retry-connrefused -O target/loged.html http://localhost:8080/petclinic/resources/j_spring_security_check --post-data 'j_username=admin&j_password=admin'
 	# Get logout URL
-	wget --retry-connrefused -O target/logout.html http://localhost:8080/petclinic/resources/j_spring_security_logout
+	#wget --retry-connrefused -O target/logout.html http://localhost:8080/petclinic/resources/j_spring_security_logout
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -649,11 +649,11 @@
 	$1/gvnix.sh script --file $2/code/addon-web-theme/src/main/resources/theme.roo --lineNumbers true
 	mkdir target
 	# Get home a non home pages in es and en languages
-	wget --retry-connrefused -O target/homees.html http://localhost:8080/petclinic/?lang=es &
-	wget --retry-connrefused -O target/petses.html http://localhost:8080/petclinic/pets?lang=es &
-	wget --retry-connrefused -O target/homeen.html http://localhost:8080/petclinic/?lang=en &
-	wget --retry-connrefused -O target/petsen.html http://localhost:8080/petclinic/pets?lang=en &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/homees.html http://localhost:8080/petclinic/?lang=es &
+	#wget --retry-connrefused -O target/petses.html http://localhost:8080/petclinic/pets?lang=es &
+	#wget --retry-connrefused -O target/homeen.html http://localhost:8080/petclinic/?lang=en &
+	#wget --retry-connrefused -O target/petsen.html http://localhost:8080/petclinic/pets?lang=en &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo theme end
 	
@@ -664,9 +664,9 @@
 	$1/gvnix.sh script --file $2/code/addon-web-theme/src/test/resources/theme-gvnix.roo --lineNumbers true
 	mkdir target
 	# Get home pages in es and en languages
-	wget --retry-connrefused -O target/homees.html http://localhost:8080/petclinic/?lang=es &
-	wget --retry-connrefused -O target/homeen.html http://localhost:8080/petclinic/?lang=en &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/homees.html http://localhost:8080/petclinic/?lang=es &
+	#wget --retry-connrefused -O target/homeen.html http://localhost:8080/petclinic/?lang=en &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo theme-gvnix end
 
@@ -680,9 +680,9 @@
 	cd gvnix-sample
 	$1/gvnix.sh script --file $2/code/src/main/resources/gvnix-sample.roo --lineNumbers true
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused -O target/services.html http://localhost:8080/sample/services/ &
-	wget --retry-connrefused -O target/claseservicio.wsdl http://localhost:8080/sample/services/ClaseServicio?wsdl &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/services.html http://localhost:8080/sample/services/ &
+	#wget --retry-connrefused -O target/claseservicio.wsdl http://localhost:8080/sample/services/ClaseServicio?wsdl &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-sample end
 
@@ -692,14 +692,14 @@
 	cd script
 	$1/gvnix.sh script --file $2/code/src/main/resources/script.roo --lineNumbers true
 	# Request the home URL
-	wget --retry-connrefused -O target/home.html http://localhost:8080/petclinic/ &
+	#wget --retry-connrefused -O target/home.html http://localhost:8080/petclinic/ &
 	# Get home a non home pages in ca language
-	wget --retry-connrefused -O target/homeca.html http://localhost:8080/petclinic/?lang=ca &
-	wget --retry-connrefused -O target/petsca.html http://localhost:8080/petclinic/pets?lang=ca &
+	#wget --retry-connrefused -O target/homeca.html http://localhost:8080/petclinic/?lang=ca &
+	#wget --retry-connrefused -O target/petsca.html http://localhost:8080/petclinic/pets?lang=ca &
 	# Get services summary page and available WSDLs
-	wget --retry-connrefused -O target/services.html http://localhost:8080/petclinic/services/ &
-	wget --retry-connrefused -O target/clase.wsdl http://localhost:8080/petclinic/services/Clase?wsdl &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/services.html http://localhost:8080/petclinic/services/ &
+	#wget --retry-connrefused -O target/clase.wsdl http://localhost:8080/petclinic/services/Clase?wsdl &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo script end
 	
@@ -728,23 +728,23 @@
 ##  Reopen shell to generate pending pattern resources
 	$1/gvnix.sh hint
 	# Request the home URL
-	wget --retry-connrefused -O target/home.html "http://localhost:8080/tiendavirtual/" &	
+	#wget --retry-connrefused -O target/home.html "http://localhost:8080/tiendavirtual/" &	
     # Get no entities dialog message
-	wget --retry-connrefused -O target/dialog.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1" &
+	#wget --retry-connrefused -O target/dialog.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1" &
 	# Request report form and report generation URLs in ca language
-	wget --retry-connrefused -O target/reportformca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?form&lang=ca" &
-	wget --retry-connrefused -O target/reportpdfca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=pdf" &
-	wget --retry-connrefused -O target/reportxlsca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=xls" &
-	wget --retry-connrefused -O target/reporthtmlca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=html" &
-	wget --retry-connrefused -O target/reportcsvca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=csv" &
+	#wget --retry-connrefused -O target/reportformca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?form&lang=ca" &
+	#wget --retry-connrefused -O target/reportpdfca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=pdf" &
+	#wget --retry-connrefused -O target/reportxlsca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=xls" &
+	#wget --retry-connrefused -O target/reporthtmlca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=html" &
+	#wget --retry-connrefused -O target/reportcsvca.html "http://localhost:8080/tiendavirtual/pedidoes/reports/informepedidos?lang=ca&format=csv" &
 	# Get pattern urls of 3 patterns (one of each type) in ca and en languages
-	wget --retry-connrefused -O target/patternregistroca.html "http://localhost:8080/tiendavirtual/productoes?gvnixform&gvnixpattern=ficha&index=1&lang=ca" &
-	wget --retry-connrefused -O target/patterntabularca.html "http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=ca" &
-	wget --retry-connrefused -O target/patternregistrotabularca.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1&lang=ca" &
-	wget --retry-connrefused -O target/patternregistroen.html "http://localhost:8080/tiendavirtual/productoes?gvnixform&gvnixpattern=ficha&index=1&lang=en" &
-	wget --retry-connrefused -O target/patterntabularen.html "http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=en" &
-	wget --retry-connrefused -O target/patternregistrotabularen.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1&lang=en" &
-	mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	#wget --retry-connrefused -O target/patternregistroca.html "http://localhost:8080/tiendavirtual/productoes?gvnixform&gvnixpattern=ficha&index=1&lang=ca" &
+	#wget --retry-connrefused -O target/patterntabularca.html "http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=ca" &
+	#wget --retry-connrefused -O target/patternregistrotabularca.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1&lang=ca" &
+	#wget --retry-connrefused -O target/patternregistroen.html "http://localhost:8080/tiendavirtual/productoes?gvnixform&gvnixpattern=ficha&index=1&lang=en" &
+	#wget --retry-connrefused -O target/patterntabularen.html "http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=en" &
+	#wget --retry-connrefused -O target/patternregistrotabularen.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1&lang=en" &
+	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo tiendavirtual end
 
@@ -756,7 +756,7 @@
 	mvn test tomcat:run &
 	mkdir target
 	# Request the home URL
-	wget --retry-connrefused -O target/home.html http://localhost:8080/aplusu-trunk/
+	#wget --retry-connrefused -O target/home.html http://localhost:8080/aplusu-trunk/
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
 	cd ..
@@ -772,7 +772,7 @@
 	mvn test tomcat:run & 
 	mkdir target
 	# Request the home URL
-	wget --retry-connrefused -O target/home.html http://localhost:8080/registro_proyectos/
+	#wget --retry-connrefused -O target/home.html http://localhost:8080/registro_proyectos/
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
     kill -9 $MVN_TOMCAT_PID
     cd ..
