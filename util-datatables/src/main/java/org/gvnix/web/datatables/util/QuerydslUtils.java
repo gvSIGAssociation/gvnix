@@ -30,17 +30,27 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.convert.ConversionException;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.Order;
 import com.mysema.query.types.OrderSpecifier;
@@ -58,11 +68,24 @@ import com.mysema.query.types.path.PathBuilder;
  */
 public class QuerydslUtils {
 
+    private static final TypeDescriptor STRING_TYPE_DESCRIPTOR = TypeDescriptor
+            .valueOf(String.class);
+
+    private static LoadingCache<Class, BeanWrapper> beanWrappersCache = CacheBuilder
+            .newBuilder().maximumSize(200)
+            .build(new CacheLoader<Class, BeanWrapper>() {
+                public BeanWrapper load(Class key) {
+                    return new BeanWrapperImpl(key);
+                }
+            });
+
     public static final Set<Class<?>> NUMBER_PRIMITIVES = new HashSet<Class<?>>(
             Arrays.asList(new Class<?>[] { int.class, long.class, double.class,
                     float.class, short.class }));
 
     public static final String OPERATOR_PREFIX = "_operator_";
+
+    private static final String SEPARATOR_FIELDS = ".";
 
     public static final String[] FULL_DATE_PATTERNS = new String[] {
             "dd-MM-yyyy HH:mm:ss", "dd/MM/yyyy HH:mm:ss",
@@ -94,6 +117,24 @@ public class QuerydslUtils {
 
     public static final String[] MONTH_AND_YEAR_DATE_PATTERNS = new String[] {
             "MM-yyyy", "MM/yyyy", "MMMM-yyyy", "MMMM/yyyy" };
+
+    /**
+     * Get BeanWrapper instance for klass. <b>Warning<b>: BeanWrapper returned
+     * is not Thread-safe!!!
+     * 
+     * @param klass
+     * @return
+     */
+    private static BeanWrapper getBeanWrapper(Class<?> klass) {
+        BeanWrapper beanWrapper;
+        try {
+            beanWrapper = beanWrappersCache.get(klass);
+        }
+        catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        return beanWrapper;
+    }
 
     /**
      * Creates a WHERE clause by the intersection of the given search-arguments
@@ -202,6 +243,30 @@ public class QuerydslUtils {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate createExpression(PathBuilder<T> entityPath,
             String fieldName, Class<?> fieldType, String searchStr) {
+        TypeDescriptor descriptor = TypeDescriptor.valueOf(fieldType);
+        return createExpression(entityPath, fieldName, descriptor, searchStr);
+    }
+
+    /**
+     * Utility for constructing where clause expressions.
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet} , {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code name} in {@code Pet} entity, {@code firstName} in
+     *        {@code Pet.owner} entity.
+     * @param fieldType Property value {@code Class}
+     * @param searchStr the value to find, may be null
+     * @return Predicate
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static <T> Predicate createExpression(PathBuilder<T> entityPath,
+            String fieldName, String searchStr) {
+
+        TypeDescriptor descriptor = getTypeDescriptor(fieldName, entityPath);
+
+        Class<?> fieldType = descriptor.getType();
+
         // Check for field type in order to delegate in custom-by-type
         // create expression method
         if (String.class == fieldType) {
@@ -213,7 +278,7 @@ public class QuerydslUtils {
         else if (Number.class.isAssignableFrom(fieldType)
                 || NUMBER_PRIMITIVES.contains(fieldType)) {
             return createNumberExpressionGenerics(entityPath, fieldName,
-                    fieldType, searchStr);
+                    fieldType, descriptor, searchStr);
         }
         else if (Date.class.isAssignableFrom(fieldType)
                 || Calendar.class.isAssignableFrom(fieldType)) {
@@ -243,8 +308,55 @@ public class QuerydslUtils {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate createExpression(PathBuilder<T> entityPath,
-            String fieldName, Class<?> fieldType, String searchStr,
+            String fieldName, TypeDescriptor descriptor, String searchStr) {
+
+        Class<?> fieldType = descriptor.getType();
+
+        // Check for field type in order to delegate in custom-by-type
+        // create expression method
+        if (String.class == fieldType) {
+            return createStringLikeExpression(entityPath, fieldName, searchStr);
+        }
+        else if (Boolean.class == fieldType || boolean.class == fieldType) {
+            return createBooleanExpression(entityPath, fieldName, searchStr);
+        }
+        else if (Number.class.isAssignableFrom(fieldType)
+                || NUMBER_PRIMITIVES.contains(fieldType)) {
+            return createNumberExpressionGenerics(entityPath, fieldName,
+                    fieldType, descriptor, searchStr);
+        }
+        else if (Date.class.isAssignableFrom(fieldType)
+                || Calendar.class.isAssignableFrom(fieldType)) {
+            BooleanExpression expression = createDateExpression(entityPath,
+                    fieldName, (Class<Date>) fieldType, searchStr);
+            return expression;
+        }
+
+        else if (fieldType.isEnum()) {
+            return createEnumExpression(entityPath, fieldName, searchStr,
+                    (Class<? extends Enum>) fieldType);
+        }
+        return null;
+    }
+
+    /**
+     * Utility for constructing where clause expressions.
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet} , {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code name} in {@code Pet} entity, {@code firstName} in
+     *        {@code Pet.owner} entity.
+     * @param fieldType Property value {@code Class}
+     * @param searchStr the value to find, may be null
+     * @return Predicate
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static <T> Predicate createExpression(PathBuilder<T> entityPath,
+            String fieldName, TypeDescriptor descriptor, String searchStr,
             ConversionService conversionService, MessageSource messageSource) {
+
+        Class<?> fieldType = descriptor.getType();
 
         // Check for field type in order to delegate in custom-by-type
         // create expression method
@@ -259,7 +371,7 @@ public class QuerydslUtils {
         else if (Number.class.isAssignableFrom(fieldType)
                 || NUMBER_PRIMITIVES.contains(fieldType)) {
             return createNumberExpressionGenericsWithOperators(entityPath,
-                    fieldName, fieldType, searchStr, conversionService,
+                    fieldName, descriptor, searchStr, conversionService,
                     messageSource);
         }
         else if (Date.class.isAssignableFrom(fieldType)
@@ -286,45 +398,54 @@ public class QuerydslUtils {
     @SuppressWarnings("unchecked")
     public static <T> Predicate createNumberExpressionGenerics(
             PathBuilder<T> entityPath, String fieldName, Class<?> fieldType,
-            String searchStr) {
+            TypeDescriptor descriptor, String searchStr) {
         Predicate numberExpression = null;
+
         if (NumberUtils.isNumber(searchStr)) {
             if (BigDecimal.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpression(entityPath,
-                        fieldName, (Class<BigDecimal>) fieldType, searchStr);
+                        fieldName, (Class<BigDecimal>) fieldType, descriptor,
+                        searchStr);
             }
             if (BigInteger.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpression(entityPath,
-                        fieldName, (Class<BigInteger>) fieldType, searchStr);
+                        fieldName, (Class<BigInteger>) fieldType, descriptor,
+                        searchStr);
             }
             if (Byte.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpression(entityPath,
-                        fieldName, (Class<Byte>) fieldType, searchStr);
+                        fieldName, (Class<Byte>) fieldType, descriptor,
+                        searchStr);
             }
             if (Double.class.isAssignableFrom(fieldType)
                     || double.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
-                        fieldName, (Class<Double>) fieldType, searchStr);
+                        fieldName, (Class<Double>) fieldType, descriptor,
+                        searchStr);
             }
             if (Float.class.isAssignableFrom(fieldType)
                     || float.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
-                        fieldName, (Class<Float>) fieldType, searchStr);
+                        fieldName, (Class<Float>) fieldType, descriptor,
+                        searchStr);
             }
             if (Integer.class.isAssignableFrom(fieldType)
                     || int.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
-                        fieldName, (Class<Integer>) fieldType, searchStr);
+                        fieldName, (Class<Integer>) fieldType, descriptor,
+                        searchStr);
             }
             if (Long.class.isAssignableFrom(fieldType)
                     || long.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
-                        fieldName, (Class<Long>) fieldType, searchStr);
+                        fieldName, (Class<Long>) fieldType, descriptor,
+                        searchStr);
             }
             if (Short.class.isAssignableFrom(fieldType)
                     || short.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
-                        fieldName, (Class<Short>) fieldType, searchStr);
+                        fieldName, (Class<Short>) fieldType, descriptor,
+                        searchStr);
             }
         }
         return numberExpression;
@@ -332,55 +453,68 @@ public class QuerydslUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> Predicate createNumberExpressionGenericsWithOperators(
-            PathBuilder<T> entityPath, String fieldName, Class<?> fieldType,
-            String searchStr, ConversionService conversionService,
-            MessageSource messageSource) {
+            PathBuilder<T> entityPath, String fieldName,
+            TypeDescriptor descriptor, String searchStr,
+            ConversionService conversionService, MessageSource messageSource) {
         Predicate numberExpression = null;
-        if (NumberUtils.isNumber(searchStr)) {
+
+        Class<?> fieldType = descriptor.getType();
+
+        Boolean isNumber = null;
+        try {
+            conversionService.convert(searchStr, STRING_TYPE_DESCRIPTOR,
+                    descriptor);
+            isNumber = Boolean.TRUE;
+        }
+        catch (ConversionException e) {
+            isNumber = Boolean.FALSE;
+        }
+
+        if (isNumber) {
             if (BigDecimal.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpressionEqual(entityPath,
-                        fieldName, (Class<BigDecimal>) fieldType, searchStr,
-                        conversionService);
+                        fieldName, (Class<BigDecimal>) fieldType, descriptor,
+                        searchStr, conversionService);
             }
             if (BigInteger.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpressionEqual(entityPath,
-                        fieldName, (Class<BigInteger>) fieldType, searchStr,
-                        conversionService);
+                        fieldName, (Class<BigInteger>) fieldType, descriptor,
+                        searchStr, conversionService);
             }
             if (Byte.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpressionEqual(entityPath,
-                        fieldName, (Class<Byte>) fieldType, searchStr,
-                        conversionService);
+                        fieldName, (Class<Byte>) fieldType, descriptor,
+                        searchStr, conversionService);
             }
             if (Double.class.isAssignableFrom(fieldType)
                     || double.class == fieldType) {
                 numberExpression = createNumberExpressionEqual(entityPath,
-                        fieldName, (Class<Double>) fieldType, searchStr,
-                        conversionService);
+                        fieldName, (Class<Double>) fieldType, descriptor,
+                        searchStr, conversionService);
             }
             if (Float.class.isAssignableFrom(fieldType)
                     || float.class == fieldType) {
                 numberExpression = createNumberExpressionEqual(entityPath,
-                        fieldName, (Class<Float>) fieldType, searchStr,
-                        conversionService);
+                        fieldName, (Class<Float>) fieldType, descriptor,
+                        searchStr, conversionService);
             }
             if (Integer.class.isAssignableFrom(fieldType)
                     || int.class == fieldType) {
                 numberExpression = createNumberExpressionEqual(entityPath,
-                        fieldName, (Class<Integer>) fieldType, searchStr,
-                        conversionService);
+                        fieldName, (Class<Integer>) fieldType, descriptor,
+                        searchStr, conversionService);
             }
             if (Long.class.isAssignableFrom(fieldType)
                     || long.class == fieldType) {
                 numberExpression = createNumberExpressionEqual(entityPath,
-                        fieldName, (Class<Long>) fieldType, searchStr,
-                        conversionService);
+                        fieldName, (Class<Long>) fieldType, descriptor,
+                        searchStr, conversionService);
             }
             if (Short.class.isAssignableFrom(fieldType)
                     || short.class == fieldType) {
                 numberExpression = createNumberExpressionEqual(entityPath,
-                        fieldName, (Class<Short>) fieldType, searchStr,
-                        conversionService);
+                        fieldName, (Class<Short>) fieldType, descriptor,
+                        searchStr, conversionService);
             }
         }
         else {
@@ -388,48 +522,48 @@ public class QuerydslUtils {
             // expression.
             if (BigDecimal.class.isAssignableFrom(fieldType)) {
                 numberExpression = getNumericFilterExpression(entityPath,
-                        fieldName, (Class<BigDecimal>) fieldType, searchStr,
-                        conversionService, messageSource);
+                        fieldName, (Class<BigDecimal>) fieldType, descriptor,
+                        searchStr, conversionService, messageSource);
             }
             if (BigInteger.class.isAssignableFrom(fieldType)) {
                 numberExpression = getNumericFilterExpression(entityPath,
-                        fieldName, (Class<BigInteger>) fieldType, searchStr,
-                        conversionService, messageSource);
+                        fieldName, (Class<BigInteger>) fieldType, descriptor,
+                        searchStr, conversionService, messageSource);
             }
             if (Byte.class.isAssignableFrom(fieldType)) {
                 numberExpression = getNumericFilterExpression(entityPath,
-                        fieldName, (Class<Byte>) fieldType, searchStr,
-                        conversionService, messageSource);
+                        fieldName, (Class<Byte>) fieldType, descriptor,
+                        searchStr, conversionService, messageSource);
             }
             if (Double.class.isAssignableFrom(fieldType)
                     || double.class == fieldType) {
                 numberExpression = getNumericFilterExpression(entityPath,
-                        fieldName, (Class<Double>) fieldType, searchStr,
-                        conversionService, messageSource);
+                        fieldName, (Class<Double>) fieldType, descriptor,
+                        searchStr, conversionService, messageSource);
             }
             if (Float.class.isAssignableFrom(fieldType)
                     || float.class == fieldType) {
                 numberExpression = getNumericFilterExpression(entityPath,
-                        fieldName, (Class<Float>) fieldType, searchStr,
-                        conversionService, messageSource);
+                        fieldName, (Class<Float>) fieldType, descriptor,
+                        searchStr, conversionService, messageSource);
             }
             if (Integer.class.isAssignableFrom(fieldType)
                     || int.class == fieldType) {
                 numberExpression = getNumericFilterExpression(entityPath,
-                        fieldName, (Class<Integer>) fieldType, searchStr,
-                        conversionService, messageSource);
+                        fieldName, (Class<Integer>) fieldType, descriptor,
+                        searchStr, conversionService, messageSource);
             }
             if (Long.class.isAssignableFrom(fieldType)
                     || long.class == fieldType) {
                 numberExpression = getNumericFilterExpression(entityPath,
-                        fieldName, (Class<Long>) fieldType, searchStr,
-                        conversionService, messageSource);
+                        fieldName, (Class<Long>) fieldType, descriptor,
+                        searchStr, conversionService, messageSource);
             }
             if (Short.class.isAssignableFrom(fieldType)
                     || short.class == fieldType) {
                 numberExpression = getNumericFilterExpression(entityPath,
-                        fieldName, (Class<Short>) fieldType, searchStr,
-                        conversionService, messageSource);
+                        fieldName, (Class<Short>) fieldType, descriptor,
+                        searchStr, conversionService, messageSource);
             }
         }
         return numberExpression;
@@ -506,8 +640,7 @@ public class QuerydslUtils {
             return entityPath.get(fieldName).isNotNull();
         }
 
-        Class<?> fieldType = DatatablesUtils
-                .getFieldType(fieldName, entityPath);
+        Class<?> fieldType = getFieldType(fieldName, entityPath);
         if (String.class == fieldType && String.class == searchObj.getClass()) {
             return createStringExpression(entityPath, fieldName, searchObj,
                     operator);
@@ -946,7 +1079,7 @@ public class QuerydslUtils {
      */
     public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression createNumberExpression(
             PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
-            String searchStr) {
+            TypeDescriptor descriptor, String searchStr) {
         if (StringUtils.isEmpty(searchStr)) {
             return null;
         }
@@ -978,15 +1111,19 @@ public class QuerydslUtils {
      */
     public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression createNumberExpressionEqual(
             PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
-            String searchStr, ConversionService conversionService) {
+            TypeDescriptor descriptor, String searchStr,
+            ConversionService conversionService) {
         if (StringUtils.isEmpty(searchStr)) {
             return null;
         }
         NumberPath<N> numberExpression = entityPath.getNumber(fieldName,
                 fieldType);
+
+        TypeDescriptor strDesc = STRING_TYPE_DESCRIPTOR;
+
         if (conversionService != null) {
-            return numberExpression.eq(conversionService.convert(searchStr,
-                    fieldType));
+            return numberExpression.eq((N) conversionService.convert(searchStr,
+                    strDesc, descriptor));
         }
         else {
             numberExpression.stringValue().like(
@@ -1646,12 +1783,15 @@ public class QuerydslUtils {
      */
     public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression getNumericFilterExpression(
             PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
-            String searchStr, ConversionService conversionService,
-            MessageSource messageSource) {
+            TypeDescriptor descriptor, String searchStr,
+            ConversionService conversionService, MessageSource messageSource) {
 
         if (StringUtils.isEmpty(searchStr)) {
             return null;
         }
+
+        TypeDescriptor strDesc = STRING_TYPE_DESCRIPTOR;
+
         NumberPath<N> numberExpression = entityPath.getNumber(fieldName,
                 fieldType);
 
@@ -1667,32 +1807,30 @@ public class QuerydslUtils {
             String value = symbolMatcher.group(2);
 
             if (!StringUtils.isBlank(value)) {
+
+                Object valueConverted = conversionService.convert(value,
+                        strDesc, descriptor);
+
                 if (symbolExpression.equals("=")
                         || symbolExpression.equals("==")) {
-                    return numberExpression.eq(conversionService.convert(value,
-                            fieldType));
+                    return numberExpression.eq((N) valueConverted);
                 }
                 else if (symbolExpression.equals(">")
                         || symbolExpression.equals(">>")) {
-                    return numberExpression.gt(conversionService.convert(value,
-                            fieldType));
+                    return numberExpression.gt((N) valueConverted);
                 }
                 else if (symbolExpression.equals("<")) {
-                    return numberExpression.lt(conversionService.convert(value,
-                            fieldType));
+                    return numberExpression.lt((N) valueConverted);
                 }
                 else if (symbolExpression.equals(">=")) {
-                    return numberExpression.goe(conversionService.convert(
-                            value, fieldType));
+                    return numberExpression.goe((N) valueConverted);
                 }
                 else if (symbolExpression.equals("<=")) {
-                    return numberExpression.loe(conversionService.convert(
-                            value, fieldType));
+                    return numberExpression.loe((N) valueConverted);
                 }
                 else if (symbolExpression.equals("!=")
                         || symbolExpression.equals("<>")) {
-                    return numberExpression.ne(conversionService.convert(value,
-                            fieldType));
+                    return numberExpression.ne((N) valueConverted);
                 }
             }
         }
@@ -1724,11 +1862,16 @@ public class QuerydslUtils {
             // Getting valueFrom and valueTo
             String valueFrom = betweenFunctionMatcher.group(1);
             String valueTo = betweenFunctionMatcher.group(2);
+
+            Object valueFromConverted = conversionService.convert(valueFrom,
+                    strDesc, descriptor);
+            Object valueToConverted = conversionService.convert(valueTo,
+                    strDesc, descriptor);
+
             if (!StringUtils.isBlank(valueFrom)
                     && !StringUtils.isBlank(valueTo)) {
-                return numberExpression.between(
-                        conversionService.convert(valueFrom, fieldType),
-                        conversionService.convert(valueTo, fieldType));
+                return numberExpression.between((N) valueFromConverted,
+                        (N) valueToConverted);
             }
         }
 
@@ -1751,5 +1894,55 @@ public class QuerydslUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Obtains the class type of the property named as {@code fieldName} of the
+     * entity.
+     * 
+     * @param fieldName the field name.
+     * @param entity the entity with a property named as {@code fieldName}
+     * @return the class type
+     */
+    public static <T> Class<?> getFieldType(String fieldName,
+            PathBuilder<T> entity) {
+        Class<?> entityType = entity.getType();
+        String fieldNameToFindType = fieldName;
+
+        // Makes the array of classes to find fieldName agains them
+        Class<?>[] classArray = ArrayUtils.<Class<?>> toArray(entityType);
+        if (fieldName.contains(SEPARATOR_FIELDS)) {
+            String[] fieldNameSplitted = StringUtils.split(fieldName,
+                    SEPARATOR_FIELDS);
+            for (int i = 0; i < fieldNameSplitted.length - 1; i++) {
+                Class<?> fieldType = BeanUtils.findPropertyType(
+                        fieldNameSplitted[i],
+                        ArrayUtils.<Class<?>> toArray(entityType));
+                classArray = ArrayUtils.add(classArray, fieldType);
+                entityType = fieldType;
+            }
+            fieldNameToFindType = fieldNameSplitted[fieldNameSplitted.length - 1];
+        }
+
+        return BeanUtils.findPropertyType(fieldNameToFindType, classArray);
+    }
+
+    /**
+     * Obtains the descriptor of the filtered field
+     * 
+     * @param fieldName
+     * @param entity
+     * @return
+     */
+    public static <T> TypeDescriptor getTypeDescriptor(String fieldName,
+            PathBuilder<T> entity) {
+        Class<?> entityType = entity.getType();
+        String fieldNameToFindType = fieldName;
+
+        BeanWrapper beanWrapper = getBeanWrapper(entityType);
+        TypeDescriptor fieldDescriptor = beanWrapper
+                .getPropertyTypeDescriptor(fieldNameToFindType);
+
+        return fieldDescriptor;
     }
 }

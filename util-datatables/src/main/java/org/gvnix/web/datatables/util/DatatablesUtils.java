@@ -1043,7 +1043,10 @@ public class DatatablesUtils {
 
                 // Entity field name and type
                 String fieldName = unescapeDot(column.getName());
-                Class<?> fieldType = getFieldType(fieldName, entity);
+                Class<?> fieldType = QuerydslUtils.getFieldType(fieldName,
+                        entity);
+                TypeDescriptor descriptor = QuerydslUtils.getTypeDescriptor(
+                        fieldName, entity);
 
                 // On column search, connect where clauses together by
                 // AND
@@ -1051,7 +1054,7 @@ public class DatatablesUtils {
                 // match with column filters
                 filtersByColumnPredicate = filtersByColumnPredicate
                         .and(QuerydslUtils.createExpression(entity, fieldName,
-                                fieldType, searchStr, conversionService,
+                                descriptor, searchStr, conversionService,
                                 messageSource));
 
                 // TODO: Este codigo se puede pasar a QuerydslUtils ?
@@ -1124,13 +1127,16 @@ public class DatatablesUtils {
 
                     // Entity field name and type
                     String fieldName = unescapeDot(column.getName());
-                    Class<?> fieldType = getFieldType(fieldName, entity);
+                    Class<?> fieldType = QuerydslUtils.getFieldType(fieldName,
+                            entity);
+                    TypeDescriptor descriptor = QuerydslUtils
+                            .getTypeDescriptor(fieldName, entity);
 
                     // Find in all columns means we want to find given
                     // value in at least one entity property, so we must
                     // join the where clauses by OR
                     Predicate expression = QuerydslUtils.createExpression(
-                            entity, fieldName, fieldType, searchStr);
+                            entity, fieldName, descriptor, searchStr);
                     if (expression != null) {
                         filtersByTablePredicate = filtersByTablePredicate
                                 .or(expression);
@@ -1214,7 +1220,8 @@ public class DatatablesUtils {
                 // Entity field name and type. Type must extend Comparable
                 // interface
                 String fieldName = unescapeDot(column.getName());
-                Class<E> fieldType = (Class<E>) getFieldType(fieldName, entity);
+                Class<E> fieldType = (Class<E>) QuerydslUtils.getFieldType(
+                        fieldName, entity);
 
                 List<String> attributes = orderByAssociations.get(fieldName);
                 try {
@@ -1571,37 +1578,6 @@ public class DatatablesUtils {
      */
     private static String unescapeDot(String str) {
         return str.replace(SEPARATOR_FIELDS_ESCAPED, SEPARATOR_FIELDS);
-    }
-
-    /**
-     * Obtains the class type of the property named as {@code fieldName} of the
-     * entity.
-     * 
-     * @param fieldName the field name.
-     * @param entity the entity with a property named as {@code fieldName}
-     * @return the class type
-     */
-    public static <T> Class<?> getFieldType(String fieldName,
-            PathBuilder<T> entity) {
-        Class<?> entityType = entity.getType();
-        String fieldNameToFindType = fieldName;
-
-        // Makes the array of classes to find fieldName agains them
-        Class<?>[] classArray = ArrayUtils.<Class<?>> toArray(entityType);
-        if (fieldName.contains(SEPARATOR_FIELDS)) {
-            String[] fieldNameSplitted = StringUtils.split(fieldName,
-                    SEPARATOR_FIELDS);
-            for (int i = 0; i < fieldNameSplitted.length - 1; i++) {
-                Class<?> fieldType = BeanUtils.findPropertyType(
-                        fieldNameSplitted[i],
-                        ArrayUtils.<Class<?>> toArray(entityType));
-                classArray = ArrayUtils.add(classArray, fieldType);
-                entityType = fieldType;
-            }
-            fieldNameToFindType = fieldNameSplitted[fieldNameSplitted.length - 1];
-        }
-
-        return BeanUtils.findPropertyType(fieldNameToFindType, classArray);
     }
 
     /**
