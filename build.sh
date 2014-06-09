@@ -48,7 +48,7 @@ do
 done
 
 ## Exit script on any error
-set -e 
+#set -e 
 ## Echo all commands
 #set -x 
 
