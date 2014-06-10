@@ -121,31 +121,19 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 	// Register Footer callback
 	st.oApi._fnCallbackReg(st, 'aoFooterCallback', 
 			function(row, data, start, end, display){
-		this.fnFooterCallback(row, data, start, end, display);
+		this.fnGvNIX_FooterCallback(row, data, start, end, display);
 	});
 	
 	// Register Draw callback
 	st.oApi._fnCallbackReg(st, 'aoDrawCallback', function( oSettings ) {
-		this.fnDrawCallback(oSettings);
+		this.fnGvNIX_DrawCallback(oSettings);
 	});
 	
 	// Calling at first time Footer Callback
 	updateDatatablesFilters($table.fnSettings());
 	
 	// Displaying always the clicked row if row click exists
-    $table.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
-    if($table.fnHasRowClick()){
-    	var rowClickedClassSelector = "." + $table.fnRowClick().s.classForClickedRow;
-    	if($table.find(rowClickedClassSelector).length > 0){
-    		var rowSelected = $table.find(rowClickedClassSelector);
-    		var scrollHeight = $table.parent(".dataTables_scrollBody").height();
-    		var rowHeight = rowSelected.height();
-    		var rowSelectedPosition = rowSelected[0].offsetTop + rowHeight + (scrollHeight / 2);
-    		if(rowSelectedPosition > scrollHeight){
-    			$table.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
-    		}
-    	}
-    }
+	fnScrollDatatableToRowClick($table);
 }
 
 /**
@@ -288,36 +276,26 @@ jQuery.fn.dataTableExt.oApi.fnSetFilteringDelay = function(oSettings, iDelay) {
  * datatable element
  */
 
-jQuery.fn.dataTableExt.oApi.fnDrawCallback = function(oSettings){
-	if (!this.fnHasEditing()) {
-		return false;
-	}
-	if(!this.fnHasRowClick()){
-		return false;
-	}
-	var rowClickedClassSelector = "." + this.fnRowClick().s.classForClickedRow;
-    var rowEditingClassSelector = "." + this.fnEditing()._options.classForEditingRow;
+jQuery.fn.dataTableExt.oApi.fnGvNIX_DrawCallback = function(oSettings){
+	var _that = this;
 
-    
-	if(!this.find(rowEditingClassSelector).length > 0){
-		this.parent(".dataTables_scrollBody").animate({scrollTop: 0}, 0);
-	    // Displaying always the clicked row
-	    if(this.find(rowClickedClassSelector).length > 0){
-	        var rowSelected = this.find(rowClickedClassSelector);
-	        var scrollHeight = this.parent(".dataTables_scrollBody").height();
-	        var rowHeight = rowSelected.height();
-	        var rowSelectedPosition = rowSelected[0].offsetTop + rowHeight + (scrollHeight / 2);
-	        if(rowSelectedPosition > scrollHeight){
-	            this.parent(".dataTables_scrollBody").animate({scrollTop:  rowSelectedPosition - scrollHeight});
-	        }
-	    }
-	}
+	// add fnScrollDatatableToRowClick in a timer to
+	// assure it is executed after all drawCallbacks are done
+	// (which can modify the row "offsetTop")
+
+	window.setTimeout(function() {
+
+		fnScrollDatatableToRowClick(_that);
+
+	}, 200);
+
 };
+
 
 /**
  * This function checks filters on footerCallback
  */
-jQuery.fn.dataTableExt.oApi.fnFooterCallback = function(nFoot, data, start, end, display){
+jQuery.fn.dataTableExt.oApi.fnGvNIX_FooterCallback = function(nFoot, data, start, end, display){
 	var _that = this;
 	var oSettings = _that.fnSettings();
 
@@ -521,3 +499,51 @@ $.fn.dataTableExt.oApi.fnStandingRedraw = function(oSettings) {
 	// draw the 'current' page
 	oSettings.oApi._fnDraw(oSettings);
 };
+
+
+/**
+ * Move datatable scroll to show current row-clicked
+ * <p/>
+ * The scroll doen't be moved if any row is in 
+ * editing mode.
+ *
+ * @param $datatable the datatable instance
+ */
+
+function fnScrollDatatableToRowClick($datatable) {
+
+	if(!$datatable.fnHasRowClick()){
+		return false;
+	}
+
+	var hasRowInEditingMode = false;
+	if ($datatable.fnHasEditing()) {
+		var rowEditingClassSelector = "." + $datatable.fnEditing()._options.classForEditingRow;
+		hasRowInEditingMode = $datatable.find(rowEditingClassSelector).length > 0;
+	}
+
+	var rowClickedClassSelector = "." + $datatable.fnRowClick().s.classForClickedRow;
+
+	if(hasRowInEditingMode){
+		return false;
+	}
+
+	var $body = $datatable.parent(".dataTables_scrollBody");
+	$body.animate({scrollTop: 0}, 0);
+
+    // Displaying always the clicked row
+
+    if($datatable.find(rowClickedClassSelector).length > 0){
+
+        var rowSelected = $datatable.find(rowClickedClassSelector);
+        var scrollHeight = $body.height();
+        var rowHeight = rowSelected.height();
+        var rowSelectedPosition = rowSelected[0].offsetTop + rowHeight + (scrollHeight / 2);
+        
+        if(rowSelectedPosition > scrollHeight){
+        	$body.animate({scrollTop:  rowSelectedPosition - scrollHeight});
+        }
+
+    }
+
+}

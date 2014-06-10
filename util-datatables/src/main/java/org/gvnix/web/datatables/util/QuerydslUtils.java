@@ -278,7 +278,7 @@ public class QuerydslUtils {
         else if (Number.class.isAssignableFrom(fieldType)
                 || NUMBER_PRIMITIVES.contains(fieldType)) {
             return createNumberExpressionGenerics(entityPath, fieldName,
-                    fieldType, descriptor, searchStr);
+                    fieldType, descriptor, searchStr, null);
         }
         else if (Date.class.isAssignableFrom(fieldType)
                 || Calendar.class.isAssignableFrom(fieldType)) {
@@ -308,7 +308,8 @@ public class QuerydslUtils {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate createExpression(PathBuilder<T> entityPath,
-            String fieldName, TypeDescriptor descriptor, String searchStr) {
+            String fieldName, TypeDescriptor descriptor, String searchStr,
+            ConversionService conversionService) {
 
         Class<?> fieldType = descriptor.getType();
 
@@ -323,7 +324,7 @@ public class QuerydslUtils {
         else if (Number.class.isAssignableFrom(fieldType)
                 || NUMBER_PRIMITIVES.contains(fieldType)) {
             return createNumberExpressionGenerics(entityPath, fieldName,
-                    fieldType, descriptor, searchStr);
+                    fieldType, descriptor, searchStr, conversionService);
         }
         else if (Date.class.isAssignableFrom(fieldType)
                 || Calendar.class.isAssignableFrom(fieldType)) {
@@ -398,54 +399,55 @@ public class QuerydslUtils {
     @SuppressWarnings("unchecked")
     public static <T> Predicate createNumberExpressionGenerics(
             PathBuilder<T> entityPath, String fieldName, Class<?> fieldType,
-            TypeDescriptor descriptor, String searchStr) {
+            TypeDescriptor descriptor, String searchStr,
+            ConversionService conversionService) {
         Predicate numberExpression = null;
 
-        if (NumberUtils.isNumber(searchStr)) {
+        if (isNumber(searchStr, conversionService, descriptor)) {
             if (BigDecimal.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<BigDecimal>) fieldType, descriptor,
-                        searchStr);
+                        searchStr, conversionService);
             }
             if (BigInteger.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<BigInteger>) fieldType, descriptor,
-                        searchStr);
+                        searchStr, conversionService);
             }
             if (Byte.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Byte>) fieldType, descriptor,
-                        searchStr);
+                        searchStr, conversionService);
             }
             if (Double.class.isAssignableFrom(fieldType)
                     || double.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Double>) fieldType, descriptor,
-                        searchStr);
+                        searchStr, conversionService);
             }
             if (Float.class.isAssignableFrom(fieldType)
                     || float.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Float>) fieldType, descriptor,
-                        searchStr);
+                        searchStr, conversionService);
             }
             if (Integer.class.isAssignableFrom(fieldType)
                     || int.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Integer>) fieldType, descriptor,
-                        searchStr);
+                        searchStr, conversionService);
             }
             if (Long.class.isAssignableFrom(fieldType)
                     || long.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Long>) fieldType, descriptor,
-                        searchStr);
+                        searchStr, conversionService);
             }
             if (Short.class.isAssignableFrom(fieldType)
                     || short.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Short>) fieldType, descriptor,
-                        searchStr);
+                        searchStr, conversionService);
             }
         }
         return numberExpression;
@@ -460,17 +462,7 @@ public class QuerydslUtils {
 
         Class<?> fieldType = descriptor.getType();
 
-        Boolean isNumber = null;
-        try {
-            conversionService.convert(searchStr, STRING_TYPE_DESCRIPTOR,
-                    descriptor);
-            isNumber = Boolean.TRUE;
-        }
-        catch (ConversionException e) {
-            isNumber = Boolean.FALSE;
-        }
-
-        if (isNumber) {
+        if (isNumber(searchStr, conversionService, descriptor)) {
             if (BigDecimal.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpressionEqual(entityPath,
                         fieldName, (Class<BigDecimal>) fieldType, descriptor,
@@ -1079,14 +1071,27 @@ public class QuerydslUtils {
      */
     public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression createNumberExpression(
             PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
-            TypeDescriptor descriptor, String searchStr) {
+            TypeDescriptor descriptor, String searchStr,
+            ConversionService conversionService) {
         if (StringUtils.isEmpty(searchStr)) {
             return null;
         }
         NumberPath<N> numberExpression = entityPath.getNumber(fieldName,
                 fieldType);
-        BooleanExpression expression = numberExpression.stringValue().like(
-                "%".concat(searchStr).concat("%"));
+
+        BooleanExpression expression = null;
+
+        try {
+            Object number = conversionService.convert(searchStr,
+                    STRING_TYPE_DESCRIPTOR, descriptor);
+            expression = numberExpression.stringValue().like(
+                    "%".concat(number.toString()).concat("%"));
+        }
+        catch (ConversionException e) {
+            expression = numberExpression.stringValue().like(
+                    "%".concat(searchStr).concat("%"));
+        }
+
         return expression;
     }
 
@@ -1944,5 +1949,31 @@ public class QuerydslUtils {
                 .getPropertyTypeDescriptor(fieldNameToFindType);
 
         return fieldDescriptor;
+    }
+
+    /**
+     * This method checks if the search string can be converted to a number
+     * using conversionService with locale.
+     * 
+     * @param searchStr
+     * @param conversionService
+     * @param descriptor
+     * @return
+     */
+    public static boolean isNumber(String searchStr,
+            ConversionService conversionService, TypeDescriptor descriptor) {
+
+        Boolean isNumber = null;
+        try {
+            conversionService.convert(searchStr, STRING_TYPE_DESCRIPTOR,
+                    descriptor);
+            isNumber = Boolean.TRUE;
+        }
+        catch (ConversionException e) {
+            isNumber = Boolean.FALSE;
+        }
+
+        return isNumber;
+
     }
 }

@@ -806,7 +806,8 @@ public class DatatablesUtils {
             // Build the query to search the given value in all columns
             filtersByTablePredicate = prepareQuerySearchPart(entity,
                     filterByAssociations, datatablesCriterias,
-                    findInAllColumns, associationMap, filtersByTablePredicate);
+                    findInAllColumns, associationMap, filtersByTablePredicate,
+                    conversionService);
         }
         catch (Exception e) {
             SearchResults<T> searchResults = new SearchResults<T>(
@@ -1117,7 +1118,8 @@ public class DatatablesUtils {
             Map<String, List<String>> filterByAssociations,
             DatatablesCriterias datatablesCriterias, boolean findInAllColumns,
             Map<String, PathBuilder<?>> associationMap,
-            BooleanBuilder filtersByTablePredicate) {
+            BooleanBuilder filtersByTablePredicate,
+            ConversionService conversionService) {
         String searchStr = datatablesCriterias.getSearch();
         if (findInAllColumns) {
             boolean expressionExists = false;
@@ -1136,7 +1138,8 @@ public class DatatablesUtils {
                     // value in at least one entity property, so we must
                     // join the where clauses by OR
                     Predicate expression = QuerydslUtils.createExpression(
-                            entity, fieldName, descriptor, searchStr);
+                            entity, fieldName, descriptor, searchStr,
+                            conversionService);
                     if (expression != null) {
                         filtersByTablePredicate = filtersByTablePredicate
                                 .or(expression);
