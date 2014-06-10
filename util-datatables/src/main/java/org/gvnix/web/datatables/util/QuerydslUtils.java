@@ -68,7 +68,7 @@ import com.mysema.query.types.path.PathBuilder;
  */
 public class QuerydslUtils {
 
-    private static final TypeDescriptor STRING_TYPE_DESCRIPTOR = TypeDescriptor
+    public static final TypeDescriptor STRING_TYPE_DESCRIPTOR = TypeDescriptor
             .valueOf(String.class);
 
     private static LoadingCache<Class, BeanWrapper> beanWrappersCache = CacheBuilder
