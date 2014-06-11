@@ -384,11 +384,11 @@ public class DatatablesUtils {
                         baseSearchValuesMap);
                 newBaseSearch.remove(ROWS_ON_TOP_IDS_PARAM);
                 basePredicate = QuerydslUtils.createPredicateByAnd(entity,
-                        newBaseSearch);
+                        newBaseSearch, conversionService);
             }
             else {
                 basePredicate = QuerydslUtils.createPredicateByAnd(entity,
-                        baseSearchValuesMap);
+                        baseSearchValuesMap, conversionService);
             }
         }
         else {
@@ -1046,8 +1046,6 @@ public class DatatablesUtils {
                 String fieldName = unescapeDot(column.getName());
                 Class<?> fieldType = QuerydslUtils.getFieldType(fieldName,
                         entity);
-                TypeDescriptor descriptor = QuerydslUtils.getTypeDescriptor(
-                        fieldName, entity);
 
                 // On column search, connect where clauses together by
                 // AND
@@ -1055,8 +1053,7 @@ public class DatatablesUtils {
                 // match with column filters
                 filtersByColumnPredicate = filtersByColumnPredicate
                         .and(QuerydslUtils.createExpression(entity, fieldName,
-                                descriptor, searchStr, conversionService,
-                                messageSource));
+                                searchStr, conversionService, messageSource));
 
                 // TODO: Este codigo se puede pasar a QuerydslUtils ?
 
@@ -1131,15 +1128,12 @@ public class DatatablesUtils {
                     String fieldName = unescapeDot(column.getName());
                     Class<?> fieldType = QuerydslUtils.getFieldType(fieldName,
                             entity);
-                    TypeDescriptor descriptor = QuerydslUtils
-                            .getTypeDescriptor(fieldName, entity);
 
                     // Find in all columns means we want to find given
                     // value in at least one entity property, so we must
                     // join the where clauses by OR
                     Predicate expression = QuerydslUtils.createExpression(
-                            entity, fieldName, descriptor, searchStr,
-                            conversionService);
+                            entity, fieldName, searchStr, conversionService);
                     if (expression != null) {
                         filtersByTablePredicate = filtersByTablePredicate
                                 .or(expression);

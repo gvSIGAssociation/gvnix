@@ -157,7 +157,8 @@ public class QuerydslUtils {
      * @return the WHERE clause
      */
     public static <T> BooleanBuilder createPredicateByAnd(
-            PathBuilder<T> entity, Map<String, Object> searchArgs) {
+            PathBuilder<T> entity, Map<String, Object> searchArgs,
+            ConversionService conversionService) {
 
         // Using BooleanBuilder, a cascading builder for
         // Predicate expressions
@@ -182,13 +183,13 @@ public class QuerydslUtils {
                     @SuppressWarnings("unchecked")
                     Collection<Object> valueColl = (Collection<Object>) valueToSearch;
                     for (Object valueObj : valueColl) {
-                        predicate.and(createExpression(entity, key, valueObj,
-                                operator));
+                        predicate.and(createObjectExpression(entity, key,
+                                valueObj, operator, conversionService));
                     }
                 }
                 else {
-                    predicate.and(createExpression(entity, key, valueToSearch,
-                            operator));
+                    predicate.and(createObjectExpression(entity, key,
+                            valueToSearch, operator, conversionService));
                 }
             }
         }
@@ -239,12 +240,12 @@ public class QuerydslUtils {
      * @param fieldType Property value {@code Class}
      * @param searchStr the value to find, may be null
      * @return Predicate
+     * @deprecated
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate createExpression(PathBuilder<T> entityPath,
             String fieldName, Class<?> fieldType, String searchStr) {
-        TypeDescriptor descriptor = TypeDescriptor.valueOf(fieldType);
-        return createExpression(entityPath, fieldName, descriptor, searchStr);
+        return createExpression(entityPath, fieldName, searchStr, null);
     }
 
     /**
@@ -258,40 +259,12 @@ public class QuerydslUtils {
      * @param fieldType Property value {@code Class}
      * @param searchStr the value to find, may be null
      * @return Predicate
+     * @deprecated
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate createExpression(PathBuilder<T> entityPath,
             String fieldName, String searchStr) {
-
-        TypeDescriptor descriptor = getTypeDescriptor(fieldName, entityPath);
-
-        Class<?> fieldType = descriptor.getType();
-
-        // Check for field type in order to delegate in custom-by-type
-        // create expression method
-        if (String.class == fieldType) {
-            return createStringLikeExpression(entityPath, fieldName, searchStr);
-        }
-        else if (Boolean.class == fieldType || boolean.class == fieldType) {
-            return createBooleanExpression(entityPath, fieldName, searchStr);
-        }
-        else if (Number.class.isAssignableFrom(fieldType)
-                || NUMBER_PRIMITIVES.contains(fieldType)) {
-            return createNumberExpressionGenerics(entityPath, fieldName,
-                    fieldType, descriptor, searchStr, null);
-        }
-        else if (Date.class.isAssignableFrom(fieldType)
-                || Calendar.class.isAssignableFrom(fieldType)) {
-            BooleanExpression expression = createDateExpression(entityPath,
-                    fieldName, (Class<Date>) fieldType, searchStr);
-            return expression;
-        }
-
-        else if (fieldType.isEnum()) {
-            return createEnumExpression(entityPath, fieldName, searchStr,
-                    (Class<? extends Enum>) fieldType);
-        }
-        return null;
+        return createExpression(entityPath, fieldName, searchStr, null);
     }
 
     /**
@@ -308,9 +281,15 @@ public class QuerydslUtils {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate createExpression(PathBuilder<T> entityPath,
-            String fieldName, TypeDescriptor descriptor, String searchStr,
+            String fieldName, String searchStr,
             ConversionService conversionService) {
 
+        TypeDescriptor descriptor = getTypeDescriptor(fieldName, entityPath);
+        if (descriptor == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Can't found field '%s' on entity '%s'", fieldName,
+                    entityPath.getType()));
+        }
         Class<?> fieldType = descriptor.getType();
 
         // Check for field type in order to delegate in custom-by-type
@@ -354,9 +333,15 @@ public class QuerydslUtils {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate createExpression(PathBuilder<T> entityPath,
-            String fieldName, TypeDescriptor descriptor, String searchStr,
+            String fieldName, String searchStr,
             ConversionService conversionService, MessageSource messageSource) {
 
+        TypeDescriptor descriptor = getTypeDescriptor(fieldName, entityPath);
+        if (descriptor == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Can't found field '%s' on entity '%s'", fieldName,
+                    entityPath.getType()));
+        }
         Class<?> fieldType = descriptor.getType();
 
         // Check for field type in order to delegate in custom-by-type
@@ -575,8 +560,10 @@ public class QuerydslUtils {
      * @return BooleanExpression
      */
     public static <T> BooleanExpression createObjectExpression(
-            PathBuilder<T> entityPath, String fieldName, Object searchObj) {
-        return createExpression(entityPath, fieldName, searchObj, null);
+            PathBuilder<T> entityPath, String fieldName, Object searchObj,
+            ConversionService conversionService) {
+        return createObjectExpression(entityPath, fieldName, searchObj, null,
+                conversionService);
     }
 
     /**
@@ -605,11 +592,18 @@ public class QuerydslUtils {
      * @return BooleanExpression
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static <T> BooleanExpression createExpression(
+    public static <T> BooleanExpression createObjectExpression(
             PathBuilder<T> entityPath, String fieldName, Object searchObj,
-            String operator) {
+            String operator, ConversionService conversionService) {
         if (searchObj == null) {
             return null;
+        }
+
+        TypeDescriptor typeDescriptor = getTypeDescriptor(fieldName, entityPath);
+        if (typeDescriptor == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Can't found field '%s' on entity '%s'", fieldName,
+                    entityPath.getType()));
         }
 
         if (StringUtils.isBlank(operator)
@@ -645,7 +639,8 @@ public class QuerydslUtils {
         else if ((Number.class.isAssignableFrom(fieldType) || NUMBER_PRIMITIVES
                 .contains(fieldType))
                 && String.class == searchObj.getClass()
-                && NumberUtils.isNumber((String) searchObj)) {
+                && isValidValueFor((String) searchObj, typeDescriptor,
+                        conversionService)) {
             return createNumericExpression(entityPath, fieldName, searchObj,
                     operator, fieldType);
 
@@ -662,6 +657,40 @@ public class QuerydslUtils {
         }
 
         return entityPath.get(fieldName).eq(searchObj);
+    }
+
+    /**
+     * Check if a string is valid for a type <br/>
+     * If conversion service is not provided try to check by apache commons
+     * utilities. <b>TODO</b> in this (no-conversionService) case just
+     * implemented for numerics
+     * 
+     * @param string
+     * @param typeDescriptor
+     * @param conversionService (optional)
+     * @return
+     */
+    private static boolean isValidValueFor(String string,
+            TypeDescriptor typeDescriptor, ConversionService conversionService) {
+        if (conversionService != null) {
+            try {
+                conversionService.convert(string, STRING_TYPE_DESCRIPTOR,
+                        typeDescriptor);
+            }
+            catch (ConversionException e) {
+                return false;
+            }
+            return true;
+        }
+        else {
+            Class<?> fieldType = typeDescriptor.getType();
+            if (Number.class.isAssignableFrom(fieldType)
+                    || NUMBER_PRIMITIVES.contains(fieldType)) {
+                return NumberUtils.isNumber(string);
+            }
+            // TODO implement other types
+            return true;
+        }
     }
 
     /**
@@ -1084,8 +1113,18 @@ public class QuerydslUtils {
         try {
             Object number = conversionService.convert(searchStr,
                     STRING_TYPE_DESCRIPTOR, descriptor);
+            String toSearch = number.toString();
+            if (number instanceof BigDecimal
+                    && ((BigDecimal) number).scale() > 1) {
+                // For bigDecimal trim 0 in decimal part
+                toSearch = StringUtils.stripEnd(toSearch, "0");
+                if (StringUtils.endsWith(toSearch, ".")) {
+                    // prevent "#." strings
+                    toSearch = toSearch.concat("0");
+                }
+            }
             expression = numberExpression.stringValue().like(
-                    "%".concat(number.toString()).concat("%"));
+                    "%".concat(toSearch).concat("%"));
         }
         catch (ConversionException e) {
             expression = numberExpression.stringValue().like(
@@ -1102,10 +1141,10 @@ public class QuerydslUtils {
      * Querydsl Expr:
      * {@code entityPath.fieldName.stringValue() eq searchStr
      * Database operation:
-     * {@code str(entity.fieldName) = searchStr 
+     * {@code str(entity.fieldName) = searchStr
      * <p/>
      * Like operation is case sensitive.
-     * 
+     *
      * @param entityPath Full path to entity and associations. For example:
      *        {@code Pet} , {@code Pet.owner}
      * @param fieldName Property name in the given entity path. For example:
@@ -1911,6 +1950,20 @@ public class QuerydslUtils {
      */
     public static <T> Class<?> getFieldType(String fieldName,
             PathBuilder<T> entity) {
+        TypeDescriptor descriptor = getTypeDescriptor(fieldName, entity);
+        return descriptor.getType();
+    }
+
+    /**
+     * Obtains the class type of the property named as {@code fieldName} of the
+     * entity.
+     * 
+     * @param fieldName the field name.
+     * @param entity the entity with a property named as {@code fieldName}
+     * @return the class type
+     */
+    public static <T> Class<?> getFieldType1(String fieldName,
+            PathBuilder<T> entity) {
         Class<?> entityType = entity.getType();
         String fieldNameToFindType = fieldName;
 
@@ -1942,10 +1995,24 @@ public class QuerydslUtils {
     public static <T> TypeDescriptor getTypeDescriptor(String fieldName,
             PathBuilder<T> entity) {
         Class<?> entityType = entity.getType();
+        if (entityType == Object.class) {
+            entityType = entity.getRoot().getType();
+        }
         String fieldNameToFindType = fieldName;
-
         BeanWrapper beanWrapper = getBeanWrapper(entityType);
-        TypeDescriptor fieldDescriptor = beanWrapper
+
+        TypeDescriptor fieldDescriptor = null;
+        // Find recursive the las beanWrapper
+        if (fieldName.contains(SEPARATOR_FIELDS)) {
+            String[] fieldNameSplitted = StringUtils.split(fieldName,
+                    SEPARATOR_FIELDS);
+            for (int i = 0; i < fieldNameSplitted.length - 1; i++) {
+                beanWrapper = getBeanWrapper(beanWrapper
+                        .getPropertyType(fieldNameSplitted[i]));
+            }
+            fieldNameToFindType = fieldNameSplitted[fieldNameSplitted.length - 1];
+        }
+        fieldDescriptor = beanWrapper
                 .getPropertyTypeDescriptor(fieldNameToFindType);
 
         return fieldDescriptor;
