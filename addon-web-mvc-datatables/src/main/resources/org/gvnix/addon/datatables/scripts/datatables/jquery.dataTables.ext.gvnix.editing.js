@@ -1634,7 +1634,7 @@ var GvNIX_Editing;
 
 			jQuery(nRow).addClass(this._options.classForEditingRowError);
 			var $tds = jQuery('>td', nRow);
-
+			
 			// Remove previous error messages
 			$tds.each(function(index) {
 				var $div = jQuery("div", $tds[index]);
@@ -1643,31 +1643,65 @@ var GvNIX_Editing;
 					$span.remove();
 				}
 			});
-			
+
 			// Put error messages in the right cells
 			jQuery.each(oErrors, jQuery.proxy(function (property, errorMessage) {
-				var colIndex = aCreateColumnField.indexOf(property);
-				if (colIndex > -1) {
-					if (fnErrorDrawer) {
-						try {
-							fnErrorDrawer(this,$tds[colIndex], property,  errorMessage);
-						} catch (e) {
-							this.error("[_fnShowBindingCreateErrors] error calling configured binding-error drawer: { property: '"+  property + "' errorMessage: '" + errorMessage +"'} exception: "+ e);
-						}
-					} else {
-						var $div = jQuery("div", $tds[colIndex]);
-						var $span = jQuery("span.errors", $div);
-						if (!$span.length) {
-							$div.append('<span class="errors">' + errorMessage + '</span>');
-						} else {
-							$span.html(errorMessage);
-						}
-					}
-				} else {
-					this.error("[_fnShowBindingErrors] find binding error of a proprerty ("+ property+ ") which has no column on table: '" + errorMessage+ "'");
+				if (errorMessage instanceof Object){
+					prefix = property;					
+					var properties = Object.keys(errorMessage);
+					jQuery.each(properties, jQuery.proxy(function (index, propertyOfErrorMessage) {
+						var message = errorMessage[propertyOfErrorMessage];
+						this._fnPutErrorMessages(propertyOfErrorMessage, message, prefix, aColumnField, fnErrorDrawer, $tds);	
+					}, this));									
+				}else{
+					this._fnPutErrorMessages(property, errorMessage, null, aColumnField, fnErrorDrawer, $tds);
 				}
 			}, this));
 		},
+		
+        /**
+         * Put error messages in the right cells
+         *
+         * @param property that has the error.
+         * @param errorMessage of the refered row.
+         * @param prefix class to which it belongs if it comes from an embedded in another class.
+         * @param columnField column fields.
+         * @param fnErrorDrawer __options.bindingErrorDrawer (See bindingErrorDrawer).
+         * @param $tds editing row td list (jQuery Objects).
+         */
+        "_fnPutErrorMessages" : function(property, errorMessage, prefix, columnField, fnErrorDrawer, $tds) {                        
+            if (prefix != null){
+                    var propertyAux = prefix.concat("_~~_").concat(property);
+                    property = prefix.concat(".").concat(property);                                
+            }
+            // Put error messages in the right cells
+            var colIndex = columnField.indexOf(property);
+            if (colIndex < 0){
+                    colIndex = columnField.indexOf(propertyAux);
+            }
+            if (colIndex > -1) {
+                    if (fnErrorDrawer) {
+                            try {
+                                    fnErrorDrawer(this,$tds[colIndex], property,  errorMessage);
+                            } catch (e) {
+                                    this.error("[_fnShowBindingCreateErrors] error calling configured binding-error drawer: { property: '"+  property + "' errorMessage: '" + errorMessage +"'} exception: "+ e);
+                            }
+                    } else {
+                            var $div = jQuery("div", $tds[colIndex]);
+                            var $span = jQuery("span.errors", $div);
+                            if (!$span.length) {
+                                    $div.append('<span class="errors">' + errorMessage + '</span>');
+                            } else {
+                                    $span.html(errorMessage);
+                            }
+                    }
+            } else {
+                    this.error("[_fnShowBindingErrors] find binding error of a proprerty ("+ property+ ") which has no column on table: '" + errorMessage+ "'");
+            }
+    	},
+
+        
+
 
 		/**
 		 * For each cell which was edited in given row or editing rows, replaces
@@ -2350,7 +2384,7 @@ var GvNIX_Editing;
 	 * @type String
 	 * @default See code
 	 */
-	GvNIX_Editing.VERSION = "${gvnix.version}";
+	GvNIX_Editing.VERSION = "1.3.1-SNAPSHOT";
 	GvNIX_Editing.prototype.VERSION = GvNIX_Editing.VERSION;
 
 	/** TODO Add as datatable feature * */
