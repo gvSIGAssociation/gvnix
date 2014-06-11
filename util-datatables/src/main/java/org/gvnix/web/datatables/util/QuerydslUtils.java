@@ -71,10 +71,10 @@ public class QuerydslUtils {
     public static final TypeDescriptor STRING_TYPE_DESCRIPTOR = TypeDescriptor
             .valueOf(String.class);
 
-    private static LoadingCache<Class, BeanWrapper> beanWrappersCache = CacheBuilder
+    private static LoadingCache<Class<?>, BeanWrapper> beanWrappersCache = CacheBuilder
             .newBuilder().maximumSize(200)
-            .build(new CacheLoader<Class, BeanWrapper>() {
-                public BeanWrapper load(Class key) {
+            .build(new CacheLoader<Class<?>, BeanWrapper>() {
+                public BeanWrapper load(Class<?> key) {
                     return new BeanWrapperImpl(key);
                 }
             });
@@ -242,7 +242,6 @@ public class QuerydslUtils {
      * @return Predicate
      * @deprecated
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate createExpression(PathBuilder<T> entityPath,
             String fieldName, Class<?> fieldType, String searchStr) {
         return createExpression(entityPath, fieldName, searchStr, null);
@@ -261,7 +260,6 @@ public class QuerydslUtils {
      * @return Predicate
      * @deprecated
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Predicate createExpression(PathBuilder<T> entityPath,
             String fieldName, String searchStr) {
         return createExpression(entityPath, fieldName, searchStr, null);
@@ -1110,27 +1108,32 @@ public class QuerydslUtils {
 
         BooleanExpression expression = null;
 
-        try {
-            Object number = conversionService.convert(searchStr,
-                    STRING_TYPE_DESCRIPTOR, descriptor);
-            String toSearch = number.toString();
-            if (number instanceof BigDecimal
-                    && ((BigDecimal) number).scale() > 1) {
-                // For bigDecimal trim 0 in decimal part
-                toSearch = StringUtils.stripEnd(toSearch, "0");
-                if (StringUtils.endsWith(toSearch, ".")) {
-                    // prevent "#." strings
-                    toSearch = toSearch.concat("0");
+        if (conversionService != null) {
+            try {
+                Object number = conversionService.convert(searchStr,
+                        STRING_TYPE_DESCRIPTOR, descriptor);
+                String toSearch = number.toString();
+                if (number instanceof BigDecimal
+                        && ((BigDecimal) number).scale() > 1) {
+                    // For bigDecimal trim 0 in decimal part
+                    toSearch = StringUtils.stripEnd(toSearch, "0");
+                    if (StringUtils.endsWith(toSearch, ".")) {
+                        // prevent "#." strings
+                        toSearch = toSearch.concat("0");
+                    }
                 }
+                expression = numberExpression.stringValue().like(
+                        "%".concat(toSearch).concat("%"));
             }
-            expression = numberExpression.stringValue().like(
-                    "%".concat(toSearch).concat("%"));
+            catch (ConversionException e) {
+                expression = numberExpression.stringValue().like(
+                        "%".concat(searchStr).concat("%"));
+            }
         }
-        catch (ConversionException e) {
+        else {
             expression = numberExpression.stringValue().like(
                     "%".concat(searchStr).concat("%"));
         }
-
         return expression;
     }
 
@@ -1153,6 +1156,7 @@ public class QuerydslUtils {
      * @param searchStr the value to find, may be null
      * @return PredicateOperation
      */
+    @SuppressWarnings("unchecked")
     public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression createNumberExpressionEqual(
             PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
             TypeDescriptor descriptor, String searchStr,
@@ -1166,16 +1170,19 @@ public class QuerydslUtils {
         TypeDescriptor strDesc = STRING_TYPE_DESCRIPTOR;
 
         if (conversionService != null) {
-            return numberExpression.eq((N) conversionService.convert(searchStr,
-                    strDesc, descriptor));
+            try {
+                return numberExpression.eq((N) conversionService.convert(
+                        searchStr, strDesc, descriptor));
+            }
+            catch (ConversionException ex) {
+                return numberExpression.stringValue().like(
+                        "%".concat(searchStr).concat("%"));
+            }
         }
         else {
-            numberExpression.stringValue().like(
+            return numberExpression.stringValue().like(
                     "%".concat(searchStr).concat("%"));
         }
-
-        return null;
-
     }
 
     /**
@@ -1414,8 +1421,6 @@ public class QuerydslUtils {
         }
 
         DatePath<C> dateExpression = entityPath.getDate(fieldName, fieldType);
-
-        BooleanExpression expression;
 
         // Getting simpleDateFormat
         DateFormat dateFormat = new SimpleDateFormat(datePattern);
@@ -1702,8 +1707,6 @@ public class QuerydslUtils {
             return null;
         }
 
-        Boolean value = null;
-
         // Getting all operations
         String trueOperation = "TRUE";
         String falseOperation = "FALSE";
@@ -1825,6 +1828,7 @@ public class QuerydslUtils {
      * @param searchStr
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression getNumericFilterExpression(
             PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
             TypeDescriptor descriptor, String searchStr,
@@ -2030,17 +2034,7 @@ public class QuerydslUtils {
     public static boolean isNumber(String searchStr,
             ConversionService conversionService, TypeDescriptor descriptor) {
 
-        Boolean isNumber = null;
-        try {
-            conversionService.convert(searchStr, STRING_TYPE_DESCRIPTOR,
-                    descriptor);
-            isNumber = Boolean.TRUE;
-        }
-        catch (ConversionException e) {
-            isNumber = Boolean.FALSE;
-        }
-
-        return isNumber;
+        return isValidValueFor(searchStr, descriptor, conversionService);
 
     }
 }

@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,8 +42,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.gvnix.web.datatables.query.SearchResults;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.context.MessageSource;
@@ -78,8 +78,8 @@ import com.mysema.query.types.path.PathBuilder;
 public class DatatablesUtils {
 
     // Logger
-    private static Logger LOGGER = LoggerFactory
-            .getLogger(DatatablesUtils.class);
+    private static Logger LOGGER = Logger.getLogger(DatatablesUtils.class
+            .getName());
 
     public static final String ROWS_ON_TOP_IDS_PARAM = "dtt_row_on_top_ids";
     private static final String SEPARATOR_FIELDS = ".";
@@ -810,10 +810,17 @@ public class DatatablesUtils {
                     conversionService);
         }
         catch (Exception e) {
+            LOGGER.log(Level.SEVERE, String.format(
+                    "Exception preparing filter for entity %s",
+                    entity.getType()), e);
             SearchResults<T> searchResults = new SearchResults<T>(
                     new ArrayList<T>(0), 0, isPaged, new Long(
-                            datatablesCriterias.getDisplayStart()), new Long(
-                            datatablesCriterias.getDisplaySize()), 0);
+                            org.apache.commons.lang3.ObjectUtils.defaultIfNull(
+                                    datatablesCriterias.getDisplayStart(), 0)),
+                    new Long(org.apache.commons.lang3.ObjectUtils
+                            .defaultIfNull(
+                                    datatablesCriterias.getDisplaySize(), 0)),
+                    0);
             return searchResults;
         }
 
@@ -845,11 +852,12 @@ public class DatatablesUtils {
             // Coherce row-on-top ids types
             Object[] cohercedRowsOnTopId = new Object[rowsOnTopIds.length];
 
-            EntityType entityMetamodel = entityManager.getMetamodel().entity(
-                    entity.getType());
+            EntityType<? extends T> entityMetamodel = entityManager
+                    .getMetamodel().entity(entity.getType());
             // We always have just one id. This id can be an Embedded Id
-            Class idType = entityMetamodel.getIdType().getJavaType();
-            SingularAttribute idAttr = (SingularAttribute) entityMetamodel
+            Class<?> idType = entityMetamodel.getIdType().getJavaType();
+            @SuppressWarnings("unchecked")
+            SingularAttribute<? extends T, ?> idAttr = (SingularAttribute<? extends T, ?>) entityMetamodel
                     .getId(idType);
 
             Object curId;
@@ -917,9 +925,12 @@ public class DatatablesUtils {
             totalResultCount = query.count();
         }
 
-        // If offset value is bigger than total results,
-        // offset needs start on 0
-        if (offset > totalResultCount) {
+        if (offset == null) {
+            offset = new Long(0);
+        }
+        else if (offset > totalResultCount) {
+            // If offset value is bigger than total results,
+            // offset needs start on 0
             offset = new Long(0);
         }
 
@@ -950,9 +961,6 @@ public class DatatablesUtils {
         }
 
         // Create a new SearchResults instance
-        if (offset == null) {
-            offset = new Long(0);
-        }
         if (limit == null) {
             limit = totalBaseCount;
         }
@@ -1044,8 +1052,6 @@ public class DatatablesUtils {
 
                 // Entity field name and type
                 String fieldName = unescapeDot(column.getName());
-                Class<?> fieldType = QuerydslUtils.getFieldType(fieldName,
-                        entity);
 
                 // On column search, connect where clauses together by
                 // AND
@@ -1073,12 +1079,6 @@ public class DatatablesUtils {
 
                     for (String associationFieldName : associationFields) {
 
-                        // Get associated entity field type
-                        Class<?> associationFieldType = BeanUtils
-                                .findPropertyType(associationFieldName,
-                                        ArrayUtils
-                                                .<Class<?>> toArray(fieldType));
-
                         // On association search, connect
                         // associated entity where clauses by OR
                         // because all assoc entity properties are
@@ -1088,7 +1088,7 @@ public class DatatablesUtils {
                         filtersByAssociationPredicate = filtersByAssociationPredicate
                                 .or(QuerydslUtils.createExpression(
                                         associationPath, associationFieldName,
-                                        associationFieldType, searchStr));
+                                        searchStr, conversionService));
                     }
 
                     filtersByColumnPredicate = filtersByColumnPredicate
@@ -1126,8 +1126,6 @@ public class DatatablesUtils {
 
                     // Entity field name and type
                     String fieldName = unescapeDot(column.getName());
-                    Class<?> fieldType = QuerydslUtils.getFieldType(fieldName,
-                            entity);
 
                     // Find in all columns means we want to find given
                     // value in at least one entity property, so we must
@@ -1153,17 +1151,11 @@ public class DatatablesUtils {
 
                         for (String associationFieldName : associationFields) {
 
-                            // Get associated entity field type
-                            Class<?> associationFieldType = BeanUtils
-                                    .findPropertyType(
-                                            associationFieldName,
-                                            ArrayUtils
-                                                    .<Class<?>> toArray(fieldType));
                             filtersByTablePredicate = filtersByTablePredicate
                                     .or(QuerydslUtils.createExpression(
                                             associationPath,
-                                            associationFieldName,
-                                            associationFieldType, searchStr));
+                                            associationFieldName, searchStr,
+                                            conversionService));
                         }
                     }
                 }
@@ -1252,9 +1244,15 @@ public class DatatablesUtils {
                                         fieldType, order));
                     }
                 }
-                catch (Exception ex) {
+                catch (ClassCastException ex) {
                     // Do nothing, on class cast exception order specifier will
                     // be null
+                    continue;
+                }
+                catch (Exception ex) {
+                    LOGGER.log(Level.WARNING, String.format(
+                            "Exception preparing order for entity %s",
+                            entity.getType()), ex);
                     continue;
                 }
             }
@@ -1335,11 +1333,11 @@ public class DatatablesUtils {
 
                 // check if property exists (trace it else)
                 if (!entityBean.isReadableProperty(unescapedFieldName)) {
-                    LOGGER.debug("Property ["
-                            .concat(unescapedFieldName)
-                            .concat("] not found in bean [")
-                            .concat(StringUtils.defaultString(
-                                    entity.toString(), "{null}")).concat("]"));
+                    LOGGER.finer(String.format(
+                            "Property [%s] not fond in bean %s [%s]",
+                            unescapedFieldName, entity.getClass()
+                                    .getSimpleName(), StringUtils
+                                    .defaultString(entity.toString(), "{null}")));
                     continue;
                 }
 
@@ -1408,21 +1406,28 @@ public class DatatablesUtils {
                     return formatter.format(value);
                 }
             }
+            String stringValue;
             // Try to use conversion service (uses field descrition
             // to handle field format annotations)
             if (conversionService.canConvert(fieldDesc, strDesc)) {
-                return (String) conversionService.convert(value, fieldDesc,
-                        strDesc);
+                stringValue = (String) conversionService.convert(value,
+                        fieldDesc, strDesc);
+                if (stringValue == null) {
+                    stringValue = "";
+                }
             }
             else {
-                return ObjectUtils.getDisplayString(value);
+                stringValue = ObjectUtils.getDisplayString(value);
             }
+            return stringValue;
         }
         catch (Exception ex) {
             // debug getting value problem
-            LOGGER.error("Error getting value of field [".concat(fieldName)
-                    .concat("]").concat(" in bean [").concat(entity.toString())
-                    .concat("]"), ex);
+            LOGGER.log(
+                    Level.SEVERE,
+                    "Error getting value of field [".concat(fieldName)
+                            .concat("]").concat(" in bean [")
+                            .concat(entity.toString()).concat("]"), ex);
             return "";
         }
     }
@@ -1586,13 +1591,9 @@ public class DatatablesUtils {
      * @param messageSource
      * @return
      */
-    public static boolean checkFilterExpressions(Class type, String expression,
-            MessageSource messageSource) {
+    public static boolean checkFilterExpressions(Class<?> type,
+            String expression, MessageSource messageSource) {
         // By default filter is not correct
-
-        Set<Class<?>> numberPrimitives = new HashSet<Class<?>>(
-                Arrays.asList(new Class<?>[] { int.class, long.class,
-                        double.class, float.class, short.class }));
 
         // Checking String filters
         if (String.class == type) {
@@ -1602,7 +1603,7 @@ public class DatatablesUtils {
             return checkBooleanFilters(expression, messageSource);
         }
         else if (Number.class.isAssignableFrom(type)
-                || numberPrimitives.contains(type)) {
+                || QuerydslUtils.NUMBER_PRIMITIVES.contains(type)) {
             return checkNumericFilters(expression, messageSource);
         }
         else if (Date.class.isAssignableFrom(type)
