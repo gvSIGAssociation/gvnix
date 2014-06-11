@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -51,6 +52,7 @@ import org.springframework.core.convert.TypeDescriptor;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Iterables;
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.Order;
 import com.mysema.query.types.OrderSpecifier;
@@ -1770,7 +1772,14 @@ public class QuerydslUtils {
     /**
      * Return IN expression for {@code entityPath.fieldName}.
      * <p/>
-     * Expr: {@code entityPath.fieldName IN ( values )}
+     * Expr: <br/>
+     * entityPath.fieldName IN ( values ) <br/>
+     * <br/>
+     * If values.size() > 500 its generates: <br/>
+     * Expr: <br/>
+     * (entityPath.fieldName IN ( values[0-500] ) OR [entityPath.fieldName IN (
+     * values[501-100]... ])) <br/>
+     * <br/>
      * 
      * @param entityPath Full path to entity and associations. For example:
      *        {@code Pet} , {@code Pet.owner}
@@ -1786,6 +1795,29 @@ public class QuerydslUtils {
             return null;
         }
 
+        if (values.size() > 500) {
+            BooleanExpression expression = null;
+            Iterable<List<E>> collectionParts = Iterables
+                    .partition(values, 500);
+            for (List<E> part : collectionParts) {
+                if (expression == null) {
+                    expression = doCreateCollectionExpression(entityPath,
+                            fieldName, part);
+                }
+                else {
+                    expression = expression.or(doCreateCollectionExpression(
+                            entityPath, fieldName, part));
+                }
+            }
+            return expression;
+        }
+        else {
+            return doCreateCollectionExpression(entityPath, fieldName, values);
+        }
+    }
+
+    public static <T, E> BooleanExpression doCreateCollectionExpression(
+            PathBuilder<T> entityPath, String fieldName, Collection<E> values) {
         BooleanExpression expression = entityPath.get(fieldName).in(values);
         return expression;
     }
