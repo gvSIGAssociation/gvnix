@@ -539,7 +539,7 @@
                                     <c:set var="hrefUpdateAction">javascript:fnEditDatatableRow(\'${id}\',\''+full.${typeIdFieldName}+'\')</c:set>
                                 </c:when>
                                 <c:otherwise>
-                                    <c:set var="hrefUpdateAction">${urlPath}/'+full.${typeIdFieldName}+'${urlParams}'+'&amp;'+ datatablesRedirect + '</c:set>
+                                    <c:set var="hrefUpdateAction">${urlPath}/'+full.${typeIdFieldName}+'${urlParams}'+'&amp;'+ datatablesRedirect + '&amp;dtt_table_id_hash=' + fnGetHashCode(window.btoa(unescape(encodeURIComponent( "${id}" ))))  + '</c:set>
                                 </c:otherwise>
                             </c:choose>
 	        	var result =

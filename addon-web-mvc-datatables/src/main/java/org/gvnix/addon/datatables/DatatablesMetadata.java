@@ -1784,6 +1784,33 @@ public class DatatablesMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
+        // String[] paramValues =
+        // httpServletRequest.getParameterValues("dtt_table_id_hash");
+        bodyBuilder
+                .appendFormalLine("String[] paramValues = httpServletRequest.getParameterValues(\"dtt_table_id_hash\");");
+
+        // if(paramValues != null && paramValues.length > 0) {
+        bodyBuilder
+                .appendFormalLine("if(paramValues != null && paramValues.length > 0) {");
+        bodyBuilder.indent();
+
+        // redirectModel.addFlashAttribute("dtt_table_id_hash", paramValues[0]);
+        bodyBuilder
+                .appendFormalLine("redirectModel.addFlashAttribute(\"dtt_table_id_hash\", paramValues[0]);");
+        bodyBuilder.indentRemove();
+
+        // }else{
+        bodyBuilder.appendFormalLine("}else{");
+        bodyBuilder.indent();
+
+        // redirectModel.addFlashAttribute("dtt_table_id_hash", "");
+        bodyBuilder
+                .appendFormalLine("redirectModel.addFlashAttribute(\"dtt_table_id_hash\", \"\");");
+        bodyBuilder.indentRemove();
+
+        // }
+        bodyBuilder.appendFormalLine("}");
+
         // uiModel.addFlashAttribute(DatatablesUtils.ROWS_ON_TOP_IDS_PARAM,
         // pet.getId());
         bodyBuilder.appendFormalLine(String.format(
