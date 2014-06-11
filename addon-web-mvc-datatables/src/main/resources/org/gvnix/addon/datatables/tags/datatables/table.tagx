@@ -90,6 +90,9 @@
   <!-- ====================================== -->
   <!-- Extra features -->
   <!-- ====================================== -->
+  
+  <!-- State Save And Load -->
+  <jsp:directive.attribute name="statePrefix" type="java.lang.String" rtexprvalue="true" required="false" description="Prefix to add on localStorage to identify the table" />
 
   <!-- FixedHeader -->
   <jsp:directive.attribute name="fixedHeader" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable the DataTables FixedHeader plugin. (Default : false) (See : http://datatables.net/extras/fixedheader/)" />
@@ -846,6 +849,7 @@
         scrollXInner="${scrollXInner}"
 
       colReorder="${colReorder}"
+      data-stateprefix="${statePrefix}"
     >
     
     <!-- Adding extra configuration into Datatables -->

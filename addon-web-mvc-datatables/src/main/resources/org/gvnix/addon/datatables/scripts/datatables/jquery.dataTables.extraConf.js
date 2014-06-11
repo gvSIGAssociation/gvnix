@@ -5,8 +5,17 @@
 {
 	
 	"fnStateSave": function(oSettings, oData) {
+		// Generating hash location
+		var hashLocation = fnGetHashCode(window.location.pathname);
+		// Getting statePrefix
+		var statePrefix = this.data().stateprefix;
+		// Generating unic sName
+		var sName = hashLocation + "_";
+		if(statePrefix != undefined){
+			sName +=  statePrefix + "_";
+		}
+		sName += oSettings.sCookiePrefix + oSettings.sInstance;
 		// Getting state information
-		var sName = oSettings.sCookiePrefix + oSettings.sInstance;
 		var sValue = this.oApi._fnJsonString(oData);
 		var iSecs = oSettings.iCookieDuration;
 		var sBaseName = oSettings.sCookiePrefix;
@@ -21,8 +30,16 @@
 	},
 	
 	"fnStateLoad": function(oSettings) {
-		var sName = oSettings.sCookiePrefix+oSettings.sInstance;
-		
+		// Generating hash location
+		var hashLocation = fnGetHashCode(window.location.pathname);
+		// Getting statePrefix
+		var statePrefix = this.data().stateprefix;
+		// Generating unic sName
+		var sName = hashLocation + "_";
+		if(statePrefix != undefined){
+			sName +=  statePrefix + "_";
+		}
+		sName += oSettings.sCookiePrefix + oSettings.sInstance;
 		// If localStorage not exists, create Cookie
 		if(!window.localStorage){
 			var sData = this.oApi._fnReadCookie(sName);

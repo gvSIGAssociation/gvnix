@@ -327,8 +327,18 @@ var GvNIX_RowClick;
 		 */
 		"fnLoadState" : function(force) {
 			var dt = this._data.dt;
-
-			var sName = "gvnixRowclk-"+dt.nTable.id;
+			
+			// Generating hash location
+			var hashLocation = fnGetHashCode(window.location.pathname);
+			// Getting statePrefix
+			var statePrefix = jQuery(dt.nTable).data().stateprefix;
+			
+			// Generating unic sName
+			var sName = hashLocation + "_";
+			if(statePrefix != undefined){
+				sName +=  statePrefix + "_";
+			}
+			sName += "gvnixRowclk-"+dt.nTable.id;
 
 			if(!window.localStorage){
 				var id = dt.oApi._fnReadCookie(sName);
@@ -351,8 +361,19 @@ var GvNIX_RowClick;
 		"fnSaveState" : function() {
 			var _d = this._data, dt = _d.dt;
 
-			var sName = "gvnixRowclk-"+dt.nTable.id;
-			var sValue = _d.lastClickedId
+			// Generating hash location
+			var hashLocation = fnGetHashCode(window.location.pathname);
+			// Getting statePrefix
+			var statePrefix = jQuery(dt.nTable).data().stateprefix;
+			
+			// Generating unic sName
+			var sName = hashLocation + "_";
+			if(statePrefix != undefined){
+				sName +=  statePrefix + "_";
+			}
+			sName += "gvnixRowclk-"+dt.nTable.id;
+			
+			var sValue = _d.lastClickedId;
 
 			if(!window.localStorage){
 				dt.oApi._fnCreateCookie(sName,
