@@ -474,8 +474,10 @@
     <![CDATA[
       /* Add the create button to gvNIX toolbar */
       function ${fnRenderCreateButton}() {
+      	var dttRowOnTopId = window.btoa(unescape(encodeURIComponent( "${id}" )));
+      	dttRowOnTopId = fnGetHashCode(dttRowOnTopId);
         var result =
-          '<a href="${urlPath}${urlParams}&amp;' + datatablesRedirect + '" alt="${create_label}" title="${create_label}" class="icon create_entity">'
+          '<a href="${urlPath}${urlParams}&amp;' + datatablesRedirect + '&amp;dtt_table_id_hash='+ dttRowOnTopId + '" alt="${create_label}" title="${create_label}" class="icon create_entity">'
           + '</a>';
         jQuery('#${id}_gvnix_toolbar').append( result );
       }
@@ -766,7 +768,7 @@
             <c:if test="${create || update || (not empty dtt_row_on_top_ids)}">
                 <c:choose>
                   <c:when test="${not empty dtt_row_on_top_ids}">
-                , 'rowsOnTop': { 'asRowOnTopIds' : ${dtt_row_on_top_ids} }
+                , 'rowsOnTop': { 'asRowOnTopIds' : ${dtt_row_on_top_ids}, 'asTableIdHash' : '${dtt_table_id_hash}', 'asParentTableIdHash' : '${dtt_parent_table_id_hash}' }
                   </c:when>
                   <c:otherwise>
                 , 'rowsOnTop': true

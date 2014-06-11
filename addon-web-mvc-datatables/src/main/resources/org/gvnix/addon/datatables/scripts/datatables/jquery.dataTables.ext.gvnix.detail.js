@@ -14,8 +14,12 @@ function loadDetail(detailDatatableId, mainDatatablesId, url) {
 /**
  * generate url to obtain some detail.
  */
-function getDetailUrl(mainDatatableId, baseUrl, mappedBy, rowId) {
-	return baseUrl + '&' + mappedBy + '=' + rowId + '&datatablesMappedValue=' + rowId + '&_dt_parentId=' + mainDatatableId;
+function getDetailUrl(mainDatatableId, baseUrl, mappedBy, rowOnTopIds, tableIdHash, rowId) {
+	if(rowOnTopIds == ""){
+		return baseUrl + '&' + mappedBy + '=' + rowId + '&datatablesMappedValue=' + rowId + '&_dt_parentId=' + mainDatatableId;
+	}else{
+		return baseUrl + '&' + mappedBy + '=' + rowId + '&datatablesMappedValue=' + rowId + '&_dt_parentId=' + mainDatatableId + '&dtt_row_on_top_ids=' + rowOnTopIds + '&dtt_parent_table_id_hash=' + tableIdHash;
+	}
 }
 
 /**

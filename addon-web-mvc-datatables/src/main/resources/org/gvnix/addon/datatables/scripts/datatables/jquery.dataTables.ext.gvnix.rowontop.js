@@ -177,9 +177,24 @@ var GvNIX_RowOnTop;
 			} else {
 				_d.asRowOnTopIds = [atrId];
 			}
+			
+			if(_d.asParentTableIdHash == undefined){
+				_d.asParentTableIdHash = _d.asTableIdHash;
+			}
+			
 			if (redraw) {
 				oTable.fnStandingRedraw();
 			}
+		},
+		
+		/**
+		 * This function generates a unic table hash
+		 */
+		"fnSetTableIdHash": function(){
+			var _d = this._data;
+			var oTable = _d.dt.oInstance;
+			var encodedId = window.btoa(unescape(encodeURIComponent( oTable.attr("id") )));
+			_d.asTableIdHash = [fnGetHashCode(encodedId) + ""];
 		},
 
 		// Private methods (they are of course public in JS, but recommended as
@@ -246,14 +261,31 @@ var GvNIX_RowOnTop;
 		"_fnRegisterServerParamsCallback" : function() {
 
 			var that = this, st = this._data.dt;
+			var oTable = st.oInstance;
 
 			st.oApi._fnCallbackReg(st, 'aoServerParams', function(
 					aoData ) {
 				var aIds = that._data.asRowOnTopIds;
-				if (aIds && aIds.length){
-					// Add ids to request
-					for (var i=0;i<aIds.length;i++) {
-					  aoData.push({ "name": "dtt_row_on_top_ids", "value": aIds[i] } );
+				// Checking if the topId table match 
+				// with the current table id
+				var currentHash = that._data.asTableIdHash;
+				if(currentHash == undefined){
+					that.fnSetTableIdHash();
+					currentHash = that._data.asTableIdHash;
+				}
+				var parentHash = that._data.asParentTableIdHash;
+				var masterParentHash = that._data.asTableIdHashParent;
+				
+				if(parentHash == undefined && masterParentHash != undefined){
+					parentHash = masterParentHash;
+				}
+				
+				if(parentHash != undefined){
+					if (aIds && aIds.length && currentHash[0] == parentHash[0]){
+						// Add ids to request
+						for (var i=0;i<aIds.length;i++) {
+						  aoData.push({ "name": "dtt_row_on_top_ids", "value": aIds[i] } );
+						}
 					}
 				}
 
@@ -276,10 +308,26 @@ var GvNIX_RowOnTop;
 					var sLastId = aIds[aIds.length-1];
 					// Clean ShowIdAsFirst
 					that._data.asRowOnTopIds = [];
+					
+					// Checking if the topId table match 
+					// with the current table id
+					var currentHash = that._data.asTableIdHash;
+					if(currentHash == undefined){
+						that.fnSetTableIdHash();
+						currentHash = that._data.asTableIdHash;
+					}
+					var parentHash = that._data.asParentTableIdHash;
+					var masterParentHash = that._data.asTableIdHashParent;
 
-					if (that.s.doRowClickOnCreatedRow &&
-							oTable.fnHasRowClick()) {
-						oTable.fnRowClick().fnSetLastClicked(sLastId,true,true);
+					if(parentHash == undefined && masterParentHash != undefined){
+						parentHash = masterParentHash;
+					}
+
+					if(parentHash != undefined){
+						if (that.s.doRowClickOnCreatedRow &&
+								oTable.fnHasRowClick() && currentHash[0] == parentHash[0]) {
+							oTable.fnRowClick().fnSetLastClicked(sLastId,true,true);
+						}
 					}
 				}
 
@@ -310,6 +358,24 @@ var GvNIX_RowOnTop;
 						_d.asRowOnTopIds = this._fnToStringArray(iSettings.asRowOnTopIds);
 					} else {
 						_d.asRowOnTopIds = [iSettings.asRowOnTopIds+""];
+					}
+					forceRedraw = true;
+				}
+				
+				if (iSettings.asTableIdHash){
+					if (jQuery.isArray(iSettings.asTableIdHash)) {
+						_d.asTableIdHashParent = this._fnToStringArray(iSettings.asTableIdHash);
+					} else {
+						_d.asTableIdHashParent = [iSettings.asTableIdHash+""];
+					}
+					forceRedraw = true;
+				}
+				
+				if (iSettings.asParentTableIdHash){
+					if (jQuery.isArray(iSettings.asParentTableIdHash)) {
+						_d.asParentTableIdHash = this._fnToStringArray(iSettings.asParentTableIdHash);
+					} else {
+						_d.asParentTableIdHash = [iSettings.asParentTableIdHash+""];
 					}
 					forceRedraw = true;
 				}
@@ -444,7 +510,10 @@ jQuery.fn.dataTableExt.oApi.fnRowOnTop = function(oSettings,
 	}
 
 	oSettings.GvNIX_RowOnTop_support = rowOnTopSupport;
-
+	
+	// Generating table hash id
+	oSettings.GvNIX_RowOnTop_support.fnSetTableIdHash();
+	
 	return rowOnTopSupport;
 };
 

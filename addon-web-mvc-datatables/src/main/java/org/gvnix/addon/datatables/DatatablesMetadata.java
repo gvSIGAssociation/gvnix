@@ -1630,6 +1630,33 @@ public class DatatablesMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
+        // String[] paramValues =
+        // httpServletRequest.getParameterValues("dtt_table_id_hash");
+        bodyBuilder
+                .appendFormalLine("String[] paramValues = httpServletRequest.getParameterValues(\"dtt_table_id_hash\");");
+
+        // if(paramValues != null && paramValues.length > 0) {
+        bodyBuilder
+                .appendFormalLine("if(paramValues != null && paramValues.length > 0) {");
+        bodyBuilder.indent();
+
+        // redirectModel.addFlashAttribute("dtt_table_id_hash", paramValues[0]);
+        bodyBuilder
+                .appendFormalLine("redirectModel.addFlashAttribute(\"dtt_table_id_hash\", paramValues[0]);");
+        bodyBuilder.indentRemove();
+
+        // }else{
+        bodyBuilder.appendFormalLine("}else{");
+        bodyBuilder.indent();
+
+        // redirectModel.addFlashAttribute("dtt_table_id_hash", "");
+        bodyBuilder
+                .appendFormalLine("redirectModel.addFlashAttribute(\"dtt_table_id_hash\", \"\");");
+        bodyBuilder.indentRemove();
+
+        // }
+        bodyBuilder.appendFormalLine("}");
+
         // uiModel.addFlashAttribute(DatatablesUtils.ROWS_ON_TOP_IDS_PARAM,
         // pet.getId());
         bodyBuilder.appendFormalLine(String.format(
@@ -2029,8 +2056,9 @@ public class DatatablesMetadata extends
 
         /*
          * // Add to the property map the parameters used as query operators
-         * Map<String, Object> params = new HashMap<String,Object>(populateParametersMap(request));
-         * Set<String> keySet = params.keySet();
+         * Map<String, Object> params = new
+         * HashMap<String,Object>(populateParametersMap(request)); Set<String>
+         * keySet = params.keySet();
          */
         bodyBuilder
                 .appendFormalLine("// Add to the property map the parameters used as query operators");
@@ -2043,13 +2071,11 @@ public class DatatablesMetadata extends
                 helper.getFinalTypeName(SET_STRING)));
 
         /*
-         * for (String key : keySet) {
-         * if (key.startsWith(QuerydslUtils.OPERATOR_PREFIX)) {
-         *     propertyValuesMap.put(key, params.get(key));
-         * } else if (DatatablesUtils.ROWS_ON_TOP_IDS_PARAM.equals(key)) {
-         *     propertyValuesMap.put(key, request.getParams().get(key));
-         * }
-         * }
+         * for (String key : keySet) { if
+         * (key.startsWith(QuerydslUtils.OPERATOR_PREFIX)) {
+         * propertyValuesMap.put(key, params.get(key)); } else if
+         * (DatatablesUtils.ROWS_ON_TOP_IDS_PARAM.equals(key)) {
+         * propertyValuesMap.put(key, request.getParams().get(key)); } }
          */
         bodyBuilder.appendFormalLine("for (String key : keySet) {");
         bodyBuilder.indent();
@@ -3110,6 +3136,46 @@ public class DatatablesMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
+        // [Code generated] String rowOnTopIds =
+        // params.remove("dtt_row_on_top_ids");
+        bodyBuilder
+                .appendFormalLine("String rowOnTopIds = params.remove(\"dtt_row_on_top_ids\");");
+
+        // [Code generated] if (StringUtils.isNotBlank(rowOnTopIds)) {
+        bodyBuilder.appendFormalLine(String.format(
+                "if (%s.isNotBlank(rowOnTopIds)) {",
+                helper.getFinalTypeName(STRING_UTILS)));
+        bodyBuilder.indent();
+
+        // [Code generated] uiModel.addAttribute("dtt_row_on_top_ids",
+        // rowOnTopIds);
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"dtt_row_on_top_ids\", rowOnTopIds);");
+        bodyBuilder.indentRemove();
+
+        // [Code generated] }
+        bodyBuilder.appendFormalLine("}");
+
+        // [Code generated] String tableHashId =
+        // params.remove("dtt_parent_table_id_hash");
+        bodyBuilder
+                .appendFormalLine("String tableHashId = params.remove(\"dtt_parent_table_id_hash\");");
+
+        // [Code generated] if (StringUtils.isNotBlank(tableHashId)) {
+        bodyBuilder.appendFormalLine(String.format(
+                "if (%s.isNotBlank(tableHashId)) {",
+                helper.getFinalTypeName(STRING_UTILS)));
+        bodyBuilder.indent();
+
+        // [Code generated] uiModel.addAttribute("dtt_parent_table_id_hash",
+        // tableHashId);
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"dtt_parent_table_id_hash\", tableHashId);");
+        bodyBuilder.indentRemove();
+
+        // [Code generated] }
+        bodyBuilder.appendFormalLine("}");
+
         // [Code generated] if (!params.isEmpty()) {
         bodyBuilder.appendFormalLine("if (!params.isEmpty()) {");
         bodyBuilder.indent();
@@ -3980,9 +4046,9 @@ public class DatatablesMetadata extends
         /*
          * @RequestMapping(value = "/exportcsv", produces = "text/csv") public
          * void PetController.exportCsv(
-         *
+         * 
          * @DatatablesParams DatatablesCriterias criterias,
-         *
+         * 
          * @ModelAttribute Pet pet, HttpServletRequest request,
          * HttpServletResponse response) throws ServletException, IOException,
          * ExportException { ... }

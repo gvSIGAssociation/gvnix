@@ -71,7 +71,7 @@
 					function callbackFunct${datatablesId} (selection, trId){
 						if (trId){
 							// Load details when exists a clicked row
-							loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", trId));
+							loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", "${dtt_row_on_top_ids}", "${dtt_table_id_hash}", trId));
 						}
 					}
 
@@ -90,7 +90,7 @@
 					    <spring:url javaScriptEscape="true" value="${detailItem.path}/list" var="datatablesDetailUrl">
 					    	<spring:param name="datatablesMappedProperty" value="${detailItem.mappedBy}"/>
 					    </spring:url>
-			    		loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}","${datatablesDetailUrl}", "${detailItem.mappedBy}", nRow.id));
+			    		loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}","${datatablesDetailUrl}", "${detailItem.mappedBy}", "${dtt_row_on_top_ids}", "${dtt_table_id_hash}", nRow.id));
 			    	</c:forEach>
 				}
 			</script>
