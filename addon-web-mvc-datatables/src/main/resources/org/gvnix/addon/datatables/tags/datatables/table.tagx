@@ -183,13 +183,13 @@
     <!-- Create JS function to include base filters as datatable extra params -->
     <c:if test="${not empty baseFilter}">
 		<c:set target="${datatables_javaScript_elements_before}" property="getExtraParams">
-			function getExtraParams( aoData ) {
+			function getExtraParams_${id}( aoData ) {
 			    <c:forEach items="${baseFilter}" var="entry">
 			    aoData.push( {"name": "${entry.key}", "value" : "${entry.value}"});
 			    </c:forEach>
 			}
 		</c:set>
-		<c:set var="serverParams" value="getExtraParams"/>
+		<c:set var="serverParams" value="getExtraParams_${id}"/>
     </c:if>
   </c:if>
 

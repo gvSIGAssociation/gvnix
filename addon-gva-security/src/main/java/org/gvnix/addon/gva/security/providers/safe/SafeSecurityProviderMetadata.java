@@ -52,6 +52,13 @@ import org.springframework.roo.project.LogicalPath;
 public class SafeSecurityProviderMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static final String GRANTED_AUTHORITY = "org.springframework.security.core.GrantedAuthority";
+    private static final String HANDLER_CONSTANTS = "org.apache.ws.security.handler.WSHandlerConstants";
+    private static final String BAD_CREDENTIALS = "org.springframework.security.authentication.BadCredentialsException";
+    private static final String PERMISO = "es.gva.dgm.ayf.war.definitions.v2u00.Permiso";
+    private static final String PERMISO_APP = "es.gva.dgm.ayf.war.definitions.v2u00.Permisoapp";
+    private static final String JAVA_UTIL_LIST = "java.util.List";
+    private static final String JAVA_UTIL_PROPERTIES = "java.util.Properties";
     private static final JavaSymbolName SAFE_PROPERTIES_METHOD = new JavaSymbolName(
             "getSafeProperties");
     private static final JavaSymbolName APPLICATION_ROL_METHOD = new JavaSymbolName(
@@ -128,7 +135,7 @@ public class SafeSecurityProviderMetadata extends
                 Modifier.PRIVATE));
 
         builder.addField(getField("prop", null, new JavaType(
-                "java.util.Properties"), Modifier.PUBLIC));
+                JAVA_UTIL_PROPERTIES), Modifier.PUBLIC));
 
         builder.addField(getField("loader", null, new JavaType(
                 "java.lang.ClassLoader"), Modifier.PUBLIC));
@@ -355,13 +362,8 @@ public class SafeSecurityProviderMetadata extends
                         new JavaType(
                                 "es.gva.dgm.ayf.war.definitions.v2u00.GetInformacionWSResponse"),
                         JavaType.STRING,
-                        new JavaType(
-                                "java.util.List",
-                                0,
-                                DataType.TYPE,
-                                null,
-                                Arrays.asList(new JavaType(
-                                        "es.gva.dgm.ayf.war.definitions.v2u00.Permisoapp"))));
+                        new JavaType(JAVA_UTIL_LIST, 0, DataType.TYPE, null,
+                                Arrays.asList(new JavaType(PERMISO_APP))));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -413,13 +415,8 @@ public class SafeSecurityProviderMetadata extends
                         new JavaType(
                                 "es.gva.dgm.ayf.war.definitions.v2u00.GetInformacionWSResponse"),
                         JavaType.STRING,
-                        new JavaType(
-                                "java.util.List",
-                                0,
-                                DataType.TYPE,
-                                null,
-                                Arrays.asList(new JavaType(
-                                        "es.gva.dgm.ayf.war.definitions.v2u00.Permiso"))));
+                        new JavaType(JAVA_UTIL_LIST, 0, DataType.TYPE, null,
+                                Arrays.asList(new JavaType(PERMISO))));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -539,7 +536,7 @@ public class SafeSecurityProviderMetadata extends
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC + Modifier.STATIC,
-                SAFE_PROPERTIES_METHOD, new JavaType("java.util.Properties"),
+                SAFE_PROPERTIES_METHOD, new JavaType(JAVA_UTIL_PROPERTIES),
                 parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
@@ -569,11 +566,9 @@ public class SafeSecurityProviderMetadata extends
                 .appendFormalLine("if (authentication.getCredentials() == null) {");
         bodyBuilder.indent();
         // throw new BadCredentialsException("Bad credentials:
-        bodyBuilder
-                .appendFormalLine(String.format(
-                        "throw new %s(\"Bad credentials: \"",
-                        helper.getFinalTypeName(new JavaType(
-                                "org.springframework.security.authentication.BadCredentialsException"))));
+        bodyBuilder.appendFormalLine(String.format(
+                "throw new %s(\"Bad credentials: \"",
+                helper.getFinalTypeName(new JavaType(BAD_CREDENTIALS))));
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("+ userDetails.getUsername());");
         bodyBuilder.indentRemove();
@@ -585,11 +580,9 @@ public class SafeSecurityProviderMetadata extends
                 .appendFormalLine("if (!passwordEncoder.isPasswordValid(userDetails.getPassword(),presentedPassword, salt)) {");
         bodyBuilder.indent();
         // throw new BadCredentialsException("Bad credentials:
-        bodyBuilder
-                .appendFormalLine(String.format(
-                        "throw new %s(\"Bad credentials: \"",
-                        helper.getFinalTypeName(new JavaType(
-                                "org.springframework.security.authentication.BadCredentialsException"))));
+        bodyBuilder.appendFormalLine(String.format(
+                "throw new %s(\"Bad credentials: \"",
+                helper.getFinalTypeName(new JavaType(BAD_CREDENTIALS))));
         bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("+ userDetails.getUsername() + \" password check\");");
@@ -843,16 +836,11 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder.indentRemove();
 
         // List<Permisoapp> listaPermisos = autorizaResponse.getPermisoapp();
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("%s listaPermisos = autorizaResponse.getPermisoapp();",
-                                helper.getFinalTypeName(new JavaType(
-                                        "java.util.List",
-                                        0,
-                                        DataType.TYPE,
-                                        null,
-                                        Arrays.asList(new JavaType(
-                                                "es.gva.dgm.ayf.war.definitions.v2u00.Permisoapp"))))));
+        bodyBuilder.appendFormalLine(String.format(
+                "%s listaPermisos = autorizaResponse.getPermisoapp();", helper
+                        .getFinalTypeName(new JavaType(JAVA_UTIL_LIST, 0,
+                                DataType.TYPE, null, Arrays
+                                        .asList(new JavaType(PERMISO_APP))))));
         bodyBuilder
                 .appendFormalLine("user = convertWSInfoToUser(getInformacionWSResponse,");
         bodyBuilder.indent();
@@ -875,16 +863,11 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder.indentRemove();
 
         // List<Permiso> listaPermisos = autorizaResponse.getLista();
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("%s listaPermisos = autorizaResponse.getLista();",
-                                helper.getFinalTypeName(new JavaType(
-                                        "java.util.List",
-                                        0,
-                                        DataType.TYPE,
-                                        null,
-                                        Arrays.asList(new JavaType(
-                                                "es.gva.dgm.ayf.war.definitions.v2u00.Permiso"))))));
+        bodyBuilder.appendFormalLine(String.format(
+                "%s listaPermisos = autorizaResponse.getLista();", helper
+                        .getFinalTypeName(new JavaType(JAVA_UTIL_LIST, 0,
+                                DataType.TYPE, null, Arrays
+                                        .asList(new JavaType(PERMISO))))));
         bodyBuilder
                 .appendFormalLine("user = convertWSInfoToUserTodasAplicaciones(getInformacionWSResponse,");
         bodyBuilder.indent();
@@ -980,7 +963,7 @@ public class SafeSecurityProviderMetadata extends
         // Properties configuration = getSafeProperties();
         bodyBuilder.appendFormalLine(String.format(
                 "%s configuration = getSafeProperties();",
-                helper.getFinalTypeName(new JavaType("java.util.Properties"))));
+                helper.getFinalTypeName(new JavaType(JAVA_UTIL_PROPERTIES))));
 
         // org.apache.cxf.endpoint.Endpoint cxfEndpoint = client.getEndpoint();
         bodyBuilder.appendFormalLine(String.format(
@@ -998,17 +981,14 @@ public class SafeSecurityProviderMetadata extends
         // WSHandlerConstants.SIGNATURE);
         bodyBuilder.appendFormalLine(String.format(
                 "outProps.put(%s.ACTION, %s.SIGNATURE);",
-                helper.getFinalTypeName(new JavaType(
-                        "org.apache.ws.security.handler.WSHandlerConstants")),
-                new JavaType(
-                        "org.apache.ws.security.handler.WSHandlerConstants")));
+                helper.getFinalTypeName(new JavaType(HANDLER_CONSTANTS)),
+                new JavaType(HANDLER_CONSTANTS)));
         bodyBuilder.appendFormalLine("outProps.put(");
         bodyBuilder.indent();
 
         // WSHandlerConstants.USER,
-        bodyBuilder.appendFormalLine(String.format("%s.USER,", helper
-                .getFinalTypeName(new JavaType(
-                        "org.apache.ws.security.handler.WSHandlerConstants"))));
+        bodyBuilder.appendFormalLine(String.format("%s.USER,",
+                helper.getFinalTypeName(new JavaType(HANDLER_CONSTANTS))));
         bodyBuilder.appendFormalLine("configuration");
         bodyBuilder.indent();
         bodyBuilder
@@ -1019,9 +999,8 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder.indent();
 
         // WSHandlerConstants.SIGNATURE_USER,
-        bodyBuilder.appendFormalLine(String.format("%s.SIGNATURE_USER,", helper
-                .getFinalTypeName(new JavaType(
-                        "org.apache.ws.security.handler.WSHandlerConstants"))));
+        bodyBuilder.appendFormalLine(String.format("%s.SIGNATURE_USER,",
+                helper.getFinalTypeName(new JavaType(HANDLER_CONSTANTS))));
         bodyBuilder.appendFormalLine("configuration");
         bodyBuilder.indent();
         bodyBuilder
@@ -1032,8 +1011,7 @@ public class SafeSecurityProviderMetadata extends
         // outProps.put(WSHandlerConstants.PW_CALLBACK_CLASS,
         bodyBuilder.appendFormalLine(String.format(
                 "outProps.put(%s.PW_CALLBACK_CLASS,",
-                helper.getFinalTypeName(new JavaType(
-                        "org.apache.ws.security.handler.WSHandlerConstants"))));
+                helper.getFinalTypeName(new JavaType(HANDLER_CONSTANTS))));
         bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("PasswordHandler.class.getCanonicalName());");
@@ -1042,14 +1020,12 @@ public class SafeSecurityProviderMetadata extends
         // outProps.put(WSHandlerConstants.SIG_PROP_FILE, PROPERTIES_PATH);
         bodyBuilder.appendFormalLine(String.format(
                 "outProps.put(%s.SIG_PROP_FILE, PROPERTIES_PATH);",
-                helper.getFinalTypeName(new JavaType(
-                        "org.apache.ws.security.handler.WSHandlerConstants"))));
+                helper.getFinalTypeName(new JavaType(HANDLER_CONSTANTS))));
 
         // outProps.put(WSHandlerConstants.SIG_KEY_ID, \"DirectReference\");
         bodyBuilder.appendFormalLine(String.format(
                 "outProps.put(%s.SIG_KEY_ID, \"DirectReference\");",
-                helper.getFinalTypeName(new JavaType(
-                        "org.apache.ws.security.handler.WSHandlerConstants"))));
+                helper.getFinalTypeName(new JavaType(HANDLER_CONSTANTS))));
 
         // WSS4JOutInterceptor wssOut = new WSS4JOutInterceptor(outProps);
         bodyBuilder
@@ -1112,11 +1088,8 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder.indent();
 
         // throw new BadCredentialsException(
-        bodyBuilder
-                .appendFormalLine(String.format(
-                        "throw new %s(",
-                        helper.getFinalTypeName(new JavaType(
-                                "org.springframework.security.authentication.BadCredentialsException"))));
+        bodyBuilder.appendFormalLine(String.format("throw new %s(",
+                helper.getFinalTypeName(new JavaType(BAD_CREDENTIALS))));
         bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("\" El usuario proporcionado no tiene módulos asignados\");");
@@ -1125,31 +1098,25 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder.appendFormalLine("}");
 
         // Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-        bodyBuilder
-                .appendFormalLine(String.format(
-                        "%s<%s> authorities = new %s<%s>();",
-                        helper.getFinalTypeName(new JavaType("java.util.Set")),
-                        helper.getFinalTypeName(new JavaType(
-                                "org.springframework.security.core.GrantedAuthority")),
-                        helper.getFinalTypeName(new JavaType(
-                                "java.util.HashSet")),
-                        helper.getFinalTypeName(new JavaType(
-                                "org.springframework.security.core.GrantedAuthority"))));
+        bodyBuilder.appendFormalLine(String.format(
+                "%s<%s> authorities = new %s<%s>();",
+                helper.getFinalTypeName(new JavaType("java.util.Set")),
+                helper.getFinalTypeName(new JavaType(GRANTED_AUTHORITY)),
+                helper.getFinalTypeName(new JavaType("java.util.HashSet")),
+                helper.getFinalTypeName(new JavaType(GRANTED_AUTHORITY))));
 
         // Iterator<Permisoapp> iter = listPermisos.iterator();
         bodyBuilder.appendFormalLine(String.format(
-                "%s<%s> iter = listPermisos.iterator();", helper
-                        .getFinalTypeName(new JavaType("java.util.Iterator")),
-                helper.getFinalTypeName(new JavaType(
-                        "es.gva.dgm.ayf.war.definitions.v2u00.Permisoapp"))));
+                "%s<%s> iter = listPermisos.iterator();",
+                helper.getFinalTypeName(new JavaType("java.util.Iterator")),
+                helper.getFinalTypeName(new JavaType(PERMISO_APP))));
         bodyBuilder.appendFormalLine("while (iter.hasNext()) {");
         bodyBuilder.indent();
 
         // Permisoapp permisoApp = iter.next();
         bodyBuilder.appendFormalLine(String.format(
                 "%s permisoApp = iter.next();",
-                helper.getFinalTypeName(new JavaType(
-                        "es.gva.dgm.ayf.war.definitions.v2u00.Permisoapp"))));
+                helper.getFinalTypeName(new JavaType(PERMISO_APP))));
         bodyBuilder
                 .appendFormalLine("String rolUsu = convertToApplicationRol(permisoApp.getIdgrupo());");
         bodyBuilder.appendFormalLine("if (rolUsu != null) {");
@@ -1229,11 +1196,8 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder.indent();
 
         // throw new BadCredentialsException(
-        bodyBuilder
-                .appendFormalLine(String.format(
-                        "throw new %s(",
-                        helper.getFinalTypeName(new JavaType(
-                                "org.springframework.security.authentication.BadCredentialsException"))));
+        bodyBuilder.appendFormalLine(String.format("throw new %s(",
+                helper.getFinalTypeName(new JavaType(BAD_CREDENTIALS))));
         bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("\" El usuario proporcionado no tiene módulos asignados\");");
@@ -1242,30 +1206,24 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder.appendFormalLine("}");
 
         // Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-        bodyBuilder
-                .appendFormalLine(String.format(
-                        "%s<%s> authorities = new %s<%s>();",
-                        helper.getFinalTypeName(new JavaType("java.util.Set")),
-                        helper.getFinalTypeName(new JavaType(
-                                "org.springframework.security.core.GrantedAuthority")),
-                        helper.getFinalTypeName(new JavaType(
-                                "java.util.HashSet")),
-                        helper.getFinalTypeName(new JavaType(
-                                "org.springframework.security.core.GrantedAuthority"))));
+        bodyBuilder.appendFormalLine(String.format(
+                "%s<%s> authorities = new %s<%s>();",
+                helper.getFinalTypeName(new JavaType("java.util.Set")),
+                helper.getFinalTypeName(new JavaType(GRANTED_AUTHORITY)),
+                helper.getFinalTypeName(new JavaType("java.util.HashSet")),
+                helper.getFinalTypeName(new JavaType(GRANTED_AUTHORITY))));
 
         // Iterator<Permiso> iter = listPermisos.iterator();
         bodyBuilder.appendFormalLine(String.format(
-                "%s<%s> iter = listPermisos.iterator();", helper
-                        .getFinalTypeName(new JavaType("java.util.Iterator")),
-                helper.getFinalTypeName(new JavaType(
-                        "es.gva.dgm.ayf.war.definitions.v2u00.Permiso"))));
+                "%s<%s> iter = listPermisos.iterator();",
+                helper.getFinalTypeName(new JavaType("java.util.Iterator")),
+                helper.getFinalTypeName(new JavaType(PERMISO))));
         bodyBuilder.appendFormalLine("while (iter.hasNext()) {");
         bodyBuilder.indent();
 
         // Permisoapp permisoApp = iter.next();
         bodyBuilder.appendFormalLine(String.format("%s permiso = iter.next();",
-                helper.getFinalTypeName(new JavaType(
-                        "es.gva.dgm.ayf.war.definitions.v2u00.Permiso"))));
+                helper.getFinalTypeName(new JavaType(PERMISO))));
         bodyBuilder
                 .appendFormalLine("String rolUsu = convertToApplicationRol(permiso.getIdgrupo());");
         bodyBuilder.appendFormalLine("if (rolUsu != null) {");
@@ -1379,8 +1337,8 @@ public class SafeSecurityProviderMetadata extends
         // Properties configuration = new Properties();
         bodyBuilder.appendFormalLine(String.format(
                 "%s configuration = new %s();",
-                helper.getFinalTypeName(new JavaType("java.util.Properties")),
-                helper.getFinalTypeName(new JavaType("java.util.Properties"))));
+                helper.getFinalTypeName(new JavaType(JAVA_UTIL_PROPERTIES)),
+                helper.getFinalTypeName(new JavaType(JAVA_UTIL_PROPERTIES))));
 
         // ClassLoader classLoader = Thread.currentThread()
         bodyBuilder.appendFormalLine(String.format(
@@ -1398,7 +1356,7 @@ public class SafeSecurityProviderMetadata extends
 
         // configuration = new Properties();
         bodyBuilder.appendFormalLine(String.format("configuration = new %s();",
-                helper.getFinalTypeName(new JavaType("java.util.Properties"))));
+                helper.getFinalTypeName(new JavaType(JAVA_UTIL_PROPERTIES))));
         bodyBuilder.appendFormalLine("try {");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("configuration.load(in);");

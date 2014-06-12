@@ -280,6 +280,12 @@ var GvNIX_RowOnTop;
 					parentHash = masterParentHash;
 				}
 				
+				// Inline editing is his own parent
+                if(parentHash == undefined && masterParentHash == undefined){
+                    parentHash = [];
+                    parentHash[0] = currentHash;
+                } 
+				
 				if(parentHash != undefined){
 					if (aIds && aIds.length && currentHash[0] == parentHash[0]){
 						// Add ids to request
@@ -322,6 +328,12 @@ var GvNIX_RowOnTop;
 					if(parentHash == undefined && masterParentHash != undefined){
 						parentHash = masterParentHash;
 					}
+					
+					// Inline editing is his own parent
+	                if(parentHash == undefined && masterParentHash == undefined){
+	                    parentHash = [];
+	                    parentHash[0] = currentHash;
+	                } 
 
 					if(parentHash != undefined){
 						if (that.s.doRowClickOnCreatedRow &&

@@ -86,6 +86,12 @@ import org.springframework.roo.support.logging.HandlerUtils;
 public class DatatablesMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static final String DATATABLES_REDIRECT = "datatablesRedirect";
+
+    private static final String PARAMETERS_AS_BASE_SEARCH = "// URL parameters are used as base search filters";
+
+    private static final String APPLICATION_JSON = "application/json";
+
     private static final String HEADERS = "headers";
 
     private static final String SIZE_VAR = "size";
@@ -461,7 +467,7 @@ public class DatatablesMetadata extends
         }
         AnnotationMetadataBuilder requestMappingAnnotation = helper
                 .getRequestMappingAnnotation(requestMappingValue, null, null,
-                        "application/json", null, ACCEPT_APPLICATION_JSON);
+                        APPLICATION_JSON, null, ACCEPT_APPLICATION_JSON);
         annotations.add(requestMappingAnnotation);
         // @ResponseBody
         AnnotationMetadataBuilder responseBodyAnnotation = new AnnotationMetadataBuilder();
@@ -536,8 +542,7 @@ public class DatatablesMetadata extends
                 pathBuilder, helper.getFinalTypeName(entity)));
 
         // // URL parameters are used as base search filters
-        bodyBuilder
-                .appendFormalLine("// URL parameters are used as base search filters");
+        bodyBuilder.appendFormalLine(PARAMETERS_AS_BASE_SEARCH);
 
         // Set<Long> set = new HashSet<Long>();
         bodyBuilder.appendFormalLine(String.format("%s set = new %s();", helper
@@ -1534,7 +1539,7 @@ public class DatatablesMetadata extends
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
 
         parameterTypes.add(helper.createRequestParam(JavaType.STRING,
-                "datatablesRedirect", true, null));
+                DATATABLES_REDIRECT, true, null));
         parameterTypes.add(new AnnotatedJavaType(entity,
                 new AnnotationMetadataBuilder(VALID).build()));
         parameterTypes.addAll(AnnotatedJavaType.convertFromJavaTypes(
@@ -1566,7 +1571,7 @@ public class DatatablesMetadata extends
         requestMappingAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD,
                 "POST");
         requestMappingAnnotation.addStringAttribute(PARAMS_VAR,
-                "datatablesRedirect");
+                DATATABLES_REDIRECT);
         annotations.add(requestMappingAnnotation);
 
         // Define method throws types (none in this case)
@@ -1692,7 +1697,7 @@ public class DatatablesMetadata extends
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
 
         parameterTypes.add(helper.createRequestParam(JavaType.STRING,
-                "datatablesRedirect", true, null));
+                DATATABLES_REDIRECT, true, null));
         parameterTypes.add(new AnnotatedJavaType(entity,
                 new AnnotationMetadataBuilder(VALID).build()));
         parameterTypes.addAll(AnnotatedJavaType.convertFromJavaTypes(
@@ -1724,7 +1729,7 @@ public class DatatablesMetadata extends
         requestMappingAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD,
                 "PUT");
         requestMappingAnnotation.addStringAttribute(PARAMS_VAR,
-                "datatablesRedirect");
+                DATATABLES_REDIRECT);
         annotations.add(requestMappingAnnotation);
 
         // Define method throws types (none in this case)
@@ -1848,7 +1853,7 @@ public class DatatablesMetadata extends
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
 
         parameterTypes.add(helper.createRequestParam(JavaType.STRING,
-                "datatablesRedirect", true, null));
+                DATATABLES_REDIRECT, true, null));
         final List<AnnotationAttributeValue<?>> annotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
         annotationAttributes.add(new StringAttributeValue(new JavaSymbolName(
                 "value"), "id"));
@@ -1887,7 +1892,7 @@ public class DatatablesMetadata extends
         requestMappingAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD,
                 "DELETE");
         requestMappingAnnotation.addStringAttribute(PARAMS_VAR,
-                "datatablesRedirect");
+                DATATABLES_REDIRECT);
         requestMappingAnnotation.addStringAttribute("value", "/{id}");
         annotations.add(requestMappingAnnotation);
 
@@ -2068,8 +2073,7 @@ public class DatatablesMetadata extends
             InvocableMemberBodyBuilder bodyBuilder) {
 
         // URL parameters are used as base search filters
-        bodyBuilder
-                .appendFormalLine("// URL parameters are used as base search filters");
+        bodyBuilder.appendFormalLine(PARAMETERS_AS_BASE_SEARCH);
 
         /*
          * @SuppressWarnings("unchecked") Map<String, Object> propertyValuesMap
@@ -2348,7 +2352,7 @@ public class DatatablesMetadata extends
         methodAnnotation
                 .addStringAttribute(
                         DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
-                        "application/json");
+                        APPLICATION_JSON);
         annotations.add(methodAnnotation);
         annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
 
@@ -3489,7 +3493,7 @@ public class DatatablesMetadata extends
         methodAnnotation
                 .addStringAttribute(
                         DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
-                        "application/json");
+                        APPLICATION_JSON);
         annotations.add(methodAnnotation);
         annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
 
@@ -3560,7 +3564,7 @@ public class DatatablesMetadata extends
         methodAnnotation
                 .addStringAttribute(
                         DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
-                        "application/json");
+                        APPLICATION_JSON);
         annotations.add(methodAnnotation);
         annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
 
@@ -3676,8 +3680,7 @@ public class DatatablesMetadata extends
             }
             else {
 
-                bodyBuilder
-                        .appendFormalLine("// URL parameters are used as base search filters");
+                bodyBuilder.appendFormalLine(PARAMETERS_AS_BASE_SEARCH);
                 // Map<String, Object> baseSearchValuesMap = getPropertyMap(pet,
                 // request);
                 bodyBuilder
@@ -3721,8 +3724,7 @@ public class DatatablesMetadata extends
             }
             else {
 
-                bodyBuilder
-                        .appendFormalLine("// URL parameters are used as base search filters");
+                bodyBuilder.appendFormalLine(PARAMETERS_AS_BASE_SEARCH);
                 // Map<String, Object> baseSearchValuesMap = getPropertyMap(pet,
                 // request);
                 bodyBuilder
@@ -4443,7 +4445,7 @@ public class DatatablesMetadata extends
 
     // Typically, no changes are required beyond this point
 
-    public String toString() {
+    public final String toString() {
         final ToStringBuilder builder = new ToStringBuilder(this);
         builder.append("identifier", getId());
         builder.append("valid", valid);
@@ -4458,63 +4460,63 @@ public class DatatablesMetadata extends
     /**
      * @return related JPA entity
      */
-    public JavaType getEntity() {
+    public final JavaType getEntity() {
         return entity;
     }
 
     /**
      * @return {@link GvNIXDatatables} annotation values
      */
-    public DatatablesAnnotationValues getAnnotationValues() {
+    public final DatatablesAnnotationValues getAnnotationValues() {
         return annotationValues;
     }
 
     /**
      * @return {@link RooWebScaffold} annotation values
      */
-    public WebScaffoldAnnotationValues getWebScaffoldAnnotationValues() {
+    public final WebScaffoldAnnotationValues getWebScaffoldAnnotationValues() {
         return webScaffoldAnnotationValues;
     }
 
     /**
      * @return controllers use AJAX data mode or not (DOM)
      */
-    public boolean isAjax() {
+    public final boolean isAjax() {
         return annotationValues.isAjax();
     }
 
     /**
      * @return controller entity properties for detail datatables
      */
-    public String[] getDetailFields() {
+    public final String[] getDetailFields() {
         return annotationValues.getDetailFields();
     }
 
     /**
      * @return informs if controllers has JPA-Batch-operations support available
      */
-    public boolean hasJpaBatchSupport() {
+    public final boolean hasJpaBatchSupport() {
         return webJpaBatchMetadata != null;
     }
 
     /**
      * @return datatables shows a standard list or use render-a-view mode
      */
-    public boolean isStantardMode() {
+    public final boolean isStantardMode() {
         return annotationValues.isStandardMode();
     }
 
     /**
      * @return information about dynamic finder registered on the controller
      */
-    public Map<FinderMetadataDetails, QueryHolderTokens> getFindersRegistered() {
+    public final Map<FinderMetadataDetails, QueryHolderTokens> getFindersRegistered() {
         return findersRegistered;
     }
 
     /**
      * @return informs if user can edit data inline (inside the table row)
      */
-    public boolean isInlineEditing() {
+    public final boolean isInlineEditing() {
         return annotationValues.isInlineEditing();
     }
 

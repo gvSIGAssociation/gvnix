@@ -84,6 +84,28 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     private static Logger logger = HandlerUtils
             .getLogger(MenuEntryOperationsImpl.class);
 
+    private static final String ID_MENU_EXP = "//*[@id='_menu']";
+
+    private static final String GVNIX_MENU = "gvnix-menu";
+
+    private static final String INVALID_XML = "menu.xml hasn't valid XML structure.";
+
+    private static final String ID_EXP = "//*[@id='";
+
+    private static final String MENU_ITEM = "menu-item";
+
+    private static final String LABEL_CODE = "labelCode";
+
+    private static final String MESSAGE_CODE = "messageCode";
+
+    private static final String URL = "url";
+
+    private static final String HIDDEN = "hidden";
+
+    private static final String NOT_FOUND = "' not found. [No changes done]";
+
+    private static final String PAGE = "Page '";
+
     /**
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
@@ -246,12 +268,11 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // make the root element of the menu the one with the menu identifier
         // allowing for different decorations of menu
-        Element rootElement = XmlUtils.findFirstElement("//*[@id='_menu']",
+        Element rootElement = XmlUtils.findFirstElement(ID_MENU_EXP,
                 (Element) document.getFirstChild());
 
-        if (!rootElement.getNodeName().equals("gvnix-menu")) {
-            throw new IllegalArgumentException(
-                    "menu.xml hasn't valid XML structure.");
+        if (!rootElement.getNodeName().equals(GVNIX_MENU)) {
+            throw new IllegalArgumentException(INVALID_XML);
         }
 
         // build category name and Id:
@@ -277,8 +298,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // check for existence of menu category by looking for the identifier
         // provided
         Element category = XmlUtils.findFirstElement(
-                "//*[@id='".concat(categoryId.toString()).concat("']"),
-                rootElement);
+                ID_EXP.concat(categoryId.toString()).concat("']"), rootElement);
 
         // if not exists, create new one
         if (category == null) {
@@ -286,10 +306,10 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                     categoryName.toLowerCase()).concat("_label");
 
             category = (Element) rootElement.appendChild(new XmlElementBuilder(
-                    "menu-item", document)
+                    MENU_ITEM, document)
                     .addAttribute("id", categoryId.toString())
                     .addAttribute("name", categoryName)
-                    .addAttribute("labelCode", categoryLabelCode).build());
+                    .addAttribute(LABEL_CODE, categoryLabelCode).build());
 
             properties.put(categoryLabelCode,
                     menuCategoryName.getReadableSymbolName());
@@ -317,24 +337,22 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // at application.properties, so we have to add idPrefix_ to look for
         // the given menu item but we have to add without idPrefix_ to
         // application.properties
-        Element menuItem = XmlUtils.findFirstElement(
-                "//*[@id='".concat(idPrefix).concat(itemId.toString())
-                        .concat("']"), rootElement);
+        Element menuItem = XmlUtils.findFirstElement(ID_EXP.concat(idPrefix)
+                .concat(itemId.toString()).concat("']"), rootElement);
 
         String itemLabelCode = "menu_item_".concat(itemId.toString()).concat(
                 "_label");
 
         if (menuItem == null) {
-            menuItem = new XmlElementBuilder("menu-item", document)
+            menuItem = new XmlElementBuilder(MENU_ITEM, document)
                     .addAttribute("id", idPrefix.concat(itemId.toString()))
-                    .addAttribute("labelCode", itemLabelCode)
+                    .addAttribute(LABEL_CODE, itemLabelCode)
                     .addAttribute(
-                            "messageCode",
+                            MESSAGE_CODE,
                             StringUtils.isNotBlank(globalMessageCode) ? globalMessageCode
                                     : "")
-                    .addAttribute("url",
-                            StringUtils.isNotBlank(link) ? link : "")
-                    .addAttribute("hidden", Boolean.toString(hide))
+                    .addAttribute(URL, StringUtils.isNotBlank(link) ? link : "")
+                    .addAttribute(HIDDEN, Boolean.toString(hide))
                     .addAttribute("roles",
                             StringUtils.isNotBlank(roles) ? roles : "").build();
 
@@ -463,25 +481,23 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // make the root element of the menu the one with the menu identifier
         // allowing for different decorations of menu
-        Element rootElement = XmlUtils.findFirstElement("//*[@id='_menu']",
+        Element rootElement = XmlUtils.findFirstElement(ID_MENU_EXP,
                 (Element) document.getFirstChild());
 
-        if (!rootElement.getNodeName().equals("gvnix-menu")) {
-            throw new IllegalArgumentException(
-                    "menu.xml hasn't valid XML structure.");
+        if (!rootElement.getNodeName().equals(GVNIX_MENU)) {
+            throw new IllegalArgumentException(INVALID_XML);
         }
 
         // check for existence of menu category by looking for the identifier
         // provided
-        Element pageElement = XmlUtils.findFirstElement(
-                "//*[@id='".concat(pageId.getSymbolName()).concat("']"),
-                rootElement);
+        Element pageElement = XmlUtils
+                .findFirstElement(
+                        ID_EXP.concat(pageId.getSymbolName()).concat("']"),
+                        rootElement);
 
         // exit if menu entry doesn't exist
-        Validate.notNull(
-                pageElement,
-                "Menu entry '".concat(pageId.getSymbolName()).concat(
-                        "' not found. [No changes done]"));
+        Validate.notNull(pageElement,
+                "Menu entry '".concat(pageId.getSymbolName()).concat(NOT_FOUND));
 
         if (nid != null) {
             pageElement.setAttribute("id", nid.getSymbolName());
@@ -492,7 +508,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         }
 
         if (StringUtils.isNotBlank(label)) {
-            String itemLabelCode = pageElement.getAttribute("labelCode");
+            String itemLabelCode = pageElement.getAttribute(LABEL_CODE);
             properties.put(itemLabelCode, label);
         }
 
@@ -504,11 +520,11 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         }
 
         if (StringUtils.isNotBlank(messageCode)) {
-            pageElement.setAttribute("messageCode", messageCode);
+            pageElement.setAttribute(MESSAGE_CODE, messageCode);
         }
 
         if (StringUtils.isNotBlank(destination)) {
-            pageElement.setAttribute("url", destination);
+            pageElement.setAttribute(URL, destination);
         }
 
         if (StringUtils.isNotBlank(roles)) {
@@ -516,7 +532,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         }
 
         if (hidden != null) {
-            pageElement.setAttribute("hidden", hidden.toString());
+            pageElement.setAttribute(HIDDEN, hidden.toString());
         }
 
         writeXMLConfigIfNeeded(document);
@@ -539,12 +555,13 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // check for existence of menu category by looking for the identifier
         // provided
-        Element pageElement = XmlUtils.findFirstElement(
-                "//*[@id='".concat(pageId.getSymbolName()).concat("']"),
-                rootElement);
+        Element pageElement = XmlUtils
+                .findFirstElement(
+                        ID_EXP.concat(pageId.getSymbolName()).concat("']"),
+                        rootElement);
 
         // if selected entry doesn't exist, error
-        Validate.notNull(pageElement, "Page '".concat(pageId.getSymbolName())
+        Validate.notNull(pageElement, PAGE.concat(pageId.getSymbolName())
                 .concat("' not found [No info found]"));
 
         // show the info of selected menu entry
@@ -571,7 +588,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             }
 
             String nodeName = node.getNodeName();
-            if (!nodeName.equals("menu-item")) {
+            if (!nodeName.equals(MENU_ITEM)) {
                 continue;
             }
 
@@ -601,7 +618,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             indent.append(" ");
         }
 
-        String url = element.getAttribute("url");
+        String url = element.getAttribute(URL);
         if (StringUtils.isNotBlank(url)) {
             builder.append(indent).append(url).append("  ");
         }
@@ -609,7 +626,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // string containing "[ID, visibility]: "
         StringBuilder idVisibility = new StringBuilder();
         idVisibility.append("[").append(element.getAttribute("id"));
-        String hidden = element.getAttribute("hidden");
+        String hidden = element.getAttribute(HIDDEN);
         if (!StringUtils.isNotBlank(hidden)) {
             hidden = "false"; // visible by default
         }
@@ -652,12 +669,13 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // check for existence of menu category by looking for the identifier
         // provided
-        Element pageElement = XmlUtils.findFirstElement(
-                "//*[@id='".concat(pageId.getSymbolName()).concat("']"),
-                rootElement);
+        Element pageElement = XmlUtils
+                .findFirstElement(
+                        ID_EXP.concat(pageId.getSymbolName()).concat("']"),
+                        rootElement);
 
         // if selected entry doesn't exist, error
-        Validate.notNull(pageElement, "Page '".concat(pageId.getSymbolName())
+        Validate.notNull(pageElement, PAGE.concat(pageId.getSymbolName())
                 .concat("' not found [No info found]"));
 
         // show the info of selected menu entry
@@ -674,12 +692,11 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // make the root element of the menu the one with the menu identifier
         // allowing for different decorations of menu
-        Element rootElement = XmlUtils.findFirstElement("//*[@id='_menu']",
+        Element rootElement = XmlUtils.findFirstElement(ID_MENU_EXP,
                 (Element) document.getFirstChild());
 
-        if (!rootElement.getNodeName().equals("gvnix-menu")) {
-            throw new IllegalArgumentException(
-                    "menu.xml hasn't valid XML structure.");
+        if (!rootElement.getNodeName().equals(GVNIX_MENU)) {
+            throw new IllegalArgumentException(INVALID_XML);
         }
 
         return rootElement;
@@ -691,33 +708,31 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // make the root element of the menu the one with the menu identifier
         // allowing for different decorations of menu
-        Element rootElement = XmlUtils.findFirstElement("//*[@id='_menu']",
+        Element rootElement = XmlUtils.findFirstElement(ID_MENU_EXP,
                 (Element) document.getFirstChild());
 
-        if (!rootElement.getNodeName().equals("gvnix-menu")) {
-            throw new IllegalArgumentException(
-                    "menu.xml hasn't valid XML structure.");
+        if (!rootElement.getNodeName().equals(GVNIX_MENU)) {
+            throw new IllegalArgumentException(INVALID_XML);
         }
 
         // check for existence of menu category by looking for the identifier
         // provided
-        Element pageElement = XmlUtils.findFirstElement(
-                "//*[@id='".concat(pageId.getSymbolName()).concat("']"),
-                rootElement);
+        Element pageElement = XmlUtils
+                .findFirstElement(
+                        ID_EXP.concat(pageId.getSymbolName()).concat("']"),
+                        rootElement);
 
         // exit if menu entry doesn't exist
-        Validate.notNull(pageElement, "Page '".concat(pageId.getSymbolName())
-                .concat("' not found. [No changes done]"));
+        Validate.notNull(pageElement, PAGE.concat(pageId.getSymbolName())
+                .concat(NOT_FOUND));
 
         Element beforeElement = XmlUtils.findFirstElement(
-                "//*[@id='".concat(beforeId.getSymbolName()).concat("']"),
+                ID_EXP.concat(beforeId.getSymbolName()).concat("']"),
                 rootElement);
 
         // exit if menu entry doesn't exist
-        Validate.notNull(
-                beforeElement,
-                "Page '".concat(beforeId.getSymbolName()).concat(
-                        "' not found. [No changes done]"));
+        Validate.notNull(beforeElement, PAGE.concat(beforeId.getSymbolName())
+                .concat(NOT_FOUND));
 
         // page parent element where remove menu entry element
         Element pageParentEl = (Element) pageElement.getParentNode();
@@ -736,31 +751,32 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // make the root element of the menu the one with the menu identifier
         // allowing for different decorations of menu
-        Element rootElement = XmlUtils.findFirstElement("//*[@id='_menu']",
+        Element rootElement = XmlUtils.findFirstElement(ID_MENU_EXP,
                 (Element) document.getFirstChild());
 
-        if (!rootElement.getNodeName().equals("gvnix-menu")) {
-            throw new IllegalArgumentException(
-                    "menu.xml hasn't valid XML structure.");
+        if (!rootElement.getNodeName().equals(GVNIX_MENU)) {
+            throw new IllegalArgumentException(INVALID_XML);
         }
 
         // check for existence of menu category by looking for the identifier
         // provided
-        Element pageElement = XmlUtils.findFirstElement(
-                "//*[@id='".concat(pageId.getSymbolName()).concat("']"),
-                rootElement);
+        Element pageElement = XmlUtils
+                .findFirstElement(
+                        ID_EXP.concat(pageId.getSymbolName()).concat("']"),
+                        rootElement);
 
         // exit if menu entry doesn't exist
-        Validate.notNull(pageElement, "Page '".concat(pageId.getSymbolName())
-                .concat("' not found. [No changes done]"));
+        Validate.notNull(pageElement, PAGE.concat(pageId.getSymbolName())
+                .concat(NOT_FOUND));
 
-        Element intoElement = XmlUtils.findFirstElement(
-                "//*[@id='".concat(intoId.getSymbolName()).concat("']"),
-                rootElement);
+        Element intoElement = XmlUtils
+                .findFirstElement(
+                        ID_EXP.concat(intoId.getSymbolName()).concat("']"),
+                        rootElement);
 
         // exit if menu entry doesn't exist
-        Validate.notNull(intoElement, "Page '".concat(intoId.getSymbolName())
-                .concat("' not found. [No changes done]"));
+        Validate.notNull(intoElement, PAGE.concat(intoId.getSymbolName())
+                .concat(NOT_FOUND));
 
         // parent element where remove menu entry element
         Element parent = (Element) pageElement.getParentNode();
@@ -1178,8 +1194,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                                 .getSymbolName());
 
                         addMenuItem(categoryName, menuItemId, null,
-                                menuItem.getAttribute("messageCode"),
-                                menuItem.getAttribute("url"), menuItemPrefix);
+                                menuItem.getAttribute(MESSAGE_CODE),
+                                menuItem.getAttribute(URL), menuItemPrefix);
                     }
                 }
                 // item elements must be inside a category
@@ -1238,7 +1254,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             }
 
             String nodeName = node.getNodeName();
-            if (!nodeName.equals("menu-item")) {
+            if (!nodeName.equals(MENU_ITEM)) {
                 continue;
             }
 
@@ -1280,7 +1296,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // build Element info
         builder.append(indent).append(idInfo).append("\n");
 
-        String url = element.getAttribute("url");
+        String url = element.getAttribute(URL);
         if (!StringUtils.isNotBlank(url)) {
             url = "No";
         }
@@ -1288,7 +1304,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 .append("\n");
 
         if (label) {
-            String labelCode = element.getAttribute("labelCode");
+            String labelCode = element.getAttribute(LABEL_CODE);
             String labelValue = null;
 
             // get label text from application.properties
@@ -1303,7 +1319,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                     .append(labelValue != null ? labelValue : "").append("\n");
         }
         if (message) {
-            String messageCode = element.getAttribute("messageCode");
+            String messageCode = element.getAttribute(MESSAGE_CODE);
             String messageValue = null;
 
             // get message text from messages.properties
@@ -1326,7 +1342,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 }
             }
             builder.append(indent).append("Message Code : ")
-                    .append(element.getAttribute("messageCode")).append("\n");
+                    .append(element.getAttribute(MESSAGE_CODE)).append("\n");
             builder.append(indent).append("Message      : ")
                     .append(messageValue != null ? messageValue : "")
                     .append("\n");
@@ -1336,7 +1352,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                     .append(element.getAttribute("roles")).append("\n");
         }
 
-        String hidden = element.getAttribute("hidden");
+        String hidden = element.getAttribute(HIDDEN);
         if (!StringUtils.isNotBlank(hidden)) {
             hidden = "false"; // visible by default
         }
