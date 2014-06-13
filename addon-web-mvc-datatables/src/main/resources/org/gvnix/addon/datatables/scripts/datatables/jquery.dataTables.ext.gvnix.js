@@ -345,12 +345,14 @@ function showSearchResultsHighLighted($tds, sSearch){
 		// Excluding utilbox
 		if(tdClass !== "utilbox" && $td.children().length == 0){
 			var content = $td.html();
-			var contentMatch = content.indexOf(sSearch);
+			var contentToLower = content.toLowerCase();
+			var contentMatch = contentToLower.indexOf(sSearch.toLowerCase());
 			// If content match with search
 			if(contentMatch != -1){
 				var toHighLightString = content.substr(contentMatch, sSearch.length);
 				var highLighted = "<span class='search-match'>" + toHighLightString + "</span>";
-				var finalContent = content.replace(sSearch, highLighted);
+				var re = new RegExp(toHighLightString, 'g');
+				var finalContent = content.replace(re, highLighted);
 				// Setting new value
 				$td.html(finalContent);
 			}
@@ -541,6 +543,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function(oSettings, sNewSource,
  * from http://datatables.net/plug-ins/api#fnStandingRedraw
  */
 $.fn.dataTableExt.oApi.fnStandingRedraw = function(oSettings) {
+	
 	if (oSettings.oFeatures.bServerSide === false) {
 		var before = oSettings._iDisplayStart;
 
