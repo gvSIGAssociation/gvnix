@@ -329,7 +329,9 @@ jQuery.fn.dataTableExt.oApi.fnGvNIX_RowCreatedCallback = function(nRow, aData, i
 	// Getting all td in the new row
 	var oTds = jQuery(aData).children("td");
 	// highlight matching results
-	showSearchResultsHighLighted(oTds, sSearch);
+	if(sSearch !== ""){
+		showSearchResultsHighLighted(oTds, sSearch);
+	}
 };
 
 /*
@@ -341,7 +343,7 @@ function showSearchResultsHighLighted($tds, sSearch){
 		var $td = jQuery(td);
 		var tdClass = $td.attr("class");
 		// Excluding utilbox
-		if(tdClass !== "utilbox"){
+		if(tdClass !== "utilbox" && $td.children().length == 0){
 			var content = $td.html();
 			var contentMatch = content.indexOf(sSearch);
 			// If content match with search

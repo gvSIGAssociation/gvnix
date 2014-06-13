@@ -68,10 +68,12 @@
 
 			    <script type="text/javascript">
 
+			        var rowOnTop_${datatablesId} = "${dtt_row_on_top_ids}";
 					function callbackFunct${datatablesId} (selection, trId){
 						if (trId){
 							// Load details when exists a clicked row
-							loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", "${dtt_row_on_top_ids}", "${dtt_table_id_hash}", trId));
+							loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", rowOnTop_${datatablesId}, "${dtt_table_id_hash}", trId));
+							rowOnTop_${datatablesId} = null;
 						}
 					}
 

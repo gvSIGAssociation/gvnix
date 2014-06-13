@@ -215,4 +215,5 @@ span.errors {
 
 .search-match{
 	background-color: #FFFF00;
+	border: 1px solid #000000;
 }
