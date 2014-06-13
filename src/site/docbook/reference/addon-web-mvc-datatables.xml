@@ -528,9 +528,10 @@
         <term>modo tabular (estándar)</term>
 
         <listitem>
-          <para xml:lang="es">Haciendo click sobre la linea deseada.
+          <para xml:lang="es">Haciendo <emphasis>doble click</emphasis> sobre la linea deseada.
           La linea actual se marcará de un color distinto (por defecto
-          verde)</para>
+          verde) y en caso de disponer detalles asociados, se desplazará hasta la posición de 
+          los mismos para facilitar su localización.</para>
         </listitem>
       </varlistentry>
 
@@ -655,6 +656,7 @@
         <para xml:lang="es">Gracias a esto tendremos siempre visible el registro que se ha editado.</para>
         <para xml:lang="es">Al recargar la página, se ordenará el registro de forma correcta siguiendo la ordenación 
         y los filtros establecidos en el Datatable.</para>
+        <para xml:lang="es">Esta funcionalidad se aplica tanto a Datatables maestros como para detalles asociados</para>
   </section>
   
   <section xml:id="addon-web-mvc-datatables_update_top">
@@ -664,6 +666,7 @@
         <para xml:lang="es">Gracias a esto tendremos siempre visible el registro que se ha editado.</para>
   		<para xml:lang="es">Al recargar la página, se ordenará el registro de forma correcta siguiendo la ordenación 
         y los filtros establecidos en el Datatable.</para>
+        <para xml:lang="es">Esta funcionalidad se aplica tanto a Datatables maestros como para detalles asociados</para>
   </section>
   
   <section xml:id="addon-web-mvc-datatables_clicked_row_visible">
