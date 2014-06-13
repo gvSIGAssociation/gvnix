@@ -213,3 +213,6 @@ span.errors {
     float: left;
 }
 
+.search-match{
+	background-color: #FFFF00;
+}

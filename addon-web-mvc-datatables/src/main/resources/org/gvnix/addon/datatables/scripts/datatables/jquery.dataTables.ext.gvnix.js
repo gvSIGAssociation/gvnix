@@ -129,9 +129,20 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 		this.fnGvNIX_DrawCallback(oSettings);
 	});
 	
+	// Register CreatedRow Callback
+	st.oApi._fnCallbackReg(st, 'aoRowCreatedCallback', function(nRow, aData, iDataIndex){
+		this.fnGvNIX_RowCreatedCallback(nRow, aData, iDataIndex);
+	});
+	
 	// Calling at first time Footer Callback
 	updateDatatablesFilters($table.fnSettings());
 	
+	// Calling at first time RowCreatedCallback
+	var $tds = $table.find("td");
+	var sSearch = $table.fnSettings().oPreviousSearch.sSearch;
+	if($tds.length > 0 && sSearch.length > 0){
+		showSearchResultsHighLighted($tds, sSearch);
+	}
 	// Displaying always the clicked row if row click exists
 	fnScrollDatatableToRowClick($table);
 }
@@ -304,8 +315,52 @@ jQuery.fn.dataTableExt.oApi.fnGvNIX_FooterCallback = function(nFoot, data, start
 	}
 	updateDatatablesFilters(oSettings);
 	
-}
+};
 
+/**
+ * This function is executed when a TR element is created
+ */
+
+jQuery.fn.dataTableExt.oApi.fnGvNIX_RowCreatedCallback = function(nRow, aData, iDataIndex){
+	var _that = this;
+	var st = _that.fnSettings();
+	// Getting sSearch
+	var sSearch = st.oPreviousSearch.sSearch;
+	// Getting all td in the new row
+	var oTds = jQuery(aData).children("td");
+	// highlight matching results
+	showSearchResultsHighLighted(oTds, sSearch);
+};
+
+/*
+ * This function highlight results that match with 
+ * the current search
+ */
+function showSearchResultsHighLighted($tds, sSearch){
+	jQuery.each($tds, function(index, td){
+		var $td = jQuery(td);
+		var tdClass = $td.attr("class");
+		// Excluding utilbox
+		if(tdClass !== "utilbox"){
+			var content = $td.html();
+			var contentMatch = content.indexOf(sSearch);
+			// If content match with search
+			if(contentMatch != -1){
+				var toHighLightString = content.substr(contentMatch, sSearch.length);
+				var highLighted = "<span class='search-match'>" + toHighLightString + "</span>";
+				var finalContent = content.replace(sSearch, highLighted);
+				// Setting new value
+				$td.html(finalContent);
+			}
+		}
+	});
+};
+
+/**
+ * This function updates datatables column filters
+ * 
+ * @param oSettings
+ */
 function updateDatatablesFilters(oSettings) {
 
 	var filters = oSettings.aoPreSearchCols;
