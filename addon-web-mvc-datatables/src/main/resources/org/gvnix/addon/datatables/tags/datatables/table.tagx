@@ -662,6 +662,13 @@
 		        				</c:otherwise>
 	        				</c:choose>
 	        				$selection.fnSelectNone();
+	        				
+	        				if($table.fnHasRowClick()){
+	        					// Save state clearing previous selection
+	        					$table.fnRowClick().fnSaveState(true);
+	        				}
+							location.reload();
+								        				
 		        		}
 					  ).fail( function (data) {
 		        			log('delete ERROR: ' + data.status + ' ' + data.statusText + '-' + data.responseText);

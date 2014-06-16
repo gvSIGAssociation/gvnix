@@ -343,7 +343,7 @@ function showSearchResultsHighLighted($tds, sSearch){
 		var $td = jQuery(td);
 		var tdClass = $td.attr("class");
 		// Excluding utilbox
-		if(tdClass !== "utilbox" && $td.children().length == 0){
+		if(tdClass !== "utilbox" && tdClass !== "dataTables_empty" && $td.children().length == 0){
 			var content = $td.html();
 			var contentToLower = content.toLowerCase();
 			var contentMatch = contentToLower.indexOf(sSearch.toLowerCase());

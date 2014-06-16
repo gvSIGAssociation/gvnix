@@ -358,7 +358,7 @@ var GvNIX_RowClick;
 		 * the cookie
 		 *
 		 */
-		"fnSaveState" : function() {
+		"fnSaveState" : function(clear) {
 			var _d = this._data, dt = _d.dt;
 
 			// Generating hash location
@@ -373,7 +373,11 @@ var GvNIX_RowClick;
 			}
 			sName += "gvnixRowclk-"+dt.nTable.id;
 			
-			var sValue = _d.lastClickedId;
+			var sValue = "";
+			if(clear == undefined){
+				sValue = _d.lastClickedId;
+			}
+			
 
 			if(!window.localStorage){
 				dt.oApi._fnCreateCookie(sName,
