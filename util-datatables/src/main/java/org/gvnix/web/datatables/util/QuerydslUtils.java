@@ -2032,8 +2032,25 @@ public class QuerydslUtils {
             PathBuilder<T> entity) {
         Class<?> entityType = entity.getType();
         if (entityType == Object.class) {
-            entityType = entity.getRoot().getType();
+            // Remove from path the root "entity" alias
+            String fromRootPath = entity.toString().replaceFirst("^[^.]+[.]",
+                    "");
+            TypeDescriptor fromRoot = getTypeDescriptor(fromRootPath, entity
+                    .getRoot().getType());
+            entityType = fromRoot.getType();
         }
+        return getTypeDescriptor(fieldName, entityType);
+    }
+
+    /**
+     * Obtains the descriptor of the filtered field
+     * 
+     * @param fieldName
+     * @param entityType
+     * @return
+     */
+    public static <T> TypeDescriptor getTypeDescriptor(String fieldName,
+            Class<T> entityType) {
         String fieldNameToFindType = fieldName;
         BeanWrapper beanWrapper = getBeanWrapper(entityType);
 
