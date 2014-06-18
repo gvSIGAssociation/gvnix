@@ -666,8 +666,8 @@
 	        				if($table.fnHasRowClick()){
 	        					// Save state clearing previous selection
 	        					$table.fnRowClick().fnSaveState(true);
+	        					location.reload();
 	        				}
-							location.reload();
 								        				
 		        		}
 					  ).fail( function (data) {
