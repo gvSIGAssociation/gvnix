@@ -88,3 +88,12 @@ Fujo de trabajo: Actualización de maestro/detalle en formulario en linea
 
 * Cuando se edita un registro en linea no se mueve a la primera posición.
 
+
+ACTUALES PROBLEMAS: Detalle rowOnTop incorrecto
+-----------------------------------------------
+
+* El principal problema que aparece es el siguiente:
+
+** Cuando se carga un listado, se búsca el atributo "dtt_row_on_top_ids". Si existe se muestra en la primera posición el registro con el id guardado en el atributo "dtt_row_on_top_ids". Al crear un maestro se muestra en primera posición de forma correcta. Si a ese maestro le asignamos un detalle, el detalle se muestra en primera posición de manera correcta. Si cambiamos la selección del maestro nos aparecerán los detalles asociados a la nueva selección si los tuviese. Al entrar en el formulario de creación del detalle y volver al listado del Datatable (sin haber creado ningún nuevo registro) aparece en el detalle, el registro asociado al maestro anterior.
+
+** Este error es debido a que al volver a cargar el "list.tagx", todavía dispone del parámetro "dtt_row_on_top_ids" y se pone en primera posición el registro con id creado en el anterior maestro.
