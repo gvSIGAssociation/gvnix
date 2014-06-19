@@ -145,6 +145,10 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 	}
 	// Displaying always the clicked row if row click exists
 	fnScrollDatatableToRowClick($table);
+	
+	// Changing filter class when there's some
+	// filter value
+	fnChangeFilterClass($table);
 }
 
 /**
@@ -606,6 +610,38 @@ function fnScrollDatatableToRowClick($datatable) {
 
     }
 
+}
+
+/**
+ * This method changes filter class and add
+ * callback to know if filter has value
+ */
+function fnChangeFilterClass(table){
+	
+	var tableId = table.attr("id");
+	var filterDiv = jQuery("#" + tableId + "_filter");
+	var filterInput = filterDiv.find("input");
+	
+	if(filterInput.length > 0){
+		// Setting class if value is not empty
+		var value = filterInput.val();
+		if(value !== ""){
+			filterInput.addClass("filter_not_empty");
+		}
+		
+		// Registering input click event
+		filterInput.on("keyup", function(){
+			var $input = jQuery(this);
+			var value = $input.val();
+
+			if(value !== ""){
+				filterInput.addClass("filter_not_empty");
+			}else{
+				filterInput.removeClass("filter_not_empty");
+			}
+		});
+	}
+	
 }
 
 

@@ -217,3 +217,7 @@ span.errors {
 	background-color: #FFFF00;
 	border: 1px solid #000000;
 }
+
+input.filter_not_empty{
+	background-color: #FCFFBA!important;
+}
