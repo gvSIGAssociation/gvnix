@@ -214,10 +214,10 @@ span.errors {
 }
 
 .search-match{
-	background-color: #FFFF00;
+	background-color: #FFFF35;
 	border: 1px solid #000000;
 }
 
 input.filter_not_empty{
-	background-color: #FCFFBA!important;
+	background-color: #FFFF35!important;
 }
