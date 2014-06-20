@@ -732,6 +732,7 @@ public class SafeSecurityProviderMetadata extends
 
         // RetornaAutorizacionWSRequest retornaUsuApliAut = null;
         // RetornaTodasAutorizacionesDNIWSRequest retornaTodasAut = null;
+        // String usuarioHDFI = getInformacionWSResponse.getIdHDFI();
         bodyBuilder
                 .appendFormalLine(String.format(
                         "%s retornaUsuApliAut = null;",
@@ -743,14 +744,18 @@ public class SafeSecurityProviderMetadata extends
                         helper.getFinalTypeName(new JavaType(
                                 "es.gva.dgm.ayf.war.definitions.v2u00.RetornaTodasAutorizacionesDNIWSRequest"))));
 
-        // if(getFiltrarPorAplicacion()){
-        bodyBuilder.appendFormalLine("if(getFiltrarPorAplicacion()){");
+        bodyBuilder
+                .appendFormalLine("String usuarioHDFI = getInformacionWSResponse.getIdHDFI();");
+
+        // if(getFiltrarPorAplicacion() && StringUtils.isNotBlank(usuarioHDFI)){
+        bodyBuilder
+                .appendFormalLine("if(getFiltrarPorAplicacion() && StringUtils.isNotBlank(usuarioHDFI)){");
         bodyBuilder.indent();
 
         // retornaUsuApliAut = new RetornaAutorizacionWSRequest();
         // String applicationId = getApplicationId();
         // retornaUsuApliAut.setIdAplicacion(applicationId);
-        // retornaUsuApliAut.setUsuarioHDFI(getInformacionWSResponse.getIdHDFI())
+        // retornaUsuApliAut.setUsuarioHDFI(usuarioHDFI)
         bodyBuilder
                 .appendFormalLine("retornaUsuApliAut = new RetornaAutorizacionWSRequest();");
         bodyBuilder
@@ -758,7 +763,7 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder
                 .appendFormalLine("retornaUsuApliAut.setIdAplicacion(applicationId);");
         bodyBuilder
-                .appendFormalLine("retornaUsuApliAut.setUsuarioHDFI(getInformacionWSResponse.getIdHDFI());");
+                .appendFormalLine("retornaUsuApliAut.setUsuarioHDFI(usuarioHDFI);");
 
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}else{");
@@ -820,8 +825,9 @@ public class SafeSecurityProviderMetadata extends
         // SafeUser user = null;
         bodyBuilder.appendFormalLine("SafeUser user = null;");
 
-        // if(getFiltrarPorAplicacion()){
-        bodyBuilder.appendFormalLine("if(getFiltrarPorAplicacion()){");
+        // if(getFiltrarPorAplicacion() && StringUtils.isNotBlank(usuarioHDFI)){
+        bodyBuilder
+                .appendFormalLine("if(getFiltrarPorAplicacion() && StringUtils.isNotBlank(usuarioHDFI)){");
         bodyBuilder.indent();
         // RetornaAutorizacionWSResponse autorizaResponse = autorizaPort
         bodyBuilder
