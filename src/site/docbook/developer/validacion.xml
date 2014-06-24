@@ -181,6 +181,9 @@
 	#cd gvnix.git
 	#git remote add origin git@github.com:DISID/gvnix.git
 	#git push origin master
+	
+	#En caso de que se pierda la sesión del agente debido a un reinicio, actualización del servidor, o simplemente por el paso del tiempo,
+	#se accederá mediante ssh al servidor y se ejecutarán estos 3 comandos.
 	#rm ~/etc/ssh/ssh-agent-socket;
 	#eval `ssh-agent -s -a ~/etc/ssh/ssh-agent-socket`;
 	#ssh-add;
