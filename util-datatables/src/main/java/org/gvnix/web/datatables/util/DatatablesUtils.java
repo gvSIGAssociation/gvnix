@@ -1250,9 +1250,11 @@ public class DatatablesUtils {
                     continue;
                 }
                 catch (Exception ex) {
-                    LOGGER.log(Level.WARNING, String.format(
-                            "Exception preparing order for entity %s",
-                            entity.getType()), ex);
+                    if (LOGGER.isLoggable(Level.WARNING)) {
+                        LOGGER.log(Level.WARNING, String.format(
+                                "Exception preparing order for entity %s",
+                                entity.getType()), ex);
+                    }
                     continue;
                 }
             }
@@ -1327,26 +1329,25 @@ public class DatatablesUtils {
             else {
                 entityBean.setWrappedInstance(entity);
             }
-            String pkStr = convertFieldValueToString(datePatterns,
-                    dateFormatters, conversionService, entityBean, entity,
-                    pkFieldName, pkFieldName, "unknown");
             for (String fieldName : fields) {
 
                 String unescapedFieldName = unescapeDot(fieldName);
 
                 // check if property exists (trace it else)
                 if (!entityBean.isReadableProperty(unescapedFieldName)) {
-                    LOGGER.finer(String.format(
-                            "Property [%s] not fond in bean %s [%s]",
-                            unescapedFieldName, entity.getClass()
-                                    .getSimpleName(), pkStr));
+                    if (LOGGER.isLoggable(Level.FINER)) {
+                        LOGGER.finer(String.format(
+                                "Property [%s] not fond in bean %s [%s]",
+                                unescapedFieldName, entity.getClass()
+                                        .getSimpleName(), entity.toString()));
+                    }
                     continue;
                 }
 
                 // Convert field value to string
                 valueStr = convertFieldValueToString(datePatterns,
                         dateFormatters, conversionService, entityBean, entity,
-                        fieldName, unescapedFieldName, pkStr);
+                        fieldName, unescapedFieldName);
                 row.put(fieldName, valueStr);
 
                 // Set PK value as DT_RowId
@@ -1382,8 +1383,7 @@ public class DatatablesUtils {
             Map<String, Object> datePatterns,
             Map<String, SimpleDateFormat> dateFormatters,
             ConversionService conversionService, BeanWrapperImpl entityBean,
-            T entity, String fieldName, String unescapedFieldName,
-            String pkValueStr) {
+            T entity, String fieldName, String unescapedFieldName) {
         try {
             Object value = null;
             TypeDescriptor fieldDesc = entityBean
@@ -1428,8 +1428,10 @@ public class DatatablesUtils {
             // debug getting value problem
             LOGGER.log(Level.SEVERE, String.format(
                     "Error getting value of property [%s] in bean %s [%s]",
-                    unescapedFieldName, entity.getClass().getSimpleName(),
-                    pkValueStr), ex);
+                    unescapedFieldName,
+                    entity.getClass().getSimpleName(),
+                    org.apache.commons.lang3.ObjectUtils.firstNonNull(
+                            entity.toString(), "{unknow}")), ex);
             return "";
         }
     }
