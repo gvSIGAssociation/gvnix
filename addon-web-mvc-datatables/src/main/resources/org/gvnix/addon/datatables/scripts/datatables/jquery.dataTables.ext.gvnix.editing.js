@@ -2384,7 +2384,7 @@ var GvNIX_Editing;
 	 * @type String
 	 * @default See code
 	 */
-	GvNIX_Editing.VERSION = "1.3.1-RELEASE";
+	GvNIX_Editing.VERSION = "1.4.0-SNAPSHOT";
 	GvNIX_Editing.prototype.VERSION = GvNIX_Editing.VERSION;
 
 	/** TODO Add as datatable feature * */
