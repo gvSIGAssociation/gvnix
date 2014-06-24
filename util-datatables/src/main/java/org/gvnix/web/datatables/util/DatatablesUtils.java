@@ -1327,6 +1327,9 @@ public class DatatablesUtils {
             else {
                 entityBean.setWrappedInstance(entity);
             }
+            String pkStr = convertFieldValueToString(datePatterns,
+                    dateFormatters, conversionService, entityBean, entity,
+                    pkFieldName, pkFieldName, "unknown");
             for (String fieldName : fields) {
 
                 String unescapedFieldName = unescapeDot(fieldName);
@@ -1336,15 +1339,14 @@ public class DatatablesUtils {
                     LOGGER.finer(String.format(
                             "Property [%s] not fond in bean %s [%s]",
                             unescapedFieldName, entity.getClass()
-                                    .getSimpleName(), StringUtils
-                                    .defaultString(entity.toString(), "{null}")));
+                                    .getSimpleName(), pkStr));
                     continue;
                 }
 
                 // Convert field value to string
                 valueStr = convertFieldValueToString(datePatterns,
                         dateFormatters, conversionService, entityBean, entity,
-                        fieldName, unescapedFieldName);
+                        fieldName, unescapedFieldName, pkStr);
                 row.put(fieldName, valueStr);
 
                 // Set PK value as DT_RowId
@@ -1380,7 +1382,8 @@ public class DatatablesUtils {
             Map<String, Object> datePatterns,
             Map<String, SimpleDateFormat> dateFormatters,
             ConversionService conversionService, BeanWrapperImpl entityBean,
-            T entity, String fieldName, String unescapedFieldName) {
+            T entity, String fieldName, String unescapedFieldName,
+            String pkValueStr) {
         try {
             Object value = null;
             TypeDescriptor fieldDesc = entityBean
@@ -1423,11 +1426,10 @@ public class DatatablesUtils {
         }
         catch (Exception ex) {
             // debug getting value problem
-            LOGGER.log(
-                    Level.SEVERE,
-                    "Error getting value of field [".concat(fieldName)
-                            .concat("]").concat(" in bean [")
-                            .concat(entity.toString()).concat("]"), ex);
+            LOGGER.log(Level.SEVERE, String.format(
+                    "Error getting value of property [%s] in bean %s [%s]",
+                    unescapedFieldName, entity.getClass().getSimpleName(),
+                    pkValueStr), ex);
             return "";
         }
     }
