@@ -1341,6 +1341,7 @@ public class DatatablesUtils {
                                 unescapedFieldName, entity.getClass()
                                         .getSimpleName(), entity.toString()));
                     }
+                    row.put(fieldName, "");
                     continue;
                 }
 
