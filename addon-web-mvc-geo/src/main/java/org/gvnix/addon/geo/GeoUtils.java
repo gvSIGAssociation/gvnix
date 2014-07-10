@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang3.Validate;
 import org.springframework.roo.process.manager.FileManager;
@@ -107,8 +108,9 @@ public class GeoUtils {
      * @param currentDialect
      * @return
      */
-    public static String convertToGeoDialect(String currentDialect) {
-        Map<String, String> dialects = getDialects();
+    public static String convertToGeoDialect(Class currentClass,
+            String currentDialect) {
+        Map<String, String> dialects = getDialects(currentClass);
         String geoDialect = dialects.get(currentDialect);
         if (geoDialect != null) {
             return geoDialect;
@@ -117,30 +119,62 @@ public class GeoUtils {
     }
 
     /**
+     * This method checks if the current dialect is a valid Geo dialect to use
+     * in Hibernate Spatial
+     * 
+     * @param currentDialect
+     * @return
+     */
+    public static boolean isGeoDialect(Class currentClass, String currentDialect) {
+        Map<String, String> geoDialects = getGeoDialects(currentClass);
+        String geoDialect = geoDialects.get(currentDialect);
+        if (geoDialect != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * This method returns a Map with Dialects and the GEO dialects associated
      * 
      * @return
      */
-    public static Map<String, String> getDialects() {
+    public static Map<String, String> getDialects(Class currentClass) {
         Map<String, String> dialects = new HashMap<String, String>();
-        dialects.put("org.hibernate.dialect.PostgreSQLDialect",
-                "org.hibernate.spatial.dialect.postgis.PostgisDialect");
-        dialects.put("org.hibernate.dialect.MySQLDialect",
-                "org.hibernate.spatial.dialect.mysql.MySQLSpatialDialect");
-        dialects.put("org.hibernate.dialect.MySQL5Dialect",
-                "org.hibernate.spatial.dialect.mysql.MySQLSpatialDialect");
-        dialects.put("org.hibernate.dialect.MySQLInnoDBDialect",
-                "org.hibernate.spatial.dialect.mysql.MySQLSpatialInnoDBDialect");
-        dialects.put("org.hibernate.dialect.MySQL5InnoDBDialect",
-                "org.hibernate.spatial.dialect.mysql.MySQLSpatialInnoDBDialect");
-        dialects.put("org.hibernate.dialect.MySQL5DBDialect",
-                "org.hibernate.spatial.dialect.mysql.MySQLSpatial56Dialect");
-        dialects.put("org.hibernate.dialect.MySQLSpatial56Dialect",
-                "org.hibernate.spatial.dialect.mysql.MySQLSpatial5InnoDBDialect");
-        dialects.put("org.hibernate.dialect.Oracle10gDialect",
-                "org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect");
-        dialects.put("org.hibernate.dialect.OracleDialect",
-                "org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect");
+        Properties properties = new Properties();
+        try {
+            properties.load(currentClass
+                    .getResourceAsStream("dialects.properties"));
+            for (String key : properties.stringPropertyNames()) {
+                String value = properties.getProperty(key);
+                dialects.put(key, value);
+            }
+        }
+        catch (Exception e) {
+            throw new RuntimeException("ERROR: Error getting valid Databases");
+        }
+        return dialects;
+    }
+
+    /**
+     * This method returns a Map with GeoDialects and the dialects associated
+     * 
+     * @return
+     */
+    public static Map<String, String> getGeoDialects(Class currentClass) {
+        Map<String, String> dialects = new HashMap<String, String>();
+        Properties properties = new Properties();
+        try {
+            properties.load(currentClass
+                    .getResourceAsStream("dialects.properties"));
+            for (String key : properties.stringPropertyNames()) {
+                String value = properties.getProperty(key);
+                dialects.put(value, key);
+            }
+        }
+        catch (Exception e) {
+            throw new RuntimeException("ERROR: Error getting valid Databases");
+        }
         return dialects;
     }
 }

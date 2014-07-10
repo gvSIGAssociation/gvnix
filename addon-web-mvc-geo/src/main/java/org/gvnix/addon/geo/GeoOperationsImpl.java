@@ -57,10 +57,10 @@ public class GeoOperationsImpl implements GeoOperations {
 
     /** {@inheritDoc} */
     public void setup() {
-        // Adding hibernate-spatial dependencies
-        addHibernateSpatialDependencies();
         // Updating Persistence dialect
         updatePersistenceDialect();
+        // Adding hibernate-spatial dependencies
+        addHibernateSpatialDependencies();
     }
 
     /**
@@ -97,7 +97,6 @@ public class GeoOperationsImpl implements GeoOperations {
             // Getting all persistence-unit
             NodeList nodes = persistenceElement.getChildNodes();
             // Saving in variables, which nodes could be changed
-            int totalPersistenceUnits = 0;
             int totalModified = 0;
             for (int i = 0; i < nodes.getLength(); i++) {
                 Node persistenceUnit = nodes.item(i);
@@ -122,20 +121,30 @@ public class GeoOperationsImpl implements GeoOperations {
                                         .equals(propertyNameValue)) {
                                     Node propertyValue = attributes
                                             .getNamedItem("value");
-                                    // Transform current Dialect to valid
-                                    // GEO dialect depens of the selected
-                                    // Database
-                                    String geoDialect = GeoUtils
-                                            .convertToGeoDialect(propertyValue
-                                                    .getNodeValue());
-                                    // If geo Dialect exists, modify value with
-                                    // the
-                                    // valid GEO dialect
-                                    if (geoDialect != null) {
-                                        propertyValue.setNodeValue(geoDialect);
+
+                                    String value = propertyValue.getNodeValue();
+                                    if (!GeoUtils.isGeoDialect(getClass(),
+                                            value)) {
+                                        // Transform current Dialect to valid
+                                        // GEO dialect depens of the selected
+                                        // Database
+                                        String geoDialect = GeoUtils
+                                                .convertToGeoDialect(
+                                                        getClass(), value);
+                                        // If geo Dialect exists, modify value
+                                        // with
+                                        // the
+                                        // valid GEO dialect
+                                        if (geoDialect != null) {
+                                            propertyValue
+                                                    .setNodeValue(geoDialect);
+                                            totalModified++;
+                                        }
+                                    }
+                                    else {
+                                        // If is geo dialect, mark as modified
                                         totalModified++;
                                     }
-                                    totalPersistenceUnits++;
                                 }
                             }
                         }
@@ -143,18 +152,26 @@ public class GeoOperationsImpl implements GeoOperations {
                 }
             }
 
-            fileManager.createOrUpdateTextFileIfRequired(persistenceFile,
-                    XmlUtils.nodeToString(persistenceXmlDocument), false);
+            if (totalModified != 0) {
+                fileManager.createOrUpdateTextFileIfRequired(persistenceFile,
+                        XmlUtils.nodeToString(persistenceXmlDocument), false);
 
-            // Showing WARNING informing that if you install a different
-            // persistence, you must to execute this
-            // command again
-            LOGGER.log(
-                    Level.INFO,
-                    "WARNING: If you install a new persistence, you must to execute 'geo setup' again to modify Persistence Dialects.");
+                // Showing WARNING informing that if you install a different
+                // persistence, you must to execute this
+                // command again
+                LOGGER.log(
+                        Level.INFO,
+                        "WARNING: If you install a new persistence, you must to execute 'geo setup' again to modify Persistence Dialects.");
+            }
+            else {
+                throw new RuntimeException(
+                        "ERROR: There's not any valid database to apply GEO support. GEO is only supported for POSTGRES, ORACLE, MYSQL and MSSQL.");
+            }
+
         }
         else {
-            LOGGER.log(Level.INFO, "Error getting persistence.xml file");
+            throw new RuntimeException(
+                    "ERROR: Error getting persistence.xml file");
         }
     }
 
