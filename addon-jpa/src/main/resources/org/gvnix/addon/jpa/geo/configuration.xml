@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<repositories>
+		<repository>
+			<id>OSGEO GeoTools repo</id>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+		<repository>
+			<id>Hibernate Spatial repo</id>
+			<url>http://www.hibernatespatial.org/repository</url>
+		</repository>
+	</repositories>
+	<dependencies>
+		<!-- Hibernate Spatial -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-spatial</artifactId>
+			<version>4.0</version>
+		</dependency>
+	</dependencies>
+	<dialects>
+		<dialect id="org.hibernate.dialect.PostgreSQLDialect"
+			value="org.hibernate.spatial.dialect.postgis.PostgisDialect" />
+		<dialect id="org.hibernate.dialect.MySQLDialect"
+			value="org.hibernate.spatial.dialect.mysql.MySQLSpatialDialect" />
+		<dialect id="org.hibernate.dialect.MySQL5Dialect"
+			value="org.hibernate.spatial.dialect.mysql.MySQLSpatialDialect" />
+		<dialect id="org.hibernate.dialect.MySQLInnoDBDialect"
+			value="org.hibernate.spatial.dialect.mysql.MySQLSpatialInnoDBDialect" />
+		<dialect id="org.hibernate.dialect.MySQL5InnoDBDialect"
+			value="org.hibernate.spatial.dialect.mysql.MySQLSpatialInnoDBDialect" />
+		<dialect id="org.hibernate.dialect.MySQL5DBDialect"
+			value="org.hibernate.spatial.dialect.mysql.MySQLSpatial56Dialect" />
+		<dialect id="org.hibernate.dialect.MySQLSpatial56Dialect"
+			value="org.hibernate.spatial.dialect.mysql.MySQLSpatial5InnoDBDialect" />
+		<dialect id="org.hibernate.dialect.Oracle10gDialect"
+			value="org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect" />
+		<dialect id="org.hibernate.dialect.OracleDialect"
+			value="org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect" />
+		<dialect id="org.hibernate.dialect.SQLServerDialect"
+			value="org.hibernate.spatial.dialect.SQLServer2008Dialect" />
+	</dialects>
+</configuration>
