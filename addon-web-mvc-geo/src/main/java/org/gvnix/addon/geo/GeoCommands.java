@@ -3,8 +3,6 @@ package org.gvnix.addon.geo;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.shell.CliAvailabilityIndicator;
-import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CommandMarker;
 
 /**
@@ -25,27 +23,5 @@ public class GeoCommands implements CommandMarker {
      */
     @Reference
     private GeoOperations operations;
-
-    /**
-     * This method checks if the setup method is available
-     * 
-     * @return true (default) if the command should be visible at this stage,
-     *         false otherwise
-     */
-    @CliAvailabilityIndicator("geo setup")
-    public boolean isSetupCommandAvailable() {
-        return operations.isSetupCommandAvailable();
-    }
-
-    /**
-     * This method registers a command with the Roo shell. It also offers a
-     * mandatory command attribute.
-     * 
-     * @param type
-     */
-    @CliCommand(value = "geo setup", help = "Setup GEO in your project.")
-    public void setup() {
-        operations.setup();
-    }
 
 }
