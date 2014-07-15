@@ -1,31 +1,37 @@
 package org.gvnix.addon.field.geo;
 
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 /**
  * Example of an enum used for tab-completion of properties.
  * 
  * @since 1.1.1
  */
 public enum FieldGeoTypes {
-    AUSTRALIA("Australia"), UNITED_STATES("United States"), GERMANY("Germany"), NOT_SPECIFIED(
-            "None of your business!");
 
-    private String propertyName;
+    POINT("com.vividsolutions.jts.geom.Point"), COORDINATE(
+            "com.vividsolutions.jts.geom.Coordinate"), GEOMETRY(
+            "com.vividsolutions.jts.geom.Geometry"), POLYGON(
+            "com.vividsolutions.jts.geom.Polygon");
 
-    private FieldGeoTypes(String propertyName) {
-        Validate.notBlank(propertyName, "Property name required");
-        this.propertyName = propertyName;
+    public final String descripcion;
+
+    FieldGeoTypes(String descripcion) {
+        this.descripcion = descripcion;
     }
 
-    public String getPropertyName() {
-        return propertyName;
+    public static FieldGeoTypes getFieldGeoTypes(String geoTypes) {
+        if (geoTypes != null && !"null".equals(geoTypes)) {
+            try {
+                return FieldGeoTypes.valueOf(geoTypes);
+            }
+            catch (java.lang.IllegalArgumentException ex) {
+                return null;
+            }
+        }
+        return null;
     }
 
+    @Override
     public String toString() {
-        final ToStringBuilder builder = new ToStringBuilder(this);
-        builder.append("propertyName", propertyName);
-        return builder.toString();
+        return descripcion;
     }
 }
