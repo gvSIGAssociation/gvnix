@@ -1,5 +1,7 @@
 package org.gvnix.addon.jpa.geo;
 
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Feature;
 
 /**
@@ -27,5 +29,20 @@ public interface JpaGeoOperations extends Feature {
      * Setup all GEO artifacts (Persistence, dependencies, etc..)
      */
     void setup();
+
+    /**
+     * 
+     * @return
+     */
+    boolean isFieldCommandAvailable();
+
+    /**
+     * @param entity
+     * @param fieldType
+     * @param name
+     * 
+     */
+    void addField(JavaSymbolName fieldName, FieldGeoTypes fieldGeoType,
+            JavaType entity);
 
 }

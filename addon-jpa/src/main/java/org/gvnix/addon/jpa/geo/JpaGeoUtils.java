@@ -16,6 +16,8 @@ import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class JpaGeoUtils {
@@ -171,4 +173,74 @@ public class JpaGeoUtils {
         }
         return dialects;
     }
+
+    public static boolean isGeoPersistenceInstalled(FileManager fileManager,
+            PathResolver pathResolver, Class currentClass) {
+        // persistence.xml file
+        final String persistenceFile = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml");
+        // if persistence.xml doesn't exists show a WARNING
+        if (fileManager.exists(persistenceFile)) {
+            // Getting document
+            final Document persistenceXmlDocument = XmlUtils
+                    .readXml(fileManager.getInputStream(persistenceFile));
+            final Element persistenceElement = persistenceXmlDocument
+                    .getDocumentElement();
+            // Getting all persistence-unit
+            NodeList nodes = persistenceElement.getChildNodes();
+            // Saving in variables, which nodes could be changed
+            int totalModified = 0;
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node persistenceUnit = nodes.item(i);
+                // Get all items of current persistence-unit
+                NodeList childNodes = persistenceUnit.getChildNodes();
+                for (int x = 0; x < childNodes.getLength(); x++) {
+                    Node childNode = childNodes.item(x);
+                    String nodeName = childNode.getNodeName();
+                    if ("properties".equals(nodeName)) {
+                        // Getting all properties
+                        NodeList properties = childNode.getChildNodes();
+                        for (int y = 0; y < properties.getLength(); y++) {
+                            Node property = properties.item(y);
+                            // Getting attribute properties
+                            NamedNodeMap attributes = property.getAttributes();
+                            if (attributes != null) {
+                                Node propertyName = attributes
+                                        .getNamedItem("name");
+                                String propertyNameValue = propertyName
+                                        .getNodeValue();
+                                if ("hibernate.dialect"
+                                        .equals(propertyNameValue)) {
+                                    Node propertyValue = attributes
+                                            .getNamedItem("value");
+
+                                    String value = propertyValue.getNodeValue();
+                                    final Element configuration = XmlUtils
+                                            .getConfiguration(currentClass);
+                                    if (JpaGeoUtils.isGeoDialect(configuration,
+                                            value)) {
+                                        totalModified++;
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (totalModified != 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+
+        }
+        else {
+            throw new RuntimeException(
+                    "ERROR: Error getting persistence.xml file");
+        }
+    }
+
 }
