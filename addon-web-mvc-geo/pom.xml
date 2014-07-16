@@ -33,7 +33,7 @@
 		<artifactId>org.gvnix.root</artifactId>
 		<version>1.4.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>org.gvnix.addon.geo</artifactId>
+	<artifactId>org.gvnix.addon.web.mvc.geo</artifactId>
 	<packaging>bundle</packaging>
 	<name>gvNIX - Spring Roo - Addon - GEO Support</name>
 	<organization>
