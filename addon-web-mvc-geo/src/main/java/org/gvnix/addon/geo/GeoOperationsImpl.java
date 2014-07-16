@@ -89,9 +89,16 @@ public class GeoOperationsImpl implements GeoOperations {
     @Override
     public void setup() {
         // Adding project dependencies
-        final Element configuration = XmlUtils.getConfiguration(getClass());
-        GeoUtils.updatePom(configuration, projectOperations, metadataService);
+        updatePomDependencies();
+        // Locate all ApplicationConversionServiceFactoryBean and annotate it
+        annotateApplicationConversionService();
+    }
 
+    /**
+     * This method annotate ApplicationConversionServices classes to transform
+     * GEO elements
+     */
+    public void annotateApplicationConversionService() {
         // Validate that exists web layer
         Set<JavaType> controllers = typeLocationService
                 .findTypesWithAnnotation(SCAFFOLD_ANNOTATION);
@@ -100,55 +107,54 @@ public class GeoOperationsImpl implements GeoOperations {
                 controllers,
                 "There's not exists any web layer on this gvNIX application. Execute 'web mvc all --package ~.web' to create web layer.");
 
-        // Locate all ApplicationConversionServiceFactoryBean and annotate it
         for (JavaType conversorService : typeLocationService
                 .findTypesWithAnnotation(CONVERSION_SERVICE_ANNOTATION)) {
-            annotateConversionService(conversorService);
+
+            Validate.notNull(conversorService, "RooConversionService required");
+
+            ClassOrInterfaceTypeDetails applicationConversionService = typeLocationService
+                    .getTypeDetails(conversorService);
+
+            // Only for @RooConversionService annotated controllers
+            final AnnotationMetadata rooConversionServiceAnnotation = MemberFindingUtils
+                    .getAnnotationOfType(
+                            applicationConversionService.getAnnotations(),
+                            CONVERSION_SERVICE_ANNOTATION);
+
+            Validate.isTrue(rooConversionServiceAnnotation != null,
+                    "Operation for @RooConversionService annotated classes only.");
+
+            final boolean isGeoConversionServiceAnnotated = MemberFindingUtils
+                    .getAnnotationOfType(
+                            applicationConversionService.getAnnotations(),
+                            GEO_CONVERSION_SERVICE_ANNOTATION) != null;
+
+            // If annotation already exists on the target type do nothing
+            if (isGeoConversionServiceAnnotated) {
+                return;
+            }
+
+            ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                    applicationConversionService);
+
+            AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                    GEO_CONVERSION_SERVICE_ANNOTATION);
+
+            // Add annotation to target type
+            detailsBuilder.addAnnotation(annotationBuilder.build());
+
+            // Save changes to disk
+            typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder
+                    .build());
         }
     }
 
     /**
-     * This method annotates ApplicationConversionServiceFactoryBean with @GvNIXGeoConversionService
-     * 
-     * @param conversionService
+     * This method updates Pom dependencies and repositories
      */
-    private void annotateConversionService(JavaType conversorService) {
-        Validate.notNull(conversorService, "RooConversionService required");
-
-        ClassOrInterfaceTypeDetails applicationConversionService = typeLocationService
-                .getTypeDetails(conversorService);
-
-        // Only for @RooConversionService annotated controllers
-        final AnnotationMetadata rooConversionServiceAnnotation = MemberFindingUtils
-                .getAnnotationOfType(
-                        applicationConversionService.getAnnotations(),
-                        CONVERSION_SERVICE_ANNOTATION);
-
-        Validate.isTrue(rooConversionServiceAnnotation != null,
-                "Operation for @RooConversionService annotated classes only.");
-
-        final boolean isGeoConversionServiceAnnotated = MemberFindingUtils
-                .getAnnotationOfType(
-                        applicationConversionService.getAnnotations(),
-                        GEO_CONVERSION_SERVICE_ANNOTATION) != null;
-
-        // If annotation already exists on the target type do nothing
-        if (isGeoConversionServiceAnnotated) {
-            return;
-        }
-
-        ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
-                applicationConversionService);
-
-        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
-                GEO_CONVERSION_SERVICE_ANNOTATION);
-
-        // Add annotation to target type
-        detailsBuilder.addAnnotation(annotationBuilder.build());
-
-        // Save changes to disk
-        typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder.build());
-
+    public void updatePomDependencies() {
+        final Element configuration = XmlUtils.getConfiguration(getClass());
+        GeoUtils.updatePom(configuration, projectOperations, metadataService);
     }
 
     /**

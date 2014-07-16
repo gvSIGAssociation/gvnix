@@ -7,10 +7,8 @@ package org.gvnix.addon.jpa.geo;
  */
 public enum FieldGeoTypes {
 
-    POINT("com.vividsolutions.jts.geom.Point"), COORDINATE(
-            "com.vividsolutions.jts.geom.Coordinate"), GEOMETRY(
-            "com.vividsolutions.jts.geom.Geometry"), POLYGON(
-            "com.vividsolutions.jts.geom.Polygon");
+    POINT("com.vividsolutions.jts.geom.Point"), LINESTRING(
+            "com.vividsolutions.jts.geom.LineString");
 
     public final String descripcion;
 

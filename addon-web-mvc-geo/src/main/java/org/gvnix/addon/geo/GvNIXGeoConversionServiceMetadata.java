@@ -66,11 +66,26 @@ public class GvNIXGeoConversionServiceMetadata extends
     private static final JavaType POINT_TYPE = new JavaType(
             "com.vividsolutions.jts.geom.Point");
 
+    private static final JavaType LINESTRING_TYPE = new JavaType(
+            "com.vividsolutions.jts.geom.LineString");
+
     private static final JavaSymbolName POINT_TO_STRING_METHOD = new JavaSymbolName(
             "getPointToStringConverter");
 
     private static final JavaSymbolName STRING_TO_POINT_METHOD = new JavaSymbolName(
             "getStringToPointConverter");
+
+    private static final JavaSymbolName LINESTRING_TO_STRING_METHOD = new JavaSymbolName(
+            "getLineStringToStringConverter");
+
+    private static final JavaSymbolName STRING_TO_LINESTRING_METHOD = new JavaSymbolName(
+            "getStringToLineStringConverter");
+
+    private static final JavaSymbolName INSTALL_GEO_LABLES_METHOD = new JavaSymbolName(
+            "installGeoLabelConverters");
+
+    private static final JavaSymbolName AFTER_PROPERTY_SET = new JavaSymbolName(
+            "afterPropertiesSet");
 
     private static final JavaType CONVERTER_POINT_STRING = new JavaType(
             CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
@@ -79,6 +94,14 @@ public class GvNIXGeoConversionServiceMetadata extends
     private static final JavaType CONVERTER_STRING_POINT = new JavaType(
             CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, POINT_TYPE));
+
+    private static final JavaType CONVERTER_LINESTRING_STRING = new JavaType(
+            CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(LINESTRING_TYPE, JavaType.STRING));
+
+    private static final JavaType CONVERTER_STRING_LINESTRING = new JavaType(
+            CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, LINESTRING_TYPE));
 
     /**
      * Itd builder helper
@@ -92,20 +115,31 @@ public class GvNIXGeoConversionServiceMetadata extends
 
     public GvNIXGeoConversionServiceMetadata(String identifier,
             JavaType aspectName,
-            PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            JavaType conversionServiceAspectName) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         // Helper itd generation
         this.helper = new ItdBuilderHelper(this, governorPhysicalTypeMetadata,
                 builder.getImportRegistrationResolver());
 
+        // Adding precedence declaration
+        // This aspect before Roo_ConversionService
+        builder.setDeclarePrecedence(aspectName, conversionServiceAspectName);
+
         // Creating WKTReader reader = new WKTReader(); field
         builder.addField(getField("reader", "new WKTReader()", WKTREADER_TYPE,
                 Modifier.PRIVATE, null));
 
-        // Adding methods
+        // Adding Converter methods
         builder.addMethod(getPointToStringConverterMethod());
         builder.addMethod(getStringToPointConverterMethod());
+        builder.addMethod(getLineStringToStringConverterMethod());
+        builder.addMethod(getStringToLineStringConverterMethod());
+
+        // Adding registry methods
+        builder.addMethod(getInstallGeoLabelsConverterMethod());
+        builder.addMethod(getAfterPropertiesSetMethod());
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
@@ -200,6 +234,185 @@ public class GvNIXGeoConversionServiceMetadata extends
     }
 
     /**
+     * Gets <code>installGeoLabelsConverter</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getInstallGeoLabelsConverterMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        parameterTypes.add(new AnnotatedJavaType(new JavaType(
+                "org.springframework.format.FormatterRegistry")));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(INSTALL_GEO_LABLES_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName("registry"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildInstallGeoLabelsConvertersMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, INSTALL_GEO_LABLES_METHOD,
+                JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>afterPropertiesSet</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getAfterPropertiesSetMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(AFTER_PROPERTY_SET,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildAfterPropertiesSetMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, AFTER_PROPERTY_SET,
+                JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>getLineStringToStringConverter</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getLineStringToStringConverterMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(LINESTRING_TO_STRING_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetLineStringToStringConverterMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, LINESTRING_TO_STRING_METHOD,
+                CONVERTER_LINESTRING_STRING, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>getStringToLineStringConverter</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getStringToLineStringConverterMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(STRING_TO_LINESTRING_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetStringToLineStringConverterMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, STRING_TO_LINESTRING_METHOD,
+                CONVERTER_STRING_LINESTRING, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
      * Builds body method for <code>getPointToStringConverter</code> method. <br>
      * 
      * @param bodyBuilder
@@ -272,6 +485,114 @@ public class GvNIXGeoConversionServiceMetadata extends
         // Reset indent
         bodyBuilder.reset();
 
+    }
+
+    /**
+     * Builds body method for <code>getLineStringToStringConverter</code>
+     * method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetLineStringToStringConverterMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine(String.format(
+                " return new %s<%s, java.lang.String>() {",
+                helper.getFinalTypeName(CONVERTER_TYPE),
+                helper.getFinalTypeName(LINESTRING_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("public String convert(LineString lineString) {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine(String.format(
+                "return %s.toLineString(lineString.getCoordinateSequence());",
+                helper.getFinalTypeName(WKTWRITER_TYPE)));
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+    }
+
+    /**
+     * Builds body method for <code>getStringToLineStringConverter</code>
+     * method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetStringToLineStringConverterMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine(String.format(
+                " return new %s<java.lang.String, %s>() {",
+                helper.getFinalTypeName(CONVERTER_TYPE),
+                helper.getFinalTypeName(LINESTRING_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("public LineString convert(String str) {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("try {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return (LineString) reader.read(str);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine(String.format("}catch( %s e) {",
+                helper.getFinalTypeName(PARSE_EXCEPTION_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("throw new IllegalArgumentException(");
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine(" \"Invalid string for LineString: \".concat(str), e);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+        // Reset indent
+        bodyBuilder.reset();
+
+    }
+
+    /**
+     * Builds body method for <code>afterPropertySet</code> method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildAfterPropertiesSetMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine("super.afterPropertiesSet();");
+        bodyBuilder.appendFormalLine("installLabelConverters(getObject());");
+        bodyBuilder.appendFormalLine("installGeoLabelConverters(getObject());");
+    }
+
+    /**
+     * Builds body method for <code>installGeoLabelsConverters</code> method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildInstallGeoLabelsConvertersMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        // Adding all methods added bellow
+        bodyBuilder
+                .appendFormalLine("registry.addConverter(getPointToStringConverter());");
+        bodyBuilder
+                .appendFormalLine("registry.addConverter(getStringToPointConverter());");
+        bodyBuilder
+                .appendFormalLine("registry.addConverter(getLineStringToStringConverter());");
+        bodyBuilder
+                .appendFormalLine("registry.addConverter(getStringToLineStringConverter());");
     }
 
     public String toString() {

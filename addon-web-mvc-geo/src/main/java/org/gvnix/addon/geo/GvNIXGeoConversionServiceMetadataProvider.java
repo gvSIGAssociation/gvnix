@@ -20,9 +20,9 @@ package org.gvnix.addon.geo;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.converter.ConversionServiceMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
@@ -74,9 +74,25 @@ public final class GvNIXGeoConversionServiceMetadataProvider extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
 
+        JavaType javaType = GvNIXGeoConversionServiceMetadata
+                .getJavaType(metadataIdentificationString);
+        LogicalPath path = GvNIXGeoConversionServiceMetadata
+                .getPath(metadataIdentificationString);
+
+        // Get RooConversionServiceMetadata
+        String conversionServiceMetadataId = PhysicalTypeIdentifierNamingUtils
+                .createIdentifier(ConversionServiceMetadata.class.getName(),
+                        javaType, path);
+        ConversionServiceMetadata conversionServiceMetadata = (ConversionServiceMetadata) metadataService
+                .get(conversionServiceMetadataId);
+
+        // Getting ConversionServiceMetadata Aspect Name
+        JavaType conversionServiceAspectName = conversionServiceMetadata
+                .getAspectName();
+
         return new GvNIXGeoConversionServiceMetadata(
                 metadataIdentificationString, aspectName,
-                governorPhysicalTypeMetadata);
+                governorPhysicalTypeMetadata, conversionServiceAspectName);
     }
 
     /**
