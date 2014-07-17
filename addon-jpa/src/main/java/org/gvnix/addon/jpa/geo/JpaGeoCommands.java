@@ -6,6 +6,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.jpa.geo.providers.GeoProviderId;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.model.JavaSymbolName;
@@ -22,7 +23,7 @@ import org.springframework.roo.shell.CommandMarker;
  * each method, or use the logger directly if you'd like to emit messages of
  * different severity (and therefore different colours on non-Windows systems).
  * 
- * @since 1.1
+ * @since 1.4
  */
 @Component
 @Service
@@ -49,17 +50,6 @@ public class JpaGeoCommands implements CommandMarker {
     }
 
     /**
-     * This method registers a command with the Roo shell. It also offers a
-     * mandatory command attribute.
-     * 
-     * @param type
-     */
-    @CliCommand(value = "jpa geo setup", help = "Setup GEO persistence in your project.")
-    public void setup() {
-        operations.setup();
-    }
-
-    /**
      * This method checks if the method to add new field is available
      * 
      * @return true (default) if the command should be visible at this stage,
@@ -76,8 +66,20 @@ public class JpaGeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "field geo", help = "Add GEO field on specified Entity")
+    @CliCommand(value = "jpa geo setup", help = "Setup GEO persistence in your project.")
     public void setup(
+            @CliOption(key = "provider", mandatory = true, help = "Provider's Name") GeoProviderId provider) {
+        operations.installProvider(provider);
+    }
+
+    /**
+     * This method registers a command with the Roo shell. It also offers a
+     * mandatory command attribute.
+     * 
+     * @param type
+     */
+    @CliCommand(value = "field geo", help = "Add GEO field on specified Entity")
+    public void addField(
             @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
             @CliOption(key = "type", mandatory = true, help = "The Java type of the entity") FieldGeoTypes fieldGeoType,
             @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType entity) {
@@ -87,7 +89,7 @@ public class JpaGeoCommands implements CommandMarker {
         Validate.notNull(javaTypeDetails,
                 "The entity specified, '%s', doesn't exist", entity);
 
-        operations.addField(fieldName, fieldGeoType, entity);
+        operations.addFieldByProvider(fieldName, fieldGeoType, entity);
     }
 
 }
