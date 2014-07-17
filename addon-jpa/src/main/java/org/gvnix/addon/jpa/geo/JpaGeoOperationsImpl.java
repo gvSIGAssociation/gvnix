@@ -179,4 +179,19 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
         return providersId;
     }
 
+    /**
+     * FEATURE METHODS
+     */
+
+    @Override
+    public String getName() {
+        return FEATURE_NAME_GVNIX_GEO_PERSISTENCE;
+    }
+
+    @Override
+    public boolean isInstalledInModule(String moduleName) {
+        // If field command is available, GEO Persistence is installed
+        return isFieldCommandAvailable();
+    }
+
 }

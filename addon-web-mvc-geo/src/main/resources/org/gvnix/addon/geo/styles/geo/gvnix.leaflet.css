@@ -1,0 +1,40 @@
+.mapviewer_control{
+	height: 550px;
+	width: 80%;
+	float:right;
+}
+
+.mapviewer_layers_container{
+	height: 550px;
+	float:left;
+	width: 19%;
+	boder: 1px solid #DDDDDD;
+	overflow: scroll;
+	overflow-x: hidden; 
+}
+
+.mapviewer_layers_header{
+	position:absolute;
+	width:15%;
+}
+
+.mapviewer_layers_container h3{
+	background-color:rgb(96,130,36);
+	padding: 15px;
+	margin-top: 0;
+	font-size: 14px;
+	color: white;
+}
+
+.mapviewer_layers_layer{
+	padding-bottom: 10px;
+	border-bottom: 1px solid #DDDDDD;
+}
+
+.mapviewer_layers_layer span{
+	padding:10px;
+}
+
+.mapviewer_layers{
+	margin-top: 50px;
+}

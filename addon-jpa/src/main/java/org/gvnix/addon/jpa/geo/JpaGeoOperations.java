@@ -5,6 +5,7 @@ import java.util.List;
 import org.gvnix.addon.jpa.geo.providers.GeoProviderId;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.Feature;
 
 /**
  * Interface of operations this add-on offers. Typically used by a command type
@@ -13,7 +14,13 @@ import org.springframework.roo.model.JavaType;
  * @author gvNIX Team
  * @since 1.4
  */
-public interface JpaGeoOperations {
+public interface JpaGeoOperations extends Feature {
+
+    /**
+     * Feature name. Use to know if gvNIX GEO component has been setup in this
+     * project
+     */
+    static final String FEATURE_NAME_GVNIX_GEO_PERSISTENCE = "gvnix-geo-persistence";
 
     /**
      * Indicate commands should be available
