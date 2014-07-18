@@ -135,14 +135,19 @@ var GvNIX_Map_Leaflet;
 			 * */
 			"_fnInitializeMap": function initializeMap(divId, center, zoom, maxZoom, url) {
 
+				// Getting center LatLng
+                var latLng = center.split(",");
+                var lat = latLng[0];
+                var lng = latLng[1];
+                
 				// Creating Map
 				var map = L.map(divId, {
-	  				center: center, 
+	  				center: [lat , lng], 
 	  				zoom: zoom
 				});
 				
 				// Adding callback to map when ready
-				map.whenReady(this._fnOnMapReadyCallback(divId));
+				//map.whenReady(this._fnOnMapReadyCallback(divId));
 				
 				// Configuring map
 				L.tileLayer(url, {
@@ -196,6 +201,6 @@ var GvNIX_Map_Leaflet;
 // Registering events
 fnRegisterFunctionsToCallBack(function(context){
 	jQuery(".mapviewer_control", context).each(function(index) {
-		new GvNIX_Map_Leaflet($(this));
+		new GvNIX_Map_Leaflet(jQuery(this));
 	});
 });
