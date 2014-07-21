@@ -1102,7 +1102,7 @@ public class QuerydslUtils {
             PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
             TypeDescriptor descriptor, String searchStr,
             ConversionService conversionService) {
-        if (StringUtils.isEmpty(searchStr)) {
+        if (StringUtils.isBlank(searchStr)) {
             return null;
         }
         NumberPath<N> numberExpression = entityPath.getNumber(fieldName,
@@ -1114,18 +1114,24 @@ public class QuerydslUtils {
             try {
                 Object number = conversionService.convert(searchStr,
                         STRING_TYPE_DESCRIPTOR, descriptor);
-                String toSearch = number.toString();
-                if (number instanceof BigDecimal
-                        && ((BigDecimal) number).scale() > 1) {
-                    // For bigDecimal trim 0 in decimal part
-                    toSearch = StringUtils.stripEnd(toSearch, "0");
-                    if (StringUtils.endsWith(toSearch, ".")) {
-                        // prevent "#." strings
-                        toSearch = toSearch.concat("0");
-                    }
+                if (number == null) {
+                    expression = numberExpression.stringValue().like(
+                            "%".concat(searchStr).concat("%"));
                 }
-                expression = numberExpression.stringValue().like(
-                        "%".concat(toSearch).concat("%"));
+                else {
+                    String toSearch = number.toString();
+                    if (number instanceof BigDecimal
+                            && ((BigDecimal) number).scale() > 1) {
+                        // For bigDecimal trim 0 in decimal part
+                        toSearch = StringUtils.stripEnd(toSearch, "0");
+                        if (StringUtils.endsWith(toSearch, ".")) {
+                            // prevent "#." strings
+                            toSearch = toSearch.concat("0");
+                        }
+                    }
+                    expression = numberExpression.stringValue().like(
+                            "%".concat(toSearch).concat("%"));
+                }
             }
             catch (ConversionException e) {
                 expression = numberExpression.stringValue().like(
