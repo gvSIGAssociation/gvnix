@@ -27,50 +27,62 @@
     <script>
     
     	jQuery(document).ready(function(){
-    		
-    		var ${id}_marker_group = L.layerGroup();
-    		
-    		// Loading all layers that are checked
-    		setTimeout(function(){
-    			loadCheckedLayer();
-    		}, 200);
-    		
-			jQuery("#${id}").change(function(){
-				if(jQuery(this).prop('checked')){
-		    		if(map){
-		    			var tileLayer = L.tileLayer('${url}');
-						tileLayer.setOpacity(${opacity});
-						if("${index}" !== ""){
-							tileLayer.setZIndex(${index});
-						}
-						${id}_marker_group.addLayer(tileLayer);
-						${id}_marker_group.addTo(map);
-		    		}else{
-		    			alert("Map is not defined!");
-		    		}
-				}else{
-					${id}_marker_group.clearLayers();
-				}
-			});	
-			
-			// This function loads layers that are checked
-			function loadCheckedLayer(){
-				if(jQuery("#${id}").prop('checked')){
-					if(map){
-						var tileLayer = L.tileLayer('${url}');
-						tileLayer.setOpacity(${opacity});
-						if("${index}" !== ""){
-							tileLayer.setZIndex(${index});
-						}
-						${id}_marker_group.addLayer(tileLayer);
-						${id}_marker_group.addTo(map);
-					}else{
-						alert("Map is not defined!");
-					}
-					
-				}
-			}  
-			
+                
+            // Getting map instance
+            var mapId = jQuery(".mapviewer_control").attr("id");
+            var mapInstance = GvNIX_Map_Leaflet.fnGetInstance(mapId);
+            if(mapInstance){
+            	var map = mapInstance.fnGetMapObject();
+
+            	var ${id}_marker_group = L.layerGroup();
+        		
+        		// Loading all layers that are checked
+        		setTimeout(function(){
+        			loadCheckedLayer();
+        		}, 200);
+        		
+    			jQuery("#${id}").change(function(){
+    				if(jQuery(this).prop('checked')){
+    		    		if(map){
+    		    			var tileLayer = L.tileLayer('${url}');
+    						tileLayer.setOpacity(${opacity});
+    						if("${index}" !== ""){
+    							tileLayer.setZIndex(${index});
+    						}
+    						${id}_marker_group.addLayer(tileLayer);
+    						${id}_marker_group.addTo(map);
+    		    		}else{
+    		    			alert("Map is not defined!");
+    		    		}
+    				}else{
+    					${id}_marker_group.clearLayers();
+    				}
+    			});	
+    			
+    			// This function loads layers that are checked
+    			function loadCheckedLayer(){
+    				if(jQuery("#${id}").prop('checked')){
+    					if(map){
+    						var tileLayer = L.tileLayer('${url}');
+    						tileLayer.setOpacity(${opacity});
+    						if("${index}" !== ""){
+    							tileLayer.setZIndex(${index});
+    						}
+    						${id}_marker_group.addLayer(tileLayer);
+    						${id}_marker_group.addTo(map);
+    					}else{
+    						alert("Map is not defined!");
+    					}
+    					
+    				}
+    			}  
+            }else{
+            	if(console){
+            		console.log("Error getting map instance");
+            	}else{
+            		alert("Error getting map instance");
+            	}
+            }
     	});
     
     </script>

@@ -18,7 +18,7 @@
     
     <!-- Zoom 5 as default -->
     <c:if test="${empty zoom}">
-    	<c:set var="zoom" value="6" />
+    	<c:set var="zoom" value="4" />
     </c:if>
     
  	<spring:message arguments="${label}" code="entity_show" var="title_msg" htmlEscape="false" />

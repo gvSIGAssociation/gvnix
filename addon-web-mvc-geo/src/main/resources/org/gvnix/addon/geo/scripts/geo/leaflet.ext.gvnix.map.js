@@ -62,7 +62,12 @@ var GvNIX_Map_Leaflet;
 			/**
 			 * URL Server to load map
 			 */
-			"url": divData.url
+			"url": divData.url,
+
+	        /**
+	        * Map instance                        
+	        */
+	        "map": null
 			
 		};
 		
@@ -98,7 +103,12 @@ var GvNIX_Map_Leaflet;
 				/**
 				 * URL Server to load map
 				 */
-				"url": divData.url
+				"url": divData.url,
+
+                /**
+                * Map instance                        
+                */
+                "map": null
 				
 			};
 		
@@ -134,14 +144,13 @@ var GvNIX_Map_Leaflet;
 			 * Function to initialize Map
 			 * */
 			"_fnInitializeMap": function initializeMap(divId, center, zoom, maxZoom, url) {
-
 				// Getting center LatLng
-                var latLng = center.split(",");
-                var lat = latLng[0];
-                var lng = latLng[1];
+                                var latLng = center.split(",");
+                                var lat = latLng[0];
+                                var lng = latLng[1];
                 
 				// Creating Map
-				var map = L.map(divId, {
+				this._data.map = L.map(divId, {
 	  				center: [lat , lng], 
 	  				zoom: zoom
 				});
@@ -153,9 +162,16 @@ var GvNIX_Map_Leaflet;
 				L.tileLayer(url, {
 	  			    attribution: '<a href="http://www.gvnix.org">gvNIX</a>',
 	  			    maxZoom: maxZoom
-	  			}).addTo(map);
+	  			}).addTo(this._data.map);
 				
-			}
+			},
+
+            /**
+            * Function to get map item
+            **/
+            "fnGetMapObject": function getMapObject(){
+                    return this._data.map;
+            }
 	};
 	
 	// Static variables * * * * * * * * * * * * * * * * * * * * * * * * * * *

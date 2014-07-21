@@ -1,21 +1,21 @@
 .mapviewer_control{
-	height: 550px;
-	width: 80%;
+	height: 350px;
+	width: 60%;
 	float:right;
 }
 
 .mapviewer_layers_container{
-	height: 550px;
+	height: 350px;
 	float:left;
-	width: 19%;
+	width: 40%;
 	boder: 1px solid #DDDDDD;
 	overflow: scroll;
 	overflow-x: hidden; 
 }
 
 .mapviewer_layers_header{
-	position:absolute;
-	width:15%;
+	position:relative;
+	width:100%;
 }
 
 .mapviewer_layers_container h3{
@@ -36,5 +36,5 @@
 }
 
 .mapviewer_layers{
-	margin-top: 50px;
+	margin-top: 10px;
 }
