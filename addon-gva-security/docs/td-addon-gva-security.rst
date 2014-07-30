@@ -1,4 +1,11 @@
 
+Introducción
+--------------
+
+Este add-on permite añadir nuevos proveedores de seguridad a Spring Security, no solo los incluidos en el add-on sino aquellos que el desarrollador instale en Roo.
+
+El add-on sigue el patrón SPI http://docs.oracle.com/javase/tutorial/sound/SPI-intro.html
+
 Addon GvNIX Security
 ---------------------
 
