@@ -14,7 +14,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 		<bootstrap-util:load-styles-bootstrap />
-		<util:load-scripts />
+		<util:load-scripts/>
 		<bootstrap-util:load-scripts-bootstrap />
 
 		<spring:message code="application_name" htmlEscape="false" var="app_name"/>
@@ -24,54 +24,43 @@
 	</head>
 
   	<body class="tundra spring">
-
-  		<!-- Fixed navbar -->
-  		<header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" role="banner">
-
-			<tiles:insertAttribute ignore="true" name="header"/>
-
-			<!-- Toggle button -->
-			<div class="col-sm-6 pull-left">
-				<p class="visible-xs">
-	    			<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Show sidebar</button>
-	        	</p>
-			</div>
-
- 		</header>
-
+   		<!-- Fixed navbar dropdown -->
+	<header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav">
 		<div class="container">
-			<div id="main">
-				<!-- option: row-offcanvas-right -->
-				<div class="row row-offcanvas row-offcanvas-left">
-					<dialog:message-box/>
 
-					<!-- main area -->
-		        	<div class="col-xs-12 col-sm-9">
-			    		<tiles:insertAttribute name="body"/>
-		        	</div>
-
-	 				<!-- sidebar -->
-			        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
-			        	<tiles:insertAttribute ignore="true" name="menu-toggle"/>
-			        </div>
-
-		      </div><!--/row-->
+			<div class="navbar-header pull-right">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target=".navbar-collapse">
+					<span class="icon-bar">&#160;</span> <span class="icon-bar">&#160;</span>
+					<span class="icon-bar">&#160;</span>
+				</button>
 			</div>
-	    </div><!--/container-->
+			<!-- /navbar-header -->
 
-		<!-- Footer
+			<div class="navbar-collapse collapse">
+				<tiles:insertAttribute ignore="true" name="header" />
+				<tiles:insertAttribute ignore="true" name="menu" />
+			</div>
+			<!--/.nav-collapse -->
+
+		</div>
+		<!-- /container -->
+
+	</header>
+
+	<div class="container-fluid">
+		<div id="main">
+			<dialog:message-box />
+			<tiles:insertAttribute name="body" />
+		</div>
+		<!-- /main -->
+	</div>
+	<!--/.container-->
+
+	<!-- Footer
     	================================================== -->
-	    <footer class="bs-footer" role="contentinfo">
-
-	      <tiles:insertAttribute ignore="true" name="footer"/>
-
-	    </footer>
-
+	<footer class="bs-footer" role="contentinfo">
+		<tiles:insertAttribute ignore="true" name="footer" />
+	</footer>
 	</body>
-
 </html>
-
-
-
-
-

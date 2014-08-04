@@ -39,7 +39,7 @@
 
  		</header>
 
-		<div class="container">
+		<div class="container-fluid">
 			<div id="main">
 				<!-- option: row-offcanvas-right -->
 				<div class="row row-offcanvas row-offcanvas-left">
@@ -56,7 +56,7 @@
 			        </div>
 
 		      </div><!--/row-->
-			</div>
+		    </div>
 	    </div><!--/container-->
 
 		<!-- Footer

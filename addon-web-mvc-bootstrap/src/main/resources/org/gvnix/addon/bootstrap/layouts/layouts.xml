@@ -5,6 +5,7 @@
 
 <tiles-definitions>
 
+  <!-- menu in header -->
   <definition name="default" template="/WEB-INF/layouts/default.jspx">
     <put-attribute name="header" value="/WEB-INF/views/header.jspx" />
     <put-attribute name="menu" value="/WEB-INF/views/menu.jspx" />
@@ -13,6 +14,26 @@
 
   <definition name="public" template="/WEB-INF/layouts/default.jspx">
     <put-attribute name="header" value="/WEB-INF/views/header.jspx" />
+    <put-attribute name="footer" value="/WEB-INF/views/footer.jspx" />
+  </definition>
+
+  <!-- menu in sidebar -->
+  <definition name="default-sidebar" template="/WEB-INF/layouts/default-menu-cols.jspx">
+    <put-attribute name="header" value="/WEB-INF/views/header.jspx" />
+    <put-attribute name="menu-toggle" value="/WEB-INF/views/menu-toggle.jspx" />
+    <put-attribute name="footer" value="/WEB-INF/views/footer.jspx" />
+  </definition>
+
+  <definition name="default-fluid" template="/WEB-INF/layouts/default-fluid.jspx">
+    <put-attribute name="header" value="/WEB-INF/views/header.jspx" />
+    <put-attribute name="menu" value="/WEB-INF/views/menu.jspx" />
+    <put-attribute name="footer" value="/WEB-INF/views/footer.jspx" />
+  </definition>
+
+  <!-- menu in sidebar 100% -->
+  <definition name="default-sidebar-fluid" template="/WEB-INF/layouts/default-menu-cols-fluid.jspx">
+    <put-attribute name="header" value="/WEB-INF/views/header.jspx" />
+    <put-attribute name="menu-toggle" value="/WEB-INF/views/menu-toggle.jspx" />
     <put-attribute name="footer" value="/WEB-INF/views/footer.jspx" />
   </definition>
 
