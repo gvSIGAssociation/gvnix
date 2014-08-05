@@ -5,10 +5,16 @@
 	width: 16px;
 }
 
-body{
-	position: relative; /* For scrollyspy */
-  	padding-top: 50px; /* Account for fixed navbar */
+body {
+  position: relative; /* For scrollyspy */
+  padding-top: 70px; /* Account for fixed navbar */
+  padding-bottom: 30px;
 }
+	@media (min-width: 768px) and (max-width: 1020px){
+		body {
+		  padding-top: 120px;
+		}
+	}
 
 /*
  * Main navigation
@@ -74,32 +80,82 @@ color: #acc47f;
 	}
 }
 
-body {
-  padding-top: 70px;
-  padding-bottom: 30px;
-}
-	@media (min-width: 768px) and (max-width: 1020px){
-		body {
-		  padding-top: 120px;
-		}
+/* Custom sidebar menu */
+#sidebar-wrapper li a{
+	text-decoration: none;
 	}
+.affix#sidebar-wrapper{
+	z-index: 100;
+	background: red;
+	}
+
+
+/*
+ * Footer
+ *
+ * Separated section of content at the bottom of all pages
+ */
+
+.bs-footer {
+  padding-top: 40px;
+  padding-bottom: 30px;
+  margin-top: 100px;
+  color: #777;
+  text-align: center;
+  border-top: 1px solid #e5e5e5;
+}
+.footer-links {
+  margin: 10px 0;
+  padding-left: 0;
+}
+.footer-links li {
+  display: inline;
+  padding: 0 2px;
+}
+.footer-links li:first-child {
+  padding-left: 0;
+}
+
+@media (min-width: 768px) {
+  .bs-footer {
+    text-align: left;
+  }
+  .bs-footer p {
+    margin-bottom: 0;
+  }
+}
+
+/*
+ * Alerts
+ *
+ */
 
 .alert{
 	font-size: 0.95em;
 	display: block;
 }
 
+/*
+ * Forms
+ *
+ */
+
  @media (min-width: 0px) {
 	.form-horizontal .control-label {
 		text-align: right;
 	}
 }
-
 .btn {
 	margin: 5px 0;
 }
+.btn-group{
+	margin-right:5px;
+}
 
-/* Custom theme Bootstrap signin.css*/
+/*
+ * Custom theme Bootstrap signin.css
+ *
+ */
 
 .form-signin {
   max-width: 330px;
@@ -134,48 +190,4 @@ body {
   margin-bottom: 10px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
-}
-
-
-/* Custom datatables */
-
-.btn-group{
-	margin-right:5px;
-}
-
-
-
-/*
- * Footer
- *
- * Separated section of content at the bottom of all pages, save the homepage.
- */
-
-.bs-footer {
-  padding-top: 40px;
-  padding-bottom: 30px;
-  margin-top: 100px;
-  color: #777;
-  text-align: center;
-  border-top: 1px solid #e5e5e5;
-}
-.footer-links {
-  margin: 10px 0;
-  padding-left: 0;
-}
-.footer-links li {
-  display: inline;
-  padding: 0 2px;
-}
-.footer-links li:first-child {
-  padding-left: 0;
-}
-
-@media (min-width: 768px) {
-  .bs-footer {
-    text-align: left;
-  }
-  .bs-footer p {
-    margin-bottom: 0;
-  }
 }
