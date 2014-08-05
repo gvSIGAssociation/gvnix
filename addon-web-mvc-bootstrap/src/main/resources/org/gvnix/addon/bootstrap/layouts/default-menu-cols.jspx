@@ -26,7 +26,7 @@
   	<body class="tundra spring">
 
   		<!-- Fixed navbar -->
-  		<header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" role="banner">
+  		<header class="navbar navbar-inverse navbar-fixed-top" role="banner">
 
 			<tiles:insertAttribute ignore="true" name="header"/>
 

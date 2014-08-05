@@ -6,9 +6,6 @@
 	<spring:url value="/resources/styles/bootstrap/bootstrap.min.css" var="bootstrap_min_css_url" />
 	<link href="${bootstrap_min_css_url}" media="screen" rel="stylesheet" type="text/css" />
 
-	<spring:url value="/resources/styles/bootstrap/docs.css" var="docs_css_url" />
-	<link href="${docs_css_url}" media="screen" rel="stylesheet" type="text/css" />
-
 	<spring:url value="/resources/styles/bootstrap/offcanvas.css" var="offcanvas_css_url" />
 	<link href="${offcanvas_css_url}" media="screen" rel="stylesheet" type="text/css" />
 

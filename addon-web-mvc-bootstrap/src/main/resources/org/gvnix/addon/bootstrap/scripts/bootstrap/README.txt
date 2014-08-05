@@ -58,5 +58,4 @@ RELATED
 Related with css styles:
 
 * styles/bootstrap/bootstrap.min.css
-* styles/bootstrap/docs.css
 * styles/bootstrap/offcanvas.css

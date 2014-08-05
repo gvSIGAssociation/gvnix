@@ -5,25 +5,67 @@
 	width: 16px;
 }
 
+body{
+	position: relative; /* For scrollyspy */
+  	padding-top: 50px; /* Account for fixed navbar */
+}
+
+/*
+ * Main navigation
+ *
+ * Turn the `.navbar` at the top
+ */
+
+.navbar {
+  text-shadow: 0 -1px 0 rgba(0,0,0,.15);
+  background-color: #563d7c;
+  border-color: #463265;
+  box-shadow: 0 1px 0 rgba(255,255,255,.1);
+}
+.navbar .navbar-collapse {
+  border-color: #463265;
+}
+.navbar .navbar-brand {
+  color: #fff;
+}
+.navbar .navbar-nav > li > a {
+  color: #cdbfe3;
+}
+.navbar .navbar-nav > li > a:hover {
+  color: #fff;
+}
+.navbar .navbar-nav > .active > a,
+.navbar .navbar-nav > .active > a:hover {
+  color: #fff;
+  background-color: #463265;
+}
+.navbar .navbar-toggle {
+  border-color: #563d7c;
+}
+.navbar .navbar-toggle:hover {
+  background-color: #463265;
+  border-color: #463265;
+}
+
 /* Custom theme Bootstrap for gvNIX by DISID */
 
-.bs-docs-nav {
+.navbar {
 	background-color: #608224;
 	border-color: #527711;
 }
-.bs-docs-nav .navbar-toggle {
+.navbar .navbar-toggle {
 	border-color: #608224;
 }
-.bs-docs-nav .navbar-toggle:hover {
+.navbar .navbar-toggle:hover {
 	background-color: #608224;
 	border-color: #43600E;
 }
 .navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:hover, .navbar-inverse .navbar-nav>.open>a:focus,
-.bs-docs-nav .navbar-nav > .active > a, .bs-docs-nav .navbar-nav > .active > a:hover {
+.navbar .navbar-nav > .active > a, .navbar .navbar-nav > .active > a:hover {
 	color: #fff;
 	background-color: #43600E;
 }
-.bs-docs-nav .navbar-nav > li > a {
+.navbar .navbar-nav > li > a {
 color: #acc47f;
 }
 @media (max-width: 767px){
@@ -101,32 +143,39 @@ body {
 	margin-right:5px;
 }
 
-/* Custom ui buttons */
 
 
-.ui-dialog-buttonset{
-	width: 100%;
+/*
+ * Footer
+ *
+ * Separated section of content at the bottom of all pages, save the homepage.
+ */
+
+.bs-footer {
+  padding-top: 40px;
+  padding-bottom: 30px;
+  margin-top: 100px;
+  color: #777;
+  text-align: center;
+  border-top: 1px solid #e5e5e5;
+}
+.footer-links {
+  margin: 10px 0;
+  padding-left: 0;
+}
+.footer-links li {
+  display: inline;
+  padding: 0 2px;
+}
+.footer-links li:first-child {
+  padding-left: 0;
 }
 
-.ui-dialog-buttonset button {
-	-moz-user-select: none;
-	 border: 1px solid rgba(0, 0, 0, 0);
-	 border-radius: 4px;
-	 cursor: pointer;
-	 display: inline-block;
-	 font-size: 14px;
-	 font-weight: normal;
-	 line-height: 1.42857;
-	 margin-bottom: 0;
-	 padding: 6px 12px;
-	 text-align: center;
-	 vertical-align: middle;
-	 white-space: nowrap;
-	 background-color: #428BCA;
-	 border-color: #357EBD;
-	 color: #FFFFFF;
-     display: block;
-	 padding-left: 0;
- 	 padding-right: 0;
-	 width: 100%;
+@media (min-width: 768px) {
+  .bs-footer {
+    text-align: left;
+  }
+  .bs-footer p {
+    margin-bottom: 0;
+  }
 }

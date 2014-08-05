@@ -25,7 +25,7 @@
 
   	<body class="tundra spring">
    		<!-- Fixed navbar dropdown -->
-	<header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav">
+	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
 
 			<div class="navbar-header pull-right">

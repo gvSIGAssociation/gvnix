@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 
 /**
  * Implementation of Bootstrap Addon operations
- * 
+ *
  * @since 1.1
  */
 @Component
@@ -148,7 +148,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         List<String> stylesFolderFiles = new ArrayList<String>();
         Collections.addAll(stylesFolderFiles, "bootstrap/bootstrap.min.css",
-                "bootstrap/docs.css", "bootstrap/jquery-ui.bootstrap.css",
+                "bootstrap/jquery-ui.bootstrap.css",
                 "bootstrap/offcanvas.css",
                 "bootstrap/images/ui-bg_glass_75_ffffff_1x400.png",
                 "bootstrap/images/ui-icons_222222_256x240.png",
@@ -443,7 +443,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /**
      * Check if load-scripts-bootstrap.tagx was modified and include datatables
-     * 
+     *
      * @return
      */
     public boolean isLoadScriptsModified() {
@@ -461,7 +461,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /**
      * Check if login.jspx is modified with bootstrap
-     * 
+     *
      * @return
      */
     public boolean isLoginModified() {
@@ -479,7 +479,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     /**
      * Creates an instance with the {@code src/main/webapp} path in the current
      * module
-     * 
+     *
      * @return
      */
     public LogicalPath getWebappPath() {
@@ -490,7 +490,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /**
      * Gets the feature name managed by this operations class.
-     * 
+     *
      * @return feature name
      */
     @Override
