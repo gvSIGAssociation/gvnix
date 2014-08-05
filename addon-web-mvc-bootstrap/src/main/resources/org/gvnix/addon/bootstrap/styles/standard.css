@@ -74,9 +74,18 @@ body {
 .navbar .navbar-nav > li > a {
 color: #acc47f;
 }
+
 @media (max-width: 767px){
 	.navbar-inverse .navbar-nav .open .dropdown-menu>li>a {
 		color: #acc47f;
+	}
+}
+
+@media (min-width: 768px){
+	.navbar-nav {
+	float: none;
+	margin: 0 180px;
+
 	}
 }
 
@@ -86,7 +95,6 @@ color: #acc47f;
 	}
 .affix#sidebar-wrapper{
 	z-index: 100;
-	background: red;
 	}
 
 
