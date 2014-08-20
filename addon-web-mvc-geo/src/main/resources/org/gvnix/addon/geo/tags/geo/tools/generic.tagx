@@ -1,0 +1,32 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Id to identify the tool element" />
+  <jsp:directive.attribute name="icon" type="java.lang.String" required="true" description="Icon to show on ToolBar to identiy the tool element" />
+  <jsp:directive.attribute name="iconLibrary" type="java.lang.String" required="false" rtexprvalue="true" description="DESC: Select de icon library.| DEFAULT: 'glyphicon' | POSSIBLE VALUES: 'fa' for font-awesome or 'glyphicon' for bootstrap 3" />
+  <jsp:directive.attribute name="actionTool" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicates if this tool is a selectable tool (false) or and action tool (true)" />
+  <jsp:directive.attribute name="activateFunction" type="java.lang.String" required="false" rtexprvalue="true" description="Function to invoke when the user press on tool button" />
+  <jsp:directive.attribute name="deactivateFunction" type="java.lang.String" required="false" rtexprvalue="true" description="Function to invoke when the user press a different tool button" />
+  <jsp:directive.attribute name="preventExitMessage" type="java.lang.String" required="false" rtexprvalue="true" description="Show this confirm message before exit of the current tool" />
+  <jsp:directive.attribute name="cursorIcon" type="java.lang.String" required="false" rtexprvalue="true" description="Icon to show as cursor when enter on map element" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+  
+  
+    <c:if test="${empty iconLibrary}">
+    	<c:set var="iconLibrary" value="glyphicon" />
+    </c:if>
+    
+     <c:if test="${empty actionTool}">
+    	<c:set var="actionTool" value="false" />
+    </c:if>
+  
+  	<!-- Generating info tool -->
+	<i id="${id}_generic_tool" class="${iconLibrary} ${icon}" data-actiontool="${actionTool}" data-activatefunction="${activateFunction}" data-deactivatefunction="${deactivateFunction}" data-preventexitmessage="${preventExitMessage}" data-cursoricon="${cursorIcon}">&amp;nbsp;</i>
+	
+	<script>
+		jQuery(document).ready(function(){
+			new GvNIX_Map_Generic_Tool(jQuery("#${id}_generic_tool"));			
+		});
+	</script>
+	
+</jsp:root>

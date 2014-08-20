@@ -131,15 +131,6 @@ public class GeoOperationsImpl extends AbstractOperations implements
         annotateApplicationConversionService();
         // Installing all necessary components
         installComponents();
-        // Add sources to loadScripts
-        addToLoadScripts("js_leaflet_geo_js",
-                "/resources/scripts/geo/leaflet.js", false);
-        addToLoadScripts("js_leaflet_ext_gvnix_url",
-                "/resources/scripts/geo/leaflet.ext.gvnix.map.js", false);
-        addToLoadScripts("styles_leaflet_geo_css",
-                "/resources/styles/geo/leaflet.css", true);
-        addToLoadScripts("styles_gvnix_leaflet_geo_css",
-                "/resources/styles/geo/gvnix.leaflet.css", true);
     }
 
     /**
@@ -259,20 +250,27 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
             Element docRoot = docXml.getDocumentElement();
 
-            // Creating page:map element
+            // Creating geo:map element
             String mapId = String.format("ps_%s_%s",
                     controllerPackage.replaceAll("[.]", "_"),
                     path.getSymbolNameCapitalisedFirstLetter());
-            Element map = docXml.createElement("page:map");
+            Element map = docXml.createElement("geo:map");
             map.setAttribute("id", mapId);
+            // TODO: CALCULATE Z
             map.setAttribute("z", "user-managed");
 
-            // Creating page:toc element and adding to map
-            Element toc = docXml.createElement("page:toc");
+            // Creating geo:toc element and adding to map
+            Element toc = docXml.createElement("geo:toc");
             toc.setAttribute("id", String.format("%s_toc", mapId));
-            toc.setAttribute("items", "${layers}");
+            // TODO: CALCULATE Z
             toc.setAttribute("z", "user-managed");
             map.appendChild(toc);
+
+            // Creating geo:toolbar element and adding to map
+            Element toolbar = docXml.createElement("geo:toolbar");
+            // TODO: CALCULATE Z
+            toolbar.setAttribute("z", "user-managed");
+            map.appendChild(toolbar);
 
             // Adding childs to mainDiv
             docRoot.appendChild(map);
@@ -472,20 +470,83 @@ public class GeoOperationsImpl extends AbstractOperations implements
         LogicalPath webappPath = getWebappPath();
 
         // Copy Javascript files and related resources
-        copyDirectoryContents("scripts/geo/*.js",
-                pathResolver.getIdentifier(webappPath, "/scripts/geo"), true);
-        copyDirectoryContents("scripts/geo/images/*.png",
-                pathResolver.getIdentifier(webappPath, "/scripts/geo/images"),
+        copyDirectoryContents("scripts/leaflet/*.js",
+                pathResolver.getIdentifier(webappPath, "/scripts/leaflet"),
                 true);
-        copyDirectoryContents("styles/geo/*.css",
-                pathResolver.getIdentifier(webappPath, "/styles/geo"), true);
-        copyDirectoryContents("tags/geo/fields/*.tagx",
+        copyDirectoryContents("scripts/leaflet/images/*.png",
                 pathResolver.getIdentifier(webappPath,
-                        "/WEB-INF/tags/geo/fields"), true);
-        copyDirectoryContents("tags/geo/form/*.tagx",
+                        "/scripts/leaflet/images"), true);
+        // Copy Styles files and related resources
+        copyDirectoryContents("styles/leaflet/*.css",
+                pathResolver.getIdentifier(webappPath, "/styles/leaflet"), true);
+        copyDirectoryContents("styles/leaflet/images/*.png",
                 pathResolver
-                        .getIdentifier(webappPath, "/WEB-INF/tags/geo/form"),
+                        .getIdentifier(webappPath, "/styles/leaflet/images"),
                 true);
+        // Copy necessary fonts
+        copyDirectoryContents("styles/fonts/*.eot",
+                pathResolver.getIdentifier(webappPath, "/styles/fonts"), true);
+        copyDirectoryContents("styles/fonts/*.svg",
+                pathResolver.getIdentifier(webappPath, "/styles/fonts"), true);
+        copyDirectoryContents("styles/fonts/*.ttf",
+                pathResolver.getIdentifier(webappPath, "/styles/fonts"), true);
+        copyDirectoryContents("styles/fonts/*.woff",
+                pathResolver.getIdentifier(webappPath, "/styles/fonts"), true);
+        copyDirectoryContents("styles/fonts/*.otf",
+                pathResolver.getIdentifier(webappPath, "/styles/fonts"), true);
+        // Copy images into images folder
+        copyDirectoryContents("images/*.png",
+                pathResolver.getIdentifier(webappPath, "/images"), true);
+        // Copy tags into tags folder
+        copyDirectoryContents("tags/geo/*.tagx",
+                pathResolver.getIdentifier(webappPath, "/WEB-INF/tags/geo"),
+                true);
+        copyDirectoryContents("tags/geo/layers/*.tagx",
+                pathResolver.getIdentifier(webappPath,
+                        "/WEB-INF/tags/geo/layers"), true);
+        copyDirectoryContents("tags/geo/tools/*.tagx",
+                pathResolver.getIdentifier(webappPath,
+                        "/WEB-INF/tags/geo/tools"), true);
+
+        // Add sources to loadScripts
+        addToLoadScripts("js_leaflet_geo_js",
+                "/resources/scripts/leaflet/leaflet.js", false);
+        addToLoadScripts("js_leaflet_ext_gvnix_url",
+                "/resources/scripts/leaflet/leaflet.ext.gvnix.map.js", false);
+        addToLoadScripts(
+                "js_leaflet_ext_gvnix_measure_tool_url",
+                "/resources/scripts/leaflet/leaflet.ext.gvnix.map.measure.tool.js",
+                false);
+        addToLoadScripts(
+                "js_leaflet_ext_gvnix_generic_tool_url",
+                "/resources/scripts/leaflet/leaflet.ext.gvnix.map.generic.tool.js",
+                false);
+        addToLoadScripts("js_leaflet_geo_omnivore_js",
+                "/resources/scripts/leaflet/leaflet-omnivore.min.js", false);
+        addToLoadScripts("js_leaflet_geo_awesome_markers_js",
+                "/resources/scripts/leaflet/leaflet.awesome-markers.min.js",
+                false);
+        addToLoadScripts("js_leaflet_geo_marker_cluster_js",
+                "/resources/scripts/leaflet/leaflet.markercluster-src.js",
+                false);
+        addToLoadScripts("js_leaflet_zoom_slider_js",
+                "/resources/scripts/leaflet/L.Control.Zoomslider.js", false);
+        addToLoadScripts("js_leaflet_measuring_tool_js",
+                "/resources/scripts/leaflet/L.MeasuringTool.js", false);
+        addToLoadScripts("styles_leaflet_geo_css",
+                "/resources/styles/leaflet/leaflet.css", true);
+        addToLoadScripts("styles_gvnix_leaflet_geo_css",
+                "/resources/styles/leaflet/gvnix.leaflet.css", true);
+        addToLoadScripts("styles_leaflet_font_css",
+                "/resources/styles/leaflet/font-awesome.min.css", true);
+        addToLoadScripts("styles_leaflet_markers_css",
+                "/resources/styles/leaflet/leaflet.awesome-markers.css", true);
+        addToLoadScripts("styles_marker_cluster_css",
+                "/resources/styles/leaflet/MarkerCluster.css", true);
+        addToLoadScripts("styles_marker_cluster_default_css",
+                "/resources/styles/leaflet/MarkerCluster.Default.css", true);
+        addToLoadScripts("styles_zoom_slider_css",
+                "/resources/styles/leaflet/L.Control.Zoomslider.css", true);
     }
 
     /**

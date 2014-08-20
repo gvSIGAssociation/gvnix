@@ -144,10 +144,6 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
         // Adding field to entity
         typeManagementService.addField(fieldBuilder.build());
 
-        // Adding field types.xml on resources Entity package to parse Hibernate
-        // Geometry Types
-        addTypesXmlFile(entity);
-
     }
 
     /**

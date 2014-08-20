@@ -69,6 +69,9 @@ public class GvNIXGeoConversionServiceMetadata extends
     private static final JavaType LINESTRING_TYPE = new JavaType(
             "com.vividsolutions.jts.geom.LineString");
 
+    private static final JavaType POLYGON_TYPE = new JavaType(
+            "com.vividsolutions.jts.geom.Polygon");
+
     private static final JavaSymbolName POINT_TO_STRING_METHOD = new JavaSymbolName(
             "getPointToStringConverter");
 
@@ -80,6 +83,12 @@ public class GvNIXGeoConversionServiceMetadata extends
 
     private static final JavaSymbolName STRING_TO_LINESTRING_METHOD = new JavaSymbolName(
             "getStringToLineStringConverter");
+
+    private static final JavaSymbolName POLYGON_TO_STRING_METHOD = new JavaSymbolName(
+            "getPolygonToStringConverter");
+
+    private static final JavaSymbolName STRING_TO_POLYGON_METHOD = new JavaSymbolName(
+            "getStringToPolygonConverter");
 
     private static final JavaSymbolName INSTALL_GEO_LABLES_METHOD = new JavaSymbolName(
             "installGeoLabelConverters");
@@ -102,6 +111,14 @@ public class GvNIXGeoConversionServiceMetadata extends
     private static final JavaType CONVERTER_STRING_LINESTRING = new JavaType(
             CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, LINESTRING_TYPE));
+
+    private static final JavaType CONVERTER_POLYGON_STRING = new JavaType(
+            CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(POLYGON_TYPE, JavaType.STRING));
+
+    private static final JavaType CONVERTER_STRING_POLYGON = new JavaType(
+            CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, POLYGON_TYPE));
 
     /**
      * Itd builder helper
@@ -130,12 +147,17 @@ public class GvNIXGeoConversionServiceMetadata extends
         // Creating WKTReader reader = new WKTReader(); field
         builder.addField(getField("reader", "new WKTReader()", WKTREADER_TYPE,
                 Modifier.PRIVATE, null));
+        // Creating WKTWriter writer = new WKTWriter(); field
+        builder.addField(getField("writer", "new WKTWriter()", WKTWRITER_TYPE,
+                Modifier.PRIVATE, null));
 
         // Adding Converter methods
         builder.addMethod(getPointToStringConverterMethod());
         builder.addMethod(getStringToPointConverterMethod());
         builder.addMethod(getLineStringToStringConverterMethod());
         builder.addMethod(getStringToLineStringConverterMethod());
+        builder.addMethod(getPolygonToStringConverterMethod());
+        builder.addMethod(getStringToPolygonConverterMethod());
 
         // Adding registry methods
         builder.addMethod(getInstallGeoLabelsConverterMethod());
@@ -413,6 +435,94 @@ public class GvNIXGeoConversionServiceMetadata extends
     }
 
     /**
+     * Gets <code>getPolygonToStringConverter</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getPolygonToStringConverterMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(POLYGON_TO_STRING_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetPolygonToStringConverterMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, POLYGON_TO_STRING_METHOD,
+                CONVERTER_POLYGON_STRING, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>getStringToPolygonConverter</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getStringToPolygonConverterMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(STRING_TO_POLYGON_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetStringToPolygonConverterMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, STRING_TO_POLYGON_METHOD,
+                CONVERTER_STRING_POLYGON, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
      * Builds body method for <code>getPointToStringConverter</code> method. <br>
      * 
      * @param bodyBuilder
@@ -566,6 +676,80 @@ public class GvNIXGeoConversionServiceMetadata extends
     }
 
     /**
+     * Builds body method for <code>getPolygonToStringConverter</code> method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetPolygonToStringConverterMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine(String.format(
+                " return new %s<%s, java.lang.String>() {",
+                helper.getFinalTypeName(CONVERTER_TYPE),
+                helper.getFinalTypeName(POLYGON_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("public String convert(Polygon polygon) {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return writer.writeFormatted(polygon);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+    }
+
+    /**
+     * Builds body method for <code>getStringToPolygonConverter</code> method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetStringToPolygonConverterMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine(String.format(
+                " return new %s<java.lang.String, %s>() {",
+                helper.getFinalTypeName(CONVERTER_TYPE),
+                helper.getFinalTypeName(POLYGON_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("public Polygon convert(String str) {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("try {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return (Polygon) reader.read(str);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine(String.format("}catch( %s e) {",
+                helper.getFinalTypeName(PARSE_EXCEPTION_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("throw new IllegalArgumentException(");
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine(" \"Invalid string for Polygon: \".concat(str), e);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+        // Reset indent
+        bodyBuilder.reset();
+
+    }
+
+    /**
      * Builds body method for <code>afterPropertySet</code> method. <br>
      * 
      * @param bodyBuilder
@@ -593,6 +777,10 @@ public class GvNIXGeoConversionServiceMetadata extends
                 .appendFormalLine("registry.addConverter(getLineStringToStringConverter());");
         bodyBuilder
                 .appendFormalLine("registry.addConverter(getStringToLineStringConverter());");
+        bodyBuilder
+                .appendFormalLine("registry.addConverter(getPolygonToStringConverter());");
+        bodyBuilder
+                .appendFormalLine("registry.addConverter(getStringToPolygonConverter());");
     }
 
     public String toString() {
