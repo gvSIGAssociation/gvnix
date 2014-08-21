@@ -8,10 +8,12 @@ import java.io.PrintWriter;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
@@ -34,11 +36,15 @@ import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
+import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.operations.AbstractOperations;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.JdkJavaType;
@@ -48,6 +54,7 @@ import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -63,6 +70,12 @@ import org.w3c.dom.Element;
 @Service
 public class GeoOperationsImpl extends AbstractOperations implements
         GeoOperations {
+
+    private static final JavaType GVNIX_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
+            "org.gvnix.addon.geo.GvNIXEntityMapLayer");
+
+    private static final JavaType ROO_WEB_SCAFFOLD_ANNOTATION = new JavaType(
+            "org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold");
 
     @Reference
     private PathResolver pathResolver;
@@ -97,6 +110,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
     private static final JavaType MAP_VIEWER_ANNOTATION = new JavaType(
             GvNIXMapViewer.class.getName());
 
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(GeoOperationsImpl.class);
+
     /**
      * This method checks if setup command is available
      * 
@@ -117,6 +133,26 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     @Override
     public boolean isMapCommandAvailable() {
+        return isSetupCommandAvailable();
+    }
+
+    /**
+     * This method checks if web mvc geo all command is available
+     * 
+     * @return true if web nvc geo all command is available
+     */
+    @Override
+    public boolean isAllCommandAvailable() {
+        return isSetupCommandAvailable();
+    }
+
+    /**
+     * This method checks if web mvc geo add command is available
+     * 
+     * @return true if web nvc geo add command is available
+     */
+    @Override
+    public boolean isAddCommandAvailable() {
         return isSetupCommandAvailable();
     }
 
@@ -156,6 +192,216 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Add new mapController view to application.properties
         addI18nControllerProperties(filePackage, path.getReadableSymbolName()
                 .toLowerCase());
+    }
+
+    /**
+     * This method adds all GEO entities to all available maps or specific map
+     */
+    @Override
+    public void all(JavaSymbolName path) {
+        // Checks if path is null or not. If is null, add all entities to all
+        // available maps, if not, add all entities to specified map.
+        List<String> paths = new ArrayList<String>();
+        if (path == null) {
+            paths = GeoUtils.getAllMaps(typeLocationService);
+        }
+        else {
+            String currentPath = path.toString().replaceAll("/", "");
+            // Getting map controller
+            ClassOrInterfaceTypeDetails mapController = GeoUtils
+                    .getMapControllerByPath(typeLocationService, currentPath);
+            // If mapController is null show an error
+            Validate.notNull(
+                    mapController,
+                    String.format(
+                            "Controller annotated with @GvNIXMapViewer doesn't found. Use \"web mvc geo map\" to generate new map view.",
+                            currentPath));
+            paths.add(currentPath);
+        }
+        // Looking for entities with GEO components and annotate his
+        // controllers
+        annotateAllGeoEntityControllers(paths);
+    }
+
+    /**
+     * This method adds specific GEO entities to all available maps or specific
+     * map
+     */
+    @Override
+    public void add(JavaType controller, JavaSymbolName path) {
+        Validate.notNull(controller,
+                "Controller is necessary to execute this operation");
+
+        // Checking that the specified controller is a valid controller
+        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+                .getTypeDetails(controller);
+
+        // Getting scaffold annotation
+        AnnotationMetadata scaffoldAnnotation = controllerDetails
+                .getAnnotation(ROO_WEB_SCAFFOLD_ANNOTATION);
+
+        Validate.notNull(
+                scaffoldAnnotation,
+                String.format(
+                        "%s is not a valid controller. Controller must be annotated with @RooWebScaffold",
+                        controller.getFullyQualifiedTypeName()));
+
+        // Check if is valid GEO Entity
+        boolean isValidEntity = GeoUtils.isGeoEntity(scaffoldAnnotation,
+                typeLocationService);
+
+        Validate.isTrue(isValidEntity, "Specified entity has not GEO fields");
+
+        List<String> paths = new ArrayList<String>();
+        // Add annotation to controller
+        if (path == null) {
+            paths = GeoUtils.getAllMaps(typeLocationService);
+        }
+        else {
+            String currentPath = path.toString().replaceAll("/", "");
+            // Getting map controller
+            ClassOrInterfaceTypeDetails mapController = GeoUtils
+                    .getMapControllerByPath(typeLocationService, currentPath);
+            // If mapController is null show an error
+            Validate.notNull(
+                    mapController,
+                    String.format(
+                            "Controller annotated with @GvNIXMapViewer doesn't found. Use \"web mvc geo map\" to generate new map view.",
+                            currentPath));
+            paths.add(currentPath);
+        }
+
+        annotateGeoEntityController(controller, paths);
+
+    }
+
+    /**
+     * This method annotate controller with @GvNIXEntityMapLayer
+     * 
+     * @param controller
+     * @param paths
+     */
+    public void annotateGeoEntityController(JavaType controller,
+            List<String> paths) {
+
+        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+                .getTypeDetails(controller);
+
+        // Generating fieldsAttribute to add to annotation
+        final List<StringAttributeValue> detailFieldsAttributes = new ArrayList<StringAttributeValue>();
+
+        // Adding all paths
+        Iterator<String> pathsIterator = paths.iterator();
+        while (pathsIterator.hasNext()) {
+            String path = pathsIterator.next();
+            StringAttributeValue detailFieldAttribute = new StringAttributeValue(
+                    new JavaSymbolName("value"), path);
+            detailFieldsAttributes.add(detailFieldAttribute);
+        }
+
+        ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                controllerDetails);
+        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
+
+        // Create "maps" attributes array from string
+        // attributes list
+        ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
+                new JavaSymbolName("maps"), detailFieldsAttributes);
+        annotationBuilder.addAttribute(detailFieldsArray);
+
+        // Add annotation to target type
+        detailsBuilder.updateTypeAnnotation(annotationBuilder.build());
+
+        // Save changes to disk
+        typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder.build());
+
+    }
+
+    /**
+     * This method annotate all controllers if has Geo Fields
+     * 
+     * @param path
+     */
+    public void annotateAllGeoEntityControllers(List<String> paths) {
+        // Getting all entity controllers annotated with @RooWebScaffold
+        Set<ClassOrInterfaceTypeDetails> entityControllers = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(ROO_WEB_SCAFFOLD_ANNOTATION);
+
+        Validate.notNull(entityControllers,
+                "Controllers with @RooWebScaffold annotation doesn't found");
+
+        Iterator<ClassOrInterfaceTypeDetails> it = entityControllers.iterator();
+        while (it.hasNext()) {
+            ClassOrInterfaceTypeDetails entityController = it.next();
+
+            // Getting @GvNIXEntityMapLayer annotation if exists
+            AnnotationMetadata entityMapLayerAnnotation = entityController
+                    .getAnnotation(GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
+
+            // Getting scaffold annotation
+            AnnotationMetadata scaffoldAnnotation = entityController
+                    .getAnnotation(ROO_WEB_SCAFFOLD_ANNOTATION);
+
+            // Getting entity asociated
+            Object entity = scaffoldAnnotation
+                    .getAttribute("formBackingObject").getValue();
+            ClassOrInterfaceTypeDetails entityDetails = typeLocationService
+                    .getTypeDetails((JavaType) entity);
+
+            // Getting all fields of current entity
+            List<? extends FieldMetadata> entityFields = entityDetails
+                    .getDeclaredFields();
+
+            Iterator<? extends FieldMetadata> fieldsIterator = entityFields
+                    .iterator();
+
+            // Generating fieldsAttribute to add to annotation
+            final List<StringAttributeValue> detailFieldsAttributes = new ArrayList<StringAttributeValue>();
+
+            while (fieldsIterator.hasNext()) {
+                // Getting field
+                FieldMetadata field = fieldsIterator.next();
+
+                // Getting field type to get package
+                JavaType fieldType = field.getFieldType();
+                JavaPackage fieldPackage = fieldType.getPackage();
+
+                // If is jts field, annotate controller with maps
+                if (fieldPackage.toString().equals(
+                        "com.vividsolutions.jts.geom")) {
+
+                    // Adding all paths
+                    Iterator<String> pathsIterator = paths.iterator();
+                    while (pathsIterator.hasNext()) {
+                        String path = pathsIterator.next();
+                        StringAttributeValue detailFieldAttribute = new StringAttributeValue(
+                                new JavaSymbolName("value"), path);
+                        detailFieldsAttributes.add(detailFieldAttribute);
+                    }
+
+                    ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                            entityController);
+                    AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                            GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
+
+                    // Create "maps" attributes array from string
+                    // attributes list
+                    ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
+                            new JavaSymbolName("maps"), detailFieldsAttributes);
+                    annotationBuilder.addAttribute(detailFieldsArray);
+
+                    // Add annotation to target type
+                    detailsBuilder.updateTypeAnnotation(annotationBuilder
+                            .build());
+
+                    // Save changes to disk
+                    typeManagementService
+                            .createOrUpdateTypeOnDisk(detailsBuilder.build());
+                    break;
+                }
+            }
+        }
     }
 
     /**

@@ -33,6 +33,20 @@ public interface GeoOperations extends Feature {
     boolean isMapCommandAvailable();
 
     /**
+     * This method checks if web mvc geo all command is available
+     * 
+     * @return true if web mvc geo all command is available
+     */
+    boolean isAllCommandAvailable();
+
+    /**
+     * This method checks if web mvc geo add command is available
+     * 
+     * @return true if web mvc geo add command is available
+     */
+    boolean isAddCommandAvailable();
+
+    /**
      * This method imports all necessary element to build a gvNIX GEO
      * application
      */
@@ -45,5 +59,19 @@ public interface GeoOperations extends Feature {
      * @param path
      */
     void addMap(JavaType controller, JavaSymbolName path);
+
+    /**
+     * This method include all GEO entities on specific map
+     * 
+     * @param path
+     */
+    void all(JavaSymbolName path);
+
+    /**
+     * This method include specific GEO entity on specific map
+     * 
+     * @param path
+     */
+    void add(JavaType controller, JavaSymbolName path);
 
 }
