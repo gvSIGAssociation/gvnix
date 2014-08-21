@@ -335,10 +335,6 @@ public class GeoOperationsImpl extends AbstractOperations implements
         while (it.hasNext()) {
             ClassOrInterfaceTypeDetails entityController = it.next();
 
-            // Getting @GvNIXEntityMapLayer annotation if exists
-            AnnotationMetadata entityMapLayerAnnotation = entityController
-                    .getAnnotation(GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
-
             // Getting scaffold annotation
             AnnotationMetadata scaffoldAnnotation = entityController
                     .getAnnotation(ROO_WEB_SCAFFOLD_ANNOTATION);
