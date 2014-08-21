@@ -19,6 +19,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MessageBundleUtils;
+import org.gvnix.support.OperationUtils;
 import org.gvnix.support.WebProjectUtils;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
@@ -470,43 +471,41 @@ public class GeoOperationsImpl extends AbstractOperations implements
         LogicalPath webappPath = getWebappPath();
 
         // Copy Javascript files and related resources
-        copyDirectoryContents("scripts/leaflet/*.js",
+        OperationUtils.updateDirectoryContents("scripts/leaflet/*.js",
                 pathResolver.getIdentifier(webappPath, "/scripts/leaflet"),
-                true);
-        copyDirectoryContents("scripts/leaflet/images/*.png",
+                fileManager, context, getClass());
+        OperationUtils.updateDirectoryContents("scripts/leaflet/images/*.png",
                 pathResolver.getIdentifier(webappPath,
-                        "/scripts/leaflet/images"), true);
+                        "/scripts/leaflet/images"), fileManager, context,
+                getClass());
         // Copy Styles files and related resources
-        copyDirectoryContents("styles/leaflet/*.css",
-                pathResolver.getIdentifier(webappPath, "/styles/leaflet"), true);
-        copyDirectoryContents("styles/leaflet/images/*.png",
+        OperationUtils.updateDirectoryContents("styles/leaflet/*.css",
+                pathResolver.getIdentifier(webappPath, "/styles/leaflet"),
+                fileManager, context, getClass());
+        OperationUtils.updateDirectoryContents("styles/leaflet/images/*.png",
                 pathResolver
                         .getIdentifier(webappPath, "/styles/leaflet/images"),
-                true);
+                fileManager, context, getClass());
         // Copy necessary fonts
-        copyDirectoryContents("styles/fonts/*.eot",
-                pathResolver.getIdentifier(webappPath, "/styles/fonts"), true);
-        copyDirectoryContents("styles/fonts/*.svg",
-                pathResolver.getIdentifier(webappPath, "/styles/fonts"), true);
-        copyDirectoryContents("styles/fonts/*.ttf",
-                pathResolver.getIdentifier(webappPath, "/styles/fonts"), true);
-        copyDirectoryContents("styles/fonts/*.woff",
-                pathResolver.getIdentifier(webappPath, "/styles/fonts"), true);
-        copyDirectoryContents("styles/fonts/*.otf",
-                pathResolver.getIdentifier(webappPath, "/styles/fonts"), true);
+        OperationUtils.updateDirectoryContents("styles/fonts/*.*",
+                pathResolver.getIdentifier(webappPath, "/styles/fonts"),
+                fileManager, context, getClass());
         // Copy images into images folder
-        copyDirectoryContents("images/*.png",
-                pathResolver.getIdentifier(webappPath, "/images"), true);
+        OperationUtils.updateDirectoryContents("images/*.*",
+                pathResolver.getIdentifier(webappPath, "/images"), fileManager,
+                context, getClass());
         // Copy tags into tags folder
-        copyDirectoryContents("tags/geo/*.tagx",
+        OperationUtils.updateDirectoryContents("tags/geo/*.tagx",
                 pathResolver.getIdentifier(webappPath, "/WEB-INF/tags/geo"),
-                true);
-        copyDirectoryContents("tags/geo/layers/*.tagx",
+                fileManager, context, getClass());
+        OperationUtils.updateDirectoryContents("tags/geo/layers/*.tagx",
                 pathResolver.getIdentifier(webappPath,
-                        "/WEB-INF/tags/geo/layers"), true);
-        copyDirectoryContents("tags/geo/tools/*.tagx",
+                        "/WEB-INF/tags/geo/layers"), fileManager, context,
+                getClass());
+        OperationUtils.updateDirectoryContents("tags/geo/tools/*.tagx",
                 pathResolver.getIdentifier(webappPath,
-                        "/WEB-INF/tags/geo/tools"), true);
+                        "/WEB-INF/tags/geo/tools"), fileManager, context,
+                getClass());
 
         // Add sources to loadScripts
         addToLoadScripts("js_leaflet_geo_js",

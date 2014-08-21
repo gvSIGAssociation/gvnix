@@ -14,16 +14,16 @@
 }
 
 .mapviewer_layers_header{
-	height: 50px;
+	height: 40px;
  	padding: 0;
  	border-radius: 5px 5px 0 0;
 	background-color:rgb(96,130,36);
 }
 
 .mapviewer_layers_container h3{
-	padding: 15px;
+	padding: 10px 15px 15px;
 	margin: 0;
-	font-size: 14px;
+	font-size: 13px;
 	color: white;
 }
 
@@ -46,18 +46,18 @@
 .mapviewer_tools_bar{
 	font-size:10px;
 	background-color:#F9F9F9;
-	min-height:50px;
+	min-height:35px;
 	border:1px solid #DDDDDD;
 	border-radius:5px 5px 0 0;
 }
 
 .mapviewer_tools_bar i{
-	margin-top:10px;
+	margin-top:7px;
 	margin-left:1px;
-	font-size:18px;
+	font-size:10px;
 	padding: 5px 0 5px 5px;
 	cursor: pointer;
-	width:30px;
+	width:18px;
 	text-align:center;
 }
 	.mapviewer_tools_bar i#default_tool{float: left;}/*out div*/

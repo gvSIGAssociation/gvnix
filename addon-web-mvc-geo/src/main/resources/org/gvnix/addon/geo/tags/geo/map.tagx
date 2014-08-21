@@ -25,7 +25,12 @@
 
     <!-- Zoom 5 as default -->
     <c:if test="${empty zoom}">
-    	<c:set var="zoom" value="6" />
+    	<c:set var="zoom" value="5" />
+    </c:if>
+    
+    <!-- MaxZoom 21 as default -->
+    <c:if test="${empty maxZoom}">
+    	<c:set var="maxZoom" value="21" />
     </c:if>
 
  	<div class="mapviewer_wrap">
