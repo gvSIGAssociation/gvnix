@@ -21,13 +21,11 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.support.ItdBuilderHelper;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.FieldMetadataBuilder;
+import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
@@ -40,6 +38,9 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectOperations;
 
 /**
  * ITD generator for {@link GvNIXGeoConversionService} annotation.
@@ -64,8 +65,13 @@ public class GvNIXMapViewerMetadata extends
             .create(PROVIDES_TYPE_STRING);
 
     public GvNIXMapViewerMetadata(String identifier, JavaType aspectName,
-            PhysicalTypeMetadata governorPhysicalTypeMetadata, String path) {
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            ProjectOperations projectOperations,
+            TypeLocationService typeLocationService, List<JavaType> entities,
+            String path) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
+
+        // Generating necessary methods
 
         // Helper itd generation
         this.helper = new ItdBuilderHelper(this, governorPhysicalTypeMetadata,
@@ -77,6 +83,35 @@ public class GvNIXMapViewerMetadata extends
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
+
+        // Updating show.jspx with entities to display
+        updateJSPXFiles(entities, finalPath, typeLocationService,
+                projectOperations);
+    }
+
+    /**
+     * This method updates necessary JSPX files to visualize correctly entities
+     * and his fields
+     * 
+     * @param entities
+     * @param path
+     * @param typeLocationService
+     * @param fileManager
+     * 
+     */
+    private void updateJSPXFiles(List<JavaType> entities, String path,
+            TypeLocationService typeLocationService,
+            ProjectOperations projectOperations) {
+
+        PathResolver pathResolver = projectOperations.getPathResolver();
+
+        // Getting jspx file path
+        String finalPath = new JavaSymbolName(path).getReadableSymbolName()
+                .toLowerCase();
+        final String showPath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP,
+                String.format("WEB-INF/views/%s/show.jspx", finalPath));
+
     }
 
     /**

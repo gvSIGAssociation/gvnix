@@ -17,7 +17,11 @@
  */
 package org.gvnix.addon.geo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -25,11 +29,14 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.ClassAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.ProjectOperations;
 
 /**
  * Provides {@link GvNIXMapViewerMetadata}.
@@ -41,6 +48,9 @@ import org.springframework.roo.project.LogicalPath;
 @Service
 public final class GvNIXMapViewerMetadataProvider extends
         AbstractItdMetadataProvider {
+
+    @Reference
+    private ProjectOperations projectOperations;
 
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
@@ -77,19 +87,40 @@ public final class GvNIXMapViewerMetadataProvider extends
         JavaType javaType = GvNIXMapViewerMetadata
                 .getJavaType(metadataIdentificationString);
 
-        // Getting @RequestMapping annotation
         ClassOrInterfaceTypeDetails controller = typeLocationService
                 .getTypeDetails(javaType);
+
+        // Getting @RequestMapping annotation
         AnnotationMetadata requestMappingAnnotation = controller
                 .getAnnotation(SpringJavaType.REQUEST_MAPPING);
+
+        // Getting @GvNIXMapViewer annotation
+        AnnotationMetadata mapViewerAnnotation = controller
+                .getAnnotation(new JavaType(GvNIXMapViewer.class.getName()));
 
         // Getting path value
         AnnotationAttributeValue<Object> value = requestMappingAnnotation
                 .getAttribute("value");
+
         String path = value.getValue().toString();
 
+        // Getting entityLayers
+        List<JavaType> entitiesToVisualize = new ArrayList<JavaType>();
+
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        ArrayAttributeValue<ClassAttributeValue> mapViewerAttributes = (ArrayAttributeValue) mapViewerAnnotation
+                .getAttribute("entityLayers");
+        if (mapViewerAttributes != null) {
+            List<ClassAttributeValue> entityLayers = mapViewerAttributes
+                    .getValue();
+            for (ClassAttributeValue entity : entityLayers) {
+                entitiesToVisualize.add(entity.getValue());
+            }
+        }
+
         return new GvNIXMapViewerMetadata(metadataIdentificationString,
-                aspectName, governorPhysicalTypeMetadata, path);
+                aspectName, governorPhysicalTypeMetadata, projectOperations,
+                typeLocationService, entitiesToVisualize, path);
     }
 
     /**

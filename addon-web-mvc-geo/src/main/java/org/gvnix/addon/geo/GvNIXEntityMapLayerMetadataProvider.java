@@ -164,8 +164,8 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
 
         return new GvNIXEntityMapLayerMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, typeLocationService,
-                typeManagementService, entity, plural, controllersList,
-                controllersToRemove);
+                typeManagementService, javaType, entity, plural,
+                controllersList, controllersToRemove);
     }
 
     /**
