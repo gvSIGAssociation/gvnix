@@ -17,7 +17,12 @@
  */
 package org.gvnix.addon.geo;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.PhysicalTypeUtils;
 import org.osgi.service.component.ComponentContext;
@@ -26,7 +31,11 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnno
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
@@ -43,8 +52,8 @@ import org.springframework.roo.project.LogicalPath;
 public final class GvNIXEntityMapLayerMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    private static final JavaType ROO_WEB_SCAFFOLD_ANNOTATION = new JavaType(
-            "org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold");
+    @Reference
+    TypeManagementService typeManagementService;
 
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
@@ -83,6 +92,10 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
         LogicalPath path = GvNIXEntityMapLayerMetadata
                 .getPath(metadataIdentificationString);
 
+        // Getting controller
+        ClassOrInterfaceTypeDetails controller = typeLocationService
+                .getTypeDetails(javaType);
+
         // Getting @RooWebScaffold annotation
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
                 javaType, path);
@@ -111,8 +124,48 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
         // Getting entity plural
         String plural = jpaMetadata.getPlural();
 
+        // Getting @GvNIXEntityMapLayer annotation
+        AnnotationMetadata entityMapLayerAnnotation = controller
+                .getAnnotation(new JavaType(GvNIXEntityMapLayer.class.getName()));
+
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        ArrayAttributeValue<StringAttributeValue> entityMapLayerAnnotationAttr = (ArrayAttributeValue) entityMapLayerAnnotation
+                .getAttribute("maps");
+
+        List<JavaType> controllersList = new ArrayList<JavaType>();
+        // If not have paths, add to all maps controllers
+        if (entityMapLayerAnnotationAttr == null) {
+            controllersList = GeoUtils
+                    .getAllMapsControllers(typeLocationService);
+        }
+        else {
+            // If have paths, use it to obtain map controller
+            List<StringAttributeValue> listPath = entityMapLayerAnnotationAttr
+                    .getValue();
+            Iterator<StringAttributeValue> it = listPath.iterator();
+            while (it.hasNext()) {
+                StringAttributeValue mapPathAttr = it.next();
+                String mapPath = mapPathAttr.getValue();
+                JavaType mapController = GeoUtils.getMapControllerByPath(
+                        typeLocationService, mapPath).getType();
+                controllersList.add(mapController);
+            }
+        }
+
+        // Calculate in which Map controller must not be displayed entity
+        List<JavaType> allMapControllers = GeoUtils
+                .getAllMapsControllers(typeLocationService);
+        List<JavaType> controllersToRemove = new ArrayList<JavaType>();
+        for (JavaType mapController : allMapControllers) {
+            if (controllersList.indexOf(mapController) == -1) {
+                controllersToRemove.add(mapController);
+            }
+        }
+
         return new GvNIXEntityMapLayerMetadata(metadataIdentificationString,
-                aspectName, governorPhysicalTypeMetadata, entity, plural);
+                aspectName, governorPhysicalTypeMetadata, typeLocationService,
+                typeManagementService, entity, plural, controllersList,
+                controllersToRemove);
     }
 
     /**

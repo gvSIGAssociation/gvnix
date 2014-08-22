@@ -133,6 +133,45 @@ public class GeoUtils {
         return paths;
     }
 
+    /**
+     * 
+     * This method returns all available maps Controllers
+     * 
+     * @param typeLocationService
+     * @return
+     */
+    public static List<JavaType> getAllMapsControllers(
+            TypeLocationService typeLocationService) {
+        List<JavaType> controllers = new ArrayList<JavaType>();
+
+        for (JavaType mapViewer : typeLocationService
+                .findTypesWithAnnotation(MAP_VIEWER_ANNOTATION)) {
+            Validate.notNull(mapViewer, "@GvNIXMapViewer required");
+
+            ClassOrInterfaceTypeDetails mapViewerController = typeLocationService
+                    .getTypeDetails(mapViewer);
+
+            // Getting RequestMapping annotations
+            final AnnotationMetadata requestMappingAnnotation = MemberFindingUtils
+                    .getAnnotationOfType(mapViewerController.getAnnotations(),
+                            SpringJavaType.REQUEST_MAPPING);
+
+            Validate.notNull(mapViewer, String.format(
+                    "Error on %s getting @RequestMapping value", mapViewer));
+
+            controllers.add(mapViewer);
+        }
+
+        return controllers;
+    }
+
+    /**
+     * This method checks if the current entity is a GEO entity or not
+     * 
+     * @param scaffoldAnnotation
+     * @param typeLocationService
+     * @return
+     */
     public static boolean isGeoEntity(AnnotationMetadata scaffoldAnnotation,
             TypeLocationService typeLocationService) {
         // Checking that entity has GEO fields

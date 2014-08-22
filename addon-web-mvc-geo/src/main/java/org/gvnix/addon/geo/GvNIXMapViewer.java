@@ -32,4 +32,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface GvNIXMapViewer {
 
+    /**
+     * 
+     * @return an array of entity class to display on map
+     */
+    Class<?>[] entityLayers();
+
 }
