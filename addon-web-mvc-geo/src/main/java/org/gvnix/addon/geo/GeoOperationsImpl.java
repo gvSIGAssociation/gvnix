@@ -199,25 +199,34 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     @Override
     public void all(JavaSymbolName path) {
+        List<String> paths = new ArrayList<String>();
         // Checks if path is null or not. If is null, add all entities to all
         // available maps, if not, add all entities to specified map.
-        List<String> paths = new ArrayList<String>();
-        if (path == null) {
-            paths = GeoUtils.getAllMaps(typeLocationService);
+        if (path != null) {
+            String pathList = path.toString();
+            String[] pathsToAdd = pathList.split(",");
+
+            for (String currentPath : pathsToAdd) {
+                currentPath = currentPath.replaceAll("/", "").trim();
+
+                // Getting map controller
+                ClassOrInterfaceTypeDetails mapController = GeoUtils
+                        .getMapControllerByPath(typeLocationService,
+                                currentPath);
+                // If mapController is null show an error
+                Validate.notNull(
+                        mapController,
+                        String.format(
+                                "Controller annotated with @GvNIXMapViewer and with path \"%s\" doesn't found. Use \"web mvc geo map\" to generate new map view.",
+                                currentPath));
+                paths.add(currentPath);
+            }
         }
         else {
-            String currentPath = path.toString().replaceAll("/", "");
-            // Getting map controller
-            ClassOrInterfaceTypeDetails mapController = GeoUtils
-                    .getMapControllerByPath(typeLocationService, currentPath);
-            // If mapController is null show an error
-            Validate.notNull(
-                    mapController,
-                    String.format(
-                            "Controller annotated with @GvNIXMapViewer doesn't found. Use \"web mvc geo map\" to generate new map view.",
-                            currentPath));
-            paths.add(currentPath);
+            // If path is null, entity will be added to all maps
+            paths.add("");
         }
+
         // Looking for entities with GEO components and annotate his
         // controllers
         annotateAllGeoEntityControllers(paths);
@@ -250,25 +259,36 @@ public class GeoOperationsImpl extends AbstractOperations implements
         boolean isValidEntity = GeoUtils.isGeoEntity(scaffoldAnnotation,
                 typeLocationService);
 
-        Validate.isTrue(isValidEntity, "Specified entity has not GEO fields");
+        Validate.isTrue(isValidEntity, String
+                .format("Specified entity \"%s\" has not GEO fields",
+                        scaffoldAnnotation.getAttribute("formBackingObject")
+                                .getValue()));
 
         List<String> paths = new ArrayList<String>();
         // Add annotation to controller
-        if (path == null) {
-            paths = GeoUtils.getAllMaps(typeLocationService);
+        if (path != null) {
+            String pathList = path.toString();
+            String[] pathsToAdd = pathList.split(",");
+
+            for (String currentPath : pathsToAdd) {
+                currentPath = currentPath.replaceAll("/", "").trim();
+
+                // Getting map controller
+                ClassOrInterfaceTypeDetails mapController = GeoUtils
+                        .getMapControllerByPath(typeLocationService,
+                                currentPath);
+                // If mapController is null show an error
+                Validate.notNull(
+                        mapController,
+                        String.format(
+                                "Controller annotated with @GvNIXMapViewer doesn't found. Use \"web mvc geo map\" to generate new map view.",
+                                currentPath));
+                paths.add(currentPath);
+            }
         }
         else {
-            String currentPath = path.toString().replaceAll("/", "");
-            // Getting map controller
-            ClassOrInterfaceTypeDetails mapController = GeoUtils
-                    .getMapControllerByPath(typeLocationService, currentPath);
-            // If mapController is null show an error
-            Validate.notNull(
-                    mapController,
-                    String.format(
-                            "Controller annotated with @GvNIXMapViewer doesn't found. Use \"web mvc geo map\" to generate new map view.",
-                            currentPath));
-            paths.add(currentPath);
+            // If path is null, entity will be added to all maps
+            paths.add("");
         }
 
         annotateGeoEntityController(controller, paths);
@@ -290,25 +310,26 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Generating fieldsAttribute to add to annotation
         final List<StringAttributeValue> detailFieldsAttributes = new ArrayList<StringAttributeValue>();
 
-        // Adding all paths
-        Iterator<String> pathsIterator = paths.iterator();
-        while (pathsIterator.hasNext()) {
-            String path = pathsIterator.next();
-            StringAttributeValue detailFieldAttribute = new StringAttributeValue(
-                    new JavaSymbolName("value"), path);
-            detailFieldsAttributes.add(detailFieldAttribute);
-        }
-
         ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                 controllerDetails);
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
 
-        // Create "maps" attributes array from string
-        // attributes list
-        ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
-                new JavaSymbolName("maps"), detailFieldsAttributes);
-        annotationBuilder.addAttribute(detailFieldsArray);
+        // If is not for all maps
+        if (!(paths.size() == 1 && paths.get(0).equals(""))) {
+            Iterator<String> pathIterator = paths.iterator();
+            while (pathIterator.hasNext()) {
+                String currentPath = pathIterator.next();
+                StringAttributeValue detailFieldAttribute = new StringAttributeValue(
+                        new JavaSymbolName("value"), currentPath);
+                detailFieldsAttributes.add(detailFieldAttribute);
+            }
+            // Create "maps" attributes array from string
+            // attributes list
+            ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
+                    new JavaSymbolName("maps"), detailFieldsAttributes);
+            annotationBuilder.addAttribute(detailFieldsArray);
+        }
 
         // Add annotation to target type
         detailsBuilder.updateTypeAnnotation(annotationBuilder.build());
@@ -367,25 +388,28 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 if (fieldPackage.toString().equals(
                         "com.vividsolutions.jts.geom")) {
 
-                    // Adding all paths
-                    Iterator<String> pathsIterator = paths.iterator();
-                    while (pathsIterator.hasNext()) {
-                        String path = pathsIterator.next();
-                        StringAttributeValue detailFieldAttribute = new StringAttributeValue(
-                                new JavaSymbolName("value"), path);
-                        detailFieldsAttributes.add(detailFieldAttribute);
-                    }
-
+                    // Generating annotation
                     ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                             entityController);
                     AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                             GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
 
-                    // Create "maps" attributes array from string
-                    // attributes list
-                    ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
-                            new JavaSymbolName("maps"), detailFieldsAttributes);
-                    annotationBuilder.addAttribute(detailFieldsArray);
+                    // If is not for all maps
+                    if (!(paths.size() == 1 && paths.get(0).equals(""))) {
+                        Iterator<String> pathIterator = paths.iterator();
+                        while (pathIterator.hasNext()) {
+                            String currentPath = pathIterator.next();
+                            StringAttributeValue detailFieldAttribute = new StringAttributeValue(
+                                    new JavaSymbolName("value"), currentPath);
+                            detailFieldsAttributes.add(detailFieldAttribute);
+                        }
+                        // Create "maps" attributes array from string
+                        // attributes list
+                        ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
+                                new JavaSymbolName("maps"),
+                                detailFieldsAttributes);
+                        annotationBuilder.addAttribute(detailFieldsArray);
+                    }
 
                     // Add annotation to target type
                     detailsBuilder.updateTypeAnnotation(annotationBuilder
@@ -912,7 +936,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
     @Override
     public boolean isInstalledInModule(String moduleName) {
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
-                "scripts/geo/leaflet.js");
+                "scripts/leaflet/leaflet.js");
         return fileManager.exists(dirPath);
     }
 

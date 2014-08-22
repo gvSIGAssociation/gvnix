@@ -33,7 +33,11 @@ import java.lang.annotation.Target;
 public @interface GvNIXEntityMapLayer {
 
     /**
-     * @return an array of maps where the entity will be displayed
+     * If blank the entity will be displayed in all available maps of the
+     * project. If not blank, the entity will be displayed only in the specified
+     * maps.
+     * 
+     * @return an array of maps where the entity will be displayed.
      */
     String[] maps() default "";
 }

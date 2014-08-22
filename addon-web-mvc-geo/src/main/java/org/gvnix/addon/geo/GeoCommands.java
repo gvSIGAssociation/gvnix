@@ -112,7 +112,7 @@ public class GeoCommands implements CommandMarker {
      */
     @CliCommand(value = "web mvc geo all", help = "Run this method to include all GEO entities on specific map or on all available maps")
     public void all(
-            @CliOption(key = "path", mandatory = false, help = "If blank, adds all GEO entities to all available maps. Indicate path if you want to include all entities in one map only.") final JavaSymbolName path) {
+            @CliOption(key = "path", mandatory = false, help = "If blank, adds all GEO entities to all available maps. Indicate a list of paths separated by commas if you want to include all entities in some specific maps.") final JavaSymbolName path) {
         operations.all(path);
     }
 
@@ -125,7 +125,7 @@ public class GeoCommands implements CommandMarker {
     @CliCommand(value = "web mvc geo add", help = "Run this method to include specific GEO entity on all maps or specific map")
     public void add(
             @CliOption(key = "controller", mandatory = true, help = "Indicates which entity controller you want to add to map") final JavaType controller,
-            @CliOption(key = "path", mandatory = false, help = "If blank, adds current GEO entity to all available maps. Indicate path if you want to include current entity in one map only.") final JavaSymbolName path) {
+            @CliOption(key = "path", mandatory = false, help = "If blank, adds all GEO entities to all available maps. Indicate a list of paths separated by commas if you want to include all entities in some specific maps.") final JavaSymbolName path) {
         operations.add(controller, path);
     }
 

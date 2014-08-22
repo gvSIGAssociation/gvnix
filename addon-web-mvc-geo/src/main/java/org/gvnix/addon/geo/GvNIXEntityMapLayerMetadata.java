@@ -60,7 +60,8 @@ public class GvNIXEntityMapLayerMetadata extends
             .create(PROVIDES_TYPE_STRING);
 
     public GvNIXEntityMapLayerMetadata(String identifier, JavaType aspectName,
-            PhysicalTypeMetadata governorPhysicalTypeMetadata, JavaType entity) {
+            PhysicalTypeMetadata governorPhysicalTypeMetadata, JavaType entity,
+            String entityPlural) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         // Helper itd generation
@@ -68,7 +69,8 @@ public class GvNIXEntityMapLayerMetadata extends
                 builder.getImportRegistrationResolver());
 
         // Adding list method
-        builder.addMethod(getListGeoEntityOnMapViewerMethod(entity));
+        builder.addMethod(getListGeoEntityOnMapViewerMethod(entity,
+                entityPlural));
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
@@ -79,7 +81,8 @@ public class GvNIXEntityMapLayerMetadata extends
      * 
      * @return
      */
-    private MethodMetadata getListGeoEntityOnMapViewerMethod(JavaType entity) {
+    private MethodMetadata getListGeoEntityOnMapViewerMethod(JavaType entity,
+            String plural) {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
 
@@ -122,7 +125,7 @@ public class GvNIXEntityMapLayerMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildlistGeoEntityOnMapViewerMethodBody(entity, bodyBuilder);
+        buildlistGeoEntityOnMapViewerMethodBody(entity, plural, bodyBuilder);
 
         // Return type
         JavaType responseEntityJavaType = new JavaType(
@@ -149,7 +152,7 @@ public class GvNIXEntityMapLayerMetadata extends
      * @param bodyBuilder
      */
     private void buildlistGeoEntityOnMapViewerMethodBody(JavaType entity,
-            InvocableMemberBodyBuilder bodyBuilder) {
+            String plural, InvocableMemberBodyBuilder bodyBuilder) {
         // HttpHeaders headers = new HttpHeaders();
         bodyBuilder.appendFormalLine(String.format(
                 "%s headers = new HttpHeaders();",
@@ -164,8 +167,20 @@ public class GvNIXEntityMapLayerMetadata extends
                 "%s<%s> result = %s.findAll%s();",
                 helper.getFinalTypeName(new JavaType("java.util.List")),
                 helper.getFinalTypeName(entity),
-                helper.getFinalTypeName(entity),
-                entity.getFullyQualifiedTypeName()));
+                helper.getFinalTypeName(entity), plural));
+
+        // return new ResponseEntity<List<Owner>>(result, headers,
+        // org.springframework.http.HttpStatus.OK);
+        // Return type
+        JavaType responseEntityJavaType = new JavaType(
+                SpringJavaType.RESPONSE_ENTITY.getFullyQualifiedTypeName(), 0,
+                DataType.TYPE, null, Arrays.asList(new JavaType(
+                        "java.util.List", 0, DataType.TYPE, null, Arrays
+                                .asList(entity))));
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("return new %s(result, headers, org.springframework.http.HttpStatus.OK);",
+                                helper.getFinalTypeName(responseEntityJavaType)));
     }
 
     public String toString() {

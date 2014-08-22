@@ -19,16 +19,17 @@ package org.gvnix.addon.geo;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.PhysicalTypeUtils;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
 
 /**
@@ -79,19 +80,39 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
 
         JavaType javaType = GvNIXEntityMapLayerMetadata
                 .getJavaType(metadataIdentificationString);
+        LogicalPath path = GvNIXEntityMapLayerMetadata
+                .getPath(metadataIdentificationString);
 
-        // Getting @RequestMapping annotation
-        ClassOrInterfaceTypeDetails controller = typeLocationService
-                .getTypeDetails(javaType);
+        // Getting @RooWebScaffold annotation
+        String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
+                javaType, path);
 
-        AnnotationMetadata scaffoldAnnotation = controller
-                .getAnnotation(ROO_WEB_SCAFFOLD_ANNOTATION);
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+                .get(webScaffoldMetadataId);
 
-        Object entity = scaffoldAnnotation.getAttribute("formBackingObject")
-                .getValue();
+        WebScaffoldAnnotationValues webScaffoldAnnotationValues = webScaffoldMetadata
+                .getAnnotationValues();
+
+        // Getting entity
+        JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
+
+        LogicalPath entityPath = PhysicalTypeUtils.getPath(entity,
+                typeLocationService);
+
+        String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
+                entityPath);
+        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
+                .get(jpaMetadataId);
+        if (jpaMetadata == null) {
+            // Unsupported type (by now)
+            return null;
+        }
+
+        // Getting entity plural
+        String plural = jpaMetadata.getPlural();
 
         return new GvNIXEntityMapLayerMetadata(metadataIdentificationString,
-                aspectName, governorPhysicalTypeMetadata, (JavaType) entity);
+                aspectName, governorPhysicalTypeMetadata, entity, plural);
     }
 
     /**
