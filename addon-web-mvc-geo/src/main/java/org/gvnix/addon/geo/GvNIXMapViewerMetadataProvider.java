@@ -35,6 +35,7 @@ import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.SpringJavaType;
+import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
 
@@ -120,7 +121,8 @@ public final class GvNIXMapViewerMetadataProvider extends
 
         return new GvNIXMapViewerMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, projectOperations,
-                typeLocationService, entitiesToVisualize, path);
+                typeLocationService, this.fileManager, entitiesToVisualize,
+                path);
     }
 
     /**

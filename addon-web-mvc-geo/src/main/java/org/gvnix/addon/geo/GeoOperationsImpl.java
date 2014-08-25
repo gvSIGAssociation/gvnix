@@ -41,6 +41,7 @@ import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.ClassAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.operations.AbstractOperations;
 import org.springframework.roo.metadata.MetadataService;
@@ -56,6 +57,7 @@ import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.FileUtils;
+import org.springframework.roo.support.util.XmlRoundTripUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -521,22 +523,21 @@ public class GeoOperationsImpl extends AbstractOperations implements
             String mapId = String.format("ps_%s_%s",
                     controllerPackage.replaceAll("[.]", "_"),
                     path.getSymbolNameCapitalisedFirstLetter());
+
             Element map = docXml.createElement("geo:map");
             map.setAttribute("id", mapId);
-            // TODO: CALCULATE Z
-            map.setAttribute("z", "user-managed");
+            map.setAttribute("z", XmlRoundTripUtils.calculateUniqueKeyFor(map));
 
             // Creating geo:toc element and adding to map
             Element toc = docXml.createElement("geo:toc");
             toc.setAttribute("id", String.format("%s_toc", mapId));
-            // TODO: CALCULATE Z
-            toc.setAttribute("z", "user-managed");
+            toc.setAttribute("z", XmlRoundTripUtils.calculateUniqueKeyFor(toc));
             map.appendChild(toc);
 
             // Creating geo:toolbar element and adding to map
             Element toolbar = docXml.createElement("geo:toolbar");
-            // TODO: CALCULATE Z
-            toolbar.setAttribute("z", "user-managed");
+            toolbar.setAttribute("z",
+                    XmlRoundTripUtils.calculateUniqueKeyFor(toolbar));
             map.appendChild(toolbar);
 
             // Adding childs to mainDiv
@@ -640,9 +641,62 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 String.format("/%s", path.toString()));
         annotations.add(requestMappingAnnotation);
 
-        // Add @GvNIXMapViewer annotation
+        // Add @GvNIXMapViewer annotation with list of all entities annotated
+        // with @GvNIXEntityMapLayer
         AnnotationMetadataBuilder mapViewerAnnotation = new AnnotationMetadataBuilder(
                 MAP_VIEWER_ANNOTATION);
+
+        // Generating empty class attribute value
+        final List<ClassAttributeValue> entityAttributes = new ArrayList<ClassAttributeValue>();
+
+        // Looking for all entities annotated with @GvNIXEntityMapLayer
+        for (ClassOrInterfaceTypeDetails entity : typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(GVNIX_ENTITY_MAP_LAYER_ANNOTATION)) {
+
+            // Getting map layer annotation
+            AnnotationMetadata mapLayerAnnotation = entity
+                    .getAnnotation(GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
+
+            // Getting maps where will be displayed
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            ArrayAttributeValue<StringAttributeValue> mapLayerAttributes = (ArrayAttributeValue) mapLayerAnnotation
+                    .getAttribute("maps");
+
+            boolean addEntityToMap = false;
+
+            if (mapLayerAttributes == null) {
+                addEntityToMap = true;
+            }
+            else {
+
+                List<StringAttributeValue> mapLayerAttributesValues = mapLayerAttributes
+                        .getValue();
+
+                for (StringAttributeValue map : mapLayerAttributesValues) {
+                    if (map.getValue() == path.toString()) {
+                        addEntityToMap = true;
+                        break;
+                    }
+                }
+            }
+
+            if (addEntityToMap) {
+                final ClassAttributeValue entityAttribute = new ClassAttributeValue(
+                        new JavaSymbolName("value"), entity.getType());
+
+                entityAttributes.add(entityAttribute);
+
+            }
+
+        }
+
+        // Create "entityLayers" attributes array from string attributes
+        // list
+        ArrayAttributeValue<ClassAttributeValue> entityLayersArray = new ArrayAttributeValue<ClassAttributeValue>(
+                new JavaSymbolName("entityLayers"), entityAttributes);
+        // Adding controller class list to MapViewer Controller
+        mapViewerAnnotation.addAttribute(entityLayersArray);
+
         annotations.add(mapViewerAnnotation);
 
         // Set annotations

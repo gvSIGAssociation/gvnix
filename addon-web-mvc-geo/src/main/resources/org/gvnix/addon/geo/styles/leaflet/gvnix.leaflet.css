@@ -97,8 +97,9 @@
 }
 
 .layer_legend_span{
-	position:absolute;
-	margin-top:-5px;
+	position:relative;
+	margin-top:2px;
+	font-size:2px;
 }
 
 .layer_legend{
