@@ -33,9 +33,9 @@ import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue
 import org.springframework.roo.classpath.details.annotations.ClassAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.SpringJavaType;
-import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
 
@@ -105,6 +105,12 @@ public final class GvNIXMapViewerMetadataProvider extends
 
         String path = value.getValue().toString();
 
+        // Getting mapId
+        String mapId = String.format("ps_%s_%s", javaType.getPackage()
+                .getFullyQualifiedPackageName().replaceAll("[.]", "_"),
+                new JavaSymbolName(path.replaceAll("/", ""))
+                        .getSymbolNameCapitalisedFirstLetter());
+
         // Getting entityLayers
         List<JavaType> entitiesToVisualize = new ArrayList<JavaType>();
 
@@ -122,7 +128,7 @@ public final class GvNIXMapViewerMetadataProvider extends
         return new GvNIXMapViewerMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, projectOperations,
                 typeLocationService, this.fileManager, entitiesToVisualize,
-                path);
+                path, mapId);
     }
 
     /**

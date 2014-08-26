@@ -536,6 +536,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
             // Creating geo:toolbar element and adding to map
             Element toolbar = docXml.createElement("geo:toolbar");
+            toolbar.setAttribute("id", String.format("%s_toolbar", mapId));
             toolbar.setAttribute("z",
                     XmlRoundTripUtils.calculateUniqueKeyFor(toolbar));
             map.appendChild(toolbar);

@@ -53,8 +53,6 @@ import org.springframework.roo.support.util.XmlRoundTripUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -83,7 +81,7 @@ public class GvNIXMapViewerMetadata extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             ProjectOperations projectOperations,
             TypeLocationService typeLocationService, FileManager fileManager,
-            List<JavaType> entities, String path) {
+            List<JavaType> entities, String path, String mapId) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         // Generating necessary methods
@@ -101,7 +99,7 @@ public class GvNIXMapViewerMetadata extends
 
         // Updating show.jspx with entities to display
         updateJSPXFiles(entities, finalPath, typeLocationService,
-                projectOperations, fileManager);
+                projectOperations, fileManager, mapId);
     }
 
     /**
@@ -116,10 +114,10 @@ public class GvNIXMapViewerMetadata extends
      */
     private void updateJSPXFiles(List<JavaType> entities, String path,
             TypeLocationService typeLocationService,
-            ProjectOperations projectOperations, FileManager fileManager) {
+            ProjectOperations projectOperations, FileManager fileManager,
+            String mapId) {
 
         PathResolver pathResolver = projectOperations.getPathResolver();
-
         // Getting jspx file path
         String finalPath = new JavaSymbolName(path).getReadableSymbolName()
                 .toLowerCase();
@@ -133,288 +131,43 @@ public class GvNIXMapViewerMetadata extends
                     fileManager);
             Element docRoot = docXml.getDocumentElement();
 
-            // Getting geo:map element
-            NodeList mapElements = docRoot.getElementsByTagName("geo:map");
-            Node mapElement = mapElements.item(0);
-            NamedNodeMap mapAttributes = mapElement.getAttributes();
-            Node zElement = mapAttributes.getNamedItem("z");
-            String zValue = zElement.getNodeValue();
+            // Getting mapElement
+            Element mapElement = getOrCreateMapElement(docRoot, docXml, mapId);
+            String zValue = mapElement.getAttribute("z");
 
             // If map is not set as user-managed gvNIX updates map content
             if (!zValue.equals("user-managed")) {
 
-                String validZValue = XmlRoundTripUtils
-                        .calculateUniqueKeyFor((Element) mapElement);
-
-                // Regenerating zValue if is blank
-                if (StringUtils.isBlank(zValue)) {
-                    zElement.setNodeValue(validZValue);
-                }
+                // Manage and Update map
+                updateMapElement(mapElement, zValue, mapId);
 
                 // Getting toc element
-                NodeList tocElements = docRoot.getElementsByTagName("geo:toc");
-                Node tocElement = tocElements.item(0);
-                NamedNodeMap tocAttributes = tocElement.getAttributes();
-                Node zTocElement = tocAttributes.getNamedItem("z");
-                String zTocValue = zTocElement.getNodeValue();
+                Element tocElement = getOrCreateTocElement(docRoot, docXml,
+                        mapElement, mapId);
+                String zTocValue = tocElement.getAttribute("z");
 
                 // If toc is not set as user-managed gvNIX updates toc content
                 if (!zTocValue.equals("user-managed")) {
 
-                    String validZTocValue = XmlRoundTripUtils
-                            .calculateUniqueKeyFor((Element) tocElement);
-                    // Regenerating zValue if is blank
-                    if (StringUtils.isBlank(zTocValue)) {
-                        zTocElement.setNodeValue(validZTocValue);
-                    }
+                    // Manage and Update toc
+                    updateTocElement(tocElement, zTocValue, mapId);
 
-                    // Adding necessary entities
-                    // STEP 1: Getting id of entities without user-managed and
-                    // with user-managed
-                    // STEP 2: Add all entities with calculate z not in current
-                    // user-managed entities and update them if exists
-
-                    List<String> notUserManagedEntities = new ArrayList<String>();
-                    List<String> userManagedEntities = new ArrayList<String>();
-                    List<Integer> notUserManagedEntitiesPosition = new ArrayList<Integer>();
-
-                    // STEP 1
-                    NodeList entityLayersElements = docRoot
-                            .getElementsByTagName("layer:entity");
-                    for (int i = 0; i < entityLayersElements.getLength(); i++) {
-                        Node entityLayerElement = entityLayersElements.item(i);
-                        NamedNodeMap entityLayerAttributes = entityLayerElement
-                                .getAttributes();
-                        Node zEntityLayerElement = entityLayerAttributes
-                                .getNamedItem("z");
-                        String zEntityLayerValue = zEntityLayerElement
-                                .getNodeValue();
-
-                        Node idEntityLayerElement = entityLayerAttributes
-                                .getNamedItem("id");
-                        String idEntityLayerValue = idEntityLayerElement
-                                .getNodeValue();
-
-                        if (!zEntityLayerValue.equals("user-managed")) {
-                            notUserManagedEntities.add(idEntityLayerValue);
-                            notUserManagedEntitiesPosition.add(i);
-                        }
-                        else {
-                            userManagedEntities.add(idEntityLayerValue);
-                        }
-                    }
-
-                    // STEP 2
-                    for (JavaType entity : entities) {
-
-                        // Obtain entityFields
-                        List<FieldMetadata> entityGeoFields = getEntityGeoFields(
-                                entity, typeLocationService);
-
-                        String entityId = generateIdFromEntity(entity,
-                                typeLocationService);
-
-                        if (userManagedEntities.indexOf(entityId) == -1) {
-
-                            // Calculate valid entityPath, entityPK and entityID
-                            String entityPath = generatePathFromEntity(entity,
-                                    typeLocationService);
-
-                            String entityPK = generatePKFromEntity(entity,
-                                    typeLocationService);
-
-                            // If exists as entity layer without user-managed,
-                            // update
-                            if (notUserManagedEntities.indexOf(entityId) != -1) {
-                                Integer position = notUserManagedEntitiesPosition
-                                        .get(notUserManagedEntities
-                                                .indexOf(entityId));
-                                Node entityLayerToUpdate = entityLayersElements
-                                        .item(position);
-
-                                NamedNodeMap entityLayerAttributes = entityLayerToUpdate
-                                        .getAttributes();
-
-                                Node pathEntityLayerElement = entityLayerAttributes
-                                        .getNamedItem("path");
-                                String pathEntityLayerValue = pathEntityLayerElement
-                                        .getNodeValue();
-
-                                Node pkEntityLayerElement = entityLayerAttributes
-                                        .getNamedItem("pk");
-                                String pkEntityLayerValue = pkEntityLayerElement
-                                        .getNodeValue();
-
-                                Node zEntityLayerElement = entityLayerAttributes
-                                        .getNamedItem("z");
-                                String zEntityLayerValue = zEntityLayerElement
-                                        .getNodeValue();
-
-                                // If path is different update
-                                if (!pathEntityLayerValue.equals(entityPath)) {
-                                    pathEntityLayerElement
-                                            .setNodeValue(entityPath);
-                                }
-
-                                // If PK is different update
-                                if (!pkEntityLayerValue.equals(entityPK)) {
-                                    pkEntityLayerElement.setNodeValue(entityPK);
-                                }
-
-                                // If z is different update
-                                String validEntityLayerZValue = XmlRoundTripUtils
-                                        .calculateUniqueKeyFor((Element) entityLayerToUpdate);
-                                if (!zEntityLayerValue
-                                        .equals(validEntityLayerZValue)) {
-                                    zEntityLayerElement
-                                            .setNodeValue(validEntityLayerZValue);
-                                }
-
-                                // Checking layer:entity-field details if
-                                // necessary
-                                NodeList entityFields = entityLayerToUpdate
-                                        .getChildNodes();
-                                if (entityFields != null) {
-
-                                    for (FieldMetadata field : entityGeoFields) {
-
-                                        boolean exists = false;
-
-                                        String fieldName = field.getFieldName()
-                                                .toString();
-
-                                        String fieldId = String.format("%s_%s",
-                                                entityId, fieldName);
-
-                                        for (int i = 0; i < entityFields
-                                                .getLength(); i++) {
-                                            Node entityField = entityFields
-                                                    .item(i);
-                                            NamedNodeMap entityFieldAttributes = entityField
-                                                    .getAttributes();
-
-                                            if (entityFieldAttributes != null) {
-                                                // Getting field value
-                                                Node fieldEntityFieldElement = entityFieldAttributes
-                                                        .getNamedItem("field");
-                                                String fieldEntityFieldValue = fieldEntityFieldElement
-                                                        .getNodeValue();
-                                                // Getting id value
-                                                Node idEntityFieldElement = entityFieldAttributes
-                                                        .getNamedItem("id");
-                                                String idEntityFieldValue = idEntityFieldElement
-                                                        .getNodeValue();
-
-                                                // Getting z value
-                                                Node zEntityFieldElement = entityFieldAttributes
-                                                        .getNamedItem("z");
-                                                String zEntityFieldValue = zEntityFieldElement
-                                                        .getNodeValue();
-
-                                                if (idEntityFieldValue
-                                                        .equals(fieldId)) {
-
-                                                    exists = true;
-
-                                                    // Checking if is
-                                                    // user-managed
-                                                    if (!zEntityFieldValue
-                                                            .equals("user-managed")) {
-
-                                                        // Update field with
-                                                        // correct
-                                                        // values
-                                                        if (!fieldEntityFieldValue
-                                                                .equals(fieldName)) {
-                                                            fieldEntityFieldElement
-                                                                    .setNodeValue(fieldName);
-                                                        }
-
-                                                    }
-                                                }
-
-                                            }
-
-                                        }
-
-                                        // If not exists, create new
-                                        // layer:entity-field
-                                        if (!exists) {
-                                            Element entityFieldLayer = docXml
-                                                    .createElement("layer:entity-field");
-                                            entityFieldLayer.setAttribute(
-                                                    "field", fieldName);
-                                            entityFieldLayer.setAttribute("id",
-                                                    fieldId);
-                                            entityFieldLayer.setAttribute(
-                                                    "markerColor",
-                                                    getRandomMarkerColor());
-                                            entityFieldLayer.setAttribute(
-                                                    "iconColor", "white");
-                                            entityFieldLayer
-                                                    .setAttribute(
-                                                            "z",
-                                                            XmlRoundTripUtils
-                                                                    .calculateUniqueKeyFor(entityFieldLayer));
-
-                                            // Append to entityLayer to update
-                                            entityLayerToUpdate
-                                                    .appendChild(entityFieldLayer);
-                                        }
-                                    }
-                                }
-
-                            }
-                            else { // Create new entity layer
-                                Element entityLayer = docXml
-                                        .createElement("layer:entity");
-                                entityLayer.setAttribute("id", entityId);
-                                entityLayer.setAttribute("path", entityPath);
-                                entityLayer.setAttribute("pk", entityPK);
-                                entityLayer.setAttribute("z", XmlRoundTripUtils
-                                        .calculateUniqueKeyFor(entityLayer));
-
-                                // Create new entity-field layer
-                                for (FieldMetadata entityField : entityGeoFields) {
-
-                                    String fieldName = entityField
-                                            .getFieldName().toString();
-
-                                    String fieldId = String.format("%s_%s",
-                                            entityId, fieldName);
-
-                                    Element entityFieldLayer = docXml
-                                            .createElement("layer:entity-field");
-                                    entityFieldLayer.setAttribute("field",
-                                            fieldName);
-                                    entityFieldLayer
-                                            .setAttribute("id", fieldId);
-                                    entityFieldLayer.setAttribute(
-                                            "markerColor",
-                                            getRandomMarkerColor());
-                                    entityFieldLayer.setAttribute("iconColor",
-                                            "white");
-                                    entityFieldLayer
-                                            .setAttribute(
-                                                    "z",
-                                                    XmlRoundTripUtils
-                                                            .calculateUniqueKeyFor(entityFieldLayer));
-
-                                    // Apppend to layer:entity element
-                                    entityLayer.appendChild(entityFieldLayer);
-
-                                }
-
-                                // Adding to geo:toc element
-                                tocElement.appendChild(entityLayer);
-                            }
-
-                        }
-                    }
+                    // Add or Update entity layers and entity fields
+                    createOrUpdateEntityLayersAndFields(docXml, docRoot,
+                            tocElement, entities, typeLocationService);
 
                 }
 
-                // TODO: Manage toolbar if necessary
+                // Get or create toolbarElement
+                Element toolbarElement = getOrCreateToolbarElement(docRoot,
+                        docXml, mapElement, mapId);
+                String zToolbarValue = toolbarElement.getAttribute("z");
+
+                // If is not setted as user-managed
+                if (!zToolbarValue.equals("user-managed")) {
+                    // Update toolbar element if necessary
+                    updateToolbarElement(toolbarElement, zToolbarValue, mapId);
+                }
 
                 // Applying all changes
                 fileManager.createOrUpdateTextFileIfRequired(showPath,
@@ -637,13 +390,399 @@ public class GvNIXMapViewerMetadata extends
     }
 
     /**
+     * This method obtains map element from document or create new one if not
+     * exists
+     * 
+     * 
+     * @param docRoot
+     * @param docXml
+     * @return
+     */
+    private Element getOrCreateMapElement(Element docRoot, Document docXml,
+            String mapId) {
+        // Getting geo:map element
+        NodeList mapElements = docRoot.getElementsByTagName("geo:map");
+        Element mapElement = (Element) mapElements.item(0);
+
+        // If map element not exists, generate new one
+        if (mapElement == null) {
+            mapElement = docXml.createElement("geo:map");
+            mapElement.setAttribute("id", mapId);
+            mapElement.setAttribute("z",
+                    XmlRoundTripUtils.calculateUniqueKeyFor(mapElement));
+
+            docRoot.appendChild(mapElement);
+
+        }
+
+        return mapElement;
+    }
+
+    /**
+     * This method updates mapElement if necessary with correct configuration
+     * 
+     * 
+     * @param mapElement
+     * @param mapId
+     */
+    private void updateMapElement(Element mapElement, String zValue,
+            String mapId) {
+
+        // Getting correct z value
+        String validZValue = XmlRoundTripUtils
+                .calculateUniqueKeyFor((Element) mapElement);
+
+        // Regenerating zValue if is blank
+        if (StringUtils.isBlank(zValue)) {
+            mapElement.setAttribute("z", validZValue);
+        }
+
+        // Regenerating id if is different
+        if (!mapElement.getAttribute("id").equals(mapId)) {
+            mapElement.setAttribute("id", mapId);
+        }
+
+    }
+
+    /**
+     * This method obtains toc element from document or create new one if not
+     * exists and append to map parent
+     * 
+     * @param docRoot
+     * @param docXml
+     * @param mapId
+     * @return
+     */
+    private Element getOrCreateTocElement(Element docRoot, Document docXml,
+            Element mapElement, String mapId) {
+
+        NodeList tocElements = docRoot.getElementsByTagName("geo:toc");
+        Element tocElement = (Element) tocElements.item(0);
+
+        // If toc element not exists, generate new one
+        if (tocElement == null) {
+            tocElement = docXml.createElement("geo:toc");
+            tocElement.setAttribute("id", String.format("%s_toc", mapId));
+            tocElement.setAttribute("z",
+                    XmlRoundTripUtils.calculateUniqueKeyFor(tocElement));
+
+            mapElement.appendChild(tocElement);
+        }
+        return tocElement;
+    }
+
+    /**
+     * This method updates tocElement if necessary with correct configuration
+     * 
+     * 
+     * @param mapElement
+     * @param mapId
+     */
+    private void updateTocElement(Element tocElement, String zTocValue,
+            String mapId) {
+
+        String validZTocValue = XmlRoundTripUtils
+                .calculateUniqueKeyFor((Element) tocElement);
+
+        // Regenerating id if is different
+        String validId = String.format("%s_toc", mapId);
+        if (!tocElement.getAttribute("id").equals(validId)) {
+            tocElement.setAttribute("id", validId);
+        }
+
+        // Regenerating zValue if is blank
+        if (StringUtils.isBlank(zTocValue)) {
+            tocElement.setAttribute("z", validZTocValue);
+        }
+
+    }
+
+    /**
+     * This method obtains toolbar element from document or create new one if
+     * not exists and append to map parent
+     * 
+     * @param docRoot
+     * @param docXml
+     * @param mapElement
+     * @param mapId
+     * @return
+     */
+    private Element getOrCreateToolbarElement(Element docRoot, Document docXml,
+            Element mapElement, String mapId) {
+        NodeList toolbarElements = docRoot.getElementsByTagName("geo:toolbar");
+        Element toolbarElement = (Element) toolbarElements.item(0);
+
+        // If not exists, create new toolbar element
+        if (toolbarElement == null) {
+            toolbarElement = docXml.createElement("geo:toolbar");
+            toolbarElement.setAttribute("id",
+                    String.format("%s_toolbar", mapId));
+            toolbarElement.setAttribute("z",
+                    XmlRoundTripUtils.calculateUniqueKeyFor(toolbarElement));
+            mapElement.appendChild(toolbarElement);
+        }
+
+        return toolbarElement;
+    }
+
+    /**
+     * 
+     * This method updates toolbarElement if necessary with correct
+     * configuration
+     * 
+     * @param toolbarElement
+     * @param zToolbarValue
+     * @param mapId
+     */
+    private void updateToolbarElement(Element toolbarElement,
+            String zToolbarValue, String mapId) {
+
+        String idToolbarValue = toolbarElement.getAttribute("id");
+
+        // Regenerating id if necessary
+        if (!idToolbarValue.equals(String.format("%s_toolbar", mapId))) {
+            toolbarElement.setAttribute("id",
+                    String.format("%s_toolbar", mapId));
+        }
+
+        // Regenerating z value if necessary
+        if (StringUtils.isBlank(zToolbarValue)) {
+            toolbarElement.setAttribute("z",
+                    XmlRoundTripUtils.calculateUniqueKeyFor(toolbarElement));
+        }
+
+    }
+
+    /**
+     * This method create or update entity layers and entity fields if necessary
+     * 
+     * @param docXml
+     * @param docRoot
+     * @param tocElement
+     * @param entities
+     * @param typeLocationService
+     */
+    private void createOrUpdateEntityLayersAndFields(Document docXml,
+            Element docRoot, Element tocElement, List<JavaType> entities,
+            TypeLocationService typeLocationService) {
+
+        // Adding necessary entities
+        // STEP 1: Getting id of entities without user-managed and
+        // with user-managed
+        // STEP 2: Add all entities with calculate z not in current
+        // user-managed entities and update them if exists
+
+        List<String> notUserManagedEntities = new ArrayList<String>();
+        List<String> userManagedEntities = new ArrayList<String>();
+        List<Integer> notUserManagedEntitiesPosition = new ArrayList<Integer>();
+
+        // STEP 1
+        NodeList entityLayersElements = docRoot
+                .getElementsByTagName("layer:entity");
+        for (int i = 0; i < entityLayersElements.getLength(); i++) {
+            Element entityLayerElement = (Element) entityLayersElements.item(i);
+            String zEntityLayerValue = entityLayerElement.getAttribute("z");
+            String idEntityLayerValue = entityLayerElement.getAttribute("id");
+
+            if (!zEntityLayerValue.equals("user-managed")) {
+                notUserManagedEntities.add(idEntityLayerValue);
+                notUserManagedEntitiesPosition.add(i);
+            }
+            else {
+                userManagedEntities.add(idEntityLayerValue);
+            }
+        }
+
+        // STEP 2
+        for (JavaType entity : entities) {
+
+            // Obtain entityFields
+            List<FieldMetadata> entityGeoFields = getEntityGeoFields(entity,
+                    typeLocationService);
+
+            String entityId = generateIdFromEntity(entity, typeLocationService);
+
+            if (userManagedEntities.indexOf(entityId) == -1) {
+
+                // Calculate valid entityPath, entityPK and entityID
+                String entityPath = generatePathFromEntity(entity,
+                        typeLocationService);
+
+                String entityPK = generatePKFromEntity(entity,
+                        typeLocationService);
+
+                // If exists as entity layer without user-managed,
+                // update
+                if (notUserManagedEntities.indexOf(entityId) != -1) {
+                    Integer position = notUserManagedEntitiesPosition
+                            .get(notUserManagedEntities.indexOf(entityId));
+                    Element entityLayerToUpdate = (Element) entityLayersElements
+                            .item(position);
+
+                    String pathEntityLayerValue = entityLayerToUpdate
+                            .getAttribute("path");
+                    String pkEntityLayerValue = entityLayerToUpdate
+                            .getAttribute("pk");
+                    String zEntityLayerValue = entityLayerToUpdate
+                            .getAttribute("z");
+
+                    // If path is different update
+                    if (!pathEntityLayerValue.equals(entityPath)) {
+                        entityLayerToUpdate.setAttribute("path", entityPath);
+                    }
+
+                    // If PK is different update
+                    if (!pkEntityLayerValue.equals(entityPK)) {
+                        entityLayerToUpdate.setAttribute("pk", entityPK);
+                    }
+
+                    // If z is different update
+                    String validEntityLayerZValue = XmlRoundTripUtils
+                            .calculateUniqueKeyFor((Element) entityLayerToUpdate);
+                    if (!zEntityLayerValue.equals(validEntityLayerZValue)) {
+                        entityLayerToUpdate.setAttribute("z",
+                                validEntityLayerZValue);
+                    }
+
+                    // Checking layer:entity-field details if
+                    // necessary
+                    NodeList entityFields = entityLayerToUpdate
+                            .getElementsByTagName("layer:entity-field");
+                    if (entityFields != null) {
+
+                        for (FieldMetadata field : entityGeoFields) {
+
+                            boolean exists = false;
+
+                            String fieldName = field.getFieldName().toString();
+
+                            String fieldId = String.format("%s_%s", entityId,
+                                    fieldName);
+
+                            for (int i = 0; i < entityFields.getLength(); i++) {
+                                Element entityField = (Element) entityFields
+                                        .item(i);
+                                // Getting field value
+                                String fieldEntityFieldValue = entityField
+                                        .getAttribute("field");
+                                // Getting id value
+                                String idEntityFieldValue = entityField
+                                        .getAttribute("id");
+                                // Getting z value
+                                String zEntityFieldValue = entityField
+                                        .getAttribute("z");
+
+                                if (idEntityFieldValue.equals(fieldId)
+                                        || fieldEntityFieldValue
+                                                .equals(fieldName)) {
+
+                                    exists = true;
+
+                                    // Checking if is user-managed
+                                    if (!zEntityFieldValue
+                                            .equals("user-managed")) {
+
+                                        // Update field name with
+                                        // correct
+                                        if (!fieldEntityFieldValue
+                                                .equals(fieldName)) {
+                                            entityField.setAttribute("field",
+                                                    fieldName);
+
+                                        }
+
+                                        // Update field id
+                                        if (!idEntityFieldValue.equals(fieldId)) {
+                                            entityField.setAttribute("id",
+                                                    fieldId);
+                                        }
+                                        // Update z value
+                                        String validZEntityFieldValue = XmlRoundTripUtils
+                                                .calculateUniqueKeyFor(entityField);
+                                        if (!zEntityFieldValue
+                                                .equals(validZEntityFieldValue)) {
+                                            entityField.setAttribute("z",
+                                                    validZEntityFieldValue);
+                                        }
+
+                                    }
+                                }
+                            }
+
+                            // If not exists, create new
+                            // layer:entity-field
+                            if (!exists) {
+                                Element entityFieldLayer = docXml
+                                        .createElement("layer:entity-field");
+                                entityFieldLayer.setAttribute("field",
+                                        fieldName);
+                                entityFieldLayer.setAttribute("id", fieldId);
+                                entityFieldLayer.setAttribute("markerColor",
+                                        getRandomMarkerColor());
+                                entityFieldLayer.setAttribute("iconColor",
+                                        "white");
+                                entityFieldLayer
+                                        .setAttribute(
+                                                "z",
+                                                XmlRoundTripUtils
+                                                        .calculateUniqueKeyFor(entityFieldLayer));
+
+                                // Append to entityLayer to update
+                                entityLayerToUpdate
+                                        .appendChild(entityFieldLayer);
+                            }
+                        }
+                    }
+
+                }
+                else { // Create new entity layer
+                    Element entityLayer = docXml.createElement("layer:entity");
+                    entityLayer.setAttribute("id", entityId);
+                    entityLayer.setAttribute("path", entityPath);
+                    entityLayer.setAttribute("pk", entityPK);
+                    entityLayer.setAttribute("z", XmlRoundTripUtils
+                            .calculateUniqueKeyFor(entityLayer));
+
+                    // Create new entity-field layer
+                    for (FieldMetadata entityField : entityGeoFields) {
+
+                        String fieldName = entityField.getFieldName()
+                                .toString();
+
+                        String fieldId = String.format("%s_%s", entityId,
+                                fieldName);
+
+                        Element entityFieldLayer = docXml
+                                .createElement("layer:entity-field");
+                        entityFieldLayer.setAttribute("field", fieldName);
+                        entityFieldLayer.setAttribute("id", fieldId);
+                        entityFieldLayer.setAttribute("markerColor",
+                                getRandomMarkerColor());
+                        entityFieldLayer.setAttribute("iconColor", "white");
+                        entityFieldLayer.setAttribute("z", XmlRoundTripUtils
+                                .calculateUniqueKeyFor(entityFieldLayer));
+
+                        // Apppend to layer:entity element
+                        entityLayer.appendChild(entityFieldLayer);
+
+                    }
+
+                    // Adding to geo:toc element
+                    tocElement.appendChild(entityLayer);
+                }
+
+            }
+        }
+
+    }
+
+    /**
      * This method returns a random marker color to use
      * 
      * @return
      */
     public String getRandomMarkerColor() {
-        String[] colors = { "red", "darkred", "orange", "green", "darkgreen",
-                "blue", "purple", "darkpuple", "cadetblue" };
+        String[] colors = { "red", "orange", "green", "blue", "purple" };
         int idx = new Random().nextInt(colors.length);
         String randomColor = (colors[idx]);
 
