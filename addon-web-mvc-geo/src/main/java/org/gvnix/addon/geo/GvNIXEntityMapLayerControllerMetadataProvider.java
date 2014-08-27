@@ -23,23 +23,26 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.PhysicalTypeUtils;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeManagementService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 
 /**
- * Provides {@link GvNIXEntityMapLayerMetadata}.
+ * Provides {@link GvNIXEntityMapLayerControllerMetadata}.
  * 
  * @author gvNIX Team
  * @since 1.4
  */
 @Component
 @Service
-public final class GvNIXEntityMapLayerMetadataProvider extends
+public final class GvNIXEntityMapLayerControllerMetadataProvider extends
         AbstractItdMetadataProvider {
 
     @Reference
@@ -54,7 +57,8 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
         metadataDependencyRegistry.registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        addMetadataTrigger(new JavaType(GvNIXEntityMapLayer.class.getName()));
+        addMetadataTrigger(new JavaType(
+                GvNIXEntityMapLayerController.class.getName()));
     }
 
     /**
@@ -78,16 +82,33 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
 
-        JavaType javaType = GvNIXEntityMapLayerMetadata
+        JavaType javaType = GvNIXEntityMapLayerControllerMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = GvNIXEntityMapLayerMetadata
+        LogicalPath path = GvNIXEntityMapLayerControllerMetadata
                 .getPath(metadataIdentificationString);
 
-        LogicalPath entityPath = PhysicalTypeUtils.getPath(javaType,
+        // Getting controller
+        ClassOrInterfaceTypeDetails controller = typeLocationService
+                .getTypeDetails(javaType);
+
+        // Getting @RooWebScaffold annotation
+        String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
+                javaType, path);
+
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+                .get(webScaffoldMetadataId);
+
+        WebScaffoldAnnotationValues webScaffoldAnnotationValues = webScaffoldMetadata
+                .getAnnotationValues();
+
+        // Getting entity
+        JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
+
+        LogicalPath entityPath = PhysicalTypeUtils.getPath(entity,
                 typeLocationService);
 
-        String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(
-                javaType, entityPath);
+        String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
+                entityPath);
         JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
                 .get(jpaMetadataId);
         if (jpaMetadata == null) {
@@ -98,33 +119,35 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
         // Getting entity plural
         String plural = jpaMetadata.getPlural();
 
-        return new GvNIXEntityMapLayerMetadata(metadataIdentificationString,
-                aspectName, governorPhysicalTypeMetadata, typeLocationService,
-                typeManagementService, javaType, plural);
+        return new GvNIXEntityMapLayerControllerMetadata(
+                metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata, typeLocationService,
+                typeManagementService, javaType, entity, plural);
     }
 
     /**
      * Define the unique ITD file name extension, here the resulting file name
-     * will be **_ROO_GvNIXEntityMapLayer.aj
+     * will be **_ROO_GvNIXEntityMapLayerController.aj
      */
     public String getItdUniquenessFilenameSuffix() {
-        return "GvNIXEntityMapLayer";
+        return "GvNIXEntityMapLayerController";
     }
 
     protected String getGovernorPhysicalTypeIdentifier(
             String metadataIdentificationString) {
-        JavaType javaType = GvNIXEntityMapLayerMetadata
+        JavaType javaType = GvNIXEntityMapLayerControllerMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = GvNIXEntityMapLayerMetadata
+        LogicalPath path = GvNIXEntityMapLayerControllerMetadata
                 .getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
     protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
-        return GvNIXEntityMapLayerMetadata.createIdentifier(javaType, path);
+        return GvNIXEntityMapLayerControllerMetadata.createIdentifier(javaType,
+                path);
     }
 
     public String getProvidesType() {
-        return GvNIXEntityMapLayerMetadata.getMetadataIdentiferType();
+        return GvNIXEntityMapLayerControllerMetadata.getMetadataIdentiferType();
     }
 }

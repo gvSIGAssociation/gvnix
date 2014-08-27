@@ -61,6 +61,29 @@ public class JpaGeoCommands implements CommandMarker {
     }
 
     /**
+     * This method checks if the method to add new finder to all entities is
+     * available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator("finder geo all")
+    public boolean isFinderGeoAllCommandAvailable() {
+        return operations.isFinderGeoAllCommandAvailable();
+    }
+
+    /**
+     * This method checks if the method to add new finder to entity is available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator("finder geo add")
+    public boolean isFinderGeoAddCommandAvailable() {
+        return operations.isFinderGeoAddCommandAvailable();
+    }
+
+    /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
      * 
@@ -90,6 +113,35 @@ public class JpaGeoCommands implements CommandMarker {
                 "The entity specified, '%s', doesn't exist", entity);
 
         operations.addFieldByProvider(fieldName, fieldGeoType, entity);
+    }
+
+    /**
+     * This method registers a command with the Roo shell. It also offers a
+     * mandatory command attribute.
+     * 
+     * @param type
+     */
+    @CliCommand(value = "finder geo all", help = "Add finders to all Geo Entities")
+    public void addFinderGeoAll() {
+        operations.addFinderGeoAllByProvider();
+    }
+
+    /**
+     * This method registers a command with the Roo shell. It also offers a
+     * mandatory command attribute.
+     * 
+     * @param type
+     */
+    @CliCommand(value = "finder geo add", help = "Add finders to selected Geo Entity")
+    public void addFinderGeoAdd(
+            @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType entity) {
+
+        final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
+                .getTypeDetails(entity);
+        Validate.notNull(javaTypeDetails,
+                "The entity specified, '%s', doesn't exist", entity);
+
+        operations.addFinderGeoAddByProvider(entity);
     }
 
 }

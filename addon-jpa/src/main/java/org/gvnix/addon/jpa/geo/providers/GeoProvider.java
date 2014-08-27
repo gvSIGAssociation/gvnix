@@ -41,6 +41,18 @@ public interface GeoProvider {
             JavaType entity);
 
     /**
+     * This method add a new finder in all entities
+     * 
+     */
+    void addFinderGeoAll();
+
+    /**
+     * This method add a new finder in the selected entity
+     * 
+     */
+    void addFinderGeoAdd(JavaType entity);
+
+    /**
      * This method checks if his provider persistence is installed
      * 
      * @return true if is installed

@@ -166,6 +166,45 @@ public class GeoUtils {
     }
 
     /**
+     * 
+     * This method returns map controller by path
+     * 
+     * @param typeLocationService
+     * @return
+     */
+    public static JavaType getMapControllerByPath(String path,
+            TypeLocationService typeLocationService) {
+
+        for (JavaType mapViewer : typeLocationService
+                .findTypesWithAnnotation(MAP_VIEWER_ANNOTATION)) {
+            Validate.notNull(mapViewer, "@GvNIXMapViewer required");
+
+            ClassOrInterfaceTypeDetails mapViewerController = typeLocationService
+                    .getTypeDetails(mapViewer);
+
+            // Getting RequestMapping annotations
+            final AnnotationMetadata requestMappingAnnotation = MemberFindingUtils
+                    .getAnnotationOfType(mapViewerController.getAnnotations(),
+                            SpringJavaType.REQUEST_MAPPING);
+
+            Validate.notNull(mapViewer, String.format(
+                    "Error on %s getting @RequestMapping value", mapViewer));
+
+            String requestMappingPath = requestMappingAnnotation
+                    .getAttribute("value").getValue().toString();
+
+            String currentPath = requestMappingPath.toString().replaceAll("/",
+                    "");
+
+            if (currentPath.equals(path)) {
+                return mapViewer;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * This method checks if the current entity is a GEO entity or not
      * 
      * @param scaffoldAnnotation

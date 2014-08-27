@@ -36,6 +36,20 @@ public interface JpaGeoOperations extends Feature {
     boolean isFieldCommandAvailable();
 
     /**
+     * Indicate commands should be available
+     * 
+     * @return true if it should be available, otherwise false
+     */
+    boolean isFinderGeoAllCommandAvailable();
+
+    /**
+     * Indicate commands should be available
+     * 
+     * @return true if it should be available, otherwise false
+     */
+    boolean isFinderGeoAddCommandAvailable();
+
+    /**
      * Installs the selected provider
      * 
      * @param provider Provider GeoProviderId
@@ -49,6 +63,19 @@ public interface JpaGeoOperations extends Feature {
      */
     void addFieldByProvider(JavaSymbolName fieldName,
             FieldGeoTypes fieldGeoType, JavaType entity);
+
+    /**
+     * Add finders to all Geo Entities
+     * 
+     */
+    void addFinderGeoAllByProvider();
+
+    /**
+     * Add finders to specific Entity
+     * 
+     * @param entity entity
+     */
+    void addFinderGeoAddByProvider(JavaType entity);
 
     /**
      * 

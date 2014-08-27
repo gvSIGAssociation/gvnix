@@ -6,7 +6,6 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.springframework.roo.classpath.TypeLocationService;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
@@ -100,7 +99,7 @@ public class GeoCommands implements CommandMarker {
     @CliCommand(value = "web mvc geo map", help = "Add new Map view to your project")
     public void addMap(
             @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the new Map Controller") final JavaType controller,
-            @CliOption(key = "path", mandatory = true, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "Path to access to the new controller operations") final JavaSymbolName path) {
+            @CliOption(key = "preferredMapping", mandatory = true, optionContext = UPDATE_PROJECT, help = "Indicates a specific request mapping path for this map (eg /foo); no default value") final JavaSymbolName path) {
         operations.addMap(controller, path);
     }
 
@@ -112,8 +111,15 @@ public class GeoCommands implements CommandMarker {
      */
     @CliCommand(value = "web mvc geo all", help = "Run this method to include all GEO entities on specific map or on all available maps")
     public void all(
-            @CliOption(key = "path", mandatory = false, help = "If blank, adds all GEO entities to all available maps. Indicate a list of paths separated by commas if you want to include all entities in some specific maps.") final JavaSymbolName path) {
-        operations.all(path);
+            @CliOption(key = "maps", mandatory = false, help = "Map where you want to add all entities. If blank, adds all GEO entities to all available maps") MapsProperty path) {
+        // Checking if path was selected
+        if (path != null) {
+            operations.all(new JavaSymbolName(path.getValue()));
+        }
+        else {
+            operations.all(null);
+        }
+
     }
 
     /**
@@ -125,8 +131,14 @@ public class GeoCommands implements CommandMarker {
     @CliCommand(value = "web mvc geo add", help = "Run this method to include specific GEO entity on all maps or specific map")
     public void add(
             @CliOption(key = "controller", mandatory = true, help = "Indicates which entity controller you want to add to map") final JavaType controller,
-            @CliOption(key = "path", mandatory = false, help = "If blank, adds all GEO entities to all available maps. Indicate a list of paths separated by commas if you want to include all entities in some specific maps.") final JavaSymbolName path) {
-        operations.add(controller, path);
+            @CliOption(key = "maps", mandatory = false, help = "Map where you want to add current entities. If blank, adds current GEO entity to all available maps") final MapsProperty path) {
+        // Checking if path was selected
+        if (path != null) {
+            operations.add(controller, new JavaSymbolName(path.getValue()));
+        }
+        else {
+            operations.add(controller, null);
+        }
     }
 
 }

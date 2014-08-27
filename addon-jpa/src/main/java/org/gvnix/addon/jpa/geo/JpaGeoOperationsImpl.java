@@ -87,6 +87,24 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
     }
 
     /**
+     * This method checks if finder geo all is available to execute checking all
+     * providers
+     */
+    @Override
+    public boolean isFinderGeoAllCommandAvailable() {
+        return isFieldCommandAvailable();
+    }
+
+    /**
+     * This method checks if finder geo add is available to execute checking all
+     * providers
+     */
+    @Override
+    public boolean isFinderGeoAddCommandAvailable() {
+        return isFieldCommandAvailable();
+    }
+
+    /**
      * This method calls the setup method of the selected provider
      */
     @Override
@@ -129,6 +147,57 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
         }
 
         provider.addField(fieldName, fieldGeoType, entity);
+
+    }
+
+    /**
+     * This method calls the addFinderGeoAll method of the installed provider.
+     */
+    @Override
+    public void addFinderGeoAllByProvider() {
+        GeoProvider provider = null;
+        // Getting all providers
+        for (GeoProvider tmpProvider : providers) {
+            // If some provider says that his GEO persistence is installed
+            // execute field geo for this provider
+            if (tmpProvider
+                    .isGeoPersistenceInstalled(fileManager, pathResolver)) {
+                provider = tmpProvider;
+                break;
+            }
+        }
+
+        if (provider == null) {
+            throw new RuntimeException(
+                    "Error checking which Provider must be used to add new field. ");
+        }
+
+        provider.addFinderGeoAll();
+    }
+
+    /**
+     * This method calls the addFinderGeoAdd method of the installed provider.
+     */
+    @Override
+    public void addFinderGeoAddByProvider(JavaType entity) {
+        GeoProvider provider = null;
+        // Getting all providers
+        for (GeoProvider tmpProvider : providers) {
+            // If some provider says that his GEO persistence is installed
+            // execute field geo for this provider
+            if (tmpProvider
+                    .isGeoPersistenceInstalled(fileManager, pathResolver)) {
+                provider = tmpProvider;
+                break;
+            }
+        }
+
+        if (provider == null) {
+            throw new RuntimeException(
+                    "Error checking which Provider must be used to add new field. ");
+        }
+
+        provider.addFinderGeoAdd(entity);
 
     }
 

@@ -23,13 +23,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Trigger annotation for Entity Map Layer
+ * Trigger annotation for Entity Map Layer Controller
  * 
  * @author gvNIX Team
  * @since 1.4
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface GvNIXEntityMapLayer {
+public @interface GvNIXEntityMapLayerController {
 
 }

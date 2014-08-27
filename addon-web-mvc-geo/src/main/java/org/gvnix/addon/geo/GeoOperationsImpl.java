@@ -306,38 +306,52 @@ public class GeoOperationsImpl extends AbstractOperations implements
     public void annotateGeoEntityController(JavaType controller,
             List<String> paths) {
 
+        // Obtain all map controllers
+        List<JavaType> mapControllers = GeoUtils
+                .getAllMapsControllers(typeLocationService);
+
         ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
                 .getTypeDetails(controller);
 
-        // Generating fieldsAttribute to add to annotation
-        final List<StringAttributeValue> detailFieldsAttributes = new ArrayList<StringAttributeValue>();
-
+        // Generating annotation
         ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                 controllerDetails);
+
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
-
-        // If is not for all maps
-        if (!(paths.size() == 1 && paths.get(0).equals(""))) {
-            Iterator<String> pathIterator = paths.iterator();
-            while (pathIterator.hasNext()) {
-                String currentPath = pathIterator.next();
-                StringAttributeValue detailFieldAttribute = new StringAttributeValue(
-                        new JavaSymbolName("value"), currentPath);
-                detailFieldsAttributes.add(detailFieldAttribute);
-            }
-            // Create "maps" attributes array from string
-            // attributes list
-            ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
-                    new JavaSymbolName("maps"), detailFieldsAttributes);
-            annotationBuilder.addAttribute(detailFieldsArray);
-        }
 
         // Add annotation to target type
         detailsBuilder.updateTypeAnnotation(annotationBuilder.build());
 
         // Save changes to disk
         typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder.build());
+
+        // / Update necessary map controllers with current entity
+        // If developer specify map path add on it
+        if (!(paths.size() == 1 && paths.get(0).equals(""))) {
+            Iterator<String> pathIterator = paths.iterator();
+            while (pathIterator.hasNext()) {
+                // Getting path
+                String currentPath = pathIterator.next();
+                // Getting map controller for current path
+                JavaType mapController = GeoUtils.getMapControllerByPath(
+                        currentPath, typeLocationService);
+
+                // Annotate map controllers adding current entity
+                annotateMapController(mapController, typeLocationService,
+                        typeManagementService, controllerDetails.getType());
+
+            }
+        }
+        else {
+            // If no path selected, annotate all mapControllers with
+            // current entityController
+            for (JavaType mapController : mapControllers) {
+                // Annotate map controllers adding current entity
+                annotateMapController(mapController, typeLocationService,
+                        typeManagementService, controllerDetails.getType());
+            }
+        }
 
     }
 
@@ -353,6 +367,10 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         Validate.notNull(entityControllers,
                 "Controllers with @RooWebScaffold annotation doesn't found");
+
+        // Obtain all map controllers
+        List<JavaType> mapControllers = GeoUtils
+                .getAllMapsControllers(typeLocationService);
 
         Iterator<ClassOrInterfaceTypeDetails> it = entityControllers.iterator();
         while (it.hasNext()) {
@@ -375,9 +393,6 @@ public class GeoOperationsImpl extends AbstractOperations implements
             Iterator<? extends FieldMetadata> fieldsIterator = entityFields
                     .iterator();
 
-            // Generating fieldsAttribute to add to annotation
-            final List<StringAttributeValue> detailFieldsAttributes = new ArrayList<StringAttributeValue>();
-
             while (fieldsIterator.hasNext()) {
                 // Getting field
                 FieldMetadata field = fieldsIterator.next();
@@ -386,7 +401,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 JavaType fieldType = field.getFieldType();
                 JavaPackage fieldPackage = fieldType.getPackage();
 
-                // If is jts field, annotate controller with maps
+                // If has jts field, annotate controller
                 if (fieldPackage.toString().equals(
                         "com.vividsolutions.jts.geom")) {
 
@@ -396,23 +411,6 @@ public class GeoOperationsImpl extends AbstractOperations implements
                     AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                             GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
 
-                    // If is not for all maps
-                    if (!(paths.size() == 1 && paths.get(0).equals(""))) {
-                        Iterator<String> pathIterator = paths.iterator();
-                        while (pathIterator.hasNext()) {
-                            String currentPath = pathIterator.next();
-                            StringAttributeValue detailFieldAttribute = new StringAttributeValue(
-                                    new JavaSymbolName("value"), currentPath);
-                            detailFieldsAttributes.add(detailFieldAttribute);
-                        }
-                        // Create "maps" attributes array from string
-                        // attributes list
-                        ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
-                                new JavaSymbolName("maps"),
-                                detailFieldsAttributes);
-                        annotationBuilder.addAttribute(detailFieldsArray);
-                    }
-
                     // Add annotation to target type
                     detailsBuilder.updateTypeAnnotation(annotationBuilder
                             .build());
@@ -420,6 +418,37 @@ public class GeoOperationsImpl extends AbstractOperations implements
                     // Save changes to disk
                     typeManagementService
                             .createOrUpdateTypeOnDisk(detailsBuilder.build());
+
+                    // Update necessary map controllers with current entity
+                    // If developer specify map path add on it
+                    if (!(paths.size() == 1 && paths.get(0).equals(""))) {
+                        Iterator<String> pathIterator = paths.iterator();
+                        while (pathIterator.hasNext()) {
+                            // Getting path
+                            String currentPath = pathIterator.next();
+                            // Getting map controller for current path
+                            JavaType mapController = GeoUtils
+                                    .getMapControllerByPath(currentPath,
+                                            typeLocationService);
+
+                            // Annotate map controllers adding current entity
+                            annotateMapController(mapController,
+                                    typeLocationService, typeManagementService,
+                                    entityController.getType());
+
+                        }
+                    }
+                    else {
+                        // If no path selected, annotate all mapControllers with
+                        // current entityController
+                        for (JavaType mapController : mapControllers) {
+                            // Annotate map controllers adding current entity
+                            annotateMapController(mapController,
+                                    typeLocationService, typeManagementService,
+                                    entityController.getType());
+                        }
+                    }
+
                     break;
                 }
             }
@@ -960,6 +989,82 @@ public class GeoOperationsImpl extends AbstractOperations implements
         propFileOperations.addProperties(getWebappPath(),
                 "WEB-INF/i18n/application.properties", propertyList, true,
                 false);
+
+    }
+
+    /**
+     * This method annotate MapControllers with entities to represent
+     * 
+     * @param mapControllersToAnnotate
+     * @param typeLocationService
+     * @param typeManagementService
+     * @param entity
+     */
+    private void annotateMapController(JavaType mapController,
+            TypeLocationService typeLocationService,
+            TypeManagementService typeManagementService, JavaType controller) {
+
+        ClassOrInterfaceTypeDetails mapControllerDetails = typeLocationService
+                .getTypeDetails(mapController);
+
+        // Getting @GvNIXMapViewer Annotation
+        AnnotationMetadata mapViewerAnnotation = mapControllerDetails
+                .getAnnotation(MAP_VIEWER_ANNOTATION);
+
+        // Generating new annotation
+        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                mapControllerDetails);
+        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                MAP_VIEWER_ANNOTATION);
+
+        // Getting current entities
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        ArrayAttributeValue<ClassAttributeValue> mapViewerAttributesOld = (ArrayAttributeValue) mapViewerAnnotation
+                .getAttribute("entityLayers");
+
+        // Initialize class attributes list for detail fields
+        final List<ClassAttributeValue> entityAttributes = new ArrayList<ClassAttributeValue>();
+        boolean notIncluded = true;
+
+        if (mapViewerAttributesOld != null) {
+            // Adding by default old entities
+            entityAttributes.addAll(mapViewerAttributesOld.getValue());
+            // Checking that current entity is not included yet
+            List<ClassAttributeValue> mapViewerAttributesOldValues = mapViewerAttributesOld
+                    .getValue();
+            for (ClassAttributeValue currentEntity : mapViewerAttributesOldValues) {
+                if (currentEntity.getValue().equals(controller)) {
+                    notIncluded = false;
+                    break;
+                }
+            }
+        }
+
+        // If current entity is not included in old values, include to new
+        // annotation
+        if (notIncluded) {
+            // Create a class attribute for property
+            final ClassAttributeValue entityAttribute = new ClassAttributeValue(
+                    new JavaSymbolName("value"), controller);
+            entityAttributes.add(entityAttribute);
+        }
+
+        // Create "entityLayers" attributes array from string attributes
+        // list
+        ArrayAttributeValue<ClassAttributeValue> entityLayersArray = new ArrayAttributeValue<ClassAttributeValue>(
+                new JavaSymbolName("entityLayers"), entityAttributes);
+
+        annotationBuilder.addAttribute(entityLayersArray);
+        annotationBuilder.build();
+
+        // Update annotation into controller
+        classOrInterfaceTypeDetailsBuilder
+                .updateTypeAnnotation(annotationBuilder);
+
+        // Save controller changes to disk
+        typeManagementService
+                .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
+                        .build());
 
     }
 

@@ -48,7 +48,7 @@ import org.springframework.roo.project.LogicalPath;
  * @author gvNIX Team
  * @since 1.4.0
  */
-public class GvNIXEntityMapLayerMetadata extends
+public class GvNIXEntityMapLayerControllerMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
     private static final JavaSymbolName LIST_GEO_ENTITY_ON_MAP_VIEWER = new JavaSymbolName(
@@ -56,16 +56,17 @@ public class GvNIXEntityMapLayerMetadata extends
 
     private final ItdBuilderHelper helper;
 
-    private static final String PROVIDES_TYPE_STRING = GvNIXEntityMapLayerMetadata.class
+    private static final String PROVIDES_TYPE_STRING = GvNIXEntityMapLayerControllerMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    public GvNIXEntityMapLayerMetadata(String identifier, JavaType aspectName,
+    public GvNIXEntityMapLayerControllerMetadata(String identifier,
+            JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             TypeLocationService typeLocationService,
-            TypeManagementService typeManagementService, JavaType entity,
-            String entityPlural) {
+            TypeManagementService typeManagementService, JavaType controller,
+            JavaType entity, String entityPlural) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         // Generate necessary methods
