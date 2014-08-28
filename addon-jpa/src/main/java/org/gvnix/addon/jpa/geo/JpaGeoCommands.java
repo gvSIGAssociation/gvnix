@@ -134,7 +134,7 @@ public class JpaGeoCommands implements CommandMarker {
      */
     @CliCommand(value = "finder geo add", help = "Add finders to selected Geo Entity")
     public void addFinderGeoAdd(
-            @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType entity) {
+            @CliOption(key = "class", mandatory = true, optionContext = UPDATE_PROJECT, help = "Entity where you want to generate geo finders") final JavaType entity) {
 
         final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
                 .getTypeDetails(entity);

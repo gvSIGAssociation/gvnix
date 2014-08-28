@@ -15,7 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
-package org.gvnix.addon.geo;
+package org.gvnix.addon.jpa.geo.providers.hibernatespatial;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -26,8 +29,12 @@ import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeManagementService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.model.JavaPackage;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 
@@ -66,8 +73,7 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
         metadataDependencyRegistry.deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        removeMetadataTrigger(new JavaType(
-                GvNIXEntityMapLayerController.class.getName()));
+        removeMetadataTrigger(new JavaType(GvNIXEntityMapLayer.class.getName()));
     }
 
     /**
@@ -82,6 +88,10 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
                 .getJavaType(metadataIdentificationString);
         LogicalPath path = GvNIXEntityMapLayerMetadata
                 .getPath(metadataIdentificationString);
+
+        // Getting entity details
+        ClassOrInterfaceTypeDetails entityDetails = typeLocationService
+                .getTypeDetails(javaType);
 
         LogicalPath entityPath = PhysicalTypeUtils.getPath(javaType,
                 typeLocationService);
@@ -98,9 +108,23 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
         // Getting entity plural
         String plural = jpaMetadata.getPlural();
 
+        // Getting declared fields
+        List<JavaSymbolName> geoFieldNames = new ArrayList<JavaSymbolName>();
+        List<? extends FieldMetadata> fields = entityDetails
+                .getDeclaredFields();
+        for (FieldMetadata field : fields) {
+            // Getting field type to get package
+            JavaType fieldType = field.getFieldType();
+            JavaPackage fieldPackage = fieldType.getPackage();
+            // If has jts field, annotate entity
+            if (fieldPackage.toString().equals("com.vividsolutions.jts.geom")) {
+                geoFieldNames.add(field.getFieldName());
+            }
+        }
+
         return new GvNIXEntityMapLayerMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, typeLocationService,
-                typeManagementService, javaType, plural);
+                typeManagementService, javaType, plural, geoFieldNames);
     }
 
     /**

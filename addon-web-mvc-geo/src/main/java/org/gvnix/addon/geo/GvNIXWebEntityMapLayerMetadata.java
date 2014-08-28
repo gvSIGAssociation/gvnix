@@ -43,12 +43,12 @@ import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
 
 /**
- * ITD generator for {@link GvNIXEntityMapLayerController} annotation.
+ * ITD generator for {@link GvNIXWebEntityMapLayer} annotation.
  * 
  * @author gvNIX Team
  * @since 1.4.0
  */
-public class GvNIXEntityMapLayerMetadata extends
+public class GvNIXWebEntityMapLayerMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
     private static final JavaSymbolName LIST_GEO_ENTITY_ON_MAP_VIEWER = new JavaSymbolName(
@@ -56,16 +56,17 @@ public class GvNIXEntityMapLayerMetadata extends
 
     private final ItdBuilderHelper helper;
 
-    private static final String PROVIDES_TYPE_STRING = GvNIXEntityMapLayerMetadata.class
+    private static final String PROVIDES_TYPE_STRING = GvNIXWebEntityMapLayerMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    public GvNIXEntityMapLayerMetadata(String identifier, JavaType aspectName,
+    public GvNIXWebEntityMapLayerMetadata(String identifier,
+            JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             TypeLocationService typeLocationService,
-            TypeManagementService typeManagementService, JavaType entity,
-            String entityPlural) {
+            TypeManagementService typeManagementService, JavaType controller,
+            JavaType entity, String entityPlural) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         // Generate necessary methods
@@ -92,6 +93,16 @@ public class GvNIXEntityMapLayerMetadata extends
             String plural) {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Adding bbox param
+        AnnotationMetadataBuilder bboxParamMetadataBuilder = new AnnotationMetadataBuilder(
+                SpringJavaType.REQUEST_PARAM);
+        bboxParamMetadataBuilder.addStringAttribute("value", "bbox");
+        bboxParamMetadataBuilder.addBooleanAttribute("required", false);
+        bboxParamMetadataBuilder.addStringAttribute("defaultValue", "");
+
+        parameterTypes.add(new AnnotatedJavaType(JavaType.STRING,
+                bboxParamMetadataBuilder.build()));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -129,6 +140,7 @@ public class GvNIXEntityMapLayerMetadata extends
 
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName("mapBoundingBox"));
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -169,12 +181,48 @@ public class GvNIXEntityMapLayerMetadata extends
         bodyBuilder
                 .appendFormalLine("headers.add(\"Content-Type\", \"application/json; charset=utf-8\");");
 
-        // List<Owner> result = Owner.findAllOwners();
+        // Generating empty result list
+        // List<Owner> result = new ArrayList<Owner>();
+        bodyBuilder.appendFormalLine("// Generating empty result list");
         bodyBuilder.appendFormalLine(String.format(
-                "%s<%s> result = %s.findAll%s();",
+                "%s<%s> result = new %s<%s>();",
                 helper.getFinalTypeName(new JavaType("java.util.List")),
                 helper.getFinalTypeName(entity),
+                helper.getFinalTypeName(new JavaType("java.util.ArrayList")),
+                helper.getFinalTypeName(entity)));
+
+        // Looking for all entries on map bounding box
+        // if (StringUtils.isNotBlank(mapBoundingBox)) {
+        bodyBuilder
+                .appendFormalLine("// Looking for all entries on map bounding box");
+        bodyBuilder.appendFormalLine(String.format(
+                "if (%s.isNotBlank(mapBoundingBox)) {", helper
+                        .getFinalTypeName(new JavaType(
+                                "org.apache.commons.lang3.StringUtils"))));
+
+        bodyBuilder.indent();
+
+        // result = Entity.findAllEntitiesByBoundingBox
+        bodyBuilder.appendFormalLine(String.format(
+                "result = %s.findAll%sByBoundingBox(mapBoundingBox);",
                 helper.getFinalTypeName(entity), plural));
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}else {");
+
+        bodyBuilder.indent();
+
+        // If bounding box is empty, find all entries
+        // result = Owner.findAllOwners();
+
+        bodyBuilder
+                .appendFormalLine("// If bounding box is empty, find all entries");
+        // List<Owner> result = Owner.findAllOwners();
+        bodyBuilder.appendFormalLine(String.format("result = %s.findAll%s();",
+                helper.getFinalTypeName(entity), plural));
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
 
         // return new ResponseEntity<List<Owner>>(result, headers,
         // org.springframework.http.HttpStatus.OK);

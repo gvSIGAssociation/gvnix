@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
-package org.gvnix.addon.geo;
+package org.gvnix.addon.jpa.geo.providers.hibernatespatial;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,13 +23,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Trigger annotation for Entity Map Layer Controller
+ * Trigger annotation for Entity Map Layer
  * 
  * @author gvNIX Team
  * @since 1.4
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface GvNIXEntityMapLayerController {
+public @interface GvNIXEntityMapLayer {
 
 }

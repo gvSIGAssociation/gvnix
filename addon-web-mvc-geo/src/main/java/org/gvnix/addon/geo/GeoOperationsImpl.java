@@ -73,8 +73,8 @@ import org.w3c.dom.Element;
 public class GeoOperationsImpl extends AbstractOperations implements
         GeoOperations {
 
-    private static final JavaType GVNIX_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
-            "org.gvnix.addon.geo.GvNIXEntityMapLayer");
+    private static final JavaType GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
+            "org.gvnix.addon.geo.GvNIXWebEntityMapLayer");
 
     private static final JavaType ROO_WEB_SCAFFOLD_ANNOTATION = new JavaType(
             "org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold");
@@ -201,6 +201,13 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     @Override
     public void all(JavaSymbolName path) {
+
+        // Checking if exists map element before to generate geo web layer
+        if (!checkExistsMapElement()) {
+            throw new RuntimeException(
+                    "ERROR. Is necesary to create new map element using \"web mvc geo map\" command before generate geo web layer");
+        }
+
         List<String> paths = new ArrayList<String>();
         // Checks if path is null or not. If is null, add all entities to all
         // available maps, if not, add all entities to specified map.
@@ -240,6 +247,13 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     @Override
     public void add(JavaType controller, JavaSymbolName path) {
+
+        // Checking if exists map element before to generate geo web layer
+        if (!checkExistsMapElement()) {
+            throw new RuntimeException(
+                    "ERROR. Is necesary to create new map element using \"web mvc geo map\" command before generate geo web layer");
+        }
+
         Validate.notNull(controller,
                 "Controller is necessary to execute this operation");
 
@@ -318,7 +332,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 controllerDetails);
 
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
-                GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
+                GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION);
 
         // Add annotation to target type
         detailsBuilder.updateTypeAnnotation(annotationBuilder.build());
@@ -409,7 +423,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                     ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                             entityController);
                     AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
-                            GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
+                            GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION);
 
                     // Add annotation to target type
                     detailsBuilder.updateTypeAnnotation(annotationBuilder
@@ -681,11 +695,11 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Looking for all entities annotated with @GvNIXEntityMapLayer
         for (ClassOrInterfaceTypeDetails entity : typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(GVNIX_ENTITY_MAP_LAYER_ANNOTATION)) {
+                .findClassesOrInterfaceDetailsWithAnnotation(GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION)) {
 
             // Getting map layer annotation
             AnnotationMetadata mapLayerAnnotation = entity
-                    .getAnnotation(GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
+                    .getAnnotation(GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION);
 
             // Getting maps where will be displayed
             @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -1066,6 +1080,18 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
                         .build());
 
+    }
+
+    /**
+     * This method checks if exists some map element
+     * 
+     * @return
+     */
+    public boolean checkExistsMapElement() {
+        // If not exists any class with @GvNIXMapViewer annotation, return false
+        return !typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(
+                        MAP_VIEWER_ANNOTATION).isEmpty();
     }
 
     /**

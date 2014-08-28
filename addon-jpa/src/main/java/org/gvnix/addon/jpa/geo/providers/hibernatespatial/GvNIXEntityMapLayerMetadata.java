@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
-package org.gvnix.addon.geo;
+package org.gvnix.addon.jpa.geo.providers.hibernatespatial;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -48,25 +48,21 @@ import org.springframework.roo.project.LogicalPath;
  * @author gvNIX Team
  * @since 1.4.0
  */
-public class GvNIXEntityMapLayerControllerMetadata extends
+public class GvNIXEntityMapLayerMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
-
-    private static final JavaSymbolName LIST_GEO_ENTITY_ON_MAP_VIEWER = new JavaSymbolName(
-            "listGeoEntityOnMapViewer");
 
     private final ItdBuilderHelper helper;
 
-    private static final String PROVIDES_TYPE_STRING = GvNIXEntityMapLayerControllerMetadata.class
+    private static final String PROVIDES_TYPE_STRING = GvNIXEntityMapLayerMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    public GvNIXEntityMapLayerControllerMetadata(String identifier,
-            JavaType aspectName,
+    public GvNIXEntityMapLayerMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             TypeLocationService typeLocationService,
-            TypeManagementService typeManagementService, JavaType controller,
-            JavaType entity, String entityPlural) {
+            TypeManagementService typeManagementService, JavaType entity,
+            String entityPlural, List<JavaSymbolName> geoFieldNames) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         // Generate necessary methods
@@ -75,9 +71,9 @@ public class GvNIXEntityMapLayerControllerMetadata extends
         this.helper = new ItdBuilderHelper(this, governorPhysicalTypeMetadata,
                 builder.getImportRegistrationResolver());
 
-        // Adding list method
-        builder.addMethod(getListGeoEntityOnMapViewerMethod(entity,
-                entityPlural));
+        // Adding findAllEntitiesByBoundingBox method
+        builder.addMethod(getFindAllEntitiesByBoundingBoxMethod(entity,
+                entityPlural, geoFieldNames));
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
@@ -85,19 +81,26 @@ public class GvNIXEntityMapLayerControllerMetadata extends
     }
 
     /**
-     * Gets <code>listGeoEntityOnMapViewer</code> method. <br>
+     * Gets <code>findAllEntitiesByBoundingBox</code> method. <br>
      * 
      * @return
      */
-    private MethodMetadata getListGeoEntityOnMapViewerMethod(JavaType entity,
-            String plural) {
+    private MethodMetadata getFindAllEntitiesByBoundingBoxMethod(
+            JavaType entity, String plural, List<JavaSymbolName> geoFieldNames) {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
 
+        // Adding String param
+        parameterTypes.add(AnnotatedJavaType
+                .convertFromJavaType(JavaType.STRING));
+
+        // Getting method name
+        JavaSymbolName methodName = new JavaSymbolName(String.format(
+                "findAll%sByBoundingBox", plural));
+
         // Check if a method with the same signature already exists in the
         // target type
-        final MethodMetadata method = methodExists(
-                LIST_GEO_ENTITY_ON_MAP_VIEWER, parameterTypes);
+        final MethodMetadata method = methodExists(methodName, parameterTypes);
         if (method != null) {
             // If it already exists, just return the method and omit its
             // generation via the ITD
@@ -107,44 +110,26 @@ public class GvNIXEntityMapLayerControllerMetadata extends
         // Define method annotations
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
 
-        AnnotationMetadataBuilder requestMappingMetadataBuilder = new AnnotationMetadataBuilder(
-                SpringJavaType.REQUEST_MAPPING);
-
-        requestMappingMetadataBuilder.addStringAttribute("params",
-                "entityMapList");
-        requestMappingMetadataBuilder.addStringAttribute("headers",
-                "Accept=application/json");
-        requestMappingMetadataBuilder.addStringAttribute("produces",
-                "application/json");
-        requestMappingMetadataBuilder.addStringAttribute("consumes",
-                "application/json");
-
-        AnnotationMetadataBuilder responseBodyMetadataBuilder = new AnnotationMetadataBuilder(
-                SpringJavaType.RESPONSE_BODY);
-
-        annotations.add(requestMappingMetadataBuilder);
-        annotations.add(responseBodyMetadataBuilder);
-
         // Define method throws types
         List<JavaType> throwsTypes = new ArrayList<JavaType>();
 
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        // bbox parameter
+        parameterNames.add(new JavaSymbolName("bbox"));
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildlistGeoEntityOnMapViewerMethodBody(entity, plural, bodyBuilder);
+        buildfindAllEntitiesByBoundingBoxMethodBody(entity, plural,
+                bodyBuilder, geoFieldNames);
 
         // Return type
-        JavaType responseEntityJavaType = new JavaType(
-                SpringJavaType.RESPONSE_ENTITY.getFullyQualifiedTypeName(), 0,
-                DataType.TYPE, null, Arrays.asList(new JavaType(
-                        "java.util.List", 0, DataType.TYPE, null, Arrays
-                                .asList(entity))));
+        JavaType responseEntityJavaType = new JavaType("java.util.List", 0,
+                DataType.TYPE, null, Arrays.asList(entity));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, LIST_GEO_ENTITY_ON_MAP_VIEWER,
+                getId(), Modifier.PUBLIC + Modifier.STATIC, methodName,
                 responseEntityJavaType, parameterTypes, parameterNames,
                 bodyBuilder);
         methodBuilder.setAnnotations(annotations);
@@ -159,36 +144,43 @@ public class GvNIXEntityMapLayerControllerMetadata extends
      * 
      * @param bodyBuilder
      */
-    private void buildlistGeoEntityOnMapViewerMethodBody(JavaType entity,
-            String plural, InvocableMemberBodyBuilder bodyBuilder) {
-        // HttpHeaders headers = new HttpHeaders();
+    private void buildfindAllEntitiesByBoundingBoxMethodBody(JavaType entity,
+            String plural, InvocableMemberBodyBuilder bodyBuilder,
+            List<JavaSymbolName> geoFieldNames) {
+
+        // Generating query
+        StringBuilder query = new StringBuilder().append(String.format(
+                "SELECT o FROM %s o", helper.getFinalTypeName(entity)));
+        String finalQuery = query.toString();
+        if (!geoFieldNames.isEmpty()) {
+            query.append(" WHERE ");
+            // Adding all fields to intersect
+            for (JavaSymbolName field : geoFieldNames) {
+                query.append(String.format(
+                        " intersects(o.%s, :bbox) = true OR ", field.toString()));
+            }
+
+            // Removing last OR
+            finalQuery = query.substring(0, query.length() - 3);
+
+        }
+
+        // TypedQuery<Entity> q = em.createQuery(query, Entity.class);
         bodyBuilder.appendFormalLine(String.format(
-                "%s headers = new HttpHeaders();",
-                helper.getFinalTypeName(SpringJavaType.HTTP_HEADERS)));
+                "%s<%s> q = entityManager().createQuery(\"%s\", %s.class);",
+                helper.getFinalTypeName(new JavaType(
+                        "javax.persistence.TypedQuery")), helper
+                        .getFinalTypeName(entity), finalQuery, helper
+                        .getFinalTypeName(entity)));
 
-        // headers.add("Content-Type", "application/json; charset=utf-8");
-        bodyBuilder
-                .appendFormalLine("headers.add(\"Content-Type\", \"application/json; charset=utf-8\");");
+        if (!geoFieldNames.isEmpty()) {
+            // q.setParameter("bbox", String.format("POLYGON((%s))", bbox));
+            bodyBuilder
+                    .appendFormalLine("q.setParameter(\"bbox\", String.format(\"POLYGON((%s))\", bbox));");
+        }
+        // return q.getResultList();
+        bodyBuilder.appendFormalLine("return q.getResultList();");
 
-        // List<Owner> result = Owner.findAllOwners();
-        bodyBuilder.appendFormalLine(String.format(
-                "%s<%s> result = %s.findAll%s();",
-                helper.getFinalTypeName(new JavaType("java.util.List")),
-                helper.getFinalTypeName(entity),
-                helper.getFinalTypeName(entity), plural));
-
-        // return new ResponseEntity<List<Owner>>(result, headers,
-        // org.springframework.http.HttpStatus.OK);
-        // Return type
-        JavaType responseEntityJavaType = new JavaType(
-                SpringJavaType.RESPONSE_ENTITY.getFullyQualifiedTypeName(), 0,
-                DataType.TYPE, null, Arrays.asList(new JavaType(
-                        "java.util.List", 0, DataType.TYPE, null, Arrays
-                                .asList(entity))));
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("return new %s(result, headers, org.springframework.http.HttpStatus.OK);",
-                                helper.getFinalTypeName(responseEntityJavaType)));
     }
 
     public String toString() {
