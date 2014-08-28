@@ -161,6 +161,9 @@ var GvNIX_Map_Leaflet;
 			 * Function to initialize Map
 			 * */
 			"_fnInitializeMap": function initializeMap(divId, center, zoom, maxZoom, url) {
+				// Saving instance
+				var instance = this;
+				
 				// Getting center LatLng
                 var latLng = center.split(",");
                 var lat = latLng[0];
@@ -181,6 +184,12 @@ var GvNIX_Map_Leaflet;
 	  			    attribution: '<a href="http://www.gvnix.org">gvNIX</a>',
 	  			    maxZoom: maxZoom
 	  			}).addTo(this._data.map);
+				
+				// Adding events to reload data
+				this._data.map.on("moveend", function(event){
+					var layers = instance._data.layers;
+					instance._fnReloadDataByCheckedLayers(instance, layers);
+				});
 
 			},
 			
@@ -411,31 +420,8 @@ var GvNIX_Map_Leaflet;
 					currentTool.data("response", true);
 				});
 			},
-			
+
 			/**
-			 * Function to add printing tool
-			 * 
-			 * @param divId
-			 */
-			/*"_fnAddPrintTool": function addPrintTool(divId){
-				var instance = this;
-				var map = instance.fnGetMapObject();
-				// Append printing icon
-				var printId = divId+"_print_tool";
-				var icon = "<i id='"+printId+"' class='fa fa-print'/>";
-				this._data.toolBar.append(icon);
-				// Adding printing functionalities
-				jQuery("#" + printId).click(function(){
-					jQuery("#" + instance._data.id).html2canvas({
-						flashcanvas: "js/flashcanvas.min.js",
-						logging: false,
-						profile: false,
-						useCORS: true
-					});
-				});
-			},*/
-			
-            /**
             * Function to get map item
             **/
             "fnGetMapObject": function getMapObject(){
@@ -476,10 +462,13 @@ var GvNIX_Map_Leaflet;
             "fnGetResultList": function getResultList(oData, oLayer){
             	// Getting map object
             	var map = this._data.map;
+            	// Getting boudingBox polygon
+            	var boundingBox = this.fnGetMapBoundingBox(map);
+            	
             	// Getting result entities
     			var jqxhr = jQuery.ajax(oData.path + "?entityMapList", {
     				contentType: "application/json",
-    				//traditional: true,
+    				data: boundingBox,
     				handleAs : "json",
     				type: "POST",
     				dataType: 'json'
@@ -491,6 +480,56 @@ var GvNIX_Map_Leaflet;
     				// Displaying records on map
     				this._fnDisplayRecordsOnMap(response, map, oLayer);
     			}, this));
+            },
+            
+            /**
+             * Function to get map bounding box 
+             * 
+             * @param map
+             */
+            "fnGetMapBoundingBox": function getBoundingBox(map){
+            	// Getting bounds
+            	var bounds = map.getBounds();
+            	
+            	// Getting points
+            	var northWest = bounds.getNorthWest().lng + " " + bounds.getNorthWest().lat;
+            	var northEast = bounds.getNorthEast().lng + " " + bounds.getNorthEast().lat;
+            	var southEast = bounds.getSouthEast().lng + " " + bounds.getSouthEast().lat;
+            	var southWest = bounds.getSouthWest().lng + " " + bounds.getSouthWest().lat;
+            	
+            	// Construct points
+            	var points = northWest + ", " + northEast + ", " + southEast + ", " + southWest + ", " + northWest;
+            	
+            	return points;
+            },
+            
+            /**
+             * 
+             * Function to reload data of all layers
+             * 
+             * @param instance
+             * @param layers
+             */
+            "_fnReloadDataByCheckedLayers": function reloadDataByCheckedLayer(instance, layers){
+            	for(layer in layers){
+					var oLayer = layers[layer];
+					// If current layer is checked, get info
+					var isChecked = oLayer.checkBox.prop("checked");
+					if(isChecked){
+						// Show loading icon
+						instance.fnShowLoadingIcon(oLayer);
+						// Clearing child layers if exists
+						var fieldLayers = oLayer.fieldsConfig;
+						if(fieldLayers !== undefined){
+							// Clear all layers to be sure that not displays more than one
+							for(var i=0;i<fieldLayers.length;i++){
+								fieldLayers[i].layerGroup.clearLayers();
+							}
+						}
+						instance.fnGetResultList(oLayer.checkBox.data(), oLayer);
+					}
+					
+				}
             },
             
             /**

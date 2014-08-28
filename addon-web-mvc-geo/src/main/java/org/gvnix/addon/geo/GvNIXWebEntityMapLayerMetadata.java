@@ -96,10 +96,8 @@ public class GvNIXWebEntityMapLayerMetadata extends
 
         // Adding bbox param
         AnnotationMetadataBuilder bboxParamMetadataBuilder = new AnnotationMetadataBuilder(
-                SpringJavaType.REQUEST_PARAM);
-        bboxParamMetadataBuilder.addStringAttribute("value", "bbox");
+                SpringJavaType.REQUEST_BODY);
         bboxParamMetadataBuilder.addBooleanAttribute("required", false);
-        bboxParamMetadataBuilder.addStringAttribute("defaultValue", "");
 
         parameterTypes.add(new AnnotatedJavaType(JavaType.STRING,
                 bboxParamMetadataBuilder.build()));
