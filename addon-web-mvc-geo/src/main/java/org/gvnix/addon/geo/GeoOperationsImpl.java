@@ -38,6 +38,7 @@ import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
@@ -73,11 +74,20 @@ import org.w3c.dom.Element;
 public class GeoOperationsImpl extends AbstractOperations implements
         GeoOperations {
 
+    private static final JavaType GVNIX_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
+            "org.gvnix.addon.jpa.geo.providers.hibernatespatial.GvNIXEntityMapLayer");
+
     private static final JavaType GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
             "org.gvnix.addon.geo.GvNIXWebEntityMapLayer");
 
     private static final JavaType ROO_WEB_SCAFFOLD_ANNOTATION = new JavaType(
             "org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold");
+
+    private static final String WEBMCV_DATABINDER_BEAN_ID = "dataBinderRequestMappingHandlerAdapter";
+
+    private static final String JACKSON2_RM_HANDLER_ADAPTER = "org.gvnix.web.json.Jackson2RequestMappingHandlerAdapter";
+
+    private static final String OBJECT_MAPPER = "org.gvnix.web.json.ConversionServiceObjectMapper";
 
     @Reference
     private PathResolver pathResolver;
@@ -166,6 +176,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
     public void setup() {
         // Adding project dependencies
         updatePomDependencies();
+        // Update web-mvc config
+        updateWebMvcConfig();
         // Locate all ApplicationConversionServiceFactoryBean and annotate it
         annotateApplicationConversionService();
         // Installing all necessary components
@@ -279,6 +291,21 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 .format("Specified entity \"%s\" has not GEO fields",
                         scaffoldAnnotation.getAttribute("formBackingObject")
                                 .getValue()));
+
+        // Checking if entity has geo finder
+        JavaType entity = (JavaType) scaffoldAnnotation.getAttribute(
+                new JavaSymbolName("formBackingObject")).getValue();
+
+        ClassOrInterfaceTypeDetails entityDetails = typeLocationService
+                .getTypeDetails(entity);
+        AnnotationMetadata gvNIXEntityMapLayerAnnotation = entityDetails
+                .getAnnotation(GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
+
+        Validate.notNull(
+                gvNIXEntityMapLayerAnnotation,
+                String.format(
+                        "Specified entity \"%s\" is not annotated with @GvNIXEntityMapLayer. Use \"finder geo add\" command to generate necessary methods",
+                        entity.getSimpleTypeName()));
 
         List<String> paths = new ArrayList<String>();
         // Add annotation to controller
@@ -400,70 +427,82 @@ public class GeoOperationsImpl extends AbstractOperations implements
             ClassOrInterfaceTypeDetails entityDetails = typeLocationService
                     .getTypeDetails((JavaType) entity);
 
-            // Getting all fields of current entity
-            List<? extends FieldMetadata> entityFields = entityDetails
-                    .getDeclaredFields();
+            // Checking if geo finders are added to entity
+            AnnotationMetadata gvNIXEntityMapLayerAnnotation = entityDetails
+                    .getAnnotation(GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
 
-            Iterator<? extends FieldMetadata> fieldsIterator = entityFields
-                    .iterator();
+            if (gvNIXEntityMapLayerAnnotation != null) {
+                // Getting all fields of current entity
+                List<? extends FieldMetadata> entityFields = entityDetails
+                        .getDeclaredFields();
 
-            while (fieldsIterator.hasNext()) {
-                // Getting field
-                FieldMetadata field = fieldsIterator.next();
+                Iterator<? extends FieldMetadata> fieldsIterator = entityFields
+                        .iterator();
 
-                // Getting field type to get package
-                JavaType fieldType = field.getFieldType();
-                JavaPackage fieldPackage = fieldType.getPackage();
+                while (fieldsIterator.hasNext()) {
+                    // Getting field
+                    FieldMetadata field = fieldsIterator.next();
 
-                // If has jts field, annotate controller
-                if (fieldPackage.toString().equals(
-                        "com.vividsolutions.jts.geom")) {
+                    // Getting field type to get package
+                    JavaType fieldType = field.getFieldType();
+                    JavaPackage fieldPackage = fieldType.getPackage();
 
-                    // Generating annotation
-                    ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
-                            entityController);
-                    AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
-                            GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION);
+                    // If has jts field, annotate controller
+                    if (fieldPackage.toString().equals(
+                            "com.vividsolutions.jts.geom")) {
 
-                    // Add annotation to target type
-                    detailsBuilder.updateTypeAnnotation(annotationBuilder
-                            .build());
+                        // Generating annotation
+                        ClassOrInterfaceTypeDetailsBuilder detailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                                entityController);
+                        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                                GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION);
 
-                    // Save changes to disk
-                    typeManagementService
-                            .createOrUpdateTypeOnDisk(detailsBuilder.build());
+                        // Add annotation to target type
+                        detailsBuilder.updateTypeAnnotation(annotationBuilder
+                                .build());
 
-                    // Update necessary map controllers with current entity
-                    // If developer specify map path add on it
-                    if (!(paths.size() == 1 && paths.get(0).equals(""))) {
-                        Iterator<String> pathIterator = paths.iterator();
-                        while (pathIterator.hasNext()) {
-                            // Getting path
-                            String currentPath = pathIterator.next();
-                            // Getting map controller for current path
-                            JavaType mapController = GeoUtils
-                                    .getMapControllerByPath(currentPath,
-                                            typeLocationService);
+                        // Save changes to disk
+                        typeManagementService
+                                .createOrUpdateTypeOnDisk(detailsBuilder
+                                        .build());
 
-                            // Annotate map controllers adding current entity
-                            annotateMapController(mapController,
-                                    typeLocationService, typeManagementService,
-                                    entityController.getType());
+                        // Update necessary map controllers with current entity
+                        // If developer specify map path add on it
+                        if (!(paths.size() == 1 && paths.get(0).equals(""))) {
+                            Iterator<String> pathIterator = paths.iterator();
+                            while (pathIterator.hasNext()) {
+                                // Getting path
+                                String currentPath = pathIterator.next();
+                                // Getting map controller for current path
+                                JavaType mapController = GeoUtils
+                                        .getMapControllerByPath(currentPath,
+                                                typeLocationService);
 
+                                // Annotate map controllers adding current
+                                // entity
+                                annotateMapController(mapController,
+                                        typeLocationService,
+                                        typeManagementService,
+                                        entityController.getType());
+
+                            }
                         }
-                    }
-                    else {
-                        // If no path selected, annotate all mapControllers with
-                        // current entityController
-                        for (JavaType mapController : mapControllers) {
-                            // Annotate map controllers adding current entity
-                            annotateMapController(mapController,
-                                    typeLocationService, typeManagementService,
-                                    entityController.getType());
+                        else {
+                            // If no path selected, annotate all mapControllers
+                            // with
+                            // current entityController
+                            for (JavaType mapController : mapControllers) {
+                                // Annotate map controllers adding current
+                                // entity
+                                annotateMapController(mapController,
+                                        typeLocationService,
+                                        typeManagementService,
+                                        entityController.getType());
+                            }
                         }
-                    }
 
-                    break;
+                        break;
+                    }
                 }
             }
         }
@@ -1080,6 +1119,57 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
                         .build());
 
+    }
+
+    /**
+     * Update the webmvc-config.xml file in order to register
+     * Jackson2RequestMappingHandlerAdapter
+     * 
+     * @param targetPackage
+     */
+    private void updateWebMvcConfig() {
+        LogicalPath webappPath = WebProjectUtils
+                .getWebappPath(projectOperations);
+        String webMvcXmlPath = projectOperations.getPathResolver()
+                .getIdentifier(webappPath, "WEB-INF/spring/webmvc-config.xml");
+        Validate.isTrue(fileManager.exists(webMvcXmlPath),
+                "webmvc-config.xml not found");
+
+        MutableFile webMvcXmlMutableFile = null;
+        Document webMvcXml;
+
+        try {
+            webMvcXmlMutableFile = fileManager.updateFile(webMvcXmlPath);
+            webMvcXml = XmlUtils.getDocumentBuilder().parse(
+                    webMvcXmlMutableFile.getInputStream());
+        }
+        catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        Element root = webMvcXml.getDocumentElement();
+
+        Element dataBinder = XmlUtils.findFirstElement("bean[@id='"
+                + WEBMCV_DATABINDER_BEAN_ID + "']", root);
+        if (dataBinder != null) {
+            root.removeChild(dataBinder);
+        }
+
+        // add bean tag to argument-resolvers
+        Element bean = webMvcXml.createElement("bean");
+        bean.setAttribute("id", WEBMCV_DATABINDER_BEAN_ID);
+        bean.setAttribute("p:order", "1");
+        bean.setAttribute("class", JACKSON2_RM_HANDLER_ADAPTER);
+
+        Element property = webMvcXml.createElement("property");
+        property.setAttribute("name", "objectMapper");
+
+        Element objectMapperBean = webMvcXml.createElement("bean");
+        objectMapperBean.setAttribute("class", OBJECT_MAPPER);
+        property.appendChild(objectMapperBean);
+        bean.appendChild(property);
+        root.appendChild(bean);
+
+        XmlUtils.writeXml(webMvcXmlMutableFile.getOutputStream(), webMvcXml);
     }
 
     /**
