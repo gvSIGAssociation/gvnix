@@ -8387,7 +8387,7 @@
 				_initControlPos : function() {
 					var corners = this._controlCorners = {}, l = 'leaflet-', container = this._controlContainer = L.DomUtil
 							.create('div', l + 'control-container',
-									this._container);
+									this._container.parentElement);
 
 					function createCorner(vSide, hSide) {
 						var className = l + vSide + ' ' + l + hSide;

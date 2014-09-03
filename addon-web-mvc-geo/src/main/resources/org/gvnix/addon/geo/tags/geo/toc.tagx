@@ -10,13 +10,10 @@
     </c:if>
     
     <spring:url var="loading_img" value="/resources/images/loading.gif" />
-    
-  	<div id="${id}_layers" class="mapviewer_layers_container">
-		<div class="mapviewer_layers_header">
-			<h3><spring:message arguments="${layers_name}" code="manage_layers_title"/></h3>
-		</div>
-		<div class="mapviewer_layers">
-			<jsp:doBody />
-		</div>
+
+  	<div id="${id}_layers" class="mapviewer_layers_container" style="display:none;">
+			<div class="mapviewer_layers">
+				<jsp:doBody />
+			</div>
 	</div>
 </jsp:root>

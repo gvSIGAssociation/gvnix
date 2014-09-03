@@ -75,9 +75,29 @@ var GvNIX_Map_Leaflet;
 	        "layers": [],
 	        
 	        /**
+	         * Tile layers
+	         */
+	        "tileLayers": [],
+	        
+	        /**
+	         * WMS layers
+	         */
+	        "wmsLayers": [],
+	        
+	        /**
 	         * Toolbar object
 	         */
 	        "toolBar": null,
+	        
+	        /**
+	         * Control Layers object
+	         */
+	        "controlLayers": null,
+	        
+	        /**
+	         * Control Toolbar object
+	         */
+	        "controlToolbar": null
 	        
 		};
 		
@@ -126,9 +146,29 @@ var GvNIX_Map_Leaflet;
     	        "layers": [],
     	        
     	        /**
+    	         * Tile layers
+    	         */
+    	        "tileLayers": [],
+    	        
+    	        /**
+    	         * WMS layers
+    	         */
+    	        "wmsLayers": [],
+    	        
+    	        /**
     	         * Toolbar object
     	         */
     	        "toolBar": null,
+    	        
+    	        /**
+    	         * Control Layers object
+    	         */
+    	        "controlLayers": null,
+    	        
+    	        /**
+    	         * Control Toolbar object
+    	         */
+    	        "controlToolbar": null
     	        
 			};
 		
@@ -176,8 +216,13 @@ var GvNIX_Map_Leaflet;
 	  		        zoomControl: false
 				});
 				
+				// Adding zoom control on top right position
+				new L.Control.Zoom({ position: 'topright' }).addTo(this._data.map);
 				// Adding Zoomslider
-				L.control.zoomslider().addTo(this._data.map);
+				//L.control.zoomslider({position: 'topright'}).addTo(this._data.map);
+				
+				// Adding layers control
+				this._fnAddLayersControl(this._data.map);
 				
 				// Configuring map
 				L.tileLayer(url, {
@@ -194,6 +239,44 @@ var GvNIX_Map_Leaflet;
 			},
 			
 			/**
+			 * Function to add layer control with toc layers
+			 */
+			"_fnAddLayersControl": function addLayersControl(map){
+				// Getting generated toc HTML
+				var tocLayers = jQuery("#" + this._data.id + "_toc_layers");
+				var html = tocLayers.html();
+				if(jQuery(html).children().length > 0){
+					// Generating controlLayers item
+					this._data.controlLayers = L.control.htmlLayers();
+					// Adding controlLayers to map
+					this._data.controlLayers.addTo(this._data.map);
+					// Removing hidden tocLayer
+					tocLayers.html("");
+					// Adding HTML toc to controlLayer
+					this._data.controlLayers._setHtmlContent(html);
+				}
+				
+			},
+			
+			/**
+			 * Function to add toolbar control with tools
+			 */
+			"_fnAddToolbarControl": function addToolbarControl(map){
+				// Generating controlLayers item
+				this._data.controlToolbar = L.control.htmlToolbar();
+				// Adding controlLayers to map
+				this._data.controlToolbar.addTo(this._data.map);
+				
+				// Getting generated toolbar HTML
+				var toolbar = jQuery(".mapviewer_tools_bar");
+				var toolbarHTML = toolbar.html();
+				// Removing hidden toolbar
+				toolbar.html("");
+				// Adding HTML toolbar to toolbarControl
+				this._data.controlToolbar._setHtmlContent(toolbarHTML);
+			},
+			
+			/**
 			 * Function to register entity layer 
 			 * 
 			 * @param oLayer
@@ -206,13 +289,29 @@ var GvNIX_Map_Leaflet;
 				data.path = data.path.replace("/","");
 				// Getting loading icon 
 				oLayer.loadingIcon = jQuery("#"+checkBox.attr("id")+"_loading_icon");
-				// Adding layer to _data object
-				this._data.layers.push(oLayer);
-				// Add onChange event for all layers checkbox
-				this._fnRegisterCheckboxEvents(checkBox, oLayer);
-				// TODO: Check which layers needs to load. 
-				// Force change event at all register layer
-				oLayer.checkBox.trigger("change");
+				
+				// Check if layer exists yet
+				var currentLayers = this._data.layers;
+				var exists = false;
+				for(i in currentLayers){
+					var currentLayer = currentLayers[i];
+					if(oLayer.checkBox.data() == currentLayer.checkBox.data()){
+						exists = true;
+						break;
+					}
+				}
+				
+				if(!exists){
+					// Adding layer to _data object
+					currentLayers.push(oLayer);
+					// Adding span click event
+					this._fnRegisterSpanEvents(checkBox);
+					// Add onChange event for all layers checkbox
+					this._fnRegisterCheckboxEvents(checkBox, oLayer);
+					// TODO: Check which layers needs to load. 
+					// Force change event at all register layer
+					oLayer.checkBox.trigger("change");
+				}
 			},
 			
 			/**
@@ -232,34 +331,202 @@ var GvNIX_Map_Leaflet;
 						if(layer.fieldsConfig == undefined){
 							layer.fieldsConfig = [];
 						}
-						// Creating layerGroup for every field
-        				var layerGroup = new L.MarkerClusterGroup({
-        				    iconCreateFunction: function(cluster) {
-        				    	var childCount = cluster.getChildCount();
-        				    	// Modifying object of child markers
-        				    	var markerChilds = cluster.getAllChildMarkers();
-        				    	if(markerChilds.length > 0){
-        				    		var child = markerChilds[0];
-        				    		var currentIcon = child.options.icon;
-        				    		var groupIcon = L.AwesomeMarkers.icon({
-            	    				    icon: currentIcon.options.icon,
-            	    				    prefix: currentIcon.options.prefix,
-            	    				    groupedMarkers: childCount,
-            	    				    markerColor: currentIcon.options.markerColor,
-            	    				    iconColor: currentIcon.options.iconColor
-                        			});
-        				    		return groupIcon;
-        				    	}
-        				    }
-        				});
-        				//var layerGroup = new L.LayerGroup();
-        				oLayer.layerGroup = layerGroup;
-        				layer.fieldsConfig.push(oLayer);
-        				
-        				// Add onChange event for all layers checkbox
-        				instance._fnRegisterCheckboxFieldsEvents(oLayer.checkBox, oLayer, layer);
+						// Checking if layer exists yet
+						var exists = false;
+						for(i in layer.fieldsConfig){
+							var item = layer.fieldsConfig[i].checkBox.attr("id");
+							var checkBoxToAdd = oLayer.checkBox.attr("id");
+							if(item == checkBoxToAdd){
+								exists = true;
+								break;
+							}
+						}
+						
+						// If not exists, add and generate necessary items
+						if(!exists){
+							// Creating layerGroup for every field
+	        				var layerGroup = new L.MarkerClusterGroup({
+	        					showCoverageOnHover: false, 
+	        					removeOutsideVisibleBounds : true,
+	        				    iconCreateFunction: function(cluster) {
+	        				    	var childCount = cluster.getChildCount();
+	        				    	// Modifying object of child markers
+	        				    	var markerChilds = cluster.getAllChildMarkers();
+	        				    	if(markerChilds.length > 0){
+	        				    		var child = markerChilds[0];
+	        				    		var currentIcon = child.options.icon;
+	        				    		var groupIcon = L.AwesomeMarkers.icon({
+	            	    				    icon: currentIcon.options.icon,
+	            	    				    prefix: currentIcon.options.prefix,
+	            	    				    groupedMarkers: childCount,
+	            	    				    markerColor: currentIcon.options.markerColor,
+	            	    				    iconColor: currentIcon.options.iconColor
+	                        			});
+	        				    		return groupIcon;
+	        				    	}
+	        				    }
+	        				});
+	        				//var layerGroup = new L.LayerGroup();
+	        				oLayer.layerGroup = layerGroup;
+	        				layer.fieldsConfig.push(oLayer);
+
+	        				// Add onClick event for all layers span
+	        				instance._fnRegisterSpanFieldsEvents(oLayer.checkBox);
+	        				// Add onChange event for all layers checkbox
+	        				instance._fnRegisterCheckboxFieldsEvents(oLayer.checkBox, oLayer, layer);
+						}
 					}
 				});
+			},
+			
+			
+			/**
+			 * Function to register tile layer 
+			 * 
+			 * @param oTileLayer
+			 */
+			"fnRegisterTileLayer": function registerTileLayer(oTileLayer){
+				// Saving instance
+				var instance = this;
+				// Getting map
+				var map = this.fnGetMapObject();
+				// Getting tilelayer configuration
+				var checkBox = oTileLayer.checkBox;
+				var span = oTileLayer.span;
+				
+				// Checking if tile layers exists
+				var exists = false;
+				for(i in instance._data.tileLayers){
+					var item =instance._data.tileLayers[i];
+					var tileLayerToAdd = checkBox.attr("id");
+					if(item == tileLayerToAdd){
+						exists = true;
+						break;
+					}
+				}
+				
+				// If exists, do nothing
+				if(!exists){
+					// Adding span event
+					jQuery(span).click(function(){
+						if(jQuery(checkBox).prop("checked")){
+							jQuery(checkBox).prop("checked", false);
+							jQuery(checkBox).trigger("change");
+						}else{
+							jQuery(checkBox).prop("checked", true);
+							jQuery(checkBox).trigger("change");
+						}
+					});
+					// Adding checkbox event
+					jQuery(checkBox).change(function(){
+						if(jQuery(this).prop('checked')){
+	    		    		if(map){
+	    		    			var tileLayer = L.tileLayer(oTileLayer.url);
+	    						tileLayer.setOpacity(oTileLayer.opacity);
+	    						if(oTileLayer.index !== ""){
+	    							tileLayer.setZIndex(oTileLayer.index);
+	    						}
+	    						oTileLayer.markerGroup.addLayer(tileLayer);
+	    						oTileLayer.markerGroup.addTo(map);
+	    		    		}else{
+	    		    			alert("Map is not defined!");
+	    		    		}
+	    				}else{
+	    					oTileLayer.markerGroup.clearLayers();
+	    				}
+					});
+					
+					// Saving current tile layer
+					instance._data.tileLayers.push(checkBox.attr("id"));
+				}
+				
+			},
+			
+			
+			/**
+			 * Function to register wms layer 
+			 * 
+			 * @param oWmsLayer
+			 */
+			"fnRegisterWmsLayer": function registerWmsLayer(oWmsLayer){
+				// Saving instance
+				var instance = this;
+				// Getting map
+				var map = this.fnGetMapObject();
+				// Getting wmsLayer configuration
+				var checkBox = oWmsLayer.checkBox;
+				var span = oWmsLayer.span;
+				
+				// Checking if tile layers exists
+				var exists = false;
+				for(i in instance._data.wmsLayers){
+					var item =instance._data.wmsLayers[i];
+					var wmsLayerToAdd = checkBox.attr("id");
+					if(item == wmsLayerToAdd){
+						exists = true;
+						break;
+					}
+				}
+				
+				// If exists, do nothing
+				if(!exists){
+					// Adding span event
+					jQuery(span).click(function(){
+						if(jQuery(checkBox).prop("checked")){
+							jQuery(checkBox).prop("checked", false);
+							jQuery(checkBox).trigger("change");
+						}else{
+							jQuery(checkBox).prop("checked", true);
+							jQuery(checkBox).trigger("change");
+						}
+					});
+					// Adding checkbox event
+					jQuery(checkBox).change(function(){
+	    				if(jQuery(this).prop('checked')){
+	    		    		if(map){
+	    		    			var wmsLayer = L.tileLayer.wms(oWmsLayer.url, {
+	    		    			    layers: oWmsLayer.layers,
+	    		    			    format: oWmsLayer.format,
+	    		    			    transparent: oWmsLayer.transparent,
+	    		    			    attribution: oWmsLayer.attribution,
+	    		    			    styles: oWmsLayer.styles,
+	    		    			    version: oWmsLayer.version,
+	    		    			    crs: oWmsLayer.crs
+	    		    			});
+	    		    			wmsLayer.setOpacity(oWmsLayer.opacity);
+	    						if(oWmsLayer.index !== ""){
+	    							wmsLayer.setZIndex(oWmsLayer.index);
+	    						}
+	    						oWmsLayer.markerGroup.addLayer(wmsLayer);
+	    						oWmsLayer.markerGroup.addTo(map);
+	    		    		}else{
+	    		    			alert("Map is not defined!");
+	    		    		}
+	    				}else{
+	    					oWmsLayer.markerGroup.clearLayers();
+	    				}
+	    			});	
+					
+					// Saving current tile layer
+					instance._data.wmsLayers.push(checkBox.attr("id"));
+				}
+				
+			},
+			
+			/**
+			 * Function to add onClick event to span layer
+			 * @param oCheckBox
+			 */
+			"_fnRegisterSpanEvents": function registerSpanEvents(oCheckBox){
+				var spanLayer = jQuery("#"+oCheckBox.attr("id")+"_span");
+				spanLayer.click(function(){
+          			if(oCheckBox.prop("checked")){
+          				oCheckBox.prop("checked", false);
+          			}else{
+          				oCheckBox.prop("checked", true);
+          			}
+          			oCheckBox.trigger("change");
+          		});
 			},
 			
 			/**
@@ -318,6 +585,22 @@ var GvNIX_Map_Leaflet;
 			},
 			
 			/**
+			 * Function to add onClick event to span field entity layers
+			 * @param oCheckBox
+			 */
+			"_fnRegisterSpanFieldsEvents": function registerSpanFieldsEvents(oCheckBox){
+				var spanLayer = jQuery("#"+oCheckBox.attr("id")+"_span");
+				spanLayer.click(function(){
+          			if(oCheckBox.prop("checked")){
+          				oCheckBox.prop("checked", false);
+          			}else{
+          				oCheckBox.prop("checked", true);
+          			}
+          			oCheckBox.trigger("change");
+          		});
+			},
+			
+			/**
 			 * Function to add onChange event to checkboxes field entity layers
 			 * 
 			 * @param oCheckbox
@@ -360,32 +643,23 @@ var GvNIX_Map_Leaflet;
 			 * @param divId
 			 * */
 			"_fnInitializeToolBar": function initializeToolBar() {
+				// Saving instance
+				var instance = this;
 				// Saving toolbar on map instance
 				this._data.toolBar = jQuery(".mapviewer_tools_bar");
 				// Adding default hand tool
 				if(this._data.toolBar.length > 0){
 					this._fnAddDefaultHandTool();
-					// Adding esc key listener
-					/*jQuery(document).keypress(function(e){
-						if(e.charCode == 0){
-							jQuery("#default_tool").trigger("click");
-						}
-					});*/
 				}
-			},
-			
-			/**
-			 * Function to add default hand tool
-			 */
-			"_fnAddDefaultHandTool": function addDefaultTool(){
-				var instance = this;
-				// Adding button element
-				this._data.toolBar.prepend('<i id="default_tool" class="fa fa-hand cursor_hand_icon mapviewer_tool_selected" >&nbsp;</i>');
+				
+				// Adding toolbar control
+				this._fnAddToolbarControl(this._data.map);
+				
 				var defaultTool = jQuery("#default_tool");
-				// Saving default tool as currentTool
+				
+				// Saving hand as current tool
 				this._data.currentTool = defaultTool;
-				// Modify icon to use hand icon
-				jQuery(this._data.map._container).css({"cursor" : "url('resources/images/cursor_hand.png'), default"});
+				
 				// Adding click event
 				defaultTool.click(function(){
 					if(!jQuery(this).hasClass("mapviewer_tool_selected")){
@@ -419,6 +693,16 @@ var GvNIX_Map_Leaflet;
 					currentTool.removeClass("mapviewer_tool_selected");
 					currentTool.data("response", true);
 				});
+			},
+			
+			/**
+			 * Function to add default hand tool
+			 */
+			"_fnAddDefaultHandTool": function addDefaultTool(){
+				// Adding button element
+				this._data.toolBar.prepend('<i id="default_tool" class="toolbar_button fa fa-hand cursor_hand_icon mapviewer_tool_selected" >&nbsp;&nbsp;&nbsp;&nbsp;</i>');
+				// Modify icon to use hand icon
+				jQuery(this._data.map._container).css({"cursor" : "url('resources/images/cursor_hand.png'), default"});
 			},
 
 			/**
@@ -516,16 +800,6 @@ var GvNIX_Map_Leaflet;
 					// If current layer is checked, get info
 					var isChecked = oLayer.checkBox.prop("checked");
 					if(isChecked){
-						// Show loading icon
-						instance.fnShowLoadingIcon(oLayer);
-						// Clearing child layers if exists
-						var fieldLayers = oLayer.fieldsConfig;
-						if(fieldLayers !== undefined){
-							// Clear all layers to be sure that not displays more than one
-							for(var i=0;i<fieldLayers.length;i++){
-								fieldLayers[i].layerGroup.clearLayers();
-							}
-						}
 						instance.fnGetResultList(oLayer.checkBox.data(), oLayer);
 					}
 					
@@ -540,6 +814,8 @@ var GvNIX_Map_Leaflet;
              * @param layerGroup layer group where add records
              */
             "_fnDisplayRecordsOnMap": function displayRecordsOnMap(oRecords, oMap, oLayer){
+            	// Getting instance
+            	var instance = this;
             	// Getting all fields config
             	var fieldsConfig = oLayer.fieldsConfig;
             	var fieldsConfigLength = fieldsConfig.length;
@@ -586,9 +862,25 @@ var GvNIX_Map_Leaflet;
                         			if(info){ 
                         				marker.bindPopup(info);
                         			}
-                        			// Adding marker to layerGroup
-                    				layerGroup.addLayer(marker);
-                    				
+                        			
+                        			// Generating unique for layer id
+                        			var idValue = fieldConfig.checkBox.data().field + "_" + item[oLayer.checkBox.data().pk];
+                        			var markerLayer = marker.getLayers()[0];
+                        			markerLayer.options.markerId = idValue;
+                        			
+                        			// Checking if current id exists on map. If exists, not add again
+                        			var currentMarkers = layerGroup.getLayers();
+                        			var exists = false;
+                        			for(x in currentMarkers){
+                        				var markerId = currentMarkers[x].options.markerId;
+                        				if(markerId == idValue){
+                        					exists = true;
+                        				}
+                        			}
+                        			if(!exists){
+                        				// Adding marker to layerGroup
+                        				layerGroup.addLayer(marker);
+                        			}
                     			}
                 			}else{
                 				alert("ERROR. Error getting field '"+oLayer.fieldToDisplay+"'" +
@@ -604,7 +896,40 @@ var GvNIX_Map_Leaflet;
         		// Hiding loading icon
         		this.fnHideLoadingIcon(oLayer);
         		
-            }
+            },
+            
+            /**
+             * Function to clean records out of current bounding box
+             * 
+             * @param oRecords
+             * @param layerGroup
+             */
+            /*"_fnCleanRecordsNotDisplayed": function cleanRecordsNotDisplayed(oRecords, layerGroup, fieldName, pk){
+            	var currentMarkersOnLayer = layerGroup.getLayers();
+            	// Checking that exists current markers
+            	if(currentMarkersOnLayer.length > 0){
+            		// Getting every markers
+            		for(i in currentMarkersOnLayer){
+            			var exists = false;
+            			var marker = currentMarkersOnLayer[i];
+            			var markerId = marker.options.markerId;
+            			// Checking if current marker exists on records
+            			for(x in oRecords){
+            				var currentRecord = oRecords[x];
+            				var idValue = fieldName + "_" + currentRecord[pk];
+            				// If exists, mark as exists
+            				if(markerId == idValue){
+            					exists = true;
+            				}
+            			}
+            			
+            			// If not exists, remove marker
+                		if(!exists){
+                			layerGroup.removeLayer(marker);
+                		}
+            		}
+            	}
+            }*/
 	};
 	
 	// Static variables * * * * * * * * * * * * * * * * * * * * * * * * * * *

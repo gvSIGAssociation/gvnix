@@ -21,8 +21,8 @@
     </c:if>
   
   	<!-- Generating info tool -->
-	<i id="${id}_generic_tool" class="${iconLibrary} ${icon}" data-actiontool="${actionTool}" data-activatefunction="${activateFunction}" data-deactivatefunction="${deactivateFunction}" data-preventexitmessage="${preventExitMessage}" data-cursoricon="${cursorIcon}">&amp;nbsp;</i>
-	
+	<i id="${id}_generic_tool" class="toolbar_button ${iconLibrary} ${icon}" data-actiontool="${actionTool}" data-activatefunction="${activateFunction}" data-deactivatefunction="${deactivateFunction}" data-preventexitmessage="${preventExitMessage}" data-cursoricon="${cursorIcon}">&amp;nbsp;</i>
+
 	<script>
 		jQuery(document).ready(function(){
 			new GvNIX_Map_Generic_Tool(jQuery("#${id}_generic_tool"));			

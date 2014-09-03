@@ -4,7 +4,7 @@
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
   
   	<!-- Generating info tool -->
-	<i id="measure_tool" class="fa fa-measure measure_icon" >&amp;nbsp;</i>
+	<i id="measure_tool" class="toolbar_button  fa fa-measure measure_icon" >&amp;nbsp;&amp;nbsp;&amp;nbsp;</i>
 	
 	<script>
 		jQuery(document).ready(function(){

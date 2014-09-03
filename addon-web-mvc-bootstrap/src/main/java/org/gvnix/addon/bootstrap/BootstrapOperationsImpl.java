@@ -11,11 +11,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.WebProjectUtils;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.FeatureNames;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
@@ -113,6 +115,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         checkAndUpdateDatatables();
         checkAndUpdateSecurity();
         checkAndUpdateTypicalSecurity();
+        checkAndUpdateGeo();
 
         LOGGER.log(Level.INFO,
                 "*** All files are updated to use JQuery and Bootstrap 3 ");
@@ -436,6 +439,71 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
             BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
                     fileManager, getClass(), loginView, "login-typical.jspx",
                     VIEWS);
+        }
+
+    }
+
+    /**
+     * This method checks if geo is installed. If is installed and update views
+     * to use bootstrap
+     */
+
+    public void checkAndUpdateGeo() {
+        // Checking if the geo addon is installed using features
+        if (projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-geo-web-mvc")) {
+            updateLoadScripts("js_leaflet_geo_js",
+                    "/resources/scripts/leaflet/leaflet_bootstrap.js", false);
+            updateLoadScripts("styles_leaflet_geo_css",
+                    "/resources/styles/leaflet/leaflet.bootstrap.css", true);
+            updateLoadScripts("styles_gvnix_leaflet_geo_css",
+                    "/resources/styles/leaflet/gvnix.leaflet.bootstrap.css",
+                    true);
+
+            LOGGER.log(
+                    Level.INFO,
+                    "** Remember to update all your map 'views.xml' to use 'default-map' layout instead of 'default'.");
+        }
+
+    }
+
+    /**
+     * This method adds reference in laod-script.tagx
+     */
+    public void updateLoadScripts(String varName, String url, boolean isCSS) {
+        // Modify Roo load-scripts.tagx
+        String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
+                "WEB-INF/tags/util/load-scripts.tagx");
+
+        Validate.isTrue(fileManager.exists(docTagxPath),
+                "load-script.tagx not found: ".concat(docTagxPath));
+
+        MutableFile docTagxMutableFile = null;
+        Document docTagx;
+
+        try {
+            docTagxMutableFile = fileManager.updateFile(docTagxPath);
+            docTagx = XmlUtils.getDocumentBuilder().parse(
+                    docTagxMutableFile.getInputStream());
+        }
+        catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        Element root = docTagx.getDocumentElement();
+
+        boolean modified = false;
+
+        if (isCSS) {
+            modified = WebProjectUtils.updateCssToTag(docTagx, root, varName,
+                    url) || modified;
+        }
+        else {
+            modified = WebProjectUtils.updateJSToTag(docTagx, root, varName,
+                    url) || modified;
+        }
+
+        if (modified) {
+            XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
         }
 
     }

@@ -30,6 +30,7 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
+import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.TypeLocationService;
@@ -38,7 +39,6 @@ import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
@@ -62,6 +62,8 @@ import org.springframework.roo.support.util.XmlRoundTripUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Implementation of GEO Addon operations
@@ -106,6 +108,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     @Reference
     private ProjectOperations projectOperations;
+
+    @Reference
+    private MenuOperations menuOperations;
 
     @Reference
     private TypeManagementService typeManagementService;
@@ -206,6 +211,12 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Add new mapController view to application.properties
         addI18nControllerProperties(filePackage, path.getReadableSymbolName()
                 .toLowerCase());
+        // Add new menu entry for this new map view
+        String finalPath = path.getReadableSymbolName().toLowerCase();
+        menuOperations.addMenuItem(path, new JavaSymbolName("map_menu_entry"),
+                path.getReadableSymbolName(), "global_generic",
+                "/" + finalPath, null, getWebappPath());
+
     }
 
     /**
@@ -542,9 +553,19 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
                 writer.println("<!DOCTYPE tiles-definitions PUBLIC \"-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN\" \"http://tiles.apache.org/dtds/tiles-config_2_1.dtd\">");
                 writer.println("<tiles-definitions>");
-                writer.println(String.format(
-                        "   <definition extends=\"default\" name=\"%s/show\">",
-                        finalPath));
+
+                // Depens of Bootstrap change extends layout
+                if (projectOperations
+                        .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+                    writer.println(String
+                            .format("   <definition extends=\"default-map\" name=\"%s/show\">",
+                                    finalPath));
+                }
+                else {
+                    writer.println(String
+                            .format("   <definition extends=\"default\" name=\"%s/show\">",
+                                    finalPath));
+                }
                 writer.println(String
                         .format("      <put-attribute name=\"body\" value=\"/WEB-INF/views/%s/show.jspx\"/>",
                                 finalPath));
@@ -909,10 +930,25 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 pathResolver.getIdentifier(webappPath,
                         "/WEB-INF/tags/geo/tools"), fileManager, context,
                 getClass());
+        // Copy necessary layouts files
+        OperationUtils.updateDirectoryContents("layouts/*.jspx",
+                pathResolver.getIdentifier(webappPath, "/WEB-INF/layouts"),
+                fileManager, context, getClass());
+        OperationUtils.updateDirectoryContents("layouts/*.xml",
+                pathResolver.getIdentifier(webappPath, "/WEB-INF/layouts"),
+                fileManager, context, getClass());
 
-        // Add sources to loadScripts
-        addToLoadScripts("js_leaflet_geo_js",
-                "/resources/scripts/leaflet/leaflet.js", false);
+        // Add JS sources to loadScripts
+        if (projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+            addToLoadScripts("js_leaflet_geo_js",
+                    "/resources/scripts/leaflet/leaflet_bootstrap.js", false);
+        }
+        else {
+            addToLoadScripts("js_leaflet_geo_js",
+                    "/resources/scripts/leaflet/leaflet.js", false);
+        }
+
         addToLoadScripts("js_leaflet_ext_gvnix_url",
                 "/resources/scripts/leaflet/leaflet.ext.gvnix.map.js", false);
         addToLoadScripts(
@@ -935,10 +971,27 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 "/resources/scripts/leaflet/L.Control.Zoomslider.js", false);
         addToLoadScripts("js_leaflet_measuring_tool_js",
                 "/resources/scripts/leaflet/L.MeasuringTool.js", false);
-        addToLoadScripts("styles_leaflet_geo_css",
-                "/resources/styles/leaflet/leaflet.css", true);
-        addToLoadScripts("styles_gvnix_leaflet_geo_css",
-                "/resources/styles/leaflet/gvnix.leaflet.css", true);
+        addToLoadScripts("js_leaflet_html_layers_control",
+                "/resources/scripts/leaflet/leaflet.htmllayercontrol.js", false);
+        addToLoadScripts("js_leaflet_html_toolbar_control",
+                "/resources/scripts/leaflet/leaflet.htmltoolbarcontrol.js",
+                false);
+
+        // Add CSS Sources to Load Scripts
+        if (projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+            addToLoadScripts("styles_leaflet_geo_css",
+                    "/resources/styles/leaflet/leaflet.bootstrap.css", true);
+            addToLoadScripts("styles_gvnix_leaflet_geo_css",
+                    "/resources/styles/leaflet/gvnix.leaflet.bootstrap.css",
+                    true);
+        }
+        else {
+            addToLoadScripts("styles_leaflet_geo_css",
+                    "/resources/styles/leaflet/leaflet.css", true);
+            addToLoadScripts("styles_gvnix_leaflet_geo_css",
+                    "/resources/styles/leaflet/gvnix.leaflet.css", true);
+        }
         addToLoadScripts("styles_leaflet_font_css",
                 "/resources/styles/leaflet/font-awesome.min.css", true);
         addToLoadScripts("styles_leaflet_markers_css",
@@ -949,6 +1002,11 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 "/resources/styles/leaflet/MarkerCluster.Default.css", true);
         addToLoadScripts("styles_zoom_slider_css",
                 "/resources/styles/leaflet/L.Control.Zoomslider.css", true);
+        addToLoadScripts("styles_leaflet_html_layers_control",
+                "/resources/styles/leaflet/leaflet.htmllayercontrol.css", true);
+        addToLoadScripts("styles_leaflet_html_toolbar_control",
+                "/resources/styles/leaflet/leaflet.htmltoolbarcontrol.css",
+                true);
     }
 
     /**

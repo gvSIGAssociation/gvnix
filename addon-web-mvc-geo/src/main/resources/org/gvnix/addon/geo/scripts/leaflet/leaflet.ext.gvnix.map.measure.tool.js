@@ -95,9 +95,11 @@ var GvNIX_Map_Measure_Tool;
 		};
 		
 		// Constructor
-		this._fnConstruct();
+		var validMeasureTool = this._fnConstruct();
 		
-		GvNIX_Map_Measure_Tool._fnAddInstance(this);
+		if(validMeasureTool){
+			GvNIX_Map_Measure_Tool._fnAddInstance(this);
+		}
 		
 		return this;
 	};
@@ -109,25 +111,31 @@ var GvNIX_Map_Measure_Tool;
 			 */
 			"_fnConstruct" : function(){
 				var instance = this;
-				var mapControl = jQuery(".mapviewer_control");
-				if(mapControl){
-					// Registering map instance
-					this._data.map = GvNIX_Map_Leaflet.fnGetInstance(mapControl.attr("id"));
-					// Registering toolbar instance
-					this._data.toolBar = mapControl.parent();
-					// Adding click event to button
-					this._data.button.on('click', function(){
-						instance.fnOnClickTool(this, instance);
-					});
-					// Adding deselect event
-					this._data.button.on("deselectCurrentTool", function(event){
-						// Calling instance deactivate method
-						var instanceId = this.id;
-						var toolInstance = GvNIX_Map_Measure_Tool.fnGetInstance(instanceId);
-						toolInstance.fnDeactivateTool(jQuery(this));
-					});
+				// Checking if exists
+				if(GvNIX_Map_Measure_Tool.fnGetInstance(this._data.id) == null){
+					var mapControl = jQuery(".mapviewer_control");
+					if(mapControl){
+						// Registering map instance
+						this._data.map = GvNIX_Map_Leaflet.fnGetInstance(mapControl.attr("id"));
+						// Registering toolbar instance
+						this._data.toolBar = mapControl.parent();
+						// Adding click event to button
+						this._data.button.on('click', function(){
+							instance.fnOnClickTool(this, instance);
+						});
+						// Adding deselect event
+						this._data.button.on("deselectCurrentTool", function(event){
+							// Calling instance deactivate method
+							var instanceId = this.id;
+							var toolInstance = GvNIX_Map_Measure_Tool.fnGetInstance(instanceId);
+							toolInstance.fnDeactivateTool(jQuery(this));
+						});
+						return true;
+					}else{
+						alert("Warning: GvNIX_Map_Measure_Tool must be initialised with map element present");
+					}
 				}else{
-					alert("Warning: GvNIX_Map_Measure_Tool must be initialised with map element present");
+					return false;
 				}
 			},
 			

@@ -152,11 +152,12 @@ Version: 1.0
 (-webkit-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5),(min-resolution: 1.5dppx) {
  .awesome-marker-big {
   background-image: url('images/markers-soft@2x.png');
-  background-size: 720px 46px;
+  background-size: 1025px;
  }
  .awesome-marker-big-shadow {
   background-image: url('images/markers-shadow@2x.png');
-  background-size: 35px 16px;
+  width: 36px!important;
+  height: 16px!important;
  }
 }
 

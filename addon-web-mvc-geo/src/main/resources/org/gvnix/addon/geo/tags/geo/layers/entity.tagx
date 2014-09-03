@@ -14,7 +14,7 @@
     
    	<div class="mapviewer_layers_layer">
     	<input id="${id}" name="${sec_field}" type="checkbox" data-path="${path}" data-pk="${pk}"/>
-		<span><c:out value="${fn:escapeXml(label)}" /></span>
+		<span id="${id}_span"><c:out value="${fn:escapeXml(label)}" /></span>
 		<img id="${id}_loading_icon" src="${loading_img}" width="15" style="display:none;"/>
    						
 		<script>

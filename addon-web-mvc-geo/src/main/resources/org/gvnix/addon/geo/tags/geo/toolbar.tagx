@@ -5,7 +5,7 @@
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   	<!-- Generating map toolbar -->
-	<div id="${id}_tool_bar" class="mapviewer_tools_bar">
+	<div id="${id}_tool_bar" class="mapviewer_tools_bar" style="display:none;">
 			<jsp:doBody />
 	</div>
 </jsp:root>

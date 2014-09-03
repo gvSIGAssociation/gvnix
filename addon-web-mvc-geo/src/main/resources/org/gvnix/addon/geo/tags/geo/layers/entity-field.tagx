@@ -21,7 +21,7 @@
     
    	<div>
     	<input id="${id}" name="${sec_field}" type="checkbox" data-field="${field}" data-icon="${icon}" data-iconColor="${iconColor}" data-iconLibrary="${iconLibrary}" data-markerColor="${markerColor}" />
-		<span><c:out value="${fn:escapeXml(label)}" /></span>
+		<span id="${id}_span"><c:out value="${fn:escapeXml(label)}" /></span>
 		
 		<!-- Legend Icons -->
 		

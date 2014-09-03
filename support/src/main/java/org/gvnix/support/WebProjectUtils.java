@@ -530,6 +530,40 @@ public class WebProjectUtils {
     }
 
     /**
+     * Append a css definition in loadScript.tagx
+     * <p/>
+     * This first append a "spring:url" (if not exists) and then add the "link"
+     * tag (if not exists)
+     * 
+     * @param docTagx loadScript.tagx document
+     * @param root root node
+     * @param varName name of variable to hold css url
+     * @param location css location
+     * @return document has changed
+     */
+    public static boolean updateCssToTag(Document docTagx, Element root,
+            String varName, String location) {
+        boolean modified = false;
+
+        // add url resolution
+        modified = updateUrlToTag(docTagx, root, varName, location);
+
+        // Add link
+        Element cssElement = XmlUtils.findFirstElement(
+                String.format("link[@href='${%s}']", varName), root);
+        if (cssElement == null) {
+            cssElement = docTagx.createElement("link");
+            cssElement.setAttribute("rel", "stylesheet");
+            cssElement.setAttribute("type", "text/css");
+            cssElement.setAttribute("media", "screen");
+            cssElement.setAttribute("href", "${".concat(varName).concat("}"));
+            root.appendChild(cssElement);
+            modified = true;
+        }
+        return modified;
+    }
+
+    /**
      * Append a '<spring:url var="varName" value='location'/>' tag inside root
      * element if not exist.
      * <p/>
@@ -558,6 +592,32 @@ public class WebProjectUtils {
     }
 
     /**
+     * Append a '<spring:url var="varName" value='location'/>' tag inside root
+     * element if not exist.
+     * <p/>
+     * First try to locate element using expresion "url[@var='varName']. If not
+     * found append this tag.
+     * <p/>
+     * 
+     * @param docTagx {@code .tagx} file document
+     * @param root XML root node
+     * @param varName name of variable to hold url
+     * @param location URL
+     * @return if document has changed
+     */
+    public static boolean updateUrlToTag(Document docTagx, Element root,
+            String varName, String location) {
+        Element urlElement = XmlUtils.findFirstElement(
+                "url[@var='".concat(varName) + "']", root);
+        if (urlElement != null) {
+            urlElement.setAttribute("var", varName);
+            urlElement.setAttribute(VALUE, location);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Append a js definition in loadScript.tagx
      * <p/>
      * This first append a "spring:url" (if not exists) and then add the "link"
@@ -575,6 +635,40 @@ public class WebProjectUtils {
 
         // add url resolution
         modified = addUrlToTag(docTagx, root, varName, location);
+
+        // Add script
+        Element scriptElement = XmlUtils.findFirstElement(
+                String.format("script[@src='${%s}']", varName), root);
+        if (scriptElement == null) {
+            scriptElement = docTagx.createElement("script");
+            scriptElement.setAttribute("src", "${".concat(varName).concat("}"));
+            scriptElement.setAttribute("type", "text/javascript");
+            scriptElement.appendChild(docTagx
+                    .createComment("required for FF3 and Opera"));
+            root.appendChild(scriptElement);
+            modified = true;
+        }
+        return modified;
+    }
+
+    /**
+     * Append a js definition in loadScript.tagx
+     * <p/>
+     * This first append a "spring:url" (if not exists) and then add the "link"
+     * tag (if not exists)
+     * 
+     * @param docTagx {@code .tagx} file document
+     * @param root XML root node
+     * @param varName name of variable to hold js url
+     * @param location js location
+     * @return document has changed
+     */
+    public static boolean updateJSToTag(Document docTagx, Element root,
+            String varName, String location) {
+        boolean modified = false;
+
+        // add url resolution
+        modified = updateUrlToTag(docTagx, root, varName, location);
 
         // Add script
         Element scriptElement = XmlUtils.findFirstElement(

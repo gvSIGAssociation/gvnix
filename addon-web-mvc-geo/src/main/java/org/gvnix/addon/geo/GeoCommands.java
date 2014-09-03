@@ -52,7 +52,7 @@ public class GeoCommands implements CommandMarker {
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
-    @CliAvailabilityIndicator("web mvc geo map")
+    @CliAvailabilityIndicator("web mvc geo controller")
     public boolean isMapCommandAvailable() {
         return operations.isMapCommandAvailable();
     }
@@ -63,7 +63,7 @@ public class GeoCommands implements CommandMarker {
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
-    @CliAvailabilityIndicator("web mvc geo all")
+    @CliAvailabilityIndicator("web mvc geo entity all")
     public boolean isAllCommandAvailable() {
         return operations.isAllCommandAvailable();
     }
@@ -74,7 +74,7 @@ public class GeoCommands implements CommandMarker {
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
-    @CliAvailabilityIndicator("web mvc geo add")
+    @CliAvailabilityIndicator("web mvc geo entity add")
     public boolean isAddCommandAvailable() {
         return operations.isAddCommandAvailable();
     }
@@ -96,7 +96,7 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo map", help = "Add new Map view to your project")
+    @CliCommand(value = "web mvc geo controller", help = "Add new Map view to your project")
     public void addMap(
             @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the new Map Controller") final JavaType controller,
             @CliOption(key = "preferredMapping", mandatory = true, optionContext = UPDATE_PROJECT, help = "Indicates a specific request mapping path for this map (eg /foo); no default value") final JavaSymbolName path) {
@@ -109,7 +109,7 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo all", help = "Run this method to include all GEO entities on specific map or on all available maps")
+    @CliCommand(value = "web mvc geo entity all", help = "Run this method to include all GEO entities on specific map or on all available maps")
     public void all(
             @CliOption(key = "maps", mandatory = false, help = "Map where you want to add all entities. If blank, adds all GEO entities to all available maps") MapsProperty path) {
         // Checking if path was selected
@@ -128,7 +128,7 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo add", help = "Run this method to include specific GEO entity on all maps or specific map")
+    @CliCommand(value = "web mvc geo entity add", help = "Run this method to include specific GEO entity on all maps or specific map")
     public void add(
             @CliOption(key = "controller", mandatory = true, help = "Indicates which entity controller you want to add to map") final JavaType controller,
             @CliOption(key = "maps", mandatory = false, help = "Map where you want to add current entities. If blank, adds current GEO entity to all available maps") final MapsProperty path) {
