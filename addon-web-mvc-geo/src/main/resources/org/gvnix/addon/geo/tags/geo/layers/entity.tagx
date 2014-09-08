@@ -2,6 +2,7 @@
   <jsp:output omit-xml-declaration="yes" />
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute name="filterType" type="java.lang.String" required="true" rtexprvalue="false" description="Set if current entity can be filtered and which mode has to use. (auto: Refresh data displayed automatically when filter on Datatables | manual: Needs to reload the page to refresh filter data \ none: Datatable filters not affect to current entity displayed data)" />
   <jsp:directive.attribute name="path" type="java.lang.String" required="true" rtexprvalue="true" description="The path to related entity controller" />
   <jsp:directive.attribute name="pk" type="java.lang.String" required="true" rtexprvalue="true" description="Entity Primary Key or Identifier" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
@@ -11,12 +12,15 @@
     </c:if>
     
     <spring:url var="loading_img" value="/resources/images/loading.gif" />
+    <spring:url var="filter_img" value="/resources/images/filter.png" />
     
    	<div class="mapviewer_layers_layer">
-    	<input id="${id}" name="${sec_field}" type="checkbox" data-path="${path}" data-pk="${pk}"/>
+    	<input id="${id}" name="${sec_field}" type="checkbox" data-path="${path}" data-pk="${pk}" data-filtertype="${filterType}"/>
 		<span id="${id}_span"><c:out value="${fn:escapeXml(label)}" /></span>
 		<img id="${id}_loading_icon" src="${loading_img}" width="15" style="display:none;"/>
-   						
+		<c:if test="${filterType ne 'none'}">
+			<img id="${id}_filter_icon" src="${filter_img}" width="15" style="float:right;margin-right:5px;margin-top:5px;cursor:pointer;"/>
+   		</c:if>				
 		<script>
 			jQuery(document).ready(function(){
 				// Getting Map Instance

@@ -195,6 +195,8 @@ var GvNIX_Map_Leaflet;
 					this._fnInitializeMap(data.id, data.center, data.zoom, data.maxZoom, data.url);
 					// Initialize toolbar
 					this._fnInitializeToolBar();
+					// Initialize Storage Event
+					this._fnInitializeStorageEvent();
 			},
 			
 			/**
@@ -209,17 +211,28 @@ var GvNIX_Map_Leaflet;
                 var lat = latLng[0];
                 var lng = latLng[1];
                 
-				// Creating Map
+                // Getting savedzoom
+                var savedZoom = instance._fnLoadZoomStatus();
+                if(savedZoom !== null){
+    				zoom = savedZoom;
+                }
+                // Getting saved center
+                var savedCenterPoint = instance._fnLoadCenterPoint();
+               if(savedCenterPoint !== null){
+            	   savedLatLng = savedCenterPoint.split(",");
+            	   lat = savedLatLng[0];
+            	   lng = savedLatLng[1];
+               }
+                
+                // Creating Map
 				this._data.map = L.map(divId, {
 	  				center: [lat , lng], 
 	  				zoom: zoom,
 	  		        zoomControl: false
 				});
-				
+                
 				// Adding zoom control on top right position
 				new L.Control.Zoom({ position: 'topright' }).addTo(this._data.map);
-				// Adding Zoomslider
-				//L.control.zoomslider({position: 'topright'}).addTo(this._data.map);
 				
 				// Adding layers control
 				this._fnAddLayersControl(this._data.map);
@@ -231,10 +244,10 @@ var GvNIX_Map_Leaflet;
 	  			}).addTo(this._data.map);
 				
 				// Adding events to reload data
-				this._data.map.on("moveend", function(event){
-					var layers = instance._data.layers;
-					instance._fnReloadDataByCheckedLayers(instance, layers);
-				});
+				instance._fnRegisterOnMoveMapEvent();
+				
+				// Adding event to save zoom
+				instance._fnSaveZoomStatus();
 
 			},
 			
@@ -287,8 +300,6 @@ var GvNIX_Map_Leaflet;
 				var data = checkBox.data();
 				// Generating correct path
 				data.path = data.path.replace("/","");
-				// Getting loading icon 
-				oLayer.loadingIcon = jQuery("#"+checkBox.attr("id")+"_loading_icon");
 				
 				// Check if layer exists yet
 				var currentLayers = this._data.layers;
@@ -302,15 +313,34 @@ var GvNIX_Map_Leaflet;
 				}
 				
 				if(!exists){
+					// Getting loading icon 
+					oLayer.loadingIcon = jQuery("#"+checkBox.attr("id")+"_loading_icon");
+					// Saving type of filter to the current entity layer
+					oLayer.filterType = data.filtertype;
+					if(oLayer.filterType !== "none"){
+						// Getting filter icon
+						oLayer.filterIcon = jQuery("#"+checkBox.attr("id")+"_filter_icon");
+						// Add click filtericon event
+						oLayer.filterIcon.click(function(){
+							window.open(data.path);
+						});
+						// Set filter as disabled
+						oLayer.filterIcon.css("opacity", "0.5");
+					}
+					// Saving Datatables localStorage key for this entity layer
+					this._fnRegisterLocalStorageEntityKey(this, data, oLayer);
 					// Adding layer to _data object
 					currentLayers.push(oLayer);
 					// Adding span click event
 					this._fnRegisterSpanEvents(checkBox);
 					// Add onChange event for all layers checkbox
 					this._fnRegisterCheckboxEvents(checkBox, oLayer);
-					// TODO: Check which layers needs to load. 
+					// Check which layers needs to load. 
+					var status = this._fnLoadCheckBoxStatus(checkBox);
 					// Force change event at all register layer
-					oLayer.checkBox.trigger("change");
+					if(status == true){
+						oLayer.checkBox.trigger("change");
+					}
 				}
 			},
 			
@@ -374,6 +404,8 @@ var GvNIX_Map_Leaflet;
 	        				instance._fnRegisterSpanFieldsEvents(oLayer.checkBox);
 	        				// Add onChange event for all layers checkbox
 	        				instance._fnRegisterCheckboxFieldsEvents(oLayer.checkBox, oLayer, layer);
+	        				// Check which layers needs to load. 
+	    					instance._fnLoadCheckBoxStatus(oLayer.checkBox);
 						}
 					}
 				});
@@ -419,7 +451,10 @@ var GvNIX_Map_Leaflet;
 					});
 					// Adding checkbox event
 					jQuery(checkBox).change(function(){
-						if(jQuery(this).prop('checked')){
+						var isChecked = jQuery(this).prop('checked');
+						// Saving checkbox status
+						instance._fnSaveCheckboxStatus(checkBox.attr("id"), isChecked);
+						if(isChecked){
 	    		    		if(map){
 	    		    			var tileLayer = L.tileLayer(oTileLayer.url);
 	    						tileLayer.setOpacity(oTileLayer.opacity);
@@ -435,6 +470,13 @@ var GvNIX_Map_Leaflet;
 	    					oTileLayer.markerGroup.clearLayers();
 	    				}
 					});
+					
+					// Loading checkbox status
+					var status = instance._fnLoadCheckBoxStatus(checkBox);
+					
+					if(status == "true"){
+						checkBox.trigger("change");
+					}
 					
 					// Saving current tile layer
 					instance._data.tileLayers.push(checkBox.attr("id"));
@@ -482,7 +524,10 @@ var GvNIX_Map_Leaflet;
 					});
 					// Adding checkbox event
 					jQuery(checkBox).change(function(){
-	    				if(jQuery(this).prop('checked')){
+						var isChecked = jQuery(this).prop('checked');
+						// Saving checkbox status
+						instance._fnSaveCheckboxStatus(checkBox.attr("id"), isChecked);
+	    				if(isChecked){
 	    		    		if(map){
 	    		    			var wmsLayer = L.tileLayer.wms(oWmsLayer.url, {
 	    		    			    layers: oWmsLayer.layers,
@@ -506,6 +551,13 @@ var GvNIX_Map_Leaflet;
 	    					oWmsLayer.markerGroup.clearLayers();
 	    				}
 	    			});	
+					
+					// Loading checkbox status
+					var status = instance._fnLoadCheckBoxStatus(checkBox);
+					
+					if(status == "true"){
+						checkBox.trigger("change");
+					}
 					
 					// Saving current tile layer
 					instance._data.wmsLayers.push(checkBox.attr("id"));
@@ -540,11 +592,14 @@ var GvNIX_Map_Leaflet;
 				var map = instance._data.map;
 				// When checkbox changes
 				oCheckbox.change(function(){
+					var isChecked = jQuery(this).prop('checked');
+					// Saving clicked checkboxes
+					instance._fnSaveCheckboxStatus(this.id, isChecked);
 					// Getting checkbox id and children layers
 					var currentLayerId = jQuery(this).attr("id");
 					var childrenLayers = jQuery("input[id^="+currentLayerId+"]");
 					// If checkbox is checked
-					if(jQuery(this).prop('checked')){
+					if(isChecked){
 						// Show loading icon
 						instance.fnShowLoadingIcon(oLayer);
 						// Clearing child layers if exists
@@ -559,6 +614,9 @@ var GvNIX_Map_Leaflet;
 						jQuery.each(childrenLayers, function(index, children){
 							if(children.id !== currentLayerId){
 								jQuery(children).prop('checked', true);
+								// Saving children status
+								instance._fnSaveCheckboxStatus(children.id, true);
+								
 							}
 						});
 						// Getting checkbox data
@@ -571,6 +629,8 @@ var GvNIX_Map_Leaflet;
 						jQuery.each(childrenLayers, function(index, children){
 							if(children.id !== currentLayerId){
 								jQuery(children).prop('checked', false);
+								// Saving children status
+								instance._fnSaveCheckboxStatus(children.id, false);
 							}
 						});
 						// Clear all field layers
@@ -614,8 +674,11 @@ var GvNIX_Map_Leaflet;
 					var checkBoxId = oCheckbox.attr("id");
 					var checkBox = jQuery("#" + checkBoxId);
 					checkBox.change(function(){
+						var isChecked = jQuery(this).prop('checked');
+						// Saving clicked checkboxes
+						instance._fnSaveCheckboxStatus(this.id, isChecked);
 						var data = jQuery(this).data();
-						if(jQuery(this).prop('checked')){
+						if(isChecked){
 							var fieldLayers = oParentLayer.fieldsConfig;
 							// Clear all layers to be sure that not displays more than one
 							for(var i=0;i<fieldLayers.length;i++){
@@ -623,6 +686,8 @@ var GvNIX_Map_Leaflet;
 							}
 							// Force check master checkbox
 							oParentLayer.checkBox.prop("checked",true);
+							// Saving master checkbox status like parent
+							instance._fnSaveCheckboxStatus(oParentLayer.checkBox.attr("id"), "parent");
 							// If oLayer has data loaded
 							if(oParentLayer.data !== undefined){
 								// Display records using oLayer data
@@ -746,10 +811,69 @@ var GvNIX_Map_Leaflet;
             "fnGetResultList": function getResultList(oData, oLayer){
             	// Getting map object
             	var map = this._data.map;
-            	// Getting boudingBox polygon
-            	var boundingBox = this.fnGetMapBoundingBox(map);
+            	// Checking if current layer is filtered
+            	var layerDTTStorage = localStorage.getItem(oLayer.localStorageEntityKey);
+            	if(layerDTTStorage !== null && oLayer.filterType !== "none"){
+            		var layerDTTStorageObject = jQuery.parseJSON(layerDTTStorage);
+    				// Search filtering or search all
+    				if(layerDTTStorageObject.isFiltered){
+    					this._fnGetFilteredResultList(oLayer, oData, layerDTTStorageObject);
+    				}else{
+    					this._fnGetAllResultList(oLayer, oData);
+    				}
+            	}else{
+            		this._fnGetAllResultList(oLayer, oData);
+            	}
             	
-            	// Getting result entities
+            },
+            
+            /**
+             * Function to get Filtered Result list
+             * 
+             * @param oLayer
+             * @param localStorageObject
+             */
+            "_fnGetFilteredResultList" : function getFilteredResultList(oLayer, oData, localStorageObject){
+            	// Mark icon as filtered
+        		oLayer.filterIcon.css("opacity","1");
+				// Generatign Ajax data to send
+				var ajaxElement = this._fnAjaxParameters(this, oLayer, localStorageObject.oSettings);
+				var jqxhr = jQuery.ajax({
+					"dataType" : 'json',
+					"type" : "POST",
+					"url" : oData.path + "/datatables/ajax",
+					"data" : ajaxElement
+				});
+				
+				// When results are getted, display results on map
+    			jqxhr.done(jQuery.proxy(function(response) {
+    				// Saving results on layer
+    				oLayer.data = response.aaData;
+    				// Clear previous data displayed
+    				var fieldsLayers = oLayer.fieldsConfig;
+    				for(i in fieldsLayers){
+    					var fieldLayer = fieldsLayers[i];
+    					fieldLayer.layerGroup.clearLayers();
+    				}
+    				// Displaying records on map
+    				this._fnDisplayRecordsOnMap(response.aaData, this._data.map, oLayer);
+    			}, this));
+            },
+            
+            /**
+             * Function to get all results
+             * 
+             * @param oLayer
+             * @param oData
+             */
+            "_fnGetAllResultList": function getAllResultList(oLayer, oData){
+            	if(oLayer.filterIcon !== undefined){
+            		// Mark icon as not filtered
+    				oLayer.filterIcon.css("opacity","0.5");
+            	}
+				// Getting boudingBox polygon
+            	var boundingBox = this.fnGetMapBoundingBox(this._data.map);
+				// Getting result entities
     			var jqxhr = jQuery.ajax(oData.path + "?entityMapList", {
     				contentType: "application/json",
     				data: boundingBox,
@@ -762,7 +886,7 @@ var GvNIX_Map_Leaflet;
     				// Saving results on layer
     				oLayer.data = response;
     				// Displaying records on map
-    				this._fnDisplayRecordsOnMap(response, map, oLayer);
+    				this._fnDisplayRecordsOnMap(response, this._data.map, oLayer);
     			}, this));
             },
             
@@ -899,37 +1023,306 @@ var GvNIX_Map_Leaflet;
             },
             
             /**
-             * Function to clean records out of current bounding box
-             * 
-             * @param oRecords
-             * @param layerGroup
+             * Function to register moveend event
              */
-            /*"_fnCleanRecordsNotDisplayed": function cleanRecordsNotDisplayed(oRecords, layerGroup, fieldName, pk){
-            	var currentMarkersOnLayer = layerGroup.getLayers();
-            	// Checking that exists current markers
-            	if(currentMarkersOnLayer.length > 0){
-            		// Getting every markers
-            		for(i in currentMarkersOnLayer){
-            			var exists = false;
-            			var marker = currentMarkersOnLayer[i];
-            			var markerId = marker.options.markerId;
-            			// Checking if current marker exists on records
-            			for(x in oRecords){
-            				var currentRecord = oRecords[x];
-            				var idValue = fieldName + "_" + currentRecord[pk];
-            				// If exists, mark as exists
-            				if(markerId == idValue){
-            					exists = true;
-            				}
-            			}
-            			
-            			// If not exists, remove marker
-                		if(!exists){
-                			layerGroup.removeLayer(marker);
-                		}
-            		}
+            "_fnRegisterOnMoveMapEvent": function(){
+            	this._data.map.on("moveend", function(event){
+            		// Saving current center point on localStorage
+            		var currentCenter = this._data.map.getCenter();
+            		localStorage.setItem(this._data.id + "_center_point", currentCenter.lat + "," + currentCenter.lng );
+            		// Reload current layers
+					var layers = this._data.layers;
+					this._fnReloadDataByCheckedLayers(this, layers);
+				}, this);
+            },
+            
+            /**
+             * Function to save checkbox status
+             * @param checkBoxId
+             * @param status
+             */
+            "_fnSaveCheckboxStatus": function saveCheckboxStatus(checkBoxId, status){
+            	// Saving status using localStorage
+            	localStorage.setItem(checkBoxId + "_map_toc_element", status);
+            },
+            
+            /**
+             * Function to load checkbox status
+             * @param checkBox
+             */
+            "_fnLoadCheckBoxStatus": function loadCheckboxStatus(checkBox){
+            	var status = localStorage.getItem(checkBox.attr("id") + "_map_toc_element");
+            	if(status !== null){
+            		if(status == "true" || status == "parent"){
+                		checkBox.prop("checked", true);
+                	}else{
+                		checkBox.prop("checked", false);
+                	}
             	}
-            }*/
+            	
+            	return status;
+            },
+            
+            /**
+             * Function to save zoom status when zoom changes
+             */
+            "_fnSaveZoomStatus": function saveZoomStatus(){
+            	this._data.map.on("zoomend", function(event){
+					var currentZoom = this._data.map.getZoom();
+					localStorage.setItem(this._data.id + "_zoom_level", currentZoom);
+				}, this);
+            },
+            
+            /**
+             * Function to get localStorage Zoom Value
+             * @returns
+             */
+            "_fnLoadZoomStatus": function loadZoomStatus(){
+            	var localStorageId = this._data.id + "_zoom_level";
+            	return localStorage.getItem(localStorageId);
+            },
+            
+            /**
+             * Function to load localStorage center point 
+             */
+            "_fnLoadCenterPoint": function loadCenterPoint(){
+            	var centerPointLocalStorageId = this._data.id + "_center_point";
+            	return localStorage.getItem(centerPointLocalStorageId);
+            },
+            
+            /**
+             * Function to generate and save localStorage key of entity layer
+             * 
+             * @param checkBoxData
+             * @param oLayer
+             */
+            "_fnRegisterLocalStorageEntityKey": function registerLocalStorageEntityKey(instance, checkBoxData, oLayer){
+				var locationArray = window.location.pathname.split("/");
+				var entityLocation = "";
+				for(var i = 0; i< locationArray.length; i++){
+					if(i == locationArray.length - 1){
+						entityLocation+=checkBoxData.path;
+					}else{
+						entityLocation+= locationArray[i] + "/";
+					}
+					
+				}
+				var hashCode = instance._fnGetHashCode(entityLocation);
+				var localStorageKey = hashCode + "_SpryMedia_DataTables_" + oLayer.checkBox.attr("id");
+				oLayer.localStorageEntityKey = localStorageKey;
+            },
+            
+            /**
+             * Function to register storage change event
+             */
+            "_fnInitializeStorageEvent": function initializeStorageEvent(){
+            	// Saving instance
+            	var instance = this;
+            	addEvent(window, 'storage', function (event) {
+            		// Getting current localStorage key
+            		var key = event.key;
+            		// Getting all registered layers
+					var registeredLayers = instance._data.layers;
+					for(var i = 0; i < registeredLayers.length; i++){
+						var layer = registeredLayers[i];
+						// Getting localStorageEntityKey
+						var localStorageEntityKey = layer.localStorageEntityKey;
+						// If changed localStorage corresponds to this entity and this entity is checked
+						if(key.indexOf(localStorageEntityKey) !== -1 && layer.checkBox.prop("checked") && layer.filterType == "auto"){
+							// Getting layer data
+							var checkBoxData = layer.checkBox.data();
+							// Getting new entity localStorage value
+							var currentEntityLocalStorage = jQuery.parseJSON(event.newValue);
+							// Mark as filtered entity layer
+							if(currentEntityLocalStorage.isFiltered){
+								// Getting filtered result list
+								instance._fnGetFilteredResultList(layer, checkBoxData ,currentEntityLocalStorage);
+							}else{
+								// Getting filtered result list
+								instance._fnGetAllResultList(layer, checkBoxData);
+							}
+							break;
+						}
+					}
+				});
+            },
+            
+            /**
+    		 * Build up the parameters in an object needed for a server-side processing request
+    		 *  @param {object} oSettings dataTables settings object
+    		 *  @returns {bool} block the table drawing or not
+    		 *  @memberof DataTable#oApi
+    		 */
+    		 "_fnAjaxParameters": function constructAjaxParameters ( instance, layer, oSettings )
+    		{
+    			// Checking if fields to display are on displayed columns
+    			instance._fnAddAdditionalColumns(layer, oSettings);
+    			var iColumns = oSettings.aoColumns.length;
+    			var aoData = [], mDataProp, aaSort, aDataSort;
+    			var i, j;
+    			
+    			aoData.push( { "name": "sEcho",          "value": oSettings.iDraw } );
+    			aoData.push( { "name": "iColumns",       "value": iColumns } );
+    			aoData.push( { "name": "sColumns",       "value": instance._fnColumnOrdering(oSettings) } );
+    			aoData.push( { "name": "iDisplayStart",  "value": oSettings._iDisplayStart } );
+    			aoData.push( { "name": "iDisplayLength", "value": oSettings.oFeatures.bPaginate !== false ?
+    				oSettings._iDisplayLength : -1 } );
+    				
+    			for ( i=0 ; i<iColumns ; i++ )
+    			{
+    			  mDataProp = oSettings.aoColumns[i].mData;
+    				aoData.push( { "name": "mDataProp_"+i, "value": typeof(mDataProp)==="function" ? 'function' : mDataProp } );
+    			}
+    			
+    			/* Filtering */
+    			if ( oSettings.oFeatures.bFilter !== false )
+    			{
+    				aoData.push( { "name": "sSearch", "value": oSettings.oPreviousSearch.sSearch } );
+    				aoData.push( { "name": "bRegex",  "value": oSettings.oPreviousSearch.bRegex } );
+    				for ( i=0 ; i<iColumns ; i++ )
+    				{
+    					aoData.push( { "name": "sSearch_"+i,     "value": oSettings.aoPreSearchCols[i].sSearch } );
+    					aoData.push( { "name": "bRegex_"+i,      "value": oSettings.aoPreSearchCols[i].bRegex } );
+    					aoData.push( { "name": "bSearchable_"+i, "value": oSettings.aoColumns[i].bSearchable } );
+    				}
+    			}
+    			
+    			/* Sorting */
+    			if ( oSettings.oFeatures.bSort !== false )
+    			{
+    				var iCounter = 0;
+    		
+    				aaSort = ( oSettings.aaSortingFixed !== null ) ?
+    					oSettings.aaSortingFixed.concat( oSettings.aaSorting ) :
+    					oSettings.aaSorting.slice();
+    				
+    				for ( i=0 ; i<aaSort.length ; i++ )
+    				{
+    					aDataSort = oSettings.aoColumns[ aaSort[i][0] ].aDataSort;
+    					
+    					for ( j=0 ; j<aDataSort.length ; j++ )
+    					{
+    						aoData.push( { "name": "iSortCol_"+iCounter,  "value": aDataSort[j] } );
+    						aoData.push( { "name": "sSortDir_"+iCounter,  "value": aaSort[i][1] } );
+    						iCounter++;
+    					}
+    				}
+    				aoData.push( { "name": "iSortingCols",   "value": iCounter } );
+    				
+    				for ( i=0 ; i<iColumns ; i++ )
+    				{
+    					aoData.push( { "name": "bSortable_"+i,  "value": oSettings.aoColumns[i].bSortable } );
+    				}
+    			}
+    			
+    			return aoData;
+    		},
+    		
+    		/**
+    		 * Get the column ordering that DataTables expects
+    		 *  @param {object} oSettings dataTables settings object
+    		 *  @returns {string} comma separated list of names
+    		 *  @memberof DataTable#oApi
+    		 */
+    		"_fnColumnOrdering" : function columnOrdering ( oSettings )
+    		{
+    			var sNames = '';
+    			for ( var i=0, iLen=oSettings.aoColumns.length ; i<iLen ; i++ )
+    			{
+    				sNames += oSettings.aoColumns[i].sName+',';
+    			}
+    			if ( sNames.length == iLen )
+    			{
+    				return "";
+    			}
+    			return sNames.slice(0, -1);
+    		},
+    		
+    		/**
+    		 * Function to add field columns on oSettings columns object
+    		 * 
+    		 * @param layer
+    		 * @param oSettings
+    		 */
+    		"_fnAddAdditionalColumns": function addAdditionalColumns(layer, oSettings){
+    			var extraColumns = [];
+    			var extraPreSearchColumns = [];
+    			var extraColumnsPos = oSettings.aoColumns.length;
+    			for(i in layer.fieldsConfig){
+    				var exists = false;
+    				
+    				var field = layer.fieldsConfig[i];
+    				var data = field.checkBox.data();
+    				var fieldName = data.field;
+    				
+    				for(x in oSettings.aoColumns){
+    					var column = oSettings.aoColumns[x];
+    					var columnName = column.mData;
+    					
+    					if(columnName == fieldName){
+    						exists = true;
+    						break;
+    					}
+    				}
+    				
+    				// If not exists, create column element and add 
+    				if(!exists){
+    					var newColumn = {
+    							"_bAutoType" : true, 
+    							"aDataSort" : [extraColumnsPos], 
+    							"asSorting" : ["asc", "desc"],
+    							"bSearchable": false,
+    							"bSortable": true,
+    							"bUseRendered": true,
+    							"bVisible": true,
+    							"fnCreatedCell": null,
+    							"fnRender": null,
+    							"iDataSort": -1,
+    							"mData": fieldName,
+    							"mRender": null,
+    							"nTf": null
+    					};
+    					
+    					var newPreSearchColumn = {
+    							"bCaseSensitive": true,
+    							"bRegex": false,
+    							"bSmart": true,
+    							"sSearch": ""
+    					};
+    					extraColumns.push(newColumn);
+    					extraPreSearchColumns.push(newPreSearchColumn);
+    					extraColumnsPos++;
+    				}
+    				
+    			}
+    			
+    			// Adding on presearch columns and columns
+    			for(i in extraColumns){
+    				oSettings.aoColumns.push(extraColumns[i]);
+    				oSettings.aoPreSearchCols.push(extraPreSearchColumns[i]);
+    			}
+    		},
+    		
+    		
+    		/**
+    		 * This method returns a hashcode from
+    		 * a string.
+    		 * 
+    		 * @param str String to transform
+    		 * @return String
+    		 */
+    		"_fnGetHashCode": function getHashCode (str){
+    			var hash = 0;
+    		    if (str.length == 0) return hash;
+    		    for (i = 0; i < str.length; i++) {
+    		        char = str.charCodeAt(i);
+    		        hash = ((hash<<5)-hash)+char;
+    		        hash = hash & hash; // Convert to 32bit integer
+    		    }
+    			return hash.toString();
+    		}
+            
+            
 	};
 	
 	// Static variables * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1026,6 +1419,34 @@ function createMarkerInfo(item, layerData){
 		return null;
 	}
 }
+
+
+// Generating addEvent function
+var addEvent = (function() {
+	if (document.addEventListener) {
+		return function(el, type, fn) {
+			if (el && el.nodeName || el === window) {
+				el.addEventListener(type, fn, false);
+			} else if (el && el.length) {
+				for (var i = 0; i < el.length; i++) {
+					addEvent(el[i], type, fn);
+				}
+			}
+		};
+	} else {
+		return function(el, type, fn) {
+			if (el && el.nodeName || el === window) {
+				el.attachEvent('on' + type, function() {
+					return fn.call(el, window.event);
+				});
+			} else if (el && el.length) {
+				for (var i = 0; i < el.length; i++) {
+					addEvent(el[i], type, fn);
+				}
+			}
+		};
+	}
+})();
 
 // Registering events
 fnRegisterFunctionsToCallBack(function(context){

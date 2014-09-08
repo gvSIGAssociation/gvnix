@@ -154,7 +154,8 @@ public class GvNIXMapViewerMetadata extends
 
                     // Add or Update entity layers and entity fields
                     createOrUpdateEntityLayersAndFields(docXml, docRoot,
-                            tocElement, entities, typeLocationService);
+                            tocElement, entities, typeLocationService,
+                            projectOperations);
 
                 }
 
@@ -301,8 +302,8 @@ public class GvNIXMapViewerMetadata extends
 
         String entityName = entity.getSimpleTypeName();
 
-        String mapId = String.format("ps_%s_%s", entityPackage.replaceAll(
-                "[.]", "_"), new JavaSymbolName(entityName)
+        String mapId = String.format("l_%s_%s", entityPackage.replaceAll("[.]",
+                "_"), new JavaSymbolName(entityName)
                 .getSymbolNameCapitalisedFirstLetter());
 
         return mapId;
@@ -564,7 +565,12 @@ public class GvNIXMapViewerMetadata extends
      */
     private void createOrUpdateEntityLayersAndFields(Document docXml,
             Element docRoot, Element tocElement, List<JavaType> entities,
-            TypeLocationService typeLocationService) {
+            TypeLocationService typeLocationService,
+            ProjectOperations projectOperations) {
+
+        // Check if datatable is installed to update filterType or not
+        boolean isDatatableInstalled = projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-datatables");
 
         // Adding necessary entities
         // STEP 1: Getting id of entities without user-managed and
@@ -623,6 +629,8 @@ public class GvNIXMapViewerMetadata extends
                             .getAttribute("path");
                     String pkEntityLayerValue = entityLayerToUpdate
                             .getAttribute("pk");
+                    String filterTypeEntityLayerValue = entityLayerToUpdate
+                            .getAttribute("filterType");
                     String zEntityLayerValue = entityLayerToUpdate
                             .getAttribute("z");
 
@@ -634,6 +642,13 @@ public class GvNIXMapViewerMetadata extends
                     // If PK is different update
                     if (!pkEntityLayerValue.equals(entityPK)) {
                         entityLayerToUpdate.setAttribute("pk", entityPK);
+                    }
+
+                    // Filter type must to be none if datatables are not
+                    // installed
+                    if (!isDatatableInstalled
+                            && !filterTypeEntityLayerValue.equals("none")) {
+                        entityLayerToUpdate.setAttribute("filterType", "none");
                     }
 
                     // If z is different update
@@ -738,6 +753,8 @@ public class GvNIXMapViewerMetadata extends
                 else { // Create new entity layer
                     Element entityLayer = docXml.createElement("layer:entity");
                     entityLayer.setAttribute("id", entityId);
+                    entityLayer.setAttribute("filterType",
+                            isDatatableInstalled ? "auto" : "none");
                     entityLayer.setAttribute("path", entityPath);
                     entityLayer.setAttribute("pk", entityPK);
                     entityLayer.setAttribute("z", XmlRoundTripUtils
