@@ -9,7 +9,7 @@
 			</repository>
 		</repositories>
 		<properties>
-			<querydsl.version>3.1.1</querydsl.version>
+			<querydsl.version>3.4.3</querydsl.version>
 		</properties>
 		<dependencies>
 			<dependency>

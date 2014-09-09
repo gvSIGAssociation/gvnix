@@ -1215,6 +1215,12 @@ var GvNIX_Map_Leaflet;
     				}
     			}
     			
+    			// Getting boudingBox polygon
+            	var boundingBox = instance.fnGetMapBoundingBox(instance._data.map);
+            	// Sending boundingBox
+            	aoData.push( { "name": "dtt_bbox", "value": boundingBox } );
+            	// Sending geo fields to display
+            	aoData.push( { "name": "dtt_bbox_fields", "value":  instance._fnGetFieldsColumns(layer, oSettings)} );
     			return aoData;
     		},
     		
@@ -1236,6 +1242,24 @@ var GvNIX_Map_Leaflet;
     				return "";
     			}
     			return sNames.slice(0, -1);
+    		},
+    		
+    		/**
+    		 * Get all fields columns
+    		 * 
+    		 * @param layer
+    		 * @param oSettings
+    		 */
+    		"_fnGetFieldsColumns": function getFieldsColumns(layer, oSettings){
+    			var extraColumns = [];
+    			for(i in layer.fieldsConfig){
+    				var field = layer.fieldsConfig[i];
+					var data = field.checkBox.data();
+    				var fieldName = data.field;
+    				
+    				extraColumns.push(fieldName);
+    			}
+    			return extraColumns;
     		},
     		
     		/**
@@ -1407,7 +1431,9 @@ function createMarkerInfo(item, layerData){
 	if(item){
 		var info = "";
 		for(i in item){
-			info+="<b>"+i+":</b> "+item[i]+"<br/>";
+			if(isNaN(i) && i !== "DT_RowId"){
+				info+="<b>"+i+":</b> "+item[i]+"<br/>";
+			}
 		}
 		info+="<br/>";
 		// Adding show button

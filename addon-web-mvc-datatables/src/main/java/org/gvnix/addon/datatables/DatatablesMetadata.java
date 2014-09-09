@@ -17,7 +17,81 @@
  */
 package org.gvnix.addon.datatables;
 
-import static org.gvnix.addon.datatables.DatatablesConstants.*;
+import static org.gvnix.addon.datatables.DatatablesConstants.ARRAYLIST_MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.ARRAYLIST_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.ARRAY_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.AUTOWIRED;
+import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_PROPERTY_BINDING_RESULT;
+import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_WRAPPER;
+import static org.gvnix.addon.datatables.DatatablesConstants.BEAN_WRAPPER_IMP;
+import static org.gvnix.addon.datatables.DatatablesConstants.BINDING_RESULT;
+import static org.gvnix.addon.datatables.DatatablesConstants.CHECK_FILTERS_RETURN;
+import static org.gvnix.addon.datatables.DatatablesConstants.CHECK_FILTER_EXPRESSIONS;
+import static org.gvnix.addon.datatables.DatatablesConstants.COLLECTIONS;
+import static org.gvnix.addon.datatables.DatatablesConstants.COLLECTION_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.CONVERSION_SERVICE;
+import static org.gvnix.addon.datatables.DatatablesConstants.CREATE_JSON_FORM_METHOD;
+import static org.gvnix.addon.datatables.DatatablesConstants.CRITERIA_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_CRITERIA_TYPE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_CSV_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_CONF;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_EXCEPTION;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_TYPE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_TYPE_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_EXPORT_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_HTML_TABLE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_PARAMS;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_PDF_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_RESPONSE;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_XLSX_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_XLS_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATATABLES_XML_EXPORT;
+import static org.gvnix.addon.datatables.DatatablesConstants.DATA_SET_MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.ENUMERATION_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.EXTENDED_MODEL_MAP;
+import static org.gvnix.addon.datatables.DatatablesConstants.FIND_ALL_RETURN;
+import static org.gvnix.addon.datatables.DatatablesConstants.GET_PROPERTY_MAP;
+import static org.gvnix.addon.datatables.DatatablesConstants.HASHMAP_STRING_OBJECT;
+import static org.gvnix.addon.datatables.DatatablesConstants.HASHMAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.HTTP_SERVLET_REQUEST;
+import static org.gvnix.addon.datatables.DatatablesConstants.HTTP_SERVLET_RESPONSE;
+import static org.gvnix.addon.datatables.DatatablesConstants.HTTP_SERVLET_RESPONSE_WRAPPER;
+import static org.gvnix.addon.datatables.DatatablesConstants.IDS_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.IO_EXCEPTION;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_DATATABLES;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_ROO;
+import static org.gvnix.addon.datatables.DatatablesConstants.LIST_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.MAP_STRING_OBJECT;
+import static org.gvnix.addon.datatables.DatatablesConstants.MAP_STRING_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.MESSAGE_SOURCE;
+import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_DATATABLES_CONFIG;
+import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_ITEM_FOR_RENDER;
+import static org.gvnix.addon.datatables.DatatablesConstants.POPULATE_PARAMETERS_MAP;
+import static org.gvnix.addon.datatables.DatatablesConstants.PRINT_WRITER;
+import static org.gvnix.addon.datatables.DatatablesConstants.QDSL_BOOLEAN_BUILDER;
+import static org.gvnix.addon.datatables.DatatablesConstants.QDSL_JPA_QUERY;
+import static org.gvnix.addon.datatables.DatatablesConstants.QDSL_PATH_BUILDER;
+import static org.gvnix.addon.datatables.DatatablesConstants.QUERYDSL_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.REDIRECT_ATTRIBUTES;
+import static org.gvnix.addon.datatables.DatatablesConstants.REDIRECT_MODEL;
+import static org.gvnix.addon.datatables.DatatablesConstants.RENDER_UPDATE_FORMS_METHOD;
+import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_DISPATCHER;
+import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_METHOD;
+import static org.gvnix.addon.datatables.DatatablesConstants.REQUEST_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.RESPONSE_PARAM_NAME;
+import static org.gvnix.addon.datatables.DatatablesConstants.SEARCH_RESULTS;
+import static org.gvnix.addon.datatables.DatatablesConstants.SERVLET_EXCEPTION;
+import static org.gvnix.addon.datatables.DatatablesConstants.SET_STRING;
+import static org.gvnix.addon.datatables.DatatablesConstants.STRING_UTILS;
+import static org.gvnix.addon.datatables.DatatablesConstants.STRING_WRITER;
+import static org.gvnix.addon.datatables.DatatablesConstants.UI_MODEL;
+import static org.gvnix.addon.datatables.DatatablesConstants.UPDATE_JSON_FORMS_METHOD;
+import static org.gvnix.addon.datatables.DatatablesConstants.VALID;
+import static org.gvnix.addon.datatables.DatatablesConstants.WEB_REQUEST;
 import static org.springframework.roo.model.JdkJavaType.LIST;
 import static org.springframework.roo.model.SpringJavaType.MODEL;
 import static org.springframework.roo.model.SpringJavaType.MODEL_ATTRIBUTE;
@@ -47,6 +121,7 @@ import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDe
 import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -2120,6 +2195,12 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine(String.format(
                 "} else if (%s.ROWS_ON_TOP_IDS_PARAM.equals(key)) {",
                 helper.getFinalTypeName(DATATABLES_UTILS)));
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("propertyValuesMap.put(key, request.getParameterMap().get(key));");
+        bodyBuilder.indentRemove();
+        bodyBuilder
+                .appendFormalLine("} else if(DatatablesUtils.BOUNDING_BOX_PARAM.equals(key) || DatatablesUtils.BOUNDING_BOX_FIELDS_PARAM.equals(key)){");
         bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("propertyValuesMap.put(key, request.getParameterMap().get(key));");
