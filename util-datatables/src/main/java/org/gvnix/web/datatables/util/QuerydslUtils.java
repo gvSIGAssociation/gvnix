@@ -40,6 +40,8 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.gvnix.web.datatables.util.querydsl.paths.GeometryPath;
+import org.gvnix.web.datatables.util.querydsl.paths.PolygonPath;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -61,6 +63,9 @@ import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.path.DatePath;
 import com.mysema.query.types.path.NumberPath;
 import com.mysema.query.types.path.PathBuilder;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTReader;
 
 /**
  * Querydsl utility functions
@@ -72,6 +77,8 @@ public class QuerydslUtils {
 
     public static final TypeDescriptor STRING_TYPE_DESCRIPTOR = TypeDescriptor
             .valueOf(String.class);
+
+    public static final WKTReader reader = new WKTReader();
 
     private static LoadingCache<Class<?>, BeanWrapper> beanWrappersCache = CacheBuilder
             .newBuilder().maximumSize(200)
@@ -173,8 +180,37 @@ public class QuerydslUtils {
         for (Entry<String, Object> entry : searchArgs.entrySet()) {
             String key = entry.getKey();
 
-            // searchArgs can contain "_operator_" entries for each field
-            if (!key.startsWith(OPERATOR_PREFIX)) {
+            // searchArgs can contain dtt_bbox attribute
+            if (key.equals(DatatablesUtils.BOUNDING_BOX_PARAM)) {
+                // Getting bbox to Search
+                String[] bBoxToSearch = (String[]) entry.getValue();
+                Geometry bBoxGeometry = null;
+                try {
+                    bBoxGeometry = reader.read(String.format("POLYGON((%s))",
+                            bBoxToSearch[0]));
+                }
+                catch (Exception e) {
+                    throw new RuntimeException(
+                            "Error getting map Bounding Box on QuerydslUtils");
+                }
+                // Getting fields to filter using bbox
+                if (searchArgs.get(DatatablesUtils.BOUNDING_BOX_FIELDS_PARAM) != null
+                        && bBoxGeometry != null) {
+                    String[] bBoxFields = (String[]) searchArgs
+                            .get(DatatablesUtils.BOUNDING_BOX_FIELDS_PARAM);
+                    String[] separatedFields = bBoxFields[0].split(",");
+                    for (String field : separatedFields) {
+                        predicate.or(createIntersectsExpression(entity, field,
+                                bBoxGeometry));
+                    }
+                }
+            }
+            else if (!key.startsWith(OPERATOR_PREFIX)
+                    && !key.equals(DatatablesUtils.BOUNDING_BOX_FIELDS_PARAM)) { // searchArgs
+                                                                                 // can
+                // contain "_operator_"
+                // entries for each
+                // field
                 Object valueToSearch = entry.getValue();
                 String operator = (String) searchArgs.get(OPERATOR_PREFIX
                         .concat(key));
@@ -317,6 +353,23 @@ public class QuerydslUtils {
                     (Class<? extends Enum>) fieldType);
         }
         return null;
+    }
+
+    /**
+     * Method to create Bounding box intersects expression
+     * 
+     * @param entityPath
+     * @param boundingBox
+     * @param fieldName
+     * @return
+     */
+    public static <T> Predicate createIntersectsExpression(
+            PathBuilder<T> entityPath, String fieldName, Geometry boundingBox) {
+        PolygonPath<Polygon> polygonPath = new PolygonPath<Polygon>(entityPath,
+                fieldName);
+        BooleanExpression intersectsExpression = polygonPath
+                .intersects(boundingBox);
+        return intersectsExpression;
     }
 
     /**

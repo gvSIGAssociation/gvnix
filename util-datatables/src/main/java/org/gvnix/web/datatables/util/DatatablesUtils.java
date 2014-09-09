@@ -42,6 +42,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.gvnix.web.datatables.query.SearchResults;
+import org.gvnix.web.datatables.util.querydsl.JPQLHSpatialTemplates;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.context.MessageSource;
@@ -82,6 +83,8 @@ public class DatatablesUtils {
             .getName());
 
     public static final String ROWS_ON_TOP_IDS_PARAM = "dtt_row_on_top_ids";
+    public static final String BOUNDING_BOX_PARAM = "dtt_bbox";
+    public static final String BOUNDING_BOX_FIELDS_PARAM = "dtt_bbox_fields";
     private static final String SEPARATOR_FIELDS = ".";
     private static final String SEPARATOR_FIELDS_ESCAPED = "_~~_";
 
@@ -768,12 +771,14 @@ public class DatatablesUtils {
 
         // query will take in account datatables search, order and paging
         // criterias
-        JPAQuery query = new JPAQuery(entityManager);
+        JPAQuery query = new JPAQuery(entityManager,
+                JPQLHSpatialTemplates.DEFAULT);
         query = query.from(entity);
 
         // baseQuery will use base search values only in order to count
         // all for success paging
-        JPAQuery baseQuery = new JPAQuery(entityManager);
+        JPAQuery baseQuery = new JPAQuery(entityManager,
+                JPQLHSpatialTemplates.DEFAULT);
         baseQuery = baseQuery.from(entity);
 
         // ----- Entity associations for Query JOINs, ORDER BY, ... -----
@@ -881,7 +886,8 @@ public class DatatablesUtils {
             basePredicate = basePredicate.and(firstRowsInExpression.not());
 
             // Gets rows on top
-            JPAQuery firstRowsQuery = new JPAQuery(entityManager);
+            JPAQuery firstRowsQuery = new JPAQuery(entityManager,
+                    JPQLHSpatialTemplates.DEFAULT);
             firstRows = firstRowsQuery.from(entity)
                     .where(firstRowsInExpression).list(entity);
 
