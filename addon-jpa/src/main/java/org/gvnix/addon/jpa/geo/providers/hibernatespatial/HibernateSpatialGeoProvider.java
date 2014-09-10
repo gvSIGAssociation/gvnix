@@ -264,6 +264,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
      * 
      */
     public void updatePersistenceDialect() {
+        boolean runTime = false;
         // persistence.xml file
         final String persistenceFile = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml");
@@ -303,30 +304,44 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
                                             .getNamedItem("value");
 
                                     String value = propertyValue.getNodeValue();
-                                    final Element configuration = XmlUtils
-                                            .getConfiguration(getClass());
-                                    if (!HibernateSpatialGeoUtils.isGeoDialect(
-                                            configuration, value)) {
-                                        // Transform current Dialect to valid
-                                        // GEO dialect depens of the selected
-                                        // Database
-                                        // Parse the configuration.xml file
-                                        String geoDialect = HibernateSpatialGeoUtils
-                                                .convertToGeoDialect(
-                                                        configuration, value);
-                                        // If geo Dialect exists, modify value
-                                        // with
-                                        // the
-                                        // valid GEO dialect
-                                        if (geoDialect != null) {
-                                            propertyValue
-                                                    .setNodeValue(geoDialect);
-                                            totalModified++;
-                                        }
+                                    // If is replaced on runtime,
+                                    // we alert to the user to change manually
+                                    if (value.startsWith("${")) {
+                                        runTime = true;
+                                        showRuntimeMessage(value);
                                     }
                                     else {
-                                        // If is geo dialect, mark as modified
-                                        totalModified++;
+                                        final Element configuration = XmlUtils
+                                                .getConfiguration(getClass());
+                                        if (!HibernateSpatialGeoUtils
+                                                .isGeoDialect(configuration,
+                                                        value)) {
+                                            // Transform current Dialect to
+                                            // valid
+                                            // GEO dialect depens of the
+                                            // selected
+                                            // Database
+                                            // Parse the configuration.xml file
+                                            String geoDialect = HibernateSpatialGeoUtils
+                                                    .convertToGeoDialect(
+                                                            configuration,
+                                                            value);
+                                            // If geo Dialect exists, modify
+                                            // value
+                                            // with
+                                            // the
+                                            // valid GEO dialect
+                                            if (geoDialect != null) {
+                                                propertyValue
+                                                        .setNodeValue(geoDialect);
+                                                totalModified++;
+                                            }
+                                        }
+                                        else {
+                                            // If is geo dialect, mark as
+                                            // modified
+                                            totalModified++;
+                                        }
                                     }
                                 }
                             }
@@ -346,7 +361,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
                         Level.INFO,
                         "WARNING: If you install a new persistence, you must to execute 'jpa geo setup' again to modify Persistence Dialects.");
             }
-            else {
+            else if (!runTime) {
                 throw new RuntimeException(
                         "ERROR: There's not any valid database to apply GEO persistence support. GEO is only supported for POSTGRES, ORACLE, MYSQL and MSSQL databases.");
             }
@@ -417,6 +432,55 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
             writer.close();
 
         }
+    }
+
+    /**
+     * Method to show which possibilities has the developer to implement new
+     * dialect
+     * 
+     * @param value
+     */
+    public void showRuntimeMessage(String value) {
+        LOGGER.log(
+                Level.INFO,
+                String.format(
+                        "Cannot replace '%s' on 'src/main/resources/META-INF/persistence.xml' with a valid Hibernate Spatial Dialect. You must change it manually following the next instructions:",
+                        value));
+
+        LOGGER.log(Level.INFO, "");
+        LOGGER.log(Level.INFO,
+                "Replace your current dialect with the correct one: ");
+        LOGGER.log(Level.INFO, "");
+        LOGGER.log(
+                Level.INFO,
+                "org.hibernate.dialect.PostgreSQLDialect ==> org.hibernate.spatial.dialect.postgis.PostgisDialect");
+        LOGGER.log(
+                Level.INFO,
+                "org.hibernate.dialect.MySQLDialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatialDialect");
+        LOGGER.log(
+                Level.INFO,
+                "org.hibernate.dialect.MySQL5Dialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatialDialect");
+        LOGGER.log(
+                Level.INFO,
+                "org.hibernate.dialect.MySQLInnoDBDialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatialInnoDBDialect");
+        LOGGER.log(
+                Level.INFO,
+                "org.hibernate.dialect.MySQL5InnoDBDialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatialInnoDBDialect");
+        LOGGER.log(
+                Level.INFO,
+                "org.hibernate.dialect.MySQL5DBDialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatial56Dialect");
+        LOGGER.log(
+                Level.INFO,
+                "org.hibernate.dialect.MySQLSpatial56Dialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatial5InnoDBDialect");
+        LOGGER.log(
+                Level.INFO,
+                "org.hibernate.dialect.Oracle10gDialect ==> org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect");
+        LOGGER.log(
+                Level.INFO,
+                "org.hibernate.dialect.OracleDialect ==> org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect");
+        LOGGER.log(
+                Level.INFO,
+                "org.hibernate.dialect.SQLServerDialect ==> org.hibernate.spatial.dialect.SQLServer2008Dialect");
     }
 
     /**
