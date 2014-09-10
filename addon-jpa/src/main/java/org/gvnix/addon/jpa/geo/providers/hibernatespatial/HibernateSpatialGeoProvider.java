@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -362,8 +363,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
                         "WARNING: If you install a new persistence, you must to execute 'jpa geo setup' again to modify Persistence Dialects.");
             }
             else if (!runTime) {
-                throw new RuntimeException(
-                        "ERROR: There's not any valid database to apply GEO persistence support. GEO is only supported for POSTGRES, ORACLE, MYSQL and MSSQL databases.");
+                showRuntimeMessage("");
             }
 
         }
@@ -441,11 +441,19 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
      * @param value
      */
     public void showRuntimeMessage(String value) {
-        LOGGER.log(
-                Level.INFO,
-                String.format(
-                        "Cannot replace '%s' on 'src/main/resources/META-INF/persistence.xml' with a valid Hibernate Spatial Dialect. You must change it manually following the next instructions:",
-                        value));
+
+        if (StringUtils.isBlank(value)) {
+            LOGGER.log(
+                    Level.INFO,
+                    "There's not any valid database to apply GEO persistence support. GEO is only supported for POSTGRES, ORACLE, MYSQL and MSSQL databases. You must change it following the next instructions:");
+        }
+        else {
+            LOGGER.log(
+                    Level.INFO,
+                    String.format(
+                            "Cannot replace '%s' on 'src/main/resources/META-INF/persistence.xml' with a valid Hibernate Spatial Dialect. You must change it manually following the next instructions:",
+                            value));
+        }
 
         LOGGER.log(Level.INFO, "");
         LOGGER.log(Level.INFO,
