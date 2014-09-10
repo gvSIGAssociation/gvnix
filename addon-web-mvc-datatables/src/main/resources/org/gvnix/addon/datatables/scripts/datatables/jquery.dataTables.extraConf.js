@@ -8,7 +8,12 @@
 		// Saving oSettings on oData
 		oData.oSettings = {};
 		// Creating aoColumns
-		oData.oSettings.aoColumns = oSettings.aoColumns;
+        var columns = [];
+        for(i in oSettings.aoColumns){
+            var column = { "bSortable" : oSettings.aoColumns[i].bSortable, "sName": oSettings.aoColumns[i].sName, "mData": oSettings.aoColumns[i].mData, "bSearchable": oSettings.aoColumns[i].bSearchable, "aDataSort": oSettings.aoColumns[i].aDataSort };
+            columns.push(column);
+        }
+        oData.oSettings.aoColumns = columns;
 		// Adding iDraw
 		oData.oSettings.iDraw = oSettings.iDraw;
 		// Adding _iDisplayStart
