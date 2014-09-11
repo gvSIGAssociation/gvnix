@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -62,6 +63,7 @@ import org.springframework.roo.support.util.XmlRoundTripUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -170,6 +172,11 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     @Override
     public boolean isAddCommandAvailable() {
+        return isSetupCommandAvailable();
+    }
+
+    @Override
+    public boolean isFieldCommandAvailable() {
         return isSetupCommandAvailable();
     }
 
@@ -346,6 +353,244 @@ public class GeoOperationsImpl extends AbstractOperations implements
         }
 
         annotateGeoEntityController(controller, paths);
+
+    }
+
+    /**
+     * This method transform an input element to map controller on CRU views
+     * 
+     * @param controller
+     * @param fieldName
+     * @param color
+     * @param weight
+     * @param center
+     * @param zoom
+     * @param maxZoom
+     */
+    @Override
+    public void field(JavaType controller, JavaSymbolName fieldName,
+            String color, String weight, String center, String zoom,
+            String maxZoom) {
+
+        Validate.notNull(controller, "Valid controller is necessary");
+
+        // Getting controller Details
+        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+                .getTypeDetails(controller);
+
+        // Getting roo web scaffold annotation
+        AnnotationMetadata rooWebScaffoldAnnotation = controllerDetails
+                .getAnnotation(ROO_WEB_SCAFFOLD_ANNOTATION);
+
+        Validate.notNull(
+                rooWebScaffoldAnnotation,
+                "Controller annotated with @RooWebScaffold is necessary. Generate controller for your entity using 'web mvc scaffold'");
+
+        // Getting @RequestMapping annotation
+        AnnotationMetadata requestMappingAnnotation = controllerDetails
+                .getAnnotation(SpringJavaType.REQUEST_MAPPING);
+
+        Validate.notNull(
+                requestMappingAnnotation,
+                "Controller annotated with @RequestMapping is necessary. Generate controller for your entity using 'web mvc scaffold'");
+
+        // Getting path
+        String path = requestMappingAnnotation.getAttribute("value").getValue()
+                .toString();
+
+        // Getting entity
+        JavaType relatedEntity = (JavaType) rooWebScaffoldAnnotation
+                .getAttribute("formBackingObject").getValue();
+
+        // Checking if current entity has Geo fields
+        Validate.isTrue(GeoUtils.isGeoEntity(rooWebScaffoldAnnotation,
+                typeLocationService), String.format(
+                "Current entity '%s' doesn't have GEO fields.",
+                relatedEntity.getSimpleTypeName()));
+
+        // Getting entity details
+        ClassOrInterfaceTypeDetails entityDetails = typeLocationService
+                .getTypeDetails(relatedEntity);
+
+        // Getting declared fields
+        FieldMetadata field = entityDetails.getDeclaredField(fieldName);
+
+        Validate.notNull(field, String.format(
+                "Field '%s' not exists on entity '%s'", fieldName,
+                relatedEntity.getSimpleTypeName()));
+
+        // Getting field type to get package
+        JavaType fieldType = field.getFieldType();
+        JavaPackage fieldPackage = fieldType.getPackage();
+
+        boolean isGeoField = fieldPackage.toString().equals(
+                "com.vividsolutions.jts.geom");
+
+        Validate.isTrue(isGeoField, String.format(
+                "Current field '%s' is not a valid GEO field", fieldName));
+
+        // Getting create.jspx
+        final String createPath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP,
+                String.format("WEB-INF/views/%s/create.jspx", path));
+
+        // Getting update.jspx
+        final String updatePath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP,
+                String.format("WEB-INF/views/%s/update.jspx", path));
+
+        // Getting show.jspx
+        final String showPath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP,
+                String.format("WEB-INF/views/%s/show.jspx", path));
+
+        updateCRU(path, createPath, fieldName, fieldType, color, weight,
+                center, zoom, maxZoom, "create");
+        updateCRU(path, updatePath, fieldName, fieldType, color, weight,
+                center, zoom, maxZoom, "update");
+        updateCRU(path, showPath, fieldName, fieldType, color, weight, center,
+                zoom, maxZoom, "show");
+
+    }
+
+    /**
+     * Method to update JSPX CRU views with map controls
+     * 
+     * @param path
+     * @param fieldName
+     * @param fieldType
+     * @param color
+     * @param weight
+     * @param center
+     * @param zoom
+     * @param maxZoom
+     * @param type
+     */
+    private void updateCRU(String path, String viewPath,
+            JavaSymbolName fieldName, JavaType fieldType, String color,
+            String weight, String center, String zoom, String maxZoom,
+            String type) {
+
+        Map<String, String> uriMap = new HashMap<String, String>(1);
+        uriMap.put("xmlns:geofield",
+                "urn:jsptagdir:/WEB-INF/tags/geo/form/fields");
+
+        WebProjectUtils.addTagxUriInJspx(path, type, uriMap, projectOperations,
+                fileManager);
+
+        // Updating file
+        if (fileManager.exists(viewPath)) {
+            Document createDoc = WebProjectUtils.loadXmlDocument(viewPath,
+                    fileManager);
+            Element docRoot = createDoc.getDocumentElement();
+
+            // Getting createForm element
+            Node form = null;
+
+            if (type.equals("create")) {
+                form = docRoot.getElementsByTagName("form:create").item(0);
+            }
+            else if (type.equals("update")) {
+                form = docRoot.getElementsByTagName("form:update").item(0);
+            }
+            else if (type.equals("show")) {
+                form = docRoot.getElementsByTagName("page:show").item(0);
+            }
+
+            // Getting all input elements
+            NodeList inputs = null;
+            if (type.equals("create") || type.equals("update")) {
+                inputs = docRoot.getElementsByTagName("field:input");
+            }
+            else {
+                inputs = docRoot.getElementsByTagName("field:display");
+            }
+
+            for (int i = 0; i < inputs.getLength(); i++) {
+                Node input = inputs.item(i);
+                NamedNodeMap inputAttr = input.getAttributes();
+                Node attr = inputAttr.getNamedItem("field");
+
+                // If field equals current field
+                if (attr != null
+                        && attr.getNodeValue().equals(fieldName.toString())) {
+                    // Save id attribute
+                    Node idAttr = inputAttr.getNamedItem("id");
+
+                    // Create element depens of type
+                    Element mapControl = null;
+                    if (type.equals("show")) {
+                        mapControl = createDoc
+                                .createElement("geofield:map-display");
+                    }
+                    else if (fieldType.equals(new JavaType(
+                            "com.vividsolutions.jts.geom.Point"))) {
+                        mapControl = createDoc
+                                .createElement("geofield:map-point");
+                    }
+                    else if (fieldType.equals(new JavaType(
+                            "com.vividsolutions.jts.geom.LineString"))) {
+                        mapControl = createDoc
+                                .createElement("geofield:map-line");
+                        if (StringUtils.isNotBlank(color)) {
+                            mapControl.setAttribute("color", color);
+                        }
+
+                        if (StringUtils.isNotBlank(weight)) {
+                            mapControl.setAttribute("weight", weight);
+                        }
+                    }
+                    else if (fieldType.equals(new JavaType(
+                            "com.vividsolutions.jts.geom.Polygon"))) {
+                        mapControl = createDoc
+                                .createElement("geofield:map-polygon");
+                        if (StringUtils.isNotBlank(color)) {
+                            mapControl.setAttribute("color", color);
+                        }
+                        if (StringUtils.isNotBlank(weight)) {
+                            mapControl.setAttribute("weight", weight);
+                        }
+                    }
+
+                    // Adding general attributes
+                    mapControl.setAttribute("field", fieldName.toString());
+
+                    if (StringUtils.isNotBlank(center)) {
+                        String validCenter = "[" + center + "]";
+                        mapControl.setAttribute("center", validCenter);
+                    }
+                    if (StringUtils.isNotBlank(zoom)) {
+                        mapControl.setAttribute("zoom", zoom);
+                    }
+                    if (StringUtils.isNotBlank(maxZoom)) {
+                        mapControl.setAttribute("maxZoom", maxZoom);
+                    }
+
+                    // Adding saved attr
+                    mapControl.setAttribute("id", idAttr.getNodeValue());
+                    // Adding object
+                    if (type.equals("show")) {
+                        mapControl.setAttribute("object", inputAttr
+                                .getNamedItem("object").getNodeValue());
+                    }
+                    mapControl.setAttribute("z", "user-managed");
+
+                    // Remove input geo field
+                    form.removeChild(input);
+
+                    // Add new element
+                    form.appendChild(mapControl);
+
+                    fileManager.createOrUpdateTextFileIfRequired(viewPath,
+                            XmlUtils.nodeToString(createDoc), true);
+
+                    break;
+
+                }
+
+            }
+
+        }
 
     }
 
@@ -930,6 +1175,10 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 pathResolver.getIdentifier(webappPath,
                         "/WEB-INF/tags/geo/tools"), fileManager, context,
                 getClass());
+        OperationUtils.updateDirectoryContents("tags/geo/form/fields/*.tagx",
+                pathResolver.getIdentifier(webappPath,
+                        "/WEB-INF/tags/geo/form/fields"), fileManager, context,
+                getClass());
         // Copy necessary layouts files
         OperationUtils.updateDirectoryContents("layouts/*.jspx",
                 pathResolver.getIdentifier(webappPath, "/WEB-INF/layouts"),
@@ -976,6 +1225,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
         addToLoadScripts("js_leaflet_html_toolbar_control",
                 "/resources/scripts/leaflet/leaflet.htmltoolbarcontrol.js",
                 false);
+        addToLoadScripts("js_leaflet_draw",
+                "/resources/scripts/leaflet/leaflet.draw-src.js", false);
 
         // Add CSS Sources to Load Scripts
         if (projectOperations
@@ -1007,6 +1258,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
         addToLoadScripts("styles_leaflet_html_toolbar_control",
                 "/resources/styles/leaflet/leaflet.htmltoolbarcontrol.css",
                 true);
+        addToLoadScripts("styles_leaflet_drawl",
+                "/resources/styles/leaflet/leaflet.draw.css", true);
     }
 
     /**

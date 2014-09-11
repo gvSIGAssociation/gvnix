@@ -80,6 +80,17 @@ public class GeoCommands implements CommandMarker {
     }
 
     /**
+     * This method checks if web mvc geo field method is available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator("web mvc geo field")
+    public boolean isFieldCommandAvailable() {
+        return operations.isFieldCommandAvailable();
+    }
+
+    /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
      * 
@@ -139,6 +150,26 @@ public class GeoCommands implements CommandMarker {
         else {
             operations.add(controller, null);
         }
+    }
+
+    /**
+     * This method registers a command with the Roo shell. It also offers a
+     * mandatory command attribute.
+     * 
+     * @param type
+     */
+    @CliCommand(value = "web mvc geo field", help = "Run this method to transform input to map control on entity CRU views.")
+    public void field(
+            @CliOption(key = "controller", mandatory = true, help = "Indicates which entity controller has field") final JavaType controller,
+            @CliOption(key = "field", mandatory = true, help = "Indicates which field you want to implements as map control") final JavaSymbolName fieldName,
+            @CliOption(key = "color", mandatory = false, help = "Indicates which color you want to use to draw element") final String color,
+            @CliOption(key = "weight", mandatory = false, help = "Indicates which weight you want to use to draw element") final String weight,
+            @CliOption(key = "center", mandatory = false, help = "Indicates map center to use as default. FORMAT: 'lat , lng'") final String center,
+            @CliOption(key = "zoom", mandatory = false, help = "Indicates which zoom you want to use on map") final String zoom,
+            @CliOption(key = "maxZoom", mandatory = false, help = "Indicates which maxZoom you want to use to on map") final String maxZoom) {
+
+        operations.field(controller, fieldName, color, weight, center, zoom,
+                maxZoom);
     }
 
 }

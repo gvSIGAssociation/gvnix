@@ -47,6 +47,13 @@ public interface GeoOperations extends Feature {
     boolean isAddCommandAvailable();
 
     /**
+     * This method checks if web mvc geo field command is available
+     * 
+     * @return true if web mvc geo field command is available
+     */
+    boolean isFieldCommandAvailable();
+
+    /**
      * This method imports all necessary element to build a gvNIX GEO
      * application
      */
@@ -73,5 +80,19 @@ public interface GeoOperations extends Feature {
      * @param path
      */
     void add(JavaType controller, JavaSymbolName path);
+
+    /**
+     * This method transform an input element to map controller on CRU views
+     * 
+     * @param controller
+     * @param fieldName
+     * @param color
+     * @param weight
+     * @param center
+     * @param zoom
+     * @param maxZoom
+     */
+    void field(JavaType controller, JavaSymbolName fieldName, String color,
+            String weight, String center, String zoom, String maxZoom);
 
 }
