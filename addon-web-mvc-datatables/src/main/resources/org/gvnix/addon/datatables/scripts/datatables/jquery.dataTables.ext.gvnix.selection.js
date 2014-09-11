@@ -991,17 +991,17 @@ var GvNIX_Selection;
 
 			if(!window.localStorage){
 				var ids = dt.oApi._fnReadCookie(sName);
-				var idParts = ids.split(",");
-				for(i in idParts){
-					if (idParts[i]) {
+				if(ids !== null){
+					var idParts = ids.split(",");
+					for(i in idParts){
 						this.fnSelect(idParts[i], true,true);
 					}
 				}
 			}else{
 				var ids = window.localStorage.getItem(sName);
-				var idParts = ids.split(",");
-				for(i in idParts){
-					if (idParts[i]) {
+				if(ids !== null){
+					var idParts = ids.split(",");
+					for(i in idParts){
 						this.fnSelect(idParts[i], true,true);
 					}
 				}
