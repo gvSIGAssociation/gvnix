@@ -90,7 +90,12 @@ var GvNIX_Selection;
 			 * @type string
 			 * @default null
 			 */
-			"infoMessage" : null
+			"infoMessage" : null,
+			
+			/**
+			 * Item to save selected rows
+			 */
+			"selectedRows": []
 
 		};
 
@@ -171,7 +176,12 @@ var GvNIX_Selection;
 			 * @type jQuery.Callbacks
 			 * @default jQuery.Callbacks("unique")
 			 */
-			"selectionChangeCallbacks" : jQuery.Callbacks("unique")
+			"selectionChangeCallbacks" : jQuery.Callbacks("unique"),
+			
+			/**
+			 * Item to save selected rows
+			 */
+			"selectedRows": []
 		};
 
 		// Public class methods * * * * * * * * * * * * * * * * * * * * * * *
@@ -516,6 +526,11 @@ var GvNIX_Selection;
 				_d.selectionChangeCallbacks.fireWith(this, [ this, 'select',
 						trId ]);
 			}
+			
+			// Save selected rows
+			this._data.selectedRows.push(trId);
+			this.fnSaveState();
+			
 			return changed;
 		},
 
@@ -573,6 +588,11 @@ var GvNIX_Selection;
 				_d.selectionChangeCallbacks.fireWith(this, [ this, 'deselect',
 						trId ]);
 			}
+			
+			// Save selected rows
+			this._data.selectedRows.splice(this._data.selectedRows.indexOf(trId), 1);
+			this.fnSaveState();
+			
 			return changed;
 		},
 
@@ -905,6 +925,87 @@ var GvNIX_Selection;
 
 			// Update visible rows
 			this.fnRedrawVisibleRows();
+			
+			// Load current state
+			this.fnLoadState();
+		},
+		
+		/**
+		 * Save current state of control to
+		 * the cookie
+		 *
+		 */
+		"fnSaveState" : function(clear) {
+			var _d = this._data, dt = _d.dt;
+			
+			// Generating hash location
+			var hashLocation = fnGetHashCode(window.location.pathname);
+			// Getting statePrefix
+			var statePrefix = jQuery(dt.nTable).data().stateprefix;
+			
+			// Generating unic sName
+			var sName = hashLocation + "_";
+			if(statePrefix != undefined){
+				sName +=  statePrefix + "_";
+			}
+			sName += "gvnixRowSelected-"+dt.nTable.id;
+			
+			var sValue = "";
+			if(clear == undefined){
+				sValue = _d.selectedRows;
+			}
+			
+
+			if(!window.localStorage){
+				dt.oApi._fnCreateCookie(sName,
+						sValue,
+						10*60, // 10 minutes
+						"gvnixRowSelected-",
+						null
+						);
+			}else{
+				window.localStorage.setItem(sName,sValue);
+			}
+		},
+		
+		/**
+		 * Load previous state of control from
+		 * the cookie
+		 *
+		 *@param force force load
+		 */
+		"fnLoadState" : function(force) {
+			var dt = this._data.dt;
+			
+			// Generating hash location
+			var hashLocation = fnGetHashCode(window.location.pathname);
+			// Getting statePrefix
+			var statePrefix = jQuery(dt.nTable).data().stateprefix;
+			
+			// Generating unic sName
+			var sName = hashLocation + "_";
+			if(statePrefix != undefined){
+				sName +=  statePrefix + "_";
+			}
+			sName += "gvnixRowSelected-"+dt.nTable.id;
+
+			if(!window.localStorage){
+				var ids = dt.oApi._fnReadCookie(sName);
+				var idParts = ids.split(",");
+				for(i in idParts){
+					if (idParts[i]) {
+						this.fnSelect(idParts[i], true,true);
+					}
+				}
+			}else{
+				var ids = window.localStorage.getItem(sName);
+				var idParts = ids.split(",");
+				for(i in idParts){
+					if (idParts[i]) {
+						this.fnSelect(idParts[i], true,true);
+					}
+				}
+			}
 		}
 
 	};
