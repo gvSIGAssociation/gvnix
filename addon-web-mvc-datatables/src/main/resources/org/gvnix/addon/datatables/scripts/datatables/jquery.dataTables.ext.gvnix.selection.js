@@ -90,13 +90,7 @@ var GvNIX_Selection;
 			 * @type string
 			 * @default null
 			 */
-			"infoMessage" : null,
-			
-			/**
-			 * Item to save selected rows
-			 */
-			"selectedRows": []
-
+			"infoMessage" : null
 		};
 
 		/**
@@ -176,12 +170,7 @@ var GvNIX_Selection;
 			 * @type jQuery.Callbacks
 			 * @default jQuery.Callbacks("unique")
 			 */
-			"selectionChangeCallbacks" : jQuery.Callbacks("unique"),
-			
-			/**
-			 * Item to save selected rows
-			 */
-			"selectedRows": []
+			"selectionChangeCallbacks" : jQuery.Callbacks("unique")
 		};
 
 		// Public class methods * * * * * * * * * * * * * * * * * * * * * * *
@@ -528,7 +517,6 @@ var GvNIX_Selection;
 			}
 			
 			// Save selected rows
-			this._data.selectedRows.push(trId);
 			this.fnSaveState();
 			
 			return changed;
@@ -556,6 +544,10 @@ var GvNIX_Selection;
 				}
 				_d.selectionChangeCallbacks.fireWith(this, [ this, 'deselect',
 						trId ]);
+				
+				// Save selected rows
+				this.fnSaveState();
+				
 				return true;
 			}
 			var changed = false;
@@ -590,7 +582,6 @@ var GvNIX_Selection;
 			}
 			
 			// Save selected rows
-			this._data.selectedRows.splice(this._data.selectedRows.indexOf(trId), 1);
 			this.fnSaveState();
 			
 			return changed;
@@ -616,6 +607,10 @@ var GvNIX_Selection;
 				this._fnUpdateInfo();
 			}
 			_d.selectionChangeCallbacks.fireWith(this, [ this, 'all', null ]);
+			
+			// Save selected rows
+			this.fnSaveState();
+			
 			return true;
 		},
 
@@ -645,6 +640,10 @@ var GvNIX_Selection;
 				}
 			}
 			_d.selectionChangeCallbacks.fireWith(this, [ this, 'none', null ]);
+			
+			// Save selected rows
+			this.fnSaveState();
+			
 			return true;
 		},
 
@@ -952,7 +951,8 @@ var GvNIX_Selection;
 			
 			var sValue = "";
 			if(clear == undefined){
-				sValue = _d.selectedRows;
+				var selectionInfo = this.fnGetSelectionInfo();
+				sValue = dt.oApi._fnJsonString(selectionInfo);
 			}
 			
 
@@ -991,18 +991,36 @@ var GvNIX_Selection;
 
 			if(!window.localStorage){
 				var ids = dt.oApi._fnReadCookie(sName);
-				if(ids !== null){
-					var idParts = ids.split(",");
-					for(i in idParts){
-						this.fnSelect(idParts[i], true,true);
+				if(ids !== ""){
+					var object = JSON.parse(ids);
+					if(object !== null && object.all){
+						this.fnSelectAll();
+					}else if(object !== null && object.idListSelected){
+						for(i in object.idList){
+							this.fnSelect(object.idList[i], true,true);
+						}
+					}else if(object !== null){
+						this.fnSelectAll();
+						for(i in object.idList){
+							this.fnDeselect(object.idList[i], true,true);
+						}
 					}
 				}
 			}else{
 				var ids = window.localStorage.getItem(sName);
-				if(ids !== null){
-					var idParts = ids.split(",");
-					for(i in idParts){
-						this.fnSelect(idParts[i], true,true);
+				if(ids !== ""){
+					var object = JSON.parse(ids);
+					if(object !== null && object.all){
+						this.fnSelectAll();
+					}else if(object !== null && object.idListSelected){
+						for(i in object.idList){
+							this.fnSelect(object.idList[i], true,true);
+						}
+					}else if(object !== null){
+						this.fnSelectAll();
+						for(i in object.idList){
+							this.fnDeselect(object.idList[i], true,true);
+						}
 					}
 				}
 			}
@@ -1159,7 +1177,7 @@ var GvNIX_Selection;
 	 * @type StrFing
 	 * @default See code
 	 */
-	GvNIX_Selection.VERSION = "${gvnix.version}";
+	GvNIX_Selection.VERSION = "1.4.0-SNAPSHOT";
 	GvNIX_Selection.prototype.VERSION = GvNIX_Selection.VERSION;
 
 	/** TODO Add as datatable feature * */
