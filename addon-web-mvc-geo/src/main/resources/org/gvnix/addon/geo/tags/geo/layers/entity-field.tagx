@@ -3,24 +3,50 @@
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
   <jsp:directive.attribute name="field" type="java.lang.String" required="true" rtexprvalue="true" description="Entity field to represent on current entity layer" />
+  <!-- No selected record config -->
   <jsp:directive.attribute name="icon" type="java.lang.String" required="false" rtexprvalue="true" description="DESC: Name of the icon.| DEFAULT: 'home' | POSSIBLE VALUES: See glyphicons or font-awesome"  />
   <jsp:directive.attribute name="iconColor" type="java.lang.String" required="false" rtexprvalue="true" description="DESC: Color of the icon.| DEFAULT: 'white' | POSSIBLE VALUES: 'white', 'black' or css code (hex, rgba etc)" />
   <jsp:directive.attribute name="iconLibrary" type="java.lang.String" required="false" rtexprvalue="true" description="DESC: Select de icon library.| DEFAULT: 'glyphicon' | POSSIBLE VALUES: 'fa' for font-awesome or 'glyphicon' for bootstrap 3" />
   <jsp:directive.attribute name="markerColor" type="java.lang.String" required="true" rtexprvalue="true" description="DESC: Color of the marker.| DEFAULT: 'blue' | POSSIBLE VALUES: 'red', 'darkred', 'orange', 'green', 'darkgreen', 'blue', 'purple', 'darkpuple', 'cadetblue'" />
+  <!-- Selected record config -->
+  <jsp:directive.attribute name="iconSelected" type="java.lang.String" required="false" rtexprvalue="true" description="DESC: Name of the icon when record is selected.| DEFAULT: 'home' | POSSIBLE VALUES: See glyphicons or font-awesome"  />
+  <jsp:directive.attribute name="iconColorSelected" type="java.lang.String" required="false" rtexprvalue="true" description="DESC: Color of the icon when record is selected.| DEFAULT: 'white' | POSSIBLE VALUES: 'white', 'black' or css code (hex, rgba etc)" />
+  <jsp:directive.attribute name="iconLibrarySelected" type="java.lang.String" required="false" rtexprvalue="true" description="DESC: Select de icon library when record is selected.| DEFAULT: 'glyphicon' | POSSIBLE VALUES: 'fa' for font-awesome or 'glyphicon' for bootstrap 3" />
+  <jsp:directive.attribute name="markerColorSelected" type="java.lang.String" required="false" rtexprvalue="true" description="DESC: Color of the marker when record is selected.| DEFAULT: 'blue' | POSSIBLE VALUES: 'red', 'darkred', 'orange', 'green', 'darkgreen', 'blue', 'purple', 'darkpuple', 'cadetblue'" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
   
     <c:if test="${empty label}">
       <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label" htmlEscape="false" />
     </c:if>
     
+    <c:if test="${empty iconColor}">
+    	<c:set var="iconColor" value="white" />
+    </c:if>
+    
+    <c:if test="${empty iconColorSelected}">
+    	<c:set var="iconColorSelected" value="yellow" />
+    </c:if>
+    
     <c:if test="${empty iconLibrary}">
     	<c:set var="iconLibrary" value="glyphicon" />
+    </c:if>
+    
+    <c:if test="${empty iconLibrarySelected}">
+    	<c:set var="iconLibrarySelected" value="glyphicon" />
+    </c:if>
+    
+    <c:if test="${empty markerColor}">
+    	<c:set var="markerColor" value="blue" />
+    </c:if>
+    
+    <c:if test="${empty markerColorSelected}">
+    	<c:set var="markerColorSelected" value="blue" />
     </c:if>
     
     <spring:url var="loading_img" value="/resources/images/loading.gif" />
     
    	<div>
-    	<input id="${id}" name="${sec_field}" type="checkbox" data-field="${field}" data-icon="${icon}" data-iconColor="${iconColor}" data-iconLibrary="${iconLibrary}" data-markerColor="${markerColor}" />
+    	<input id="${id}" name="${sec_field}" type="checkbox" data-field="${field}" data-icon="${icon}" data-iconColor="${iconColor}" data-iconLibrary="${iconLibrary}" data-markerColor="${markerColor}" data-iconSelected="${iconSelected}" data-iconColorSelected="${iconColorSelected}" data-iconLibrarySelected="${iconLibrarySelected}" data-markerColorSelected="${markerColorSelected}" />
 		<span id="${id}_span"><c:out value="${fn:escapeXml(label)}" /></span>
 		
 		<!-- Legend Icons -->

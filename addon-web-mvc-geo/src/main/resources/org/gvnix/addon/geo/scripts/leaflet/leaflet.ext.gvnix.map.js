@@ -813,6 +813,10 @@ var GvNIX_Map_Leaflet;
             	var map = this._data.map;
             	// Checking if current layer is filtered
             	var layerDTTStorage = localStorage.getItem(oLayer.localStorageEntityKey);
+            	var layerSelectedRowsDTTStorage = localStorage.getItem(oLayer.selectLocalStorageEntityKey);
+            	if(layerSelectedRowsDTTStorage !== ""){
+            		this._fnSaveSelectedRecordsDT(oLayer, layerSelectedRowsDTTStorage);
+            	}
             	if(layerDTTStorage !== null && oLayer.filterType !== "none"){
             		var layerDTTStorageObject = jQuery.parseJSON(layerDTTStorage);
     				// Search filtering or search all
@@ -945,6 +949,13 @@ var GvNIX_Map_Leaflet;
             	var fieldsConfigLength = fieldsConfig.length;
             	// Getting all records
         		jQuery.each(oRecords, function(index, item){
+        			// Getting pk value
+        			var pk = item[oLayer.checkBox.data().pk];
+        			// Checking if current record is selected on DataTable
+        			var isSelectedRecord = false;
+        			if(oLayer.currentSelectionDT !== null){
+        				isSelectedRecord = instance._fnIsSelectedRecord(oLayer.currentSelectionDT, pk);
+    				}
         			for(var i = 0;i<fieldsConfigLength;i++){
         				// Getting field configuration
         				var fieldConfig = fieldsConfig[i];
@@ -965,30 +976,15 @@ var GvNIX_Map_Leaflet;
                     			var wkt = formatWkt(fieldToDisplayValue);
                     			if(wkt){
                     				// Creating marker using WKT
-                        			var marker = omnivore.wkt.parse(wkt);
-                        			// Adding icon if necessary
-                        			jQuery.each(marker._layers, function(index, layer){
-                        				if(layer.setIcon != undefined){
-                        					var iconMarker = L.AwesomeMarkers.icon({
-                    	    				    icon: checkboxData.icon,
-                    	    				    prefix: checkboxData.iconlibrary,
-                    	    				    markerColor: checkboxData.markercolor,
-                    	    				    iconColor: checkboxData.iconcolor
-                                			});
-                        					layer.setIcon(iconMarker);
-                        				}else{
-                        					layer.options.color = checkboxData.markercolor;
-                        				}
-                        				
-                        			});
+                        			var marker = instance.fnCreateWKTMarker(wkt, checkboxData, isSelectedRecord);
                         			// Adding popup info to marker
-                        			var info = createMarkerInfo(item, oLayer.checkBox.data());
+                        			var info = createMarkerInfo(item, oLayer, instance);
                         			if(info){ 
                         				marker.bindPopup(info);
                         			}
                         			
                         			// Generating unique for layer id
-                        			var idValue = fieldConfig.checkBox.data().field + "_" + item[oLayer.checkBox.data().pk];
+                        			var idValue = fieldConfig.checkBox.data().field + "_" + pk;
                         			var markerLayer = marker.getLayers()[0];
                         			markerLayer.options.markerId = idValue;
                         			
@@ -998,12 +994,17 @@ var GvNIX_Map_Leaflet;
                         			for(x in currentMarkers){
                         				var markerId = currentMarkers[x].options.markerId;
                         				if(markerId == idValue){
+                        					var currentMarker = currentMarkers[x];
                         					exists = true;
+                        					break;
                         				}
                         			}
                         			if(!exists){
                         				// Adding marker to layerGroup
                         				layerGroup.addLayer(marker);
+                        			}else{
+                						layerGroup.removeLayer(currentMarker);
+                						layerGroup.addLayer(marker);
                         			}
                     			}
                 			}else{
@@ -1022,10 +1023,64 @@ var GvNIX_Map_Leaflet;
         		
             },
             
+            
+            /**
+             * 
+             * Function to create WKT marker. If is selected, apply selected styles
+             * 
+             * @param wkt
+             * @param oData
+             * @param bSelected
+             */
+            "fnCreateWKTMarker": function createWKTMarker(wkt, oData, bSelected){
+            	var marker = omnivore.wkt.parse(wkt);
+            	// Adding icon if necessary
+    			jQuery.each(marker._layers, function(index, layer){
+    				// Create marker or selected marker
+    				if(layer.setIcon != undefined){
+    					var iconMarker = L.AwesomeMarkers.icon({
+	    				    icon: bSelected == false ? oData.icon : oData.iconselected,
+	    				    prefix: bSelected == false ? oData.iconlibrary : oData.iconlibraryselected,
+	    				    markerColor: bSelected == false ? oData.markercolor : oData.markercolorselected,
+	    				    iconColor: bSelected == false ? oData.iconcolor : oData.iconcolorselected
+            			});
+    					layer.setIcon(iconMarker);
+    				}else{
+    					layer.options.color = bSelected == false ? oData.markercolor : oData.markercolorselected;
+    				}
+    				
+    			});
+    			
+    			return marker;
+            },
+            
+            /**
+             * Function to know if current record is selected or no in DT 
+             */
+            "_fnIsSelectedRecord": function isSelectedRecord(oSelectionInfo, pkValue){
+            	if(oSelectionInfo.all){
+					return true;
+				}else if(oSelectionInfo.idListSelected){
+					for(i in oSelectionInfo.idList){
+						if(oSelectionInfo.idList[i] === pkValue){
+							return true;	
+						}
+					}
+					return false;
+				}else{
+					for(i in oSelectionInfo.idList){
+						if(oSelectionInfo.idList[i] === pkValue){
+							return false;
+						}
+					}
+					return true;
+				}
+            },
+            
             /**
              * Function to register moveend event
              */
-            "_fnRegisterOnMoveMapEvent": function(){
+            "_fnRegisterOnMoveMapEvent": function registerOnMoveMapEvent(){
             	this._data.map.on("moveend", function(event){
             		// Saving current center point on localStorage
             		var currentCenter = this._data.map.getCenter();
@@ -1091,6 +1146,17 @@ var GvNIX_Map_Leaflet;
             },
             
             /**
+             * Function to save on layer, current selected rows
+             * 
+             * @param oLayer
+             * @param oSelectedRowsDT
+             */
+            "_fnSaveSelectedRecordsDT": function loadSelectedRecords(oLayer, oSelectedRowsDT){
+            	var currentSelectionObject = JSON.parse(oSelectedRowsDT);
+            	oLayer.currentSelectionDT = currentSelectionObject;
+            },
+            
+            /**
              * Function to generate and save localStorage key of entity layer
              * 
              * @param checkBoxData
@@ -1108,8 +1174,15 @@ var GvNIX_Map_Leaflet;
 					
 				}
 				var hashCode = instance._fnGetHashCode(entityLocation);
+				
+				// Getting general Datatable localStorageKey
 				var localStorageKey = hashCode + "_SpryMedia_DataTables_" + oLayer.checkBox.attr("id");
+				
+				// Getting select tool Datatable localStorageKey
+				var selectLocalStorageKey = hashCode + "_gvnixRowSelected-" + oLayer.checkBox.attr("id");
+				
 				oLayer.localStorageEntityKey = localStorageKey;
+				oLayer.selectLocalStorageEntityKey = selectLocalStorageKey;
             },
             
             /**
@@ -1127,6 +1200,7 @@ var GvNIX_Map_Leaflet;
 						var layer = registeredLayers[i];
 						// Getting localStorageEntityKey
 						var localStorageEntityKey = layer.localStorageEntityKey;
+						var selectLocalStorageEntityKey = layer.selectLocalStorageEntityKey;
 						// If changed localStorage corresponds to this entity and this entity is checked
 						if(key.indexOf(localStorageEntityKey) !== -1 && layer.checkBox.prop("checked") && layer.filterType == "auto"){
 							// Getting layer data
@@ -1142,6 +1216,14 @@ var GvNIX_Map_Leaflet;
 								instance._fnGetAllResultList(layer, checkBoxData);
 							}
 							break;
+						}else if(key.indexOf(selectLocalStorageEntityKey) !== -1){
+							// Getting new entity localStorage value
+							var currentSelection = event.newValue;
+							var currentSelectionObject = JSON.parse(currentSelection);
+							layer.currentSelectionDT = currentSelectionObject;
+							if(layer.data !== undefined){
+								instance._fnDisplayRecordsOnMap(layer.data, instance.fnGetMapObject(), layer);
+							}
 						}
 					}
 				});
@@ -1427,11 +1509,13 @@ function manipulateCanvasFunction(savedMap) {
 }
 
 // This method returns marker info
-function createMarkerInfo(item, layerData){
+function createMarkerInfo(item, layer, instance){
+	var layerData = layer.checkBox.data();
+	var geoFields = instance._fnGetFieldsColumns(layer);
 	if(item){
 		var info = "";
 		for(i in item){
-			if(isNaN(i) && i !== "DT_RowId"){
+			if(isNaN(i) && i !== "DT_RowId" && geoFields.indexOf(i) === -1){
 				info+="<b>"+i+":</b> "+item[i]+"<br/>";
 			}
 		}
