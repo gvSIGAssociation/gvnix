@@ -669,6 +669,9 @@ public class GvNIXMapViewerMetadata extends
 
                             boolean exists = false;
 
+                            String fieldType = field.getFieldType()
+                                    .getSimpleTypeName();
+
                             String fieldName = field.getFieldName().toString();
 
                             String fieldId = String.format("%s_%s", entityId,
@@ -706,6 +709,20 @@ public class GvNIXMapViewerMetadata extends
 
                                         }
 
+                                        // Adding icon if is POINT
+                                        if (fieldType.equals("Point")) {
+                                            String iconAttr = entityField
+                                                    .getAttribute("icon");
+                                            if (StringUtils.isBlank(iconAttr)) {
+                                                entityField.setAttribute(
+                                                        "icon",
+                                                        "glyphicon-home");
+                                                entityField.setAttribute(
+                                                        "iconLibrary",
+                                                        "glyphicon");
+                                            }
+                                        }
+
                                         // Update field id
                                         if (!idEntityFieldValue.equals(fieldId)) {
                                             entityField.setAttribute("id",
@@ -736,6 +753,15 @@ public class GvNIXMapViewerMetadata extends
                                         getRandomMarkerColor());
                                 entityFieldLayer.setAttribute("iconColor",
                                         "white");
+
+                                // Adding icon if is POINT
+                                if (fieldType.equals("Point")) {
+                                    entityFieldLayer.setAttribute("icon",
+                                            "glyphicon-home");
+                                    entityFieldLayer.setAttribute(
+                                            "iconLibrary", "glyphicon");
+                                }
+
                                 entityFieldLayer
                                         .setAttribute(
                                                 "z",

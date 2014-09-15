@@ -54,6 +54,13 @@ public interface GeoOperations extends Feature {
     boolean isFieldCommandAvailable();
 
     /**
+     * This method checks if web mvc geo layers command is available
+     * 
+     * @return true if web mvc geo layers command is available
+     */
+    boolean isLayerCommandAvailable();
+
+    /**
      * This method imports all necessary element to build a gvNIX GEO
      * application
      */
@@ -94,5 +101,37 @@ public interface GeoOperations extends Feature {
      */
     void field(JavaType controller, JavaSymbolName fieldName, String color,
             String weight, String center, String zoom, String maxZoom);
+
+    /**
+     * This method add new base tile layers on selected map
+     * 
+     * @param name
+     * @param url
+     * @param path
+     * @param index
+     * @param opacity
+     */
+    void tileLayer(String name, String url, JavaSymbolName path, String index,
+            String opacity);
+
+    /**
+     * 
+     * This method add new base wms layers on selected map
+     * 
+     * @param name
+     * @param url
+     * @param path
+     * @param index
+     * @param opacity
+     * @param layers
+     * @param format
+     * @param transparent
+     * @param styles
+     * @param version
+     * @param crs
+     */
+    void wmsLayer(String name, String url, JavaSymbolName path, String index,
+            String opacity, String layers, String format, boolean transparent,
+            String styles, String version, String crs);
 
 }

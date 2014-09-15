@@ -91,6 +91,18 @@ public class GeoCommands implements CommandMarker {
     }
 
     /**
+     * This method checks if web mvc geo tilelayer or wmslayer method is
+     * available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator({ "web mvc geo tilelayer", "web mvc geo wmslayer" })
+    public boolean isLayerCommandAvailable() {
+        return operations.isLayerCommandAvailable();
+    }
+
+    /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
      * 
@@ -142,7 +154,7 @@ public class GeoCommands implements CommandMarker {
     @CliCommand(value = "web mvc geo entity add", help = "Run this method to include specific GEO entity on all maps or specific map")
     public void add(
             @CliOption(key = "controller", mandatory = true, help = "Indicates which entity controller you want to add to map") final JavaType controller,
-            @CliOption(key = "maps", mandatory = false, help = "Map where you want to add current entities. If blank, adds current GEO entity to all available maps") final MapsProperty path) {
+            @CliOption(key = "map", mandatory = false, help = "Map where you want to add current entities. If blank, adds current GEO entity to all available maps") final MapsProperty path) {
         // Checking if path was selected
         if (path != null) {
             operations.add(controller, new JavaSymbolName(path.getKey()));
@@ -170,6 +182,62 @@ public class GeoCommands implements CommandMarker {
 
         operations.field(controller, fieldName, color, weight, center, zoom,
                 maxZoom);
+    }
+
+    /**
+     * This method registers a command with the Roo shell. It also offers a
+     * mandatory command attribute.
+     * 
+     * @param type
+     */
+    @CliCommand(value = "web mvc geo tilelayer", help = "Run this method to add new base tile layers on your map.")
+    public void tileLayer(
+            @CliOption(key = "name", mandatory = true, help = "Indicates which name has current base tile layer") final String name,
+            @CliOption(key = "url", mandatory = true, help = "Indicates base tile layer URL") final String url,
+            @CliOption(key = "map", mandatory = false, help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
+            @CliOption(key = "index", mandatory = false, help = "Indicates in which position must be layer displayed. Default: Poisiton of the layer on map view") final String index,
+            @CliOption(key = "opacity", mandatory = false, help = "Indicates which opacity has base layer. Number between 0 and 1. DEFAULT: 1") final String opacity) {
+
+        // Checking if path was selected
+        if (path != null) {
+            operations.tileLayer(name, url, new JavaSymbolName(path.getKey()),
+                    index, opacity);
+        }
+        else {
+            operations.tileLayer(name, url, null, index, opacity);
+        }
+    }
+
+    /**
+     * This method registers a command with the Roo shell. It also offers a
+     * mandatory command attribute.
+     * 
+     * @param type
+     */
+    @CliCommand(value = "web mvc geo wmslayer", help = "Run this method to add new base wms layers on your map.")
+    public void wmsLayer(
+            @CliOption(key = "name", mandatory = true, help = "Indicates which name has current base wms layer") final String name,
+            @CliOption(key = "url", mandatory = true, help = "Indicates base wms layer URL") final String url,
+            @CliOption(key = "map", mandatory = false, help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
+            @CliOption(key = "index", mandatory = false, help = "Indicates in which position must be layer displayed. Default: Poisiton of the layer on map view") final String index,
+            @CliOption(key = "opacity", mandatory = false, help = "Indicates which opacity has base layer. Number between 0 and 1. DEFAULT: 0.5") final String opacity,
+            @CliOption(key = "layers", mandatory = false, help = "Indicates which layers you want to load on this wms layer") final String layers,
+            @CliOption(key = "format", mandatory = false, help = "Indicates which image format you want to load on this wms layer. EX: image/png") final String format,
+            @CliOption(key = "transparent", mandatory = false, help = "Indicates if current layer is transparent or not") final boolean transparent,
+            @CliOption(key = "styles", mandatory = false, help = "Indicates which styles you want to use on current wms layer") final String styles,
+            @CliOption(key = "version", mandatory = false, help = "Indicates which wms version you want to use on current wms layer") final String version,
+            @CliOption(key = "crs", mandatory = false, help = "Indicates which CRS you want to use on current wms layer") final String crs) {
+
+        // Checking if path was selected
+        if (path != null) {
+            operations.wmsLayer(name, url, new JavaSymbolName(path.getKey()),
+                    index, opacity, layers, format, transparent, styles,
+                    version, crs);
+        }
+        else {
+            operations.wmsLayer(name, url, null, index, opacity, layers,
+                    format, transparent, styles, version, crs);
+        }
     }
 
 }

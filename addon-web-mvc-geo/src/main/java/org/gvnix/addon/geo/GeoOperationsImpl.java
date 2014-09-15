@@ -12,7 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
@@ -180,6 +182,11 @@ public class GeoOperationsImpl extends AbstractOperations implements
         return isSetupCommandAvailable();
     }
 
+    @Override
+    public boolean isLayerCommandAvailable() {
+        return isSetupCommandAvailable();
+    }
+
     /**
      * This method imports all necessary element to build a gvNIX GEO
      * application
@@ -220,9 +227,10 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 .toLowerCase());
         // Add new menu entry for this new map view
         String finalPath = path.getReadableSymbolName().toLowerCase();
-        menuOperations.addMenuItem(path, new JavaSymbolName("map_menu_entry"),
-                path.getReadableSymbolName(), "global_generic",
-                "/" + finalPath, null, getWebappPath());
+        menuOperations.addMenuItem(new JavaSymbolName("map_menu_category"),
+                new JavaSymbolName(path.getReadableSymbolName()
+                        + "_map_menu_entry"), path.getReadableSymbolName(),
+                "global_generic", "/" + finalPath, null, getWebappPath());
 
     }
 
@@ -451,6 +459,227 @@ public class GeoOperationsImpl extends AbstractOperations implements
         updateCRU(path, showPath, fieldName, fieldType, color, weight, center,
                 zoom, maxZoom, "show");
 
+    }
+
+    /**
+     * This method add new base tile layers on selected map
+     * 
+     * @param name
+     * @param url
+     * @param path
+     * @param index
+     * @param opacity
+     */
+    @Override
+    public void tileLayer(String name, String url, JavaSymbolName path,
+            String index, String opacity) {
+
+        // Checking if exists map element before to generate geo tile layer
+        if (!checkExistsMapElement()) {
+            throw new RuntimeException(
+                    "ERROR. Is necesary to create new map element using \"web mvc geo map\" command before generate geo web layer");
+        }
+
+        // Creating map with params to send
+        Map<String, String> tileLayerAttr = new HashMap<String, String>();
+        tileLayerAttr.put("index", index);
+        tileLayerAttr.put("url", url);
+        tileLayerAttr.put("opacity", opacity);
+
+        createBaseLayer(name, tileLayerAttr, path, "tile");
+
+    }
+
+    /**
+     * 
+     * This method add new base wms layers on selected map
+     * 
+     * @param name
+     * @param url
+     * @param path
+     * @param index
+     * @param opacity
+     * @param layers
+     * @param format
+     * @param transparent
+     * @param styles
+     * @param version
+     * @param crs
+     */
+    @Override
+    public void wmsLayer(String name, String url, JavaSymbolName path,
+            String index, String opacity, String layers, String format,
+            boolean transparent, String styles, String version, String crs) {
+        // Checking if exists map element before to generate geo tile layer
+        if (!checkExistsMapElement()) {
+            throw new RuntimeException(
+                    "ERROR. Is necesary to create new map element using \"web mvc geo map\" command before generate geo web layer");
+        }
+
+        // Creating map with params to send
+        Map<String, String> wmsLayerAttr = new HashMap<String, String>();
+        wmsLayerAttr.put("index", index);
+        wmsLayerAttr.put("url", url);
+        wmsLayerAttr.put("opacity", opacity);
+        wmsLayerAttr.put("layers", layers);
+        wmsLayerAttr.put("format", format);
+        wmsLayerAttr.put("transparent", transparent ? "true" : "false");
+        wmsLayerAttr.put("styles", styles);
+        wmsLayerAttr.put("version", version);
+        wmsLayerAttr.put("crs", crs);
+
+        createBaseLayer(name, wmsLayerAttr, path, "wms");
+
+    }
+
+    /**
+     * 
+     * This method generate a Map with map path and new base layer id
+     * 
+     * @param name
+     * @param baseLayerAttr
+     * @param path
+     * @param type
+     */
+    private void createBaseLayer(String name,
+            Map<String, String> baseLayerAttr, JavaSymbolName path, String type) {
+
+        String mapId = "";
+
+        // Adding id base layer to application.properties
+        Map<String, String> propertyList = new HashMap<String, String>();
+
+        // Getting paths to add base layer
+        Map<String, String> pathsMap = new HashMap<String, String>();
+
+        Set<ClassOrInterfaceTypeDetails> controllerDetails = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(MAP_VIEWER_ANNOTATION);
+
+        for (ClassOrInterfaceTypeDetails controller : controllerDetails) {
+            String controllerPath = (String) controller
+                    .getAnnotation(SpringJavaType.REQUEST_MAPPING)
+                    .getAttribute("value").getValue();
+            if (path != null) {
+                if (controllerPath.replaceAll("/", "").equals(
+                        path.getSymbolName())) {
+                    // Getting mapId
+                    mapId = String.format("ps_%s_%s", controller.getType()
+                            .getPackage().getFullyQualifiedPackageName()
+                            .replaceAll("[.]", "_"), new JavaSymbolName(path
+                            .getSymbolName().replaceAll("/", ""))
+                            .getSymbolNameCapitalisedFirstLetter());
+
+                    pathsMap.put(path.getSymbolName(), mapId + "_" + name);
+                    // Add to application.properties
+                    propertyList.put("label" + mapId.substring(2).toLowerCase()
+                            + "_" + name, name);
+                }
+            }
+            else {
+                // Getting mapId
+                mapId = String.format("ps_%s_%s", controller.getType()
+                        .getPackage().getFullyQualifiedPackageName()
+                        .replaceAll("[.]", "_"), new JavaSymbolName(
+                        controllerPath.replaceAll("/", ""))
+                        .getSymbolNameCapitalisedFirstLetter());
+
+                pathsMap.put(controllerPath.replaceAll("/", ""), mapId + "_"
+                        + name);
+                // Add to application.properties
+                propertyList.put("label" + mapId.substring(2).toLowerCase()
+                        + "_" + name, name);
+            }
+
+        }
+
+        addBaseLayerToMaps(name, pathsMap, baseLayerAttr, type);
+
+        propFileOperations.addProperties(getWebappPath(),
+                "WEB-INF/i18n/application.properties", propertyList, true,
+                false);
+
+    }
+
+    /**
+     * 
+     * This method uses id map and id base layer to generate new base layer
+     * using baseLayerAttr
+     * 
+     * @param name
+     * @param pathsMap
+     * @param baseLayerAttr
+     * @param type
+     */
+    private void addBaseLayerToMaps(String name, Map<String, String> pathsMap,
+            Map<String, String> baseLayerAttr, String type) {
+
+        boolean exists = false;
+
+        // Getting all maps
+        for (Entry mapPath : pathsMap.entrySet()) {
+            String viewPath = pathResolver.getFocusedIdentifier(
+                    Path.SRC_MAIN_WEBAPP,
+                    String.format("WEB-INF/views/%s/show.jspx",
+                            mapPath.getKey()));
+
+            if (fileManager.exists(viewPath)) {
+                Document docXml = WebProjectUtils.loadXmlDocument(viewPath,
+                        fileManager);
+
+                // Getting current base layers
+                Element docRoot = docXml.getDocumentElement();
+                NodeList baseLayers = docRoot.getElementsByTagName("layer:"
+                        + type);
+                // If exists baselayers, check if current name exists
+                if (baseLayers.getLength() > 0) {
+                    for (int i = 0; i < baseLayers.getLength(); i++) {
+                        Node baseLayer = baseLayers.item(i);
+                        NamedNodeMap currentBaseLayerAttr = baseLayer
+                                .getAttributes();
+                        if (currentBaseLayerAttr.getNamedItem("id") != null) {
+                            String id = currentBaseLayerAttr.getNamedItem("id")
+                                    .getNodeValue().toString();
+                            String newId = (String) mapPath.getValue();
+
+                            if (id.equals(newId)) {
+                                LOGGER.log(Level.INFO, String.format(
+                                        "Base %s layer exists on '%s'", type,
+                                        viewPath));
+                                exists = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // If not exists, add new base layer
+                if (!exists) {
+                    // If not exists base layers, create new one
+                    Element baseLayer = docXml.createElement("layer:" + type);
+                    baseLayer.setAttribute("id", (String) mapPath.getValue());
+                    for (Entry attr : baseLayerAttr.entrySet()) {
+                        String key = (String) attr.getKey();
+                        String value = (String) attr.getValue();
+                        if (StringUtils.isNotBlank(value)) {
+                            baseLayer.setAttribute(key, value);
+                        }
+                    }
+
+                    Node tocElement = docRoot.getElementsByTagName("geo:toc")
+                            .item(0);
+                    tocElement.appendChild(baseLayer);
+
+                    fileManager.createOrUpdateTextFileIfRequired(viewPath,
+                            XmlUtils.nodeToString(docXml), true);
+                }
+
+            }
+            else {
+                throw new RuntimeException(String.format(
+                        " Error getting 'WEB-INF/views/%s/show.jspx' view",
+                        mapPath.getKey()));
+            }
+        }
     }
 
     /**
@@ -1341,6 +1570,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
             String path) {
 
         Map<String, String> propertyList = new HashMap<String, String>();
+
+        propertyList.put("menu_category_map_menu_category_label", "Maps");
+
         propertyList.put(
                 String.format("label_%s_%s",
                         controllerPackage.replaceAll("[.]", "_"), path),
@@ -1526,5 +1758,4 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 "scripts/leaflet/leaflet.js");
         return fileManager.exists(dirPath);
     }
-
 }
