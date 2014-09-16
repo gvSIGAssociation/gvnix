@@ -486,6 +486,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
         tileLayerAttr.put("url", url);
         tileLayerAttr.put("opacity", opacity);
 
+        name = name.replaceAll(" ", "_");
+
         createBaseLayer(name, tileLayerAttr, path, "tile");
 
     }
@@ -527,6 +529,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
         wmsLayerAttr.put("styles", styles);
         wmsLayerAttr.put("version", version);
         wmsLayerAttr.put("crs", crs);
+
+        name = name.replaceAll(" ", "_");
 
         createBaseLayer(name, wmsLayerAttr, path, "wms");
 

@@ -38,6 +38,10 @@
     	<c:set var="opacity" value="1" />
     </c:if>
     
+    <c:if test="${empty crs}">
+    	<c:set var="crs" value="EPSG3857" />
+    </c:if>
+    
     <div class="mapviewer_layers_layer">
     	<input id="${id}" name="${sec_field}" type="checkbox" />
    		<span id="${id}_span"><c:out value="${fn:escapeXml(label)}" /></span>

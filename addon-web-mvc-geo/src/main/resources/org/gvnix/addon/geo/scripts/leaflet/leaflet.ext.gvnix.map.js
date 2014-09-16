@@ -223,7 +223,7 @@ var GvNIX_Map_Leaflet;
             	   lat = savedLatLng[0];
             	   lng = savedLatLng[1];
                }
-                
+               
                 // Creating Map
 				this._data.map = L.map(divId, {
 	  				center: [lat , lng], 
@@ -529,6 +529,10 @@ var GvNIX_Map_Leaflet;
 						instance._fnSaveCheckboxStatus(checkBox.attr("id"), isChecked);
 	    				if(isChecked){
 	    		    		if(map){
+	    		    			
+	    		    			// Creating crs object
+	    		    			var crsObject = L.CRS[oWmsLayer.crs];
+
 	    		    			var wmsLayer = L.tileLayer.wms(oWmsLayer.url, {
 	    		    			    layers: oWmsLayer.layers,
 	    		    			    format: oWmsLayer.format,
@@ -536,7 +540,7 @@ var GvNIX_Map_Leaflet;
 	    		    			    attribution: oWmsLayer.attribution,
 	    		    			    styles: oWmsLayer.styles,
 	    		    			    version: oWmsLayer.version,
-	    		    			    crs: oWmsLayer.crs
+	    		    			    crs: crsObject
 	    		    			});
 	    		    			wmsLayer.setOpacity(oWmsLayer.opacity);
 	    						if(oWmsLayer.index !== ""){

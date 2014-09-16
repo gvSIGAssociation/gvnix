@@ -122,7 +122,8 @@ public class GeoCommands implements CommandMarker {
     @CliCommand(value = "web mvc geo controller", help = "Add new Map view to your project")
     public void addMap(
             @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the new Map Controller") final JavaType controller,
-            @CliOption(key = "preferredMapping", mandatory = true, optionContext = UPDATE_PROJECT, help = "Indicates a specific request mapping path for this map (eg /foo); no default value") final JavaSymbolName path) {
+            @CliOption(key = "preferredMapping", mandatory = true, optionContext = UPDATE_PROJECT, help = "Indicates a specific request mapping path for this map (eg /foo); no default value") final JavaSymbolName path,
+            @CliOption(key = "projection", mandatory = false, help = "Indicates which CRS you want to use on current wms layer. DEFAULT: EPSG3857") final ProjectionCRSTypes crs) {
         operations.addMap(controller, path);
     }
 
@@ -226,17 +227,17 @@ public class GeoCommands implements CommandMarker {
             @CliOption(key = "transparent", mandatory = false, help = "Indicates if current layer is transparent or not") final boolean transparent,
             @CliOption(key = "styles", mandatory = false, help = "Indicates which styles you want to use on current wms layer") final String styles,
             @CliOption(key = "version", mandatory = false, help = "Indicates which wms version you want to use on current wms layer") final String version,
-            @CliOption(key = "crs", mandatory = false, help = "Indicates which CRS you want to use on current wms layer") final String crs) {
+            @CliOption(key = "crs", mandatory = false, help = "Indicates which CRS projection you want to use on current wms layer. DEFAULT: EPSG3857") final ProjectionCRSTypes crs) {
 
         // Checking if path was selected
         if (path != null) {
             operations.wmsLayer(name, url, new JavaSymbolName(path.getKey()),
                     index, opacity, layers, format, transparent, styles,
-                    version, crs);
+                    version, crs.toString());
         }
         else {
             operations.wmsLayer(name, url, null, index, opacity, layers,
-                    format, transparent, styles, version, crs);
+                    format, transparent, styles, version, crs.toString());
         }
     }
 
