@@ -135,7 +135,7 @@ public class GeoCommands implements CommandMarker {
      */
     @CliCommand(value = "web mvc geo entity all", help = "Run this method to include all GEO entities on specific map or on all available maps")
     public void all(
-            @CliOption(key = "maps", mandatory = false, help = "Map where you want to add all entities. If blank, adds all GEO entities to all available maps") MapsProperty path) {
+            @CliOption(key = "map", mandatory = false, help = "Map where you want to add all entities. If blank, adds all GEO entities to all available maps") MapsProperty path) {
         // Checking if path was selected
         if (path != null) {
             operations.all(new JavaSymbolName(path.getValue()));

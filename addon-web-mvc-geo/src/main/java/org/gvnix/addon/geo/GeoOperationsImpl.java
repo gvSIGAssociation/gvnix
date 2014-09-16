@@ -243,7 +243,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Checking if exists map element before to generate geo web layer
         if (!checkExistsMapElement()) {
             throw new RuntimeException(
-                    "ERROR. Is necesary to create new map element using \"web mvc geo map\" command before generate geo web layer");
+                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
         }
 
         List<String> paths = new ArrayList<String>();
@@ -264,7 +264,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 Validate.notNull(
                         mapController,
                         String.format(
-                                "Controller annotated with @GvNIXMapViewer and with path \"%s\" doesn't found. Use \"web mvc geo map\" to generate new map view.",
+                                "Controller annotated with @GvNIXMapViewer and with path \"%s\" doesn't found. Use \"web mvc geo controller\" to generate new map view.",
                                 currentPath));
                 paths.add(currentPath);
             }
@@ -289,7 +289,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Checking if exists map element before to generate geo web layer
         if (!checkExistsMapElement()) {
             throw new RuntimeException(
-                    "ERROR. Is necesary to create new map element using \"web mvc geo map\" command before generate geo web layer");
+                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
         }
 
         Validate.notNull(controller,
@@ -350,7 +350,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 Validate.notNull(
                         mapController,
                         String.format(
-                                "Controller annotated with @GvNIXMapViewer doesn't found. Use \"web mvc geo map\" to generate new map view.",
+                                "Controller annotated with @GvNIXMapViewer doesn't found. Use \"web mvc geo controller\" to generate new map view.",
                                 currentPath));
                 paths.add(currentPath);
             }
@@ -477,7 +477,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Checking if exists map element before to generate geo tile layer
         if (!checkExistsMapElement()) {
             throw new RuntimeException(
-                    "ERROR. Is necesary to create new map element using \"web mvc geo map\" command before generate geo web layer");
+                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
         }
 
         // Creating map with params to send
@@ -515,7 +515,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Checking if exists map element before to generate geo tile layer
         if (!checkExistsMapElement()) {
             throw new RuntimeException(
-                    "ERROR. Is necesary to create new map element using \"web mvc geo map\" command before generate geo web layer");
+                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
         }
 
         // Creating map with params to send
