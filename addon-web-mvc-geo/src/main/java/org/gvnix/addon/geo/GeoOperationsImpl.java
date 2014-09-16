@@ -187,6 +187,11 @@ public class GeoOperationsImpl extends AbstractOperations implements
         return isSetupCommandAvailable();
     }
 
+    @Override
+    public boolean isToolCommandAvailable() {
+        return isSetupCommandAvailable();
+    }
+
     /**
      * This method imports all necessary element to build a gvNIX GEO
      * application
@@ -533,6 +538,179 @@ public class GeoOperationsImpl extends AbstractOperations implements
         name = name.replaceAll(" ", "_");
 
         createBaseLayer(name, wmsLayerAttr, path, "wms");
+
+    }
+
+    /**
+     * 
+     * This method add new tool on selected map
+     * 
+     * @param name
+     * @param type
+     * @param path
+     * @param preventExitMessageCode
+     */
+    @Override
+    public void addTool(String name, ToolTypes type, JavaSymbolName path,
+            String preventExitMessageCode) {
+        // Checking if exists map element before to generate geo tool
+        if (!checkExistsMapElement()) {
+            throw new RuntimeException(
+                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
+        }
+
+        // Creating map with params to send
+        Map<String, String> toolAttr = new HashMap<String, String>();
+        toolAttr.put("preventExitMessage", preventExitMessageCode);
+
+        createTool(name, toolAttr, path, type.toString());
+
+    }
+
+    /**
+     * This method generate a Map with map path and new tool id
+     * 
+     * @param toolAttr
+     * @param path
+     * @param string
+     */
+    private void createTool(String name, Map<String, String> toolAttr,
+            JavaSymbolName path, String type) {
+
+        String mapId = "";
+
+        // Adding id base layer to application.properties
+        Map<String, String> propertyList = new HashMap<String, String>();
+
+        // Getting paths to add base layer
+        Map<String, String> pathsMap = new HashMap<String, String>();
+
+        Set<ClassOrInterfaceTypeDetails> controllerDetails = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(MAP_VIEWER_ANNOTATION);
+
+        for (ClassOrInterfaceTypeDetails controller : controllerDetails) {
+            String controllerPath = (String) controller
+                    .getAnnotation(SpringJavaType.REQUEST_MAPPING)
+                    .getAttribute("value").getValue();
+            if (path != null) {
+                if (controllerPath.replaceAll("/", "").equals(
+                        path.getSymbolName())) {
+                    // Getting mapId
+                    mapId = String.format("ps_%s_%s", controller.getType()
+                            .getPackage().getFullyQualifiedPackageName()
+                            .replaceAll("[.]", "_"), new JavaSymbolName(path
+                            .getSymbolName().replaceAll("/", ""))
+                            .getSymbolNameCapitalisedFirstLetter());
+
+                    pathsMap.put(path.getSymbolName(), mapId + "_" + name);
+                    // Add to application.properties
+                    propertyList.put("label" + mapId.substring(2).toLowerCase()
+                            + "_" + name, name);
+                }
+            }
+            else {
+                // Getting mapId
+                mapId = String.format("ps_%s_%s", controller.getType()
+                        .getPackage().getFullyQualifiedPackageName()
+                        .replaceAll("[.]", "_"), new JavaSymbolName(
+                        controllerPath.replaceAll("/", ""))
+                        .getSymbolNameCapitalisedFirstLetter());
+
+                pathsMap.put(controllerPath.replaceAll("/", ""), mapId + "_"
+                        + name);
+                // Add to application.properties
+                propertyList.put("label" + mapId.substring(2).toLowerCase()
+                        + "_" + name, name);
+            }
+
+        }
+
+        addToolToMaps(name, pathsMap, toolAttr, type);
+
+        propFileOperations.addProperties(getWebappPath(),
+                "WEB-INF/i18n/application.properties", propertyList, true,
+                false);
+
+    }
+
+    /**
+     * 
+     * This method uses id map and id base layer to generate new base layer
+     * using baseLayerAttr
+     * 
+     * @param name
+     * @param pathsMap
+     * @param toolAttr
+     * @param type
+     */
+    private void addToolToMaps(String name, Map<String, String> pathsMap,
+            Map<String, String> toolAttr, String type) {
+
+        boolean exists = false;
+
+        // Getting all maps
+        for (Entry mapPath : pathsMap.entrySet()) {
+            String viewPath = pathResolver.getFocusedIdentifier(
+                    Path.SRC_MAIN_WEBAPP,
+                    String.format("WEB-INF/views/%s/show.jspx",
+                            mapPath.getKey()));
+
+            if (fileManager.exists(viewPath)) {
+                Document docXml = WebProjectUtils.loadXmlDocument(viewPath,
+                        fileManager);
+
+                // Getting current tools
+                Element docRoot = docXml.getDocumentElement();
+                NodeList tools = docRoot.getElementsByTagName("tool:" + type);
+                // If exists tools, check if current name exists
+                if (tools.getLength() > 0) {
+                    for (int i = 0; i < tools.getLength(); i++) {
+                        Node tool = tools.item(i);
+                        NamedNodeMap currentToolAttr = tool.getAttributes();
+                        if (currentToolAttr.getNamedItem("id") != null) {
+                            String id = currentToolAttr.getNamedItem("id")
+                                    .getNodeValue().toString();
+                            String newId = (String) mapPath.getValue();
+
+                            if (id.equals(newId)) {
+                                LOGGER.log(Level.INFO, String.format(
+                                        "Tool %s exists on '%s'", type,
+                                        viewPath));
+                                exists = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // If not exists, add tool
+                if (!exists) {
+                    // If not existstool, create new one
+                    Element baseLayer = docXml.createElement("tool:" + type);
+                    baseLayer.setAttribute("id", (String) mapPath.getValue());
+                    for (Entry attr : toolAttr.entrySet()) {
+                        String key = (String) attr.getKey();
+                        String value = (String) attr.getValue();
+                        if (StringUtils.isNotBlank(value)) {
+                            baseLayer.setAttribute(key, value);
+                        }
+                    }
+
+                    Node toolbarElement = docRoot.getElementsByTagName(
+                            "geo:toolbar").item(0);
+                    toolbarElement.appendChild(baseLayer);
+
+                    fileManager.createOrUpdateTextFileIfRequired(viewPath,
+                            XmlUtils.nodeToString(docXml), true);
+                }
+
+            }
+            else {
+                throw new RuntimeException(String.format(
+                        " Error getting 'WEB-INF/views/%s/show.jspx' view",
+                        mapPath.getKey()));
+            }
+        }
 
     }
 

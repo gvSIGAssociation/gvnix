@@ -103,6 +103,17 @@ public class GeoCommands implements CommandMarker {
     }
 
     /**
+     * This method checks if web mvc geo tool method is available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator({ "web mvc geo tool" })
+    public boolean isToolCommandAvailable() {
+        return operations.isToolCommandAvailable();
+    }
+
+    /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
      * 
@@ -238,6 +249,29 @@ public class GeoCommands implements CommandMarker {
         else {
             operations.wmsLayer(name, url, null, index, opacity, layers,
                     format, transparent, styles, version, crs.toString());
+        }
+    }
+
+    /**
+     * This method registers a command with the Roo shell. It also offers a
+     * mandatory command attribute.
+     * 
+     * @param type
+     */
+    @CliCommand(value = "web mvc geo tool", help = "Run this method to add new tool on your map.")
+    public void tool(
+            @CliOption(key = "name", mandatory = true, help = "Indicates which name has current tool") final String name,
+            @CliOption(key = "type", mandatory = true, help = "Indicates which type of tool you want to add to your map") final ToolTypes type,
+            @CliOption(key = "map", mandatory = false, help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
+            @CliOption(key = "preventExitMessageCode", mandatory = false, help = "Indicates which MessageCode you want to use to prevent exit. If blank, not prevent exit. DEFAULT: blank.") final String preventExitMessageCode) {
+
+        // Checking if path was selected
+        if (path != null) {
+            operations.addTool(name, type, new JavaSymbolName(path.getKey()),
+                    preventExitMessageCode);
+        }
+        else {
+            operations.addTool(name, type, null, preventExitMessageCode);
         }
     }
 

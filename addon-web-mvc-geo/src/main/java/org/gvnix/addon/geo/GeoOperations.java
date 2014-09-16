@@ -61,6 +61,13 @@ public interface GeoOperations extends Feature {
     boolean isLayerCommandAvailable();
 
     /**
+     * This method checks if web mvc geo tool command is available
+     * 
+     * @return true if web mvc geo tool command is available
+     */
+    boolean isToolCommandAvailable();
+
+    /**
      * This method imports all necessary element to build a gvNIX GEO
      * application
      */
@@ -133,5 +140,17 @@ public interface GeoOperations extends Feature {
     void wmsLayer(String name, String url, JavaSymbolName path, String index,
             String opacity, String layers, String format, boolean transparent,
             String styles, String version, String crs);
+
+    /**
+     * 
+     * This method add new tool on selected map
+     * 
+     * @param name
+     * @param type
+     * @param path
+     * @param preventExitMessageCode
+     */
+    void addTool(String name, ToolTypes type, JavaSymbolName path,
+            String preventExitMessageCode);
 
 }
