@@ -784,6 +784,22 @@ public class GeoOperationsImpl extends AbstractOperations implements
                             mapControl.setAttribute("weight", weight);
                         }
                     }
+                    else if (fieldType.equals(new JavaType(
+                            "com.vividsolutions.jts.geom.MultiLineString"))) {
+                        mapControl = createDoc
+                                .createElement("geofield:map-multiline");
+                        if (StringUtils.isNotBlank(color)) {
+                            mapControl.setAttribute("color", color);
+                        }
+                        if (StringUtils.isNotBlank(weight)) {
+                            mapControl.setAttribute("weight", weight);
+                        }
+                    }
+                    else {
+                        throw new RuntimeException(String.format(
+                                "Cannot convert field type %s to map control",
+                                fieldType));
+                    }
 
                     // Adding general attributes
                     mapControl.setAttribute("field", fieldName.toString());

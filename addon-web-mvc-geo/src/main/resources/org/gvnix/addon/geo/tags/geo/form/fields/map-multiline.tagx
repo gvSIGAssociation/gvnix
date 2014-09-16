@@ -110,12 +110,15 @@
           					var layer = layers[i];
           					// Getting map center
           					var layerCenter = layer.getBounds().getCenter();
-          					// Setting color
-          					layers[i].options.color = "${color}";
-          					// Setting weight
-          					layers[i].options.weight = ${weight};
-          					// Adding marker
-          					layers[i].addTo(drawnItems);
+          					var moreLayers = layer.getLayers();
+          					for(x in moreLayers){
+              					// Setting color
+              					moreLayers[x].options.color = "${color}";
+              					// Setting weight
+              					moreLayers[x].options.weight = ${weight};
+              					// Adding marker
+              					moreLayers[x].addTo(drawnItems);
+          					}
           					// Creating map with view on center
           					map = L.map('${id}_map_control').setView([layerCenter.lat, layerCenter.lng], ${zoom});
           				}
@@ -152,45 +155,52 @@
         		map.addControl(drawControl);
         		
         		map.on('draw:created', function (e) {
-        			var currentLayers = drawnItems.getLayers();
-        			if(currentLayers.length > 0){
-        				drawnItems.removeLayer(currentLayers[0]);
-        			}
         			var type = e.layerType,
-        				layer = e.layer;
-        			drawnItems.addLayer(layer);
+    				layer = e.layer;
+    				drawnItems.addLayer(layer);
+    				
+        			var multiLine = "MULTILINESTRING ( ";
         			
-        			// Creating line using points
-        			var points = e.layer.getLatLngs();
-        			var line = "LINESTRING ( ";
-        			
-        			for(i in points){
-        				var point = points[i];
-        				line+= " " + point.lng + " " + point.lat + " ,";
-        			}
-        			line = line.substring(0, line.length - 1) + ")";
+        			var currentLayers = drawnItems.getLayers();
+       				for(i in currentLayers){
+       					var currentLayer = currentLayers[i];
+       					var layerPoints = currentLayer.getLatLngs();
+       					var line = "( ";
+       					for(x in layerPoints){
+       						var point = layerPoints[x];
+       						line+= "" + point.lng + " " + point.lat + " ,";
+       					}
+       					line = line.substring(0, line.length - 1);
+       					multiLine+=line + "),";
+       				}
+       				
+       				multiLine = multiLine.substring(0, multiLine.length - 1) + ")";
         			
         			// Adding to hidden input
-        			jQuery("#_${sec_field}_id").val(line);
+        			jQuery("#_${sec_field}_id").val(multiLine);
         		});
         		
         		map.on('draw:edited', function (e) {
-        			// Getting point layer
-        			var layers = e.layers.getLayers();
-        			if(layers.length > 0){
-        				var layer = layers[0];
-        				// Adding to hidden input
-						// Creating line using points
-	        			var points = layer.getLatLngs();
-	        			var line = "LINESTRING ( ";
-	        			for(i in points){
-	        				var point = points[i];
-	        				line+= " " + point.lng + " " + point.lat + " ,";
-	        			}
-	        			line = line.substring(0, line.length - 1) + ")";
-	        			
-        				jQuery("#_${sec_field}_id").val(line);
-        			}
+        			// Creating multiline using points
+        			var multiLine = "MULTILINESTRING ( ";
+        			
+        			var currentLayers = drawnItems.getLayers();
+       				for(i in currentLayers){
+       					var currentLayer = currentLayers[i];
+       					var layerPoints = currentLayer.getLatLngs();
+       					var line = "( ";
+       					for(x in layerPoints){
+       						var point = layerPoints[x];
+       						line+= "" + point.lng + " " + point.lat + " ,";
+       					}
+       					line = line.substring(0, line.length - 1);
+       					multiLine+=line + "),";
+       				}
+       				
+       				multiLine = multiLine.substring(0, multiLine.length - 1) + ")";
+        			
+        			// Adding to hidden input
+        			jQuery("#_${sec_field}_id").val(multiLine);
         				
         		});
         		

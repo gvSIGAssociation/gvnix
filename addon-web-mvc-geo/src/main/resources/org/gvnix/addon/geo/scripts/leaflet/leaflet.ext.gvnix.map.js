@@ -1072,6 +1072,23 @@ var GvNIX_Map_Leaflet;
     					layer.setIcon(iconMarker);
     				}else if(layer.options != undefined){
     					layer.options.color = bSelected == false ? oData.markercolor : oData.markercolorselected;
+    				}else{
+    					var moreLayers = layer.getLayers();
+    					for(j in moreLayers){
+    						var currenLayer = moreLayers[j];
+    						// Create marker or selected marker
+    	    				if(currenLayer.setIcon != undefined){
+    	    					var iconMarker = L.AwesomeMarkers.icon({
+    		    				    icon: bSelected == false ? oData.icon : oData.iconselected,
+    		    				    prefix: bSelected == false ? oData.iconlibrary : oData.iconlibraryselected,
+    		    				    markerColor: bSelected == false ? oData.markercolor : oData.markercolorselected,
+    		    				    iconColor: bSelected == false ? oData.iconcolor : oData.iconcolorselected
+    	            			});
+    	    					currenLayer.setIcon(iconMarker);
+    	    				}else if(currenLayer.options != undefined){
+    	    					currenLayer.options.color = bSelected == false ? oData.markercolor : oData.markercolorselected;
+    	    				}
+	    				}
     				}
     				
     			});

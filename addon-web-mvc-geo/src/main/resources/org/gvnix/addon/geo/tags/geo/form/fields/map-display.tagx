@@ -73,10 +73,22 @@
           				var layers = marker._layers;
           				for(i in layers){
           					var layer = layers[i];
-          					// Setting color
-          					layers[i].options.color = "${color}";
-          					// Setting weight
-          					layers[i].options.weight = ${weight};
+          					if(layers[i].options !== undefined){
+          						// Setting color
+              					layers[i].options.color = "${color}";
+              					// Setting weight
+              					layers[i].options.weight = ${weight};
+          					}
+          					else{
+          						var moreLayers = layer.getLayers();
+          						for(x in moreLayers){
+          							// Setting color
+                  					moreLayers[x].options.color = "${color}";
+                  					// Setting weight
+                  					moreLayers[x].options.weight = ${weight};
+          						}
+          					}
+          					
           					// Creating map with view on center
           					if(layer.getLatLng !== undefined){
           						map = L.map('${id}_map_control').setView([layer.getLatLng().lat, layer.getLatLng().lng], ${zoom});	
@@ -103,7 +115,7 @@
           		
           		setTimeout(function(){
           			jQuery(".leaflet-top").css("margin-top", "-42px");
-          			jQuery(".leaflet-bottom").css("display","none");
+          			jQuery(".leaflet-bottom").hide();
           			jQuery(".leaflet-left").css("margin-left", "20px");
           			jQuery(".leaflet-right").css("margin-right", "20px");
           			
