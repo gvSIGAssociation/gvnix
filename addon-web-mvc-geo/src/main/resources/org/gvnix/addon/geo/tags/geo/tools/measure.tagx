@@ -1,14 +1,20 @@
 <jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
   <jsp:output omit-xml-declaration="yes" />
 
+  <jsp:directive.attribute name="preventExitMessage" type="java.lang.String" required="false" description="Use i18n message for prevent exit of measure tool. If empty exits without prevent" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+  
+  	<c:if test="${!empty preventExitMessage}">
+ 		<spring:message code="${preventExitMessage}" var="label" htmlEscape="false" /> 		
+  	</c:if>
+ 
   
   	<!-- Generating info tool -->
 	<i id="measure_tool" class="toolbar_button  fa fa-measure measure_icon" >&amp;nbsp;&amp;nbsp;&amp;nbsp;</i>
 	
 	<script>
 		jQuery(document).ready(function(){
-			new GvNIX_Map_Measure_Tool(jQuery("#measure_tool"));			
+			new GvNIX_Map_Measure_Tool(jQuery("#measure_tool"), "${label}");			
 		});
 	</script>
 	

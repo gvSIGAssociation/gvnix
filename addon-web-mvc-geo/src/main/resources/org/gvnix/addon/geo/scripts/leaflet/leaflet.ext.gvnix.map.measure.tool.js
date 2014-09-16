@@ -20,7 +20,7 @@ var GvNIX_Map_Measure_Tool;
 
 (function(jQuery, window, document) {
 	
-	GvNIX_Map_Measure_Tool = function($aTool) {
+	GvNIX_Map_Measure_Tool = function($aTool, message) {
 		// Santiy check that we are a new instance
 		if (!this instanceof GvNIX_Map_Measure_Tool) {
 			alert("Warning: GvNIX_Map_Measure_Tool must be initialised with the keyword 'new'");
@@ -55,7 +55,12 @@ var GvNIX_Map_Measure_Tool;
 	        /**
 	         * Toolbar instance
 	         */
-	        "toolBar": null
+	        "toolBar": null,
+	        
+	        /**
+	         * Prevent exit message
+	         */
+	        "preventExitMessage": message
 	        
 		};
 		
@@ -86,7 +91,12 @@ var GvNIX_Map_Measure_Tool;
 	        /**
 	         * Toolbar instance
 	         */
-	        "toolBar": null
+	        "toolBar": null,
+	        
+	        /**
+	         * Prevent exit message
+	         */
+	        "preventExitMessage": message
 			
 		};
 		
@@ -205,7 +215,13 @@ var GvNIX_Map_Measure_Tool;
 			 * @param tool
 			 */
 			"fnDeactivateTool": function deselectCurrentTool(element){
-				var response = confirm("Do you want to get out of the current edition? You will lose all changes made ");
+				if(this._data.preventExitMessage !== ""){
+					var response = confirm(this._data.preventExitMessage);
+					
+				}else{
+					response = true;
+				}
+				
 				if(response){
 					// Changing icon to default
 					jQuery(this._data.map._data.map._container).css({"cursor" : "url('resources/images/cursor_hand.png'), default"});
@@ -213,7 +229,9 @@ var GvNIX_Map_Measure_Tool;
 					// Disable measuring tool
 					this._data.measuringTool.disable();
 				}
+				
 				element.data("response", response);
+				
 			},
 			
             /**
