@@ -72,6 +72,12 @@ public class GvNIXGeoConversionServiceMetadata extends
     private static final JavaType POLYGON_TYPE = new JavaType(
             "com.vividsolutions.jts.geom.Polygon");
 
+    private static final JavaType GEOMETRY_TYPE = new JavaType(
+            "com.vividsolutions.jts.geom.Geometry");
+
+    private static final JavaType MULTILINESTRING_TYPE = new JavaType(
+            "com.vividsolutions.jts.geom.MultiLineString");
+
     private static final JavaSymbolName POINT_TO_STRING_METHOD = new JavaSymbolName(
             "getPointToStringConverter");
 
@@ -89,6 +95,18 @@ public class GvNIXGeoConversionServiceMetadata extends
 
     private static final JavaSymbolName STRING_TO_POLYGON_METHOD = new JavaSymbolName(
             "getStringToPolygonConverter");
+
+    private static final JavaSymbolName GEOMETRY_TO_STRING_METHOD = new JavaSymbolName(
+            "getGeometryToStringConverter");
+
+    private static final JavaSymbolName STRING_TO_GEOMETRY_METHOD = new JavaSymbolName(
+            "getStringToGeometryConverter");
+
+    private static final JavaSymbolName MULTILINESTRING_TO_STRING_METHOD = new JavaSymbolName(
+            "getMultiLineStringToStringConverter");
+
+    private static final JavaSymbolName STRING_TO_MULTILINESTRING_METHOD = new JavaSymbolName(
+            "getStringToMultiLineStringConverter");
 
     private static final JavaSymbolName INSTALL_GEO_LABLES_METHOD = new JavaSymbolName(
             "installGeoLabelConverters");
@@ -119,6 +137,22 @@ public class GvNIXGeoConversionServiceMetadata extends
     private static final JavaType CONVERTER_STRING_POLYGON = new JavaType(
             CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, POLYGON_TYPE));
+
+    private static final JavaType CONVERTER_GEOMETRY_STRING = new JavaType(
+            CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(GEOMETRY_TYPE, JavaType.STRING));
+
+    private static final JavaType CONVERTER_STRING_GEOMETRY = new JavaType(
+            CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, GEOMETRY_TYPE));
+
+    private static final JavaType CONVERTER_MULTILINESTRING_STRING = new JavaType(
+            CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(MULTILINESTRING_TYPE, JavaType.STRING));
+
+    private static final JavaType CONVERTER_STRING_MULTILINESTRING = new JavaType(
+            CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+            Arrays.asList(JavaType.STRING, MULTILINESTRING_TYPE));
 
     /**
      * Itd builder helper
@@ -158,6 +192,10 @@ public class GvNIXGeoConversionServiceMetadata extends
         builder.addMethod(getStringToLineStringConverterMethod());
         builder.addMethod(getPolygonToStringConverterMethod());
         builder.addMethod(getStringToPolygonConverterMethod());
+        builder.addMethod(getGeometryToStringConverterMethod());
+        builder.addMethod(getStringToGeometryConverterMethod());
+        builder.addMethod(getMultiLineStringToStringConverterMethod());
+        builder.addMethod(getStringToMultiLineStringConverterMethod());
 
         // Adding registry methods
         builder.addMethod(getInstallGeoLabelsConverterMethod());
@@ -523,6 +561,182 @@ public class GvNIXGeoConversionServiceMetadata extends
     }
 
     /**
+     * Gets <code>getGeometryToStringConverter</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getGeometryToStringConverterMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(GEOMETRY_TO_STRING_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetGeometryToStringConverterMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, GEOMETRY_TO_STRING_METHOD,
+                CONVERTER_GEOMETRY_STRING, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>getStringToGeometryConverter</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getStringToGeometryConverterMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(STRING_TO_GEOMETRY_METHOD,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetStringToGeometryConverterMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, STRING_TO_GEOMETRY_METHOD,
+                CONVERTER_STRING_GEOMETRY, parameterTypes, parameterNames,
+                bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>getMultiLineStringToStringConverter</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getMultiLineStringToStringConverterMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(
+                MULTILINESTRING_TO_STRING_METHOD, parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetMultiLineStringToStringConverterMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, MULTILINESTRING_TO_STRING_METHOD,
+                CONVERTER_MULTILINESTRING_STRING, parameterTypes,
+                parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Gets <code>getStringToMultiLineStringConverter</code> method. <br>
+     * 
+     * @return
+     */
+    private MethodMetadata getStringToMultiLineStringConverterMethod() {
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(
+                STRING_TO_MULTILINESTRING_METHOD, parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // Define method throws types
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        buildGetStringToMultiLineStringConverterMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, STRING_TO_MULTILINESTRING_METHOD,
+                CONVERTER_STRING_MULTILINESTRING, parameterTypes,
+                parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
      * Builds body method for <code>getPointToStringConverter</code> method. <br>
      * 
      * @param bodyBuilder
@@ -750,6 +964,159 @@ public class GvNIXGeoConversionServiceMetadata extends
     }
 
     /**
+     * Builds body method for <code>getGeometryToStringConverter</code> method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetGeometryToStringConverterMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine(String.format(
+                " return new %s<%s, java.lang.String>() {",
+                helper.getFinalTypeName(CONVERTER_TYPE),
+                helper.getFinalTypeName(GEOMETRY_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("public String convert(Geometry geometry) {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return writer.writeFormatted(geometry);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+    }
+
+    /**
+     * Builds body method for <code>getStringToGeometryConverter</code> method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetStringToGeometryConverterMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine(String.format(
+                " return new %s<java.lang.String, %s>() {",
+                helper.getFinalTypeName(CONVERTER_TYPE),
+                helper.getFinalTypeName(GEOMETRY_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("public Geometry convert(String str) {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("try {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return reader.read(str);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine(String.format("}catch( %s e) {",
+                helper.getFinalTypeName(PARSE_EXCEPTION_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("throw new IllegalArgumentException(");
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine(" \"Invalid string for Geometry: \".concat(str), e);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+        // Reset indent
+        bodyBuilder.reset();
+
+    }
+
+    /**
+     * Builds body method for <code>getMultiLineStringToStringConverter</code>
+     * method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetMultiLineStringToStringConverterMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine(String.format(
+                " return new %s<%s, java.lang.String>() {",
+                helper.getFinalTypeName(CONVERTER_TYPE),
+                helper.getFinalTypeName(MULTILINESTRING_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("public String convert(MultiLineString multiLineString) {");
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return writer.writeFormatted(multiLineString);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+    }
+
+    /**
+     * Builds body method for <code>getStringToMultiLineStringConverter</code>
+     * method. <br>
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetStringToMultiLineStringConverterMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        bodyBuilder.appendFormalLine(String.format(
+                " return new %s<java.lang.String, %s>() {",
+                helper.getFinalTypeName(CONVERTER_TYPE),
+                helper.getFinalTypeName(MULTILINESTRING_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("public MultiLineString convert(String str) {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("try {");
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return (MultiLineString) reader.read(str);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine(String.format("}catch( %s e) {",
+                helper.getFinalTypeName(PARSE_EXCEPTION_TYPE)));
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("throw new IllegalArgumentException(");
+
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine(" \"Invalid string for MultiLineString: \".concat(str), e);");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+        // Reset indent
+        bodyBuilder.reset();
+
+    }
+
+    /**
      * Builds body method for <code>afterPropertySet</code> method. <br>
      * 
      * @param bodyBuilder
@@ -781,6 +1148,14 @@ public class GvNIXGeoConversionServiceMetadata extends
                 .appendFormalLine("registry.addConverter(getPolygonToStringConverter());");
         bodyBuilder
                 .appendFormalLine("registry.addConverter(getStringToPolygonConverter());");
+        bodyBuilder
+                .appendFormalLine("registry.addConverter(getGeometryToStringConverter());");
+        bodyBuilder
+                .appendFormalLine("registry.addConverter(getStringToGeometryConverter());");
+        bodyBuilder
+                .appendFormalLine("registry.addConverter(getMultiLineStringToStringConverter());");
+        bodyBuilder
+                .appendFormalLine("registry.addConverter(getStringToMultiLineStringConverter());");
     }
 
     public String toString() {

@@ -9,7 +9,9 @@ public enum FieldGeoTypes {
 
     POINT("com.vividsolutions.jts.geom.Point"), LINESTRING(
             "com.vividsolutions.jts.geom.LineString"), POLYGON(
-            "com.vividsolutions.jts.geom.Polygon");
+            "com.vividsolutions.jts.geom.Polygon"), GEOMETRY(
+            "com.vividsolutions.jts.geom.Geometry"), MULTILINESTRING(
+            "com.vividsolutions.jts.geom.MultiLineString");
 
     public final String descripcion;
 

@@ -990,17 +990,38 @@ var GvNIX_Map_Leaflet;
                         			// Generating unique for layer id
                         			var idValue = fieldConfig.checkBox.data().field + "_" + pk;
                         			var markerLayer = marker.getLayers()[0];
-                        			markerLayer.options.markerId = idValue;
+                        			if(markerLayer.options != undefined){
+                        				markerLayer.options.markerId = idValue;
+                        			}else{
+                        				var moreLayers = markerLayer.getLayers();
+                        				for(x in moreLayers){
+                        					if(moreLayers[x].options != undefined){
+                        						moreLayers[x].options.markerId = idValue + "_" + x;
+                        					}
+                        				}
+                        			}
                         			
                         			// Checking if current id exists on map. If exists, not add again
                         			var currentMarkers = layerGroup.getLayers();
                         			var exists = false;
                         			for(x in currentMarkers){
-                        				var markerId = currentMarkers[x].options.markerId;
-                        				if(markerId == idValue){
-                        					var currentMarker = currentMarkers[x];
-                        					exists = true;
-                        					break;
+                        				if(currentMarkers[x].options != undefined){
+                        					var markerId = currentMarkers[x].options.markerId;
+                            				if(markerId == idValue){
+                            					var currentMarker = currentMarkers[x];
+                            					exists = true;
+                            					break;
+                            				}
+                        				}else{
+                        					var moreLayers = currentMarkers[x].getLayers();
+                        					for(z in moreLayers){
+                            					if(moreLayers[z].options != undefined){
+                            						var markerId = moreLayers[z].options.markerId;
+                                    				if(markerId == idValue + "_" + z){
+                                    					currentMarkers[x].removeLayer(moreLayers[z]);
+                                    				}
+                            					}
+                            				}
                         				}
                         			}
                         			if(!exists){
@@ -1049,7 +1070,7 @@ var GvNIX_Map_Leaflet;
 	    				    iconColor: bSelected == false ? oData.iconcolor : oData.iconcolorselected
             			});
     					layer.setIcon(iconMarker);
-    				}else{
+    				}else if(layer.options != undefined){
     					layer.options.color = bSelected == false ? oData.markercolor : oData.markercolorselected;
     				}
     				
