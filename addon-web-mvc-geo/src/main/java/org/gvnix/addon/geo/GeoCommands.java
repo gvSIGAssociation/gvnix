@@ -108,7 +108,8 @@ public class GeoCommands implements CommandMarker {
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
-    @CliAvailabilityIndicator({ "web mvc geo tool" })
+    @CliAvailabilityIndicator({ "web mvc geo tool measure",
+            "web mvc geo tool custom" })
     public boolean isToolCommandAvailable() {
         return operations.isToolCommandAvailable();
     }
@@ -235,7 +236,7 @@ public class GeoCommands implements CommandMarker {
             @CliOption(key = "opacity", mandatory = false, help = "Indicates which opacity has base layer. Number between 0 and 1. DEFAULT: 0.5") final String opacity,
             @CliOption(key = "layers", mandatory = false, help = "Indicates which layers you want to load on this wms layer") final String layers,
             @CliOption(key = "format", mandatory = false, help = "Indicates which image format you want to load on this wms layer. EX: image/png") final String format,
-            @CliOption(key = "transparent", mandatory = false, help = "Indicates if current layer is transparent or not") final boolean transparent,
+            @CliOption(key = "transparent", mandatory = false, help = "Indicates if current layer is transparent or not", unspecifiedDefaultValue = "false") final boolean transparent,
             @CliOption(key = "styles", mandatory = false, help = "Indicates which styles you want to use on current wms layer") final String styles,
             @CliOption(key = "version", mandatory = false, help = "Indicates which wms version you want to use on current wms layer") final String version,
             @CliOption(key = "crs", mandatory = false, help = "Indicates which CRS projection you want to use on current wms layer. DEFAULT: EPSG3857") final ProjectionCRSTypes crs) {
@@ -258,20 +259,50 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo tool", help = "Run this method to add new tool on your map.")
-    public void tool(
+    @CliCommand(value = "web mvc geo tool measure", help = "Run this method to add new measure tool on your map.")
+    public void measureTool(
             @CliOption(key = "name", mandatory = true, help = "Indicates which name has current tool") final String name,
-            @CliOption(key = "type", mandatory = true, help = "Indicates which type of tool you want to add to your map") final ToolTypes type,
             @CliOption(key = "map", mandatory = false, help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
             @CliOption(key = "preventExitMessageCode", mandatory = false, help = "Indicates which MessageCode you want to use to prevent exit. If blank, not prevent exit. DEFAULT: blank.") final String preventExitMessageCode) {
 
         // Checking if path was selected
         if (path != null) {
-            operations.addTool(name, type, new JavaSymbolName(path.getKey()),
+            operations.addMeasureTool(name, new JavaSymbolName(path.getKey()),
                     preventExitMessageCode);
         }
         else {
-            operations.addTool(name, type, null, preventExitMessageCode);
+            operations.addMeasureTool(name, null, preventExitMessageCode);
+        }
+    }
+
+    /**
+     * This method registers a command with the Roo shell. It also offers a
+     * mandatory command attribute.
+     * 
+     * @param type
+     */
+    @CliCommand(value = "web mvc geo tool custom", help = "Run this method to add new custom tool on your map.")
+    public void customTool(
+            @CliOption(key = "name", mandatory = true, help = "Indicates which name has current tool") final String name,
+            @CliOption(key = "icon", mandatory = true, help = "Icon to show on ToolBar to identiy the tool element. Fontawesome icons or glyphicon icons") final String icon,
+            @CliOption(key = "activateFunction", mandatory = true, help = "Function to invoke when the user press on tool button") final String activateFunction,
+            @CliOption(key = "deactivateFunction", mandatory = true, help = "Function to invoke when the user press a different tool button") final String deactivateFunction,
+            @CliOption(key = "map", mandatory = false, help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
+            @CliOption(key = "iconLibrary", mandatory = false, help = "DESC: Select de icon library.| DEFAULT: 'glyphicon' | POSSIBLE VALUES: 'fa' for font-awesome or 'glyphicon' for bootstrap 3") final String iconLibrary,
+            @CliOption(key = "actionTool", mandatory = false, help = "Indicates if this tool is a selectable tool (false) or and action tool (true)", unspecifiedDefaultValue = "false") final boolean actionTool,
+            @CliOption(key = "cursorIcon", mandatory = false, help = "Icon to show as cursor when enter on map element") final String cursorIcon,
+            @CliOption(key = "preventExitMessageCode", mandatory = false, help = "Indicates which MessageCode you want to use to prevent exit. If blank, not prevent exit. DEFAULT: blank.") final String preventExitMessageCode) {
+
+        // Checking if path was selected
+        if (path != null) {
+            operations.addCustomTool(name, new JavaSymbolName(path.getKey()),
+                    preventExitMessageCode, icon, iconLibrary, actionTool,
+                    activateFunction, deactivateFunction, cursorIcon);
+        }
+        else {
+            operations.addCustomTool(name, null, preventExitMessageCode, icon,
+                    iconLibrary, actionTool, activateFunction,
+                    deactivateFunction, cursorIcon);
         }
     }
 

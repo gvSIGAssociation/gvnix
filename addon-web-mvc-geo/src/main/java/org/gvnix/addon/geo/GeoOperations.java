@@ -143,14 +143,26 @@ public interface GeoOperations extends Feature {
 
     /**
      * 
-     * This method add new tool on selected map
+     * This method add new measure tool on selected map
      * 
      * @param name
-     * @param type
      * @param path
      * @param preventExitMessageCode
      */
-    void addTool(String name, ToolTypes type, JavaSymbolName path,
+    void addMeasureTool(String name, JavaSymbolName path,
             String preventExitMessageCode);
+
+    /**
+     * 
+     * This method add new measure tool on selected map
+     * 
+     * @param name
+     * @param path
+     * @param preventExitMessageCode
+     */
+    void addCustomTool(String name, JavaSymbolName path,
+            String preventExitMessageCode, String icon, String iconLibrary,
+            boolean actionTool, String activateFunction,
+            String deactivateFunction, String cursorIcon);
 
 }

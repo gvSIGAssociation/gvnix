@@ -543,15 +543,14 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * 
-     * This method add new tool on selected map
+     * This method add new measure tool on selected map
      * 
      * @param name
-     * @param type
      * @param path
      * @param preventExitMessageCode
      */
     @Override
-    public void addTool(String name, ToolTypes type, JavaSymbolName path,
+    public void addMeasureTool(String name, JavaSymbolName path,
             String preventExitMessageCode) {
         // Checking if exists map element before to generate geo tool
         if (!checkExistsMapElement()) {
@@ -563,7 +562,46 @@ public class GeoOperationsImpl extends AbstractOperations implements
         Map<String, String> toolAttr = new HashMap<String, String>();
         toolAttr.put("preventExitMessage", preventExitMessageCode);
 
-        createTool(name, toolAttr, path, type.toString());
+        createTool(name, toolAttr, path, "measure");
+
+    }
+
+    /**
+     * 
+     * This method add new custom tool on selected map
+     * 
+     * @param name
+     * @param path
+     * @param preventExitMessageCode
+     */
+    @Override
+    public void addCustomTool(String name, JavaSymbolName path,
+            String preventExitMessageCode, String icon, String iconLibrary,
+            boolean actionTool, String activateFunction,
+            String deactivateFunction, String cursorIcon) {
+        // Checking if exists map element before to generate geo tool
+        if (!checkExistsMapElement()) {
+            throw new RuntimeException(
+                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
+        }
+
+        // Creating map with params to send
+        Map<String, String> toolAttr = new HashMap<String, String>();
+        toolAttr.put("preventExitMessage", preventExitMessageCode);
+        toolAttr.put("icon", icon);
+        toolAttr.put("iconLibrary", iconLibrary);
+        toolAttr.put("actionTool", actionTool ? "true" : "false");
+        toolAttr.put("activateFunction", activateFunction);
+        toolAttr.put("deactivateFunction", deactivateFunction);
+        toolAttr.put("cursorIcon", cursorIcon);
+
+        createTool(name, toolAttr, path, "custom");
+
+        LOGGER.log(
+                Level.INFO,
+                String.format(
+                        "**NOTE: Remember that you need to create %s and %s JavaScript functions with your custom tool implementation.",
+                        activateFunction, deactivateFunction));
 
     }
 
@@ -686,19 +724,23 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 // If not exists, add tool
                 if (!exists) {
                     // If not existstool, create new one
-                    Element baseLayer = docXml.createElement("tool:" + type);
-                    baseLayer.setAttribute("id", (String) mapPath.getValue());
+                    Element tool = docXml.createElement("tool:" + type);
+                    tool.setAttribute("id", (String) mapPath.getValue());
                     for (Entry attr : toolAttr.entrySet()) {
                         String key = (String) attr.getKey();
                         String value = (String) attr.getValue();
                         if (StringUtils.isNotBlank(value)) {
-                            baseLayer.setAttribute(key, value);
+                            tool.setAttribute(key, value);
                         }
                     }
 
+                    // Generating z attr
+                    tool.setAttribute("z",
+                            XmlRoundTripUtils.calculateUniqueKeyFor(tool));
+
                     Node toolbarElement = docRoot.getElementsByTagName(
                             "geo:toolbar").item(0);
-                    toolbarElement.appendChild(baseLayer);
+                    toolbarElement.appendChild(tool);
 
                     fileManager.createOrUpdateTextFileIfRequired(viewPath,
                             XmlUtils.nodeToString(docXml), true);
@@ -846,6 +888,10 @@ public class GeoOperationsImpl extends AbstractOperations implements
                             baseLayer.setAttribute(key, value);
                         }
                     }
+
+                    // Generating z attr
+                    baseLayer.setAttribute("z",
+                            XmlRoundTripUtils.calculateUniqueKeyFor(baseLayer));
 
                     Node tocElement = docRoot.getElementsByTagName("geo:toc")
                             .item(0);

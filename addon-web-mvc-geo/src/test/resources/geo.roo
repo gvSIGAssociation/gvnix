@@ -58,4 +58,5 @@ web mvc geo field --controller ~.web.OwnerController --field distance
 web mvc geo field --controller ~.web.OwnerController --field area
 web mvc geo tilelayer --name satellit --url "http://maptile.maps.svc.ovi.com/maptiler/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8"
 web mvc geo wmslayer --name "geological map of valencia" --url "http://mapas.igme.es/gis/services/Cartografia_Geologica/IGME_GeologicoCValenciana_400/MapServer/WMSServer" --format "image/png" --transparent true --version "1.1.1" --crs EPSG4326 --layers "0,1,2,3"
-web mvc geo tool --name measure --type MEASURE_TOOL
+web mvc geo tool measure --name measure
+web mvc geo tool custom --name latlng --icon fa-location-arrow --activateFunction activateLatLngTool --deactivateFunction deactivateLatLngTool --iconLibrary fa
