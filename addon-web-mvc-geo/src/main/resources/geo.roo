@@ -52,6 +52,7 @@ field geo --fieldName distance --type LINESTRING --class ~.domain.Owner
 field geo --fieldName area --type POLYGON --class ~.domain.Owner
 finder geo all
 web mvc geo controller --class ~.web.MapViewerController --preferredMapping mapview
+web mvc geo controller --class ~.web.MapController --preferredMapping map
 web mvc geo entity all
 web mvc geo field --controller ~.web.OwnerController --field location
 web mvc geo field --controller ~.web.OwnerController --field distance

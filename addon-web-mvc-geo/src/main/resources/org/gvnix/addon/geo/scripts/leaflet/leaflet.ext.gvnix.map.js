@@ -1153,7 +1153,7 @@ var GvNIX_Map_Leaflet;
              */
             "_fnSaveCheckboxStatus": function saveCheckboxStatus(checkBoxId, status){
             	// Saving status using localStorage
-            	localStorage.setItem(checkBoxId + "_map_toc_element", status);
+            	localStorage.setItem(checkBoxId + "_map_toc_element_" + this._data.id, status);
             },
             
             /**
@@ -1161,7 +1161,7 @@ var GvNIX_Map_Leaflet;
              * @param checkBox
              */
             "_fnLoadCheckBoxStatus": function loadCheckboxStatus(checkBox){
-            	var status = localStorage.getItem(checkBox.attr("id") + "_map_toc_element");
+            	var status = localStorage.getItem(checkBox.attr("id") + "_map_toc_element_" + this._data.id);
             	if(status !== null){
             		if(status == "true" || status == "parent"){
                 		checkBox.prop("checked", true);
