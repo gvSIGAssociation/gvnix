@@ -2,6 +2,7 @@
 	<jsp:output omit-xml-declaration="yes" />
 
 	<jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+	<jsp:directive.attribute name="projection" type="java.lang.String" required="true" rtexprvalue="true" description="Projection to use on current map." />
 	<jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this object, will default to a message bundle if not supplied" />
 	<jsp:directive.attribute name="center" type="java.lang.String" required="false" rtexprvalue="true" description="The center point to display on the map" />
 	<jsp:directive.attribute name="zoom" type="java.lang.String" required="false" rtexprvalue="true" description="The initial zoom to use on the map" />
@@ -37,11 +38,16 @@
 		<!-- Generating toc component with layers -->
 		<jsp:doBody />
 		<!-- Generating map -->
-		<div id="${id}" class="mapviewer_control" data-center="${center}" data-zoom="${zoom}" data-maxzoom="${maxZoom}" data-url="${url}">
+		<div id="${id}" class="mapviewer_control" data-center="${center}" data-zoom="${zoom}" data-maxzoom="${maxZoom}" data-url="${url}" data-projection="${projection}">
 		</div>
 	</div>
 
 	<script>
+	
+		jQuery("#${id}").on("click", function(e){
+			L.DomEvent._skipped(e);
+		});
+	
 		jQuery(document).ready(function() {
 			resizeMap();
 		});

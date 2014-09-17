@@ -212,7 +212,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
      * This method adds all necessary components to display a map view
      */
     @Override
-    public void addMap(JavaType controller, JavaSymbolName path) {
+    public void addMap(JavaType controller, JavaSymbolName path,
+            ProjectionCRSTypes projection) {
         String filePackage = controller.getPackage()
                 .getFullyQualifiedPackageName();
         // Doing a previous setup to install necessary components and annotate
@@ -222,9 +223,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
             setup();
         }
         // Adding new controller with annotated class
-        addMapViewerController(controller, path);
+        addMapViewerController(controller, path, projection);
         // Adding new show.jspx and views.xml
-        createViews(filePackage, path);
+        createViews(filePackage, path, projection);
         // Add new component labels to application.properties
         addI18nComponentsProperties();
         // Add new mapController view to application.properties
@@ -1242,7 +1243,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
      * 
      * @param path
      */
-    public void createViews(String controllerPackage, JavaSymbolName path) {
+    public void createViews(String controllerPackage, JavaSymbolName path,
+            ProjectionCRSTypes projection) {
         PathResolver pathResolver = projectOperations.getPathResolver();
 
         String finalPath = path.getReadableSymbolName().toLowerCase();
@@ -1347,6 +1349,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
             Element map = docXml.createElement("geo:map");
             map.setAttribute("id", mapId);
+            map.setAttribute("projection",
+                    projection != null ? projection.toString() : "EPSG3857");
             map.setAttribute("z", XmlRoundTripUtils.calculateUniqueKeyFor(map));
 
             // Creating geo:toc element and adding to map
@@ -1378,7 +1382,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
      * @param controller
      * @param path
      */
-    public void addMapViewerController(JavaType controller, JavaSymbolName path) {
+    public void addMapViewerController(JavaType controller,
+            JavaSymbolName path, ProjectionCRSTypes projection) {
         // Getting all classes with @GvNIXMapViewer annotation
         // and checking that not exists another with the specified path
         for (JavaType mapViewer : typeLocationService
@@ -1410,7 +1415,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
         }
 
         // Create new class
-        createNewController(controller, generateJavaType(controller), path);
+        createNewController(controller, generateJavaType(controller), path,
+                projection);
     }
 
     /**
@@ -1421,7 +1427,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
      * @param path
      */
     public void createNewController(JavaType controller, JavaType target,
-            JavaSymbolName path) {
+            JavaSymbolName path, ProjectionCRSTypes projection) {
         Validate.notNull(controller, "Entity required");
         if (target == null) {
             target = generateJavaType(controller);
@@ -1518,6 +1524,12 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 new JavaSymbolName("entityLayers"), entityAttributes);
         // Adding controller class list to MapViewer Controller
         mapViewerAnnotation.addAttribute(entityLayersArray);
+
+        // Adding projection to MapViewer annotation
+        StringAttributeValue projectionAttribute = new StringAttributeValue(
+                new JavaSymbolName("projection"),
+                projection != null ? projection.toString() : "EPSG3857");
+        mapViewerAnnotation.addAttribute(projectionAttribute);
 
         annotations.add(mapViewerAnnotation);
 

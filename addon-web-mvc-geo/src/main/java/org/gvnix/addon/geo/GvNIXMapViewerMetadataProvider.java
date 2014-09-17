@@ -125,10 +125,18 @@ public final class GvNIXMapViewerMetadataProvider extends
             }
         }
 
+        // Getting projection
+        String projection = "";
+        AnnotationAttributeValue<Object> projectionAttr = mapViewerAnnotation
+                .getAttribute("projection");
+        if (projectionAttr != null) {
+            projection = projectionAttr.getValue().toString();
+        }
+
         return new GvNIXMapViewerMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, projectOperations,
                 typeLocationService, this.fileManager, entitiesToVisualize,
-                path, mapId);
+                path, mapId, projection);
     }
 
     /**

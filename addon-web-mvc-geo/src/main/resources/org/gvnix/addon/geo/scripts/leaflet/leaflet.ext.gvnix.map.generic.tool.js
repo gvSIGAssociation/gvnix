@@ -195,12 +195,16 @@ var GvNIX_Map_Generic_Tool;
 			"fnOnClickTool": function onClickTool(element, instance){
 				if(!jQuery(element).hasClass("mapviewer_tool_selected")){
 					var functionName = instance._data.activateFunction;
-					var response = true;
-					if(!instance._data.actionTool){
-						response = instance.fnSetCurrentTool();
-					}
-					if( functionName !== "" && response){
-						window[functionName](element, instance, instance.fnGetMapObject());
+					if(functionName !== "" && window[functionName] !== undefined){
+						var response = true;
+						if(!instance._data.actionTool){
+							response = instance.fnSetCurrentTool();
+						}
+						if(response){
+							window[functionName](element, instance, instance.fnGetMapObject());
+						}
+					}else{
+						console.log("You need to define activateFunction on current tool");
 					}
 				}
 			},

@@ -135,8 +135,8 @@ public class GeoCommands implements CommandMarker {
     public void addMap(
             @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the new Map Controller") final JavaType controller,
             @CliOption(key = "preferredMapping", mandatory = true, optionContext = UPDATE_PROJECT, help = "Indicates a specific request mapping path for this map (eg /foo); no default value") final JavaSymbolName path,
-            @CliOption(key = "projection", mandatory = false, help = "Indicates which CRS you want to use on current wms layer. DEFAULT: EPSG3857") final ProjectionCRSTypes crs) {
-        operations.addMap(controller, path);
+            @CliOption(key = "projection", mandatory = false, help = "Indicates which CRS you want to use on current wms layer.  Don't change this if you're not sure what it means. If you change it, you must to specify URL param. DEFAULT: EPSG3857. ") final ProjectionCRSTypes crs) {
+        operations.addMap(controller, path, crs);
     }
 
     /**

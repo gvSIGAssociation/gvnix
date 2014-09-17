@@ -38,4 +38,10 @@ public @interface GvNIXMapViewer {
      */
     Class<?>[] entityLayers();
 
+    /**
+     * 
+     * @return in which projection works the map view
+     */
+    String projection();
+
 }

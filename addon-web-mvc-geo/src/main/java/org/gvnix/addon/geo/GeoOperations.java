@@ -79,7 +79,7 @@ public interface GeoOperations extends Feature {
      * @param controller
      * @param path
      */
-    void addMap(JavaType controller, JavaSymbolName path);
+    void addMap(JavaType controller, JavaSymbolName path, ProjectionCRSTypes crs);
 
     /**
      * This method include all GEO entities on specific map

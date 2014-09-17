@@ -81,7 +81,8 @@ public class GvNIXMapViewerMetadata extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             ProjectOperations projectOperations,
             TypeLocationService typeLocationService, FileManager fileManager,
-            List<JavaType> entities, String path, String mapId) {
+            List<JavaType> entities, String path, String mapId,
+            String projection) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         // Generating necessary methods
@@ -99,7 +100,7 @@ public class GvNIXMapViewerMetadata extends
 
         // Updating show.jspx with entities to display
         updateJSPXFiles(entities, finalPath, typeLocationService,
-                projectOperations, fileManager, mapId);
+                projectOperations, fileManager, mapId, projection);
     }
 
     /**
@@ -115,7 +116,7 @@ public class GvNIXMapViewerMetadata extends
     private void updateJSPXFiles(List<JavaType> entities, String path,
             TypeLocationService typeLocationService,
             ProjectOperations projectOperations, FileManager fileManager,
-            String mapId) {
+            String mapId, String projection) {
 
         PathResolver pathResolver = projectOperations.getPathResolver();
         // Getting jspx file path
@@ -139,7 +140,7 @@ public class GvNIXMapViewerMetadata extends
             if (!zValue.equals("user-managed")) {
 
                 // Manage and Update map
-                updateMapElement(mapElement, zValue, mapId);
+                updateMapElement(mapElement, zValue, mapId, projection);
 
                 // Getting toc element
                 Element tocElement = getOrCreateTocElement(docRoot, docXml,
@@ -427,7 +428,7 @@ public class GvNIXMapViewerMetadata extends
      * @param mapId
      */
     private void updateMapElement(Element mapElement, String zValue,
-            String mapId) {
+            String mapId, String projection) {
 
         // Getting correct z value
         String validZValue = XmlRoundTripUtils
@@ -442,6 +443,9 @@ public class GvNIXMapViewerMetadata extends
         if (!mapElement.getAttribute("id").equals(mapId)) {
             mapElement.setAttribute("id", mapId);
         }
+
+        // Regenerating projection
+        mapElement.setAttribute("projection", projection);
 
     }
 

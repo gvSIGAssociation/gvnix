@@ -97,7 +97,12 @@ var GvNIX_Map_Leaflet;
 	        /**
 	         * Control Toolbar object
 	         */
-	        "controlToolbar": null
+	        "controlToolbar": null,
+	        
+	        /**
+	         * Projection of the current map
+	         */
+	        "projection": divData.projection
 	        
 		};
 		
@@ -168,7 +173,12 @@ var GvNIX_Map_Leaflet;
     	        /**
     	         * Control Toolbar object
     	         */
-    	        "controlToolbar": null
+    	        "controlToolbar": null,
+    	        
+    	        /**
+    	         * Projection of the current map
+    	         */
+    	        "projection": divData.projection
     	        
 			};
 		
@@ -192,7 +202,7 @@ var GvNIX_Map_Leaflet;
 			"_fnConstruct" : function(instance){
 					var data = this._data;
 					// Initialize map
-					this._fnInitializeMap(data.id, data.center, data.zoom, data.maxZoom, data.url);
+					this._fnInitializeMap(data.id, data.center, data.zoom, data.maxZoom, data.url, data.projection);
 					// Initialize toolbar
 					this._fnInitializeToolBar();
 					// Initialize Storage Event
@@ -202,7 +212,7 @@ var GvNIX_Map_Leaflet;
 			/**
 			 * Function to initialize Map
 			 * */
-			"_fnInitializeMap": function initializeMap(divId, center, zoom, maxZoom, url) {
+			"_fnInitializeMap": function initializeMap(divId, center, zoom, maxZoom, url, projection) {
 				// Saving instance
 				var instance = this;
 				
@@ -224,11 +234,14 @@ var GvNIX_Map_Leaflet;
             	   lng = savedLatLng[1];
                }
                
+               	// Create projection object
+               	var crsObject = L.CRS[projection];
                 // Creating Map
 				this._data.map = L.map(divId, {
 	  				center: [lat , lng], 
 	  				zoom: zoom,
-	  		        zoomControl: false
+	  		        zoomControl: false,
+	  		        crs: crsObject
 				});
                 
 				// Adding zoom control on top right position
