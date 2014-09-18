@@ -25,7 +25,7 @@ import org.springframework.roo.metadata.internal.AbstractMetadataCache;
  * This implementation is not thread safe. It should only be accessed by a
  * single thread at a time. This is enforced by the process manager semantics,
  * so we avoid the cost of re-synchronization here.
- *
+ * 
  * @author Ben Alex
  * @since 1.0
  */

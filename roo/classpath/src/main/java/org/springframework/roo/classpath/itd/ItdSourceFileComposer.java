@@ -205,12 +205,12 @@ public class ItdSourceFileComposer {
         }
 
         content = true;
-
+        
         appendIndent();
         append("declare precedence: ");
-
-        List<String> aspectNames = new ArrayList<String>(aspects.size());
-
+        
+        List<String> aspectNames = new ArrayList<String>(aspects.size()); 
+        
         for (final JavaType aspect : aspects) {
             if (resolver
                     .isFullyQualifiedFormRequiredAfterAutoImport(aspect)) {

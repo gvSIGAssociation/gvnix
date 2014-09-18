@@ -171,6 +171,10 @@ public class DatatablesMetadata extends
 
     private static final String SIZE_VAR = "size";
 
+    private static final String SORT_FIELD_NAME = "sortFieldName";
+
+    private static final String SORT_ORDER = "sortOrder";
+
     private static final String PAGE_VAR = "page";
 
     private static final String PARAMS_VAR = "params";
@@ -3466,13 +3470,23 @@ public class DatatablesMetadata extends
         // public String OwnerController.list(
         // @RequestParam(value = "page", required = false) Integer page,
         // @RequestParam(value = "size", required = false) Integer size,
+
+        /** Added on 1.2.6.RELEASE Roo Version */
+        // @RequestParam(value = "sortFieldName", required = false) String
+        // sortFieldName,
+        // @RequestParam(value = "sortOrder", required = false) String sortOrder
+        /** Added on 1.2.6.RELEASE Roo Version */
+
         // Model uiModel) {
 
         // Define method parameter types
         final List<AnnotatedJavaType> parameterTypes = Arrays.asList(
                 helper.createRequestParam(JavaType.INT_OBJECT, PAGE_VAR, false,
                         null), helper.createRequestParam(JavaType.INT_OBJECT,
-                        SIZE_VAR, false, null), new AnnotatedJavaType(MODEL));
+                        SIZE_VAR, false, null), helper.createRequestParam(
+                        JavaType.STRING, SORT_FIELD_NAME, false, null), helper
+                        .createRequestParam(JavaType.STRING, SORT_ORDER, false,
+                                null), new AnnotatedJavaType(MODEL));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -3502,7 +3516,8 @@ public class DatatablesMetadata extends
         // Define method parameter names
         final List<JavaSymbolName> parameterNames = Arrays.asList(
                 new JavaSymbolName(PAGE_VAR), new JavaSymbolName(SIZE_VAR),
-                UI_MODEL);
+                new JavaSymbolName(SORT_FIELD_NAME), new JavaSymbolName(
+                        SORT_ORDER), UI_MODEL);
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();

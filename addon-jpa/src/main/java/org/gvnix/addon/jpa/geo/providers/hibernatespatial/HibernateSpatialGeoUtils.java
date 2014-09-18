@@ -52,7 +52,7 @@ public class HibernateSpatialGeoUtils {
             // Getting providerValue
             String providerValue = node.item(0).getNodeValue();
             // If provider selected is HIBERNATE returns true
-            if (providerValue.equals("org.hibernate.ejb.HibernatePersistence")) {
+            if (providerValue.startsWith("org.hibernate")) {
                 return true;
             }
             return false;
@@ -174,6 +174,15 @@ public class HibernateSpatialGeoUtils {
         return dialects;
     }
 
+    /**
+     * 
+     * Checks if Hibernate Spatial is installed
+     * 
+     * @param fileManager
+     * @param pathResolver
+     * @param currentClass
+     * @return
+     */
     public static boolean isHibernateSpatialPersistenceInstalled(
             FileManager fileManager, PathResolver pathResolver,
             Class currentClass) {

@@ -11,7 +11,7 @@ simply like to try a release that has already been built, tested and
 distributed by the core development team, we recommend that you visit
 the Spring Roo home page and download an official release:
 
-   http://www.springsource.org/roo
+   http://projects.spring.io/spring-roo/
 
 ======================================================================
 ONE-TIME SETUP INSTRUCTIONS
@@ -21,7 +21,8 @@ We'll assume you typed the following to checkout Roo (if not, adjust
 the paths in the following instructions accordingly):
 
   cd ~
-  git clone git@github.com:SpringSource/spring-roo.git
+  git clone git@github.com:spring-projects/spring-roo.git
+
 
 In the instructions below, $ROO_HOME refers to the location where you
 checked out Roo (in this case it would be ROO_HOME="~/roo"). You do NOT
@@ -196,7 +197,7 @@ Setup Git correctly before you do anything else:
 
 Perform the initial checkout with this:
 
-  git clone git@github.com:SpringSource/spring-roo.git
+  git clone git@github.com:spring-projects/spring-roo.git
 
 Let's take the simple case where you just want to make a minor change
 against master. You don't want a new branch etc, and you only want a
@@ -299,7 +300,7 @@ RELEASE PROCEDURE:
 
 5. Build the reference guide and deploy to the static staging server.
    You must be connected to the VPN for deployment to work. Note that
-   http://www.springsource.org/roo is updated bi-hourly from staging:
+   http://projects.spring.io/spring-roo/ is updated bi-hourly from staging:
 
    cd $ROO_HOME/deployment-support
    mvn clean site site:deploy
@@ -354,7 +355,7 @@ to defer step 8 (and beyond) until you're sure everything is fine.
 
 PRE-NOTIFICATION TESTING:
 
-   * Visit http://www.springsource.org/roo/start, click "DOWNLOAD!"
+   * Visit http://projects.spring.io/spring-roo/, click "DOWNLOAD!"
    * Ensure it unzips OK and the sha1sum matches the downloaded .sha
    * rm -rf ~/.m2/repository/org/springframework/roo
    * Use "roo script clinic.roo" to build a new Roo project
@@ -367,11 +368,9 @@ Once the release is completed (ie all steps above) you'll typically:
    * Mark the version as "released" in JIRA (Admin > JIRA Admin...)
    * Publish a blog.springsource.com entry explaining what's new
    * Update http://en.wikipedia.org/wiki/Spring_Roo with the version
-   * Update http://www.springsource.org/node/2/ with the version
-   * Add a "News" announcement http://www.springsource.org
-   * Add a "News" announcement http://forum.springframework.org
-   * Add a "Roo" forum announcement http://forum.springframework.org
-   * Edit http://forum.springsource.org/showthread.php?t=71985
+   * Add a "News" announcement http://forum.spring.io/forum/spring-projects/roo
+   * Add a "Roo" forum announcement http://forum.spring.io/forum/spring-projects/roo
+   * Edit http://forum.spring.io/forum/spring-projects/roo/64079-latest-project-links-and-version-details
    * Tweet from @SpringRoo (NB: ensure #SpringRoo is in the message)
    * Tweet from your personal account
    * Email dev list
@@ -383,6 +382,6 @@ HELP
 
 There are no developer-specific forums or mailing lists for Roo. If
 you have any questions, please use the community support forum at
-http://forum.springsource.org/forumdisplay.php?f=67. Thanks for your
+http://forum.spring.io/forum/spring-projects/roo. Thanks for your
 interest in Spring Roo!
 
