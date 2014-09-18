@@ -193,7 +193,7 @@ var GvNIX_RowOnTop;
 		"fnSetTableIdHash": function(){
 			var _d = this._data;
 			var oTable = _d.dt.oInstance;
-			var encodedId = window.btoa(unescape(encodeURIComponent( oTable.attr("id") )));
+			var encodedId = jQuery.base64.encode(unescape(encodeURIComponent( oTable.attr("id") )));
 			_d.asTableIdHash = [fnGetHashCode(encodedId) + ""];
 		},
 

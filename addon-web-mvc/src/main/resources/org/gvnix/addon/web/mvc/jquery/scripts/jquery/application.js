@@ -353,10 +353,10 @@ function jQueryInitializeComponents(context) {
       });
     });
 
-    //Calling all callback functions
-    callbackFunctionsNames.forEach(function(name){
-    	functionCallbacks.fire(name,[context]);
-    });
+    jQuery.each(callbackFunctionsNames, function(index, callbackFunctionName) {
+    	  functionCallbacks.fire(callbackFunctionName, [context]);
+	});
+
 }
 
 
