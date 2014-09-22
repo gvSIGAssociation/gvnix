@@ -461,6 +461,9 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
         LOGGER.log(Level.INFO, "");
         LOGGER.log(
                 Level.INFO,
+                "org.hibernate.dialect.H2Dialect ==> org.hibernate.spatial.dialect.h2geodb.GeoDBDialect");
+        LOGGER.log(
+                Level.INFO,
                 "org.hibernate.dialect.PostgreSQLDialect ==> org.hibernate.spatial.dialect.postgis.PostgisDialect");
         LOGGER.log(
                 Level.INFO,

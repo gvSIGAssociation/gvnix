@@ -9,7 +9,7 @@
 			</repository>
 		</repositories>
 		<properties>
-			<querydsl.version>3.1.1</querydsl.version>
+			<querydsl.version>3.4.3</querydsl.version>
 		</properties>
 	    <dependencies>
     		<dependency>
@@ -31,6 +31,17 @@
 				<groupId>com.mysema.querydsl</groupId>
 				<artifactId>querydsl-jpa</artifactId>
 				<version>${querydsl.version}</version>
+			</dependency>
+			<dependency>
+			  <groupId>com.mysema.querydsl</groupId>
+			  <artifactId>querydsl-spatial</artifactId>
+			  <version>${querydsl.version}</version>
+			  <exclusions>
+			  	<exclusion>
+			  		<groupId>org.geolatte</groupId>
+      				<artifactId>geolatte-geom</artifactId>
+			  	</exclusion>
+			  </exclusions>
 			</dependency>
     	</dependencies>
 	</gvnix>

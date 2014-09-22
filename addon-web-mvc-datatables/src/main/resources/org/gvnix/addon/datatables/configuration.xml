@@ -3,6 +3,14 @@
 	<gvnix>
 		<repositories>
 			<repository>
+				<id>OSGEO GeoTools repo</id>
+				<url>http://download.osgeo.org/webdav/geotools</url>
+			</repository>
+			<repository>
+				<id>Hibernate Spatial repo</id>
+				<url>http://www.hibernatespatial.org/repository</url>
+			</repository>
+			<repository>
 				<id>gvNIX Add-on repository</id>
 				<name>gvNIX Add-on repository</name>
 				<url>https://gvnix.googlecode.com/svn/repo</url>
@@ -41,6 +49,23 @@
 				<groupId>com.mysema.querydsl</groupId>
 				<artifactId>querydsl-jpa</artifactId>
 				<version>${querydsl.version}</version>
+			</dependency>
+			<!-- Hibernate Spatial -->
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-spatial</artifactId>
+				<version>4.3</version>
+			</dependency>
+			<dependency>
+			  <groupId>com.mysema.querydsl</groupId>
+			  <artifactId>querydsl-spatial</artifactId>
+			  <version>${querydsl.version}</version>
+			  <exclusions>
+			  	<exclusion>
+			  		<groupId>org.geolatte</groupId>
+      				<artifactId>geolatte-geom</artifactId>
+			  	</exclusion>
+			  </exclusions>
 			</dependency>
 		</dependencies>
 	</gvnix>

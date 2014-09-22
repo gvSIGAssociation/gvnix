@@ -9,6 +9,11 @@
 			<id>Hibernate Spatial repo</id>
 			<url>http://www.hibernatespatial.org/repository</url>
 		</repository>
+		<repository>
+            <id>gvNIX Add-on repository</id>
+            <url>https://gvnix.googlecode.com/svn/repo</url>
+            <name>gvNIX Add-on repository</name>
+        </repository>
 	</repositories>
 	<dependencies>
 		<!-- Hibernate Spatial -->
@@ -17,8 +22,15 @@
 			<artifactId>hibernate-spatial</artifactId>
 			<version>4.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.opengeo</groupId>
+			<artifactId>geodb</artifactId>
+			<version>0.8</version>
+		</dependency>
 	</dependencies>
 	<dialects>
+		<dialect id="org.hibernate.dialect.H2Dialect"
+			value="org.hibernate.spatial.dialect.h2geodb.GeoDBDialect" />
 		<dialect id="org.hibernate.dialect.PostgreSQLDialect"
 			value="org.hibernate.spatial.dialect.postgis.PostgisDialect" />
 		<dialect id="org.hibernate.dialect.MySQLDialect"

@@ -462,8 +462,10 @@ public class DatatablesMetadata extends
             if (this.findersRegistered != null) {
                 for (Entry<FinderMetadataDetails, QueryHolderTokens> finder : this.findersRegistered
                         .entrySet()) {
-                    builder.addMethod(getAjaxFinderMethod(finder.getKey(),
-                            finder.getValue()));
+                    if (finder.getValue() != null) {
+                        builder.addMethod(getAjaxFinderMethod(finder.getKey(),
+                                finder.getValue()));
+                    }
                 }
             }
 
