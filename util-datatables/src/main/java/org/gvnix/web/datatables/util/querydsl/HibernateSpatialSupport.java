@@ -15,15 +15,40 @@ package org.gvnix.web.datatables.util.querydsl;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Maps;
 import com.mysema.query.spatial.SpatialOps;
 import com.mysema.query.types.Operator;
+import com.mysema.query.types.OperatorImpl;
 
 public class HibernateSpatialSupport {
 
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(HibernateSpatialSupport.class);
+
+    private static Map<Operator<?>, String> spatialOps = null;
+
     public static Map<Operator<?>, String> getSpatialOps(String prefix,
             boolean asFunction) {
+        if (spatialOps != null) {
+            return spatialOps;
+        }
         Map<Operator<?>, String> ops = Maps.newHashMap();
+
+        // Initialize spatialOps whatever exception found
+        spatialOps = ops;
+        try {
+            // Check for 3.4.1 QueryDSL required constructor
+            OperatorImpl.class.getConstructor(String.class, String.class);
+        }
+        catch (NoSuchMethodException ex) {
+            LOGGER.warn("No Hibernate Spatial supported added: Check queryDSL library version");
+            LOGGER.debug("Exception Initializing Hibernate Spatial support", ex);
+            return ops;
+        }
+
         ops.put(SpatialOps.DIMENSION, "dimension({0})");
         ops.put(SpatialOps.GEOMETRY_TYPE, "geometrytype({0}, {1})");
         ops.put(SpatialOps.SRID, "srid({0})");
@@ -54,6 +79,7 @@ public class HibernateSpatialSupport {
         // dwithin({0}, {1}, 2)
         ops.put(SpatialOps.TRANSFORM, "transform({0}, {1})");
         // extent({0})
+
         return ops;
     }
 }
