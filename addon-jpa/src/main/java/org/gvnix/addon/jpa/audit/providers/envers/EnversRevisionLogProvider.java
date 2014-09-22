@@ -70,12 +70,12 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
             .getLogger(EnversRevisionLogProvider.class);
 
     private static final Dependency HIBERNATE_DEPENDENCY = new Dependency(
-            "org.hibernate", "hibernate-entitymanager", "4.2.2.Final");
+            "org.hibernate", "hibernate-entitymanager", "4.3.6.Final");
 
     private static final Dependency HIBERNATE_ENVERS_DEPENDENCY = new Dependency(
-            "org.hibernate", "hibernate-envers", "4.2.2.Final");
+            "org.hibernate", "hibernate-envers", "4.3.6.Final");
 
-    private static final String HIBERNATE_PERSISTENCE_PROVIDER_CLASS = "org.hibernate.ejb.HibernatePersistence";
+    private static final String HIBERNATE_PERSISTENCE_PROVIDER_CLASS = "org.hibernate.jpa.HibernatePersistenceProvider";
 
     private static String PROVIDER_NAME = "H-ENVERS";
     private static String PROVIDER_DESCRIPTION = "Revision-log provider base on Hibernate envers module";
