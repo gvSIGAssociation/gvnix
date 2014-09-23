@@ -489,7 +489,7 @@ var GvNIX_Loupe;
 					setTimeout(function(){
 						// Hidding dropdown div
 						$("#" + data.name + "_dropdown_div" + sufix).html("");
-					},100);
+					},500);
 				})
 			},
 			
@@ -747,7 +747,6 @@ var GvNIX_Loupe;
 							"$('#" + inputData.name + "_dropdown_div_itemid_" + item[pkField] + "').on"
 								+ "('click'," + "function(e){" 
 									+ "$('#" + inputId + "').val('"+ item.__caption__ + "');" 
-									+ "$('#" + inputData.name+ "_dropdown_div"+ sufix +"').html('');" 
 									+ "$('#" + inputData.name+ "_loupe_hidden"+ sufix +"').val(" + item[pkField] + ");"
 									+ "$('#" + inputData.name+ "_loupe_hidden"+ sufix +"').trigger('change');"
 									+ "GvNIX_Loupe.prototype._fnSetItemCallback.fire('" + onSetNameFunction + "',['" + i +"']);"
