@@ -17,8 +17,7 @@
  */
 package org.gvnix.addon.datatables;
 
-import org.springframework.roo.model.JavaPackage;
-import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.*;
 import org.springframework.roo.project.Feature;
 
 /**
@@ -57,9 +56,11 @@ public interface DatatablesOperations extends Feature {
      * @param ajax
      * @param mode
      * @param inlineEditing
+     * @param baseFilter
      */
+
     void annotateController(JavaType controller, boolean ajax, String mode,
-            boolean inlineEditing);
+            boolean inlineEditing, JavaSymbolName baseFilter);
 
     /**
      * Annotate the provided web mvc controller with {@link GvNIXDatatables}

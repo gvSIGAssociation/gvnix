@@ -189,12 +189,12 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
     /** {@inheritDoc} */
     public void annotateController(JavaType javaType, boolean ajax) {
-        annotateController(javaType, ajax, "", false);
+        annotateController(javaType, ajax, "", false, null);
     }
 
     /** {@inheritDoc} */
     public void annotateController(JavaType javaType, boolean ajax,
-            String mode, boolean inlineEditing) {
+            String mode, boolean inlineEditing, JavaSymbolName baseFilter) {
         Validate.notNull(javaType, "Controller required");
 
         ClassOrInterfaceTypeDetails existing = getControllerDetails(javaType);
@@ -252,6 +252,11 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 annotationBuilder.addStringAttribute("mode", mode);
             }
 
+            if (baseFilter != null) {
+                annotationBuilder.addStringAttribute("baseFilter",
+                        baseFilter.toString());
+            }
+
             // Add annotation to target type
             classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder
                     .build());
@@ -263,6 +268,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
             // doUpdateListMenuUrl(javaType, controllerAnnotation);
         }
+
     }
 
     /** {@inheritDoc} */

@@ -100,12 +100,9 @@ import static org.springframework.roo.model.SpringJavaType.RESPONSE_BODY;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
@@ -114,42 +111,22 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.addon.jpa.query.JpaQueryMetadata;
 import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.gvnix.support.WebItdBuilderHelper;
-import org.springframework.roo.addon.finder.FieldToken;
-import org.springframework.roo.addon.finder.ReservedToken;
-import org.springframework.roo.addon.finder.Token;
-import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
-import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
-import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
-import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
+import org.springframework.roo.addon.finder.*;
+import org.springframework.roo.addon.web.mvc.controller.details.*;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.FieldMetadataBuilder;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MethodMetadata;
-import org.springframework.roo.classpath.details.MethodMetadataBuilder;
-import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
-import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
+import org.springframework.roo.classpath.details.*;
+import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.details.comments.CommentStructure;
 import org.springframework.roo.classpath.details.comments.JavadocComment;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.model.DataType;
-import org.springframework.roo.model.JavaSymbolName;
-import org.springframework.roo.model.JavaType;
-import org.springframework.roo.model.JdkJavaType;
-import org.springframework.roo.model.SpringJavaType;
-import org.springframework.roo.project.LogicalPath;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.model.*;
+import org.springframework.roo.project.*;
 import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
@@ -192,7 +169,6 @@ public class DatatablesMetadata extends
     private static final JavaSymbolName RETRIEVE_DATA_METHOD_NAME = new JavaSymbolName(
             "retrieveData");
 
-    @SuppressWarnings("unused")
     private static final Logger LOGGER = HandlerUtils
             .getLogger(DatatablesMetadata.class);
 
@@ -428,7 +404,7 @@ public class DatatablesMetadata extends
         builder.addMethod(getPopulateParameterMapMethod());
         builder.addMethod(getGetPropertyMapMethod());
         builder.addMethod(getGetPropertyMapUrlMethod());
-        builder.addMethod(getSetDatatablesBaseFilterMethod());
+        builder.addMethod(getSetDatatablesBaseFilterMethod(annotationValues));
 
         // Detail methods
         builder.addMethod(getListDatatablesDetailMethod());
@@ -1267,6 +1243,7 @@ public class DatatablesMetadata extends
                 "%s propertyMap = %s(%s, propertyNames);",
                 helper.getFinalTypeName(MAP_STRING_OBJECT),
                 GET_PROPERTY_MAP.getSymbolName(), entityName));
+
         //
         bodyBuilder.appendFormalLine("");
         //
@@ -1447,9 +1424,12 @@ public class DatatablesMetadata extends
      * Gets <code>setDatatablesBaseFilter</code> method. <br>
      * This method is used to set baseFilters into datatables
      * 
+     * @param annotationValues
+     * 
      * @return
      */
-    private MethodMetadata getSetDatatablesBaseFilterMethod() {
+    private MethodMetadata getSetDatatablesBaseFilterMethod(
+            DatatablesAnnotationValues annotationValues) {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
                 .convertFromJavaTypes(MAP_STRING_OBJECT);
@@ -1476,7 +1456,7 @@ public class DatatablesMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildSetDatatablesBaseFilterMethodBody(bodyBuilder);
+        buildSetDatatablesBaseFilterMethodBody(bodyBuilder, annotationValues);
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -2225,21 +2205,49 @@ public class DatatablesMetadata extends
      * This method returns a Map with bean properties which appears on a
      * Enumeration (usually from httpRequest.getParametersNames())
      * 
+     * @param annotationValues2
+     * 
      * @return
      */
     private void buildSetDatatablesBaseFilterMethodBody(
-            InvocableMemberBodyBuilder bodyBuilder) {
+            InvocableMemberBodyBuilder bodyBuilder,
+            DatatablesAnnotationValues annotationValues) {
 
-        /*
-         * // todo: Add here your baseFilters to propertyMap. // This code will
-         * be generated by gvNIX commands/annotation // on future.
-         */
+        // Add here your baseFilters to propertyMap.
+        bodyBuilder
+                .appendFormalLine("// Add here your baseFilters to propertyMap.");
 
-        bodyBuilder
-                .appendFormalLine("// TODO: Add here your baseFilters to propertyMap.");
-        bodyBuilder
-                .appendFormalLine("//		 This code will be generated by gvNIX commands/annotation");
-        bodyBuilder.appendFormalLine("//		 on future.");
+        String baseFilter = annotationValues.getBaseFilter();
+
+        if (baseFilter != null) {
+
+            for (String i : baseFilter.split("And")) {
+
+                String[] values = i.split("[A-Z][A-Z]+");
+
+                String operation = "";
+                for (BaseFilterOperationTypes op : BaseFilterOperationTypes
+                        .values()) {
+                    if (i.contains(op.toString()))
+                        operation = op.toString();
+                }
+
+                if (operation.equals("")) {
+                    LOGGER.log(Level.INFO, "Invalid operation for base filter.");
+                }
+                else {
+
+                    String safevalue = "";
+                    if (values.length > 1)
+                        safevalue = values[1];
+
+                    bodyBuilder.appendFormalLine("propertyMap.put(\""
+                            + values[0] + "\",\"" + safevalue + "\");");
+                    bodyBuilder.appendFormalLine("propertyMap.put(\"_operator_"
+                            + values[0] + "\",\"" + operation + "\");");
+                }
+            }
+        }
     }
 
     /**
@@ -4173,9 +4181,9 @@ public class DatatablesMetadata extends
         /*
          * @RequestMapping(value = "/exportcsv", produces = "text/csv") public
          * void PetController.exportCsv(
-         * 
+         *
          * @DatatablesParams DatatablesCriterias criterias,
-         * 
+         *
          * @ModelAttribute Pet pet, HttpServletRequest request,
          * HttpServletResponse response) throws ServletException, IOException,
          * ExportException { ... }

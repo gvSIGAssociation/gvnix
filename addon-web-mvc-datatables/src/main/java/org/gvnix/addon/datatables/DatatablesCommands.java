@@ -17,15 +17,13 @@
  */
 package org.gvnix.addon.datatables;
 
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.model.JavaPackage;
-import org.springframework.roo.model.JavaType;
-import org.springframework.roo.shell.CliAvailabilityIndicator;
-import org.springframework.roo.shell.CliCommand;
-import org.springframework.roo.shell.CliOption;
-import org.springframework.roo.shell.CommandMarker;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.felix.scr.annotations.*;
+import org.springframework.roo.model.*;
+import org.springframework.roo.shell.*;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Web MVC JQuery datatables commands class
@@ -35,6 +33,9 @@ import org.springframework.roo.shell.CommandMarker;
 @Component
 @Service
 public class DatatablesCommands implements CommandMarker {
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(DatatablesCommands.class);
     /**
      * Get a reference to the DatatablesOperations
      */
@@ -82,8 +83,23 @@ public class DatatablesCommands implements CommandMarker {
             @CliOption(key = "type", mandatory = true, help = "The controller to apply this component to") JavaType target,
             @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "true (default) to load data using AJAX, otherwise the data are loaded on page render time") boolean ajax,
             @CliOption(key = "inline", mandatory = false, unspecifiedDefaultValue = "false", help = "Allow user to modify data in-line, that is, enable in-line editing") boolean inline,
-            @CliOption(key = "mode", mandatory = false, unspecifiedDefaultValue = GvNIXDatatables.TABLE, help = "Visualization mode: if empty (default) renders a table, otherwise create one-row-per-page + one-cell-per-row datatable will be created. On each cell the content of given mode will be rendered, that is, by setting mode == show, each cell will have the show.jspx containing the data of the current entity") String mode) {
-        operations.annotateController(target, ajax, mode, inline);
+            @CliOption(key = "mode", mandatory = false, unspecifiedDefaultValue = GvNIXDatatables.TABLE, help = "Visualization mode: if empty (default) renders a table, otherwise create one-row-per-page + one-cell-per-row datatable will be created. On each cell the content of given mode will be rendered, that is, by setting mode == show, each cell will have the show.jspx containing the data of the current entity") String mode,
+            @CliOption(key = "baseFilter", mandatory = false, help = "Add a default base filter to this datatable.  Using the following format: nameEQjohnAndageGT26") JavaSymbolName baseFilter) {
+        if (baseFilter != null
+                && !baseFilter.toString().matches(
+                        "((And)?[a-zA-Z0-9]+[A-Z][B-Z]+[a-zA-Z0-9]*)+")) {
+            LOGGER.log(Level.INFO,
+                    "[ERROR] BaseFilter value " + baseFilter.toString()
+                            + " doesn't match required format.");
+        }
+        else {
+            if (baseFilter != null && ajax != true)
+                LOGGER.log(Level.INFO, "[INFO] BaseFilter with value "
+                        + baseFilter.toString()
+                        + " will not be applied if mode ajax is disabled.");
+            operations.annotateController(target, ajax, mode, inline,
+                    baseFilter);
+        }
     }
 
     /**
