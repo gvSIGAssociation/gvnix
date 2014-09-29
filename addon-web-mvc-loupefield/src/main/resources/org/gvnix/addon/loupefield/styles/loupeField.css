@@ -1,0 +1,13 @@
+/* Loupe */
+
+.loupe-button {
+
+  -moz-border-radius: 0px 4px 4px 0px !important; /* Firefox */
+
+  -webkit-border-radius: 0px 4px 4px 0px !important; /* Safari, Chrome */
+
+  border-radius: 0px 4px 4px 0px !important; /* CSS3 */
+
+  border-left: 0px;
+
+}

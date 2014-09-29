@@ -132,11 +132,16 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         addTagx();
         // Adding scripts/loupefield/jquery.loupeField.ext.gvnix.js
         addLoupeFunctions();
+        // Adding styles/loupefield/loupeField.css
+        addLoupeStyles();
         // Add necessary properties to messages.properties
         addI18nProperties();
         // Include jquery.loupeField.ext.gvnix.js into load-scripts.tagx
         addToLoadScripts("loupe_js_url",
                 "/resources/scripts/loupefield/jquery.loupeField.ext.gvnix.js");
+        // Add style css for components
+        addToLoadScripts("loupe_css_url",
+                "/resources/styles/loupefield/loupeField.css");
         // Add Necessary Dependencies
         setupProjectPom();
     }
@@ -147,11 +152,16 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         updateTagx();
         // Adding scripts/loupefield/jquery.loupeField.ext.gvnix.js
         updateLoupeFunctions();
+        // Adding styles/loupefield/loupeField.css
+        updateLoupeStyles();
         // Add necessary properties to messages.properties
         addI18nProperties();
         // Include jquery.loupeField.ext.gvnix.js into load-scripts.tagx
         addToLoadScripts("loupe_js_url",
                 "/resources/scripts/loupefield/jquery.loupeField.ext.gvnix.js");
+        // Add style css for components
+        addToLoadScripts("loupe_css_url",
+                "/resources/styles/loupefield/loupeField.css");
         // Add Necessary Dependencies
         setupProjectPom();
     }
@@ -378,6 +388,34 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
+     * This method adds <code>styles/loupefield/loupeField.css</code> to the
+     * styles folder
+     */
+    public void addLoupeStyles() {
+        final String filePath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, "styles/loupefield/loupeField.css");
+
+        if (!fileManager.exists(filePath)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = FileUtils.getInputStream(getClass(),
+                        "styles/loupeField.css");
+                outputStream = fileManager.createFile(filePath)
+                        .getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            }
+            catch (final IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
+    }
+
+    /**
      * This method adds <code>scripts/loupefield/loupe-callbacks.js</code> to
      * the scripts folder and add to load-scripts.js to load in all pages
      */
@@ -432,6 +470,31 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
                 outputStream = fileManager.updateFile(filePath)
                         .getOutputStream();
             }
+            IOUtils.copy(inputStream, outputStream);
+        }
+        catch (final IOException ioe) {
+            throw new IllegalStateException(ioe);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
+        }
+    }
+
+    /**
+     * This method updates <code>styles/loupefield/loupeField.css</code> to the
+     * styles folder
+     */
+    public void updateLoupeStyles() {
+        final String filePath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, "styles/loupefield/loupeField.css");
+
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            inputStream = FileUtils.getInputStream(getClass(),
+                    "styles/loupeField.css");
+            outputStream = fileManager.createFile(filePath).getOutputStream();
             IOUtils.copy(inputStream, outputStream);
         }
         catch (final IOException ioe) {

@@ -14,105 +14,138 @@
   <jsp:directive.attribute name="disableFormBinding" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Set to true to disable Spring form binding" />
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
-  
+
   <!-- Configuration -->
   <jsp:directive.attribute name="listPath" type="java.lang.String" required="true" description="Path where the selector view is (Ex: path/list)" />
   <jsp:directive.attribute name="controllerPath" type="java.lang.String" required="true" rtexprvalue="true" description="The relative path to the referenced resource" />
   <jsp:directive.attribute name="pkField" type="java.lang.String" required="true" description="Search by this field" />
   <jsp:directive.attribute name="max" type="java.lang.String" required="false" description="Max results to show (Default 3)" />
-  <jsp:directive.attribute name="caption" type="java.lang.String" required="false" description="Entity Field to use as caption" />
+  <jsp:directive.attribute name="caption" type="java.lang.String" required="false" description="Entity fields to use as caption (Separated by commas)" />
   <jsp:directive.attribute name="additionalFields" type="java.lang.String" required="false" description="Additional fields to return in ajax (Separated by commas)" />
   <jsp:directive.attribute name="baseFilter" type="java.lang.String" required="false" description="Base Filter to add to the query (Ex: propA=1||propB=2)" />
   <!-- Callbacks configuration -->
   <jsp:directive.attribute name="onSetFunction" type="java.lang.String" required="false" description="Method to use when property sets" />
   <jsp:directive.attribute name="onDrawFunction" type="java.lang.String" required="false" description="Method to use when property sets" />
+  <jsp:directive.attribute name="onAcceptFunction" type="java.lang.String" required="false" description="Method to use when push accept in modal" />
 
-  <c:if test="${empty render or render}">
+  <jsp:directive.attribute name="value" type="java.lang.Object" required="false" rtexprvalue="true" description="Value for input tag (don't use spring tags)" />
+  <jsp:directive.attribute name="modalWidth" type="java.lang.String" required="false" description="Specify width for the window opened when push loupe button (default 800)" />
+  <jsp:directive.attribute name="hiddeUtilbox" type="java.lang.String" required="false" description="Specify if hidde elements with utilbox class (default true)" />
+  <jsp:directive.attribute name="searchField" type="java.lang.String" required="false" description="Specify the field used to search when the input lost focus (default first element of caption)" />
 
-      <c:set var="sec_field">
-	      <spring:escapeBody javaScriptEscape="true" >${field}</spring:escapeBody>
-	  </c:set>
+		<c:if test="${empty render or render}">
 
-	  <c:if test="${empty disabled}">
-	  	<c:set var="disabled" value="false" />
-	  </c:if>
+				<c:set var="sec_field">
+						<spring:escapeBody javaScriptEscape="true">${field}</spring:escapeBody>
+				</c:set>
 
-      <c:if test="${empty label}">
-      	<spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label" htmlEscape="false" />
-      </c:if>
+				<c:if test="${empty disableFormBinding}">
+						<c:set var="disableFormBinding" value="false" />
+				</c:if>
 
-      <!-- Generating i18 codes -->
-      <spring:message code="button_accept" var="button_accept" htmlEscape="false"/>
-      <spring:message code="button_view_more" var="button_view_more" htmlEscape="false"/>
+				<c:if test="${empty disabled}">
+						<c:set var="disabled" value="false" />
+				</c:if>
 
-      <!-- Generating controller url -->
-      <spring:url value="${request}/${controllerPath}" var="controller_path_url"></spring:url>
+				<c:if test="${empty modalWidth}">
+						<c:set var="modalWidth" value="800" />
+				</c:if>
 
-      <div id="_${fn:escapeXml(id)}_id" class="control-group form-group">
-      	  <label for="_${sec_field}_id" class="control-label">
-            <c:out value="${fn:escapeXml(label)}" />
-            :
-          </label>
-      	<div class="controls">
-          	<c:choose>
-          		<c:when test="${disabled eq false}">
-	          		<input autocomplete="off"
-		          		class="form-control input-sm loupe_control"
-		          		id="_${fn:escapeXml(id)}_loupe_input_id"
-		          		type="text"
-		          		data-field= "${field}"
-		          		data-name="${sec_field}"
-		          		data-pkfield = "${pkField}"
-		          		data-max = "${max}"
-		          		data-caption = "${caption}"
-		          		data-additionalfields = "${additionalFields}"
-		          		data-listPath = "${listPath}"
-		          		data-searchbuttonid="_${fn:escapeXml(field)}_button_loupe_search_id"
-		          		data-basefilter="${baseFilter}"
-		          		data-onset="${onSetFunction}"
-		          		data-ondraw="${onDrawFunction}"
-		          		data-parent="_${fn:escapeXml(id)}_id"
-		          		data-listselectorid="_${fn:escapeXml(field)}_list_view_selector_id"
-		          		data-label="${fn:escapeXml(label)}"
-		          		data-inputid="_${fn:escapeXml(id)}_loupe_input_id"
-		          		data-listurl="${listUrl}"
-		          		data-path="${controllerPath}"
-		          		data-controllerurl="${controller_path_url}"
-		          		data-idlabel="_${fn:escapeXml(id)}_loupe_label_id"
-		          		data-acceptlabel="${button_accept}"
-		          		data-viewmorelabel="${button_view_more}"/>
-	          	</c:when>
-	          	<c:otherwise>
-       				<input autocomplete="off"
-		          		class="form-control input-sm loupe_control"
-		          		id="_${fn:escapeXml(id)}_loupe_input_id"
-		          		type="text"
-		          		disabled="${disabled}"
-		          		data-field= "${field}"
-		          		data-name="${sec_field}"
-		          		data-pkfield = "${pkField}"
-		          		data-max = "${max}"
-		          		data-caption = "${caption}"
-		          		data-additionalfields = "${additionalFields}"
-		          		data-listPath = "${listPath}"
-		          		data-searchbuttonid="_${fn:escapeXml(field)}_button_loupe_search_id"
-		          		data-basefilter="${baseFilter}"
-		          		data-onset="${onSetFunction}"
-		          		data-ondraw="${onDrawFunction}"
-		          		data-parent="_${fn:escapeXml(id)}_id"
-		          		data-listselectorid="_${fn:escapeXml(field)}_list_view_selector_id"
-		          		data-label="${fn:escapeXml(label)}"
-		          		data-inputid="_${fn:escapeXml(id)}_loupe_input_id"
-		          		data-listurl="${listUrl}"
-		          		data-path="${controllerPath}"
-		          		data-controllerurl="${controller_path_url}"
-		          		data-idlabel="_${fn:escapeXml(id)}_loupe_label_id"
-		          		data-acceptlabel="${button_accept}"
-		          		data-viewmorelabel="${button_view_more}"/>
-          		</c:otherwise>
-          	</c:choose>
-          	<form:hidden id="${sec_field}_loupe_hidden_bind" name="${sec_field}" path="${field}.${pkField}" />
-       	</div>
-      </div>
-  </c:if>
+				<c:if test="${empty hiddeUtilbox}">
+						<c:set var="hiddeUtilbox" value="true" />
+				</c:if>
+
+				<c:if test="${empty label}">
+						<spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}"
+								var="label" htmlEscape="false" />
+				</c:if>
+
+				<c:if test="${empty searchField}">
+						<c:set var="captionParts" value="${fn:split(caption, ',')}" />
+						<c:set var="searchField" value="${captionParts[0]}" />
+				</c:if>
+
+				<!-- Generating i18 codes -->
+				<spring:message code="button_accept" var="button_accept" htmlEscape="false" />
+				<spring:message code="button_view_more" var="button_view_more"
+						htmlEscape="false" />
+
+				<!-- Generating controller url -->
+				<spring:url value="${request}/${controllerPath}" var="controller_path_url"></spring:url>
+
+				<div id="_${fn:escapeXml(id)}_id" class="control-group form-group">
+						<label for="_${sec_field}_id" class="control-label"> <c:out
+										value="${fn:escapeXml(label)}" /> :
+						</label>
+						<div class="controls input-group">
+								<c:choose>
+										<c:when test="${disabled eq false}">
+												<input autocomplete="off"
+														class="form-control loupe_control"
+														id="_${fn:escapeXml(id)}_loupe_input_id" type="text"
+														data-field="${field}" data-name="${sec_field}"
+														data-pkfield="${pkField}" data-max="${max}"
+														data-caption="${caption}"
+														data-additionalfields="${additionalFields}"
+														data-listPath="${listPath}"
+														data-searchbuttonid="_${fn:escapeXml(field)}_button_loupe_search_id"
+														data-basefilter="${baseFilter}" data-onset="${onSetFunction}"
+														data-ondraw="${onDrawFunction}"
+														data-onaccept="${onAcceptFunction}"
+														data-parent="_${fn:escapeXml(id)}_id"
+														data-listselectorid="_${fn:escapeXml(field)}_list_view_selector_id"
+														data-label="${fn:escapeXml(label)}"
+														data-inputid="_${fn:escapeXml(id)}_loupe_input_id"
+														data-listurl="${listUrl}" data-path="${controllerPath}"
+														data-controllerurl="${controller_path_url}"
+														data-idlabel="_${fn:escapeXml(id)}_loupe_label_id"
+														data-acceptlabel="${button_accept}"
+														data-viewmorelabel="${button_view_more}"
+														data-modalwidth="${modalWidth}"
+														data-hiddeutilbox="${hiddeUtilbox}"
+														data-searchfield="${searchField}"
+														onchange="cleanHiddenInputLoupe('_${fn:escapeXml(id)}_loupe_input_id','${sec_field}_loupe_hidden')" />
+										</c:when>
+										<c:otherwise>
+												<input autocomplete="off"
+														class="form-control loupe_control"
+														id="_${fn:escapeXml(id)}_loupe_input_id" type="text"
+														disabled="${disabled}" data-field="${field}"
+														data-name="${sec_field}" data-pkfield="${pkField}"
+														data-max="${max}" data-caption="${caption}"
+														data-additionalfields="${additionalFields}"
+														data-listPath="${listPath}"
+														data-searchbuttonid="_${fn:escapeXml(field)}_button_loupe_search_id"
+														data-basefilter="${baseFilter}" data-onset="${onSetFunction}"
+														data-ondraw="${onDrawFunction}"
+														data-onaccept="${onAcceptFunction}"
+														data-parent="_${fn:escapeXml(id)}_id"
+														data-listselectorid="_${fn:escapeXml(field)}_list_view_selector_id"
+														data-label="${fn:escapeXml(label)}"
+														data-inputid="_${fn:escapeXml(id)}_loupe_input_id"
+														data-listurl="${listUrl}" data-path="${controllerPath}"
+														data-controllerurl="${controller_path_url}"
+														data-idlabel="_${fn:escapeXml(id)}_loupe_label_id"
+														data-acceptlabel="${button_accept}"
+														data-viewmorelabel="${button_view_more}"
+														data-modalwidth="${modalWidth}"
+														data-hiddeutilbox="${hiddeUtilbox}"
+														data-searchfield="${searchField}"
+														onchange="cleanHiddenInputLoupe('_${fn:escapeXml(id)}_loupe_input_id','${sec_field}_loupe_hidden')" />
+										</c:otherwise>
+								</c:choose>
+								<c:choose>
+										<c:when test="${!disableFormBinding}">
+												<input type="hidden" id="${sec_field}_loupe_hidden_bind"
+														name="${sec_field}" />
+										</c:when>
+										<c:otherwise>
+												<form:hidden id="${sec_field}_loupe_hidden_bind" name="${sec_field}"
+														path="${field}.${pkField}" />
+										</c:otherwise>
+								</c:choose>
+						</div>
+						<form:errors cssClass="errors alert alert-danger" id="_${sec_field}_error_id" path="${sec_field}" />
+				</div>
+		</c:if>
 </jsp:root>
