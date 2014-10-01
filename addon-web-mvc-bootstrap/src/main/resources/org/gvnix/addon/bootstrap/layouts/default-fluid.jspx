@@ -24,29 +24,13 @@
 	</head>
 
   	<body class="tundra spring">
-   		<!-- Fixed navbar dropdown -->
-	<header class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container">
 
-			<div class="navbar-header pull-right">
-				<button type="button" class="navbar-toggle" data-toggle="collapse"
-					data-target=".navbar-collapse">
-					<span class="icon-bar">&#160;</span> <span class="icon-bar">&#160;</span>
-					<span class="icon-bar">&#160;</span>
-				</button>
-			</div>
-			<!-- /navbar-header -->
-
-			<div class="navbar-collapse collapse">
-				<tiles:insertAttribute ignore="true" name="header" />
-				<tiles:insertAttribute ignore="true" name="menu" />
-			</div>
-			<!--/.nav-collapse -->
-
-		</div>
-		<!-- /container -->
-
-	</header>
+    <header class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <tiles:insertAttribute ignore="true" name="header" />
+        <tiles:insertAttribute ignore="true" name="menu" />
+      </div>
+    </header>
 
 	<div class="container-fluid">
 		<div id="main">

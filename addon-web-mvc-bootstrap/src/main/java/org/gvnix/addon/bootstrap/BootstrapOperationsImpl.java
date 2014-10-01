@@ -291,7 +291,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     public void addImageResources() {
 
         List<String> imageFolderFiles = new ArrayList<String>();
-        Collections.addAll(imageFolderFiles, "logo_roo.png", "logo_spring.png");
+        Collections.addAll(imageFolderFiles, "logo_gvnix.png");
 
         Iterator<String> imageFolderIterator = imageFolderFiles.iterator();
 

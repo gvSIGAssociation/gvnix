@@ -1,30 +1,25 @@
-<div id="header" xmlns:jsp="http://java.sun.com/JSP/Page"
-	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
-	xmlns:c="http://java.sun.com/jsp/jstl/core"
-	xmlns:spring="http://www.springframework.org/tags" version="2.0">
-	<jsp:directive.page contentType="text/html;charset=UTF-8" />
-	<jsp:output omit-xml-declaration="yes" />
+<div id="header" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:directive.page contentType="text/html;charset=UTF-8" />
+  <jsp:output omit-xml-declaration="yes" />
 
-	<!-- <spring:url var="banner" value="/resources/images/banner-graphic.png" /> -->
-	<spring:url var="logo_roo" value="/resources/images/logo_roo.png" />
-	<spring:url var="logo_spring" value="/resources/images/logo_spring.png" />
+      <spring:url var="logo_gvnix" value="/resources/images/logo_gvnix.png" />
 
-	<div class="pull-left hidden-xs">
-		<img src="${logo_roo}" />&#160; <img src="${logo_spring}" />&#160;
-	</div>
+			<div class="pull-left">
+				<img src="${logo_gvnix}" />
+			</div>
 
-	<div class="pull-right">
-		<spring:url var="home" value="/" />
-		<spring:message code="button_home" var="home_label" htmlEscape="false" />
-		<spring:message code="application_name" var="project_name"
-			htmlEscape="false" />
-		<a class="navbar-brand nav navbar-nav navbar-right" href="${home}"
-			name="${fn:escapeXml(home_label)}"
-			title="${fn:escapeXml(home_label)}">${fn:escapeXml(project_name)}</a>
-	</div>
+			<div class="pull-right">
+      			<spring:url var="home" value="/" />
+      			<spring:message code="application_name" var="project_name" htmlEscape="false" />
+				<spring:message code="button_home" var="home_label" htmlEscape="false" />
+
+					<a class="navbar-brand nav navbar-right" href="${home}"
+				name="${fn:escapeXml(home_label)}"
+				title="${fn:escapeXml(home_label)}">${fn:escapeXml(project_name)}</a>
+
+			</div>
+
 </div>
-
-
 
 
 

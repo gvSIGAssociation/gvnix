@@ -31,9 +31,9 @@
 			<tiles:insertAttribute ignore="true" name="header"/>
 
 			<!-- Toggle button -->
-			<div class="col-sm-6 pull-left">
+			<div class="col-sm-6 col-xs-3 pull-left">
 				<p class="visible-xs">
-	    			<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Show sidebar</button>
+	    			<button type="button" class="btn btn-success btn-xs" data-toggle="offcanvas">Menu</button>
 	        	</p>
 			</div>
 

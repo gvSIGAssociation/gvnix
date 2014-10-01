@@ -23,21 +23,22 @@
         </title>
 	</head>
 
-  	<body class="tundra spring">
+  <body class="tundra spring">
 
   		<!-- Fixed navbar -->
   		<header class="navbar navbar-inverse navbar-fixed-top" role="banner">
+          <div class="container">
+			       <tiles:insertAttribute ignore="true" name="header"/>
 
-			<tiles:insertAttribute ignore="true" name="header"/>
+        			<!-- Toggle button for sidebar menu -->
+        			<div class="col-sm-6 col-xs-3 pull-left">
+        				<p class="visible-xs">
+        	    			<button type="button" class="btn btn-success btn-xs" data-toggle="offcanvas">Menu</button>
+        	        	</p>
+        			</div>
+          </div>
 
-			<!-- Toggle button -->
-			<div class="col-sm-6 pull-left">
-				<p class="visible-xs">
-	    			<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Show sidebar</button>
-	        	</p>
-			</div>
-
- 		</header>
+ 		 </header>
 
 		<div class="container">
 			<div id="main">

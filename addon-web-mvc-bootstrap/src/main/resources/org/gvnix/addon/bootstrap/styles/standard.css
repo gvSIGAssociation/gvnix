@@ -78,18 +78,29 @@ color: #acc47f;
 @media (max-width: 767px){
 	.navbar-inverse .navbar-nav .open .dropdown-menu>li>a {
 		color: #acc47f;
+		white-space: normal;
 	}
+	.navbar-nav .open .dropdown-menu{
+	 max-width: 300px;
+	}
+	.navbar-nav .open .dropdown-menu li{
+   max-width: 300px;
+  }
+  .col-xs-3 button[data-toggle="offcanvas"]{
+    margin: 15px 0 0;
+  }
 }
 
 @media (min-width: 768px){
 	.navbar-nav {
 	float: none;
-	margin: 0 180px;
+	margin: 0 100px;
 
 	}
 }
 
 /* Custom sidebar menu */
+
 #sidebar-wrapper li a{
 	text-decoration: none;
 	}
