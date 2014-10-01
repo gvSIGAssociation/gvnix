@@ -58,11 +58,6 @@ var GvNIX_Map_Leaflet;
 			 * Max Zoom allowed on Map
 			 */
 			"maxZoom": divData.maxzoom,
-			
-			/**
-			 * URL Server to load map
-			 */
-			"url": divData.url,
 
 	        /**
 	        * Map instance                        
@@ -134,11 +129,6 @@ var GvNIX_Map_Leaflet;
 				 * Max Zoom allowed on Map
 				 */
 				"maxZoom": divData.maxzoom,
-				
-				/**
-				 * URL Server to load map
-				 */
-				"url": divData.url,
 
                 /**
                 * Map instance                        
@@ -202,7 +192,7 @@ var GvNIX_Map_Leaflet;
 			"_fnConstruct" : function(instance){
 					var data = this._data;
 					// Initialize map
-					this._fnInitializeMap(data.id, data.center, data.zoom, data.maxZoom, data.url, data.projection);
+					this._fnInitializeMap(data.id, data.center, data.zoom, data.maxZoom, data.projection);
 					// Initialize toolbar
 					this._fnInitializeToolBar();
 					// Initialize Storage Event
@@ -212,7 +202,7 @@ var GvNIX_Map_Leaflet;
 			/**
 			 * Function to initialize Map
 			 * */
-			"_fnInitializeMap": function initializeMap(divId, center, zoom, maxZoom, url, projection) {
+			"_fnInitializeMap": function initializeMap(divId, center, zoom, maxZoom, projection) {
 				// Saving instance
 				var instance = this;
 				
@@ -250,8 +240,8 @@ var GvNIX_Map_Leaflet;
 				// Adding layers control
 				this._fnAddLayersControl(this._data.map);
 				
-				// Configuring map
-				L.tileLayer(url, {
+				// Creating empty layer with maxZoom
+				L.tileLayer("", {
 	  			    attribution: '<a href="http://www.gvnix.org">gvNIX</a>',
 	  			    maxZoom: maxZoom
 	  			}).addTo(this._data.map);
@@ -326,6 +316,8 @@ var GvNIX_Map_Leaflet;
 				}
 				
 				if(!exists){
+					// Getting span 
+					var spanLayer = jQuery("#"+checkBox.attr("id")+"_span");
 					// Getting loading icon 
 					oLayer.loadingIcon = jQuery("#"+checkBox.attr("id")+"_loading_icon");
 					// Saving type of filter to the current entity layer
@@ -340,20 +332,34 @@ var GvNIX_Map_Leaflet;
 						// Set filter as disabled
 						oLayer.filterIcon.css("opacity", "0.5");
 					}
-					// Saving Datatables localStorage key for this entity layer
-					this._fnRegisterLocalStorageEntityKey(this, data, oLayer);
-					// Adding layer to _data object
-					currentLayers.push(oLayer);
-					// Adding span click event
-					this._fnRegisterSpanEvents(checkBox);
+					
+					// Register checkbox event
 					// Add onChange event for all layers checkbox
 					this._fnRegisterCheckboxEvents(checkBox, oLayer);
-					// Check which layers needs to load. 
-					var status = this._fnLoadCheckBoxStatus(checkBox);
-					// Force change event at all register layer
-					if(status == true){
-						oLayer.checkBox.trigger("change");
+					
+					if(data.allowdisable){
+						// Saving Datatables localStorage key for this entity layer
+						this._fnRegisterLocalStorageEntityKey(this, data, oLayer);
+						// Adding span click event
+						this._fnRegisterSpanEvents(checkBox);
+						// Check which layers needs to load. 
+						var status = this._fnLoadCheckBoxStatus(checkBox);
+						// Force change event at all register layer
+						if(status == true){
+							oLayer.checkBox.trigger("change");
+						}
+					}else{
+						// If is not selectable, set as checked and disable 
+						checkBox.prop("checked", true);
+						checkBox.trigger("change");
+						// Disabling
+						checkBox.attr("disabled", true);
+						spanLayer.css("opacity", ".5");
 					}
+					
+					// Adding layer to _data object
+					currentLayers.push(oLayer);
+					
 				}
 			},
 			
@@ -369,6 +375,9 @@ var GvNIX_Map_Leaflet;
 				var entityCheckbox = oLayer.checkBox.parent().parent().parent().children().get(0);
 				var registeredLayers = this._data.layers;
 				jQuery.each(registeredLayers, function(index, layer){
+					// Get parent data
+					var parentData = layer.checkBox.data();
+					var layerData = oLayer.checkBox.data();
 					// If gets parent layer configuration, add fields config
 					if(layer.checkBox.attr("id") == entityCheckbox.id){
 						if(layer.fieldsConfig == undefined){
@@ -387,6 +396,8 @@ var GvNIX_Map_Leaflet;
 						
 						// If not exists, add and generate necessary items
 						if(!exists){
+							// Getting span 
+							var parentLayer = jQuery("#" + layer.checkBox.attr("id") + "_span");
 							// Creating layerGroup for every field
 	        				var layerGroup = new L.MarkerClusterGroup({
 	        					showCoverageOnHover: false, 
@@ -413,12 +424,25 @@ var GvNIX_Map_Leaflet;
 	        				oLayer.layerGroup = layerGroup;
 	        				layer.fieldsConfig.push(oLayer);
 
-	        				// Add onClick event for all layers span
-	        				instance._fnRegisterSpanFieldsEvents(oLayer.checkBox);
 	        				// Add onChange event for all layers checkbox
 	        				instance._fnRegisterCheckboxFieldsEvents(oLayer.checkBox, oLayer, layer);
-	        				// Check which layers needs to load. 
-	    					instance._fnLoadCheckBoxStatus(oLayer.checkBox);
+	        				
+	        				// Check if parent allow disable 
+	        				if(parentData.allowdisable && layerData.allowdisable){
+	        					// Add onClick event for all layers span
+		        				instance._fnRegisterSpanFieldsEvents(oLayer.checkBox);
+		        				// Check which layers needs to load. 
+		    					instance._fnLoadCheckBoxStatus(oLayer.checkBox);
+	        				}else {
+	        					// If is not selectable, set as checked and disable 
+	        					oLayer.checkBox.prop("checked", true);
+	        					oLayer.checkBox.trigger("change");
+	    						// Disabling
+	        					oLayer.checkBox.attr("disabled", true);
+	        					// If some children is not selectable, parent layer is not selectable too
+	        					layer.checkBox.attr("disabled", true);
+	        					parentLayer.off("click");
+	        				}
 						}
 					}
 				});
@@ -452,21 +476,13 @@ var GvNIX_Map_Leaflet;
 				
 				// If exists, do nothing
 				if(!exists){
-					// Adding span event
-					jQuery(span).click(function(){
-						if(jQuery(checkBox).prop("checked")){
-							jQuery(checkBox).prop("checked", false);
-							jQuery(checkBox).trigger("change");
-						}else{
-							jQuery(checkBox).prop("checked", true);
-							jQuery(checkBox).trigger("change");
-						}
-					});
 					// Adding checkbox event
 					jQuery(checkBox).change(function(){
 						var isChecked = jQuery(this).prop('checked');
-						// Saving checkbox status
-						instance._fnSaveCheckboxStatus(checkBox.attr("id"), isChecked);
+						// Saving checkbox status if allowDisable
+						if(oTileLayer.allowDisable){
+							instance._fnSaveCheckboxStatus(checkBox.attr("id"), isChecked);
+						}
 						if(isChecked){
 	    		    		if(map){
 	    		    			var tileLayer = L.tileLayer(oTileLayer.url);
@@ -484,11 +500,29 @@ var GvNIX_Map_Leaflet;
 	    				}
 					});
 					
-					// Loading checkbox status
-					var status = instance._fnLoadCheckBoxStatus(checkBox);
-					
-					if(status == "true"){
+					if(oTileLayer.allowDisable){
+						// Adding span event
+						jQuery(span).click(function(){
+							if(jQuery(checkBox).prop("checked")){
+								jQuery(checkBox).prop("checked", false);
+								jQuery(checkBox).trigger("change");
+							}else{
+								jQuery(checkBox).prop("checked", true);
+								jQuery(checkBox).trigger("change");
+							}
+						});
+						// Loading checkbox status
+						var status = instance._fnLoadCheckBoxStatus(checkBox);
+						
+						if(status == "true"){
+							checkBox.trigger("change");
+						}
+					}else{
+						// If is not selectable, set as checked and disable 
+						checkBox.prop("checked", true);
 						checkBox.trigger("change");
+						// Disabling
+						checkBox.attr("disabled", true);
 					}
 					
 					// Saving current tile layer
@@ -525,21 +559,14 @@ var GvNIX_Map_Leaflet;
 				
 				// If exists, do nothing
 				if(!exists){
-					// Adding span event
-					jQuery(span).click(function(){
-						if(jQuery(checkBox).prop("checked")){
-							jQuery(checkBox).prop("checked", false);
-							jQuery(checkBox).trigger("change");
-						}else{
-							jQuery(checkBox).prop("checked", true);
-							jQuery(checkBox).trigger("change");
-						}
-					});
+					
 					// Adding checkbox event
 					jQuery(checkBox).change(function(){
 						var isChecked = jQuery(this).prop('checked');
-						// Saving checkbox status
-						instance._fnSaveCheckboxStatus(checkBox.attr("id"), isChecked);
+						if(oWmsLayer.allowDisable){
+							// Saving checkbox status
+							instance._fnSaveCheckboxStatus(checkBox.attr("id"), isChecked);
+						}
 	    				if(isChecked){
 	    		    		if(map){
 	    		    			
@@ -569,12 +596,33 @@ var GvNIX_Map_Leaflet;
 	    				}
 	    			});	
 					
-					// Loading checkbox status
-					var status = instance._fnLoadCheckBoxStatus(checkBox);
-					
-					if(status == "true"){
+					if(oWmsLayer.allowDisable){
+						// Adding span event
+						jQuery(span).click(function(){
+							if(jQuery(checkBox).prop("checked")){
+								jQuery(checkBox).prop("checked", false);
+								jQuery(checkBox).trigger("change");
+							}else{
+								jQuery(checkBox).prop("checked", true);
+								jQuery(checkBox).trigger("change");
+							}
+						});
+						
+						// Loading checkbox status
+						var status = instance._fnLoadCheckBoxStatus(checkBox);
+						
+						if(status == "true"){
+							checkBox.trigger("change");
+						}
+					}else{
+						// If is not selectable, set as checked and disable 
+						checkBox.prop("checked", true);
 						checkBox.trigger("change");
+						// Disabling
+						checkBox.attr("disabled", true);
 					}
+					
+					
 					
 					// Saving current tile layer
 					instance._data.wmsLayers.push(checkBox.attr("id"));
@@ -607,11 +655,14 @@ var GvNIX_Map_Leaflet;
 				// Getting mapInstance
 				var instance = this;
 				var map = instance._data.map;
+				var checkBoxData = oCheckbox.data();
 				// When checkbox changes
 				oCheckbox.change(function(){
 					var isChecked = jQuery(this).prop('checked');
-					// Saving clicked checkboxes
-					instance._fnSaveCheckboxStatus(this.id, isChecked);
+					if(checkBoxData.allowdisable){
+						// Saving clicked checkboxes
+						instance._fnSaveCheckboxStatus(this.id, isChecked);
+					}
 					// Getting checkbox id and children layers
 					var currentLayerId = jQuery(this).attr("id");
 					var childrenLayers = jQuery("input[id^="+currentLayerId+"]");
@@ -631,8 +682,10 @@ var GvNIX_Map_Leaflet;
 						jQuery.each(childrenLayers, function(index, children){
 							if(children.id !== currentLayerId){
 								jQuery(children).prop('checked', true);
-								// Saving children status
-								instance._fnSaveCheckboxStatus(children.id, true);
+								if(checkBoxData.allowdisable){
+									// Saving children status
+									instance._fnSaveCheckboxStatus(children.id, true);
+								}
 								
 							}
 						});
@@ -646,8 +699,10 @@ var GvNIX_Map_Leaflet;
 						jQuery.each(childrenLayers, function(index, children){
 							if(children.id !== currentLayerId){
 								jQuery(children).prop('checked', false);
-								// Saving children status
-								instance._fnSaveCheckboxStatus(children.id, false);
+								if(checkBoxData.allowdisable){
+									// Saving children status
+									instance._fnSaveCheckboxStatus(children.id, false);
+								}
 							}
 						});
 						// Clear all field layers
@@ -686,14 +741,17 @@ var GvNIX_Map_Leaflet;
 					// Getting instance
 					var instance = this;
 					var map = instance._data.map;
+					var parentData = oParentLayer.checkBox.data();
 					// Getting the field layers and adding event
 					// When checkbox field layers changes
 					var checkBoxId = oCheckbox.attr("id");
 					var checkBox = jQuery("#" + checkBoxId);
 					checkBox.change(function(){
 						var isChecked = jQuery(this).prop('checked');
-						// Saving clicked checkboxes
-						instance._fnSaveCheckboxStatus(this.id, isChecked);
+						if (parentData.allowdisable){
+							// Saving clicked checkboxes
+							instance._fnSaveCheckboxStatus(this.id, isChecked);
+						}
 						var data = jQuery(this).data();
 						if(isChecked){
 							var fieldLayers = oParentLayer.fieldsConfig;
@@ -703,8 +761,10 @@ var GvNIX_Map_Leaflet;
 							}
 							// Force check master checkbox
 							oParentLayer.checkBox.prop("checked",true);
-							// Saving master checkbox status like parent
-							instance._fnSaveCheckboxStatus(oParentLayer.checkBox.attr("id"), "parent");
+							if (parentData.allowdisable){
+								// Saving master checkbox status like parent
+								instance._fnSaveCheckboxStatus(oParentLayer.checkBox.attr("id"), "parent");
+							}
 							// If oLayer has data loaded
 							if(oParentLayer.data !== undefined){
 								// Display records using oLayer data

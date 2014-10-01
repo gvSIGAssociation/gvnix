@@ -19,13 +19,16 @@ package org.gvnix.addon.geo;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.support.ItdBuilderHelper;
 import org.gvnix.support.WebProjectUtils;
+import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeLocationService;
@@ -80,6 +83,7 @@ public class GvNIXMapViewerMetadata extends
     public GvNIXMapViewerMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             ProjectOperations projectOperations,
+            PropFileOperations propFileOperations,
             TypeLocationService typeLocationService, FileManager fileManager,
             List<JavaType> entities, String path, String mapId,
             String projection) {
@@ -100,7 +104,8 @@ public class GvNIXMapViewerMetadata extends
 
         // Updating show.jspx with entities to display
         updateJSPXFiles(entities, finalPath, typeLocationService,
-                projectOperations, fileManager, mapId, projection);
+                projectOperations, fileManager, mapId, projection,
+                propFileOperations);
     }
 
     /**
@@ -116,7 +121,8 @@ public class GvNIXMapViewerMetadata extends
     private void updateJSPXFiles(List<JavaType> entities, String path,
             TypeLocationService typeLocationService,
             ProjectOperations projectOperations, FileManager fileManager,
-            String mapId, String projection) {
+            String mapId, String projection,
+            PropFileOperations propFileOperations) {
 
         PathResolver pathResolver = projectOperations.getPathResolver();
         // Getting jspx file path
@@ -157,6 +163,12 @@ public class GvNIXMapViewerMetadata extends
                     createOrUpdateEntityLayersAndFields(docXml, docRoot,
                             tocElement, entities, typeLocationService,
                             projectOperations);
+
+                    // Create default layer if not exists more tile layers or
+                    // wms layers
+                    getOrCreateDefaultBaseLayerElement(docRoot, docXml,
+                            tocElement, mapId, projectOperations,
+                            propFileOperations);
 
                 }
 
@@ -503,6 +515,50 @@ public class GvNIXMapViewerMetadata extends
     }
 
     /**
+     * This method obtains layer element from document or create new one if not
+     * exists and append to map parent
+     * 
+     * @param docRoot
+     * @param docXml
+     * @param mapElement
+     * @param mapId
+     * @return
+     */
+    private Element getOrCreateDefaultBaseLayerElement(Element docRoot,
+            Document docXml, Element tocElement, String mapId,
+            ProjectOperations projectOperations,
+            PropFileOperations propFileOperations) {
+
+        // Gettings tiles layers
+        NodeList tilesElements = docRoot.getElementsByTagName("layer:tile");
+        Element tileElement = (Element) tilesElements.item(0);
+
+        // Getting wms layers
+        NodeList wmsElements = docRoot.getElementsByTagName("layer:wms");
+        Element wmsElement = (Element) wmsElements.item(0);
+
+        // If not exists, create new tile
+        if (tileElement == null && wmsElement == null) {
+            String defaultLayerId = String.format("%s_default_layer", mapId);
+            tileElement = docXml.createElement("layer:tile");
+            tileElement.setAttribute("id", defaultLayerId);
+            tileElement.setAttribute("index", "1");
+            tileElement.setAttribute("url",
+                    "http://{s}.tile.osm.org/{z}/{x}/{y}.png?bar");
+            tileElement.setAttribute("allowDisable", "false");
+            tileElement.setAttribute("z",
+                    XmlRoundTripUtils.calculateUniqueKeyFor(tileElement));
+            tocElement.appendChild(tileElement);
+
+            // Adding i18n messages
+            addI18nProperties(defaultLayerId, "Default Layer",
+                    projectOperations, propFileOperations);
+        }
+
+        return tileElement;
+    }
+
+    /**
      * This method obtains toolbar element from document or create new one if
      * not exists and append to map parent
      * 
@@ -821,6 +877,33 @@ public class GvNIXMapViewerMetadata extends
             }
         }
 
+    }
+
+    /**
+     * This method add necessary properties to messages.properties
+     */
+    public void addI18nProperties(String key, String value,
+            ProjectOperations projectOperations,
+            PropFileOperations propFileOperations) {
+
+        Map<String, String> propertyList = new HashMap<String, String>();
+
+        propertyList.put(key.replace("ps_", "label_").toLowerCase(), value);
+
+        propFileOperations.addProperties(getWebappPath(projectOperations),
+                "WEB-INF/i18n/application.properties", propertyList, true,
+                false);
+
+    }
+
+    /**
+     * Creates an instance with the {@code src/main/webapp} path in the current
+     * module
+     * 
+     * @return
+     */
+    public LogicalPath getWebappPath(ProjectOperations projectOperations) {
+        return WebProjectUtils.getWebappPath(projectOperations);
     }
 
     /**

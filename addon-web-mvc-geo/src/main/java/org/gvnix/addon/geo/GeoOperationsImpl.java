@@ -890,6 +890,11 @@ public class GeoOperationsImpl extends AbstractOperations implements
                         }
                     }
 
+                    // Checks if exists index
+                    if (StringUtils.isBlank(baseLayer.getAttribute("index"))) {
+                        baseLayer.setAttribute("index", Integer
+                                .toString(getNewBaseLayerPosition(docRoot)));
+                    }
                     // Generating z attr
                     baseLayer.setAttribute("z",
                             XmlRoundTripUtils.calculateUniqueKeyFor(baseLayer));
@@ -1981,6 +1986,18 @@ public class GeoOperationsImpl extends AbstractOperations implements
         return !typeLocationService
                 .findClassesOrInterfaceDetailsWithAnnotation(
                         MAP_VIEWER_ANNOTATION).isEmpty();
+    }
+
+    /**
+     * This method returns position of new base layer
+     * 
+     * @param docRoot
+     * @return
+     */
+    public int getNewBaseLayerPosition(Element docRoot) {
+        NodeList tileLayers = docRoot.getElementsByTagName("layer:tile");
+        NodeList wmsLayers = docRoot.getElementsByTagName("layer:wms");
+        return tileLayers.getLength() + wmsLayers.getLength() + 1;
     }
 
     /**

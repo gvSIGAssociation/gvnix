@@ -24,6 +24,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -52,6 +53,9 @@ public final class GvNIXMapViewerMetadataProvider extends
 
     @Reference
     private ProjectOperations projectOperations;
+
+    @Reference
+    private PropFileOperations propFileOperations;
 
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
@@ -135,8 +139,8 @@ public final class GvNIXMapViewerMetadataProvider extends
 
         return new GvNIXMapViewerMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, projectOperations,
-                typeLocationService, this.fileManager, entitiesToVisualize,
-                path, mapId, projection);
+                propFileOperations, typeLocationService, this.fileManager,
+                entitiesToVisualize, path, mapId, projection);
     }
 
     /**

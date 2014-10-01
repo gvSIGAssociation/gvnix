@@ -3,6 +3,7 @@
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
   <jsp:directive.attribute name="field" type="java.lang.String" required="true" rtexprvalue="true" description="Entity field to represent on current entity layer" />
+  <jsp:directive.attribute name="allowDisable" type="java.lang.Boolean" required="false" description="Use this to set current entity-field layer to allow Disable or not. DEFAULT true." />
   <!-- No selected record config -->
   <jsp:directive.attribute name="icon" type="java.lang.String" required="false" rtexprvalue="true" description="DESC: Name of the icon.| DEFAULT: 'home' | POSSIBLE VALUES: See glyphicons or font-awesome"  />
   <jsp:directive.attribute name="iconColor" type="java.lang.String" required="false" rtexprvalue="true" description="DESC: Color of the icon.| DEFAULT: 'white' | POSSIBLE VALUES: 'white', 'black' or css code (hex, rgba etc)" />
@@ -43,10 +44,14 @@
     	<c:set var="markerColorSelected" value="blue" />
     </c:if>
     
+    <c:if test="${empty allowDisable}">
+    	<c:set var="allowDisable" value="true" />
+    </c:if>
+    
     <spring:url var="loading_img" value="/resources/images/loading.gif" />
     
    	<div>
-    	<input id="${id}" name="${sec_field}" type="checkbox" data-field="${field}" data-icon="${icon}" data-iconColor="${iconColor}" data-iconLibrary="${iconLibrary}" data-markerColor="${markerColor}" data-iconSelected="${iconSelected}" data-iconColorSelected="${iconColorSelected}" data-iconLibrarySelected="${iconLibrarySelected}" data-markerColorSelected="${markerColorSelected}" />
+    	<input id="${id}" name="${sec_field}" type="checkbox" data-field="${field}" data-icon="${icon}" data-iconColor="${iconColor}" data-iconLibrary="${iconLibrary}" data-markerColor="${markerColor}" data-iconSelected="${iconSelected}" data-iconColorSelected="${iconColorSelected}" data-iconLibrarySelected="${iconLibrarySelected}" data-markerColorSelected="${markerColorSelected}" data-allowdisable="${allowDisable}" />
 		<span id="${id}_span"><c:out value="${fn:escapeXml(label)}" /></span>
 		
 		<!-- Legend Icons -->

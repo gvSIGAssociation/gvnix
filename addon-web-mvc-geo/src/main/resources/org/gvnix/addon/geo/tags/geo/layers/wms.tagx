@@ -13,6 +13,7 @@
   <jsp:directive.attribute name="crs" type="java.lang.String" required="false" description="Coordinate Reference System to use for the WMS requests, defaults to map CRS. Don't change this if you're not sure what it means." />
   <jsp:directive.attribute name="opacity" type="java.lang.String" required="false" description="Layer opacity (between 0 and 1)" />
   <jsp:directive.attribute name="index" type="java.lang.String" required="false" description="Index position of the layer to display" />
+  <jsp:directive.attribute name="allowDisable" type="java.lang.Boolean" required="false" description="Use this to set current layer as allowDisable or not. DEFAULT true." />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
     
     <c:if test="${empty label}">
@@ -40,6 +41,10 @@
     
     <c:if test="${empty crs}">
     	<c:set var="crs" value="EPSG3857" />
+    </c:if>
+    
+    <c:if test="${empty allowDisable}">
+    	<c:set var="allowDisable" value="true" />
     </c:if>
     
     <div class="mapviewer_layers_layer">
@@ -71,6 +76,7 @@
       		wmsObject.opacity = "${opacity}";
       		wmsObject.index = "${index}";
       		wmsObject.markerGroup = ${id}_marker_group;
+      		wmsObject.allowDisable= ${allowDisable};
       		// Registring wms layer
       		mapInstance.fnRegisterWmsLayer(wmsObject);
       		
