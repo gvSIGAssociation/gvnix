@@ -193,9 +193,13 @@ var GvNIX_Loupe;
 			 * Indicates if the loupe has been initialized
 			 */
 
-			"initialized": false
-
-
+			"initialized": false,
+			
+			/**
+			 * Additional Fields to return by ajax but
+			 * don't search by them
+			 */
+			"returnfields": inputData.returnfields
 
 		}
 
@@ -364,8 +368,13 @@ var GvNIX_Loupe;
 				 * Indicates if the loupe has been initialized
 				 */
 
-				"initialized": false
-
+				"initialized": false,
+				
+				/**
+				 * Additional Fields to return by ajax but
+				 * don't search by them
+				 */
+				"returnfields": inputData.returnfields
 
 			}
 
@@ -665,6 +674,7 @@ var GvNIX_Loupe;
 						_max_ : data.max,
 						_caption_ : data.caption,
 						_additionalFields_ : data.additionalfields,
+						_returnFields_ : data.returnfields,
 						_field_ : data.field
 					}, baseFilter);
 
@@ -707,6 +717,7 @@ var GvNIX_Loupe;
 						_max_ : data.max,
 						_caption_ : data.caption,
 						_additionalFields_ : data.additionalfields,
+						_returnFields_ : data.returnfields,
 						_field_ : data.field
 					}, baseFilter);
 
@@ -809,6 +820,7 @@ var GvNIX_Loupe;
 						_max_ : data.max,
 						_caption_ : data.caption,
 						_additionalFields_ : additionalfieldsAux,
+						_returnFields_ : data.returnfields,
 						_field_ : data.field
 					}, baseFilter);
 

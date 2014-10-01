@@ -22,6 +22,7 @@
   <jsp:directive.attribute name="max" type="java.lang.String" required="false" description="Max results to show (Default 3)" />
   <jsp:directive.attribute name="caption" type="java.lang.String" required="false" description="Entity fields to use as caption (Separated by commas)" />
   <jsp:directive.attribute name="additionalFields" type="java.lang.String" required="false" description="Additional fields to return in ajax (Separated by commas)" />
+  <jsp:directive.attribute name="returnFields" type="java.lang.String" required="false" description="Additional fields to return in ajax but don't search by them(Separated by commas)" />
   <jsp:directive.attribute name="baseFilter" type="java.lang.String" required="false" description="Base Filter to add to the query (Ex: propA=1||propB=2)" />
   <!-- Callbacks configuration -->
   <jsp:directive.attribute name="onSetFunction" type="java.lang.String" required="false" description="Method to use when property sets" />
@@ -104,6 +105,7 @@
 														data-modalwidth="${modalWidth}"
 														data-hiddeutilbox="${hiddeUtilbox}"
 														data-searchfield="${searchField}"
+														data-returnfields = "${returnFields}"
 														onchange="cleanHiddenInputLoupe('_${fn:escapeXml(id)}_loupe_input_id','${sec_field}_loupe_hidden')" />
 										</c:when>
 										<c:otherwise>
@@ -131,6 +133,7 @@
 														data-modalwidth="${modalWidth}"
 														data-hiddeutilbox="${hiddeUtilbox}"
 														data-searchfield="${searchField}"
+														data-returnfields = "${returnFields}"
 														onchange="cleanHiddenInputLoupe('_${fn:escapeXml(id)}_loupe_input_id','${sec_field}_loupe_hidden')" />
 										</c:otherwise>
 								</c:choose>
