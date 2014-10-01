@@ -199,7 +199,13 @@ var GvNIX_Loupe;
 			 * Additional Fields to return by ajax but
 			 * don't search by them
 			 */
-			"returnfields": inputData.returnfields
+			"returnfields": inputData.returnfields,
+			
+			/**
+			 * Label of the title of the modal
+			 */
+			"labeltitlemodal": inputData.labeltitlemodal
+
 
 		}
 
@@ -374,7 +380,12 @@ var GvNIX_Loupe;
 				 * Additional Fields to return by ajax but
 				 * don't search by them
 				 */
-				"returnfields": inputData.returnfields
+				"returnfields": inputData.returnfields,
+				
+				/**
+				 * Label of the title of the modal
+				 */
+				"labeltitlemodal": inputData.labeltitlemodal
 
 			}
 
@@ -508,7 +519,7 @@ var GvNIX_Loupe;
 								resizable : false,
 								width : 800,
 								height : 500,
-								title : "Select " + data.label,
+								title : data.labeltitlemodal,
 								buttons : buttonOpts,
 								close : function(event, ui) {
 									selectorDialog.dialog('close');

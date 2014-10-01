@@ -33,6 +33,7 @@
   <jsp:directive.attribute name="modalWidth" type="java.lang.String" required="false" description="Specify width for the window opened when push loupe button (default 800)" />
   <jsp:directive.attribute name="hiddeUtilbox" type="java.lang.String" required="false" description="Specify if hidde elements with utilbox class (default true)" />
   <jsp:directive.attribute name="searchField" type="java.lang.String" required="false" description="Specify the field used to search when the input lost focus (default first element of caption)" />
+  <jsp:directive.attribute name="labelTitleModal" type="java.lang.String" required="false" description="Specify the code of the label used for the title of modal, default 'Select' followed by label parameter" />
 
 		<c:if test="${empty render or render}">
 
@@ -70,6 +71,17 @@
 				<spring:message code="button_accept" var="button_accept" htmlEscape="false" />
 				<spring:message code="button_view_more" var="button_view_more"
 						htmlEscape="false" />
+						
+		      	<c:choose>
+					<c:when test="${empty labelTitleModal}">
+						<spring:message code="label_loupe_dialog_title" var="labelSelect" htmlEscape="false" />
+						<c:set var="labelTitleModal" value="${labelSelect} ${label}" />
+					</c:when>
+					<c:otherwise>
+						<spring:message code="${fn:toLowerCase(labelTitleModal)}" var="labelTitleModal" htmlEscape="false" />
+					</c:otherwise>
+				</c:choose>	  
+						
 
 				<!-- Generating controller url -->
 				<spring:url value="${request}/${controllerPath}" var="controller_path_url"></spring:url>
@@ -106,6 +118,7 @@
 														data-hiddeutilbox="${hiddeUtilbox}"
 														data-searchfield="${searchField}"
 														data-returnfields = "${returnFields}"
+														data-labeltitlemodal="${labelTitleModal}"
 														onchange="cleanHiddenInputLoupe('_${fn:escapeXml(id)}_loupe_input_id','${sec_field}_loupe_hidden')" />
 										</c:when>
 										<c:otherwise>
@@ -134,6 +147,7 @@
 														data-hiddeutilbox="${hiddeUtilbox}"
 														data-searchfield="${searchField}"
 														data-returnfields = "${returnFields}"
+														data-labeltitlemodal="${labelTitleModal}"
 														onchange="cleanHiddenInputLoupe('_${fn:escapeXml(id)}_loupe_input_id','${sec_field}_loupe_hidden')" />
 										</c:otherwise>
 								</c:choose>
