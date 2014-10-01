@@ -582,10 +582,65 @@ public class LoupefieldMetadata extends
         bodyBuilder
                 .appendFormalLine("Class idType = targetBean.getPropertyType(pkField);");
 
-        // String query = String.format("SELECT o FROM %s o WHERE o.%s = :id",
-        // targetEntity.getSimpleName(), pkField);
+        // StringBuffer sqlBuf = new StringBuffer("");
         bodyBuilder
-                .appendFormalLine("String query = String.format(\"SELECT o FROM %s o WHERE o.%s = :id\",targetEntity.getSimpleName(), pkField);");
+                .appendFormalLine(String.format(" %s sqlBuf = new %s(\"\");",
+                        helper.getFinalTypeName(new JavaType(
+                                "java.lang.StringBuffer")), helper
+                                .getFinalTypeName(new JavaType(
+                                        "java.lang.StringBuffer"))));
+
+        // if(idType.equals(String.class)){
+        bodyBuilder.appendFormalLine("if(idType.equals(String.class)){");
+        bodyBuilder.indent();
+        // //String with case insensitive
+        bodyBuilder.appendFormalLine("//String with case insensitive");
+
+        // sqlBuf.append("SELECT o FROM %s o WHERE UPPER(o.%s) = UPPER(:id)");
+        bodyBuilder
+                .appendFormalLine("sqlBuf.append(\"SELECT o FROM %s o WHERE UPPER(o.%s) = UPPER(:id)\");");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}else{");
+
+        bodyBuilder.indent();
+
+        // sqlBuf.append("SELECT o FROM %s o WHERE o.%s = :id");
+        bodyBuilder
+                .appendFormalLine("sqlBuf.append(\"SELECT o FROM %s o WHERE o.%s = :id\");");
+
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // // set baseSearch parameters to query
+        bodyBuilder.appendFormalLine("// set baseSearch parameters to query");
+
+        // if(baseSearchValuesMap != null && !baseSearchValuesMap.isEmpty()){
+        bodyBuilder
+                .appendFormalLine("if(baseSearchValuesMap != null && !baseSearchValuesMap.isEmpty()){");
+        bodyBuilder.indent();
+
+        // for (Entry<String, Object> entry : baseSearchValuesMap.entrySet()) {
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("for (%s<String, Object> entry : baseSearchValuesMap.entrySet()) {",
+                                helper.getFinalTypeName(new JavaType(
+                                        "java.util.Map.Entry"))));
+        bodyBuilder.indent();
+
+        // sqlBuf.append(" AND ").append(entry.getKey()).append(" = :").append(entry.getKey());
+        bodyBuilder
+                .appendFormalLine("sqlBuf.append(\" AND \").append(entry.getKey()).append(\" = :\").append(entry.getKey());");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // String query =
+        // String.format(sqlBuf.toString(),targetEntity.getSimpleName(),
+        // pkField);
+        bodyBuilder
+                .appendFormalLine("String query = String.format(sqlBuf.toString(),targetEntity.getSimpleName(), pkField);");
 
         // TypedQuery<Object> q =
         // targetEntityManager.createQuery(query,targetEntity);
@@ -598,6 +653,30 @@ public class LoupefieldMetadata extends
         // q.setParameter("id", targetBean.convertIfNecessary(id, idType));
         bodyBuilder
                 .appendFormalLine("q.setParameter(\"id\", targetBean.convertIfNecessary(id, idType));");
+
+        // set baseSearch values
+        bodyBuilder.appendFormalLine("// set baseSearch values");
+
+        // if (baseSearchValuesMap != null && !baseSearchValuesMap.isEmpty()) {
+        bodyBuilder
+                .appendFormalLine("if (baseSearchValuesMap != null && !baseSearchValuesMap.isEmpty()) {");
+        bodyBuilder.indent();
+
+        // for (Entry<String, Object> entry : baseSearchValuesMap.entrySet()) {
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("for (%s<String, Object> entry : baseSearchValuesMap.entrySet()) {",
+                                helper.getFinalTypeName(new JavaType(
+                                        "java.util.Map.Entry"))));
+        bodyBuilder.indent();
+
+        // q.setParameter(entry.getKey(), entry.getValue());
+        bodyBuilder
+                .appendFormalLine("q.setParameter(entry.getKey(), entry.getValue());");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
 
         // searchResult = new SearchResults(q.getResultList(), 1, false, 0,
         // 1, 1);
