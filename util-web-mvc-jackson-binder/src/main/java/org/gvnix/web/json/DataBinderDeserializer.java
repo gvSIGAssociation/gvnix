@@ -22,9 +22,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.gvnix.web.json.DataBinderMappingJackson2HttpMessageConverter.DataBinderList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.validation.BindingResult;
@@ -56,8 +57,8 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
      */
     private static final long serialVersionUID = -7345091954698956061L;
 
-    private static final Logger LOGGER = Logger
-            .getLogger(DataBinderDeserializer.class.getName());
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(DataBinderDeserializer.class);
 
     public DataBinderDeserializer(BeanDeserializerBase source) {
         super(source);
@@ -145,13 +146,13 @@ public class DataBinderDeserializer extends BeanDeserializerBase {
             }
             else if (target instanceof Map) {
                 // TODO
-                LOGGER.warning("Map deserialization not implemented yet!");
+                LOGGER.warn("Map deserialization not implemented yet!");
             }
             Map<String, String> obj = readObject(parser, ctxt, prefix);
             propertyValues.addPropertyValues(obj);
         }
         else {
-            LOGGER.warning("Deserialization for non-object not implemented yet!");
+            LOGGER.warn("Deserialization for non-object not implemented yet!");
             return null; // TODO?
         }
 

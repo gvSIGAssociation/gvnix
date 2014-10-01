@@ -21,9 +21,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -76,8 +76,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  */
 public class BindingResultSerializer extends JsonSerializer<Object> {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(BindingResultSerializer.class.getCanonicalName());
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(BindingResultSerializer.class);
 
     private static final String ERROR_WRITTING_BINDING = "Error writting BindingResult";
 
@@ -118,15 +118,15 @@ public class BindingResultSerializer extends JsonSerializer<Object> {
             jgen.writeObject(allErrorsMessages);
         }
         catch (JsonProcessingException e) {
-            LOGGER.log(Level.SEVERE, ERROR_WRITTING_BINDING, e);
+            LOGGER.warn(ERROR_WRITTING_BINDING, e);
             throw e;
         }
         catch (IOException e) {
-            LOGGER.log(Level.SEVERE, ERROR_WRITTING_BINDING, e);
+            LOGGER.warn(ERROR_WRITTING_BINDING, e);
             throw e;
         }
         catch (Exception e) {
-            LOGGER.log(Level.SEVERE, ERROR_WRITTING_BINDING, e);
+            LOGGER.warn(ERROR_WRITTING_BINDING, e);
             throw new IOException(ERROR_WRITTING_BINDING, e);
         }
 
