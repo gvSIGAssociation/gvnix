@@ -356,8 +356,72 @@ public class LoupefieldMetadata extends
                 .appendFormalLine("// Do common datatables operations: get entity list filtered by request");
         bodyBuilder.appendFormalLine("// parameters");
 
-        // listDatatables(uiModel, request);
-        bodyBuilder.appendFormalLine("listDatatables(uiModel, request);");
+        // Map<String, String> params = populateParametersMap(request);
+        bodyBuilder.appendFormalLine(String.format(
+                "%s<String, String> params = populateParametersMap(request);",
+                helper.getFinalTypeName(new JavaType("java.util.Map"))));
+
+        // // Get parentId information for details render
+        bodyBuilder
+                .appendFormalLine("// Get parentId information for details render");
+
+        // String parentId = params.remove("_dt_parentId");
+        bodyBuilder
+                .appendFormalLine("String parentId = params.remove(\"_dt_parentId\");");
+
+        // if (StringUtils.isNotBlank(parentId)) {
+        bodyBuilder.appendFormalLine(String.format(
+                "if (%s.isNotBlank(parentId)) {", helper
+                        .getFinalTypeName(new JavaType(
+                                "org.apache.commons.lang3.StringUtils"))));
+
+        bodyBuilder.indent();
+
+        // uiModel.addAttribute("parentId", parentId);
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"parentId\", parentId);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // String rowOnTopIds = params.remove("dtt_row_on_top_ids");
+        bodyBuilder
+                .appendFormalLine("String rowOnTopIds = params.remove(\"dtt_row_on_top_ids\");");
+
+        // if (StringUtils.isNotBlank(rowOnTopIds)) {
+        bodyBuilder
+                .appendFormalLine("if (StringUtils.isNotBlank(rowOnTopIds)) {");
+        bodyBuilder.indent();
+
+        // uiModel.addAttribute("dtt_row_on_top_ids", rowOnTopIds);
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"dtt_row_on_top_ids\", rowOnTopIds);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // String tableHashId = params.remove("dtt_parent_table_id_hash");
+        bodyBuilder
+                .appendFormalLine("String tableHashId = params.remove(\"dtt_parent_table_id_hash\");");
+
+        // if (StringUtils.isNotBlank(tableHashId)) {
+        bodyBuilder
+                .appendFormalLine("if (StringUtils.isNotBlank(tableHashId)) {");
+        bodyBuilder.indent();
+
+        // uiModel.addAttribute("dtt_parent_table_id_hash", tableHashId);
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"dtt_parent_table_id_hash\", tableHashId);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // if (!params.isEmpty()) {
+        bodyBuilder.appendFormalLine(" if (!params.isEmpty()) {");
+        bodyBuilder.indent();
+
+        // uiModel.addAttribute("baseFilter", params);
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"baseFilter\", params);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
 
         // Adding comments
         bodyBuilder
@@ -570,9 +634,56 @@ public class LoupefieldMetadata extends
                 helper.getFinalTypeName(new JavaType(
                         "org.gvnix.web.datatables.query.SearchResults"))));
 
-        // if (StringUtils.isNotBlank(id)) {
-        bodyBuilder.appendFormalLine("if (StringUtils.isNotBlank(id)) {");
+        // if (id != null) {
+        bodyBuilder.appendFormalLine("if (id != null) {");
         bodyBuilder.indent();
+
+        // if not select element, id is empty. Return item with empty values
+        bodyBuilder
+                .appendFormalLine("// if not select element, id is empty. Return item with empty values ");
+
+        // if(id.isEmpty()){
+        bodyBuilder.appendFormalLine("if(id.isEmpty()){");
+        bodyBuilder.indent();
+
+        // List<Map<String, String>> resultRows = new
+        // ArrayList<Map<String,String>>();
+        bodyBuilder
+                .appendFormalLine("List<Map<String, String>> resultRows = new ArrayList<Map<String,String>>();");
+
+        // Map<String, String> rowItem = new HashMap<String, String>();
+        bodyBuilder
+                .appendFormalLine("Map<String, String> rowItem = new HashMap<String, String>();");
+
+        // Iterator<ColumnDef> iterColumns = columnDefs.iterator();
+        bodyBuilder
+                .appendFormalLine("Iterator<ColumnDef> iterColumns = columnDefs.iterator();");
+
+        // while(iterColumns.hasNext()){
+        bodyBuilder.appendFormalLine("while(iterColumns.hasNext()){");
+        bodyBuilder.indent();
+
+        // ColumnDef columnDef = iterColumns.next();
+        bodyBuilder
+                .appendFormalLine("ColumnDef columnDef = iterColumns.next();");
+
+        // rowItem.put(columnDef.getName(),"");
+        bodyBuilder.appendFormalLine("rowItem.put(columnDef.getName(),\"\");");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // rowItem.put("__caption__","");
+        bodyBuilder.appendFormalLine("rowItem.put(\"__caption__\",\"\");");
+
+        // resultRows.add(rowItem);
+        bodyBuilder.appendFormalLine("resultRows.add(rowItem);");
+
+        // return new ResponseEntity<List<Map<String,
+        // String>>>(resultRows,headers, HttpStatus.OK);
+        bodyBuilder
+                .appendFormalLine("return new ResponseEntity<List<Map<String, String>>>(resultRows,headers, HttpStatus.OK);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
 
         // targetBean.setConversionService(conversionService_loupe);
         bodyBuilder
