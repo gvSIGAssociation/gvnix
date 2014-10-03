@@ -927,7 +927,7 @@ var GvNIX_Editing;
 		 *
 		 * @param id the identifier
 		 */
-		"fnBeginCreate" : function(id) {
+		"fnBeginCreate" : function(id, dataTablesMappedProperty, dataTablesMappedValue) {
 			var createPanel = jQuery('#' + id + 'CreateForm');
 			if (createPanel.length == 0) {
 				throw "fnDisplayCreateForm : id not found '" + id + "CreateForm'";
@@ -972,10 +972,92 @@ var GvNIX_Editing;
 				var aFields = _d.aColumnField;
 				var aHeaderCells = [];
 				var aFormCells = [];
+				
+				for (var colIdx = 0; colIdx < aFields.length; colIdx++) {
+					var property = aFields[colIdx];
 
-				var aAllFields = $createForm.find("input");
+					// property is undefined for action columns
+					if (property !== undefined) {
+						property = this._fnUnscapePropertyName(property);
+						
+						// Roo property id has the pattern "... _Entity_propertyName_id"
+						var $ctrlGroup = $createForm.find("div[id $= '_" + property.replace(".","_") + "_id'].control-group");
+						var $createCtrls = $ctrlGroup.find("div.controls");
+						var $input = $createCtrls.find(":input");
+						if ($input.length == 0) {
+							this.error("[fnDisplayCreateForm] Input control for property '" + property + "' not found.");
+							continue;
+						}
+
+						// Store property name in array of values by column index
+						_d.aCreateColumnField.push(property);
+						
+						// Create header cell
+						var headerCell = '<th>' + _d.oSettings.aoColumns[colIdx].sTitle + '</th>';
+						aHeaderCells.push(headerCell);
+
+						aFormCells.push("<td>");
+						
+						for(var i = 0; i < $input.length; i++){
+							// Add proper CSS classes to contained and input
+							var fieldClass = jQuery($input[i]).attr("class");
+							if(fieldClass !== undefined && fieldClass.indexOf("loupe_control") !== -1){
+								var divClass = 'controls input-group';
+							}else{
+								var divClass = 'controls';
+							}
+							
+							
+							if (jQuery($input[i]).attr('type') == 'checkbox') {
+								divClass = divClass + ' checkbox';
+							} else {
+								var inputClass = jQuery($input[i]).attr('class');
+								if (inputClass !== undefined && inputClass) {
+									inputClass = inputClass + ' form-control input-sm';
+								} else {
+									inputClass = 'form-control input-sm';
+								}
+								jQuery($input[i]).attr('class', inputClass);
+							}
+
+							// Make a new unique ID for the input to avoid
+							// collisions with other elements with same ID
+							jQuery($input[i]).attr('id', '_' + $form.attr('id') + jQuery($input[i]).attr('id') + '_create_' + rowId);
+							
+							
+							
+							var formCell = "";
+							
+							if(i == 0){
+								formCell = '<div class="' + divClass + '">';
+							}
+							
+							formCell+= fnOuterHTML(jQuery($input[i]));
+							
+							if(i == $input.length){
+								formCell+= '</div>';
+							}
+							
+							aFormCells.push(formCell);
+							
+							formCell = "";
+						}
+						
+						aFormCells.push("</td>");
+					}
+				}
+				
+				// TODO: Implement following code to use on Composite PK Fields
+				/*var aAllFields = $createForm.find("input");
 				for (var colIdx = 0; colIdx < aAllFields.length; colIdx++) {
-					var property = aAllFields[colIdx].id;
+					// Adding checks on loupe fields
+					var fieldClass = jQuery(aAllFields[colIdx]).attr("class");
+					if(fieldClass !== undefined && fieldClass.indexOf("loupe_control") !== -1){
+						var propertyData = jQuery(aAllFields[colIdx]).data();
+						var property = "_" + propertyData.field + "_id";
+					}else{
+						var property = aAllFields[colIdx].id;
+					}
 
 					if(property !== undefined && aAllFields[colIdx].type !== "hidden" && aAllFields[colIdx].type !== "submit"){
 						property = property.substring(1,property.length-3);
@@ -1002,7 +1084,11 @@ var GvNIX_Editing;
 
 						for(var i = 0; i < $input.length; i++){
 							// Add proper CSS classes to contained and input
-							var divClass = 'controls';
+							if(fieldClass !== undefined && fieldClass.indexOf("loupe_control") !== -1){
+								var divClass = 'controls input-group';
+							}else{
+								var divClass = 'controls';
+							}
 							if (jQuery($input[i]).attr('type') == 'checkbox') {
 								divClass = divClass + ' checkbox';
 							} else {
@@ -1038,7 +1124,7 @@ var GvNIX_Editing;
 
 						aFormCells.push("</td>");
 					}
-				}
+				}*/
 
 				// Add a column to send button
 				aHeaderCells.push('<th></th>');
@@ -1115,16 +1201,78 @@ var GvNIX_Editing;
 					oCreateRow.oCreatingData[property] = value;
 
 					// Store current value to be able to recover when redraw the create form
-					oCreateRow.aOriginalData.push(value);
-					oCreateRow.oOriginalData[property] = value;
+					if(property == dataTablesMappedProperty){
+						oCreateRow.aOriginalData.push(dataTablesMappedValue);
+						oCreateRow.oOriginalData[dataTablesMappedProperty] = dataTablesMappedValue;
+					}else{
+						oCreateRow.aOriginalData.push(value);
+						oCreateRow.oOriginalData[property] = value;
+					}
 				}
 
 				// Bind events for create inputs, focus cursor and initialize components
 				this._fnBindCreateRowEvents(this.fnGetCreationRowById(oCreateRow.sRowId));
+				
+				// Adding script to hide related properties
+				createPanel.append(this._fnHideRelatedFields(dataTablesMappedProperty, dataTablesMappedValue))
 
 			}, this));
 
 			return true;
+		},
+		
+		/**
+		 * Function to hide related fields and set related value
+		 * 
+		 * @param dataTablesMappedProperty related property. 
+		 * @param dataTablesMappedValue related property value
+		 * @returns script string to append on inline create form
+		 */
+		"_fnHideRelatedFields": function(dataTablesMappedProperty, dataTablesMappedValue){
+			
+			var scriptText = "";
+			if(dataTablesMappedProperty !== ""){
+				scriptText = "<script type=\"text/javascript\">"
+					   + "jQuery(document).ready(function() {"
+					   + "	jQuery(\"select[id*='_"+dataTablesMappedProperty+"_id']\").each(function(index, node) {"
+					   + "		jQuery(node).val(\""+dataTablesMappedValue+"\");"
+					   + "		jQuery(node).change();"
+					   + "	});"
+					   + "	var select = jQuery(\"select[id*='_"+ dataTablesMappedProperty +"_id'] option[value='"+dataTablesMappedValue+"']\");"
+					   + "	if(select.length !== 0){"
+					   + "		select.parent().parent().parent().hide();"
+					   + "		var parent = select.parent().parent().parent().parent();"
+					   + "		var childrens = parent.children();"	
+					   + "		var position;"
+					   + "		for(var i = 0; i < childrens.length; i++){"
+					   + "			if(jQuery(childrens[i]).css('display') == 'none'){"
+					   + " 				position = i;"
+					   + "				var headers = parent.parent().parent().find(\"th\");"
+					   + "				jQuery(headers.get(position)).hide();"		
+					   + "			}"	
+					   + "		}"
+					   + "	}else{"
+					   + "		var loupeHiddenInput = jQuery(\"input[id*='"+dataTablesMappedProperty+"_loupe_input']\");"
+					   + "		if(loupeHiddenInput.length !== 0){"
+					   + "			loupeHiddenInput.val(\""+dataTablesMappedValue+"\").trigger('change');"
+					   + "			loupeHiddenInput.parent().parent().hide();"
+					   + "			var parent = loupeHiddenInput.parent().parent().parent();"
+					   + "			var childrens = parent.children();"	
+					   + "			var position;"
+					   + "			for(var i = 0; i < childrens.length; i++){"
+					   + "				if(jQuery(childrens[i]).css('display') == 'none'){"
+					   + " 					position = i;"
+					   + "					var headers = parent.parent().parent().find(\"th\");"
+					   + "					jQuery(headers.get(position)).hide();"		
+					   + "				}"	
+					   + "			}"
+					   + "		}"
+					   + "	}"
+					   + "});"
+					   + "</script>";
+			}
+			
+		   return scriptText;
 		},
 
 		/**
@@ -1570,45 +1718,28 @@ var GvNIX_Editing;
 
 			// Check if compositePK
 			var isCompositePk = false;
-			for (var i = 0; i < this._data.aCreateColumnField.length;i++)
+			for (var i = 0; i < this._data.aCreateColumnField.length;i++){
 				if(this._data.aCreateColumnField[i].indexOf(".") !== -1){
 					isCompositePk = true;
 					break;
 				}
+			}
 
-			// If its not composite Pk
-			if(!isCompositePk) {
-				// For each ids
-				jQuery.each(trIds, function(index, key) {
-					var item = {};
-					// get editedRow info
-					var oEditingRow = oEditingRows[key];
-					// Store original values from received form
-					jQuery.each(oEditingRow.oAllItemData, function (property, value){
-						item[property] = value;
-					});
-					// Update the edited values
-					jQuery.each(oEditingRow.oCreatingData, function (property, value){
-						item[property] = value;
-					});
-					// Store item values
-					requestData.push(item);
+			// For each ids
+			jQuery.each(trIds, function(index, key) {
+				var item = {};
+				// get editedRow info
+				var oEditingRow = oEditingRows[key];
+				// Store original values from received form
+				jQuery.each(oEditingRow.oAllItemData, function (property, value){
+					item[property] = value;
 				});
-				return requestData;
-			} else {
-				// For each ids
-				jQuery.each(trIds, function(index, key) {
-					var item = {};
-					// get editedRow info
-					var oEditingRow = oEditingRows[key];
-					// Store original values from received form
-					jQuery.each(oEditingRow.oAllItemData, function (property, value){
-						item[property] = value;
-					});
-					// Update the edited values
-					jQuery.each(oEditingRow.oCreatingData, function (property, value){
-						item[property] = value;
-					});
+				// Update the edited values
+				jQuery.each(oEditingRow.oCreatingData, function (property, value){
+					item[property] = value;
+				});
+				// Check if is composite pk
+				if(isCompositePk){
 					// Store item values
 					if(jQuery.base64) {
 		                var obj = new Object();
@@ -1621,12 +1752,12 @@ var GvNIX_Editing;
 		                var encoded = jQuery.base64.encode(json);
 		                item["id"] = encoded;
 		             }
+				}
+				// Store item values
+				requestData.push(item);
+			});
 
-					requestData.push(item);
-				});
-				return requestData;
-			}
-
+			return requestData;
 
 		},
 

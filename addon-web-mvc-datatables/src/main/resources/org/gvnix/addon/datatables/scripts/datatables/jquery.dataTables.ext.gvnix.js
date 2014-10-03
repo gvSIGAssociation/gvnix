@@ -156,12 +156,12 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
  *
  * @param sPanelId
  */
-function fnDisplayCreateForm(sTableId) {
+function fnDisplayCreateForm(sTableId, dataTablesMappedProperty, dataTablesMappedValue) {
 	var oTable = jQuery('#' + sTableId);
 	if (oTable.length == 0) {
 		throw "fnDisplayCreateForm : id not found '" + sTableId + "'";
 	}
-	oTable.dataTable().fnEditing().fnBeginCreate(sTableId);
+	oTable.dataTable().fnEditing().fnBeginCreate(sTableId, dataTablesMappedProperty, dataTablesMappedValue);
 }
 
 /**
