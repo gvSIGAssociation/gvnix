@@ -3,17 +3,21 @@
   <jsp:output omit-xml-declaration="yes" />
 
       <spring:url var="logo_gvnix" value="/resources/images/logo_gvnix.png" />
+      <spring:url var="home" value="/" />
+      <spring:message code="button_home" var="home_label" htmlEscape="false" />
 
 			<div class="pull-left">
-				<img src="${logo_gvnix}" />
+        <a href="${home}" name="${fn:escapeXml(home_label)}"
+        title="${fn:escapeXml(home_label)}">
+				  <img src="${logo_gvnix}" />
+        </a>
 			</div>
 
 			<div class="pull-right">
-      			<spring:url var="home" value="/" />
-      			<spring:message code="application_name" var="project_name" htmlEscape="false" />
-				<spring:message code="button_home" var="home_label" htmlEscape="false" />
 
-					<a class="navbar-brand nav navbar-right" href="${home}"
+        <spring:message code="application_name" var="project_name" htmlEscape="false" />
+
+				<a class="navbar-brand nav navbar-right" href="${home}"
 				name="${fn:escapeXml(home_label)}"
 				title="${fn:escapeXml(home_label)}">${fn:escapeXml(project_name)}</a>
 
