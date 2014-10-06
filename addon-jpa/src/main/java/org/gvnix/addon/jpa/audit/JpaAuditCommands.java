@@ -134,7 +134,7 @@ public class JpaAuditCommands implements CommandMarker {
      */
     @CliCommand(value = "jpa audit revisionLog", help = "Enable the revision log provider for audit entity changes.")
     public void revisionLog(
-            @CliOption(key = "provider", mandatory = false, help = "Provider to use to handle revision log information") RevisionLogProviderId provider) {
+            @CliOption(key = "provider", mandatory = true, help = "Provider to use to handle revision log information") RevisionLogProviderId provider) {
         operations.activeRevisionLog(provider);
     }
 }

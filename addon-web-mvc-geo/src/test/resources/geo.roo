@@ -37,6 +37,7 @@ jpa gvnix setup
 jpa batch all
 web mvc setup
 web mvc all --package ~.web
+security setup
 web mvc language --code de
 web mvc language --code es
 web mvc jquery setup

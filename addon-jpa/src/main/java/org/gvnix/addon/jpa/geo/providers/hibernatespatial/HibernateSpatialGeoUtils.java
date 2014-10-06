@@ -1,12 +1,20 @@
 package org.gvnix.addon.jpa.geo.providers.hibernatespatial;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
@@ -253,4 +261,61 @@ public class HibernateSpatialGeoUtils {
         }
     }
 
+    /**
+     * This method generates package-info.java on current entity package.
+     * 
+     * If <b>package-info.java</b> is generated on current entity package, don't
+     * replace or change.
+     * 
+     * If <b>package-info.java</b> is not generated on current entity package,
+     * generate it with necessary GEO configuration.
+     * 
+     * @param entityPackage
+     * @param pathResolver
+     * @param fileManager
+     * @return
+     */
+    public static boolean generatePackageInfoIfNotExists(
+            JavaPackage entityPackage, PathResolver pathResolver,
+            FileManager fileManager) {
+
+        if (entityPackage != null) {
+            // Getting package
+            String stringPackage = entityPackage.getFullyQualifiedPackageName();
+            if (StringUtils.isNotBlank(stringPackage)) {
+                // Generating final path
+                String packageInfoPath = stringPackage.replaceAll("\\.", "/")
+                        + "/package-info.java";
+                final String finalPath = pathResolver.getFocusedIdentifier(
+                        Path.SRC_MAIN_JAVA, packageInfoPath);
+
+                // If file not exists, create new one
+                if (!fileManager.exists(finalPath)) {
+                    MutableFile file = fileManager.createFile(finalPath);
+
+                    OutputStream outputStream = file.getOutputStream();
+
+                    // Modifying created file
+                    if (outputStream != null) {
+                        PrintWriter writer = new PrintWriter(outputStream);
+                        writer.println("@org.hibernate.annotations.TypeDefs({ ");
+                        writer.println("	@org.hibernate.annotations.TypeDef(name=\"geometry\", ");
+                        writer.println("		typeClass = org.hibernate.spatial.GeometryType.class)");
+                        writer.println("})");
+                        writer.println(String.format("package %s;",
+                                stringPackage));
+                        writer.flush();
+                        writer.close();
+                    }
+
+                }
+                else {
+                    // Return true if exists
+                    return true;
+                }
+            }
+        }
+
+        return true;
+    }
 }

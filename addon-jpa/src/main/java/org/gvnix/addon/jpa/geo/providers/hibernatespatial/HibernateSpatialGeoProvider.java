@@ -139,6 +139,11 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
         ReservedWords
                 .verifyReservedWordsNotPresent(fieldDetails.getFieldName());
 
+        // Generating package-info.java if necessary
+        JavaPackage entityPackage = entity.getPackage();
+        HibernateSpatialGeoUtils.generatePackageInfoIfNotExists(entityPackage,
+                pathResolver, fileManager);
+
         // Adding Annotation @Type
         List<AnnotationMetadataBuilder> fieldAnnotations = new ArrayList<AnnotationMetadataBuilder>();
         AnnotationMetadataBuilder typeAnnotation = new AnnotationMetadataBuilder(
