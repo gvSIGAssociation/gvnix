@@ -47,6 +47,17 @@ TinyMCE
 * License: LGPL v2.1
 * Downloaded from: http://www.tinymce.com/js/tinymce/jscripts/tiny_mce/license.txt
 
+jquery-numberformatter
+=======================
+
+* version: 1.2.4
+* jquery.numberformatter.js: uncompressed version
+* jquery.numberformatter.min.js: YUI Compressed version
+* hashtable.js: required dependency "jshashtable" v3.0 (Apache license 2.0)
+      from https://code.google.com/p/jshashtable/
+* License: MIT Licencse (http://www.opensource.org/licenses/mit-license.php)
+* Downloaded from: https://code.google.com/p/jquery-numberformatter/
+
 NOTE
 ====
 

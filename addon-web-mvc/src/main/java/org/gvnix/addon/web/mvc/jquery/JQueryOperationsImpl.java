@@ -465,6 +465,17 @@ public class JQueryOperationsImpl extends AbstractOperations implements
                         "/resources/scripts/jquery/i18n/jquery.validate-${jqueryLocale}.js")
                 || modified;
 
+        // Add jQuery hastable.js
+        modified = WebProjectUtils.addJSToTag(docTagx, root,
+                "hashtable_js_url", "/resources/scripts/jquery/hashtable.js")
+                || modified;
+
+        // Add jQuery numberformatter.js
+        modified = WebProjectUtils.addJSToTag(docTagx, root,
+                "jquery_numberformatter_js_url",
+                "/resources/scripts/jquery/jquery.numberformatter.min.js")
+                || modified;
+
         if (modified) {
             XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
         }

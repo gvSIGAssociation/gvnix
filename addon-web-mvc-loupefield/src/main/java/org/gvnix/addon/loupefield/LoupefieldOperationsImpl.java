@@ -138,10 +138,11 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         addI18nProperties();
         // Include jquery.loupeField.ext.gvnix.js into load-scripts.tagx
         addToLoadScripts("loupe_js_url",
-                "/resources/scripts/loupefield/jquery.loupeField.ext.gvnix.js");
+                "/resources/scripts/loupefield/jquery.loupeField.ext.gvnix.js",
+                false);
         // Add style css for components
         addToLoadScripts("loupe_css_url",
-                "/resources/styles/loupefield/loupeField.css");
+                "/resources/styles/loupefield/loupeField.css", true);
         // Add Necessary Dependencies
         setupProjectPom();
     }
@@ -158,10 +159,11 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         addI18nProperties();
         // Include jquery.loupeField.ext.gvnix.js into load-scripts.tagx
         addToLoadScripts("loupe_js_url",
-                "/resources/scripts/loupefield/jquery.loupeField.ext.gvnix.js");
-        // Add style css for components
+                "/resources/scripts/loupefield/jquery.loupeField.ext.gvnix.js",
+                false);
+        // Add loupeField.css on load Scripts
         addToLoadScripts("loupe_css_url",
-                "/resources/styles/loupefield/loupeField.css");
+                "/resources/styles/loupefield/loupeField.css", true);
         // Add Necessary Dependencies
         setupProjectPom();
     }
@@ -442,7 +444,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
             }
             // Adding to load-scripts
             addToLoadScripts("loupe_callbacks_js_url",
-                    "/resources/scripts/loupefield/loupe-callbacks.js");
+                    "/resources/scripts/loupefield/loupe-callbacks.js", false);
 
         }
     }
@@ -539,7 +541,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      * This method adds reference in laod-script.tagx to use
      * jquery.loupeField.ext.gvnix.js
      */
-    public void addToLoadScripts(String varName, String url) {
+    public void addToLoadScripts(String varName, String url, boolean isCss) {
         // Modify Roo load-scripts.tagx
         String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
                 "WEB-INF/tags/util/load-scripts.tagx");
@@ -562,9 +564,14 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
         boolean modified = false;
 
-        // Add jquery.loupeField.ext.gvnix.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root, varName, url)
-                || modified;
+        if (isCss) {
+            modified = WebProjectUtils.addCssToTag(docTagx, root, varName, url)
+                    || modified;
+        }
+        else {
+            modified = WebProjectUtils.addJSToTag(docTagx, root, varName, url)
+                    || modified;
+        }
 
         if (modified) {
             XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);

@@ -290,6 +290,51 @@ function jQueryInitializeComponents(context) {
       ignoreTitle: true 
     });
 
+     /**
+	 * Replaces the standar number validation to support number with comma.
+	 *
+	 * @name jQuery.validator.methods.number
+	 * @type Boolean
+	 */
+	jQuery.validator.addMethod("number", function(value, element) {
+		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage(), strict: true});
+		return this.optional(element) || !isNaN(localizedValue);
+	}, "Please enter a valid number");
+
+	/**
+	 * Replaces the standar min validation to support number with comma.
+	 *
+	 * @name jQuery.validator.methods.number
+	 * @type Boolean
+	 */
+	jQuery.validator.addMethod("min", function(value, element, params) {
+		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage()});
+		return this.optional(element) || localizedValue >= params;
+	}, jQuery.validator.format("Please enter a value greater than or equal to {0}."));
+
+	/**
+	 * Replaces the standar max validation to support number with comma.
+	 *
+	 * @name jQuery.validator.methods.number
+	 * @type Boolean
+	 */
+	jQuery.validator.addMethod("max", function(value, element, params) {
+		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage()});
+		return this.optional(element) || localizedValue >= params;
+	}, jQuery.validator.format("Please enter a value less than or equal to {0}."));
+
+	/**
+	 * Replaces the standar range validation to support number with comma.
+	 *
+	 * @name jQuery.validator.methods.number
+	 * @type Boolean
+	 */
+	jQuery.validator.addMethod("range", function(value, element, params) {
+		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage()});
+		return this.optional(element) ||( localizedValue >= param[0] && localizedValue <= param[1] );
+	}, jQuery.validator.format("Please enter a value between {0} and {1}."));
+
+
     // Form validation init
     jQuery("form.validate",context).each(function( index ) {
       var $form = $(this);
