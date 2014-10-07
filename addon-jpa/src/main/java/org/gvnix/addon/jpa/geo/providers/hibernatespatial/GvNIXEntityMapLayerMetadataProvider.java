@@ -86,8 +86,6 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
 
         JavaType javaType = GvNIXEntityMapLayerMetadata
                 .getJavaType(metadataIdentificationString);
-        LogicalPath path = GvNIXEntityMapLayerMetadata
-                .getPath(metadataIdentificationString);
 
         // Getting entity details
         ClassOrInterfaceTypeDetails entityDetails = typeLocationService

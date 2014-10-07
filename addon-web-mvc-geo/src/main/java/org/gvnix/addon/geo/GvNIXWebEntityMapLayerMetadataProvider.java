@@ -28,7 +28,6 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMeta
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeManagementService;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
@@ -85,10 +84,6 @@ public final class GvNIXWebEntityMapLayerMetadataProvider extends
                 .getJavaType(metadataIdentificationString);
         LogicalPath path = GvNIXWebEntityMapLayerMetadata
                 .getPath(metadataIdentificationString);
-
-        // Getting controller
-        ClassOrInterfaceTypeDetails controller = typeLocationService
-                .getTypeDetails(javaType);
 
         // Getting @RooWebScaffold annotation
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(

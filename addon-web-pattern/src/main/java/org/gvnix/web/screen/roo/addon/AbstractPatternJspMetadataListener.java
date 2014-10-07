@@ -102,6 +102,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     private static final String ID_ATTRIBUTE = "id";
     private static final String ID_RENDER_ATTRIBUTE = "idRender";
     private static final String ID_DISABLED_ATTRIBUTE = "idDisabled";
+    private static final String PATH_IS_NOT_SPECIFIED = "Path is not specified in the @RooWebScaffold annotation for '";
 
     private static final Logger LOGGER = HandlerUtils
             .getLogger(AbstractPatternJspMetadataListener.class);
@@ -137,10 +138,9 @@ public abstract class AbstractPatternJspMetadataListener implements
         PathResolver pathResolver = _projectOperations.getPathResolver();
         String controllerPath = webScaffoldMetadata.getAnnotationValues()
                 .getPath();
-        Validate.notNull(controllerPath,
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        + webScaffoldMetadata.getAnnotationValues()
-                                .getGovernorTypeDetails().getName() + "'");
+        Validate.notNull(controllerPath, PATH_IS_NOT_SPECIFIED
+                + webScaffoldMetadata.getAnnotationValues()
+                        .getGovernorTypeDetails().getName() + "'");
         if (controllerPath.startsWith("/")) {
             controllerPath = controllerPath.substring(1);
         }
@@ -270,10 +270,9 @@ public abstract class AbstractPatternJspMetadataListener implements
      */
     private Document getRegisterDocument(String patternName) {
         String controllerPath = webScaffoldAnnotationValues.getPath();
-        Validate.notNull(controllerPath,
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        + webScaffoldAnnotationValues.getGovernorTypeDetails()
-                                .getName() + "'");
+        Validate.notNull(controllerPath, PATH_IS_NOT_SPECIFIED
+                + webScaffoldAnnotationValues.getGovernorTypeDetails()
+                        .getName() + "'");
         if (!controllerPath.startsWith("/")) {
             controllerPath = "/".concat(controllerPath);
         }
@@ -677,10 +676,9 @@ public abstract class AbstractPatternJspMetadataListener implements
      */
     private void modifyRooJsp(RooJspx rooJspx) {
         String controllerPath = webScaffoldAnnotationValues.getPath();
-        Validate.notNull(controllerPath,
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        + webScaffoldAnnotationValues.getGovernorTypeDetails()
-                                .getName() + "'");
+        Validate.notNull(controllerPath, PATH_IS_NOT_SPECIFIED
+                + webScaffoldAnnotationValues.getGovernorTypeDetails()
+                        .getName() + "'");
         if (!controllerPath.startsWith("/")) {
             controllerPath = "/".concat(controllerPath);
         }
@@ -855,10 +853,9 @@ public abstract class AbstractPatternJspMetadataListener implements
             WebPatternType patternType) {
 
         String controllerPath = webScaffoldAnnotationValues.getPath();
-        Validate.notNull(controllerPath,
-                "Path is not specified in the @RooWebScaffold annotation for '"
-                        + webScaffoldAnnotationValues.getGovernorTypeDetails()
-                                .getName() + "'");
+        Validate.notNull(controllerPath, PATH_IS_NOT_SPECIFIED
+                + webScaffoldAnnotationValues.getGovernorTypeDetails()
+                        .getName() + "'");
         if (!controllerPath.startsWith("/")) {
             controllerPath = "/".concat(controllerPath);
         }
