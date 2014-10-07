@@ -80,7 +80,19 @@ import org.w3c.dom.NodeList;
 public class GeoOperationsImpl extends AbstractOperations implements
         GeoOperations {
 
-    private static final JavaType GVNIX_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
+    private static final String LABEL = "label";
+
+	private static final String INDEX_ATTR = "index";
+
+	private static final String SHOW = "show";
+
+	private static final String SHOW_VIEW = "WEB-INF/views/%s/show.jspx";
+
+	private static final String VALUE = "value";
+
+	private static final String ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT = "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer";
+
+	private static final JavaType GVNIX_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
             "org.gvnix.addon.jpa.geo.providers.hibernatespatial.GvNIXEntityMapLayer");
 
     private static final JavaType GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
@@ -249,7 +261,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Checking if exists map element before to generate geo web layer
         if (!checkExistsMapElement()) {
             throw new RuntimeException(
-                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
+                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         List<String> paths = new ArrayList<String>();
@@ -295,7 +307,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Checking if exists map element before to generate geo web layer
         if (!checkExistsMapElement()) {
             throw new RuntimeException(
-                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
+                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         Validate.notNull(controller,
@@ -409,7 +421,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 "Controller annotated with @RequestMapping is necessary. Generate controller for your entity using 'web mvc scaffold'");
 
         // Getting path
-        String path = requestMappingAnnotation.getAttribute("value").getValue()
+        String path = requestMappingAnnotation.getAttribute(VALUE).getValue()
                 .toString();
 
         // Getting entity
@@ -456,14 +468,14 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Getting show.jspx
         final String showPath = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP,
-                String.format("WEB-INF/views/%s/show.jspx", path));
+                String.format(SHOW_VIEW, path));
 
         updateCRU(path, createPath, fieldName, fieldType, color, weight,
                 center, zoom, maxZoom, "create");
         updateCRU(path, updatePath, fieldName, fieldType, color, weight,
                 center, zoom, maxZoom, "update");
         updateCRU(path, showPath, fieldName, fieldType, color, weight, center,
-                zoom, maxZoom, "show");
+                zoom, maxZoom, SHOW);
 
     }
 
@@ -483,12 +495,12 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Checking if exists map element before to generate geo tile layer
         if (!checkExistsMapElement()) {
             throw new RuntimeException(
-                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
+                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         // Creating map with params to send
         Map<String, String> tileLayerAttr = new HashMap<String, String>();
-        tileLayerAttr.put("index", index);
+        tileLayerAttr.put(INDEX_ATTR, index);
         tileLayerAttr.put("url", url);
         tileLayerAttr.put("opacity", opacity);
 
@@ -521,12 +533,12 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Checking if exists map element before to generate geo tile layer
         if (!checkExistsMapElement()) {
             throw new RuntimeException(
-                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
+                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         // Creating map with params to send
         Map<String, String> wmsLayerAttr = new HashMap<String, String>();
-        wmsLayerAttr.put("index", index);
+        wmsLayerAttr.put(INDEX_ATTR, index);
         wmsLayerAttr.put("url", url);
         wmsLayerAttr.put("opacity", opacity);
         wmsLayerAttr.put("layers", layers);
@@ -556,7 +568,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Checking if exists map element before to generate geo tool
         if (!checkExistsMapElement()) {
             throw new RuntimeException(
-                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
+                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         // Creating map with params to send
@@ -583,7 +595,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Checking if exists map element before to generate geo tool
         if (!checkExistsMapElement()) {
             throw new RuntimeException(
-                    "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer");
+                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         // Creating map with params to send
@@ -630,7 +642,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         for (ClassOrInterfaceTypeDetails controller : controllerDetails) {
             String controllerPath = (String) controller
                     .getAnnotation(SpringJavaType.REQUEST_MAPPING)
-                    .getAttribute("value").getValue();
+                    .getAttribute(VALUE).getValue();
             if (path != null) {
                 if (controllerPath.replaceAll("/", "").equals(
                         path.getSymbolName())) {
@@ -643,7 +655,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
                     pathsMap.put(path.getSymbolName(), mapId + "_" + name);
                     // Add to application.properties
-                    propertyList.put("label" + mapId.substring(2).toLowerCase()
+                    propertyList.put(LABEL + mapId.substring(2).toLowerCase()
                             + "_" + name, name);
                 }
             }
@@ -658,7 +670,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 pathsMap.put(controllerPath.replaceAll("/", ""), mapId + "_"
                         + name);
                 // Add to application.properties
-                propertyList.put("label" + mapId.substring(2).toLowerCase()
+                propertyList.put(LABEL + mapId.substring(2).toLowerCase()
                         + "_" + name, name);
             }
 
@@ -691,7 +703,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         for (Entry mapPath : pathsMap.entrySet()) {
             String viewPath = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP,
-                    String.format("WEB-INF/views/%s/show.jspx",
+                    String.format(SHOW_VIEW,
                             mapPath.getKey()));
 
             if (fileManager.exists(viewPath)) {
@@ -783,7 +795,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         for (ClassOrInterfaceTypeDetails controller : controllerDetails) {
             String controllerPath = (String) controller
                     .getAnnotation(SpringJavaType.REQUEST_MAPPING)
-                    .getAttribute("value").getValue();
+                    .getAttribute(VALUE).getValue();
             if (path != null) {
                 if (controllerPath.replaceAll("/", "").equals(
                         path.getSymbolName())) {
@@ -796,7 +808,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
                     pathsMap.put(path.getSymbolName(), mapId + "_" + name);
                     // Add to application.properties
-                    propertyList.put("label" + mapId.substring(2).toLowerCase()
+                    propertyList.put(LABEL + mapId.substring(2).toLowerCase()
                             + "_" + name, name);
                 }
             }
@@ -811,7 +823,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 pathsMap.put(controllerPath.replaceAll("/", ""), mapId + "_"
                         + name);
                 // Add to application.properties
-                propertyList.put("label" + mapId.substring(2).toLowerCase()
+                propertyList.put(LABEL + mapId.substring(2).toLowerCase()
                         + "_" + name, name);
             }
 
@@ -844,7 +856,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         for (Entry mapPath : pathsMap.entrySet()) {
             String viewPath = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP,
-                    String.format("WEB-INF/views/%s/show.jspx",
+                    String.format(SHOW_VIEW,
                             mapPath.getKey()));
 
             if (fileManager.exists(viewPath)) {
@@ -891,8 +903,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
                     }
 
                     // Checks if exists index
-                    if (StringUtils.isBlank(baseLayer.getAttribute("index"))) {
-                        baseLayer.setAttribute("index", Integer
+                    if (StringUtils.isBlank(baseLayer.getAttribute(INDEX_ATTR))) {
+                        baseLayer.setAttribute(INDEX_ATTR, Integer
                                 .toString(getNewBaseLayerPosition(docRoot)));
                     }
                     // Generating z attr
@@ -956,7 +968,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
             else if (type.equals("update")) {
                 form = docRoot.getElementsByTagName("form:update").item(0);
             }
-            else if (type.equals("show")) {
+            else if (type.equals(SHOW)) {
                 form = docRoot.getElementsByTagName("page:show").item(0);
             }
 
@@ -982,7 +994,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
                     // Create element depens of type
                     Element mapControl = null;
-                    if (type.equals("show")) {
+                    if (type.equals(SHOW)) {
                         mapControl = createDoc
                                 .createElement("geofield:map-display");
                     }
@@ -1048,7 +1060,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                     // Adding saved attr
                     mapControl.setAttribute("id", idAttr.getNodeValue());
                     // Adding object
-                    if (type.equals("show")) {
+                    if (type.equals(SHOW)) {
                         mapControl.setAttribute("object", inputAttr
                                 .getNamedItem("object").getNodeValue());
                     }
@@ -1260,7 +1272,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 String.format("WEB-INF/views/%s/views.xml", finalPath));
         final String showPath = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP,
-                String.format("WEB-INF/views/%s/show.jspx", finalPath));
+                String.format(SHOW_VIEW, finalPath));
 
         // Copying views.xml
         if (!fileManager.exists(viewsPath)) {
@@ -1408,7 +1420,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                     "Error on %s getting @RequestMapping value", mapViewer));
 
             String requestMappingPath = requestMappingAnnotation
-                    .getAttribute("value").getValue().toString();
+                    .getAttribute(VALUE).getValue().toString();
             // If exists some path like the selected, shows an error
             String finalPath = String.format("/%s", path.toString());
             if (finalPath.equals(requestMappingPath)) {
@@ -1470,7 +1482,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Add @RequestMapping annotation
         AnnotationMetadataBuilder requestMappingAnnotation = new AnnotationMetadataBuilder(
                 SpringJavaType.REQUEST_MAPPING);
-        requestMappingAnnotation.addStringAttribute("value",
+        requestMappingAnnotation.addStringAttribute(VALUE,
                 String.format("/%s", path.toString()));
         annotations.add(requestMappingAnnotation);
 
@@ -1515,7 +1527,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
             if (addEntityToMap) {
                 final ClassAttributeValue entityAttribute = new ClassAttributeValue(
-                        new JavaSymbolName("value"), entity.getType());
+                        new JavaSymbolName(VALUE), entity.getType());
 
                 entityAttributes.add(entityAttribute);
 
@@ -1902,7 +1914,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         if (notIncluded) {
             // Create a class attribute for property
             final ClassAttributeValue entityAttribute = new ClassAttributeValue(
-                    new JavaSymbolName("value"), controller);
+                    new JavaSymbolName(VALUE), controller);
             entityAttributes.add(entityAttribute);
         }
 
