@@ -42,6 +42,7 @@ import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
@@ -82,17 +83,17 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     private static final String LABEL = "label";
 
-	private static final String INDEX_ATTR = "index";
+    private static final String INDEX_ATTR = "index";
 
-	private static final String SHOW = "show";
+    private static final String SHOW = "show";
 
-	private static final String SHOW_VIEW = "WEB-INF/views/%s/show.jspx";
+    private static final String SHOW_VIEW = "WEB-INF/views/%s/show.jspx";
 
-	private static final String VALUE = "value";
+    private static final String VALUE = "value";
 
-	private static final String ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT = "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer";
+    private static final String ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT = "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer";
 
-	private static final JavaType GVNIX_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
+    private static final JavaType GVNIX_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
             "org.gvnix.addon.jpa.geo.providers.hibernatespatial.GvNIXEntityMapLayer");
 
     private static final JavaType GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
@@ -218,6 +219,11 @@ public class GeoOperationsImpl extends AbstractOperations implements
         annotateApplicationConversionService();
         // Installing all necessary components
         installComponents();
+        // Install Bootstrap if necessary
+        if (projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+            updateGeoAddonToBootstrap();
+        }
     }
 
     /**
@@ -260,8 +266,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Checking if exists map element before to generate geo web layer
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(
-                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         List<String> paths = new ArrayList<String>();
@@ -306,8 +311,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Checking if exists map element before to generate geo web layer
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(
-                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         Validate.notNull(controller,
@@ -467,8 +471,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Getting show.jspx
         final String showPath = pathResolver.getFocusedIdentifier(
-                Path.SRC_MAIN_WEBAPP,
-                String.format(SHOW_VIEW, path));
+                Path.SRC_MAIN_WEBAPP, String.format(SHOW_VIEW, path));
 
         updateCRU(path, createPath, fieldName, fieldType, color, weight,
                 center, zoom, maxZoom, "create");
@@ -494,8 +497,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Checking if exists map element before to generate geo tile layer
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(
-                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         // Creating map with params to send
@@ -532,8 +534,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
             boolean transparent, String styles, String version, String crs) {
         // Checking if exists map element before to generate geo tile layer
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(
-                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         // Creating map with params to send
@@ -567,8 +568,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
             String preventExitMessageCode) {
         // Checking if exists map element before to generate geo tool
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(
-                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         // Creating map with params to send
@@ -594,8 +594,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
             String deactivateFunction, String cursorIcon) {
         // Checking if exists map element before to generate geo tool
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(
-                    ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
         }
 
         // Creating map with params to send
@@ -670,8 +669,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 pathsMap.put(controllerPath.replaceAll("/", ""), mapId + "_"
                         + name);
                 // Add to application.properties
-                propertyList.put(LABEL + mapId.substring(2).toLowerCase()
-                        + "_" + name, name);
+                propertyList.put(LABEL + mapId.substring(2).toLowerCase() + "_"
+                        + name, name);
             }
 
         }
@@ -703,8 +702,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         for (Entry mapPath : pathsMap.entrySet()) {
             String viewPath = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP,
-                    String.format(SHOW_VIEW,
-                            mapPath.getKey()));
+                    String.format(SHOW_VIEW, mapPath.getKey()));
 
             if (fileManager.exists(viewPath)) {
                 Document docXml = WebProjectUtils.loadXmlDocument(viewPath,
@@ -823,8 +821,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 pathsMap.put(controllerPath.replaceAll("/", ""), mapId + "_"
                         + name);
                 // Add to application.properties
-                propertyList.put(LABEL + mapId.substring(2).toLowerCase()
-                        + "_" + name, name);
+                propertyList.put(LABEL + mapId.substring(2).toLowerCase() + "_"
+                        + name, name);
             }
 
         }
@@ -856,8 +854,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         for (Entry mapPath : pathsMap.entrySet()) {
             String viewPath = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP,
-                    String.format(SHOW_VIEW,
-                            mapPath.getKey()));
+                    String.format(SHOW_VIEW, mapPath.getKey()));
 
             if (fileManager.exists(viewPath)) {
                 Document docXml = WebProjectUtils.loadXmlDocument(viewPath,
@@ -1271,8 +1268,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 Path.SRC_MAIN_WEBAPP,
                 String.format("WEB-INF/views/%s/views.xml", finalPath));
         final String showPath = pathResolver.getFocusedIdentifier(
-                Path.SRC_MAIN_WEBAPP,
-                String.format(SHOW_VIEW, finalPath));
+                Path.SRC_MAIN_WEBAPP, String.format(SHOW_VIEW, finalPath));
 
         // Copying views.xml
         if (!fileManager.exists(viewsPath)) {
@@ -2043,4 +2039,184 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 "scripts/leaflet/leaflet.js");
         return fileManager.exists(dirPath);
     }
+
+    /**
+     * This method updates geo addon to use Bootstrap components
+     */
+    @Override
+    public void updateGeoAddonToBootstrap() {
+        updateLoadScripts("js_leaflet_geo_js",
+                "/resources/scripts/leaflet/leaflet_bootstrap.js", false);
+        updateLoadScripts("styles_leaflet_geo_css",
+                "/resources/styles/leaflet/leaflet.bootstrap.css", true);
+        updateLoadScripts("styles_gvnix_leaflet_geo_css",
+                "/resources/styles/leaflet/gvnix.leaflet.bootstrap.css", true);
+
+        // Getting all maps and update layouts to use Bootstrap layout
+        Set<ClassOrInterfaceTypeDetails> mapViews = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(new JavaType(
+                        "org.gvnix.addon.geo.GvNIXMapViewer"));
+
+        PathResolver pathResolver = projectOperations.getPathResolver();
+
+        for (ClassOrInterfaceTypeDetails mapView : mapViews) {
+
+            // Getting current map path
+            AnnotationMetadata requestMapping = mapView
+                    .getAnnotation(new JavaType(
+                            "org.springframework.web.bind.annotation.RequestMapping"));
+
+            String path = (String) requestMapping.getAttribute("value")
+                    .getValue();
+
+            path = path.substring(1);
+
+            String finalPath = new JavaSymbolName(path).getReadableSymbolName()
+                    .toLowerCase();
+
+            // Modifying views.xml to add default-map
+            final String viewsPath = pathResolver.getFocusedIdentifier(
+                    Path.SRC_MAIN_WEBAPP,
+                    String.format("WEB-INF/views/%s/views.xml", finalPath));
+
+            // Checking if has default-map yet
+            boolean isMapLayout = false;
+
+            Document docXml = WebProjectUtils.loadXmlDocument(viewsPath,
+                    fileManager);
+
+            // Getting current layout
+            Element docRoot = docXml.getDocumentElement();
+
+            Element definitionElement = (Element) docRoot.getElementsByTagName(
+                    "definition").item(0);
+            if (definitionElement != null) {
+                String currentLayout = definitionElement
+                        .getAttribute("extends");
+                isMapLayout = "default-map".equals(currentLayout);
+            }
+
+            if (!isMapLayout) {
+                // Copying views.xml
+                InputStream inputStream = null;
+                OutputStream outputStream = null;
+                try {
+                    inputStream = FileUtils.getInputStream(getClass(),
+                            "views/views.xml");
+                    if (fileManager.exists(viewsPath)) {
+                        outputStream = fileManager.updateFile(viewsPath)
+                                .getOutputStream();
+                    }
+                    else {
+                        outputStream = fileManager.createFile(viewsPath)
+                                .getOutputStream();
+                    }
+
+                    // Doing this to solve problems with <!DOCTYPE element
+                    // ////////////////////////////////////////////////
+                    PrintWriter writer = new PrintWriter(outputStream);
+                    writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
+                    writer.println("<!DOCTYPE tiles-definitions PUBLIC \"-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN\" \"http://tiles.apache.org/dtds/tiles-config_2_1.dtd\">");
+                    writer.println("<tiles-definitions>");
+
+                    writer.println(String
+                            .format("   <definition extends=\"default-map\" name=\"%s/show\">",
+                                    finalPath));
+                    writer.println(String
+                            .format("      <put-attribute name=\"body\" value=\"/WEB-INF/views/%s/show.jspx\"/>",
+                                    finalPath));
+                    writer.println("   </definition>");
+                    writer.println("</tiles-definitions>");
+
+                    writer.flush();
+                    writer.close();
+
+                    IOUtils.copy(inputStream, outputStream);
+                }
+                catch (final IOException ioe) {
+                    throw new IllegalStateException(ioe);
+                }
+                finally {
+                    IOUtils.closeQuietly(inputStream);
+                    IOUtils.closeQuietly(outputStream);
+                }
+            }
+        }
+    }
+
+    /**
+     * This method adds reference in laod-script.tagx
+     */
+    public void updateLoadScripts(String varName, String url, boolean isCSS) {
+        // Modify Roo load-scripts.tagx
+        String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
+                "WEB-INF/tags/util/load-scripts.tagx");
+
+        Validate.isTrue(fileManager.exists(docTagxPath),
+                "load-script.tagx not found: ".concat(docTagxPath));
+
+        MutableFile docTagxMutableFile = null;
+        Document docTagx;
+
+        try {
+            docTagxMutableFile = fileManager.updateFile(docTagxPath);
+            docTagx = XmlUtils.getDocumentBuilder().parse(
+                    docTagxMutableFile.getInputStream());
+        }
+        catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        Element root = docTagx.getDocumentElement();
+
+        boolean modified = false;
+
+        Element urlElement = XmlUtils.findFirstElement(
+                "url[@var='".concat(varName) + "']", root);
+        if (urlElement != null) {
+            // Getting current url value
+            String currentUrlValue = urlElement.getAttribute("value");
+            if (!url.equals(currentUrlValue)) {
+                urlElement.setAttribute("var", varName);
+                urlElement.setAttribute(VALUE, url);
+                modified = true;
+            }
+        }
+
+        if (isCSS) {
+            // Add link
+            Element cssElement = XmlUtils.findFirstElement(
+                    String.format("link[@href='${%s}']", varName), root);
+            if (cssElement == null) {
+                cssElement = docTagx.createElement("link");
+                cssElement.setAttribute("rel", "stylesheet");
+                cssElement.setAttribute("type", "text/css");
+                cssElement.setAttribute("media", "screen");
+                cssElement.setAttribute("href", "${".concat(varName)
+                        .concat("}"));
+                root.appendChild(cssElement);
+                modified = true;
+            }
+        }
+        else {
+            // Add script
+            Element scriptElement = XmlUtils.findFirstElement(
+                    String.format("script[@src='${%s}']", varName), root);
+            if (scriptElement == null) {
+                scriptElement = docTagx.createElement("script");
+                scriptElement.setAttribute("src",
+                        "${".concat(varName).concat("}"));
+                scriptElement.setAttribute("type", "text/javascript");
+                scriptElement.appendChild(docTagx
+                        .createComment("required for FF3 and Opera"));
+                root.appendChild(scriptElement);
+                modified = true;
+            }
+        }
+
+        if (modified) {
+            XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
+        }
+
+    }
+
 }

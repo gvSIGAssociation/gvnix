@@ -17,7 +17,9 @@
  */
 package org.gvnix.addon.datatables;
 
-import org.springframework.roo.model.*;
+import org.springframework.roo.model.JavaPackage;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Feature;
 
 /**
@@ -151,5 +153,10 @@ public interface DatatablesOperations extends Feature {
      * Add required i18n keys
      */
     void addI18nKeys();
+
+    /**
+     * This method updates Datatable elements to use Bootstrap
+     */
+    void updateDatatablesAddonToBootstrap();
 
 }

@@ -17,6 +17,9 @@
  */
 package org.gvnix.addon.datatables;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -62,6 +66,7 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.FeatureNames;
@@ -72,6 +77,8 @@ import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.project.maven.Pom;
+import org.springframework.roo.support.util.DomUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -526,6 +533,12 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
         // Update web.xml
         updateWebXmlFile();
+
+        // Installing bootstrap components if necessary
+        if (projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+            updateDatatablesAddonToBootstrap();
+        }
     }
 
     /**
@@ -956,6 +969,16 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     }
 
     /**
+     * Creates an instance with the {@code src/main/webapp} path in the current
+     * module
+     * 
+     * @return
+     */
+    public LogicalPath getWebappPath() {
+        return WebProjectUtils.getWebappPath(projectOperations);
+    }
+
+    /**
      * Gets the feature name managed by this operations class.
      * 
      * @return feature name
@@ -982,5 +1005,126 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             }
         }
         return false;
+    }
+
+    // BOOTSTRAP METHODS
+
+    /**
+     * This method modifies Datatables to uses Bootstrap appereance
+     */
+    @Override
+    public void updateDatatablesAddonToBootstrap() {
+
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        /**
+         * Installing script datatables files
+         */
+        final String scriptFile = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP,
+                "scripts/bootstrap/dataTables.bootstrap.js");
+
+        createFilesInLocationIfNotExists(fileManager, getClass(), scriptFile,
+                "dataTables.bootstrap.js", "scripts/bootstrap/");
+
+        /**
+         * Installing css datatable styles
+         */
+        final String styleFile = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP,
+                "styles/bootstrap/dataTables.bootstrap.css");
+
+        createFilesInLocationIfNotExists(fileManager, getClass(), styleFile,
+                "dataTables.bootstrap.css", "styles/bootstrap/");
+
+        /**
+         * Adding references to load-scripts-bootsrap.tagx
+         */
+
+        final String loadScriptsFile = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP,
+                "WEB-INF/tags/bootstrap/util/load-scripts-bootstrap.tagx");
+
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            inputStream = FileUtils.getInputStream(getClass(),
+                    "tags/bootstrap/util/load-scripts-bootstrap.tagx");
+            if (!fileManager.exists(loadScriptsFile)) {
+                outputStream = fileManager.createFile(loadScriptsFile)
+                        .getOutputStream();
+            }
+            else if (fileManager.exists(loadScriptsFile)
+                    && !isLoadScriptsModified()) {
+                outputStream = fileManager.updateFile(loadScriptsFile)
+                        .getOutputStream();
+            }
+            if (outputStream != null) {
+                IOUtils.copy(inputStream, outputStream);
+            }
+        }
+        catch (final IOException ioe) {
+            throw new IllegalStateException(ioe);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            if (outputStream != null) {
+                IOUtils.closeQuietly(outputStream);
+            }
+
+        }
+
+    }
+
+    /**
+     * This method copy a new file in a directory if the file not exists in the
+     * system
+     * 
+     * @param fileManager
+     * @param loadingClass
+     * @param filePath
+     * @param fileName
+     * @param directory
+     */
+    public static void createFilesInLocationIfNotExists(
+            FileManager fileManager, Class loadingClass, String filePath,
+            String fileName, String directory) {
+        if (!fileManager.exists(filePath)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = FileUtils.getInputStream(loadingClass,
+                        directory.concat(fileName));
+                outputStream = fileManager.createFile(filePath)
+                        .getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            }
+            catch (final IOException ioe) {
+                throw new IllegalStateException(ioe);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
+
+    }
+
+    /**
+     * Check if load-scripts-bootstrap.tagx was modified and include datatables
+     * 
+     * @return
+     */
+    public boolean isLoadScriptsModified() {
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+                "WEB-INF/tags/bootstrap/util/load-scripts-bootstrap.tagx");
+        final Document document = XmlUtils.readXml(fileManager
+                .getInputStream(dirPath));
+        final Element config = document.getDocumentElement();
+        final Element urlElement = DomUtils.findFirstElementByName(
+                "spring:url", config);
+        String value = urlElement.getAttribute("value");
+
+        return value.contains("dataTables.bootstrap.css");
     }
 }

@@ -86,6 +86,11 @@
       <artifactId>org.gvnix.addon.web.mvc</artifactId>
       <version>${gvnix.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.addon.geo</artifactId>
+      <version>${gvnix.version}</version>
+    </dependency>
   </dependencies>
   
   <!-- DiSiD: Add google code distribution management -->

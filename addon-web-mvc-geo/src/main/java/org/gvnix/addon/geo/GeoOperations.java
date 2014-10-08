@@ -8,7 +8,7 @@ import org.springframework.roo.project.Feature;
  * Interface of operations this add-on offers. Typically used by a command type
  * or an external add-on.
  * 
- * @since 1.1
+ * @since 1.4.0
  */
 public interface GeoOperations extends Feature {
 
@@ -17,6 +17,8 @@ public interface GeoOperations extends Feature {
      * project
      */
     static final String FEATURE_NAME_GVNIX_GEO_WEB_MVC = "gvnix-geo-web-mvc";
+
+    static final String FEATURE_DESCRIPTION_GVNIX_GEO_WEB_MVC = "Geo Component";
 
     /**
      * This method checks if setup command is available
@@ -164,5 +166,10 @@ public interface GeoOperations extends Feature {
             String preventExitMessageCode, String icon, String iconLibrary,
             boolean actionTool, String activateFunction,
             String deactivateFunction, String cursorIcon);
+
+    /**
+     * This method updates geo addon to use Bootstrap components
+     */
+    void updateGeoAddonToBootstrap();
 
 }

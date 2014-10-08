@@ -44,7 +44,6 @@ web mvc jquery setup
 web mvc datatables setup
 web mvc jquery all
 web mvc datatables all
-web mvc bootstrap setup
 web mvc batch setup
 web mvc batch all
 jpa geo setup --provider HIBERNATE_SPATIAL 
@@ -62,3 +61,5 @@ web mvc geo tilelayer --name satellit --url "http://maptile.maps.svc.ovi.com/map
 web mvc geo wmslayer --name "geological map of valencia" --url "http://mapas.igme.es/gis/services/Cartografia_Geologica/IGME_GeologicoCValenciana_400/MapServer/WMSServer" --format "image/png" --transparent true --version "1.1.1" --crs EPSG4326 --layers "0,1,2,3"
 web mvc geo tool measure --name measure
 web mvc geo tool custom --name latlng --icon fa-location-arrow --activateFunction activateLatLngTool --deactivateFunction deactivateLatLngTool --iconLibrary fa
+// Change to Bootstrap view
+web mvc bootstrap setup

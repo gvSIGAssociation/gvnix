@@ -11,7 +11,11 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -27,15 +31,20 @@ import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.FeatureNames;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.shell.Shell;
+import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.gvnix.support.WebProjectUtils;
 
 /**
  * Implementation of commands that are available via the Roo shell.
@@ -45,6 +54,7 @@ import org.w3c.dom.Element;
 @Component
 @Service
 public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations {
+    private static final String VIEWS = "views/";
     private static final String SIGNUP = "signup";
     private static final String INTERCEPT_URL = "intercept-url";
     private static final String COULD_NOT_ACQUIRE = "Could not acquire ";
@@ -79,6 +89,11 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
         createUserRoleEntities(entityPackage);
         createControllers(entityPackage, controllerPackage);
         injectDatabasebasedSecurity(entityPackage, controllerPackage);
+
+        if (projectOperations
+                .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+            updateTypicalSecurityAddonToBootstrap();
+        }
 
         return "Done";
     }
@@ -693,5 +708,133 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
         else {
             return "";
         }
+    }
+
+    /**
+     * This method checks if typical security is installed. If is installed
+     * update views to use bootstrap
+     */
+    @Override
+    public void updateTypicalSecurityAddonToBootstrap() {
+        // Checking if the addon is installed using features
+        if (projectOperations
+                .isFeatureInstalledInFocusedModule(FeatureNames.SECURITY)
+                && isTypicalSecurityInstalled() && !isLoginModified()) {
+
+            List<String> viewsFolderFiles = new ArrayList<String>();
+            Collections.addAll(viewsFolderFiles,
+                    "changepassword/bootstrap/index.jspx",
+                    "changepassword/bootstrap/thanks.jspx",
+                    "forgotpassword/bootstrap/index.jspx",
+                    "forgotpassword/bootstrap/thanks.jspx",
+                    "signup/bootstrap/error.jspx",
+                    "signup/bootstrap/index.jspx",
+                    "signup/bootstrap/thanks.jspx",
+                    "roles/bootstrap/create.jspx", "roles/bootstrap/list.jspx",
+                    "roles/bootstrap/show.jspx", "roles/bootstrap/update.jspx",
+                    "userroles/bootstrap/create.jspx",
+                    "userroles/bootstrap/list.jspx",
+                    "userroles/bootstrap/show.jspx",
+                    "userroles/bootstrap/update.jspx",
+                    "users/bootstrap/create.jspx", "users/bootstrap/list.jspx",
+                    "users/bootstrap/show.jspx", "users/bootstrap/update.jspx");
+
+            Iterator<String> viewsFolderIterator = viewsFolderFiles.iterator();
+
+            while (viewsFolderIterator.hasNext()) {
+                String fileName = viewsFolderIterator.next();
+                final String viewFile = pathResolver
+                        .getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
+                                "WEB-INF/views/".concat(fileName));
+
+                createFilesInLocationIfNotExistsUpdateIfExists(fileManager,
+                        getClass(), viewFile, fileName, "");
+            }
+
+            // Copying typical-security login
+
+            final String loginView = pathResolver.getFocusedIdentifier(
+                    Path.SRC_MAIN_WEBAPP, "WEB-INF/views/login.jspx");
+
+            createFilesInLocationIfNotExistsUpdateIfExists(fileManager,
+                    getClass(), loginView, "login-typical.jspx", "");
+        }
+
+    }
+
+    /**
+     * Check if typical security is installed
+     */
+    @Override
+    public boolean isTypicalSecurityInstalled() {
+        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+                "WEB-INF/views/changepassword/index.jspx");
+        return fileManager.exists(dirPath);
+    }
+
+    /**
+     * Check if login.jspx is modified with bootstrap
+     * 
+     * @return
+     */
+    @Override
+    public boolean isLoginModified() {
+        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+                "WEB-INF/views/login.jspx");
+        final Document document = XmlUtils.readXml(fileManager
+                .getInputStream(dirPath));
+        final Element config = document.getDocumentElement();
+        final Element urlElement = DomUtils.findFirstElementByName("div",
+                config);
+        String value = urlElement.getAttribute("class");
+        return value.contains("alert alert-danger");
+    }
+
+    /**
+     * Creates an instance with the {@code src/main/webapp} path in the current
+     * module
+     * 
+     * @return
+     */
+    public LogicalPath getWebappPath() {
+        return WebProjectUtils.getWebappPath(projectOperations);
+    }
+
+    /**
+     * This method copy a new file in a directory if the file not exists and
+     * update the file if exists
+     * 
+     * @param fileManager
+     * @param loadingClass
+     * @param filePath
+     * @param fileName
+     * @param directory
+     */
+    public static void createFilesInLocationIfNotExistsUpdateIfExists(
+            FileManager fileManager, Class loadingClass, String filePath,
+            String fileName, String directory) {
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            inputStream = FileUtils.getInputStream(loadingClass,
+                    directory.concat(fileName));
+            if (!fileManager.exists(filePath)) {
+                outputStream = fileManager.createFile(filePath)
+                        .getOutputStream();
+            }
+            else {
+                outputStream = fileManager.updateFile(filePath)
+                        .getOutputStream();
+            }
+            IOUtils.copy(inputStream, outputStream);
+        }
+        catch (final IOException ioe) {
+            throw new IllegalStateException(ioe);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
+        }
+
     }
 }

@@ -40,4 +40,24 @@ public interface BootstrapOperations extends Feature {
      */
     void updateTags();
 
+    /**
+     * 
+     * This method checks if typical security is installed
+     * 
+     * @return
+     */
+    boolean isTypicalSecurityInstalled();
+
+    /**
+     * This method checks if login was modified before
+     * 
+     * @return
+     */
+    boolean isLoginModified();
+
+    /**
+     * This method updates security addon components to use Bootstrap
+     */
+    void updateSecurityAddonToBootstrap();
+
 }
