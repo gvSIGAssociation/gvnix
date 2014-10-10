@@ -42,6 +42,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.gvnix.web.datatables.util.querydsl.paths.GeometryPath;
 import org.gvnix.web.datatables.util.querydsl.paths.PolygonPath;
+import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -2096,6 +2097,9 @@ public class QuerydslUtils {
                     "");
             TypeDescriptor fromRoot = getTypeDescriptor(fromRootPath, entity
                     .getRoot().getType());
+            if (fromRoot == null) {
+                return null;
+            }
             entityType = fromRoot.getType();
         }
         return getTypeDescriptor(fieldName, entityType);
@@ -2114,13 +2118,21 @@ public class QuerydslUtils {
         BeanWrapper beanWrapper = getBeanWrapper(entityType);
 
         TypeDescriptor fieldDescriptor = null;
+        Class<?> propType = null;
         // Find recursive the las beanWrapper
         if (fieldName.contains(SEPARATOR_FIELDS)) {
             String[] fieldNameSplitted = StringUtils.split(fieldName,
                     SEPARATOR_FIELDS);
             for (int i = 0; i < fieldNameSplitted.length - 1; i++) {
-                beanWrapper = getBeanWrapper(beanWrapper
-                        .getPropertyType(fieldNameSplitted[i]));
+                propType = beanWrapper.getPropertyType(fieldNameSplitted[i]);
+                if (propType == null) {
+                    throw new IllegalArgumentException(String.format(
+                            "Property %s not found in %s (request %s.%s)",
+                            fieldNameSplitted[i],
+                            beanWrapper.getWrappedClass(), entityType,
+                            fieldName));
+                }
+                beanWrapper = getBeanWrapper(propType);
             }
             fieldNameToFindType = fieldNameSplitted[fieldNameSplitted.length - 1];
         }
