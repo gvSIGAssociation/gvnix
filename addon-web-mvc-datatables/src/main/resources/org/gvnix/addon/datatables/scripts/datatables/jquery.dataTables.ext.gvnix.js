@@ -379,13 +379,31 @@ function updateDatatablesFilters(oSettings) {
 		
 		for ( var i=0, iLen=filters.length ; i<iLen ; i++ )
 	    {
-			if(footer[i] !== null){
+			if(footer[i] !== null && footer[i] !== undefined){
 				var $cell = jQuery(footer[i].cell);
 				var property = $cell.data().property;
 				var filterExpression = filters[i].sSearch;
-				
-				if(filterExpression != "")	{
 
+				// Gettting filter input
+				var filterInput = $cell.find('input');
+				
+				 // Adding data to current filter input
+                if(filterInput !== null && filterInput !== undefined){
+                	// Saving Parent Id
+                    filterInput.data("dataTableId", oSettings.sTableId);
+                    // Saving Parent Path
+                    var ajaxSource = oSettings.sAjaxSource;
+                    if(ajaxSource !== null && ajaxSource !== undefined){
+                        ajaxSource = ajaxSource.replace("/datatables/ajax","");
+                        filterInput.data("dataTablePath", ajaxSource);
+                    }
+                }
+
+				filterInput.css("width", "80%");
+
+				if(filterExpression != "")	{
+					// Mark as filtered
+					filterInput.addClass("filter_not_empty");
 					jQuery.ajax({
 						  url: "?checkFilters",
 						  data: {property: property, expression: filterExpression},
@@ -394,9 +412,9 @@ function updateDatatablesFilters(oSettings) {
 							  for(var i=0;i<footer.length;i++){
 								  if(property == jsonResponse.property){
 									  if(!jsonResponse.response){
-										  $cell.find('input').css("background-color","#FA5858");
+										  filterInput.css("background-color","#FA5858");
 									  }else{
-										  $cell.find('input').css("background-color","#ffffff");
+										  filterInput.css("background-color","#ffffff");
 									  }
 								  }
 							  }
@@ -405,7 +423,7 @@ function updateDatatablesFilters(oSettings) {
 						  }
 					});
 				}else{
-					$cell.find('input').css("background-color","#ffffff");
+					filterInput.css("background-color","#ffffff");
 				}
 			}
 	    }

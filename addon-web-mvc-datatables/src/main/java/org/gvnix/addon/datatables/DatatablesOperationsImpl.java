@@ -707,6 +707,11 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 "js_jquery_datatables_custom_api_url",
                 "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.js"));
 
+        // Add jquery.dataTables.ext.gvnix.js
+        jsList.add(new ImmutablePair<String, String>(
+                "js_jquery_datatables_advancedfilter_url",
+                "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.advancedfilter.js"));
+
         WebProjectUtils.addJsAndCssToLoadScriptsTag(cssList, jsList,
                 projectOperations, fileManager);
     }

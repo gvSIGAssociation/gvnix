@@ -157,6 +157,10 @@ public class DatatablesConstants {
             "renderForDatatables");
     static final JavaSymbolName LIST_DATATABLES = new JavaSymbolName(
             "listDatatables");
+    static final JavaSymbolName GET_COLUMN_TYPE = new JavaSymbolName(
+            "getColumnType");
+    static final JavaSymbolName GET_I18N_TEXT = new JavaSymbolName(
+            "geti18nText");
     static final JavaSymbolName LIST_ROO = new JavaSymbolName("list");
     static final JavaSymbolName UI_MODEL = new JavaSymbolName("uiModel");
     static final JavaSymbolName REDIRECT_MODEL = new JavaSymbolName(

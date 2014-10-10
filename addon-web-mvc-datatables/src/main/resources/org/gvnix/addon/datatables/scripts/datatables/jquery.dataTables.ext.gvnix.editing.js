@@ -967,19 +967,32 @@ var GvNIX_Editing;
 				// Init data containers
 				oCreateRow.oCreatingData.id = rowId;
 
+				// Building our pseudo aColumnField with composite PKField included
+				var controls =  $createForm.find('[class^=controls]')
+				var columns = [undefined];
+				for(var i = 0; i < controls.length; i++){
+					if(jQuery(jQuery(controls[i]).find('[name][type!=hidden]')).length !== 0){
+						columns.push(jQuery(jQuery(controls[i]).find('[name][type!=hidden]')).attr('name'));
+					}
+					else if(jQuery(jQuery(controls[i]).find('[data-name]')).length !== 0){
+						columns.push(jQuery(jQuery(controls[i]).find('[data-name]')).attr('data-name'));
+					}
+				}
+
+
 				// Iterate over column fields to get create controls from
 				// entire create form
-				var aFields = _d.aColumnField;
+				var aFields = columns;
 				var aHeaderCells = [];
 				var aFormCells = [];
-				
+
 				for (var colIdx = 0; colIdx < aFields.length; colIdx++) {
 					var property = aFields[colIdx];
 
 					// property is undefined for action columns
 					if (property !== undefined) {
 						property = this._fnUnscapePropertyName(property);
-						
+
 						// Roo property id has the pattern "... _Entity_propertyName_id"
 						var $ctrlGroup = $createForm.find("div[id $= '_" + property.replace(".","_") + "_id'].control-group");
 						var $createCtrls = $ctrlGroup.find("div.controls");
@@ -991,13 +1004,13 @@ var GvNIX_Editing;
 
 						// Store property name in array of values by column index
 						_d.aCreateColumnField.push(property);
-						
+
 						// Create header cell
 						var headerCell = '<th>' + _d.oSettings.aoColumns[colIdx].sTitle + '</th>';
 						aHeaderCells.push(headerCell);
 
 						aFormCells.push("<td>");
-						
+
 						for(var i = 0; i < $input.length; i++){
 							// Add proper CSS classes to contained and input
 							var fieldClass = jQuery($input[i]).attr("class");
@@ -1006,8 +1019,8 @@ var GvNIX_Editing;
 							}else{
 								var divClass = 'controls';
 							}
-							
-							
+
+
 							if (jQuery($input[i]).attr('type') == 'checkbox') {
 								divClass = divClass + ' checkbox';
 							} else {
@@ -1023,108 +1036,27 @@ var GvNIX_Editing;
 							// Make a new unique ID for the input to avoid
 							// collisions with other elements with same ID
 							jQuery($input[i]).attr('id', '_' + $form.attr('id') + jQuery($input[i]).attr('id') + '_create_' + rowId);
-							
-							
-							
+
 							var formCell = "";
-							
+
 							if(i == 0){
 								formCell = '<div class="' + divClass + '">';
 							}
-							
+
 							formCell+= fnOuterHTML(jQuery($input[i]));
-							
+
 							if(i == $input.length){
 								formCell+= '</div>';
 							}
-							
+
 							aFormCells.push(formCell);
-							
+
 							formCell = "";
 						}
-						
+
 						aFormCells.push("</td>");
 					}
 				}
-				
-				// TODO: Implement following code to use on Composite PK Fields
-				/*var aAllFields = $createForm.find("input");
-				for (var colIdx = 0; colIdx < aAllFields.length; colIdx++) {
-					// Adding checks on loupe fields
-					var fieldClass = jQuery(aAllFields[colIdx]).attr("class");
-					if(fieldClass !== undefined && fieldClass.indexOf("loupe_control") !== -1){
-						var propertyData = jQuery(aAllFields[colIdx]).data();
-						var property = "_" + propertyData.field + "_id";
-					}else{
-						var property = aAllFields[colIdx].id;
-					}
-
-					if(property !== undefined && aAllFields[colIdx].type !== "hidden" && aAllFields[colIdx].type !== "submit"){
-						property = property.substring(1,property.length-3);
-						property = this._fnUnscapePropertyName(property);
-
-						// Roo property id has the pattern "... _Entity_propertyName_id"
-						var $ctrlGroup = $createForm.find("div[id $= '_" + property.replace(".","_") + "_id'].control-group");
-						var $createCtrls = $ctrlGroup.find("div.controls");
-						var $input = $createCtrls.find(":input");
-						if ($input.length == 0) {
-							this.error("[fnDisplayCreateForm] Input control for property '" + property + "' not found.");
-							continue;
-						}
-
-						// Store property name in array of values by column index
-						_d.aCreateColumnField.push(property);
-
-						// Create header cell
-
-						var headerCell = '<th>' + $ctrlGroup.find("label").text().replace(":", "").trim() + '</th>';
-						aHeaderCells.push(headerCell);
-
-						aFormCells.push("<td>");
-
-						for(var i = 0; i < $input.length; i++){
-							// Add proper CSS classes to contained and input
-							if(fieldClass !== undefined && fieldClass.indexOf("loupe_control") !== -1){
-								var divClass = 'controls input-group';
-							}else{
-								var divClass = 'controls';
-							}
-							if (jQuery($input[i]).attr('type') == 'checkbox') {
-								divClass = divClass + ' checkbox';
-							} else {
-								var inputClass = jQuery($input[i]).attr('class');
-								if (inputClass !== undefined && inputClass) {
-									inputClass = inputClass + ' form-control input-sm';
-								} else {
-									inputClass = 'form-control input-sm';
-								}
-								jQuery($input[i]).attr('class', inputClass);
-							}
-
-							// Make a new unique ID for the input to avoid
-							// collisions with other elements with same ID
-							jQuery($input[i]).attr('id', '_' + $form.attr('id') + jQuery($input[i]).attr('id') + '_create_' + rowId);
-
-							var formCell = "";
-
-							if(i == 0){
-								formCell = '<div class="' + divClass + '">';
-							}
-
-							formCell+= fnOuterHTML(jQuery($input[i]));
-
-							if(i == $input.length){
-								formCell+= '</div>';
-							}
-
-							aFormCells.push(formCell);
-
-							formCell = "";
-						}
-
-						aFormCells.push("</td>");
-					}
-				}*/
 
 				// Add a column to send button
 				aHeaderCells.push('<th></th>');

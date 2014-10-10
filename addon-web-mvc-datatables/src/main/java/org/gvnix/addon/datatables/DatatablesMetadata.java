@@ -53,6 +53,8 @@ import static org.gvnix.addon.datatables.DatatablesConstants.DATA_SET_MAP_STRING
 import static org.gvnix.addon.datatables.DatatablesConstants.ENUMERATION_STRING;
 import static org.gvnix.addon.datatables.DatatablesConstants.EXTENDED_MODEL_MAP;
 import static org.gvnix.addon.datatables.DatatablesConstants.FIND_ALL_RETURN;
+import static org.gvnix.addon.datatables.DatatablesConstants.GET_COLUMN_TYPE;
+import static org.gvnix.addon.datatables.DatatablesConstants.GET_I18N_TEXT;
 import static org.gvnix.addon.datatables.DatatablesConstants.GET_PROPERTY_MAP;
 import static org.gvnix.addon.datatables.DatatablesConstants.HASHMAP_STRING_OBJECT;
 import static org.gvnix.addon.datatables.DatatablesConstants.HASHMAP_STRING_STRING;
@@ -100,7 +102,11 @@ import static org.springframework.roo.model.SpringJavaType.RESPONSE_BODY;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -111,22 +117,42 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.addon.jpa.query.JpaQueryMetadata;
 import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
 import org.gvnix.support.WebItdBuilderHelper;
-import org.springframework.roo.addon.finder.*;
-import org.springframework.roo.addon.web.mvc.controller.details.*;
+import org.springframework.roo.addon.finder.FieldToken;
+import org.springframework.roo.addon.finder.ReservedToken;
+import org.springframework.roo.addon.finder.Token;
+import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
+import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
+import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
+import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.*;
-import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.FieldMetadataBuilder;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.MethodMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.details.comments.CommentStructure;
 import org.springframework.roo.classpath.details.comments.JavadocComment;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.model.*;
-import org.springframework.roo.project.*;
+import org.springframework.roo.model.DataType;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.JdkJavaType;
+import org.springframework.roo.model.SpringJavaType;
+import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
@@ -405,6 +431,8 @@ public class DatatablesMetadata extends
         builder.addMethod(getGetPropertyMapMethod());
         builder.addMethod(getGetPropertyMapUrlMethod());
         builder.addMethod(getSetDatatablesBaseFilterMethod(annotationValues));
+        builder.addMethod(getColumnTypeRequestMethod());
+        builder.addMethod(geti18nTextRequestMethod());
 
         // Detail methods
         builder.addMethod(getListDatatablesDetailMethod());
@@ -3097,6 +3125,433 @@ public class DatatablesMetadata extends
     }
 
     /**
+     * Returns <code>geti18nText</code> method <br>
+     * This method returns column type after AJAX request
+     * 
+     * @return
+     */
+    private MethodMetadata geti18nTextRequestMethod() {
+        // Define method parameter types
+
+        final List<AnnotatedJavaType> parameterTypes = Arrays.asList(
+                new AnnotatedJavaType(MODEL), AnnotatedJavaType
+                        .convertFromJavaType(HTTP_SERVLET_REQUEST), helper
+                        .createRequestParam(JavaType.STRING, "_locale_", false,
+                                null));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(GET_I18N_TEXT,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // @RequestMapping
+        AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
+        methodAnnotation.setAnnotationType(REQUEST_MAPPING);
+
+        // @RequestMapping(headers = "Accept=application/json"...
+        methodAnnotation.addStringAttribute(HEADERS, ACCEPT_APPLICATION_JSON);
+
+        // @RequestMapping(params = "geti18nText"...
+        methodAnnotation.addStringAttribute(PARAMS_VAR, "geti18nText");
+
+        // @ResponseBody
+        annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
+
+        annotations.add(methodAnnotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(UI_MODEL);
+        parameterNames.add(new JavaSymbolName(
+                DatatablesConstants.REQUEST_PARAMETER_NAME));
+        parameterNames.add(new JavaSymbolName("locale"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        buildGeti18nTextMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, GET_I18N_TEXT, JavaType.STRING,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Build method body for <code>Geti18nText</code> method
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGeti18nTextMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        // TODO Auto-generated method stub
+        bodyBuilder.appendFormalLine("// Getting current locale");
+        bodyBuilder.appendFormalLine(String.format(
+                "%s defaultLocale = Locale.forLanguageTag(locale);",
+                helper.getFinalTypeName(new JavaType("java.util.Locale"))));
+
+        bodyBuilder.appendFormalLine("// Building JSON response");
+        bodyBuilder.appendFormalLine("String JSON = \"{\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"all_isnull\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.all.isnull\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"all_notnull\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.all.notnull\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"boolean_false\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.boolean.false\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"boolean_true\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.boolean.true\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"date_between\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.between\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"date_date\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.date\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"date_day\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.day\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"date_month\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.month\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"date_year\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.year\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"number_between\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.number.between\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"string_contains\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.contains\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"string_ends\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.ends\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"string_isempty\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.isempty\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"string_isnotempty\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.isnotempty\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"string_starts\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.starts\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"button_find\\\": \\\"\" + messageSource_dtt.getMessage(\"button_find\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_all_isnull\\\": \\\"\" + messageSource_dtt.getMessage(\"help.all.isnull\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_all_notnull\\\": \\\"\" + messageSource_dtt.getMessage(\"help.all.notnull\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_boolean_false\\\": \\\"\" + messageSource_dtt.getMessage(\"help.boolean.false\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_boolean_true\\\": \\\"\" + messageSource_dtt.getMessage(\"help.boolean.true\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_date_between\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.between\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_date_date\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.date\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_date_day\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.day\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_date_month\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.month\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_date_year\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.year\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_number_between\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.between\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_number_eq\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.eq\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_number_neq\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.neq\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_number_gt\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.gt\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_number_lt\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.lt\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_number_goe\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.goe\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_number_loe\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.loe\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_string_contains\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.contains\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_string_ends\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.ends\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_string_isempty\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.isempty\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_string_isnotempty\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.isnotempty\", null, defaultLocale) + \"\\\"\";");
+        bodyBuilder.appendFormalLine("JSON += \",\";");
+        bodyBuilder
+                .appendFormalLine("JSON += \"\\\"help_string_starts\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.starts\", null, defaultLocale) + \"\\\"\";");
+
+        bodyBuilder.appendFormalLine("JSON += \"}\";");
+
+        bodyBuilder.appendFormalLine("// return JSON with locale strings");
+        bodyBuilder.appendFormalLine("return JSON;");
+    }
+
+    /**
+     * Returns <code>getColumnType</code> method <br>
+     * This method is to return column type after AJAX request
+     * 
+     * @return
+     */
+    private MethodMetadata getColumnTypeRequestMethod() {
+        // Define method parameter types
+
+        final List<AnnotatedJavaType> parameterTypes = Arrays.asList(
+                new AnnotatedJavaType(MODEL), AnnotatedJavaType
+                        .convertFromJavaType(HTTP_SERVLET_REQUEST), helper
+                        .createRequestParam(JavaType.STRING, "_columnName_",
+                                false, null));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        final MethodMetadata method = methodExists(GET_COLUMN_TYPE,
+                parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method annotations
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+
+        // @RequestMapping
+        AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
+        methodAnnotation.setAnnotationType(REQUEST_MAPPING);
+
+        // @RequestMapping(headers = "Accept=application/json"...
+        methodAnnotation.addStringAttribute(HEADERS, ACCEPT_APPLICATION_JSON);
+
+        // @RequestMapping(params = "getColumnType"...
+        methodAnnotation.addStringAttribute(PARAMS_VAR, "getColumnType");
+
+        // @ResponseBody
+        annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
+
+        annotations.add(methodAnnotation);
+
+        // Define method throws types (none in this case)
+        List<JavaType> throwsTypes = new ArrayList<JavaType>();
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(UI_MODEL);
+        parameterNames.add(new JavaSymbolName(
+                DatatablesConstants.REQUEST_PARAMETER_NAME));
+        parameterNames.add(new JavaSymbolName("columnName"));
+
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        buildGetColumnTypeMethodBody(bodyBuilder);
+
+        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, GET_COLUMN_TYPE, JavaType.STRING,
+                parameterTypes, parameterNames, bodyBuilder);
+        methodBuilder.setAnnotations(annotations);
+        methodBuilder.setThrowsTypes(throwsTypes);
+
+        return methodBuilder.build(); // Build and return a MethodMetadata
+        // instance
+    }
+
+    /**
+     * Build method body for <code>GetColumnType</code> method
+     * 
+     * @param bodyBuilder
+     */
+    private void buildGetColumnTypeMethodBody(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        JavaSymbolName entity = new JavaSymbolName(entityName);
+
+        // Getting all declared fields
+        bodyBuilder.appendFormalLine("// Getting all declared fields");
+
+        // boolean fieldExists = false;
+        bodyBuilder.appendFormalLine("boolean fieldExists = false;");
+
+        // Field attr = null;
+        bodyBuilder.appendFormalLine(String.format("%s attr = null;", helper
+                .getFinalTypeName(new JavaType("java.lang.reflect.Field"))));
+
+        // for(Field field : Owner.class.getDeclaredFields()){
+        bodyBuilder.appendFormalLine(String.format(
+                "for(Field field : %s.class.getDeclaredFields()){",
+                entity.getReadableSymbolName()));
+        bodyBuilder.indent();
+
+        // if(field.getName().equals(columnName)){
+        bodyBuilder.appendFormalLine("if(field.getName().equals(columnName)){");
+        bodyBuilder.indent();
+
+        // attr = field;
+        bodyBuilder.appendFormalLine("attr = field;");
+
+        // fieldExists = true;
+        bodyBuilder.appendFormalLine("fieldExists = true;");
+
+        // break;
+        bodyBuilder.appendFormalLine("break;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // // If current field not exists on entity, find on superclass
+        bodyBuilder
+                .appendFormalLine("// If current field not exists on entity, find on superclass");
+
+        // if(!fieldExists){
+        bodyBuilder.appendFormalLine("if(!fieldExists){");
+        bodyBuilder.indent();
+
+        // if(Owner.class.getSuperclass() != null){
+        bodyBuilder.appendFormalLine(String.format(
+                "if(%s.class.getSuperclass() != null){",
+                entity.getReadableSymbolName()));
+        bodyBuilder.indent();
+
+        // for(Field field : Owner.class.getSuperclass().getDeclaredFields()){
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("for(Field field : %s.class.getSuperclass().getDeclaredFields()){",
+                                entity.getReadableSymbolName()));
+        bodyBuilder.indent();
+
+        // if(field.getName().equals(columnName)){
+        bodyBuilder.appendFormalLine("if(field.getName().equals(columnName)){");
+        bodyBuilder.indent();
+
+        // attr = field;
+        bodyBuilder.appendFormalLine("attr = field;");
+
+        // fieldExists = true;
+        bodyBuilder.appendFormalLine("fieldExists = true;");
+
+        // break;
+        bodyBuilder.appendFormalLine("break;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        // if(fieldExists){
+        bodyBuilder.appendFormalLine("if(fieldExists){");
+        bodyBuilder.indent();
+
+        bodyBuilder.appendFormalLine("// Getting field type");
+        bodyBuilder.appendFormalLine("Object fieldType = null;");
+        bodyBuilder.appendFormalLine("if (attr != null) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("fieldType = attr.getType();");
+        bodyBuilder.appendFormalLine("String type = fieldType.toString();");
+        bodyBuilder.appendFormalLine("// Returning value based on type");
+        bodyBuilder.appendFormalLine("if (\"String\".equals(type)){");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return \"{\\\"columnType\\\": \\\"string\\\"}\";");
+        bodyBuilder.indentRemove();
+        bodyBuilder
+                .appendFormalLine("} else if (\"float\".equals(type) || type.contains(\"Float\")){");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return \"{\\\"columnType\\\": \\\"number\\\"}\";");
+        bodyBuilder.indentRemove();
+        bodyBuilder
+                .appendFormalLine("} else if (\"short\".equals(type) || type.contains(\"Short\")){");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return \"{\\\"columnType\\\": \\\"number\\\"}\";");
+        bodyBuilder.indentRemove();
+        bodyBuilder
+                .appendFormalLine("} else if (\"long\".equals(type) || type.contains(\"Long\")){");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return \"{\\\"columnType\\\": \\\"number\\\"}\";");
+        bodyBuilder.indentRemove();
+        bodyBuilder
+                .appendFormalLine("} else if (\"double\".equals(type) || type.contains(\"Double\")){");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return \"{\\\"columnType\\\": \\\"number\\\"}\";");
+        bodyBuilder.indentRemove();
+        bodyBuilder
+                .appendFormalLine("} else if (\"int\".equals(type) || type.contains(\"Integer\")){");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return \"{\\\"columnType\\\": \\\"number\\\"}\";");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} else if (\"Date\".equals(type)){");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return \"{\\\"columnType\\\": \\\"date\\\"}\";");
+        bodyBuilder.indentRemove();
+        bodyBuilder
+                .appendFormalLine("} else if (\"boolean\".equals(type) || type.contains(\"Boolean\")){");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return \"{\\\"columnType\\\": \\\"boolean\\\"}\";");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} else {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("// Returning by default");
+        bodyBuilder
+                .appendFormalLine("return \"{\\\"columnType\\\": \\\"undefined\\\"}\";");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine("// Returning by default");
+        bodyBuilder
+                .appendFormalLine("return \"{\\\"columnType\\\": \\\"undefined\\\"}\";");
+    }
+
+    /**
      * Returns <code>listDatatables</code> method <br>
      * This method is default list request handler for datatables controllers
      * 
@@ -4181,9 +4636,9 @@ public class DatatablesMetadata extends
         /*
          * @RequestMapping(value = "/exportcsv", produces = "text/csv") public
          * void PetController.exportCsv(
-         *
+         * 
          * @DatatablesParams DatatablesCriterias criterias,
-         *
+         * 
          * @ModelAttribute Pet pet, HttpServletRequest request,
          * HttpServletResponse response) throws ServletException, IOException,
          * ExportException { ... }

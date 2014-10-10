@@ -170,6 +170,10 @@ a.cancel_entity {
 	background: url("../../images/datatables/cancel.png") no-repeat scroll center center transparent;
 }
 
+a.open_wizard {
+	background: url("../../images/datatables/magic_wand.png") no-repeat scroll center center transparent;
+}
+
 /** RowClick and RowOnTop **/
 table.dataTable tr.row_clicked td[class*="sorting_"],
 table.dataTable tr.row_clicked td,
@@ -220,4 +224,11 @@ span.errors {
 
 input.filter_not_empty{
 	background-color: #FFFF35!important;
+}
+.wizard-help{
+		margin-left: 9px;
+		font-size: 9px;
+		vertical-align:super;
+		font-weight: bold;
+		cursor: help;
 }
