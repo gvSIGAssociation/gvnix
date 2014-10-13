@@ -71,6 +71,32 @@
 
           <entry xml:lang="es">Establece el proveedor de registro de cambios a usar.</entry>
         </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-geo_jpa-geo-setup">jpa geo setup</link></entry>
+
+          <entry xml:lang="es">Configura el proyecto para poder guardar entidades con campos de tipo geográficos.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-geo_field-geo">field geo</link></entry>
+
+          <entry xml:lang="es">Añade un nuevo campo de tipo geográfico a la entidad seleccionada.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-geo_finder-geo-all">finder geo all</link></entry>
+
+          <entry xml:lang="es">Genera los buscadores de todos los campos de tipo GEO de <emphasis>todas</emphasis> 
+            las entidades registradas en el proyecto.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-jpa_jpa-geo_finder-geo-add">finder geo add</link></entry>
+
+          <entry xml:lang="es">Genera los buscadores de todos los campos de tipo GEO para la entidad
+            seleccionada.</entry>
+        </row>
       </tbody>
     </tgroup>
   </table>
@@ -254,6 +280,114 @@
               se consulta al la propia instancia de proveedor). Los proveedores se registran como
               add-ons en el framework (al estilo de los proveedores de JDBC para la
               ingeniería inversa) y deben de implementar un interfaz definido.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    </para>
+  </section>
+  
+  <section xml:id="apendice-comandos_addon-jpa_jpa-geo_jpa-geo-setup">
+    <title>jpa geo setup</title>
+
+    <para xml:lang="es">Configura el proyecto para poder guardar entidades con campos de tipo geográficos.</para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--provider</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido] [Identificador de proveedor] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Identificador del proveedor de persistencia GEO a usar. Sólo estarán
+              visibles aquellos proveedor que puedan utilizarse en el proyecto actual (esto
+              se consulta al la propia instancia de proveedor). Los proveedores se registran como
+              add-ons en el framework (al estilo de los proveedores de JDBC para la
+              ingeniería inversa) y deben de implementar un interfaz definido.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    </para>
+  </section>
+  
+  <section xml:id="apendice-comandos_addon-jpa_jpa-geo_field-geo">
+    <title>field geo</title>
+
+    <para xml:lang="es">Añade un nuevo campo de tipo geográfico a la entidad seleccionada.</para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--class</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Entidad sobre la que se quiere añadir el nuevo campo de tipo GEO</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>--fieldName</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido]</emphasis></para>
+
+              <para xml:lang="es">Nombre del nuevo campo que se quiere añadir</para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>--type</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Selecciona el tipo de dato GEO que representará el nuevo campo añadido
+              a la entidad. Puede tomar los siguientes valores:
+              <itemizedlist>
+	       			<listitem>
+	       				<para xml:lang="es">POINT (Se guarda un único punto en la base de datos)</para>
+	       			</listitem>
+	       			<listitem>
+	       				<para xml:lang="es">LINESTRING (Se guardan una serie de puntos que forman una linea continua)</para>
+	       			</listitem>
+	       			<listitem>
+	       				<para xml:lang="es">MULTILINESTRING (Se guardan una serie de puntos que forman varias lineas continuas)</para>
+	       			</listitem>
+	       			<listitem>
+	       				<para xml:lang="es">POLYGON (Se guardan una serie de puntos que forman un polígono. Siempre empieza y acaba en el mismo punto.)</para>
+	       			</listitem>
+	       			<listitem>
+	       				<para xml:lang="es">GEOMETRY (Se guarda una serie de puntos que forman una geometría. Acepta cualquiera de las geometrías anteriores.)</para>
+	       			</listitem>
+	  			</itemizedlist>
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+    </para>
+  </section>
+  
+  <section xml:id="apendice-comandos_addon-jpa_jpa-geo_finder-geo-all">
+    <title>finder geo all</title>
+
+    <para xml:lang="es">Genera los buscadores de todos los campos de tipo GEO de <emphasis>todas</emphasis> 
+            las entidades registradas en el proyecto.</para>
+  </section>
+  
+    <section xml:id="apendice-comandos_addon-jpa_jpa-geo_finder-geo-add">
+    <title>finder geo add</title>
+
+    <para xml:lang="es">Genera los buscadores de todos los campos de tipo GEO para la entidad
+            seleccionada.</para>
+
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
+          <varlistentry>
+            <term>--class</term>
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Entidad sobre la que se quieren generar los métodos de búsqueda.</para>
             </listitem>
           </varlistentry>
         </variablelist>

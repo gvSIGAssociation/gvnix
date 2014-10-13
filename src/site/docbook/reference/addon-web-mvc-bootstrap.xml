@@ -28,15 +28,17 @@
     <para xml:lang="es">Para instalarlo, hay que utilizar el comando <link
     linkend="apendice-comandos_addon-web-mvc-bootstrap_setup">web mvc
     bootstrap setup</link>, el cual solo estará disponible después de instalar el 
-    <link linked="addon-web-mvc_jquery">add-on JQuery</link> en nuestro proyecto.
+    <link linked="addon-web-mvc_jquery">add-on JQuery</link> en nuestro proyecto. Este comando detectará
+    de forma automática, aquellos addons que ya hayan sido instalados y modificará sus componentes para
+    una correcta visualización utilizando Bootstrap. Además, los addons que se instalen después de instalar
+    Bootstrap tendrán apariencia Bootstrap por defecto.
     </para>
   </section>
   
   <section xml:id="addon-web-mvc-bootstrap_actualizacion">
     <title xml:lang="es">Actualización de componentes</title>
     
-    <para xml:lang="es">Para aplicar cambios a las vistas generadas después de la instalación
-    de Bootstrap, hay que utilizar el comando <link
+    <para xml:lang="es">Para actualizar los componentes instalados de Bootstrap basta con ejecutar <link
     linkend="apendice-comandos_addon-web-mvc-bootstrap_update">web mvc
     bootstrap update</link>, el cual solo estará disponible después de haber instalado Bootstrap.
     </para>

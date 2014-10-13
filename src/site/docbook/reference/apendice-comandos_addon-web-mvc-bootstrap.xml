@@ -43,13 +43,9 @@
           linkend="apendice-comandos_addon-web-mvc-bootstrap_update">web mvc bootstrap
           update</link></entry>
 
-          <entry xml:lang="es">Este comando se debe ejecutar después de añadir nuevas vistas a la aplicación, 
-          tanto si se han generado manualmente como automáticamente después de instalar otro add-on.
-          Al ejecutar este comando se modifican todas las vistas de la aplicación para que utilicen los 
-          tags de JQuery (create, update, show, list, finders). En caso de haber instalado el componenete
-          Datatable en el proyecto, importará los recursos necesarios para su correcta visualización. En caso
-          de haber aplicado seguridad al proyecto (security setup, typical security), también  se modificarán 
-          las vistas generadas.</entry>
+          <entry xml:lang="es">Este comando permite regenerar de forma correcta todos los componentes
+          importados por Bootstrap. En caso de una modificación incorrecta de estos componentes, podremos
+          regenerarlos para que vuelvan a su estado inicial.</entry>
         </row>
       </tbody>
     </tgroup>
@@ -67,13 +63,9 @@
   <section xml:id="apendice-comandos_addon-web-mvc-bootstrap_update">
     <title>web mvc bootstrap update</title>
 
-    <para xml:lang="es">Este comando se debe ejecutar después de añadir nuevas vistas a la aplicación, 
-          tanto si se han generado manualmente como automáticamente después de instalar otro add-on.
-          Al ejecutar este comando se modifican todas las vistas de la aplicación para que utilicen los 
-          tags de JQuery (create, update, show, list, finders). En caso de haber instalado el componenete
-          Datatable en el proyecto, importará los recursos necesarios para su correcta visualización. En caso
-          de haber aplicado seguridad al proyecto (security setup, typical security), también  se modificarán 
-          las vistas generadas.</para>
+    <para xml:lang="es">Este comando permite regenerar de forma correcta todos los componentes
+          importados por Bootstrap. En caso de una modificación incorrecta de estos componentes, podremos
+          regenerarlos para que vuelvan a su estado inicial.</para>
   </section>
   
   

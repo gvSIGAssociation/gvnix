@@ -23,6 +23,9 @@
     <listitem>
       <para xml:lang="es">Auditoría y registro de histórico de cambios de las endidades.</para>
     </listitem>
+    <listitem>
+      <para xml:lang="es">Persistencia de entidades con campos de tipo geográfico.</para>
+    </listitem>
   </itemizedlist>
 
   <para xml:lang="es">Para poder utilizar estas funcionalidades hay que ejecutar
@@ -585,5 +588,118 @@ public class Pet {
       JavaDoc de la clase o la documentación del módulo <emphasis>Envers</emphasis>.</para>
 
     </section>
+  </section>
+  <section xml:id="addon-jpa_geo">
+  	<title>Persistencia de entidades con campos de tipo geográfico</title>
+
+    <para xml:lang="es">Esta funcionalidad permite guardar entidades con campos de tipo geográfico.</para>
+    
+    <section xml:id="addon-jpa_geo-setup">
+      <title>Configuración del proyecto para soporte geográfico</title>
+      <para xml:lang="es">Para poder guardar entidades con campos de tipo GEO es necesario configurar
+      el proyecto generado. Para ello se ejecuta el siguiente comando:</para>
+      <variablelist>
+      
+        <varlistentry>
+          <term><command><link
+          linkend="apendice-comandos_addon-jpa_jpa-geo_jpa-geo-setup">
+          jpa geo setup</link></command></term>
+          <listitem>
+            <para xml:lang="es">Configura el proyecto para poder guardar entidades con campos de tipo 
+            geográfico. Este comando solo funcionará si se ha instalado persistencia en el proyecto con
+            proveedor <emphasis>HIBERNATE</emphasis> y se ha seleccionado una de las siguientes 
+            bases de datos:
+           	<itemizedlist>
+       			<listitem>
+       				<para xml:lang="es">H2_IN_MEMORY</para>
+       			</listitem>
+       			<listitem>
+       				<para xml:lang="es">POSTGRES</para>
+       			</listitem>
+       			<listitem>
+       				<para xml:lang="es">MYSQL</para>
+       			</listitem>
+       			<listitem>
+       				<para xml:lang="es">ORACLE</para>
+       			</listitem>
+       			<listitem>
+       				<para xml:lang="es">MSSQL</para>
+       			</listitem>
+  			</itemizedlist>
+            </para>
+          </listitem>
+        </varlistentry>
+        
+       </variablelist>
+    </section>
+    
+    <section xml:id="addon-jpa_geo-field_geo">
+      <title>Añadir campos de tipo geográfico a entidades</title>
+      <para xml:lang="es">Una vez configurado el proyecto para poder guardar entidades con campos de tipo
+      geográfico, ya es posible añadir campos de tipo geográfico a las entidades. Para poder añadir
+      estos nuevos tipos de campo, es necesario ejecutar este comando:</para>
+      <variablelist>
+      
+        <varlistentry>
+          <term><command><link
+          linkend="apendice-comandos_addon-jpa_jpa-geo_field-geo">
+          field geo</link></command></term>
+          <listitem>
+            <para xml:lang="es">Añade un nuevo campo de tipo GEO a la entidad seleccionada. Los nuevos campos
+            añadidos pueden ser de los siguientes tipos: 
+           	<itemizedlist>
+       			<listitem>
+       				<para xml:lang="es">POINT (Se guarda un único punto en la base de datos)</para>
+       			</listitem>
+       			<listitem>
+       				<para xml:lang="es">LINESTRING (Se guardan una serie de puntos que forman una linea continua)</para>
+       			</listitem>
+       			<listitem>
+       				<para xml:lang="es">MULTILINESTRING (Se guardan una serie de puntos que forman varias lineas continuas)</para>
+       			</listitem>
+       			<listitem>
+       				<para xml:lang="es">POLYGON (Se guardan una serie de puntos que forman un polígono. Siempre empieza y acaba en el mismo punto.)</para>
+       			</listitem>
+       			<listitem>
+       				<para xml:lang="es">GEOMETRY (Se guarda una serie de puntos que forman una geometría. Acepta cualquiera de las geometrías anteriores.)</para>
+       			</listitem>
+  			</itemizedlist>
+            </para>
+          </listitem>
+        </varlistentry>
+        
+       </variablelist>
+    </section>
+    
+    <section xml:id="addon-jpa_geo-finder_geo">
+      <title>Implementación de buscadores para campos GEO</title>
+      <para xml:lang="es">Para poder realizar búsquedas sobre campos de tipo GEO es necesario generar una 
+      serie de métodos. Para ello se ejecutan los siguientes comandos:</para>
+      <variablelist>
+      
+        <varlistentry>
+          <term><command><link
+          linkend="apendice-comandos_addon-jpa_jpa-geo_finder-geo-all">
+          finder geo all</link></command></term>
+          <listitem>
+            <para xml:lang="es">Genera los buscadores de todos los campos de tipo GEO de <emphasis>todas</emphasis> 
+            las entidades registradas en el proyecto.</para>
+          </listitem>
+        </varlistentry>
+        
+        
+        <varlistentry>
+          <term><command><link
+          linkend="apendice-comandos_addon-jpa_jpa-geo_finder-geo-add">
+          finder geo add</link></command></term>
+          <listitem>
+            <para xml:lang="es">Genera los buscadores de todos los campos de tipo GEO para la entidad
+            seleccionada.</para>
+          </listitem>
+        </varlistentry>
+        
+       </variablelist>
+    </section>
+    
   </section>
 </chapter>

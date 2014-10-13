@@ -47,7 +47,9 @@
           <para xml:lang="es">Soporta filtrar los datos mostrados por columna,
           además de hacer búsquedas de texto sobre los resultados de los filtros.
           La configuración de que filtros están disponibles para el usuario
-          se pueden configurar en la página.</para>
+          se pueden configurar en la página. Además, estos filtros por columna
+          disponen de un asistente para realizar búsquedas dependiendo del tipo de dato
+          representado en cada una de ellas.</para>
         </listitem>
       </varlistentry>
 
@@ -337,15 +339,19 @@
     <para xml:lang="es">Para activar el filtrado en una columna hay
     que añadir el parámetro <literal>filterable="true"</literal>
     en la etiqueta <classname>table:column</classname> correspondiente a la columna
-    en el fichero <filename>list.jspx</filename></para>
+    en el fichero <filename>list.jspx</filename>. Al añadir este filtrado por columna
+    se añadirán de forma automática un asistente de búsqueda al lado de cada filtro que
+    permitirá realizar búsquedas avanzadas dependiendo del tipo de dato representado en cada
+    columna.</para>
   </section>
   
    <section xml:id="addon-web-mvc-datatables_filtros-simples">
     <title xml:lang="es">Filtros Simples</title>
     	<para xml:lang="es">Los filtros por columna llevan predefinidas unas operaciones
 	    dependiendo del tipo de campo de la columna. Los nombres de estas operaciones
-	    son multidioma y pueden ser configuradas por el desarrollador. Por defecto se instalan
-	    las siguientes operaciones:</para>
+	    son multidioma y pueden ser configuradas por el desarrollador. Estas operaciones 
+	    pueden ser introducidas manualmente o utilizando el asistente de búsqueda comentado anteriormente.
+	    Por defecto se pueden utilizar las siguientes operaciones:</para>
 	    
 	    <para xml:lang="es"><ns:emphasis>Campos de Tipo Texto</ns:emphasis></para>
 	    
