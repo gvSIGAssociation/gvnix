@@ -196,6 +196,8 @@
 
     <xi:include href="addon-web-mvc-datatables.xml"/>
     
+    <xi:include href="addon-web-mvc-geo.xml"/>
+    
     <xi:include href="addon-web-mvc-loupe.xml"/>
 
     <xi:include href="addon-web-screen-pattern.xml"/>
