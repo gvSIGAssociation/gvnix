@@ -670,6 +670,24 @@
 	cd ..
 	echo theme-gvnix end
 
+
+##
+## gvNIX monitoring add-on
+##
+	
+	## monitoring
+	echo monitoring start
+	mkdir monitoring
+	cd monitoring
+	$1/gvnix.sh script --file $2/code/addon-monitoring/src/main/resources/monitoring.roo --lineNumbers true
+	mvn test tomcat:run &
+	mkdir target
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo monitoring end
+
+
 ##
 ## gvNIX add-ons
 ##
