@@ -27,7 +27,6 @@ var options = {
  ================================================= */
 
 var functionCallbacks = jQuery.Callbacks("unique");
-var callbackFunctionsNames = [];
 
 /* JS Utilities
 ================================================== */
@@ -398,9 +397,7 @@ function jQueryInitializeComponents(context) {
       });
     });
 
-    jQuery.each(callbackFunctionsNames, function(index, callbackFunctionName) {
-    	  functionCallbacks.fire(callbackFunctionName, [context]);
-	});
+    functionCallbacks.fire(context);
 
 }
 
@@ -410,7 +407,6 @@ function jQueryInitializeComponents(context) {
  */
 function fnRegisterFunctionsToCallBack(callback){
 	functionCallbacks.add(callback);
-	callbackFunctionsNames.push(callback.name);
 }
 
 !function ($) {
