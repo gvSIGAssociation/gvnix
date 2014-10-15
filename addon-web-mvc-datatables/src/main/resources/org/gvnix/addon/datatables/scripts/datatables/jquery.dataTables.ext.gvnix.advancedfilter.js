@@ -1362,13 +1362,14 @@ var GvNIX_Advanced_Filter;
  * STATIC METHODS
  */
 
-
-// Registering events
+//Registering events
 fnRegisterFunctionsToCallBack(function(context){
-	jQuery(".search_init , .dandelion_text_filter", context).each(function(index) {
-        // Checking that not exists another advanced search
-        if(jQuery(this).parent().find('a').length == 0){
-		    new GvNIX_Advanced_Filter(jQuery(this));
-        }
-	});
+    setTimeout(function(){
+        jQuery(".search_init , .dandelion_text_filter", context).each(function(index) {
+	        // Checking that not exists another advanced search
+	        if(jQuery(this).parent().find('a').length == 0){
+			    new GvNIX_Advanced_Filter(jQuery(this));
+	        }
+		});
+    }, 500);
 });
