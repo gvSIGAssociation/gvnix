@@ -68,6 +68,7 @@
     <module>addon-web-mvc-binding</module>
     <module>addon-web-dialog</module>
     <module>addon-web-mvc-typicalsecurity</module>
+    <module>addon-monitoring</module>
     <module>addon-flex</module>
   </modules>
 
