@@ -1,4 +1,4 @@
-project --topLevelPackage org.gvnix.geo.component
+project --topLevelPackage com.springsource.petclinic
 jpa setup --provider HIBERNATE --database POSTGRES --userName postgres --databaseName postgis_example --password admin --hostName localhost
 enum type --class ~.reference.PetType
 enum constant --name Dog
