@@ -91,6 +91,7 @@
 	width:21px;
 	text-align:center;
 	border-radius:5px;
+	float: right;
 }
 
 .layer_legend_span{
@@ -100,8 +101,9 @@
 
 .layer_legend{
 	height:3px;
-	margin-top:5px;
+	margin-top:10px;
 	padding-left: 25px;
+	float:right;
 }
 
 .toolbar_button{

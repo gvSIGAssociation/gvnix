@@ -363,6 +363,8 @@ public class UpdateCompilationUnitTest {
         assertTrue(result.contains("extends OtheClass<String, Boolean>"));
         assertTrue(result.contains("implements SimpleInterface"));
 
+        // assertTrue(result.contains("== Comment in code =="));
+
         // Check fields
         // assertTrue(result.contains("* Javadoc for field"));
         assertTrue(result.contains("private final String[] params;"));
@@ -381,7 +383,7 @@ public class UpdateCompilationUnitTest {
                 .contains("private List<String>[] listArray = new List<String>[3];"));
         assertTrue(result
                 .contains("Set<String>[] setArray = new Set<String>[] { null, null, null };"));
-        //assertTrue(result.contains("* Enum javaDoc"));
+        // assertTrue(result.contains("* Enum javaDoc"));
         assertTrue(result.contains("public enum theNumbers"));
         assertTrue(result.contains("uno, dos, tres"));
 
