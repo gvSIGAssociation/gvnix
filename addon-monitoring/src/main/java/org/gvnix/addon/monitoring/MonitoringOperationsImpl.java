@@ -1,16 +1,22 @@
 package org.gvnix.addon.monitoring;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.support.WebProjectUtils;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
-import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.classpath.details.*;
+import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.model.*;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.*;
 
@@ -22,6 +28,21 @@ import org.w3c.dom.*;
 @Component
 @Service
 public class MonitoringOperationsImpl implements MonitoringOperations {
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(MonitoringOperationsImpl.class);
+
+    private static final JavaType SPRING_MONITORING_ANNOTATION = new JavaType(
+            "net.bull.javamelody.MonitoredWithSpring");
+
+    private static final JavaType ROO_JAVABEAN = new JavaType(
+            "org.springframework.roo.addon.javabean.RooJavaBean");
+
+    private static final JavaType SPRING_CONTROLLER = new JavaType(
+            "org.springframework.stereotype.Controller");
+
+    private static final JavaType SPRING_SERVICE = new JavaType(
+            "org.springframework.stereotype.Service");
 
     @Reference
     private MenuOperations menuOperations;
@@ -59,6 +80,11 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
     public boolean isCommandAvailable() {
         // Check if a project has been created
         return projectOperations.isFocusedProjectAvailable();
+    }
+
+    public boolean isAddAvailable() {
+        return projectOperations
+                .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_MONITORING);
     }
 
     /** {@inheritDoc} */
@@ -375,6 +401,452 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      */
     public LogicalPath getWebappPath() {
         return WebProjectUtils.getWebappPath(projectOperations);
+    }
+
+    /**
+     * Add all files to be monitored as a Spring service
+     */
+    @Override
+    public void all() {
+        addPackage(projectOperations.getFocusedTopLevelPackage());
+    }
+
+    /**
+     * Add a path which all his child methods will be monitored as a Spring
+     * service
+     * 
+     * @param path Set the package path to be monitored
+     */
+    @Override
+    public void addPackage(JavaPackage path) {
+        // Setting up monitoring annotations
+        createMonitoringConfig();
+
+        // Creating annotation
+        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                SPRING_MONITORING_ANNOTATION);
+
+        // Getting all entity, controllers and services
+        Set<ClassOrInterfaceTypeDetails> entities = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(ROO_JAVABEAN);
+
+        Set<ClassOrInterfaceTypeDetails> controllers = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(SPRING_CONTROLLER);
+
+        Set<ClassOrInterfaceTypeDetails> services = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(SPRING_SERVICE);
+
+        // Annotating all entities if they exists
+        if (entities != null) {
+            Iterator<ClassOrInterfaceTypeDetails> it = entities.iterator();
+
+            while (it.hasNext()) {
+                ClassOrInterfaceTypeDetails entity = it.next();
+                if (entity.getType().getPackage().isWithin(path)) {
+
+                    // Generating new annotation
+                    ClassOrInterfaceTypeDetailsBuilder builder = new ClassOrInterfaceTypeDetailsBuilder(
+                            entity);
+
+                    // Add annotation to target type
+                    builder.updateTypeAnnotation(annotationBuilder.build());
+
+                    // Save changes to disk
+                    typeManagementService.createOrUpdateTypeOnDisk(builder
+                            .build());
+                }
+            }
+        }
+
+        // Annotating all controllers if they exists
+        if (controllers != null) {
+            Iterator<ClassOrInterfaceTypeDetails> it = controllers.iterator();
+
+            while (it.hasNext()) {
+                ClassOrInterfaceTypeDetails controller = it.next();
+                if (controller.getType().getPackage().isWithin(path)) {
+
+                    // Generating new annotation
+                    ClassOrInterfaceTypeDetailsBuilder builder = new ClassOrInterfaceTypeDetailsBuilder(
+                            controller);
+
+                    // Add annotation to target type
+                    builder.updateTypeAnnotation(annotationBuilder.build());
+
+                    // Save changes to disk
+                    typeManagementService.createOrUpdateTypeOnDisk(builder
+                            .build());
+                }
+            }
+        }
+
+        // Annotating all services if they exists
+        if (services != null) {
+            Iterator<ClassOrInterfaceTypeDetails> it = services.iterator();
+
+            while (it.hasNext()) {
+                ClassOrInterfaceTypeDetails service = it.next();
+                if (service.getType().getPackage().isWithin(path)) {
+
+                    // Generating new annotation
+                    ClassOrInterfaceTypeDetailsBuilder builder = new ClassOrInterfaceTypeDetailsBuilder(
+                            service);
+
+                    // Add annotation to target type
+                    builder.updateTypeAnnotation(annotationBuilder.build());
+
+                    // Save changes to disk
+                    typeManagementService.createOrUpdateTypeOnDisk(builder
+                            .build());
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds config data for Spring monitoring
+     * 
+     * @param appContextPath
+     */
+    public void createMonitoringConfig() {
+
+        // Getting Application Context path
+        String appContextPath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_RESOURCES,
+                "META-INF/spring/applicationContext.xml");
+        // Getting Web Config Path
+        String webPath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml");
+
+        // Building configuration for annotation support in both context if
+        // needed
+        createMonitoringAutoProxy(appContextPath);
+        createMonitoringAdvisor(appContextPath);
+        if (fileManager.exists(webPath)) { // If web mvc exists
+            createMonitoringAutoProxy(webPath);
+            createMonitoringAdvisor(webPath);
+        }
+
+    }
+
+    /**
+     * Adds an aop:config for Spring monitoring
+     * 
+     * @param appContextPath
+     */
+    public void createMonitoringAdvisor(String appContextPath) {
+        if (fileManager.exists(appContextPath)) {
+            Document docXml = WebProjectUtils.loadXmlDocument(appContextPath,
+                    fileManager);
+
+            // Getting root element
+            Element docRoot = docXml.getDocumentElement();
+
+            // Checking if exist
+            NodeList beanElements = docRoot.getElementsByTagName("bean");
+
+            for (int i = 0; i < beanElements.getLength(); i++) {
+                Node bean = beanElements.item(i);
+                NamedNodeMap beanAttr = bean.getAttributes();
+                if (beanAttr != null) {
+                    Node idAttr = beanAttr.getNamedItem("id");
+                    // Checking if bean exists on current beans
+                    if (idAttr != null
+                            && "monitoringAdvisor"
+                                    .equals(idAttr.getNodeValue())) {
+
+                        // Checking if exist
+                        NodeList propertyList = bean.getChildNodes();
+
+                        for (int j = 0; j < propertyList.getLength(); j++) {
+                            Node property = propertyList.item(j);
+                            NamedNodeMap propertyAttr = property
+                                    .getAttributes();
+                            if (propertyAttr != null) {
+                                Node nameAttr = propertyAttr
+                                        .getNamedItem("name");
+                                // Checkin if property exists on current bean
+                                if (nameAttr != null
+                                        && "pointcut".equals(nameAttr
+                                                .getNodeValue())) {
+
+                                    // Checking if exist
+                                    NodeList bean2List = property
+                                            .getChildNodes();
+
+                                    for (int k = 0; k < bean2List.getLength(); k++) {
+                                        Node bean2 = bean2List.item(k);
+                                        NamedNodeMap bean2Attr = bean2
+                                                .getAttributes();
+                                        if (bean2Attr != null) {
+                                            Node classAttr = bean2Attr
+                                                    .getNamedItem("class");
+                                            // Checkin if bean exists on current
+                                            // property
+                                            if (classAttr != null
+                                                    && "net.bull.javamelody.MonitoredWithAnnotationPointcut"
+                                                            .equals(classAttr
+                                                                    .getNodeValue())) {
+                                                return;
+                                            }
+                                        }
+                                    }
+
+                                    // Creating new element (bean)
+                                    Element bean2Element = docXml
+                                            .createElement("bean");
+                                    bean2Element
+                                            .setAttribute("class",
+                                                    "net.bull.javamelody.MonitoredWithAnnotationPointcut");
+
+                                    property.appendChild(bean2Element);
+
+                                    // Saving changes and exit
+                                    fileManager
+                                            .createOrUpdateTextFileIfRequired(
+                                                    appContextPath,
+                                                    XmlUtils.nodeToString(docXml),
+                                                    true);
+                                }
+                            }
+                        }
+
+                        // Creating new element (property)
+                        Element propertyElement = docXml
+                                .createElement("property");
+                        propertyElement.setAttribute("name", "pointcut");
+
+                        // Creating new element (bean)
+                        Element bean2Element = docXml.createElement("bean");
+                        bean2Element
+                                .setAttribute("class",
+                                        "net.bull.javamelody.MonitoredWithAnnotationPointcut");
+
+                        propertyElement.appendChild(bean2Element);
+                        bean.appendChild(propertyElement);
+
+                        // Saving changes and exit
+                        fileManager.createOrUpdateTextFileIfRequired(
+                                appContextPath, XmlUtils.nodeToString(docXml),
+                                true);
+                    }
+                }
+            }
+
+            // Creating new element (bean)
+            Element beanElement = docXml.createElement("bean");
+            beanElement.setAttribute("id", "monitoringAdvisor");
+            beanElement.setAttribute("class",
+                    "net.bull.javamelody.MonitoringSpringAdvisor");
+
+            // Creating new element (property)
+            Element propertyElement = docXml.createElement("property");
+            propertyElement.setAttribute("name", "pointcut");
+
+            // Creating new element (bean)
+            Element bean2Element = docXml.createElement("bean");
+            bean2Element.setAttribute("class",
+                    "net.bull.javamelody.MonitoredWithAnnotationPointcut");
+
+            propertyElement.appendChild(bean2Element);
+            beanElement.appendChild(propertyElement);
+            docRoot.appendChild(beanElement);
+
+            // Saving changes
+            fileManager.createOrUpdateTextFileIfRequired(appContextPath,
+                    XmlUtils.nodeToString(docXml), true);
+        }
+    }
+
+    /**
+     * Adds a bean for Spring monitoring
+     * 
+     * @param appContextPath
+     */
+    public void createMonitoringAutoProxy(String appContextPath) {
+        if (fileManager.exists(appContextPath)) {
+            Document docXml = WebProjectUtils.loadXmlDocument(appContextPath,
+                    fileManager);
+
+            // Getting root element
+            Element docRoot = docXml.getDocumentElement();
+
+            // Checking if exist
+            NodeList beanElements = docRoot.getElementsByTagName("bean");
+
+            for (int i = 0; i < beanElements.getLength(); i++) {
+                Node bean = beanElements.item(i);
+                NamedNodeMap beanAttr = bean.getAttributes();
+                if (beanAttr != null) {
+                    Node classAttr = beanAttr.getNamedItem("class");
+                    // Checking if bean exists on current beans
+                    if (classAttr != null
+                            && "org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+                                    .equals(classAttr.getNodeValue())) {
+                        return;
+                    }
+                }
+            }
+
+            // Creating new element (bean)
+            Element beanElement = docXml.createElement("bean");
+            beanElement
+                    .setAttribute("class",
+                            "org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator");
+
+            docRoot.appendChild(beanElement);
+
+            // Saving changes
+            fileManager.createOrUpdateTextFileIfRequired(appContextPath,
+                    XmlUtils.nodeToString(docXml), true);
+        }
+    }
+
+    /**
+     * Add a class to be monitored as a Spring service
+     * 
+     * @param name Set the class name to be monitored
+     */
+    @Override
+    public void addClass(JavaType name) {
+        // Setting up monitoring annotations
+        createMonitoringConfig();
+
+        // Get java type controller
+        ClassOrInterfaceTypeDetails controller = getControllerDetails(name);
+
+        // Generating new annotation
+        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                controller);
+        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                SPRING_MONITORING_ANNOTATION);
+
+        // Add annotation to target type
+        classOrInterfaceTypeDetailsBuilder
+                .updateTypeAnnotation(annotationBuilder.build());
+
+        // Save changes to disk
+        typeManagementService
+                .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
+                        .build());
+
+    }
+
+    /**
+     * Add a method to be monitored as a Spring service
+     * 
+     * @param methodName Set the method name to be monitored
+     * @param className Set the class name of the method to be monitored
+     */
+    @Override
+    public void addMethod(JavaSymbolName methodName, JavaType className) {
+        // Setting up monitoring annotations
+        createMonitoringConfig();
+
+        // Get java type controller
+        ClassOrInterfaceTypeDetails controller = getControllerDetails(className);
+
+        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                controller);
+
+        List<MethodMetadata> methodList = (List<MethodMetadata>) controller
+                .getDeclaredMethods();
+
+        for (int i = 0; i < methodList.size(); i++) {
+            MethodMetadata method = methodList.get(i);
+            if (methodName.equals(method.getMethodName())) {
+                MethodMetadataBuilder builder = new MethodMetadataBuilder(
+                        method);
+
+                // Generating new annotation
+                AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                        SPRING_MONITORING_ANNOTATION);
+
+                // Add annotation to target type
+                builder.updateTypeAnnotation(annotationBuilder.build());
+
+                // Save changes to disk
+                typeManagementService
+                        .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
+                                .build());
+
+            }
+        }
+        LOGGER.log(
+                Level.INFO,
+                "[ERROR] This method doesn't exist for this class or maybe it's inside an .aj file. In this case you must to push-in that method and then execute this command again");
+    }
+
+    /**
+     * This method annotates a class or method
+     * 
+     * @param controller
+     */
+    private void annotateThing(ClassOrInterfaceTypeDetails controller) {
+
+    }
+
+    /**
+     * This method gets class details
+     * 
+     * @param controller
+     * @return
+     */
+    private ClassOrInterfaceTypeDetails getControllerDetails(JavaType controller) {
+        ClassOrInterfaceTypeDetails existing = typeLocationService
+                .getTypeDetails(controller);
+
+        Validate.notNull(existing, "Can't get Type details");
+        return existing;
+    }
+
+    /*** Feature Methods ***/
+
+    /**
+     * Gets the feature name managed by this operations class.
+     * 
+     * @return feature name
+     */
+    @Override
+    public String getName() {
+        return FEATURE_NAME_GVNIX_MONITORING;
+    }
+
+    /**
+     * Returns true if the given feature is installed in current project.
+     * 
+     * @param moduleName feature name to check in current project
+     * @return true if given feature name is installed, otherwise returns false
+     */
+    @Override
+    public boolean isInstalledInModule(String moduleName) {
+        // If its installed provider is net.bull.javamelody.JpaPersistence
+        String persistencePath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml");
+
+        if (fileManager.exists(persistencePath)) {
+            Document docXml = WebProjectUtils.loadXmlDocument(persistencePath,
+                    fileManager);
+
+            // Getting root element
+            Element docRoot = docXml.getDocumentElement();
+
+            // Getting provider
+            NodeList allProviders = docRoot.getElementsByTagName("provider");
+
+            // Check providers
+            if (allProviders.getLength() > 0) {
+                for (int i = 0; i < allProviders.getLength(); i++) {
+                    Element provider = (Element) allProviders.item(i);
+                    if (provider != null
+                            && "net.bull.javamelody.JpaPersistence"
+                                    .equals(provider.getTextContent())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 }
