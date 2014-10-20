@@ -3416,7 +3416,7 @@ public class DatatablesMetadata extends
         // for(Field field : Owner.class.getDeclaredFields()){
         bodyBuilder.appendFormalLine(String.format(
                 "for(Field field : %s.class.getDeclaredFields()){",
-                entity.getReadableSymbolName()));
+                entity.getSymbolNameCapitalisedFirstLetter()));
         bodyBuilder.indent();
 
         // if(field.getName().equals(columnName)){
@@ -3447,14 +3447,14 @@ public class DatatablesMetadata extends
         // if(Owner.class.getSuperclass() != null){
         bodyBuilder.appendFormalLine(String.format(
                 "if(%s.class.getSuperclass() != null){",
-                entity.getReadableSymbolName()));
+                entity.getSymbolNameCapitalisedFirstLetter()));
         bodyBuilder.indent();
 
         // for(Field field : Owner.class.getSuperclass().getDeclaredFields()){
         bodyBuilder
                 .appendFormalLine(String
                         .format("for(Field field : %s.class.getSuperclass().getDeclaredFields()){",
-                                entity.getReadableSymbolName()));
+                                entity.getSymbolNameCapitalisedFirstLetter()));
         bodyBuilder.indent();
 
         // if(field.getName().equals(columnName)){
