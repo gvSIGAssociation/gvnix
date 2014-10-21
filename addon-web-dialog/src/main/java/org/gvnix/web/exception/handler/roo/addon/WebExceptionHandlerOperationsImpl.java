@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -97,9 +97,9 @@ public class WebExceptionHandlerOperationsImpl implements
 
     private static final String PROBLEM_DESCRIPTION = ".problemdescription";
 
-    private static final String IMP_IDENTIFIER_GENERATION_EXCEPTION = "org.hibernate.id.IdentifierGenerationException";
+    private static final String IMP_ID_GEN_EXCEPTION = "org.hibernate.id.IdentifierGenerationException";
 
-    private static final String IDENTIFIER_GENERATION_EXCEPTION = "IdentifierGenerationException";
+    private static final String ID_GEN_EXCEPTION = "IdentifierGenerationException";
 
     @Reference
     private ProjectOperations projectOperations;
@@ -118,7 +118,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #getHandledExceptionList()
@@ -163,7 +163,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #addNewHandledException(java.lang.String, java.lang.String,
@@ -198,7 +198,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #removeExceptionHandled(java.lang.String)
@@ -223,7 +223,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #languageExceptionHandled(java.lang.String, java.lang.String,
@@ -248,7 +248,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #getLanguagePropertiesFile(java.lang.String)
@@ -831,7 +831,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #setUpGvNIXExceptions()
@@ -950,39 +950,39 @@ public class WebExceptionHandlerOperationsImpl implements
 
         // org.hibernate.id.IdentifierGenerationException
         addNewHandledException(
-                IMP_IDENTIFIER_GENERATION_EXCEPTION,
-                IDENTIFIER_GENERATION_EXCEPTION,
+                IMP_ID_GEN_EXCEPTION,
+                ID_GEN_EXCEPTION,
                 "No se puede crear porque alguno de los campos que que conforman el identificador del registro no ha sido informado.",
                 "es");
 
         languageExceptionHandled(
-                IMP_IDENTIFIER_GENERATION_EXCEPTION,
-                IDENTIFIER_GENERATION_EXCEPTION,
+                IMP_ID_GEN_EXCEPTION,
+                ID_GEN_EXCEPTION,
                 "No es pot crear perque algun dels camps que conformen l'identificador del registre no ha estat informat.",
                 "ca");
 
         languageExceptionHandled(
-                IMP_IDENTIFIER_GENERATION_EXCEPTION,
-                IDENTIFIER_GENERATION_EXCEPTION,
+                IMP_ID_GEN_EXCEPTION,
+                ID_GEN_EXCEPTION,
                 "Can not create the record because any of the field comprising the identifier of the record has not been informed.",
                 "en");
 
         // org.hibernate.id.IdentifierGenerationException
         addNewHandledException(
-                IMP_IDENTIFIER_GENERATION_EXCEPTION,
-                IDENTIFIER_GENERATION_EXCEPTION,
+                IMP_ID_GEN_EXCEPTION,
+                ID_GEN_EXCEPTION,
                 "No se puede crear porque alguno de los campos que que conforman el identificador del registro no ha sido informado.",
                 "es");
 
         languageExceptionHandled(
-                IMP_IDENTIFIER_GENERATION_EXCEPTION,
-                IDENTIFIER_GENERATION_EXCEPTION,
+                IMP_ID_GEN_EXCEPTION,
+                ID_GEN_EXCEPTION,
                 "No es pot crear perque algun dels camps que conformen l'identificador del registre no ha estat informat.",
                 "ca");
 
         languageExceptionHandled(
-                IMP_IDENTIFIER_GENERATION_EXCEPTION,
-                IDENTIFIER_GENERATION_EXCEPTION,
+                IMP_ID_GEN_EXCEPTION,
+                ID_GEN_EXCEPTION,
                 "Can not create the record because any of the field comprising the identifier of the record has not been informed.",
                 "en");
 
@@ -1005,7 +1005,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isExceptionMappingAvailable()
@@ -1047,7 +1047,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isExceptionMappingAvailable()
@@ -1088,7 +1088,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isProjectAvailable()

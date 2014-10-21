@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -97,7 +97,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
             .getLogger(WebScreenOperationsImpl.class.getName());
 
     /** Name of {@link GvNIXPattern} attribute value */
-    public static final JavaSymbolName PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
+    public static final JavaSymbolName PAT_ANN_ATTR_VAL_NAME = new JavaSymbolName(
             "value");
 
     /** {@link GvNIXPattern} JavaType */
@@ -105,7 +105,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
             GvNIXPattern.class.getName());
 
     /** Name of {@link GvNIXRelationPattern} attribute value */
-    public static final JavaSymbolName RELATION_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
+    public static final JavaSymbolName REL_PAT_ANN_ATTR_VAL_NAME = new JavaSymbolName(
             "value");
 
     /** {@link GvNIXRelationPattern} JavaType */
@@ -117,11 +117,11 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
             GvNIXRelatedPattern.class.getName());
 
     /** Name of {@link GvNIXRelatedPattern} attribute value */
-    public static final JavaSymbolName RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
+    public static final JavaSymbolName RELTD_PAT_ANN_ATTR_VAL_NAME = new JavaSymbolName(
             "value");
 
     /** Name of {@link RooWebScaffold} attribute formBackingObject */
-    public static final JavaSymbolName ROOWEBSCAFFOLD_ANNOTATION_ATTR_VALUE_FORMBACKINGOBJECT = new JavaSymbolName(
+    public static final JavaSymbolName SCAFF_ANN_ATTR_FORMBOBJ = new JavaSymbolName(
             "formBackingObject");
 
     /** {@link RooWebScaffold} JavaType */
@@ -223,7 +223,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                 PATTERN_ANNOTATION);
         annotationBuilder
                 .addAttribute(new ArrayAttributeValue<StringAttributeValue>(
-                        PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList));
+                        PAT_ANN_ATTR_VAL_NAME, patternList));
 
         // Add or update annotation to target type
         ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
@@ -307,9 +307,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         // Check if filed exists in formBackingObject entity and is OneToMany or
         // ManyToMany
         JavaType formBackingObject = (JavaType) controllerAnnotationMetadata
-                .getAttribute(
-                        ROOWEBSCAFFOLD_ANNOTATION_ATTR_VALUE_FORMBACKINGOBJECT)
-                .getValue();
+                .getAttribute(SCAFF_ANN_ATTR_FORMBOBJ).getValue();
         Validate.notNull(
                 patternService.getEntityToManyField(formBackingObject,
                         field.getSymbolName()),
@@ -343,7 +341,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
             // Loads previously registered values into patterList
             // Also identifies previous value of target pattern
             AnnotationAttributeValue<?> previousAnnotationValues = annotationMetadata
-                    .getAttribute(RELATION_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+                    .getAttribute(REL_PAT_ANN_ATTR_VAL_NAME);
 
             if (previousAnnotationValues != null) {
 
@@ -417,7 +415,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 RELATION_PATTERN_ANNOTATION);
         AnnotationAttributeValue<?> annotationValues = new ArrayAttributeValue<StringAttributeValue>(
-                RELATION_PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList);
+                REL_PAT_ANN_ATTR_VAL_NAME, patternList);
         annotationBuilder.addAttribute(annotationValues);
 
         // Add or update annotation to target type
@@ -575,7 +573,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
             // Loads previously registered pattern into patterList
             // Also checks if name is used previously
             AnnotationAttributeValue<?> previousAnnotationValues = annotationMetadata
-                    .getAttribute(RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+                    .getAttribute(RELTD_PAT_ANN_ATTR_VAL_NAME);
 
             if (previousAnnotationValues != null) {
 
@@ -591,8 +589,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         // instance
         @SuppressWarnings("unchecked")
         List<StringAttributeValue> newValues = (List<StringAttributeValue>) annotation
-                .getAttribute(RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME)
-                .getValue();
+                .getAttribute(RELTD_PAT_ANN_ATTR_VAL_NAME).getValue();
         // Check if the same annotation value is already defined avoiding define
         // it twice
         for (StringAttributeValue stringAttributeValue : newValues) {
@@ -602,7 +599,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         }
 
         AnnotationAttributeValue<?> gvNIXRelatedPatternValue = new ArrayAttributeValue<StringAttributeValue>(
-                RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList);
+                RELTD_PAT_ANN_ATTR_VAL_NAME, patternList);
 
         // TODO: next check must be over if pattern id is already defined in
         // project
@@ -684,7 +681,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                 "__ARRAY_ELEMENT__"), attrValue));
 
         attributes.add(new ArrayAttributeValue<StringAttributeValue>(
-                RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList));
+                RELTD_PAT_ANN_ATTR_VAL_NAME, patternList));
 
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 RELATED_PATTERN_ANNOTATION);
@@ -702,11 +699,11 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
      */
     private JavaType getFormBakingObject(
             ClassOrInterfaceTypeDetails controllerDetails) {
-        AnnotationMetadata rooWebScaffoldAnnotationMetadata = MemberFindingUtils
+        AnnotationMetadata rooWSacffAnnMdata = MemberFindingUtils
                 .getAnnotationOfType(controllerDetails.getAnnotations(),
                         ROOWEBSCAFFOLD_ANNOTATION);
 
-        AnnotationAttributeValue<?> formbakingObjectAttValue = rooWebScaffoldAnnotationMetadata
+        AnnotationAttributeValue<?> formbakingObjectAttValue = rooWSacffAnnMdata
                 .getAttribute(new JavaSymbolName("formBackingObject"));
 
         JavaType formBakingObjectType = (JavaType) formbakingObjectAttValue
@@ -736,7 +733,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.gvnix.web.screen.roo.addon.WebScreenOperations#setup()
      */
     @Override
@@ -987,7 +984,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.gvnix.web.screen.roo.addon.WebScreenOperations#updatePattern()
      */
     public void updatePattern() {
@@ -1151,7 +1148,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.gvnix.web.screen.roo.addon.WebScreenOperations#
      * isControllerEntityActiveRecord(org.springframework.roo.model.JavaType)
      */

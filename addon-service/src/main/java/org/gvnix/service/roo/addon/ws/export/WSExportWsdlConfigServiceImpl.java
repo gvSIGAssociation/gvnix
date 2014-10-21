@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -724,9 +724,9 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                     gvNixAnnotationList.add(gvNIXWebServiceAnnotation);
 
                     // Default Web Service Namespace.
-                    AnnotationAttributeValue<?> targetNamespaceAnnotationAttributeValue = gvNIXWebServiceAnnotation
+                    AnnotationAttributeValue<?> tarNamespaceAnnAttrVal = gvNIXWebServiceAnnotation
                             .getAttribute(new JavaSymbolName("targetNamespace"));
-                    String defaultNamespace = ((StringAttributeValue) targetNamespaceAnnotationAttributeValue)
+                    String defaultNamespace = ((StringAttributeValue) tarNamespaceAnnAttrVal)
                             .getValue();
 
                     // @GvNIXWebMethod annotations.
@@ -987,31 +987,31 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
             ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
             ClassOrInterfaceDeclaration implementedInterface, JavaType javaType) {
 
-        AnnotationMetadata gvNIXWebServiceAnnotationMetadata;
-        List<AnnotationAttributeValue<?>> gvNIXWebServiceAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        AnnotationMetadata gvNIXWServAnnMdata;
+        List<AnnotationAttributeValue<?>> gvNIXWServAnnAttr = new ArrayList<AnnotationAttributeValue<?>>();
 
         /*
          * Class:
-         * 
+         *
          * @javax.jws.WebService( serviceName = "TempConvert", portName =
          * "TempConvertSoap12", targetNamespace = "http://tempuri.org/",
          * wsdlLocation =
          * "http://www.w3schools.com/webservices/tempconvert.asmx?WSDL",
          * endpointInterface = "org.tempuri.TempConvertSoap") Interface:
-         * 
+         *
          * @WebService(targetNamespace = "http://tempuri.org/", name =
          * "TempConvertSoap") Result:
-         * 
+         *
          * @WebService(name = "TempConvertSoap",portName = "TempConvertSoap12",
          * targetNamespace = "http://tempuri.org/", serviceName =
          * "TempConvert");
-         * 
+         *
          * @WebService(targetNamespace =
          * "http://fps.amazonaws.com/doc/2008-09-17/", name =
          * "AmazonFPSPortType")
-         * 
+         *
          * @XmlSeeAlso({ObjectFactory.class})
-         * 
+         *
          * @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
          */
 
@@ -1045,8 +1045,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                                     ((StringLiteralExpr) pair.getValue())
                                             .getValue());
 
-                            gvNIXWebServiceAnnotationAttributes
-                                    .add(addressStringAttributeValue);
+                            gvNIXWServAnnAttr.add(addressStringAttributeValue);
                             break;
                         }
                     }
@@ -1056,7 +1055,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                     for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
 
-                        EnumAttributeValue enumparameterStyleAttributeValue;
+                        EnumAttributeValue enumparamStyleAttrVal;
                         // TODO this is dead code, to Remove it or it's a bug??
                         // enumparameterStyleAttributeValue = new
                         // EnumAttributeValue(
@@ -1068,7 +1067,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                         if (pair.getName().contentEquals("parameterStyle")) {
 
-                            enumparameterStyleAttributeValue = new EnumAttributeValue(
+                            enumparamStyleAttrVal = new EnumAttributeValue(
                                     new JavaSymbolName("parameterStyle"),
                                     new EnumDetails(
                                             new JavaType(
@@ -1078,8 +1077,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                                                             .getValue())
                                                             .getField())));
 
-                            gvNIXWebServiceAnnotationAttributes
-                                    .add(enumparameterStyleAttributeValue);
+                            gvNIXWServAnnAttr.add(enumparamStyleAttrVal);
                         }
                     }
                 }
@@ -1101,9 +1099,9 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                 StringAttributeValue nameStringAttributeValue;
 
-                StringAttributeValue targetNamespaceStringAttributeValue;
+                StringAttributeValue tarNamespaceStrAttrVal;
 
-                StringAttributeValue serviceNameStringAttributeValue;
+                StringAttributeValue servNameStrAttrVal;
 
                 // Retrieve values.
                 for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
@@ -1111,25 +1109,23 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                     if (pair.getName().contentEquals("serviceName")) {
 
                         // serviceName
-                        serviceNameStringAttributeValue = new StringAttributeValue(
+                        servNameStrAttrVal = new StringAttributeValue(
                                 new JavaSymbolName("serviceName"),
                                 ((StringLiteralExpr) pair.getValue())
                                         .getValue());
 
-                        gvNIXWebServiceAnnotationAttributes
-                                .add(serviceNameStringAttributeValue);
+                        gvNIXWServAnnAttr.add(servNameStrAttrVal);
                         continue;
                     }
                     else if (pair.getName().contentEquals("targetNamespace")) {
 
                         // targetNamespace
-                        targetNamespaceStringAttributeValue = new StringAttributeValue(
+                        tarNamespaceStrAttrVal = new StringAttributeValue(
                                 new JavaSymbolName("targetNamespace"),
                                 ((StringLiteralExpr) pair.getValue())
                                         .getValue());
 
-                        gvNIXWebServiceAnnotationAttributes
-                                .add(targetNamespaceStringAttributeValue);
+                        gvNIXWServAnnAttr.add(tarNamespaceStrAttrVal);
                         continue;
                     }
                     else if (pair.getName().contentEquals("portName")) {
@@ -1140,8 +1136,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                                 ((StringLiteralExpr) pair.getValue())
                                         .getValue());
 
-                        gvNIXWebServiceAnnotationAttributes
-                                .add(nameStringAttributeValue);
+                        gvNIXWServAnnAttr.add(nameStringAttributeValue);
                         continue;
                     }
 
@@ -1150,23 +1145,21 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         }
 
         // fullyQualifiedTypeName
-        StringAttributeValue fullyQualifiedStringAttributeValue = new StringAttributeValue(
+        StringAttributeValue fullyQualStrAttrVal = new StringAttributeValue(
                 new JavaSymbolName("fullyQualifiedTypeName"),
                 javaType.getFullyQualifiedTypeName());
-        gvNIXWebServiceAnnotationAttributes
-                .add(fullyQualifiedStringAttributeValue);
+        gvNIXWServAnnAttr.add(fullyQualStrAttrVal);
 
         // exported
         BooleanAttributeValue exportedAttributeValue = new BooleanAttributeValue(
                 new JavaSymbolName("exported"), true);
-        gvNIXWebServiceAnnotationAttributes.add(exportedAttributeValue);
+        gvNIXWServAnnAttr.add(exportedAttributeValue);
 
         // Create GvNIXWebService annotation.
-        gvNIXWebServiceAnnotationMetadata = new AnnotationMetadataBuilder(
-                new JavaType(GvNIXWebService.class.getName()),
-                gvNIXWebServiceAnnotationAttributes).build();
+        gvNIXWServAnnMdata = new AnnotationMetadataBuilder(new JavaType(
+                GvNIXWebService.class.getName()), gvNIXWServAnnAttr).build();
 
-        return gvNIXWebServiceAnnotationMetadata;
+        return gvNIXWServAnnMdata;
     }
 
     /**

@@ -238,19 +238,19 @@ public class DatatablesConstants {
 
     static final String URN_TAG_DATATABLES = "urn:jsptagdir:/WEB-INF/tags/datatables";
 
-    static final String DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE = "detailFields";
+    static final String DTTBL_ANN_DET_FIELDS_ATTR = "detailFields";
 
-    static final String LIST_DATATABLES_DETAIL_METHOD_NAME = "listDatatablesDetail";
+    static final String LIST_DTTBLS_DET_MTHD_NAME = "listDatatablesDetail";
 
     static final String REQUEST_PARAMETER_NAME = "request";
 
-    static final String REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_VALUE_LIST = "/list";
+    static final String RQST_MAP_ANN_LIST = "/list";
 
-    static final String REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME = "value";
+    static final String RQST_MAP_ANN_VAL_NAME = "value";
 
-    static final String REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML = "text/html";
+    static final String RQST_MAP_ANN_VAL_HTML = "text/html";
 
-    static final String REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME = "produces";
+    static final String RQST_MAP_ANN_PROD_NAME = "produces";
 
     static final JavaSymbolName UPDATE_JSON_FORMS_METHOD = new JavaSymbolName(
             "updateJsonForms");

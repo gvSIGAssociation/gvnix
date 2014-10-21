@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -180,11 +180,11 @@ public class ReportConfigServiceImpl implements ReportConfigService {
 
         // Add jasper-views.xml file
         MutableFile mutableFile;
-        InputStream jasperReportsTemplateInputStream;
+        InputStream jRepTInStrm;
 
         try {
-            jasperReportsTemplateInputStream = FileUtils.getInputStream(
-                    getClass(), "jasperreports-views-config-template.xml");
+            jRepTInStrm = FileUtils.getInputStream(getClass(),
+                    "jasperreports-views-config-template.xml");
         }
         catch (Exception ex) {
             throw new IllegalStateException(
@@ -208,7 +208,7 @@ public class ReportConfigServiceImpl implements ReportConfigService {
         InputStream inputStream = null;
         OutputStream outputStream = null;
         try {
-            inputStream = jasperReportsTemplateInputStream;
+            inputStream = jRepTInStrm;
             outputStream = mutableFile.getOutputStream();
             IOUtils.copy(inputStream, outputStream);
         }
@@ -374,10 +374,10 @@ public class ReportConfigServiceImpl implements ReportConfigService {
         InputStream configTemplateInputStream = FileUtils
                 .getInputStream(getClass(),
                         "jasperfonts-extension/jasperreports_extension-template.properties");
-        String jasperReportExtensionPropTemplate;
+        String jRepExtPropT;
         try {
-            jasperReportExtensionPropTemplate = IOUtils
-                    .toString(new InputStreamReader(configTemplateInputStream));
+            jRepExtPropT = IOUtils.toString(new InputStreamReader(
+                    configTemplateInputStream));
         }
         catch (IOException ioe) {
             throw new IllegalStateException(
@@ -398,7 +398,7 @@ public class ReportConfigServiceImpl implements ReportConfigService {
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/classes/jasperreports_extension.properties");
         fileManager.createOrUpdateTextFileIfRequired(jasperReportExtensionProp,
-                jasperReportExtensionPropTemplate, false);
+                jRepExtPropT, false);
         String classesPathDest = projectOperations.getPathResolver()
                 .getIdentifier(
                         LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),

@@ -244,7 +244,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
         // Test if the annotation already exists on the target type
         if (!isDatatablesAnnotated) {
-            ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+            ClassOrInterfaceTypeDetailsBuilder builder = new ClassOrInterfaceTypeDetailsBuilder(
                     existing);
 
             AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
@@ -265,13 +265,10 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             }
 
             // Add annotation to target type
-            classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder
-                    .build());
+            builder.addAnnotation(annotationBuilder.build());
 
             // Save changes to disk
-            typeManagementService
-                    .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
-                            .build());
+            typeManagementService.createOrUpdateTypeOnDisk(builder.build());
 
             // doUpdateListMenuUrl(javaType, controllerAnnotation);
         }
@@ -302,10 +299,10 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         ArrayAttributeValue<StringAttributeValue> detailFieldsAttributesOld = (ArrayAttributeValue) datatablesAnnotation
-                .getAttribute(DatatablesConstants.DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE);
+                .getAttribute(DatatablesConstants.DTTBL_ANN_DET_FIELDS_ATTR);
 
         // Get java type controller builder
-        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+        ClassOrInterfaceTypeDetailsBuilder builder = new ClassOrInterfaceTypeDetailsBuilder(
                 existing);
 
         // Initialize string attributes list for detail fields
@@ -334,7 +331,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         // Create "detailFields" attributes array from string attributes list
         ArrayAttributeValue<StringAttributeValue> detailFieldsArray = new ArrayAttributeValue<StringAttributeValue>(
                 new JavaSymbolName(
-                        DatatablesConstants.DATATABLES_ANNOTATION_DETAIL_FIELDS_ATTRIBUTE),
+                        DatatablesConstants.DTTBL_ANN_DET_FIELDS_ATTR),
                 detailFieldsAttributes);
 
         // Get datatables annotation builder and add "detailFields"
@@ -344,13 +341,10 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         datatablesAnnotationBuilder.build();
 
         // Update annotation into controller
-        classOrInterfaceTypeDetailsBuilder
-                .updateTypeAnnotation(datatablesAnnotationBuilder);
+        builder.updateTypeAnnotation(datatablesAnnotationBuilder);
 
         // Save controller changes to disk
-        typeManagementService
-                .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
-                        .build());
+        typeManagementService.createOrUpdateTypeOnDisk(builder.build());
     }
 
     private ClassOrInterfaceTypeDetails getControllerDetails(JavaType controller) {

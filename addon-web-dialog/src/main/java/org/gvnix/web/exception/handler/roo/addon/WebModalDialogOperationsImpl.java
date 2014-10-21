@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -132,7 +132,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
      * isProjectAvailable()
      */
@@ -145,7 +145,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
      * addModalDialogAnnotation(org.springframework.roo.model.JavaType,
      * org.springframework.roo.model.JavaSymbolName)
@@ -162,7 +162,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
      * addDefaultModalDialogAnnotation(org.springframework.roo.model.JavaType)
      */
@@ -268,7 +268,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
      * setupModalDialogsSupport()
      */
@@ -294,7 +294,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
      * setupMavenDependency()
      */
@@ -445,25 +445,23 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         }
         Element root = webXml.getDocumentElement();
 
-        Element simpleMappingExceptionResolverBean = XmlUtils
+        Element sMapExcepResBean = XmlUtils
                 .findFirstElement(
                         "/beans/bean[@class='org.springframework.web.servlet.handler.SimpleMappingExceptionResolver']",
                         root);
 
         // We'll replace the class just if SimpleMappingExceptionResolver is set
-        if (simpleMappingExceptionResolverBean != null) {
-            simpleMappingExceptionResolverBean.setAttribute("class",
-                    beanClassName);
-            simpleMappingExceptionResolverBean.setAttribute("id",
-                    "messageMappingExceptionResolverBean");
+        if (sMapExcepResBean != null) {
+            sMapExcepResBean.setAttribute("class", beanClassName);
+            sMapExcepResBean.setAttribute("id", "mMapExcepResBean");
             XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);
         }
 
         // Here we need MessageMappingExceptionResolver set as ExceptionResolver
-        Element messageMappingExceptionResolverBean = XmlUtils
+        Element mMapExcepResBean = XmlUtils
                 .findFirstElement("/beans/bean[@class='".concat(beanClassName)
                         .concat("']"), root);
-        Validate.notNull(messageMappingExceptionResolverBean,
+        Validate.notNull(mMapExcepResBean,
                 "MessageMappingExceptionResolver is not configured. Check webmvc-config.xml");
 
     }
@@ -729,7 +727,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
      * isMessageBoxOfTypeModal()
      */

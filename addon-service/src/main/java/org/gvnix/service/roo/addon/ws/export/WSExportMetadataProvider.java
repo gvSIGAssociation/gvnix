@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -94,7 +94,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
      * createLocalIdentifier(org.springframework.roo.model.JavaType,
      * org.springframework.roo.project.Path)
@@ -106,7 +106,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
      * getGovernorPhysicalTypeIdentifier(java.lang.String)
      */
@@ -124,7 +124,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getMetadata
      * (java.lang.String, org.springframework.roo.model.JavaType,
@@ -165,10 +165,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                 governorTypeDetails);
 
         // Default Web Service target Namespace.
-        StringAttributeValue webServiceTargetNamespaceAttributeValue = (StringAttributeValue) gvNIXWebServiceAnnotation
+        StringAttributeValue webSrvTarNmspcAttrVal = (StringAttributeValue) gvNIXWebServiceAnnotation
                 .getAttribute(new JavaSymbolName("targetNamespace"));
-        String webServiceTargetNamespace = webServiceTargetNamespaceAttributeValue
-                .getValue();
+        String webServiceTargetNamespace = webSrvTarNmspcAttrVal.getValue();
 
         // Show info
         logger.log(Level.FINE,
@@ -176,9 +175,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                         + governorTypeDetails.getName() + "'");
 
         // Update CXF XML
-        boolean updateGvNIXWebServiceAnnotation = wSConfigService
-                .publishClassAsWebService(governorTypeDetails.getName(),
-                        gvNIXWebServiceAnnotation);
+        boolean updtGvNIXWServAnn = wSConfigService.publishClassAsWebService(
+                governorTypeDetails.getName(), gvNIXWebServiceAnnotation);
 
         // Define Jax-WS plugin and creates and execution build for this
         // service to generate the wsdl file to check errors before deploy.
@@ -257,7 +255,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
         }
 
         // Update Annotation because Java Class or package has changed.
-        if (updateGvNIXWebServiceAnnotation) {
+        if (updtGvNIXWServAnn) {
 
             List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
             gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
@@ -624,9 +622,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
         AnnotationMetadata gvNixWebParamAnnotation;
         AnnotationMetadata webParamAnnotation;
 
-        StringAttributeValue gvNixWebParamNameAttributeValue;
+        StringAttributeValue gvNIXWParamNmAttrVal;
         StringAttributeValue webParamNameAttributeValue;
-        ClassAttributeValue gvNIxWebParamTypeAttributeValue;
+        ClassAttributeValue gvNIXWParamTypeAttrVal;
         StringAttributeValue targetNamespaceAttribute;
 
         for (AnnotatedJavaType inputParameter : annotatedInputParameters) {
@@ -660,11 +658,11 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                                     .getFullyQualifiedTypeName()
                             + "' to be exported as web Service operation.");
 
-            gvNIxWebParamTypeAttributeValue = (ClassAttributeValue) gvNixWebParamAnnotation
+            gvNIXWParamTypeAttrVal = (ClassAttributeValue) gvNixWebParamAnnotation
                     .getAttribute(new JavaSymbolName("type"));
 
-            Validate.isTrue(gvNIxWebParamTypeAttributeValue != null
-                    && gvNIxWebParamTypeAttributeValue.getValue() != null,
+            Validate.isTrue(gvNIXWParamTypeAttrVal != null
+                    && gvNIXWParamTypeAttrVal.getValue() != null,
                     "Must be set 'type' attribute in @GvNIXWebParam annotation to: "
                             + inputParameter.getJavaType()
                                     .getFullyQualifiedTypeName()
@@ -677,12 +675,12 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
             // Check if is the same class type as parameter type.
             Validate.isTrue(
-                    gvNIxWebParamTypeAttributeValue != null
+                    gvNIXWParamTypeAttrVal != null
                             && inputParameter
                                     .getJavaType()
                                     .getFullyQualifiedTypeName()
                                     .contentEquals(
-                                            gvNIxWebParamTypeAttributeValue
+                                            gvNIXWParamTypeAttrVal
                                                     .getValue()
                                                     .getFullyQualifiedTypeName()),
                     "The 'type' attribute in @GvNIXWebParam annotation to: "
@@ -696,14 +694,13 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                             + "' is different than parameter Java type. This would change web service contract."
                             + "\nIf you want to change the web service contract you must define the same Java type in 'type' attribute in @GvNIXWebParam annotation.");
 
-            gvNixWebParamNameAttributeValue = (StringAttributeValue) gvNixWebParamAnnotation
+            gvNIXWParamNmAttrVal = (StringAttributeValue) gvNixWebParamAnnotation
                     .getAttribute(new JavaSymbolName("name"));
 
             Validate.isTrue(
-                    gvNixWebParamNameAttributeValue != null
-                            && StringUtils
-                                    .isNotBlank(gvNixWebParamNameAttributeValue
-                                            .getValue()),
+                    gvNIXWParamNmAttrVal != null
+                            && StringUtils.isNotBlank(gvNIXWParamNmAttrVal
+                                    .getValue()),
                     "Must be set 'name' attribute in @GvNIXWebParam annotation to: "
                             + inputParameter.getJavaType()
                                     .getFullyQualifiedTypeName()
@@ -749,11 +746,10 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
             Validate.isTrue(
                     webParamNameAttributeValue != null
-                            && gvNixWebParamNameAttributeValue != null
+                            && gvNIXWParamNmAttrVal != null
                             && webParamNameAttributeValue.getValue()
                                     .contentEquals(
-                                            gvNixWebParamNameAttributeValue
-                                                    .getValue()),
+                                            gvNIXWParamNmAttrVal.getValue()),
                     "The 'name' attribute in @GvNIXWebParam and @WebParam annotation to: "
                             + inputParameter.getJavaType()
                                     .getFullyQualifiedTypeName()
@@ -860,7 +856,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @seeorg.springframework.roo.classpath.itd.ItdMetadataProvider#
      * getItdUniquenessFilenameSuffix()
      */
@@ -870,7 +866,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
      */
     public String getProvidesType() {

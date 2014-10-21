@@ -716,19 +716,16 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
         ClassOrInterfaceTypeDetails controller = getControllerDetails(name);
 
         // Generating new annotation
-        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+        ClassOrInterfaceTypeDetailsBuilder builder = new ClassOrInterfaceTypeDetailsBuilder(
                 controller);
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 SPRING_MONITORING_ANNOTATION);
 
         // Add annotation to target type
-        classOrInterfaceTypeDetailsBuilder
-                .updateTypeAnnotation(annotationBuilder.build());
+        builder.updateTypeAnnotation(annotationBuilder.build());
 
         // Save changes to disk
-        typeManagementService
-                .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
-                        .build());
+        typeManagementService.createOrUpdateTypeOnDisk(builder.build());
 
     }
 
@@ -746,7 +743,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
         // Get java type controller
         ClassOrInterfaceTypeDetails controller = getControllerDetails(className);
 
-        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+        ClassOrInterfaceTypeDetailsBuilder classBuilder = new ClassOrInterfaceTypeDetailsBuilder(
                 controller);
 
         List<MethodMetadata> methodList = (List<MethodMetadata>) controller
@@ -766,9 +763,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                 builder.updateTypeAnnotation(annotationBuilder.build());
 
                 // Save changes to disk
-                typeManagementService
-                        .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
-                                .build());
+                typeManagementService.createOrUpdateTypeOnDisk(classBuilder
+                        .build());
 
             }
         }

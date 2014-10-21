@@ -78,15 +78,15 @@ public class JpaAuditMetadata extends
             "auditLastUpdate");
     public static final JavaSymbolName LAST_UPDATED_BY_FIELD = new JavaSymbolName(
             "auditLastUpdatedBy");
-    public static final JavaSymbolName GET_REVISON_NUMBER_FOR_DATE_METHOD = new JavaSymbolName(
+    public static final JavaSymbolName GET_REV_N_F_DATE_M = new JavaSymbolName(
             "getRevisionNumberForDate");
     public static final JavaSymbolName REV_ITEM_GET_ITEM_METHOD = new JavaSymbolName(
             "getItem");
-    public static final JavaSymbolName REV_ITEM_GET_REVISION_NUMBER_METHOD = new JavaSymbolName(
+    public static final JavaSymbolName REV_ITEM_GET_REV_N_MET = new JavaSymbolName(
             "getRevisionNumber");
-    public static final JavaSymbolName REV_ITEM_GET_REVISION_USER_METHOD = new JavaSymbolName(
+    public static final JavaSymbolName REV_ITEM_GET_REV_USER_MET = new JavaSymbolName(
             "getRevisionUser");
-    public static final JavaSymbolName REV_ITEM_GET_REVISION_DATE_METHOD = new JavaSymbolName(
+    public static final JavaSymbolName REV_ITEM_GET_REV_DATE_MET = new JavaSymbolName(
             "getRevisionDate");
     public static final JavaSymbolName REV_ITEM_IS_CREATE_METHOD = new JavaSymbolName(
             "isCreate");
@@ -499,7 +499,7 @@ public class JpaAuditMetadata extends
     private MethodMetadata createRevisionItemGetRevisionDateMethod() {
         InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
         revisionLogBuilder.buildBodyRevisionItemGetRevisionDate(body);
-        return createRevisionItemMethod(REV_ITEM_GET_REVISION_DATE_METHOD,
+        return createRevisionItemMethod(REV_ITEM_GET_REV_DATE_MET,
                 JdkJavaType.DATE, body);
     }
 
@@ -509,8 +509,8 @@ public class JpaAuditMetadata extends
     private MethodMetadata createRevisionItemGetRevisionUserMethod() {
         InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
         revisionLogBuilder.buildBodyRevisionItemGetRevisionUser(body);
-        return createRevisionItemMethod(REV_ITEM_GET_REVISION_USER_METHOD,
-                userType, body);
+        return createRevisionItemMethod(REV_ITEM_GET_REV_USER_MET, userType,
+                body);
     }
 
     /**
@@ -519,7 +519,7 @@ public class JpaAuditMetadata extends
     private MethodMetadata createRevisionItemGetRevisionNumberMethod() {
         InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
         revisionLogBuilder.buildBodyRevisionItemGetRevisionNumber(body);
-        return createRevisionItemMethod(REV_ITEM_GET_REVISION_NUMBER_METHOD,
+        return createRevisionItemMethod(REV_ITEM_GET_REV_N_MET,
                 JavaType.LONG_OBJECT, body);
     }
 
@@ -819,7 +819,7 @@ public class JpaAuditMetadata extends
      */
     private MethodMetadata getGetRevisionNumberForDateMethod() {
         // method name
-        JavaSymbolName methodName = GET_REVISON_NUMBER_FOR_DATE_METHOD;
+        JavaSymbolName methodName = GET_REV_N_F_DATE_M;
 
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = helper
@@ -1408,7 +1408,7 @@ public class JpaAuditMetadata extends
         /** {@inheritDoc} */
         @Override
         public JavaSymbolName getGetRevisionNumberForDate() {
-            return GET_REVISON_NUMBER_FOR_DATE_METHOD;
+            return GET_REV_N_F_DATE_M;
         }
 
         /** {@inheritDoc} */

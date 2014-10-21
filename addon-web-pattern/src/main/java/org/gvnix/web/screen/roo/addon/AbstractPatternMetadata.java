@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -118,7 +118,7 @@ public abstract class AbstractPatternMetadata extends
             "params");
     private static final JavaSymbolName VALUE_ATTRIBUTE_NAME = new JavaSymbolName(
             "value");
-    private static final JavaType REQUEST_MAPPING_ANNOTATION_TYPE = new JavaType(
+    private static final JavaType RQST_MAP_ANN_TYPE = new JavaType(
             "org.springframework.web.bind.annotation.RequestMapping");
 
     protected WebScaffoldMetadata webScaffoldMetadata;
@@ -379,7 +379,7 @@ public abstract class AbstractPatternMetadata extends
                 .add(getMethodRequestMapping(RequestMethod.DELETE));
         requestMappingAttributes.add(PRODUCES_PARAM_MAPPING);
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
+                RQST_MAP_ANN_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
 
@@ -487,7 +487,7 @@ public abstract class AbstractPatternMetadata extends
         requestMappingAttributes.add(getMethodRequestMapping(requestMethod));
         requestMappingAttributes.add(PRODUCES_PARAM_MAPPING);
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
+                RQST_MAP_ANN_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
         return annotations;
@@ -754,7 +754,7 @@ public abstract class AbstractPatternMetadata extends
                 .add(getMethodRequestMapping(RequestMethod.GET));
         requestMappingAttributes.add(PRODUCES_PARAM_MAPPING);
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
+                RQST_MAP_ANN_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
         methodBuilder.setAnnotations(annotations);
@@ -934,7 +934,7 @@ public abstract class AbstractPatternMetadata extends
                 .add(getMethodRequestMapping(RequestMethod.GET));
         requestMappingAttributes.add(PRODUCES_PARAM_MAPPING);
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
+                RQST_MAP_ANN_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
         methodBuilder.setAnnotations(annotations);
@@ -997,19 +997,18 @@ public abstract class AbstractPatternMetadata extends
      */
     private void addBodyLinesRegisteringRelatedEntitiesDateTypesFormat(
             InvocableMemberBodyBuilder bodyBuilder) {
-        for (Entry<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> javaTypeDateTimeFormatDetailsEntry : relatedDates
+        for (Entry<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> jTypeDTimeFormatDet : relatedDates
                 .entrySet()) {
 
-            String relatedEntityName = uncapitalize(javaTypeDateTimeFormatDetailsEntry
+            String relatedEntityName = uncapitalize(jTypeDTimeFormatDet
                     .getKey().getSimpleTypeName());
-            for (Entry<JavaSymbolName, DateTimeFormatDetails> javaSymbolNameDateTimeFormatDetailsEntry : javaTypeDateTimeFormatDetailsEntry
+            for (Entry<JavaSymbolName, DateTimeFormatDetails> jSymNDTimeFormDet : jTypeDTimeFormatDet
                     .getValue().entrySet()) {
 
                 String pattern;
-                if (javaSymbolNameDateTimeFormatDetailsEntry.getValue().pattern != null) {
-                    pattern = "\""
-                            + javaSymbolNameDateTimeFormatDetailsEntry
-                                    .getValue().pattern + "\"";
+                if (jSymNDTimeFormDet.getValue().pattern != null) {
+                    pattern = "\"" + jSymNDTimeFormDet.getValue().pattern
+                            + "\"";
                 }
                 else {
                     JavaType dateTimeFormat = new JavaType(
@@ -1022,18 +1021,16 @@ public abstract class AbstractPatternMetadata extends
                     String localeContextHolderSimple = localeContextHolder
                             .getNameIncludingTypeParameters(false,
                                     builder.getImportRegistrationResolver());
-                    pattern = dateTimeFormatSimple
-                            + ".patternForStyle(\""
-                            + javaSymbolNameDateTimeFormatDetailsEntry
-                                    .getValue().style + "\", "
+                    pattern = dateTimeFormatSimple + ".patternForStyle(\""
+                            + jSymNDTimeFormDet.getValue().style + "\", "
                             + localeContextHolderSimple + ".getLocale())";
                 }
                 bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
                         + relatedEntityName
                         + "_"
-                        + javaSymbolNameDateTimeFormatDetailsEntry.getKey()
-                                .getSymbolName().toLowerCase()
-                        + "_date_format\", " + pattern + ");");
+                        + jSymNDTimeFormDet.getKey().getSymbolName()
+                                .toLowerCase() + "_date_format\", " + pattern
+                        + ");");
             }
         }
     }
@@ -1158,7 +1155,7 @@ public abstract class AbstractPatternMetadata extends
 
         // Get Method RequestMapping annotation
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
+                RQST_MAP_ANN_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
         methodBuilder.setAnnotations(annotations);
@@ -1204,7 +1201,7 @@ public abstract class AbstractPatternMetadata extends
 
         // Get Method RequestMapping annotation
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
+                RQST_MAP_ANN_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
         methodBuilder.setAnnotations(annotations);
@@ -1250,7 +1247,7 @@ public abstract class AbstractPatternMetadata extends
 
         // Get Method RequestMapping annotation
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
-                REQUEST_MAPPING_ANNOTATION_TYPE, requestMappingAttributes);
+                RQST_MAP_ANN_TYPE, requestMappingAttributes);
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         annotations.add(requestMapping);
         methodBuilder.setAnnotations(annotations);
@@ -1568,7 +1565,7 @@ public abstract class AbstractPatternMetadata extends
         List<AnnotationAttributeValue<?>> requestMappingAnnotation = getParamsRequestMapping(patternName);
         requestMappingAnnotation.add(getMethodRequestMapping(method));
         requestMappingAnnotation.add(PRODUCES_PARAM_MAPPING);
-        return new AnnotationMetadataBuilder(REQUEST_MAPPING_ANNOTATION_TYPE,
+        return new AnnotationMetadataBuilder(RQST_MAP_ANN_TYPE,
                 requestMappingAnnotation);
     }
 

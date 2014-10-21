@@ -472,9 +472,9 @@ public class SafeSecurityProvider implements SecurityProvider {
                 2);
 
         // Add @GvNIXUserAuthoritySAFE annotation
-        AnnotationMetadataBuilder gvnixUserAuthoritySafeAnnotation = new AnnotationMetadataBuilder(
+        AnnotationMetadataBuilder gvNIXUserAuthSafeAnn = new AnnotationMetadataBuilder(
                 new JavaType(GvNIXUserAuthoritySAFE.class));
-        annotations.add(gvnixUserAuthoritySafeAnnotation);
+        annotations.add(gvNIXUserAuthSafeAnn);
 
         // Add @RooJavaBean annotation
         AnnotationMetadataBuilder javaBeanAnnotation = new AnnotationMetadataBuilder(
@@ -577,9 +577,9 @@ public class SafeSecurityProvider implements SecurityProvider {
                 1);
 
         // Add @GvNIXAuthenticationFilter annotation
-        AnnotationMetadataBuilder gvnixAuthenticationFilterAnnotation = new AnnotationMetadataBuilder(
+        AnnotationMetadataBuilder gvNIXAuthFiltAnn = new AnnotationMetadataBuilder(
                 new JavaType(GvNIXSafeAuthenticationFilter.class));
-        annotations.add(gvnixAuthenticationFilterAnnotation);
+        annotations.add(gvNIXAuthFiltAnn);
 
         // Add Extends Type
         cidBuilder
@@ -625,9 +625,9 @@ public class SafeSecurityProvider implements SecurityProvider {
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
 
         // Add @GvNIXSafeLoginController annotation
-        AnnotationMetadataBuilder gvnixSafeLoginControllerAnnotation = new AnnotationMetadataBuilder(
+        AnnotationMetadataBuilder gvNIXSafeLoginContAnn = new AnnotationMetadataBuilder(
                 new JavaType(GvNIXSafeLoginController.class));
-        annotations.add(gvnixSafeLoginControllerAnnotation);
+        annotations.add(gvNIXSafeLoginContAnn);
 
         // Add @Controller annotation
         AnnotationMetadataBuilder controllerAnnotation = new AnnotationMetadataBuilder(

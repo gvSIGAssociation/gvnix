@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -217,8 +217,8 @@ public class WSExportWsdlImpl implements WsExportWsdl {
             ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
             JavaType exceptionType) {
 
-        AnnotationMetadata gvNIXWebFaultAnnotationMetadata;
-        List<AnnotationAttributeValue<?>> gvNIXWebFaultAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        AnnotationMetadata gvNIXWFAMetadata;
+        List<AnnotationAttributeValue<?>> gvNIXWFAAttr = new ArrayList<AnnotationAttributeValue<?>>();
 
         // @WebFault(name = "faultDetail", targetNamespace =
         // "http://apache.org/hello_world_soap_http/types")
@@ -235,7 +235,7 @@ public class WSExportWsdlImpl implements WsExportWsdl {
 
                 StringAttributeValue nameStringAttributeValue;
 
-                StringAttributeValue targetNamespaceStringAttributeValue;
+                StringAttributeValue targetNamespcStrAttrVal;
 
                 // Retrieve values.
                 for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
@@ -248,19 +248,17 @@ public class WSExportWsdlImpl implements WsExportWsdl {
                                 ((StringLiteralExpr) pair.getValue())
                                         .getValue());
 
-                        gvNIXWebFaultAnnotationAttributes
-                                .add(nameStringAttributeValue);
+                        gvNIXWFAAttr.add(nameStringAttributeValue);
                     }
                     else if (pair.getName().contentEquals("targetNamespace")) {
 
                         // targetNamespace
-                        targetNamespaceStringAttributeValue = new StringAttributeValue(
+                        targetNamespcStrAttrVal = new StringAttributeValue(
                                 new JavaSymbolName("targetNamespace"),
                                 ((StringLiteralExpr) pair.getValue())
                                         .getValue());
 
-                        gvNIXWebFaultAnnotationAttributes
-                                .add(targetNamespaceStringAttributeValue);
+                        gvNIXWFAAttr.add(targetNamespcStrAttrVal);
                     }
 
                 }
@@ -268,15 +266,14 @@ public class WSExportWsdlImpl implements WsExportWsdl {
         }
 
         // faultBean
-        gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-                new JavaSymbolName("faultBean"), faultBeanWebFault));
+        gvNIXWFAAttr.add(new StringAttributeValue(new JavaSymbolName(
+                "faultBean"), faultBeanWebFault));
 
         // Create GvNIXWebFault annotation.
-        gvNIXWebFaultAnnotationMetadata = new AnnotationMetadataBuilder(
-                new JavaType(GvNIXWebFault.class.getName()),
-                gvNIXWebFaultAnnotationAttributes).build();
+        gvNIXWFAMetadata = new AnnotationMetadataBuilder(new JavaType(
+                GvNIXWebFault.class.getName()), gvNIXWFAAttr).build();
 
-        return gvNIXWebFaultAnnotationMetadata;
+        return gvNIXWFAMetadata;
     }
 
     /**
@@ -395,26 +392,25 @@ public class WSExportWsdlImpl implements WsExportWsdl {
         MethodMetadata gvNIXMethodMetadata;
 
         // Method annotations.
-        List<AnnotationMetadata> gvNIXWebMethodAnnotationMetadataList = new ArrayList<AnnotationMetadata>();
+        List<AnnotationMetadata> gvNIXWMAMdataList = new ArrayList<AnnotationMetadata>();
 
-        AnnotationMetadata gvNIXWEbMethodAnnotationMetadata = getGvNIXWebMethodAnnotation(
+        AnnotationMetadata gvNIXWMAnnMdata = getGvNIXWebMethodAnnotation(
                 methodMetadata, defaultNamespace);
 
         Validate.isTrue(
-                gvNIXWEbMethodAnnotationMetadata != null,
+                gvNIXWMAnnMdata != null,
                 "Generated Web Service method: '"
                         + methodMetadata.getMethodName()
                         + "' is not correctly generated with Web Service annotation values.\nRelaunch the command.");
 
-        gvNIXWebMethodAnnotationMetadataList
-                .add(gvNIXWEbMethodAnnotationMetadata);
+        gvNIXWMAMdataList.add(gvNIXWMAnnMdata);
 
         // Input Parameters annotations.
         List<AnnotatedJavaType> annotatedGvNIXWebParameterList = getGvNIXWebParamsAnnotations(
                 methodMetadata, defaultNamespace);
 
         Validate.isTrue(
-                gvNIXWEbMethodAnnotationMetadata != null,
+                gvNIXWMAnnMdata != null,
                 "Generated Web Service method: '"
                         + methodMetadata.getMethodName()
                         + "' is not correctly generated with Web Service annotation values for its parameters.\nRelaunch the command.");
@@ -427,7 +423,7 @@ public class WSExportWsdlImpl implements WsExportWsdl {
                 methodMetadata.getModifier(), methodMetadata.getMethodName(),
                 methodMetadata.getReturnType(), annotatedGvNIXWebParameterList,
                 methodMetadata.getParameterNames(), bodyBuilder);
-        for (AnnotationMetadata annotationMetadata : gvNIXWebMethodAnnotationMetadataList) {
+        for (AnnotationMetadata annotationMetadata : gvNIXWMAMdataList) {
             methodMetadataBuilder.addAnnotation(annotationMetadata);
         }
         for (JavaType javaType : methodMetadata.getThrowsTypes()) {
@@ -455,10 +451,10 @@ public class WSExportWsdlImpl implements WsExportWsdl {
     private AnnotationMetadata getGvNIXWebMethodAnnotation(
             MethodMetadata methodMetadata, String defaultNamespace) {
 
-        AnnotationMetadata gvNIXWEbMethodAnnotationMetadata = null;
+        AnnotationMetadata gvNIXWMAnnMdata = null;
         AnnotationAttributeValue<?> tmpAttributeValue;
 
-        List<AnnotationAttributeValue<?>> gvNIXWEbMethodAnnotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
+        List<AnnotationAttributeValue<?>> gvNIXWMAnnAttrVal = new ArrayList<AnnotationAttributeValue<?>>();
 
         List<AnnotationMetadata> methodAnnotations = methodMetadata
                 .getAnnotations();
@@ -468,24 +464,23 @@ public class WSExportWsdlImpl implements WsExportWsdl {
                         "javax.jws.WebMethod"));
 
         if (webMethodAnnotation == null) {
-            return gvNIXWEbMethodAnnotationMetadata;
+            return gvNIXWMAnnMdata;
         }
 
         // String operationName();
-        StringAttributeValue operationNameStringAttributeValue;
+        StringAttributeValue opeNameStringAttrValue;
         tmpAttributeValue = webMethodAnnotation
                 .getAttribute(new JavaSymbolName("operationName"));
         if (tmpAttributeValue == null) {
-            operationNameStringAttributeValue = new StringAttributeValue(
+            opeNameStringAttrValue = new StringAttributeValue(
                     new JavaSymbolName("operationName"), methodMetadata
                             .getMethodName().getSymbolName());
         }
         else {
-            operationNameStringAttributeValue = (StringAttributeValue) tmpAttributeValue;
+            opeNameStringAttrValue = (StringAttributeValue) tmpAttributeValue;
         }
 
-        gvNIXWEbMethodAnnotationAttributeValues
-                .add(operationNameStringAttributeValue);
+        gvNIXWMAnnAttrVal.add(opeNameStringAttrValue);
 
         // Check if exists action attribute value.
         tmpAttributeValue = webMethodAnnotation
@@ -502,7 +497,7 @@ public class WSExportWsdlImpl implements WsExportWsdl {
                     "action"), "");
         }
 
-        gvNIXWEbMethodAnnotationAttributeValues.add(actionAttributeValue);
+        gvNIXWMAnnAttrVal.add(actionAttributeValue);
 
         // @javax.jws.WebResult
         AnnotationMetadata webResultAnnotation = MemberFindingUtils
@@ -587,19 +582,18 @@ public class WSExportWsdlImpl implements WsExportWsdl {
 
         }
 
-        gvNIXWEbMethodAnnotationAttributeValues.add(resultTypeAttributeValue);
-        gvNIXWEbMethodAnnotationAttributeValues.add(resultNameAttributeValue);
+        gvNIXWMAnnAttrVal.add(resultTypeAttributeValue);
+        gvNIXWMAnnAttrVal.add(resultNameAttributeValue);
 
         if (resultNamespaceAttributeValue != null) {
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(resultNamespaceAttributeValue);
+            gvNIXWMAnnAttrVal.add(resultNamespaceAttributeValue);
         }
 
         if (headerAttributeValue != null) {
-            gvNIXWEbMethodAnnotationAttributeValues.add(headerAttributeValue);
+            gvNIXWMAnnAttrVal.add(headerAttributeValue);
         }
         if (partNameAttributeValue != null) {
-            gvNIXWEbMethodAnnotationAttributeValues.add(partNameAttributeValue);
+            gvNIXWMAnnAttrVal.add(partNameAttributeValue);
         }
 
         // @javax.xml.ws.RequestWrapper
@@ -612,20 +606,18 @@ public class WSExportWsdlImpl implements WsExportWsdl {
             StringAttributeValue localNameAttributeValue = (StringAttributeValue) requestWrapperAnnotation
                     .getAttribute(new JavaSymbolName("localName"));
 
-            StringAttributeValue requestWrapperNameAttributeValue = new StringAttributeValue(
+            StringAttributeValue rqstWrapperNameAttrVal = new StringAttributeValue(
                     new JavaSymbolName("requestWrapperName"),
                     localNameAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(requestWrapperNameAttributeValue);
+            gvNIXWMAnnAttrVal.add(rqstWrapperNameAttrVal);
 
             StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) requestWrapperAnnotation
                     .getAttribute(new JavaSymbolName("targetNamespace"));
 
-            StringAttributeValue requestTargetNamespaceAttributeValue = new StringAttributeValue(
+            StringAttributeValue rqstTarNamespaceAttrVal = new StringAttributeValue(
                     new JavaSymbolName("requestWrapperNamespace"),
                     targetNamespaceAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(requestTargetNamespaceAttributeValue);
+            gvNIXWMAnnAttrVal.add(rqstTarNamespaceAttrVal);
 
             StringAttributeValue classNameAttributeValue = (StringAttributeValue) requestWrapperAnnotation
                     .getAttribute(new JavaSymbolName("className"));
@@ -633,8 +625,7 @@ public class WSExportWsdlImpl implements WsExportWsdl {
             StringAttributeValue requestClassNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("requestWrapperClassName"),
                     classNameAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(requestClassNameAttributeValue);
+            gvNIXWMAnnAttrVal.add(requestClassNameAttributeValue);
 
         }
 
@@ -648,29 +639,26 @@ public class WSExportWsdlImpl implements WsExportWsdl {
             StringAttributeValue localNameAttributeValue = (StringAttributeValue) responseWrapperAnnotation
                     .getAttribute(new JavaSymbolName("localName"));
 
-            StringAttributeValue responseWrapperNameAttributeValue = new StringAttributeValue(
+            StringAttributeValue rspnsWrapperNameAttrVal = new StringAttributeValue(
                     new JavaSymbolName("responseWrapperName"),
                     localNameAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(responseWrapperNameAttributeValue);
+            gvNIXWMAnnAttrVal.add(rspnsWrapperNameAttrVal);
 
             StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) responseWrapperAnnotation
                     .getAttribute(new JavaSymbolName("targetNamespace"));
 
-            StringAttributeValue responseTargetNamespaceAttributeValue = new StringAttributeValue(
+            StringAttributeValue rspnsTarNamespaceAttrVal = new StringAttributeValue(
                     new JavaSymbolName("responseWrapperNamespace"),
                     targetNamespaceAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(responseTargetNamespaceAttributeValue);
+            gvNIXWMAnnAttrVal.add(rspnsTarNamespaceAttrVal);
 
             StringAttributeValue classNameAttributeValue = (StringAttributeValue) responseWrapperAnnotation
                     .getAttribute(new JavaSymbolName("className"));
 
-            StringAttributeValue responseClassNameAttributeValue = new StringAttributeValue(
+            StringAttributeValue rspnsClassNameAttrVal = new StringAttributeValue(
                     new JavaSymbolName("responseWrapperClassName"),
                     classNameAttributeValue.getValue());
-            gvNIXWEbMethodAnnotationAttributeValues
-                    .add(responseClassNameAttributeValue);
+            gvNIXWMAnnAttrVal.add(rspnsClassNameAttrVal);
 
         }
 
@@ -686,7 +674,7 @@ public class WSExportWsdlImpl implements WsExportWsdl {
 
             if (sOAPBindingAttributeValue != null) {
 
-                gvNIXWEbMethodAnnotationAttributeValues
+                gvNIXWMAnnAttrVal
                         .add(new EnumAttributeValue(
                                 new JavaSymbolName("parameterStyle"),
                                 new EnumDetails(
@@ -697,11 +685,10 @@ public class WSExportWsdlImpl implements WsExportWsdl {
             }
         }
 
-        gvNIXWEbMethodAnnotationMetadata = new AnnotationMetadataBuilder(
-                new JavaType(GvNIXWebMethod.class.getName()),
-                gvNIXWEbMethodAnnotationAttributeValues).build();
+        gvNIXWMAnnMdata = new AnnotationMetadataBuilder(new JavaType(
+                GvNIXWebMethod.class.getName()), gvNIXWMAnnAttrVal).build();
 
-        return gvNIXWEbMethodAnnotationMetadata;
+        return gvNIXWMAnnMdata;
     }
 
     /**
@@ -747,24 +734,24 @@ public class WSExportWsdlImpl implements WsExportWsdl {
                 return null;
             }
 
-            List<AnnotationAttributeValue<?>> gvNIXWebParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+            List<AnnotationAttributeValue<?>> gvNIXWParamAttrValList = new ArrayList<AnnotationAttributeValue<?>>();
 
             StringAttributeValue nameWebParamAttributeValue = (StringAttributeValue) webParamAnnotationMetadata
                     .getAttribute(new JavaSymbolName("name"));
 
-            gvNIXWebParamAttributeValueList.add(nameWebParamAttributeValue);
+            gvNIXWParamAttrValList.add(nameWebParamAttributeValue);
 
             ClassAttributeValue typeClassAttributeValue = new ClassAttributeValue(
                     new JavaSymbolName("type"), parameterType.getJavaType());
 
-            gvNIXWebParamAttributeValueList.add(typeClassAttributeValue);
+            gvNIXWParamAttrValList.add(typeClassAttributeValue);
 
             // @GvNIXWebParam
-            AnnotationMetadata gvNixWebParamAnnotationMetadata = new AnnotationMetadataBuilder(
+            AnnotationMetadata gvNixWParamAnnMdata = new AnnotationMetadataBuilder(
                     new JavaType(GvNIXWebParam.class.getName()),
-                    gvNIXWebParamAttributeValueList).build();
+                    gvNIXWParamAttrValList).build();
 
-            parameterAnnotationList.add(gvNixWebParamAnnotationMetadata);
+            parameterAnnotationList.add(gvNixWParamAnnMdata);
 
             // @WebParam
             parameterAnnotationList.add(webParamAnnotationMetadata);

@@ -79,7 +79,7 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
     private static final JavaType AUDIT_ANNOTATION_TYPE = new JavaType(
             GvNIXJpaAudit.class.getName());
 
-    private static final JavaType AUDIT_USER_SERV_ANNOTATION_TYPE = new JavaType(
+    private static final JavaType AUDIT_USR_SERV_ANN_T = new JavaType(
             GvNIXJpaAuditUserService.class.getName());
 
     private static final String DEFAULT_USER_SERVICE_NAME = "AuditUserService";
@@ -117,7 +117,7 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
     private JavaType revisionEntityJavaType;
 
     // revisionEntityJavaType cache timestamp
-    private Long revisionEntityJavaTypeTimestamp = null;
+    private Long revEntJTypeTimestamp = null;
 
     /**
      * Registered providers
@@ -191,7 +191,7 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
 
         // Look for user service class
         Set<ClassOrInterfaceTypeDetails> classes = typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(AUDIT_USER_SERV_ANNOTATION_TYPE);
+                .findClassesOrInterfaceDetailsWithAnnotation(AUDIT_USR_SERV_ANN_T);
 
         if (classes != null && !classes.isEmpty()) {
 
@@ -199,7 +199,7 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
             if (classes.size() > 1) {
                 LOGGER.severe(String.format(
                         "Only one class can be annotated with %s: found %s",
-                        AUDIT_USER_SERV_ANNOTATION_TYPE, classes.size()));
+                        AUDIT_USR_SERV_ANN_T, classes.size()));
             }
             else {
                 // load data from locate of userService
@@ -552,9 +552,9 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
                 1);
 
         // Add @GvNIXJpaAuditListener annotation
-        AnnotationMetadataBuilder jpaAuditRevisionEntityAnnotation = new AnnotationMetadataBuilder(
+        AnnotationMetadataBuilder jpaAuditRevEntAnn = new AnnotationMetadataBuilder(
                 new JavaType(GvNIXJpaAuditRevisionEntity.class));
-        annotations.add(jpaAuditRevisionEntityAnnotation);
+        annotations.add(jpaAuditRevEntAnn);
 
         // Set annotations
         cidBuilder.setAnnotations(annotations);
@@ -568,8 +568,7 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
      */
     public JavaType getRevisionEntityJavaType() {
         if (this.revisionEntityJavaType != null) {
-            if (System.currentTimeMillis()
-                    - revisionEntityJavaTypeTimestamp.longValue() < EVICT_CACHE_MLSEC) {
+            if (System.currentTimeMillis() - revEntJTypeTimestamp.longValue() < EVICT_CACHE_MLSEC) {
                 return this.revisionEntityJavaType;
             }
         }
@@ -589,7 +588,7 @@ public class JpaAuditOperationsImpl implements JpaAuditOperations,
                             .getFullyQualifiedTypeName()));
         }
         this.revisionEntityJavaType = found.iterator().next().getType();
-        this.revisionEntityJavaTypeTimestamp = System.currentTimeMillis();
+        this.revEntJTypeTimestamp = System.currentTimeMillis();
         return this.revisionEntityJavaType;
     }
 

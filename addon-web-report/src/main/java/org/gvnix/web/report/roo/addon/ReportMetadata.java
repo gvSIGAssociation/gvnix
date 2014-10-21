@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -747,10 +747,9 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                                 File.separator).concat(
                                 "/CustomJasperReportsMultiFormatView.java"));
 
-        MutableFile mutableCustomMultiFormatViewClass = null;
+        MutableFile mutCMultFormVCl = null;
         if (!fileManager.exists(customMultiFormatViewPath)) {
-            mutableCustomMultiFormatViewClass = fileManager
-                    .createFile(customMultiFormatViewPath);
+            mutCMultFormVCl = fileManager.createFile(customMultiFormatViewPath);
             InputStream template = FileUtils
                     .getInputStream(
                             getClass(),
@@ -769,8 +768,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                 OutputStream outputStream = null;
                 try {
                     inputStream = IOUtils.toInputStream(javaTemplate);
-                    outputStream = mutableCustomMultiFormatViewClass
-                            .getOutputStream();
+                    outputStream = mutCMultFormVCl.getOutputStream();
                     IOUtils.copy(inputStream, outputStream);
                 }
                 finally {
@@ -799,18 +797,16 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
      * @return
      */
     private MemberDetails getMemberDetails(JavaType type) {
-        PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+        PhysicalTypeMetadata fBackObjPhTypeMD = (PhysicalTypeMetadata) metadataService
                 .get(PhysicalTypeIdentifier.createIdentifier(type,
                         LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
         Validate.notNull(
-                formBackingObjectPhysicalTypeMetadata,
+                fBackObjPhTypeMD,
                 "Unable to obtain physical type metdata for type "
                         + type.getFullyQualifiedTypeName());
-        return memberDetailsScanner
-                .getMemberDetails(
-                        getClass().getName(),
-                        (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadata
-                                .getMemberHoldingTypeDetails());
+        return memberDetailsScanner.getMemberDetails(getClass().getName(),
+                (ClassOrInterfaceTypeDetails) fBackObjPhTypeMD
+                        .getMemberHoldingTypeDetails());
     }
 
     /**

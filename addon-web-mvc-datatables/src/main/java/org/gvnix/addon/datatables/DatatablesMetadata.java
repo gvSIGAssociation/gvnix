@@ -1519,8 +1519,7 @@ public class DatatablesMetadata extends
         // Check if a method with the same signature already exists in the
         // target type
         final MethodMetadata method = methodExists(new JavaSymbolName(
-                DatatablesConstants.LIST_DATATABLES_DETAIL_METHOD_NAME),
-                parameterTypes);
+                DatatablesConstants.LIST_DTTBLS_DET_MTHD_NAME), parameterTypes);
         if (method != null) {
             // If it already exists, just return the method and omit its
             // generation via the ITD
@@ -1535,16 +1534,14 @@ public class DatatablesMetadata extends
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
 
         // @RequestMapping(... produces = "text/html")
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML);
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_PROD_NAME,
+                DatatablesConstants.RQST_MAP_ANN_VAL_HTML);
 
         // @RequestMapping(... value ="/list")
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_VALUE_LIST);
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_VAL_NAME,
+                DatatablesConstants.RQST_MAP_ANN_LIST);
 
         annotations.add(methodAnnotation);
 
@@ -1595,10 +1592,8 @@ public class DatatablesMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(),
-                Modifier.PUBLIC,
-                new JavaSymbolName(
-                        DatatablesConstants.LIST_DATATABLES_DETAIL_METHOD_NAME),
+                getId(), Modifier.PUBLIC, new JavaSymbolName(
+                        DatatablesConstants.LIST_DTTBLS_DET_MTHD_NAME),
                 JavaType.STRING, parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
@@ -1651,12 +1646,8 @@ public class DatatablesMetadata extends
         // @RequestMapping(method = RequestMethod.POST, produces = "text/html",
         // params = "datatablesRedirect")
         AnnotationMetadataBuilder requestMappingAnnotation = helper
-                .getRequestMappingAnnotation(
-                        null,
-                        null,
-                        null,
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
-                        null, null);
+                .getRequestMappingAnnotation(null, null, null,
+                        DatatablesConstants.RQST_MAP_ANN_VAL_HTML, null, null);
         requestMappingAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD,
                 "POST");
         requestMappingAnnotation.addStringAttribute(PARAMS_VAR,
@@ -1809,12 +1800,8 @@ public class DatatablesMetadata extends
         // @RequestMapping(method = RequestMethod.PUT, produces = "text/html",
         // params = "datatablesRedirect")
         AnnotationMetadataBuilder requestMappingAnnotation = helper
-                .getRequestMappingAnnotation(
-                        null,
-                        null,
-                        null,
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
-                        null, null);
+                .getRequestMappingAnnotation(null, null, null,
+                        DatatablesConstants.RQST_MAP_ANN_VAL_HTML, null, null);
         requestMappingAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD,
                 "PUT");
         requestMappingAnnotation.addStringAttribute(PARAMS_VAR,
@@ -1972,12 +1959,8 @@ public class DatatablesMetadata extends
         // @RequestMapping(value = "/{id}", method = RequestMethod.DELETE,
         // produces = "text/html", params = "datatablesRedirect")
         AnnotationMetadataBuilder requestMappingAnnotation = helper
-                .getRequestMappingAnnotation(
-                        null,
-                        null,
-                        null,
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
-                        null, null);
+                .getRequestMappingAnnotation(null, null, null,
+                        DatatablesConstants.RQST_MAP_ANN_VAL_HTML, null, null);
         requestMappingAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD,
                 "DELETE");
         requestMappingAnnotation.addStringAttribute(PARAMS_VAR,
@@ -2466,16 +2449,12 @@ public class DatatablesMetadata extends
         AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
         methodAnnotation.addStringAttribute(HEADERS, ACCEPT_APPLICATION_JSON);
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
-                        "/datatables/ajax");
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_VAL_NAME, "/datatables/ajax");
         methodAnnotation.addStringAttribute(PARAMS_VAR,
                 "ajax_find=".concat(finderNameValue));
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
-                        APPLICATION_JSON);
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_PROD_NAME, APPLICATION_JSON);
         annotations.add(methodAnnotation);
         annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
 
@@ -3591,10 +3570,9 @@ public class DatatablesMetadata extends
         methodAnnotation.addEnumAttribute(METHOD_VAR, REQUEST_METHOD, "GET");
 
         // @RequestMapping(... produces = "text/html")
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML);
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_PROD_NAME,
+                DatatablesConstants.RQST_MAP_ANN_VAL_HTML);
 
         annotations.add(methodAnnotation);
 
@@ -3967,14 +3945,8 @@ public class DatatablesMetadata extends
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
 
         // @RequestMapping(produces = "text/html")
-        annotations
-                .add(helper
-                        .getRequestMappingAnnotation(
-                                null,
-                                null,
-                                null,
-                                DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_VALUE_HTML,
-                                null, null));
+        annotations.add(helper.getRequestMappingAnnotation(null, null, null,
+                DatatablesConstants.RQST_MAP_ANN_VAL_HTML, null, null));
 
         // Define method throws types (none in this case)
         List<JavaType> throwsTypes = new ArrayList<JavaType>();
@@ -4048,14 +4020,10 @@ public class DatatablesMetadata extends
         AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
         methodAnnotation.addStringAttribute(HEADERS, ACCEPT_APPLICATION_JSON);
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
-                        "/datatables/ajax");
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
-                        APPLICATION_JSON);
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_VAL_NAME, "/datatables/ajax");
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_PROD_NAME, APPLICATION_JSON);
         annotations.add(methodAnnotation);
         annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
 
@@ -4119,14 +4087,10 @@ public class DatatablesMetadata extends
         AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
         methodAnnotation.addStringAttribute(HEADERS, ACCEPT_APPLICATION_JSON);
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
-                        "/datatables/ajax");
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
-                        APPLICATION_JSON);
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_VAL_NAME, "/datatables/ajax");
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_PROD_NAME, APPLICATION_JSON);
         annotations.add(methodAnnotation);
         annotations.add(new AnnotationMetadataBuilder(RESPONSE_BODY));
 
@@ -4672,14 +4636,12 @@ public class DatatablesMetadata extends
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
         AnnotationMetadataBuilder methodAnnotation = new AnnotationMetadataBuilder();
         methodAnnotation.setAnnotationType(REQUEST_MAPPING);
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_VALUE_ATTRIBUTE_NAME,
-                        "/export".concat(exportType));
-        methodAnnotation
-                .addStringAttribute(
-                        DatatablesConstants.REQUEST_MAPPING_ANNOTATION_PRODUCES_ATTRIBUTE_NAME,
-                        "text/".concat(exportType));
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_VAL_NAME,
+                "/export".concat(exportType));
+        methodAnnotation.addStringAttribute(
+                DatatablesConstants.RQST_MAP_ANN_PROD_NAME,
+                "text/".concat(exportType));
         annotations.add(methodAnnotation);
 
         // Define method throws types (none in this case)

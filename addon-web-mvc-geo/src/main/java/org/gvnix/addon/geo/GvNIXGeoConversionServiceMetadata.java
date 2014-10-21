@@ -102,10 +102,10 @@ public class GvNIXGeoConversionServiceMetadata extends
     private static final JavaSymbolName STRING_TO_GEOMETRY_METHOD = new JavaSymbolName(
             "getStringToGeometryConverter");
 
-    private static final JavaSymbolName MULTILINESTRING_TO_STRING_METHOD = new JavaSymbolName(
+    private static final JavaSymbolName MULTLINESTR_TO_STR_MET = new JavaSymbolName(
             "getMultiLineStringToStringConverter");
 
-    private static final JavaSymbolName STRING_TO_MULTILINESTRING_METHOD = new JavaSymbolName(
+    private static final JavaSymbolName STR_TO_MULTSTR_MET = new JavaSymbolName(
             "getStringToMultiLineStringConverter");
 
     private static final JavaSymbolName INSTALL_GEO_LABLES_METHOD = new JavaSymbolName(
@@ -146,11 +146,11 @@ public class GvNIXGeoConversionServiceMetadata extends
             CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, GEOMETRY_TYPE));
 
-    private static final JavaType CONVERTER_MULTILINESTRING_STRING = new JavaType(
+    private static final JavaType CONV_MULTSTR_STR = new JavaType(
             CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(MULTILINESTRING_TYPE, JavaType.STRING));
 
-    private static final JavaType CONVERTER_STRING_MULTILINESTRING = new JavaType(
+    private static final JavaType CONV_STR_MULTSTR = new JavaType(
             CONVERTER_TYPE.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
             Arrays.asList(JavaType.STRING, MULTILINESTRING_TYPE));
 
@@ -659,8 +659,8 @@ public class GvNIXGeoConversionServiceMetadata extends
 
         // Check if a method with the same signature already exists in the
         // target type
-        final MethodMetadata method = methodExists(
-                MULTILINESTRING_TO_STRING_METHOD, parameterTypes);
+        final MethodMetadata method = methodExists(MULTLINESTR_TO_STR_MET,
+                parameterTypes);
         if (method != null) {
             // If it already exists, just return the method and omit its
             // generation via the ITD
@@ -682,9 +682,8 @@ public class GvNIXGeoConversionServiceMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, MULTILINESTRING_TO_STRING_METHOD,
-                CONVERTER_MULTILINESTRING_STRING, parameterTypes,
-                parameterNames, bodyBuilder);
+                getId(), Modifier.PUBLIC, MULTLINESTR_TO_STR_MET,
+                CONV_MULTSTR_STR, parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
 
@@ -703,8 +702,8 @@ public class GvNIXGeoConversionServiceMetadata extends
 
         // Check if a method with the same signature already exists in the
         // target type
-        final MethodMetadata method = methodExists(
-                STRING_TO_MULTILINESTRING_METHOD, parameterTypes);
+        final MethodMetadata method = methodExists(STR_TO_MULTSTR_MET,
+                parameterTypes);
         if (method != null) {
             // If it already exists, just return the method and omit its
             // generation via the ITD
@@ -726,9 +725,8 @@ public class GvNIXGeoConversionServiceMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, STRING_TO_MULTILINESTRING_METHOD,
-                CONVERTER_STRING_MULTILINESTRING, parameterTypes,
-                parameterNames, bodyBuilder);
+                getId(), Modifier.PUBLIC, STR_TO_MULTSTR_MET, CONV_STR_MULTSTR,
+                parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
 
