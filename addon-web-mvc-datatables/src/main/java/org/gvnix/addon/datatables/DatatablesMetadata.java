@@ -3203,126 +3203,127 @@ public class DatatablesMetadata extends
         // TODO Auto-generated method stub
         bodyBuilder.appendFormalLine("// Getting current locale");
         bodyBuilder.appendFormalLine(String.format(
-                "%s defaultLocale = Locale.forLanguageTag(locale);",
+                "%s defaultLocale = new Locale(locale);",
                 helper.getFinalTypeName(new JavaType("java.util.Locale"))));
 
         bodyBuilder.appendFormalLine("// Building JSON response");
-        bodyBuilder.appendFormalLine("String JSON = \"{\";");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"all_isnull\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.all.isnull\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("StringBuilder json = new StringBuilder();");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"all_notnull\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.all.notnull\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"all_isnull\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.all.isnull\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"boolean_false\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.boolean.false\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"all_notnull\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.all.notnull\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"boolean_true\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.boolean.true\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"boolean_false\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.boolean.false\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"date_between\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.between\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"boolean_true\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.boolean.true\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"date_date\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.date\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"date_between\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.between\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"date_day\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.day\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"date_date\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.date\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"date_month\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.month\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"date_day\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.day\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"date_year\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.year\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"date_month\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.month\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"number_between\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.number.between\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"date_year\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.year\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"string_contains\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.contains\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"number_between\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.number.between\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"string_ends\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.ends\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"string_contains\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.contains\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"string_isempty\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.isempty\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"string_ends\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.ends\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"string_isnotempty\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.isnotempty\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"string_isempty\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.isempty\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"string_starts\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.starts\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"string_isnotempty\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.isnotempty\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"button_find\\\": \\\"\" + messageSource_dtt.getMessage(\"button_find\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"string_starts\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.starts\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_all_isnull\\\": \\\"\" + messageSource_dtt.getMessage(\"help.all.isnull\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"button_find\\\": \\\"\" + messageSource_dtt.getMessage(\"button_find\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_all_notnull\\\": \\\"\" + messageSource_dtt.getMessage(\"help.all.notnull\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_all_isnull\\\": \\\"\" + messageSource_dtt.getMessage(\"help.all.isnull\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_boolean_false\\\": \\\"\" + messageSource_dtt.getMessage(\"help.boolean.false\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_all_notnull\\\": \\\"\" + messageSource_dtt.getMessage(\"help.all.notnull\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_boolean_true\\\": \\\"\" + messageSource_dtt.getMessage(\"help.boolean.true\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_boolean_false\\\": \\\"\" + messageSource_dtt.getMessage(\"help.boolean.false\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_date_between\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.between\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_boolean_true\\\": \\\"\" + messageSource_dtt.getMessage(\"help.boolean.true\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_date_date\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.date\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_date_between\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.between\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_date_day\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.day\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_date_date\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.date\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_date_month\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.month\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_date_day\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.day\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\";");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_date_year\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.year\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_date_month\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.month\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_number_between\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.between\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_date_year\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.year\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_number_eq\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.eq\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_number_between\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.between\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_number_neq\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.neq\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_number_eq\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.eq\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_number_gt\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.gt\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_number_neq\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.neq\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_number_lt\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.lt\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_number_gt\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.gt\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_number_goe\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.goe\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_number_lt\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.lt\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_number_loe\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.loe\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_number_goe\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.goe\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_string_contains\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.contains\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_number_loe\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.loe\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_string_ends\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.ends\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_string_contains\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.contains\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_string_isempty\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.isempty\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_string_ends\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.ends\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_string_isnotempty\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.isnotempty\", null, defaultLocale) + \"\\\"\";");
-        bodyBuilder.appendFormalLine("JSON += \",\";");
+                .appendFormalLine("json.append(\"\\\"help_string_isempty\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.isempty\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
-                .appendFormalLine("JSON += \"\\\"help_string_starts\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.starts\", null, defaultLocale) + \"\\\"\";");
+                .appendFormalLine("json.append(\"\\\"help_string_isnotempty\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.isnotempty\", null, defaultLocale) + \"\\\"\");");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder
+                .appendFormalLine("json.append(\"\\\"help_string_starts\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.starts\", null, defaultLocale) + \"\\\"\");");
 
-        bodyBuilder.appendFormalLine("JSON += \"}\";");
+        bodyBuilder.appendFormalLine("json.append(\"}\");");
 
         bodyBuilder.appendFormalLine("// return JSON with locale strings");
-        bodyBuilder.appendFormalLine("return JSON;");
+        bodyBuilder.appendFormalLine("return json.toString();");
     }
 
     /**
@@ -4636,9 +4637,9 @@ public class DatatablesMetadata extends
         /*
          * @RequestMapping(value = "/exportcsv", produces = "text/csv") public
          * void PetController.exportCsv(
-         * 
+         *
          * @DatatablesParams DatatablesCriterias criterias,
-         * 
+         *
          * @ModelAttribute Pet pet, HttpServletRequest request,
          * HttpServletResponse response) throws ServletException, IOException,
          * ExportException { ... }

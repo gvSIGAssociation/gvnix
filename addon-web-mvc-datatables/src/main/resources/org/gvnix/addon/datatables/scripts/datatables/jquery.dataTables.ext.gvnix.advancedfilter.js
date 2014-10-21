@@ -1099,7 +1099,7 @@ var GvNIX_Advanced_Filter;
 
 				// If there's no cookie check browser for locale
 				if(locale === undefined)
-					locale = window.navigator.userLanguage || window.navigator.language;
+					locale = window.navigator.language.substring(0,2) || window.navigator.userLanguage.substring(0,2);
 
 				var params = {
 						"_locale_": locale
