@@ -30,13 +30,4 @@
 	    <util:language label="Espanol" locale="es"/>
 	    </span>
  </div>
- <div class="col-xs-12 col-sm-3">
-	  <spring:url value="/resources/images/springsource-logo.png" var="logo"/>
-	  <spring:message code="global_sponsored" htmlEscape="false" var="sponsored"/>
-	  <span>
-	    <a href="http://springsource.com" title="${fn:escapeXml(sponsored)}">
-	      <img align="right" alt="${fn:escapeXml(sponsored)}" src="${logo}"/>
-	    </a>
-	  </span>
-  </div>
 </div>

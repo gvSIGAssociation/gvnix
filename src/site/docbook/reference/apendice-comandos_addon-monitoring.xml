@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_addon-monitoring"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+
+  <title xml:lang="es">Comandos del add-on Web MVC Datatables</title>
+
+  <para xml:lang="es">Para una descripción detallada de las características
+  del add-on consultar la documentación del <link linkend="addon-monitoring">
+  add-on Monitoring</link>.</para>
+
+  <table>
+    <title xml:lang="es">Comandos del add-on Monitoring</title>
+
+    <tgroup cols="2">
+      <colspec colwidth="145" />
+      <colspec colwidth="300" />
+      <thead>
+        <row>
+          <entry xml:lang="es" align="center">Comando</entry>
+
+          <entry xml:lang="es" align="center">Descripción</entry>
+        </row>
+      </thead>
+
+      <tbody>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-monitoring_monitoring_setup">monitoring setup</link></entry>
+
+          <entry xml:lang="es">Instala las dependencias de JavaMelody además de configurar el proyecto con lo necesario para su funcionamiento.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-monitoring_monitoring_all">monitoring all</link></entry>
+
+          <entry xml:lang="es">Establece todas las clases del proyecto para ser monitorizadas a través de Spring.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-monitoring_monitoring-add-class">monitoring add class</link></entry>
+
+          <entry xml:lang="es">Añade la monitorización a una clase determinada.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-monitoring_monitoring-add-method">monitoring add method</link></entry>
+
+          <entry xml:lang="es">Añade la monitorización de un método de una clase. Es posible que si se trata de una clase controlador y el método que deseamos monitorizar está incluido en el .aj no funcione, para solucionarlo bastará con hacer push-in del método previo a ejecutar el comando.</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-monitoring_monitoring-add-package">monitoring add package</link></entry>
+
+          <entry xml:lang="es">Añade la monitorización a un paquete determinado.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <section xml:id="apendice-comandos_addon-monitoring_monitoring_setup">
+    <title>monitoring setup</title>
+
+    <para xml:lang="es">Instala las dependencias de JavaMelody además de configurar el proyecto con lo necesario para su funcionamiento.</para>
+          
+       <para xml:lang="es">Sus parámetros son:
+          	<variablelist>
+		        <varlistentry>
+		          <term>--path</term>
+		
+		          <listitem>
+		            <para xml:lang="es"><emphasis>[Cadena]</emphasis></para>
+		
+		            <para xml:lang="es">Ruta de la carpeta donde se guardaran los datos de la monitorización dentro del servidor.</para>
+		          </listitem>
+		        </varlistentry>
+      		</variablelist>
+      </para>
+  </section>
+  <section xml:id="apendice-comandos_addon-monitoring_monitoring_all">
+    <title>monitoring all</title>
+    <para xml:lang="es">Establece todas las clases del proyecto para ser monitorizadas a través de Spring.</para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-monitoring_monitoring_add_class">
+    <title>monitoring add class</title>
+
+    <para xml:lang="es">Añade la monitorización a una clase determinada.</para>
+          
+       <para xml:lang="es">Sus parámetros son:
+          	<variablelist>
+		        <varlistentry>
+		          <term>--name</term>
+		
+		          <listitem>
+		            <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
+		
+		            <para xml:lang="es">Ruta de la clase sobre la que se va a establecer la monitorización.</para>
+		          </listitem>
+		        </varlistentry>
+      		</variablelist>
+      </para>
+  </section>
+  <section xml:id="apendice-comandos_addon-monitoring_monitoring_add_method">
+    <title>monitoring add method</title>
+
+    <para xml:lang="es">Añade la monitorización de un método de una clase. Es posible que si se trata de una clase controlador y el método que deseamos monitorizar está incluido en el .aj no funcione, para solucionarlo bastará con hacer push-in del método previo a ejecutar el comando.</para>
+          
+       <para xml:lang="es">Sus parámetros son:
+          	<variablelist>
+		        <varlistentry>
+		          <term>--name</term>
+		
+		          <listitem>
+		            <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
+		
+		            <para xml:lang="es">Nombre del método de la clase que se va a establecer la monitorización.</para>
+		          </listitem>
+		        </varlistentry>
+			<varlistentry>
+		          <term>--class</term>
+		
+		          <listitem>
+		            <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
+		
+		            <para xml:lang="es">Ruta de la clase sobre cuyo método se va a establecer la monitorización.</para>
+		          </listitem>
+		        </varlistentry>
+      		</variablelist>
+      </para>
+  </section>
+  <section xml:id="apendice-comandos_addon-monitoring_monitoring_add_package">
+    <title>monitoring add package</title>
+
+    <para xml:lang="es">Añade la monitorización a un paquete determinado.</para>
+          
+       <para xml:lang="es">Sus parámetros son:
+          	<variablelist>
+		        <varlistentry>
+		          <term>--path</term>
+		
+		          <listitem>
+		            <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
+		
+		            <para xml:lang="es">Ruta del paquete sobre cuyas clases se va a establecer la monitorización.</para>
+		          </listitem>
+		        </varlistentry>
+      		</variablelist>
+      </para>
+  </section>
+</section>
