@@ -3256,7 +3256,7 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_date_day\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.day\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\";");
+        bodyBuilder.appendFormalLine("json.append(\",\");");
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_date_month\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.month\", null, defaultLocale) + \"\\\"\");");
         bodyBuilder.appendFormalLine("json.append(\",\");");
