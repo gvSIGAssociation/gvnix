@@ -25,6 +25,8 @@
 ##
 	
 	## bikeshop
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo bikeshop start
 	mkdir bikeshop
 	cd bikeshop
@@ -32,8 +34,13 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true
 	cd .. 
 	echo bikeshop end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 	
 	## clinic
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo clinic start
 	mkdir clinic
 	cd clinic
@@ -41,8 +48,13 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo clinic end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## embedding
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo embedding start
 	mkdir embedding
 	cd embedding
@@ -50,8 +62,13 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo embedding end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## expenses
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo expenses start
 	mkdir expenses
 	cd expenses
@@ -59,8 +76,13 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo expenses end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## gae-expenses
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo gae-expenses start
 	mkdir gae-expenses
 	cd gae-expenses
@@ -68,8 +90,13 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gae-expenses end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## multimodule
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo multimodule start
 	mkdir multimodule
 	cd multimodule
@@ -77,8 +104,13 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo multimodule end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## pizzashop
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo pizzashop start
 	mkdir pizzashop
 	cd pizzashop
@@ -86,8 +118,13 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo pizzashop end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## vote
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo vote start
 	mkdir vote
 	cd vote
@@ -95,8 +132,13 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo vote end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## wedding
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo wedding start
 	mkdir wedding
 	cd wedding
@@ -104,12 +146,17 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo wedding end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX binding add-on
 ##
 	
 	## binding
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo binding start
 	mkdir binding
 	cd binding
@@ -117,12 +164,17 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo binding end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX cit security add-on
 ##
 
 	## cit-security
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo cit-security start
 	mkdir cit-security
 	cd cit-security
@@ -137,12 +189,17 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo cit-security end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX configuration add-on
 ##
 	
 	## configuration
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo configuration start
 	mkdir configuration
 	cd configuration
@@ -152,12 +209,17 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true -Ppro -Ddatabase.password=
 	cd ..
 	echo configuration end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX datatables add-on
 ##
 	
 	## datatables
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo datatables start
 	mkdir datatables
 	cd datatables
@@ -171,8 +233,13 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo datatables end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## datatables-multimodule
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo datatables-multimodule start
 	mkdir datatables-multimodule
 	cd datatables-multimodule
@@ -188,8 +255,13 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo datatables-multimodule end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## datatables-test
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo datatables-test start
 	mkdir datatables-test
 	cd datatables-test
@@ -203,8 +275,13 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo datatables-test end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## datatables-pkc
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo datatables-pkc start
 	mkdir datatables-pkc
 	cd datatables-pkc
@@ -219,12 +296,17 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo datatables-pkc end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX loupe add-on
 ##
 	
 	## loupefield
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo loupefield start
 	mkdir loupefield
 	cd loupefield
@@ -234,12 +316,17 @@
 	#wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits?form
 	cd ..
 	echo loupefield end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX dialog add-on
 ##
 	
 	## dialog
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo dialog start
 	mkdir dialog
 	cd dialog
@@ -251,12 +338,17 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo dialog end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX flex add-on
 ##
 	
 	## basic-flex-scaffold-test
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo basic-flex-scaffold-test start
 	mkdir basic-flex-scaffold-test
 	cd basic-flex-scaffold-test
@@ -269,8 +361,13 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo basic-flex-scaffold-test end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## remoting-scaffold-all-test
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo remoting-scaffold-all-test start
 	mkdir remoting-scaffold-all-test
 	cd remoting-scaffold-all-test
@@ -283,8 +380,13 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo remoting-scaffold-all-test end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## flex
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo flex start
 	mkdir flex
 	cd flex
@@ -297,8 +399,13 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo flex end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## rootunes
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo rootunes start
 	mkdir rootunes
 	cd rootunes
@@ -311,12 +418,17 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo rootunes end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX i18n add-on
 ##
 	
 	## es-i18n
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo es-i18n start
 	mkdir es-i18n
 	cd es-i18n
@@ -334,12 +446,17 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo es-i18n end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX menu add-on
 ##
 	
 	## menu
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo menu start
 	mkdir menu
 	cd menu
@@ -347,8 +464,13 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo menu end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 	
 	## base
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo base start
 	mkdir base
 	cd base
@@ -356,12 +478,17 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo base end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX occ add-on
 ##
 	
 	## occ
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo occ start
 	mkdir occ
 	cd occ
@@ -371,12 +498,17 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo occ end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX jpa add-on
 ##
 	
 	## jpa-audit-test
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo jpa-audit-test start
 	mkdir jpa-audit
 	cd jpa-audit
@@ -386,8 +518,13 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo jpa-audit-test end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## jpa-audit-envers
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo jpa-audit-envers start
 	mkdir jpa-audit-envers
 	cd jpa-audit-envers
@@ -397,12 +534,17 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo jpa-audit-envers end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX pattern add-on
 ##
 	
 	## pattern
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo pattern start
 	mkdir pattern
 	cd pattern
@@ -416,8 +558,13 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo pattern end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 	
 	## test-script-pkc
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo test-script-pkc start
 	mkdir test-script-pkc
 	cd test-script-pkc
@@ -431,8 +578,13 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo test-script-pkc end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 	
 	## test-script-pkc2
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo test-script-pkc2 start
 	mkdir test-script-pkc2
 	cd test-script-pkc2
@@ -446,8 +598,13 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo test-script-pkc2 end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## test-script-pkc3
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo test-script-pkc3 start
 	mkdir test-script-pkc3
 	cd test-script-pkc3
@@ -461,8 +618,13 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo test-script-pkc3 end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## test-script-manytomany
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo test-script-manytomany start
 	mkdir test-script-manytomany
 	cd test-script-manytomany
@@ -476,12 +638,17 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo test-script-manytomany end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX report add-on
 ##
 	
 	## report
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo report start
 	mkdir report
 	cd report
@@ -506,8 +673,13 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo report end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 	
 	## gvnix-test-report
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo gvnix-test-report start
 	mkdir gvnix-test-report
 	cd gvnix-test-report
@@ -519,12 +691,17 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-report end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX service add-on
 ##
 	
 	## bing
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo bing start
 	mkdir bing
 	cd bing
@@ -532,8 +709,13 @@
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo bing end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## service
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo service start
 	mkdir service
 	cd service
@@ -544,8 +726,14 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo service end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
 
 	## gvnix-test-no-jpa-no-web
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo gvnix-test-no-jpa-no-web start
 	mkdir gvnix-test-no-jpa-no-web
 	cd gvnix-test-no-jpa-no-web
@@ -553,8 +741,13 @@
 	mvn test package
 	cd ..
 	echo gvnix-test-no-jpa-no-web end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## gvnix-test-no-jpa
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo gvnix-test-no-jpa start
 	mkdir gvnix-test-no-jpa
 	cd gvnix-test-no-jpa
@@ -563,8 +756,13 @@
 #	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-no-jpa end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## gvnix-test-no-web
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo gvnix-test-no-web start
 	mkdir gvnix-test-no-web
 	cd gvnix-test-no-web
@@ -572,8 +770,13 @@
 	mvn test package
 	cd ..
 	echo gvnix-test-no-web end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 	
 	## gvnix-test
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo gvnix-test start
 	mkdir gvnix-test
 	cd gvnix-test
@@ -584,6 +787,9 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## gvnix-test-security
   ## DISABLED temporaly as ACCV service is down
@@ -596,6 +802,8 @@
 	#echo gvnix-test-security end
 
 	## gvnix-test-entity
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo gvnix-test-entity start
 	mkdir gvnix-test-entity
 	cd gvnix-test-entity
@@ -608,12 +816,17 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-test-entity end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX typicalsecurity add-on
 ##
 	
 	## typicalsecurity
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo typicalsecurity start
 	mkdir typicalsecurity
 	cd typicalsecurity
@@ -637,12 +850,17 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo typicalsecurity end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 ##
 ## gvNIX theme add-on
 ##
 	
 	## theme
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo theme start
 	mkdir theme
 	cd theme
@@ -656,8 +874,13 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo theme end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 	
 	## theme-gvnix
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo theme-gvnix start
 	mkdir theme-gvnix
 	cd theme-gvnix
@@ -669,6 +892,9 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo theme-gvnix end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 
 ##
@@ -676,6 +902,8 @@
 ##
 	
 	## monitoring
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo monitoring start
 	mkdir monitoring
 	cd monitoring
@@ -686,6 +914,9 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo monitoring end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 
 ##
@@ -693,6 +924,8 @@
 ##
 	
 	## gvnix-sample
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo gvnix-sample start
 	mkdir gvnix-sample
 	cd gvnix-sample
@@ -703,8 +936,13 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo gvnix-sample end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## script
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo script start
 	mkdir script
 	cd script
@@ -720,6 +958,9 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo script end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 	
 	## gvnix-multimodule
 ##  echo gvnix-multimodule start
@@ -739,6 +980,8 @@
 ##  echo gvnix-multimodule end
 	
 	## tiendavirtual
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo tiendavirtual start
 	mkdir tiendavirtual
 	cd tiendavirtual
@@ -765,8 +1008,13 @@
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 	cd ..
 	echo tiendavirtual end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## aplusu (database required)
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo aplusu start
 	mkdir aplusu
 	cd aplusu
@@ -779,8 +1027,13 @@
     kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo aplusu end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 	## regproy (database required)
+    echo "======================================================"
+    echo "------------------------------------------------------"
 	echo regproy start
 	mkdir regproy
 	cd regproy
@@ -795,3 +1048,6 @@
     kill -9 $MVN_TOMCAT_PID
     cd ..
 	echo regproy end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
