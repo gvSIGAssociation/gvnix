@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -211,28 +211,25 @@ public class WSExportMetadata extends
 
             annotationAttributeValueList.add(enumUseAttributeValue);
 
-            EnumAttributeValue enumparameterStyleAttributeValue = (EnumAttributeValue) annotationMetadata
+            EnumAttributeValue enuparamSAttrVal = (EnumAttributeValue) annotationMetadata
                     .getAttribute(new JavaSymbolName("parameterStyle"));
 
-            if (enumparameterStyleAttributeValue != null) {
+            if (enuparamSAttrVal != null) {
 
-                enumparameterStyleAttributeValue = new EnumAttributeValue(
-                        new JavaSymbolName("parameterStyle"),
-                        new EnumDetails(new JavaType(
-                                "javax.jws.soap.SOAPBinding.ParameterStyle"),
-                                enumparameterStyleAttributeValue.getValue()
-                                        .getField()));
+                enuparamSAttrVal = new EnumAttributeValue(new JavaSymbolName(
+                        "parameterStyle"), new EnumDetails(new JavaType(
+                        "javax.jws.soap.SOAPBinding.ParameterStyle"),
+                        enuparamSAttrVal.getValue().getField()));
 
             }
             else {
-                enumparameterStyleAttributeValue = new EnumAttributeValue(
-                        new JavaSymbolName("parameterStyle"),
-                        new EnumDetails(new JavaType(
-                                "javax.jws.soap.SOAPBinding.ParameterStyle"),
-                                new JavaSymbolName("WRAPPED")));
+                enuparamSAttrVal = new EnumAttributeValue(new JavaSymbolName(
+                        "parameterStyle"), new EnumDetails(new JavaType(
+                        "javax.jws.soap.SOAPBinding.ParameterStyle"),
+                        new JavaSymbolName("WRAPPED")));
             }
 
-            annotationAttributeValueList.add(enumparameterStyleAttributeValue);
+            annotationAttributeValueList.add(enuparamSAttrVal);
 
             return new AnnotationMetadataBuilder(javaType,
                     annotationAttributeValueList).build();

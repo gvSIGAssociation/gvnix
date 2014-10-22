@@ -79,6 +79,11 @@ import com.mysema.query.types.path.PathBuilder;
  */
 public class DatatablesUtils {
 
+    private static final String ISNULL_OPE = "ISNULL";
+    private static final String NOTNULL_OPE = "NOTNULL";
+    private static final String G_ISNULL_OPE = "global.filters.operations.all.isnull";
+    private static final String G_NOTNULL_OPE = "global.filters.operations.all.notnull";
+
     // Logger
     private static Logger LOGGER = LoggerFactory
             .getLogger(DatatablesUtils.class);
@@ -1749,8 +1754,8 @@ public class DatatablesUtils {
         String containsOperation = "CONTAINS";
         String isEmptyOperation = "ISEMPTY";
         String isNotEmptyOperation = "ISNOTEMPTY";
-        String isNullOperation = "ISNULL";
-        String isNotNullOperation = "NOTNULL";
+        String isNullOperation = ISNULL_OPE;
+        String isNotNullOperation = NOTNULL_OPE;
 
         if (messageSource != null) {
             endsOperation = messageSource.getMessage(
@@ -1768,11 +1773,9 @@ public class DatatablesUtils {
             isNotEmptyOperation = messageSource.getMessage(
                     "global.filters.operations.string.isnotempty", null,
                     LocaleContextHolder.getLocale());
-            isNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.isnull", null,
+            isNullOperation = messageSource.getMessage(G_ISNULL_OPE, null,
                     LocaleContextHolder.getLocale());
-            isNotNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.notnull", null,
+            isNotNullOperation = messageSource.getMessage(G_NOTNULL_OPE, null,
                     LocaleContextHolder.getLocale());
         }
 
@@ -1857,8 +1860,8 @@ public class DatatablesUtils {
         // Getting all operations
         String trueOperation = "TRUE";
         String falseOperation = "FALSE";
-        String isNullOperation = "ISNULL";
-        String isNotNullOperation = "NOTNULL";
+        String isNullOperation = ISNULL_OPE;
+        String isNotNullOperation = NOTNULL_OPE;
 
         if (messageSource != null) {
             trueOperation = messageSource.getMessage(
@@ -1867,11 +1870,9 @@ public class DatatablesUtils {
             falseOperation = messageSource.getMessage(
                     "global.filters.operations.boolean.false", null,
                     LocaleContextHolder.getLocale());
-            isNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.isnull", null,
+            isNullOperation = messageSource.getMessage(G_ISNULL_OPE, null,
                     LocaleContextHolder.getLocale());
-            isNotNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.notnull", null,
+            isNotNullOperation = messageSource.getMessage(G_NOTNULL_OPE, null,
                     LocaleContextHolder.getLocale());
         }
 
@@ -1956,17 +1957,15 @@ public class DatatablesUtils {
             }
 
             // Get all operations
-            String isNullOperation = "ISNULL";
-            String isNotNullOperation = "NOTNULL";
+            String isNullOperation = ISNULL_OPE;
+            String isNotNullOperation = NOTNULL_OPE;
             String betweenOperation = "BETWEEN";
 
             if (messageSource != null) {
-                isNullOperation = messageSource.getMessage(
-                        "global.filters.operations.all.isnull", null,
+                isNullOperation = messageSource.getMessage(G_ISNULL_OPE, null,
                         LocaleContextHolder.getLocale());
-                isNotNullOperation = messageSource.getMessage(
-                        "global.filters.operations.all.notnull", null,
-                        LocaleContextHolder.getLocale());
+                isNotNullOperation = messageSource.getMessage(G_NOTNULL_OPE,
+                        null, LocaleContextHolder.getLocale());
                 betweenOperation = messageSource.getMessage(
                         "global.filters.operations.number.between", null,
                         LocaleContextHolder.getLocale());
@@ -2018,8 +2017,8 @@ public class DatatablesUtils {
         String month = "MONTH";
         String day = "DAY";
         String between = "BETWEEN";
-        String isNullOperation = "ISNULL";
-        String isNotNullOperation = "NOTNULL";
+        String isNullOperation = ISNULL_OPE;
+        String isNotNullOperation = NOTNULL_OPE;
 
         String datePattern = "dd/MM/yyyy";
 
@@ -2039,11 +2038,9 @@ public class DatatablesUtils {
             between = messageSource.getMessage(
                     "global.filters.operations.date.between", null,
                     LocaleContextHolder.getLocale());
-            isNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.isnull", null,
+            isNullOperation = messageSource.getMessage(G_ISNULL_OPE, null,
                     LocaleContextHolder.getLocale());
-            isNotNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.notnull", null,
+            isNotNullOperation = messageSource.getMessage(G_NOTNULL_OPE, null,
                     LocaleContextHolder.getLocale());
             datePattern = messageSource.getMessage(
                     "global.filters.operations.date.pattern", null,

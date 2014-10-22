@@ -116,6 +116,12 @@ import org.w3c.dom.NodeList;
 public class ThemeOperationsImpl extends AbstractOperations implements
         ThemeOperations {
 
+    private static final String SPRING_URL = "spring:url";
+    private static final String FF3_AND_OPERA = " required for FF3 and Opera ";
+    private static final String SCRIPT = "script";
+    private static final String SRC = "src";
+    private static final String TEXT_JSCRPT = "text/javascript";
+
     private static final String WEB_INF_THEME_FILE = "WEB-INF/views/theme.xml";
 
     private static final String HREF_ATTRIBUTE = "href";
@@ -520,33 +526,32 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         Element testElement = org.springframework.roo.support.util.XmlUtils
                 .findFirstElement("/root/url[@var='roo_css-ie_url']", lsRoot);
         if (testElement == null) {
-            Element urlCitIECss = new XmlElementBuilder("spring:url",
+            Element urlCitIECss = new XmlElementBuilder(SPRING_URL,
                     loadScriptsXml)
                     .addAttribute(VALUE_ATTRIBUTE,
                             "/resources/styles/cit-IE.css")
                     .addAttribute(VAR_ATTRIBUTE, "roo_css-ie_url").build();
-            Element urlApplicationCss = new XmlElementBuilder("spring:url",
+            Element urlApplicationCss = new XmlElementBuilder(SPRING_URL,
                     loadScriptsXml)
                     .addAttribute(VALUE_ATTRIBUTE,
                             "/resources/styles/application.css")
                     .addAttribute(VAR_ATTRIBUTE, "application_css_url").build();
-            Element urlYuiEventJs = new XmlElementBuilder("spring:url",
+            Element urlYuiEventJs = new XmlElementBuilder(SPRING_URL,
                     loadScriptsXml)
                     .addAttribute(VALUE_ATTRIBUTE,
                             "/resources/scripts/yui/yahoo-dom-event.js")
                     .addAttribute(VAR_ATTRIBUTE, "yui_event").build();
-            Element urlYuiCoreJs = new XmlElementBuilder("spring:url",
+            Element urlYuiCoreJs = new XmlElementBuilder(SPRING_URL,
                     loadScriptsXml)
                     .addAttribute(VALUE_ATTRIBUTE,
                             "/resources/scripts/yui/container_core-min.js")
                     .addAttribute(VAR_ATTRIBUTE, "yui_core").build();
-            Element urlYoiMenuJs = new XmlElementBuilder("spring:url",
+            Element urlYoiMenuJs = new XmlElementBuilder(SPRING_URL,
                     loadScriptsXml)
                     .addAttribute(VALUE_ATTRIBUTE,
                             "/resources/scripts/yui/menu-min.js")
                     .addAttribute(VAR_ATTRIBUTE, "yui_menu").build();
-            Element urlCitJs = new XmlElementBuilder("spring:url",
-                    loadScriptsXml)
+            Element urlCitJs = new XmlElementBuilder(SPRING_URL, loadScriptsXml)
                     .addAttribute(VALUE_ATTRIBUTE,
                             "/resources/scripts/utils.js")
                     .addAttribute(VAR_ATTRIBUTE, "cit_js_url").build();
@@ -636,7 +641,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                     .addAttribute(HREF_ATTRIBUTE, "${application_css_url}")
                     .build();
             linkApplicationCss.appendChild(loadScriptsXml
-                    .createComment(" required for FF3 and Opera "));
+                    .createComment(FF3_AND_OPERA));
             Node linkFaviconNode = org.springframework.roo.support.util.XmlUtils
                     .findFirstElement("/root/link[@href='${favicon}']", lsRoot);
             if (linkFaviconNode != null) {
@@ -669,26 +674,26 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         testElement = org.springframework.roo.support.util.XmlUtils
                 .findFirstElement("/root/script[@src='${cit_js_url}']", lsRoot);
         if (testElement == null) {
-            Element scriptYuiEventJs = new XmlElementBuilder("script",
-                    loadScriptsXml).addAttribute("src", "${yui_event}")
-                    .addAttribute(TYPE_ATTRIBUTE, "text/javascript").build();
+            Element scriptYuiEventJs = new XmlElementBuilder(SCRIPT,
+                    loadScriptsXml).addAttribute(SRC, "${yui_event}")
+                    .addAttribute(TYPE_ATTRIBUTE, TEXT_JSCRPT).build();
             scriptYuiEventJs.appendChild(loadScriptsXml
-                    .createComment(" required for FF3 and Opera "));
-            Element scriptYuiCoreJs = new XmlElementBuilder("script",
-                    loadScriptsXml).addAttribute("src", "${yui_core}")
-                    .addAttribute(TYPE_ATTRIBUTE, "text/javascript").build();
+                    .createComment(FF3_AND_OPERA));
+            Element scriptYuiCoreJs = new XmlElementBuilder(SCRIPT,
+                    loadScriptsXml).addAttribute(SRC, "${yui_core}")
+                    .addAttribute(TYPE_ATTRIBUTE, TEXT_JSCRPT).build();
             scriptYuiCoreJs.appendChild(loadScriptsXml
-                    .createComment(" required for FF3 and Opera "));
-            Element scriptYoiMenuJs = new XmlElementBuilder("script",
-                    loadScriptsXml).addAttribute("src", "${yui_menu}")
-                    .addAttribute(TYPE_ATTRIBUTE, "text/javascript").build();
+                    .createComment(FF3_AND_OPERA));
+            Element scriptYoiMenuJs = new XmlElementBuilder(SCRIPT,
+                    loadScriptsXml).addAttribute(SRC, "${yui_menu}")
+                    .addAttribute(TYPE_ATTRIBUTE, TEXT_JSCRPT).build();
             scriptYoiMenuJs.appendChild(loadScriptsXml
-                    .createComment(" required for FF3 and Opera "));
-            Element scriptCitJs = new XmlElementBuilder("script",
-                    loadScriptsXml).addAttribute("src", "${cit_js_url}")
-                    .addAttribute(TYPE_ATTRIBUTE, "text/javascript").build();
-            scriptCitJs.appendChild(loadScriptsXml
-                    .createComment(" required for FF3 and Opera "));
+                    .createComment(FF3_AND_OPERA));
+            Element scriptCitJs = new XmlElementBuilder(SCRIPT, loadScriptsXml)
+                    .addAttribute(SRC, "${cit_js_url}")
+                    .addAttribute(TYPE_ATTRIBUTE, TEXT_JSCRPT).build();
+            scriptCitJs
+                    .appendChild(loadScriptsXml.createComment(FF3_AND_OPERA));
             List<Element> scrtiptElements = org.springframework.roo.support.util.XmlUtils
                     .findElements("/root/script", lsRoot);
             // Element lastScript = null;
@@ -1611,8 +1616,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                     .addAttribute(VALUE_ATTRIBUTE, " | ").build());
 
             // create gvNIX spring:url and add theme parameter
-            Element gvnixUrlEl = new XmlElementBuilder("spring:url",
-                    tagxDocument)
+            Element gvnixUrlEl = new XmlElementBuilder(SPRING_URL, tagxDocument)
                     .addAttribute(VAR_ATTRIBUTE, "url_theme_gvnix")
                     .addAttribute(VALUE_ATTRIBUTE, "").build();
             gvnixUrlEl.appendChild(new XmlElementBuilder("spring:param",

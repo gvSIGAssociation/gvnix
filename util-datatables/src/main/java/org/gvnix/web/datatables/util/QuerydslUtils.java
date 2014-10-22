@@ -76,6 +76,13 @@ import com.vividsolutions.jts.io.WKTReader;
  */
 public class QuerydslUtils {
 
+    public static final String OPERATOR_GOE = "goe";
+    public static final String OPERATOR_LOE = "loe";
+    public static final String OPERATOR_ISNULL = "isnull";
+    public static final String OPERATOR_NOTNULL = "notnull";
+    public static final String G_FIL_OPE_ISNULL = "global.filters.operations.all.isnull";
+    public static final String G_FIL_OPE_NOTNULL = "global.filters.operations.all.notnull";
+
     public static final TypeDescriptor STRING_TYPE_DESCRIPTOR = TypeDescriptor
             .valueOf(String.class);
 
@@ -117,7 +124,7 @@ public class QuerydslUtils {
             "dd-MMMM-yyyy HH:mm", "dd/MMMM/yyyy HH:mm", "MMMM-dd-yyyy HH:mm",
             "MMMM/dd/yyyy HH:mm" };
 
-    public static final String[] FULL_DATE_PATTERNS_WITHOUT_TIME = new String[] {
+    public static final String[] FULL_DATE_PAT_WO_TIME = new String[] {
             "dd-MM-yyyy", "dd/MM/yyyy", "MM-dd-yyyy", "MMMM/dd/yyyy",
             "dd-MMMM-yyyy", "dd/MMMM/yyyy", "MMMM-dd-yyyy", "MMMM/dd/yyyy" };
 
@@ -673,7 +680,7 @@ public class QuerydslUtils {
         else if (StringUtils.equalsIgnoreCase(operator, "notIn")) {
             return entityPath.get(fieldName).notIn(searchObj);
         }
-        else if (StringUtils.equalsIgnoreCase(operator, "isNull")) {
+        else if (StringUtils.equalsIgnoreCase(operator, OPERATOR_ISNULL)) {
             return entityPath.get(fieldName).isNull();
         }
         else if (StringUtils.equalsIgnoreCase(operator, "isNotNull")) {
@@ -769,14 +776,14 @@ public class QuerydslUtils {
         try {
             Date value = DateUtils.parseDateStrictly((String) searchObj,
                     FULL_DATE_PATTERNS);
-            if (StringUtils.equalsIgnoreCase(operator, "goe")) {
+            if (StringUtils.equalsIgnoreCase(operator, OPERATOR_GOE)) {
                 return dateExpression.goe(value);
             }
             else if (StringUtils.equalsIgnoreCase(operator, "gt")
                     || StringUtils.equalsIgnoreCase(operator, "after")) {
                 return dateExpression.gt(value);
             }
-            else if (StringUtils.equalsIgnoreCase(operator, "loe")) {
+            else if (StringUtils.equalsIgnoreCase(operator, OPERATOR_LOE)) {
                 return dateExpression.loe(value);
             }
             else if (StringUtils.equalsIgnoreCase(operator, "lt")
@@ -847,7 +854,7 @@ public class QuerydslUtils {
         }
         if (numberExpression != null) {
             Number value = NumberUtils.createNumber((String) searchObj);
-            if (StringUtils.equalsIgnoreCase(operator, "goe")) {
+            if (StringUtils.equalsIgnoreCase(operator, OPERATOR_GOE)) {
                 return numberExpression.goe(value);
             }
             else if (StringUtils.equalsIgnoreCase(operator, "gt")) {
@@ -856,7 +863,7 @@ public class QuerydslUtils {
             else if (StringUtils.equalsIgnoreCase(operator, "like")) {
                 return numberExpression.like((String) searchObj);
             }
-            else if (StringUtils.equalsIgnoreCase(operator, "loe")) {
+            else if (StringUtils.equalsIgnoreCase(operator, OPERATOR_LOE)) {
                 return numberExpression.loe(value);
             }
             else if (StringUtils.equalsIgnoreCase(operator, "lt")) {
@@ -883,13 +890,13 @@ public class QuerydslUtils {
             String operator) {
         Boolean value = BooleanUtils.toBooleanObject((String) searchObj);
         if (value != null) {
-            if (StringUtils.equalsIgnoreCase(operator, "goe")) {
+            if (StringUtils.equalsIgnoreCase(operator, OPERATOR_GOE)) {
                 return entityPath.getBoolean(fieldName).goe(value);
             }
             else if (StringUtils.equalsIgnoreCase(operator, "gt")) {
                 return entityPath.getBoolean(fieldName).gt(value);
             }
-            else if (StringUtils.equalsIgnoreCase(operator, "loe")) {
+            else if (StringUtils.equalsIgnoreCase(operator, OPERATOR_LOE)) {
                 return entityPath.getBoolean(fieldName).loe(value);
             }
             else if (StringUtils.equalsIgnoreCase(operator, "lt")) {
@@ -914,13 +921,13 @@ public class QuerydslUtils {
     public static <T> BooleanExpression createStringExpression(
             PathBuilder<T> entityPath, String fieldName, Object searchObj,
             String operator) {
-        if (StringUtils.equalsIgnoreCase(operator, "goe")) {
+        if (StringUtils.equalsIgnoreCase(operator, OPERATOR_GOE)) {
             return entityPath.getString(fieldName).goe((String) searchObj);
         }
         else if (StringUtils.equalsIgnoreCase(operator, "gt")) {
             return entityPath.getString(fieldName).gt((String) searchObj);
         }
-        else if (StringUtils.equalsIgnoreCase(operator, "loe")) {
+        else if (StringUtils.equalsIgnoreCase(operator, OPERATOR_LOE)) {
             return entityPath.getString(fieldName).loe((String) searchObj);
         }
         else if (StringUtils.equalsIgnoreCase(operator, "lt")) {
@@ -1011,8 +1018,8 @@ public class QuerydslUtils {
         String containsOperation = "CONTAINS";
         String isEmptyOperation = "ISEMPTY";
         String isNotEmptyOperation = "ISNOTEMPTY";
-        String isNullOperation = "ISNULL";
-        String isNotNullOperation = "NOTNULL";
+        String isNullOperation = OPERATOR_ISNULL;
+        String isNotNullOperation = OPERATOR_NOTNULL;
 
         if (messageSource != null) {
             endsOperation = messageSource.getMessage(
@@ -1030,12 +1037,10 @@ public class QuerydslUtils {
             isNotEmptyOperation = messageSource.getMessage(
                     "global.filters.operations.string.isnotempty", null,
                     LocaleContextHolder.getLocale());
-            isNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.isnull", null,
+            isNullOperation = messageSource.getMessage(G_FIL_OPE_ISNULL, null,
                     LocaleContextHolder.getLocale());
-            isNotNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.notnull", null,
-                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(G_FIL_OPE_NOTNULL,
+                    null, LocaleContextHolder.getLocale());
         }
 
         // If written expression is ENDS operation
@@ -1334,7 +1339,7 @@ public class QuerydslUtils {
 
         if (expression == null) {
             try {
-                parsePatterns = FULL_DATE_PATTERNS_WITHOUT_TIME;
+                parsePatterns = FULL_DATE_PAT_WO_TIME;
                 Date searchDate = DateUtils.parseDateStrictly(searchStr,
                         parsePatterns);
                 Calendar searchCal = Calendar.getInstance();
@@ -1493,8 +1498,8 @@ public class QuerydslUtils {
         String month = "MONTH";
         String day = "DAY";
         String between = "BETWEEN";
-        String isNullOperation = "ISNULL";
-        String isNotNullOperation = "NOTNULL";
+        String isNullOperation = OPERATOR_ISNULL;
+        String isNotNullOperation = OPERATOR_NOTNULL;
 
         if (messageSource != null) {
             date = messageSource.getMessage(
@@ -1512,12 +1517,10 @@ public class QuerydslUtils {
             between = messageSource.getMessage(
                     "global.filters.operations.date.between", null,
                     LocaleContextHolder.getLocale());
-            isNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.isnull", null,
+            isNullOperation = messageSource.getMessage(G_FIL_OPE_ISNULL, null,
                     LocaleContextHolder.getLocale());
-            isNotNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.notnull", null,
-                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(G_FIL_OPE_NOTNULL,
+                    null, LocaleContextHolder.getLocale());
         }
 
         // If written expression is ISNULL operation
@@ -1772,8 +1775,8 @@ public class QuerydslUtils {
         // Getting all operations
         String trueOperation = "TRUE";
         String falseOperation = "FALSE";
-        String isNullOperation = "ISNULL";
-        String isNotNullOperation = "NOTNULL";
+        String isNullOperation = OPERATOR_ISNULL;
+        String isNotNullOperation = OPERATOR_NOTNULL;
 
         if (messageSource != null) {
             trueOperation = messageSource.getMessage(
@@ -1782,12 +1785,10 @@ public class QuerydslUtils {
             falseOperation = messageSource.getMessage(
                     "global.filters.operations.boolean.false", null,
                     LocaleContextHolder.getLocale());
-            isNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.isnull", null,
+            isNullOperation = messageSource.getMessage(G_FIL_OPE_ISNULL, null,
                     LocaleContextHolder.getLocale());
-            isNotNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.notnull", null,
-                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(G_FIL_OPE_NOTNULL,
+                    null, LocaleContextHolder.getLocale());
         }
 
         // If written function is TRUE
@@ -1976,17 +1977,15 @@ public class QuerydslUtils {
         }
 
         // Get all operations
-        String isNullOperation = "ISNULL";
-        String isNotNullOperation = "NOTNULL";
+        String isNullOperation = OPERATOR_ISNULL;
+        String isNotNullOperation = OPERATOR_NOTNULL;
         String betweenOperation = "BETWEEN";
 
         if (messageSource != null) {
-            isNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.isnull", null,
+            isNullOperation = messageSource.getMessage(G_FIL_OPE_ISNULL, null,
                     LocaleContextHolder.getLocale());
-            isNotNullOperation = messageSource.getMessage(
-                    "global.filters.operations.all.notnull", null,
-                    LocaleContextHolder.getLocale());
+            isNotNullOperation = messageSource.getMessage(G_FIL_OPE_NOTNULL,
+                    null, LocaleContextHolder.getLocale());
             betweenOperation = messageSource.getMessage(
                     "global.filters.operations.number.between", null,
                     LocaleContextHolder.getLocale());

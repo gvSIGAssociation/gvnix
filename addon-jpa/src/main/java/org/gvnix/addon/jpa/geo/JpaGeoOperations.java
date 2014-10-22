@@ -20,7 +20,7 @@ public interface JpaGeoOperations extends Feature {
      * Feature name. Use to know if gvNIX GEO component has been setup in this
      * project
      */
-    static final String FEATURE_NAME_GVNIX_GEO_PERSISTENCE = "gvnix-geo-persistence";
+    static final String FT_NM_GVNIX_GEO_PERS = "gvnix-geo-persistence";
 
     /**
      * Indicate commands should be available

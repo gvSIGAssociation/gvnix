@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -81,7 +81,7 @@ public class RelatedPatternJspMetadataListener extends
     private PathResolver pathResolver;
     @Reference
     private TypeLocationService typeLocationService;
-    private final Map<JavaType, String> formBackingObjectTypesToLocalMids = new HashMap<JavaType, String>();
+    private final Map<JavaType, String> fBackObjType2LocMids = new HashMap<JavaType, String>();
 
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -133,8 +133,7 @@ public class RelatedPatternJspMetadataListener extends
                 formBackingTypeMetadataDetails,
                 "Unable to obtain metadata for type "
                         + formbackingType.getFullyQualifiedTypeName());
-        formBackingObjectTypesToLocalMids.put(formbackingType,
-                metadataIdentificationString);
+        fBackObjType2LocMids.put(formbackingType, metadataIdentificationString);
 
         eligibleFields = webMetadataService.getScaffoldEligibleFieldMetadata(
                 formbackingType, memberDetails, metadataIdentificationString);
@@ -216,8 +215,8 @@ public class RelatedPatternJspMetadataListener extends
                 return;
             }
 
-            String localMid = formBackingObjectTypesToLocalMids
-                    .get(itdTypeDetails.getGovernor().getName());
+            String localMid = fBackObjType2LocMids.get(itdTypeDetails
+                    .getGovernor().getName());
             if (localMid != null) {
                 metadataService.evictAndGet(localMid);
             }

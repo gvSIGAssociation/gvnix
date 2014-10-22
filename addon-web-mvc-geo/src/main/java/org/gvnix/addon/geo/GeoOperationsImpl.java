@@ -91,7 +91,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     private static final String VALUE = "value";
 
-    private static final String ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT = "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer";
+    private static final String ERR_N_TO_CREATE_NEW_MAP = "ERROR. Is necesary to create new map element using \"web mvc geo controller\" command before generate geo web layer";
 
     private static final JavaType GVNIX_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
             "org.gvnix.addon.jpa.geo.providers.hibernatespatial.GvNIXEntityMapLayer");
@@ -266,7 +266,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Checking if exists map element before to generate geo web layer
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERR_N_TO_CREATE_NEW_MAP);
         }
 
         List<String> paths = new ArrayList<String>();
@@ -311,7 +311,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Checking if exists map element before to generate geo web layer
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERR_N_TO_CREATE_NEW_MAP);
         }
 
         Validate.notNull(controller,
@@ -497,7 +497,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Checking if exists map element before to generate geo tile layer
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERR_N_TO_CREATE_NEW_MAP);
         }
 
         // Creating map with params to send
@@ -534,7 +534,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
             boolean transparent, String styles, String version, String crs) {
         // Checking if exists map element before to generate geo tile layer
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERR_N_TO_CREATE_NEW_MAP);
         }
 
         // Creating map with params to send
@@ -568,7 +568,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
             String preventExitMessageCode) {
         // Checking if exists map element before to generate geo tool
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERR_N_TO_CREATE_NEW_MAP);
         }
 
         // Creating map with params to send
@@ -594,7 +594,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
             String deactivateFunction, String cursorIcon) {
         // Checking if exists map element before to generate geo tool
         if (!checkExistsMapElement()) {
-            throw new RuntimeException(ERROR_NECESARY_TO_CREATE_NEW_MAP_ELEMENT);
+            throw new RuntimeException(ERR_N_TO_CREATE_NEW_MAP);
         }
 
         // Creating map with params to send

@@ -254,7 +254,7 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
 
     @Override
     public String getName() {
-        return FEATURE_NAME_GVNIX_GEO_PERSISTENCE;
+        return FT_NM_GVNIX_GEO_PERS;
     }
 
     @Override

@@ -142,10 +142,10 @@ public final class JpaAuditListenerMetadataProvider extends
         }
 
         // Check than target entity class is a entity
-        final MemberHoldingTypeDetails targetEntityMemberHoldingTypeDetails = MemberFindingUtils
+        final MemberHoldingTypeDetails tarMemHoldTDetails = MemberFindingUtils
                 .getMostConcreteMemberHoldingTypeDetailsWithTag(
                         targetEntityMemberDetails, PERSISTENT_TYPE);
-        if (targetEntityMemberHoldingTypeDetails == null) {
+        if (tarMemHoldTDetails == null) {
             return null;
         }
 

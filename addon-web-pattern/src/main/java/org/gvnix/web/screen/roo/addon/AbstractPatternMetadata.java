@@ -83,6 +83,14 @@ import org.springframework.roo.support.util.XmlUtils;
 public abstract class AbstractPatternMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static final String VALUE_TXT = "value";
+    private static final String REQUIRED_TXT = "required";
+    private static final String RQST_PARAM_PATH = "org.springframework.web.bind.annotation.RequestParam";
+    private static final String RETURN_TXT = "return \"";
+    private static final String ADD_ATTR = "uiModel.addAttribute(\"";
+    private static final String CONCAT = "/\".concat(";
+    private static final String QUOTE_COMMA = "\", ";
+
     private static final JavaSymbolName METHOD_SYMBOL_NAME = new JavaSymbolName(
             "method");
     private static final StringAttributeValue PRODUCES_PARAM_MAPPING = new StringAttributeValue(
@@ -117,7 +125,7 @@ public abstract class AbstractPatternMetadata extends
     private static final JavaSymbolName PARAMS_ATTRIBUTE_NAME = new JavaSymbolName(
             "params");
     private static final JavaSymbolName VALUE_ATTRIBUTE_NAME = new JavaSymbolName(
-            "value");
+            VALUE_TXT);
     private static final JavaType RQST_MAP_ANN_TYPE = new JavaType(
             "org.springframework.web.bind.annotation.RequestMapping");
 
@@ -300,12 +308,10 @@ public abstract class AbstractPatternMetadata extends
         reqParamAttrPage.add(new StringAttributeValue(VALUE_ATTRIBUTE_NAME,
                 "page"));
         reqParamAttrPage.add(new BooleanAttributeValue(new JavaSymbolName(
-                "required"), false));
+                REQUIRED_TXT), false));
         List<AnnotationMetadata> methodAttrPageAnnotations = new ArrayList<AnnotationMetadata>();
         AnnotationMetadataBuilder methodAttrPageAnnotation = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestParam"),
-                reqParamAttrPage);
+                new JavaType(RQST_PARAM_PATH), reqParamAttrPage);
         methodAttrPageAnnotations.add(methodAttrPageAnnotation.build());
         methodParamTypes.add(new AnnotatedJavaType(JavaType.INT_OBJECT,
                 methodAttrPageAnnotations));
@@ -314,12 +320,10 @@ public abstract class AbstractPatternMetadata extends
         reqParamAttrSize.add(new StringAttributeValue(VALUE_ATTRIBUTE_NAME,
                 "size"));
         reqParamAttrSize.add(new BooleanAttributeValue(new JavaSymbolName(
-                "required"), false));
+                REQUIRED_TXT), false));
         List<AnnotationMetadata> methodAttrSizeAnnotations = new ArrayList<AnnotationMetadata>();
         AnnotationMetadataBuilder methodAttrSizeAnnotation = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestParam"),
-                reqParamAttrSize);
+                new JavaType(RQST_PARAM_PATH), reqParamAttrSize);
         methodAttrSizeAnnotations.add(methodAttrSizeAnnotation.build());
         methodParamTypes.add(new AnnotatedJavaType(JavaType.INT_OBJECT,
                 methodAttrSizeAnnotations));
@@ -354,7 +358,7 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("delete(".concat(
                 formBackingObjectIdField.getFieldName().getSymbolName())
                 .concat(", page, size, uiModel);"));
-        bodyBuilder.appendFormalLine("return \""
+        bodyBuilder.appendFormalLine(RETURN_TXT
                 .concat("redirect:/")
                 .concat(entityNamePlural.toLowerCase())
                 .concat("?gvnixform&\" + refererQuery("
@@ -713,15 +717,15 @@ public abstract class AbstractPatternMetadata extends
                         .concat(entityNamePlural.toLowerCase())
                         .concat(".isEmpty() && httpServletRequest.getSession().getAttribute(\"dialogMessage\") == null) {"));
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
+        bodyBuilder.appendFormalLine(ADD_ATTR.concat(
                 entityNamePlural.toLowerCase()).concat("Tab\", null);"));
 
         addBodyLinesForDialogMessage(bodyBuilder, DialogType.Info,
                 "message_entitynotfound_problemdescription");
 
-        bodyBuilder.appendFormalLine("return \"".concat(
+        bodyBuilder.appendFormalLine(RETURN_TXT.concat(
                 entityNamePlural.toLowerCase()).concat(
-                "/\".concat(" + GVNIXPATTERN + ");"));
+                CONCAT + GVNIXPATTERN + ");"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
@@ -729,12 +733,12 @@ public abstract class AbstractPatternMetadata extends
         // related entities
         addBodyLinesPopulatingRelatedEntitiesData(bodyBuilder);
 
-        bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+        bodyBuilder.appendFormalLine(ADD_ATTR
                 .concat(entityNamePlural.toLowerCase()).concat("Tab\", ")
                 .concat(entityNamePlural.toLowerCase()).concat(");"));
-        bodyBuilder.appendFormalLine("return \"".concat(
+        bodyBuilder.appendFormalLine(RETURN_TXT.concat(
                 entityNamePlural.toLowerCase()).concat(
-                "/\".concat(" + GVNIXPATTERN + ");"));
+                CONCAT + GVNIXPATTERN + ");"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
@@ -777,12 +781,10 @@ public abstract class AbstractPatternMetadata extends
         reqParamAttrIndex.add(new StringAttributeValue(VALUE_ATTRIBUTE_NAME,
                 "index"));
         reqParamAttrIndex.add(new BooleanAttributeValue(new JavaSymbolName(
-                "required"), true));
+                REQUIRED_TXT), true));
         List<AnnotationMetadata> methodAttrIndexAnnotations = new ArrayList<AnnotationMetadata>();
         AnnotationMetadataBuilder methodAttrIndexAnnotation = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestParam"),
-                reqParamAttrIndex);
+                new JavaType(RQST_PARAM_PATH), reqParamAttrIndex);
         methodAttrIndexAnnotations.add(methodAttrIndexAnnotation.build());
 
         methodParamTypes.add(new AnnotatedJavaType(JavaType.LONG_OBJECT,
@@ -835,15 +837,15 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("if (count < 1) {");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("// None register found");
-        bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
-                entityName.toLowerCase()).concat("\", null);"));
+        bodyBuilder.appendFormalLine(ADD_ATTR.concat(entityName.toLowerCase())
+                .concat("\", null);"));
 
         addBodyLinesForDialogMessage(bodyBuilder, DialogType.Info,
                 "message_entitynotfound_problemdescription");
 
-        bodyBuilder.appendFormalLine("return \"".concat(
+        bodyBuilder.appendFormalLine(RETURN_TXT.concat(
                 entityNamePlural.toLowerCase()).concat(
-                "/\".concat(" + GVNIXPATTERN + ");"));
+                CONCAT + GVNIXPATTERN + ");"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
@@ -878,15 +880,15 @@ public abstract class AbstractPatternMetadata extends
                         .concat(entityNamePlural.toLowerCase())
                         .concat(".isEmpty() && httpServletRequest.getSession().getAttribute(\"dialogMessage\") == null) {"));
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
-                entityName.toLowerCase()).concat("\", null);"));
+        bodyBuilder.appendFormalLine(ADD_ATTR.concat(entityName.toLowerCase())
+                .concat("\", null);"));
 
         addBodyLinesForDialogMessage(bodyBuilder, DialogType.Info,
                 "message_entitynotfound_problemdescription");
 
-        bodyBuilder.appendFormalLine("return \"".concat(
+        bodyBuilder.appendFormalLine(RETURN_TXT.concat(
                 entityNamePlural.toLowerCase()).concat(
-                "/\".concat(" + GVNIXPATTERN + ");"));
+                CONCAT + GVNIXPATTERN + ");"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
@@ -894,9 +896,9 @@ public abstract class AbstractPatternMetadata extends
                 .concat(entityName.toLowerCase()).concat(" = ")
                 .concat(entityNamePlural.toLowerCase()).concat(".get(0);"));
 
-        bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-                .concat(entityName.toLowerCase()).concat("\", ")
-                .concat(entityName.toLowerCase()).concat(");"));
+        bodyBuilder.appendFormalLine(ADD_ATTR.concat(entityName.toLowerCase())
+                .concat(QUOTE_COMMA).concat(entityName.toLowerCase())
+                .concat(");"));
 
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"maxEntities"
                 .concat("\", count);"));
@@ -911,9 +913,9 @@ public abstract class AbstractPatternMetadata extends
         // Add date validation pattern to model if some date type field exists
         addBodyLinesRegisteringRelatedEntitiesDateTypesFormat(bodyBuilder);
 
-        bodyBuilder.appendFormalLine("return \"".concat(
+        bodyBuilder.appendFormalLine(RETURN_TXT.concat(
                 entityNamePlural.toLowerCase()).concat(
-                "/\".concat(" + GVNIXPATTERN + ");"));
+                CONCAT + GVNIXPATTERN + ");"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
@@ -961,9 +963,9 @@ public abstract class AbstractPatternMetadata extends
                     .getPersistenceDetails();
             if (javaTypePersistenceMd != null
                     && javaTypePersistenceMd.getFindAllMethod() != null) {
-                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                bodyBuilder.appendFormalLine(ADD_ATTR
                         .concat(javaTypeMd.getPlural().toLowerCase())
-                        .concat("\", ")
+                        .concat(QUOTE_COMMA)
                         .concat(type.getNameIncludingTypeParameters(false,
                                 builder.getImportRegistrationResolver()))
                         .concat(".")
@@ -972,9 +974,9 @@ public abstract class AbstractPatternMetadata extends
             }
             else if (javaTypeMd.isEnumType()) {
                 JavaType arrays = new JavaType("java.util.Arrays");
-                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                bodyBuilder.appendFormalLine(ADD_ATTR
                         .concat(javaTypeMd.getPlural().toLowerCase())
-                        .concat("\", ")
+                        .concat(QUOTE_COMMA)
                         .concat(arrays.getNameIncludingTypeParameters(false,
                                 builder.getImportRegistrationResolver()))
                         .concat(".asList(")
@@ -1022,10 +1024,10 @@ public abstract class AbstractPatternMetadata extends
                             .getNameIncludingTypeParameters(false,
                                     builder.getImportRegistrationResolver());
                     pattern = dateTimeFormatSimple + ".patternForStyle(\""
-                            + jSymNDTimeFormDet.getValue().style + "\", "
+                            + jSymNDTimeFormDet.getValue().style + QUOTE_COMMA
                             + localeContextHolderSimple + ".getLocale())";
                 }
-                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                bodyBuilder.appendFormalLine(ADD_ATTR
                         + relatedEntityName
                         + "_"
                         + jSymNDTimeFormDet.getKey().getSymbolName()
@@ -1467,10 +1469,9 @@ public abstract class AbstractPatternMetadata extends
         // TODO Required can be always same value ?
 
         AnnotationMetadataBuilder gvnixpatternParamBuilder = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestParam"));
-        gvnixpatternParamBuilder.addStringAttribute("value", GVNIXPATTERN);
-        gvnixpatternParamBuilder.addBooleanAttribute("required", required);
+                new JavaType(RQST_PARAM_PATH));
+        gvnixpatternParamBuilder.addStringAttribute(VALUE_TXT, GVNIXPATTERN);
+        gvnixpatternParamBuilder.addBooleanAttribute(REQUIRED_TXT, required);
         List<AnnotationMetadata> gvnixpatternParam = new ArrayList<AnnotationMetadata>();
         gvnixpatternParam.add(gvnixpatternParamBuilder.build());
 
@@ -1493,13 +1494,12 @@ public abstract class AbstractPatternMetadata extends
     protected Entry<JavaSymbolName, AnnotatedJavaType> getPageRequestParam() {
 
         AnnotationMetadataBuilder gvnixpatternParamBuilder = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestParam"));
+                new JavaType(RQST_PARAM_PATH));
         gvnixpatternParamBuilder.addStringAttribute(
-                "value",
+                VALUE_TXT,
                 XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()
                         + "Page"));
-        gvnixpatternParamBuilder.addBooleanAttribute("required", false);
+        gvnixpatternParamBuilder.addBooleanAttribute(REQUIRED_TXT, false);
         List<AnnotationMetadata> gvnixpatternParam = new ArrayList<AnnotationMetadata>();
         gvnixpatternParam.add(gvnixpatternParamBuilder.build());
 
@@ -1523,13 +1523,12 @@ public abstract class AbstractPatternMetadata extends
     protected Entry<JavaSymbolName, AnnotatedJavaType> getPageSizeRequestParam() {
 
         AnnotationMetadataBuilder gvnixpatternParamBuilder = new AnnotationMetadataBuilder(
-                new JavaType(
-                        "org.springframework.web.bind.annotation.RequestParam"));
+                new JavaType(RQST_PARAM_PATH));
         gvnixpatternParamBuilder.addStringAttribute(
-                "value",
+                VALUE_TXT,
                 XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()
                         + "PageSize"));
-        gvnixpatternParamBuilder.addBooleanAttribute("required", false);
+        gvnixpatternParamBuilder.addBooleanAttribute(REQUIRED_TXT, false);
         List<AnnotationMetadata> gvnixpatternParam = new ArrayList<AnnotationMetadata>();
         gvnixpatternParam.add(gvnixpatternParamBuilder.build());
 

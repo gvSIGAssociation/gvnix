@@ -134,10 +134,10 @@ public final class JpaAuditUserServiceMetadataProvider extends
             final MemberDetails userTypeMemberDetails = getMemberDetails(userTypeDetails);
             if (userTypeMemberDetails != null) {
 
-                final MemberHoldingTypeDetails userTypeMemberHoldingTypeDetails = MemberFindingUtils
+                final MemberHoldingTypeDetails userTypeMHTD = MemberFindingUtils
                         .getMostConcreteMemberHoldingTypeDetailsWithTag(
                                 userTypeMemberDetails, PERSISTENT_TYPE);
-                if (userTypeMemberHoldingTypeDetails != null) {
+                if (userTypeMHTD != null) {
                     userTypeIsEntity = true;
                 }
 

@@ -2,17 +2,17 @@
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
  * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
  * Valenciana
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -64,6 +64,13 @@ import org.springframework.roo.project.LogicalPath;
  * @since 0.8
  */
 public class RelatedPatternMetadata extends AbstractPatternMetadata {
+
+    private static final String RETURN_QUOTE = "return \"";
+    private static final String EQUAL_OPE = " = ";
+    private static final String GVNIX_REF_TAG = "(gvnixreference);";
+    private static final String EQUAL_NEW = " = new ";
+    private static final String DOT_SET = ".set";
+    private static final String GVNIX_REF = "gvnixreference";
 
     private static final String PROVIDES_TYPE_STRING = RelatedPatternMetadata.class
             .getName();
@@ -235,7 +242,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
             bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
         }
 
-        bodyBuilder.appendFormalLine("return \""
+        bodyBuilder.appendFormalLine(RETURN_QUOTE
                 + webScaffoldMetadata.getAnnotationValues().getPath()
                 + "/create\";");
 
@@ -276,19 +283,18 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
                             builder.getImportRegistrationResolver())
                     + " "
                     + masterEntityName.toLowerCase()
-                    + " = "
+                    + EQUAL_OPE
                     + masterEntityName
                     + "."
                     + masterEntityJavaDetails.getPersistenceDetails()
-                            .getFindMethod().getMethodName()
-                    + "(gvnixreference);");
+                            .getFindMethod().getMethodName() + GVNIX_REF_TAG);
             bodyBuilder.appendFormalLine(entityName
                     + " "
                     + entityName.toLowerCase()
-                    + " = new "
+                    + EQUAL_NEW
                     + entity.getNameIncludingTypeParameters(false,
                             builder.getImportRegistrationResolver()) + "();");
-            bodyBuilder.appendFormalLine(entityName.toLowerCase() + ".set"
+            bodyBuilder.appendFormalLine(entityName.toLowerCase() + DOT_SET
                     + masterEntityName + "(" + masterEntityName.toLowerCase()
                     + ");");
         }
@@ -314,7 +320,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
                     + entityTypeDetails.getPersistenceDetails()
                             .getIdentifierField().getFieldType()
                             .getSimpleTypeName().toLowerCase()
-                    + " = new "
+                    + EQUAL_NEW
                     + entityTypeDetails
                             .getPersistenceDetails()
                             .getIdentifierField()
@@ -328,7 +334,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
             while (fields.hasNext()) {
                 FieldMetadata field = fields.next();
                 if (field.getFieldName().equals(relationField.getFieldName())) {
-                    tmpBody.append("gvnixreference");
+                    tmpBody.append(GVNIX_REF);
                 }
                 else {
                     tmpBody.append("null");
@@ -343,11 +349,11 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
             bodyBuilder.appendFormalLine(entityName
                     + " "
                     + entityName.toLowerCase()
-                    + " = new "
+                    + EQUAL_NEW
                     + entity.getNameIncludingTypeParameters(false,
                             builder.getImportRegistrationResolver()) + "();");
             bodyBuilder.appendFormalLine(entityName.toLowerCase()
-                    + ".set"
+                    + DOT_SET
                     + entityTypeDetails.getPersistenceDetails()
                             .getIdentifierField().getFieldName()
                             .getSymbolNameCapitalisedFirstLetter()
@@ -370,20 +376,19 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
                             builder.getImportRegistrationResolver())
                     + " "
                     + masterEntityName.toLowerCase()
-                    + " = "
+                    + EQUAL_OPE
                     + masterEntityName
                     + "."
                     + masterEntityJavaDetails.getPersistenceDetails()
-                            .getFindMethod().getMethodName()
-                    + "(gvnixreference);");
+                            .getFindMethod().getMethodName() + GVNIX_REF_TAG);
             bodyBuilder.appendFormalLine(entityName
                     + " "
                     + entityName.toLowerCase()
-                    + " = new "
+                    + EQUAL_NEW
                     + entity.getNameIncludingTypeParameters(false,
                             builder.getImportRegistrationResolver()) + "();");
             bodyBuilder.appendFormalLine(entityName.toLowerCase()
-                    + ".set"
+                    + DOT_SET
                     + relationField.getFieldName()
                             .getSymbolNameCapitalisedFirstLetter() + "("
                     + masterEntityName.toLowerCase() + ");");
@@ -459,13 +464,12 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
                             builder.getImportRegistrationResolver())
                     + " "
                     + masterEntityName.toLowerCase()
-                    + " = "
+                    + EQUAL_OPE
                     + masterEntityName
                     + "."
                     + masterEntityJavaDetails.getPersistenceDetails()
-                            .getFindMethod().getMethodName()
-                    + "(gvnixreference);");
-            bodyBuilder.appendFormalLine(entityName.toLowerCase() + ".set"
+                            .getFindMethod().getMethodName() + GVNIX_REF_TAG);
+            bodyBuilder.appendFormalLine(entityName.toLowerCase() + DOT_SET
                     + masterEntityName + "(" + masterEntityName.toLowerCase()
                     + ");");
         }
@@ -491,7 +495,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
                     + entityTypeDetails.getPersistenceDetails()
                             .getIdentifierField().getFieldType()
                             .getSimpleTypeName().toLowerCase()
-                    + " = new "
+                    + EQUAL_NEW
                     + entityTypeDetails
                             .getPersistenceDetails()
                             .getIdentifierField()
@@ -505,7 +509,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
             while (fields.hasNext()) {
                 FieldMetadata field = fields.next();
                 if (field.getFieldName().equals(relationField.getFieldName())) {
-                    tmpBody.append("gvnixreference");
+                    tmpBody.append(GVNIX_REF);
                 }
                 else {
                     tmpBody.append(entityTypeDetails.getJavaType()
@@ -527,7 +531,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
             bodyBuilder.appendFormalLine(tmpBody.toString());
 
             bodyBuilder.appendFormalLine(entityName.toLowerCase()
-                    + ".set"
+                    + DOT_SET
                     + entityTypeDetails.getPersistenceDetails()
                             .getIdentifierField().getFieldName()
                             .getSymbolNameCapitalisedFirstLetter()
@@ -549,14 +553,13 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
                             builder.getImportRegistrationResolver())
                     + " "
                     + masterEntityName.toLowerCase()
-                    + " = "
+                    + EQUAL_OPE
                     + masterEntityName
                     + "."
                     + masterEntityJavaDetails.getPersistenceDetails()
-                            .getFindMethod().getMethodName()
-                    + "(gvnixreference);");
+                            .getFindMethod().getMethodName() + GVNIX_REF_TAG);
             bodyBuilder.appendFormalLine(entityName.toLowerCase()
-                    + ".set"
+                    + DOT_SET
                     + relationField.getFieldName()
                             .getSymbolNameCapitalisedFirstLetter() + "("
                     + masterEntityName.toLowerCase() + ");");
@@ -570,12 +573,12 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         bodyBuilder.indent();
         addBodyLinesForDialogBinding(bodyBuilder, DialogType.Error,
                 "message_errorbinding_problemdescription");
-        bodyBuilder.appendFormalLine("return \"".concat(
+        bodyBuilder.appendFormalLine(RETURN_QUOTE.concat(
                 entityNamePlural.toLowerCase()).concat("/create\";"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
+        bodyBuilder.appendFormalLine(RETURN_QUOTE.concat("redirect:/")
                 .concat(masterEntityJavaDetails.getPlural().toLowerCase())
                 .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
 
@@ -622,12 +625,12 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         bodyBuilder.indent();
         addBodyLinesForDialogBinding(bodyBuilder, DialogType.Error,
                 "message_errorbinding_problemdescription");
-        bodyBuilder.appendFormalLine("return \"".concat(
+        bodyBuilder.appendFormalLine(RETURN_QUOTE.concat(
                 entityNamePlural.toLowerCase()).concat("/update\";"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
+        bodyBuilder.appendFormalLine(RETURN_QUOTE.concat("redirect:/")
                 .concat(masterEntityJavaDetails.getPlural().toLowerCase())
                 .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
 
@@ -722,14 +725,13 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         AnnotationMetadataBuilder gvnixreferenceParamBuilder = new AnnotationMetadataBuilder(
                 new JavaType(
                         "org.springframework.web.bind.annotation.RequestParam"));
-        gvnixreferenceParamBuilder
-                .addStringAttribute("value", "gvnixreference");
+        gvnixreferenceParamBuilder.addStringAttribute("value", GVNIX_REF);
         gvnixreferenceParamBuilder.addBooleanAttribute("required", true);
         List<AnnotationMetadata> gvnixreferenceParam = new ArrayList<AnnotationMetadata>();
         gvnixreferenceParam.add(gvnixreferenceParamBuilder.build());
 
         return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
-                new JavaSymbolName("gvnixreference"), new AnnotatedJavaType(
+                new JavaSymbolName(GVNIX_REF), new AnnotatedJavaType(
                         new JavaType(masterEntityJavaDetails
                                 .getPersistenceDetails().getIdentifierField()
                                 .getFieldType().getFullyQualifiedTypeName()),

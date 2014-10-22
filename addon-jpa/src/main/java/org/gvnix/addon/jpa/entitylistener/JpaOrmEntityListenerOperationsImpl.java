@@ -80,7 +80,7 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
     @Reference
     private JpaOrmEntityListenerRegistry registry;
 
-    private final Set<JavaType> entitiesWithListenersRegistered = new HashSet<JavaType>();
+    private final Set<JavaType> entWListenRegs = new HashSet<JavaType>();
 
     /**
      * {@inheritDoc}
@@ -140,14 +140,14 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
 
         // If there is more than one listeners
         if (entityElement.getElementsByTagName(ENTITY_LISTENER_TAG).getLength() > 1) {
-            entitiesWithListenersRegistered.add(entityClass);
+            entWListenRegs.add(entityClass);
             // check listeners order
             modified = adjustEntityListenerOrder(ormXml, entityListenerElement,
                     entityListenerElements) || modified;
         }
 
         if (modified) {
-            entitiesWithListenersRegistered.add(entityClass);
+            entWListenRegs.add(entityClass);
             // If there is any changes on orm.xml save it
             XmlUtils.writeXml(ormXmlMutableFile.getOutputStream(), ormXml);
         }
@@ -525,7 +525,7 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
 
         if (modified) {
             // entity element do not exists on orm.xml: nothing to clean up
-            entitiesWithListenersRegistered.remove(entity);
+            entWListenRegs.remove(entity);
             return;
         }
 
@@ -538,7 +538,7 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
         if (modified) {
             // entity-listeners element do not exists on orm.xml: nothing to
             // clean up
-            entitiesWithListenersRegistered.remove(entity);
+            entWListenRegs.remove(entity);
             return;
         }
 
@@ -548,7 +548,7 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
 
         if (entityListenerElements == null || entityListenerElements.isEmpty()) {
             // no entity-listener element found on orm.xml: nothing to clean up
-            entitiesWithListenersRegistered.remove(entity);
+            entWListenRegs.remove(entity);
             return;
         }
 
@@ -567,10 +567,10 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
             // Update cache of entities with listeners:
             if (XmlUtils.findElements(ENTITY_LISTENER_TAG,
                     entityListenerElement).isEmpty()) {
-                entitiesWithListenersRegistered.remove(entity);
+                entWListenRegs.remove(entity);
             }
             else {
-                entitiesWithListenersRegistered.add(entity);
+                entWListenRegs.add(entity);
             }
             // If there is any changes on orm.xml save it
             XmlUtils.writeXml(ormXmlMutableFile.getOutputStream(), ormXml);
@@ -616,6 +616,6 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
      */
     @Override
     public boolean hasAnyListener(JavaType entity) {
-        return entitiesWithListenersRegistered.contains(entity);
+        return entWListenRegs.contains(entity);
     }
 }

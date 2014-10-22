@@ -33,7 +33,7 @@ import org.springframework.roo.model.JavaType;
 public class JpaAuditRevisionEntityAnnotationValues extends
         AbstractAnnotationValues {
 
-    public static final JavaType JPA_AUDIT_REVISON_ENTITY_ANNOTATION = new JavaType(
+    public static final JavaType JPA_AUDIT_REV_ANN = new JavaType(
             GvNIXJpaAuditRevisionEntity.class);
 
     @AutoPopulate
@@ -41,7 +41,7 @@ public class JpaAuditRevisionEntityAnnotationValues extends
 
     public JpaAuditRevisionEntityAnnotationValues(
             final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {
-        super(governorPhysicalTypeDetails, JPA_AUDIT_REVISON_ENTITY_ANNOTATION);
+        super(governorPhysicalTypeDetails, JPA_AUDIT_REV_ANN);
         AutoPopulationUtils.populate(this, annotationMetadata);
     }
 
@@ -52,7 +52,7 @@ public class JpaAuditRevisionEntityAnnotationValues extends
      */
     public JpaAuditRevisionEntityAnnotationValues(
             final PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-        super(governorPhysicalTypeMetadata, JPA_AUDIT_REVISON_ENTITY_ANNOTATION);
+        super(governorPhysicalTypeMetadata, JPA_AUDIT_REV_ANN);
         AutoPopulationUtils.populate(this, annotationMetadata);
     }
 

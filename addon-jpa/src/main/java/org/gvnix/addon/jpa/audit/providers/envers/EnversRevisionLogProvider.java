@@ -75,7 +75,7 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
     private static final Dependency HIBERNATE_ENVERS_DEPENDENCY = new Dependency(
             "org.hibernate", "hibernate-envers", "4.3.6.Final");
 
-    private static final String HIBERNATE_PERSISTENCE_PROVIDER_CLASS = "org.hibernate.jpa.HibernatePersistenceProvider";
+    private static final String HBER_PERS_PROV_CLS = "org.hibernate.jpa.HibernatePersistenceProvider";
 
     private static String PROVIDER_NAME = "H-ENVERS";
     private static String PROVIDER_DESCRIPTION = "Revision-log provider base on Hibernate envers module";
@@ -275,12 +275,11 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
                     "': /persistence/persistence-unit/provider tag is empty"));
         }
         provider = provider.trim();
-        if (!HIBERNATE_PERSISTENCE_PROVIDER_CLASS.equals(provider)) {
+        if (!HBER_PERS_PROV_CLS.equals(provider)) {
             throw new IllegalStateException(
                     String.format(
                             "Error loading file '%s': unexpected /persistence/persistence-unit/provider (expected: '%s' found: '%s')",
-                            persistencePath,
-                            HIBERNATE_PERSISTENCE_PROVIDER_CLASS, provider));
+                            persistencePath, HBER_PERS_PROV_CLS, provider));
         }
     }
 

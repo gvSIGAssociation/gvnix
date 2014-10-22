@@ -69,6 +69,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 public class WebJpaBatchMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
+    private static final String APP_JSON = "application/json";
+    private static final String TRY = "try {";
+    private static final String JSON_ERROR = "jsonResponse.setStatus(\"ERROR\");";
+    private static final String RET_JSON = "return jsonResponse;";
 
     private static final String REQUEST_METHOD_WITHOUT_TYPE = "org.springframework.web.bind.annotation.RequestMethod.";
 
@@ -486,8 +490,8 @@ public class WebJpaBatchMetadata extends
 
         // @RequestMapping
         AnnotationMetadataBuilder requestMappingAnnotation = helper
-                .getRequestMappingAnnotation("/delete", "POST", null,
-                        "application/json", null, null);
+                .getRequestMappingAnnotation("/delete", "POST", null, APP_JSON,
+                        null, null);
         annotations.add(requestMappingAnnotation);
 
         // Define method throws types (none in this case)
@@ -527,14 +531,14 @@ public class WebJpaBatchMetadata extends
                 "%s headers = new HttpHeaders();",
                 helper.getFinalTypeName(SpringJavaType.HTTP_HEADERS)));
 
-        // headers.add("Content-Type", "application/json");
+        // headers.add("Content-Type", APP_JSON);
         builder.appendFormalLine("headers.add(\"Content-Type\", \"application/json\");");
 
         // long count = 0;
         builder.appendFormalLine("long count = 0;");
 
         // try {
-        builder.appendFormalLine("try {");
+        builder.appendFormalLine(TRY);
         builder.indent(); // 1
 
         // if (all) {
@@ -696,8 +700,8 @@ public class WebJpaBatchMetadata extends
 
         // @RequestMapping
         AnnotationMetadataBuilder requestMappingAnnotation = helper
-                .getRequestMappingAnnotation(null, "PUT", "application/json",
-                        "application/json", null, "Accept=application/json");
+                .getRequestMappingAnnotation(null, "PUT", APP_JSON, APP_JSON,
+                        null, "Accept=application/json");
         annotations.add(requestMappingAnnotation);
         // @ResponseBody
         AnnotationMetadataBuilder responseBodyAnnotation = new AnnotationMetadataBuilder();
@@ -753,16 +757,16 @@ public class WebJpaBatchMetadata extends
                 BINDING_RESULT_NAME.getSymbolName()));
 
         // jsonResponse.setStatus("ERROR");
-        builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
+        builder.appendFormalLine(JSON_ERROR);
         // return jsonResponse
-        builder.appendFormalLine("return jsonResponse;");
+        builder.appendFormalLine(RET_JSON);
 
         // }
         builder.indentRemove();
         builder.appendFormalLine("}");
 
         // try {
-        builder.appendFormalLine("try {");
+        builder.appendFormalLine(TRY);
         builder.indent();
 
         // vets = batchService.update(vets);
@@ -779,11 +783,11 @@ public class WebJpaBatchMetadata extends
         builder.indent();
 
         // jsonResponse.setStatus("ERROR");
-        builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
+        builder.appendFormalLine(JSON_ERROR);
         // jsonResponse.setExceptionMessage(ex.getLocalizedMessage());
         builder.appendFormalLine("jsonResponse.setExceptionMessage(ex.getLocalizedMessage());");
         // return jsonResponse
-        builder.appendFormalLine("return jsonResponse;");
+        builder.appendFormalLine(RET_JSON);
 
         // }
         builder.indentRemove();
@@ -798,7 +802,7 @@ public class WebJpaBatchMetadata extends
         // jsonResponse.setStatus("SUCCESS");
         builder.appendFormalLine("jsonResponse.setStatus(\"SUCCESS\");");
         // return jsonResponse
-        builder.appendFormalLine("return jsonResponse;");
+        builder.appendFormalLine(RET_JSON);
     }
 
     /**
@@ -834,8 +838,8 @@ public class WebJpaBatchMetadata extends
 
         // @RequestMapping
         AnnotationMetadataBuilder requestMappingAnnotation = helper
-                .getRequestMappingAnnotation(null, "POST", "application/json",
-                        "application/json", null, "Accept=application/json");
+                .getRequestMappingAnnotation(null, "POST", APP_JSON, APP_JSON,
+                        null, "Accept=application/json");
         annotations.add(requestMappingAnnotation);
         // @ResponseBody
         AnnotationMetadataBuilder responseBodyAnnotation = new AnnotationMetadataBuilder();
@@ -890,16 +894,16 @@ public class WebJpaBatchMetadata extends
                 "jsonResponse.setBindingResult(%s);",
                 BINDING_RESULT_NAME.getSymbolName()));
         // jsonResponse.setStatus("ERROR");
-        builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
+        builder.appendFormalLine(JSON_ERROR);
         // return jsonResponse
-        builder.appendFormalLine("return jsonResponse;");
+        builder.appendFormalLine(RET_JSON);
 
         // }
         builder.indentRemove();
         builder.appendFormalLine("}");
 
         // try {
-        builder.appendFormalLine("try {");
+        builder.appendFormalLine(TRY);
         builder.indent();
 
         // batchService.create(vets);
@@ -915,11 +919,11 @@ public class WebJpaBatchMetadata extends
         builder.indent();
 
         // jsonResponse.setStatus("ERROR");
-        builder.appendFormalLine("jsonResponse.setStatus(\"ERROR\");");
+        builder.appendFormalLine(JSON_ERROR);
         // jsonResponse.setExceptionMessage(ex.getLocalizedMessage());
         builder.appendFormalLine("jsonResponse.setExceptionMessage(ex.getLocalizedMessage());");
         // return jsonResponse
-        builder.appendFormalLine("return jsonResponse;");
+        builder.appendFormalLine(RET_JSON);
 
         // }
         builder.indentRemove();
@@ -931,7 +935,7 @@ public class WebJpaBatchMetadata extends
         // jsonResponse.setStatus("SUCCESS");
         builder.appendFormalLine("jsonResponse.setStatus(\"SUCCESS\");");
         // return jsonResponse
-        builder.appendFormalLine("return jsonResponse;");
+        builder.appendFormalLine(RET_JSON);
     }
 
     /**
@@ -1208,7 +1212,7 @@ public class WebJpaBatchMetadata extends
         // Object propertyValue = null;
         bodyBuilder.appendFormalLine("Object propertyValue = null;");
         // try {
-        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.appendFormalLine(TRY);
         bodyBuilder.indent();
         // propertyValue = entityBean.getPropertyValue(propertyName);
         bodyBuilder

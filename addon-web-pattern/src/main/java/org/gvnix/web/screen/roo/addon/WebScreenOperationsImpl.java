@@ -93,12 +93,17 @@ import org.w3c.dom.Node;
 @Service
 public class WebScreenOperationsImpl extends AbstractOperations implements
         WebScreenOperations {
+    private static final String VALUE = "value";
+    private static final String FORM_BACKING_OBJ = "formBackingObject";
+    private static final String ARRAY_ELEM = "__ARRAY_ELEMENT__";
+    private static final String VAR = "var";
+
     private static Logger logger = Logger
             .getLogger(WebScreenOperationsImpl.class.getName());
 
     /** Name of {@link GvNIXPattern} attribute value */
     public static final JavaSymbolName PAT_ANN_ATTR_VAL_NAME = new JavaSymbolName(
-            "value");
+            VALUE);
 
     /** {@link GvNIXPattern} JavaType */
     public static final JavaType PATTERN_ANNOTATION = new JavaType(
@@ -106,7 +111,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
     /** Name of {@link GvNIXRelationPattern} attribute value */
     public static final JavaSymbolName REL_PAT_ANN_ATTR_VAL_NAME = new JavaSymbolName(
-            "value");
+            VALUE);
 
     /** {@link GvNIXRelationPattern} JavaType */
     public static final JavaType RELATION_PATTERN_ANNOTATION = new JavaType(
@@ -118,11 +123,11 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
     /** Name of {@link GvNIXRelatedPattern} attribute value */
     public static final JavaSymbolName RELTD_PAT_ANN_ATTR_VAL_NAME = new JavaSymbolName(
-            "value");
+            VALUE);
 
     /** Name of {@link RooWebScaffold} attribute formBackingObject */
     public static final JavaSymbolName SCAFF_ANN_ATTR_FORMBOBJ = new JavaSymbolName(
-            "formBackingObject");
+            FORM_BACKING_OBJ);
 
     /** {@link RooWebScaffold} JavaType */
     public static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(
@@ -215,8 +220,8 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                 .concat(pattern.toString());
 
         // Adds new pattern
-        patternList.add(new StringAttributeValue(new JavaSymbolName(
-                "__ARRAY_ELEMENT__"), patternParameter));
+        patternList.add(new StringAttributeValue(
+                new JavaSymbolName(ARRAY_ELEM), patternParameter));
 
         // Prepare annotation builder
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
@@ -404,11 +409,11 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         if (previousValueIndex >= 0) {
             // Restore previous value position if any
             patternList.add(previousValueIndex, new StringAttributeValue(
-                    new JavaSymbolName("__ARRAY_ELEMENT__"), finalValue));
+                    new JavaSymbolName(ARRAY_ELEM), finalValue));
         }
         else {
             patternList.add(new StringAttributeValue(new JavaSymbolName(
-                    "__ARRAY_ELEMENT__"), finalValue));
+                    ARRAY_ELEM), finalValue));
         }
 
         // Prepare annotation builder
@@ -516,10 +521,10 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                     cid.getAnnotations(), ROOWEBSCAFFOLD_ANNOTATION);
             if (annotationMetadata != null) {
                 AnnotationAttributeValue<?> annotationValues = annotationMetadata
-                        .getAttribute(new JavaSymbolName("formBackingObject"));
+                        .getAttribute(new JavaSymbolName(FORM_BACKING_OBJ));
                 if (annotationValues != null) {
                     if (annotationValues.getName().compareTo(
-                            new JavaSymbolName("formBackingObject")) == 0
+                            new JavaSymbolName(FORM_BACKING_OBJ)) == 0
                             && ((JavaType) annotationValues.getValue())
                                     .getFullyQualifiedTypeName()
                                     .equalsIgnoreCase(
@@ -677,8 +682,8 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>(
                 1);
 
-        patternList.add(new StringAttributeValue(new JavaSymbolName(
-                "__ARRAY_ELEMENT__"), attrValue));
+        patternList.add(new StringAttributeValue(
+                new JavaSymbolName(ARRAY_ELEM), attrValue));
 
         attributes.add(new ArrayAttributeValue<StringAttributeValue>(
                 RELTD_PAT_ANN_ATTR_VAL_NAME, patternList));
@@ -704,7 +709,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                         ROOWEBSCAFFOLD_ANNOTATION);
 
         AnnotationAttributeValue<?> formbakingObjectAttValue = rooWSacffAnnMdata
-                .getAttribute(new JavaSymbolName("formBackingObject"));
+                .getAttribute(new JavaSymbolName(FORM_BACKING_OBJ));
 
         JavaType formBakingObjectType = (JavaType) formbakingObjectAttValue
                 .getValue();
@@ -784,25 +789,25 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         if (testElement == null) {
             Element urlPatternCss = new XmlElementBuilder("spring:url",
                     loadScriptsXml)
-                    .addAttribute("value", "/resources/styles/pattern.css")
-                    .addAttribute("var", "pattern_css_url").build();
+                    .addAttribute(VALUE, "/resources/styles/pattern.css")
+                    .addAttribute(VAR, "pattern_css_url").build();
             Element urlQlJs = new XmlElementBuilder("spring:url",
                     loadScriptsXml)
-                    .addAttribute("value", "/resources/scripts/quicklinks.js")
-                    .addAttribute("var", "qljs_url").build();
+                    .addAttribute(VALUE, "/resources/scripts/quicklinks.js")
+                    .addAttribute(VAR, "qljs_url").build();
             // Add i18n messages for quicklinks.js
             List<Element> qlJsI18n = new ArrayList<Element>();
             qlJsI18n.add(new XmlElementBuilder("spring:message", loadScriptsXml)
                     .addAttribute("code", "message_selectrowtodelete_alert")
-                    .addAttribute("var", "msg_selectrowtodelete_alert")
+                    .addAttribute(VAR, "msg_selectrowtodelete_alert")
                     .addAttribute("htmlEscape", "false").build());
             qlJsI18n.add(new XmlElementBuilder("spring:message", loadScriptsXml)
                     .addAttribute("code", "message_selectrowtoupdate_alert")
-                    .addAttribute("var", "msg_selectrowtoupdate_alert")
+                    .addAttribute(VAR, "msg_selectrowtoupdate_alert")
                     .addAttribute("htmlEscape", "false").build());
             qlJsI18n.add(new XmlElementBuilder("spring:message", loadScriptsXml)
                     .addAttribute("code", "message_updateonlyonerow_alert")
-                    .addAttribute("var", "msg_updateonlyonerow_alert")
+                    .addAttribute(VAR, "msg_updateonlyonerow_alert")
                     .addAttribute("htmlEscape", "false").build());
             StringBuilder qlJsI18nScriptText = new StringBuilder("<!--\n");
             qlJsI18nScriptText

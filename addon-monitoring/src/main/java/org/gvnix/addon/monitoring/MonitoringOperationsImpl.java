@@ -29,6 +29,12 @@ import org.w3c.dom.*;
 @Service
 public class MonitoringOperationsImpl implements MonitoringOperations {
 
+    private static final String MONITORING = "monitoring";
+    private static final String BEAN_TAG = "bean";
+    private static final String CLASS_TAG = "class";
+    private static final String NAME_TAG = "name";
+    private static final String JM_ANN_POINTCUT = "net.bull.javamelody.MonitoredWithAnnotationPointcut";
+
     private static final Logger LOGGER = HandlerUtils
             .getLogger(MonitoringOperationsImpl.class);
 
@@ -107,7 +113,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      * This method adds a new entry menu
      */
     public void addMenuEntry() {
-        String finalPath = "monitoring";
+        String finalPath = MONITORING;
         menuOperations.addMenuItem(new JavaSymbolName(
                 "monitoring_menu_category"), new JavaSymbolName(
                 "monitoring_menu_entry"), "JMelody Monitoring",
@@ -123,7 +129,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
         Map<String, String> propertyList = new HashMap<String, String>();
 
         propertyList.put("menu_category_monitoring_menu_category_label",
-                "Monitoring");
+                MONITORING);
 
         propFileOperations.addProperties(getWebappPath(),
                 "WEB-INF/i18n/application.properties", propertyList, true,
@@ -147,7 +153,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             Element docRoot = docXml.getDocumentElement();
 
             // Checking if exist
-            NodeList beanElements = docRoot.getElementsByTagName("bean");
+            NodeList beanElements = docRoot.getElementsByTagName(BEAN_TAG);
 
             for (int i = 0; i < beanElements.getLength(); i++) {
                 Node bean = beanElements.item(i);
@@ -163,9 +169,9 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             }
 
             // Creating new element (bean)
-            Element beanElement = docXml.createElement("bean");
+            Element beanElement = docXml.createElement(BEAN_TAG);
             beanElement.setAttribute("id", "springDataSourceBeanPostProcessor");
-            beanElement.setAttribute("class",
+            beanElement.setAttribute(CLASS_TAG,
                     "net.bull.javamelody.SpringDataSourceBeanPostProcessor");
 
             docRoot.appendChild(beanElement);
@@ -223,7 +229,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                         Node property = propertyElements.item(x);
                         NamedNodeMap propertyAttr = property.getAttributes();
                         if (propertyAttr != null) {
-                            Node nameAttr = propertyAttr.getNamedItem("name");
+                            Node nameAttr = propertyAttr.getNamedItem(NAME_TAG);
                             // Checking if property exists on current Properties
                             if ("net.bull.javamelody.jpa.provider"
                                     .equals(nameAttr.getNodeValue())) {
@@ -240,7 +246,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
             // Creating provider property
             Element property = docXml.createElement("property");
-            property.setAttribute("name", "net.bull.javamelody.jpa.provider");
+            property.setAttribute(NAME_TAG, "net.bull.javamelody.jpa.provider");
             property.setAttribute("value",
                     "org.hibernate.ejb.HibernatePersistence");
 
@@ -275,7 +281,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             NodeList allFilters = docRoot.getElementsByTagName("filter-name");
             for (int i = 0; i < allFilters.getLength(); i++) {
                 Element filter = (Element) allFilters.item(i);
-                if ("monitoring".equals(filter.getTextContent())) {
+                if (MONITORING.equals(filter.getTextContent())) {
                     return;
                 }
             }
@@ -284,7 +290,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             Element filterElement = docXml.createElement("filter");
             // filter-name
             Element filterNameElement = docXml.createElement("filter-name");
-            filterNameElement.setTextContent("monitoring");
+            filterNameElement.setTextContent(MONITORING);
             filterElement.appendChild(filterNameElement);
             // filter-class
             Element filterClassElement = docXml.createElement("filter-class");
@@ -348,7 +354,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                     .createElement("filter-mapping");
             // filter-name 2
             Element filterName2Element = docXml.createElement("filter-name");
-            filterName2Element.setTextContent("monitoring");
+            filterName2Element.setTextContent(MONITORING);
             filterMappingElement.appendChild(filterName2Element);
             // url-pattern
             Element urlPatternElement = docXml.createElement("url-pattern");
@@ -543,7 +549,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             Element docRoot = docXml.getDocumentElement();
 
             // Checking if exist
-            NodeList beanElements = docRoot.getElementsByTagName("bean");
+            NodeList beanElements = docRoot.getElementsByTagName(BEAN_TAG);
 
             for (int i = 0; i < beanElements.getLength(); i++) {
                 Node bean = beanElements.item(i);
@@ -564,7 +570,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                                     .getAttributes();
                             if (propertyAttr != null) {
                                 Node nameAttr = propertyAttr
-                                        .getNamedItem("name");
+                                        .getNamedItem(NAME_TAG);
                                 // Checkin if property exists on current bean
                                 if (nameAttr != null
                                         && "pointcut".equals(nameAttr
@@ -580,11 +586,11 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                                                 .getAttributes();
                                         if (bean2Attr != null) {
                                             Node classAttr = bean2Attr
-                                                    .getNamedItem("class");
+                                                    .getNamedItem(CLASS_TAG);
                                             // Checkin if bean exists on current
                                             // property
                                             if (classAttr != null
-                                                    && "net.bull.javamelody.MonitoredWithAnnotationPointcut"
+                                                    && JM_ANN_POINTCUT
                                                             .equals(classAttr
                                                                     .getNodeValue())) {
                                                 return;
@@ -594,10 +600,9 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
                                     // Creating new element (bean)
                                     Element bean2Element = docXml
-                                            .createElement("bean");
-                                    bean2Element
-                                            .setAttribute("class",
-                                                    "net.bull.javamelody.MonitoredWithAnnotationPointcut");
+                                            .createElement(BEAN_TAG);
+                                    bean2Element.setAttribute(CLASS_TAG,
+                                            JM_ANN_POINTCUT);
 
                                     property.appendChild(bean2Element);
 
@@ -614,13 +619,11 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                         // Creating new element (property)
                         Element propertyElement = docXml
                                 .createElement("property");
-                        propertyElement.setAttribute("name", "pointcut");
+                        propertyElement.setAttribute(NAME_TAG, "pointcut");
 
                         // Creating new element (bean)
-                        Element bean2Element = docXml.createElement("bean");
-                        bean2Element
-                                .setAttribute("class",
-                                        "net.bull.javamelody.MonitoredWithAnnotationPointcut");
+                        Element bean2Element = docXml.createElement(BEAN_TAG);
+                        bean2Element.setAttribute(CLASS_TAG, JM_ANN_POINTCUT);
 
                         propertyElement.appendChild(bean2Element);
                         bean.appendChild(propertyElement);
@@ -634,19 +637,18 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             }
 
             // Creating new element (bean)
-            Element beanElement = docXml.createElement("bean");
+            Element beanElement = docXml.createElement(BEAN_TAG);
             beanElement.setAttribute("id", "monitoringAdvisor");
-            beanElement.setAttribute("class",
+            beanElement.setAttribute(CLASS_TAG,
                     "net.bull.javamelody.MonitoringSpringAdvisor");
 
             // Creating new element (property)
             Element propertyElement = docXml.createElement("property");
-            propertyElement.setAttribute("name", "pointcut");
+            propertyElement.setAttribute(NAME_TAG, "pointcut");
 
             // Creating new element (bean)
-            Element bean2Element = docXml.createElement("bean");
-            bean2Element.setAttribute("class",
-                    "net.bull.javamelody.MonitoredWithAnnotationPointcut");
+            Element bean2Element = docXml.createElement(BEAN_TAG);
+            bean2Element.setAttribute(CLASS_TAG, JM_ANN_POINTCUT);
 
             propertyElement.appendChild(bean2Element);
             beanElement.appendChild(propertyElement);
@@ -672,13 +674,13 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             Element docRoot = docXml.getDocumentElement();
 
             // Checking if exist
-            NodeList beanElements = docRoot.getElementsByTagName("bean");
+            NodeList beanElements = docRoot.getElementsByTagName(BEAN_TAG);
 
             for (int i = 0; i < beanElements.getLength(); i++) {
                 Node bean = beanElements.item(i);
                 NamedNodeMap beanAttr = bean.getAttributes();
                 if (beanAttr != null) {
-                    Node classAttr = beanAttr.getNamedItem("class");
+                    Node classAttr = beanAttr.getNamedItem(CLASS_TAG);
                     // Checking if bean exists on current beans
                     if (classAttr != null
                             && "org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
@@ -689,9 +691,9 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             }
 
             // Creating new element (bean)
-            Element beanElement = docXml.createElement("bean");
+            Element beanElement = docXml.createElement(BEAN_TAG);
             beanElement
-                    .setAttribute("class",
+                    .setAttribute(CLASS_TAG,
                             "org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator");
 
             docRoot.appendChild(beanElement);

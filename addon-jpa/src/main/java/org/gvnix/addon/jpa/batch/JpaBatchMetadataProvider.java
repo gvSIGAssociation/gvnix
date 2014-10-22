@@ -113,10 +113,10 @@ public final class JpaBatchMetadataProvider extends
             return null;
         }
 
-        final MemberHoldingTypeDetails targetEntityMemberHoldingTypeDetails = MemberFindingUtils
+        final MemberHoldingTypeDetails targetMHTD = MemberFindingUtils
                 .getMostConcreteMemberHoldingTypeDetailsWithTag(
                         targetEntityMemberDetails, PERSISTENT_TYPE);
-        if (targetEntityMemberHoldingTypeDetails == null) {
+        if (targetMHTD == null) {
             return null;
         }
 

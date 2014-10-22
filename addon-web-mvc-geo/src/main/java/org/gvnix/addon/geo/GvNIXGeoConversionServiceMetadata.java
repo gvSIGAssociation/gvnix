@@ -50,6 +50,11 @@ import org.springframework.roo.project.LogicalPath;
  */
 public class GvNIXGeoConversionServiceMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
+    private static final String RET_JL_STRING = " return new %s<%s, java.lang.String>() {";
+    private static final String RET_JL_STRING_S = " return new %s<java.lang.String, %s>() {";
+    private static final String TRY_BR = "try {";
+    private static final String CATCH = "}catch( %s e) {";
+    private static final String THROW_ILLEGAL_EX = "throw new IllegalArgumentException(";
 
     private static final JavaType PARSE_EXCEPTION_TYPE = new JavaType(
             "com.vividsolutions.jts.io.ParseException");
@@ -741,8 +746,7 @@ public class GvNIXGeoConversionServiceMetadata extends
      */
     private void buildGetPointToStringConverterMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder.appendFormalLine(String.format(
-                " return new %s<%s, java.lang.String>() {",
+        bodyBuilder.appendFormalLine(String.format(RET_JL_STRING,
                 helper.getFinalTypeName(CONVERTER_TYPE),
                 helper.getFinalTypeName(POINT_TYPE)));
 
@@ -769,8 +773,7 @@ public class GvNIXGeoConversionServiceMetadata extends
      */
     private void buildGetStringToPointConverterMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder.appendFormalLine(String.format(
-                " return new %s<java.lang.String, %s>() {",
+        bodyBuilder.appendFormalLine(String.format(RET_JL_STRING_S,
                 helper.getFinalTypeName(CONVERTER_TYPE),
                 helper.getFinalTypeName(POINT_TYPE)));
 
@@ -778,17 +781,17 @@ public class GvNIXGeoConversionServiceMetadata extends
         bodyBuilder.appendFormalLine("public Point convert(String str) {");
 
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.appendFormalLine(TRY_BR);
 
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("return (Point) reader.read(str);");
 
         bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine(String.format("}catch( %s e) {",
+        bodyBuilder.appendFormalLine(String.format(CATCH,
                 helper.getFinalTypeName(PARSE_EXCEPTION_TYPE)));
 
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("throw new IllegalArgumentException(");
+        bodyBuilder.appendFormalLine(THROW_ILLEGAL_EX);
 
         bodyBuilder.indent();
         bodyBuilder
@@ -817,8 +820,7 @@ public class GvNIXGeoConversionServiceMetadata extends
      */
     private void buildGetLineStringToStringConverterMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder.appendFormalLine(String.format(
-                " return new %s<%s, java.lang.String>() {",
+        bodyBuilder.appendFormalLine(String.format(RET_JL_STRING,
                 helper.getFinalTypeName(CONVERTER_TYPE),
                 helper.getFinalTypeName(LINESTRING_TYPE)));
 
@@ -847,8 +849,7 @@ public class GvNIXGeoConversionServiceMetadata extends
      */
     private void buildGetStringToLineStringConverterMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder.appendFormalLine(String.format(
-                " return new %s<java.lang.String, %s>() {",
+        bodyBuilder.appendFormalLine(String.format(RET_JL_STRING_S,
                 helper.getFinalTypeName(CONVERTER_TYPE),
                 helper.getFinalTypeName(LINESTRING_TYPE)));
 
@@ -856,17 +857,17 @@ public class GvNIXGeoConversionServiceMetadata extends
         bodyBuilder.appendFormalLine("public LineString convert(String str) {");
 
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.appendFormalLine(TRY_BR);
 
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("return (LineString) reader.read(str);");
 
         bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine(String.format("}catch( %s e) {",
+        bodyBuilder.appendFormalLine(String.format(CATCH,
                 helper.getFinalTypeName(PARSE_EXCEPTION_TYPE)));
 
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("throw new IllegalArgumentException(");
+        bodyBuilder.appendFormalLine(THROW_ILLEGAL_EX);
 
         bodyBuilder.indent();
         bodyBuilder
@@ -894,8 +895,7 @@ public class GvNIXGeoConversionServiceMetadata extends
      */
     private void buildGetPolygonToStringConverterMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder.appendFormalLine(String.format(
-                " return new %s<%s, java.lang.String>() {",
+        bodyBuilder.appendFormalLine(String.format(RET_JL_STRING,
                 helper.getFinalTypeName(CONVERTER_TYPE),
                 helper.getFinalTypeName(POLYGON_TYPE)));
 
@@ -921,8 +921,7 @@ public class GvNIXGeoConversionServiceMetadata extends
      */
     private void buildGetStringToPolygonConverterMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder.appendFormalLine(String.format(
-                " return new %s<java.lang.String, %s>() {",
+        bodyBuilder.appendFormalLine(String.format(RET_JL_STRING_S,
                 helper.getFinalTypeName(CONVERTER_TYPE),
                 helper.getFinalTypeName(POLYGON_TYPE)));
 
@@ -930,17 +929,17 @@ public class GvNIXGeoConversionServiceMetadata extends
         bodyBuilder.appendFormalLine("public Polygon convert(String str) {");
 
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.appendFormalLine(TRY_BR);
 
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("return (Polygon) reader.read(str);");
 
         bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine(String.format("}catch( %s e) {",
+        bodyBuilder.appendFormalLine(String.format(CATCH,
                 helper.getFinalTypeName(PARSE_EXCEPTION_TYPE)));
 
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("throw new IllegalArgumentException(");
+        bodyBuilder.appendFormalLine(THROW_ILLEGAL_EX);
 
         bodyBuilder.indent();
         bodyBuilder
@@ -968,8 +967,7 @@ public class GvNIXGeoConversionServiceMetadata extends
      */
     private void buildGetGeometryToStringConverterMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder.appendFormalLine(String.format(
-                " return new %s<%s, java.lang.String>() {",
+        bodyBuilder.appendFormalLine(String.format(RET_JL_STRING,
                 helper.getFinalTypeName(CONVERTER_TYPE),
                 helper.getFinalTypeName(GEOMETRY_TYPE)));
 
@@ -995,8 +993,7 @@ public class GvNIXGeoConversionServiceMetadata extends
      */
     private void buildGetStringToGeometryConverterMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder.appendFormalLine(String.format(
-                " return new %s<java.lang.String, %s>() {",
+        bodyBuilder.appendFormalLine(String.format(RET_JL_STRING_S,
                 helper.getFinalTypeName(CONVERTER_TYPE),
                 helper.getFinalTypeName(GEOMETRY_TYPE)));
 
@@ -1004,17 +1001,17 @@ public class GvNIXGeoConversionServiceMetadata extends
         bodyBuilder.appendFormalLine("public Geometry convert(String str) {");
 
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.appendFormalLine(TRY_BR);
 
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("return reader.read(str);");
 
         bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine(String.format("}catch( %s e) {",
+        bodyBuilder.appendFormalLine(String.format(CATCH,
                 helper.getFinalTypeName(PARSE_EXCEPTION_TYPE)));
 
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("throw new IllegalArgumentException(");
+        bodyBuilder.appendFormalLine(THROW_ILLEGAL_EX);
 
         bodyBuilder.indent();
         bodyBuilder
@@ -1043,8 +1040,7 @@ public class GvNIXGeoConversionServiceMetadata extends
      */
     private void buildGetMultiLineStringToStringConverterMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder.appendFormalLine(String.format(
-                " return new %s<%s, java.lang.String>() {",
+        bodyBuilder.appendFormalLine(String.format(RET_JL_STRING,
                 helper.getFinalTypeName(CONVERTER_TYPE),
                 helper.getFinalTypeName(MULTILINESTRING_TYPE)));
 
@@ -1072,8 +1068,7 @@ public class GvNIXGeoConversionServiceMetadata extends
      */
     private void buildGetStringToMultiLineStringConverterMethodBody(
             InvocableMemberBodyBuilder bodyBuilder) {
-        bodyBuilder.appendFormalLine(String.format(
-                " return new %s<java.lang.String, %s>() {",
+        bodyBuilder.appendFormalLine(String.format(RET_JL_STRING_S,
                 helper.getFinalTypeName(CONVERTER_TYPE),
                 helper.getFinalTypeName(MULTILINESTRING_TYPE)));
 
@@ -1082,18 +1077,18 @@ public class GvNIXGeoConversionServiceMetadata extends
                 .appendFormalLine("public MultiLineString convert(String str) {");
 
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.appendFormalLine(TRY_BR);
 
         bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("return (MultiLineString) reader.read(str);");
 
         bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine(String.format("}catch( %s e) {",
+        bodyBuilder.appendFormalLine(String.format(CATCH,
                 helper.getFinalTypeName(PARSE_EXCEPTION_TYPE)));
 
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("throw new IllegalArgumentException(");
+        bodyBuilder.appendFormalLine(THROW_ILLEGAL_EX);
 
         bodyBuilder.indent();
         bodyBuilder

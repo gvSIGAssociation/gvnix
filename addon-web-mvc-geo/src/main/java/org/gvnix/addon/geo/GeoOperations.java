@@ -18,7 +18,7 @@ public interface GeoOperations extends Feature {
      */
     static final String FEATURE_NAME_GVNIX_GEO_WEB_MVC = "gvnix-geo-web-mvc";
 
-    static final String FEATURE_DESCRIPTION_GVNIX_GEO_WEB_MVC = "Geo Component";
+    static final String FT_DESC_GVNIX_GEO = "Geo Component";
 
     /**
      * This method checks if setup command is available

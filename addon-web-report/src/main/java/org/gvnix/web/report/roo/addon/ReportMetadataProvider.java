@@ -115,20 +115,18 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
                 .getJavaType(metadataIdentificationString);
 
         // We know governor type details are non-null and can be safely cast
-        ClassOrInterfaceTypeDetails controllerClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
+        ClassOrInterfaceTypeDetails controllerCoID = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
         Validate.notNull(
-                controllerClassOrInterfaceDetails,
+                controllerCoID,
                 "Governor failed to provide class type details, in violation of superclass contract");
         MemberDetails controllerMemberDetails = memberDetailsScanner
-                .getMemberDetails(getClass().getName(),
-                        controllerClassOrInterfaceDetails);
+                .getMemberDetails(getClass().getName(), controllerCoID);
 
         List<StringAttributeValue> definedReports = new ArrayList<StringAttributeValue>();
 
         AnnotationMetadata gvNixReportsAnnotation = MemberFindingUtils
-                .getAnnotationOfType(
-                        controllerClassOrInterfaceDetails.getAnnotations(),
+                .getAnnotationOfType(controllerCoID.getAnnotations(),
                         new JavaType(GvNIXReports.class.getName()));
         if (gvNixReportsAnnotation != null) {
             AnnotationAttributeValue<?> val = gvNixReportsAnnotation

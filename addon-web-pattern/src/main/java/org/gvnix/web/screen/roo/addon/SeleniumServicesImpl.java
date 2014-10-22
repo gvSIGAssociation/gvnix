@@ -81,6 +81,12 @@ import org.w3c.dom.Node;
 @Service
 public class SeleniumServicesImpl implements SeleniumServices {
 
+    private static final String CONTR_TYPE_REQ = "Controller type required";
+    private static final String TEST_DASH = "test-";
+    private static final String SELENIUM_SLASH = "selenium/";
+    private static final String GVNIX_CHECKBOX = "gvnix_checkbox_fu_";
+    private static final String INPUT_AT_PROC = "//input[@id='proceed']";
+
     private static final String TBODY_XPATH = "/html/body/table/tbody";
 
     private static final String CONTROLLER_NO_CREATION_WARN = "The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.";
@@ -122,7 +128,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
     public void generateTestMasterRegister(JavaType controller, String name,
             String serverURL) {
 
-        Validate.notNull(controller, "Controller type required");
+        Validate.notNull(controller, CONTR_TYPE_REQ);
 
         // Get web scaffold annotation from controller
         WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
@@ -162,8 +168,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
                 id);
 
         // Store the test file into project
-        String testName = "test-" + name + "-master-register";
-        String relativeTestFilePath = "selenium/" + testName + ".xhtml";
+        String testName = TEST_DASH + name + "-master-register";
+        String relativeTestFilePath = SELENIUM_SLASH + testName + ".xhtml";
         installTest(testName, serverURL, document, relativeTestFilePath);
     }
 
@@ -177,7 +183,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
     public void generateTestMasterTabular(JavaType controller, String name,
             String serverURL) {
 
-        Validate.notNull(controller, "Controller type required");
+        Validate.notNull(controller, CONTR_TYPE_REQ);
 
         // Get web scaffold annotation from controller
         WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
@@ -219,8 +225,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
         addTestTabular(formBackingType, document, tbody, baseURL, name, id);
 
         // Store the test file into project
-        String testName = "test-" + name + "-master-tabular";
-        String relativeTestFilePath = "selenium/" + testName + ".xhtml";
+        String testName = TEST_DASH + name + "-master-tabular";
+        String relativeTestFilePath = SELENIUM_SLASH + testName + ".xhtml";
         installTest(testName, serverURL, document, relativeTestFilePath);
     }
 
@@ -235,7 +241,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
     public void generateTestMasterTabularEditRegister(JavaType controller,
             String name, String serverURL) {
 
-        Validate.notNull(controller, "Controller type required");
+        Validate.notNull(controller, CONTR_TYPE_REQ);
 
         // Get web scaffold annotation from controller
         WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
@@ -278,8 +284,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
                 name, id);
 
         // Store the test file into project
-        String testName = "test-" + name + "-master-tabular";
-        String relativeTestFilePath = "selenium/" + testName + ".xhtml";
+        String testName = TEST_DASH + name + "-master-tabular";
+        String relativeTestFilePath = SELENIUM_SLASH + testName + ".xhtml";
         installTest(testName, serverURL, document, relativeTestFilePath);
     }
 
@@ -295,7 +301,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
             WebPatternType type, JavaSymbolName fieldName, String name,
             String serverURL) {
 
-        Validate.notNull(controller, "Controller type required");
+        Validate.notNull(controller, CONTR_TYPE_REQ);
         Validate.notNull(fieldName, "Field name required");
 
         // Get web scaffold annotation from controller
@@ -393,7 +399,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
             tbody.appendChild(clickAndWaitCommand(
                     document,
-                    "gvnix_checkbox_fu_"
+                    GVNIX_CHECKBOX
                             + XmlUtils.convertId(formBackingType
                                     .getFullyQualifiedTypeName()) + "_0"));
 
@@ -418,7 +424,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
             tbody.appendChild(clickAndWaitCommand(
                     document,
-                    "gvnix_checkbox_fu_"
+                    GVNIX_CHECKBOX
                             + XmlUtils.convertId(formBackingType
                                     .getFullyQualifiedTypeName()) + "_0"));
 
@@ -442,7 +448,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
             tbody.appendChild(clickAndWaitCommand(
                     document,
-                    "gvnix_checkbox_fu_"
+                    GVNIX_CHECKBOX
                             + XmlUtils.convertId(formBackingType
                                     .getFullyQualifiedTypeName()) + "_0"));
 
@@ -465,7 +471,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
             tbody.appendChild(clickAndWaitCommand(
                     document,
-                    "gvnix_checkbox_fu_"
+                    GVNIX_CHECKBOX
                             + XmlUtils.convertId(formBackingType
                                     .getFullyQualifiedTypeName()) + "_0"));
 
@@ -477,8 +483,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
         }
 
         // Store the test file into project
-        String testName = "test-" + name + "-detail-tabular" + "-" + fieldName;
-        String relativeTestFilePath = "selenium/" + testName + ".xhtml";
+        String testName = TEST_DASH + name + "-detail-tabular" + "-"
+                + fieldName;
+        String relativeTestFilePath = SELENIUM_SLASH + testName + ".xhtml";
         installTest(testName, serverURL, document, relativeTestFilePath);
     }
 
@@ -631,8 +638,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
         element.appendChild(clickAndWaitCommand(document, "//a[@id='ps_"
                 + XmlUtils.convertId(entity.getFullyQualifiedTypeName())
                 + "_update'" + "]"));
-        element.appendChild(clickAndWaitCommand(document,
-                "//input[@id='proceed']"));
+        element.appendChild(clickAndWaitCommand(document, INPUT_AT_PROC));
 
         // Update register fields verification
         addVerificationRegister(entity, document, element, fields);
@@ -667,8 +673,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
         element.appendChild(clickAndWaitCommand(document, "//img[@id='fu_"
                 + XmlUtils.convertId(entity.getFullyQualifiedTypeName())
                 + "_update'" + "]"));
-        element.appendChild(clickAndWaitCommand(document,
-                "//input[@id='proceed']"));
+        element.appendChild(clickAndWaitCommand(document, INPUT_AT_PROC));
 
         addTestTabularDelete(entity, document, element);
     }
@@ -700,8 +705,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
         addFieldsRegister(fields, document, element);
 
         // Add submit
-        element.appendChild(clickAndWaitCommand(document,
-                "//input[@id='proceed']"));
+        element.appendChild(clickAndWaitCommand(document, INPUT_AT_PROC));
 
         // Add register fields verification
         addVerificationTabular(entity, document, element, fields);
@@ -730,8 +734,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
         addFieldsRegister(fields, document, element);
 
         // Add submit
-        element.appendChild(clickAndWaitCommand(document,
-                "//input[@id='proceed']"));
+        element.appendChild(clickAndWaitCommand(document, INPUT_AT_PROC));
 
         // Add register fields verification
         addVerificationRegister(entity, document, element, fields);
@@ -1263,7 +1266,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
         td1.setTextContent("check");
 
         Node td2 = tr.appendChild(document.createElement("td"));
-        String id = "gvnix_checkbox_fu_"
+        String id = GVNIX_CHECKBOX
                 + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_0";
         td2.setTextContent(id);
 

@@ -163,6 +163,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 public class DatatablesMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
+    private static final String ENDING = "\");";
+    private static final String ELSE = "} else {";
+    private static final String JSON_APPEND = "json.append(\",\");";
+    private static final String COLTYPE_NUM = "return \"{\\\"columnType\\\": \\\"number\\\"}\";";
 
     private static final String DATATABLES_REDIRECT = "datatablesRedirect";
 
@@ -2253,9 +2257,9 @@ public class DatatablesMetadata extends
                         safevalue = values[1];
 
                     bodyBuilder.appendFormalLine("propertyMap.put(\""
-                            + values[0] + "\",\"" + safevalue + "\");");
+                            + values[0] + "\",\"" + safevalue + ENDING);
                     bodyBuilder.appendFormalLine("propertyMap.put(\"_operator_"
-                            + values[0] + "\",\"" + operation + "\");");
+                            + values[0] + "\",\"" + operation + ENDING);
                 }
             }
         }
@@ -2328,7 +2332,7 @@ public class DatatablesMetadata extends
                 helper.getFinalTypeName(COLLECTIONS)));
         // } else {
         bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("} else {");
+        bodyBuilder.appendFormalLine(ELSE);
         bodyBuilder.indent();
         // params = new HashMap<String, Object>(request.getParameterMap());
         bodyBuilder.appendFormalLine(String.format(
@@ -2366,7 +2370,7 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("value = ((String[]) objValue)[0];");
         // } else {
         bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("} else {");
+        bodyBuilder.appendFormalLine(ELSE);
         bodyBuilder.indent();
         // value = (String) entry.getValue();
         bodyBuilder.appendFormalLine("value = (String) objValue;");
@@ -3016,7 +3020,7 @@ public class DatatablesMetadata extends
         if (!entityDatePatterns.isEmpty()) {
             // } else {
             bodyBuilder.indentRemove();
-            bodyBuilder.appendFormalLine("} else {");
+            bodyBuilder.appendFormalLine(ELSE);
             bodyBuilder.indent();
 
             // // Add date time patterns
@@ -3190,112 +3194,112 @@ public class DatatablesMetadata extends
                 .appendFormalLine("StringBuilder json = new StringBuilder();");
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"all_isnull\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.all.isnull\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"all_notnull\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.all.notnull\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"boolean_false\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.boolean.false\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"boolean_true\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.boolean.true\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"date_between\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.between\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"date_date\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.date\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"date_day\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.day\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"date_month\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.month\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"date_year\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.date.year\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"number_between\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.number.between\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"string_contains\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.contains\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"string_ends\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.ends\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"string_isempty\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.isempty\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"string_isnotempty\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.isnotempty\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"string_starts\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.string.starts\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"button_find\\\": \\\"\" + messageSource_dtt.getMessage(\"button_find\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_all_isnull\\\": \\\"\" + messageSource_dtt.getMessage(\"help.all.isnull\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_all_notnull\\\": \\\"\" + messageSource_dtt.getMessage(\"help.all.notnull\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_boolean_false\\\": \\\"\" + messageSource_dtt.getMessage(\"help.boolean.false\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_boolean_true\\\": \\\"\" + messageSource_dtt.getMessage(\"help.boolean.true\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_date_between\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.between\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_date_date\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.date\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_date_day\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.day\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_date_month\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.month\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_date_year\\\": \\\"\" + messageSource_dtt.getMessage(\"help.date.year\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_number_between\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.between\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_number_eq\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.eq\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_number_neq\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.neq\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_number_gt\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.gt\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_number_lt\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.lt\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_number_goe\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.goe\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_number_loe\\\": \\\"\" + messageSource_dtt.getMessage(\"help.number.loe\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_string_contains\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.contains\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_string_ends\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.ends\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_string_isempty\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.isempty\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_string_isnotempty\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.isnotempty\", null, defaultLocale) + \"\\\"\");");
-        bodyBuilder.appendFormalLine("json.append(\",\");");
+        bodyBuilder.appendFormalLine(JSON_APPEND);
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"help_string_starts\\\": \\\"\" + messageSource_dtt.getMessage(\"help.string.starts\", null, defaultLocale) + \"\\\"\");");
 
@@ -3477,32 +3481,27 @@ public class DatatablesMetadata extends
         bodyBuilder
                 .appendFormalLine("} else if (\"float\".equals(type) || type.contains(\"Float\")){");
         bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("return \"{\\\"columnType\\\": \\\"number\\\"}\";");
+        bodyBuilder.appendFormalLine(COLTYPE_NUM);
         bodyBuilder.indentRemove();
         bodyBuilder
                 .appendFormalLine("} else if (\"short\".equals(type) || type.contains(\"Short\")){");
         bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("return \"{\\\"columnType\\\": \\\"number\\\"}\";");
+        bodyBuilder.appendFormalLine(COLTYPE_NUM);
         bodyBuilder.indentRemove();
         bodyBuilder
                 .appendFormalLine("} else if (\"long\".equals(type) || type.contains(\"Long\")){");
         bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("return \"{\\\"columnType\\\": \\\"number\\\"}\";");
+        bodyBuilder.appendFormalLine(COLTYPE_NUM);
         bodyBuilder.indentRemove();
         bodyBuilder
                 .appendFormalLine("} else if (\"double\".equals(type) || type.contains(\"Double\")){");
         bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("return \"{\\\"columnType\\\": \\\"number\\\"}\";");
+        bodyBuilder.appendFormalLine(COLTYPE_NUM);
         bodyBuilder.indentRemove();
         bodyBuilder
                 .appendFormalLine("} else if (\"int\".equals(type) || type.contains(\"Integer\")){");
         bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("return \"{\\\"columnType\\\": \\\"number\\\"}\";");
+        bodyBuilder.appendFormalLine(COLTYPE_NUM);
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("} else if (\"Date\".equals(type)){");
         bodyBuilder.indent();
@@ -3515,7 +3514,7 @@ public class DatatablesMetadata extends
         bodyBuilder
                 .appendFormalLine("return \"{\\\"columnType\\\": \\\"boolean\\\"}\";");
         bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("} else {");
+        bodyBuilder.appendFormalLine(ELSE);
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("// Returning by default");
         bodyBuilder
@@ -3892,13 +3891,13 @@ public class DatatablesMetadata extends
         bodyBuilder
                 .appendFormalLine("// Base path for detail datatables entity (to get detail datatables fragment URL)");
         bodyBuilder.appendFormalLine("details.put(\"path\", \"".concat(
-                javaTypeMetadataDetails.getControllerPath()).concat("\");"));
+                javaTypeMetadataDetails.getControllerPath()).concat(ENDING));
         bodyBuilder.appendFormalLine("details.put(\"property\", \"".concat(
-                entityField.getFieldName().getSymbolName()).concat("\");"));
+                entityField.getFieldName().getSymbolName()).concat(ENDING));
         bodyBuilder
                 .appendFormalLine("// Property name in detail entity with the relation to master entity");
         bodyBuilder.appendFormalLine("details.put(\"mappedBy\", \"".concat(
-                entityFieldOneToManyAnnotationMappedBy).concat("\");"));
+                entityFieldOneToManyAnnotationMappedBy).concat(ENDING));
 
         bodyBuilder.appendFormalLine("detailsInfo.add(details);");
     }
