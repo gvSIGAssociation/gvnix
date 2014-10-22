@@ -381,7 +381,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
         newExceptionMapping.setTextContent(exceptionViewName);
 
-        if (updateMappings) {
+        if (updateMappings && simpleMappingException != null) {
             simpleMappingException.appendChild(newExceptionMapping);
         }
 
