@@ -190,6 +190,8 @@
 
     <xi:include href="addon-jpa.xml"/>
 
+    <xi:include href="addon-monitoring.xml"/>
+
     <xi:include href="addon-web-mvc.xml"/>
     
     <xi:include href="addon-web-mvc-bootstrap.xml"/>

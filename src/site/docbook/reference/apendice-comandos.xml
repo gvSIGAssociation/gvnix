@@ -44,5 +44,7 @@
   <xi:include href="apendice-comandos_addon-web-mvc-geo.xml" />
   
   <xi:include href="apendice-comandos_addon-web-mvc-loupe.xml" />
+
+  <xi:include href="apendice-comandos_addon-monitoring.xml" />
   
 </chapter>
