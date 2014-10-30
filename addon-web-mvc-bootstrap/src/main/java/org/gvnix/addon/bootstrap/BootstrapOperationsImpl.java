@@ -370,7 +370,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     public void addImageResources() {
 
         List<String> imageFolderFiles = new ArrayList<String>();
-        Collections.addAll(imageFolderFiles, "logo_gvnix.png");
+        Collections.addAll(imageFolderFiles, "logo_gvnix.png", "favicon.ico");
 
         Iterator<String> imageFolderIterator = imageFolderFiles.iterator();
 
@@ -379,8 +379,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
             final String imageFile = pathResolver.getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "images/".concat(fileName));
 
-            BootstrapUtils.createFilesInLocationIfNotExists(fileManager,
-                    getClass(), imageFile, fileName, "images/");
+            BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
+                    fileManager, getClass(), imageFile, fileName, "images/");
         }
     }
 
@@ -390,7 +390,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     public void restoreImageResources() {
 
         List<String> imageFolderFiles = new ArrayList<String>();
-        Collections.addAll(imageFolderFiles, "logo_gvnix.png");
+        Collections.addAll(imageFolderFiles, "logo_gvnix.png", "favicon.ico");
 
         Iterator<String> imageFolderIterator = imageFolderFiles.iterator();
 
