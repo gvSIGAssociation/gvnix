@@ -1,32 +1,18 @@
 package org.gvnix.addon.jpa.geo.providers.hibernatespatial;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.Dependency;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.project.Repository;
+import org.springframework.roo.project.*;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 public class HibernateSpatialGeoUtils {
 
@@ -239,6 +225,9 @@ public class HibernateSpatialGeoUtils {
                                             configuration, value)) {
                                         totalModified++;
                                     }
+                                    else if ("${".equals(value.substring(0, 2))) {
+                                        totalModified++;
+                                    }
 
                                 }
                             }
@@ -248,7 +237,9 @@ public class HibernateSpatialGeoUtils {
             }
 
             if (totalModified != 0) {
-                return true;
+                // return true;
+                return isHibernateSpatialDependenceInstalled(fileManager,
+                        pathResolver);
             }
             else {
                 return false;
@@ -262,13 +253,41 @@ public class HibernateSpatialGeoUtils {
     }
 
     /**
-     * This method generates package-info.java on current entity package.
+     * Checks if Hibernate Spatial dependencies are installed
      * 
-     * If <b>package-info.java</b> is generated on current entity package, don't
-     * replace or change.
-     * 
-     * If <b>package-info.java</b> is not generated on current entity package,
-     * generate it with necessary GEO configuration.
+     * @param fileManager
+     * @param pathResolver
+     * @param currentClass
+     * @return
+     */
+    public static boolean isHibernateSpatialDependenceInstalled(
+            FileManager fileManager, PathResolver pathResolver) {
+        // Pom root element
+        String pom = pathResolver.getIdentifier(
+                LogicalPath.getInstance(Path.ROOT, ""), "pom.xml");
+
+        if (fileManager.exists(pom)) {
+            // Getting document
+            Document doc = XmlUtils.readXml(fileManager.getInputStream(pom));
+
+            NodeList allArtifactId = doc.getElementsByTagName("artifactId");
+
+            for (int i = 0; i < allArtifactId.getLength(); i++) {
+                Element artifactId = (Element) allArtifactId.item(i);
+                if ("hibernate-spatial".equals(artifactId.getTextContent())) {
+                    return true;
+                }
+            }
+
+        }
+        return false;
+    }
+
+    /**
+     * This method generates package-info.java on current entity package. If
+     * <b>package-info.java</b> is generated on current entity package, don't
+     * replace or change. If <b>package-info.java</b> is not generated on
+     * current entity package, generate it with necessary GEO configuration.
      * 
      * @param entityPackage
      * @param pathResolver
