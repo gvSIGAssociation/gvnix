@@ -48,6 +48,11 @@
         ($HOME/software/springsource-X.X.X/sts-X.X.X.RELEASE/STS). Tener en
         cuenta que STS es una aplicación Java por lo que requiere tener una
         máquina virtual Java instalada en el sistema.</listitem>
+        
+        <listitem>Abrir el <literal>Dashboard</literal> de STS, buscar <literal>Spring Roo</literal>,
+        instalar <literal>Spring Roo (current production release)</literal> y
+        <literal>Spring IDE - Roo Extension</literal> y reiniciar STS.</listitem>
+        
       </itemizedlist>
     </section>
 
