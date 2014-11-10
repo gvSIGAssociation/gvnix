@@ -453,7 +453,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         // We'll replace the class just if SimpleMappingExceptionResolver is set
         if (sMapExcepResBean != null) {
             sMapExcepResBean.setAttribute("class", beanClassName);
-            sMapExcepResBean.setAttribute("id", "mMapExcepResBean");
+            sMapExcepResBean.setAttribute("id",
+                    "messageMappingExceptionResolverBean");
             XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);
         }
 
