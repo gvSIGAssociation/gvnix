@@ -48,11 +48,6 @@
         ($HOME/software/springsource-X.X.X/sts-X.X.X.RELEASE/STS). Tener en
         cuenta que STS es una aplicación Java por lo que requiere tener una
         máquina virtual Java instalada en el sistema.</listitem>
-        
-        <listitem>Abrir el <literal>Dashboard</literal> de STS, buscar <literal>Spring Roo</literal>,
-        instalar <literal>Spring Roo (current production release)</literal> y
-        <literal>Spring IDE - Roo Extension</literal> y reiniciar STS.</listitem>
-        
       </itemizedlist>
     </section>
 
@@ -171,6 +166,51 @@
       xlink:href="http://dist.springsource.com/release/STS/doc/STS-installation_instructions.pdf">Spring
       Source Tool Suite Installation Instructions</link>.</listitem>
     </itemizedlist>
+
+    <section xml:id="guia-desarrollo_eclipse-instalar3">
+      <title xml:id="es">Integrar soporte ROO en STS</title>
+    </section>
+
+    <para>
+      Spring Roo ya no está incluido en la distribución de STS a partir de su versión <emphasis>3.6.0</emphasis>, por ello necesitaremos instalar este soporte para poder trabajar con gvNIX.
+    </para>
+
+    <para>
+      Para incluir este soporte, sigue los siguientes pasos:
+    </para>
+    
+    <orderedlist>
+      <listitem>
+        <para>Abre tu STS</para>
+      </listitem>
+
+      <listitem>
+        <para>Abre el dashboard del STS y busca Spring ROO</para>
+      </listitem>
+
+      <listitem>
+        <para>Instala <emphasis>Spring Roo (current production release)</emphasis> y <emphasis>Spring IDE - Roo Extension</emphasis></para>
+      </listitem>   
+
+      <listitem>
+        <para>Reinicia tu STS</para>
+      </listitem>   
+
+    </orderedlist>
+
+    <figure>
+     <title>Integrando soporte ROO en STS</title>
+     <mediaobject>
+       <imageobject>
+         <imagedata align="center" width="400" fileref="images/sts_install.jpeg"/>
+       </imageobject>
+     </mediaobject>
+     <mediaobject>
+       <imageobject>
+         <imagedata align="center" width="400" fileref="images/sts_install.png"/>
+       </imageobject>
+     </mediaobject>
+    </figure>
 
 
   </section>
