@@ -1,8 +1,11 @@
-
 gvNIX - RAD tool for Java developers
 ======================================
 
 Welcome to gvNIX, Spring Roo based RAD tool for Java developers.
+
+gvNIX is an Spring Roo distribution that focuses both enterprise knowledge and enterprise standards to build Java applications.
+
+gvNIX is sponsored by the <a href="http://www.dgti.gva.es/" target="_blank">General Directorate for Information Technologies</a> (DGTI) at Regional Ministry of Finance and Public Administration of the Generalitat Valenciana (Valencian Community, Spain), and led by <a href="http://www.disid.com" target="_blank">DISID</a>.
 
 About this doc
 ==============
