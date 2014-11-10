@@ -969,13 +969,27 @@ var GvNIX_Editing;
 
 				// Building our pseudo aColumnField with composite PKField included
 				var controls =  $createForm.find('[class^=controls]')
+				var labels = $createForm.find('[class^=control-label]')
 				var columns = [undefined];
+				var columnNames = [undefined];
 				for(var i = 0; i < controls.length; i++){
 					if(jQuery(jQuery(controls[i]).find('[name][type!=hidden]')).length !== 0){
 						columns.push(jQuery(jQuery(controls[i]).find('[name][type!=hidden]')).attr('name'));
+						var label = jQuery(labels[i]).text();
+						if(label.lastIndexOf(":") > 0){
+							columnNames.push(label.substring(0,label.lastIndexOf(":")).trim());
+						} else {
+							columnNames.push(label.trim());
+						}
 					}
 					else if(jQuery(jQuery(controls[i]).find('[data-name]')).length !== 0){
 						columns.push(jQuery(jQuery(controls[i]).find('[data-name]')).attr('data-name'));
+						var label = jQuery(labels[i]).text();
+						if(label.lastIndexOf(":") > 0){
+							columnNames.push(label.substring(0,label.lastIndexOf(":")).trim());
+						} else {
+							columnNames.push(label.trim());
+						}
 					}
 				}
 
@@ -1006,7 +1020,8 @@ var GvNIX_Editing;
 						_d.aCreateColumnField.push(property);
 
 						// Create header cell
-						var headerCell = '<th>' + _d.oSettings.aoColumns[colIdx].sTitle + '</th>';
+						//var headerCell = '<th>' + _d.oSettings.aoColumns[colIdx].sTitle + '</th>';
+						var headerCell = '<th>' + columnNames[colIdx] + '</th>';
 						aHeaderCells.push(headerCell);
 
 						aFormCells.push("<td>");
@@ -1174,14 +1189,14 @@ var GvNIX_Editing;
 					   + "	if(select.length !== 0){"
 					   + "		select.parent().parent().parent().hide();"
 					   + "		var parent = select.parent().parent().parent().parent();"
-					   + "		var childrens = parent.children();"	
+					   + "		var childrens = parent.children();"
 					   + "		var position;"
 					   + "		for(var i = 0; i < childrens.length; i++){"
 					   + "			if(jQuery(childrens[i]).css('display') == 'none'){"
 					   + " 				position = i;"
 					   + "				var headers = parent.parent().parent().find(\"th\");"
-					   + "				jQuery(headers.get(position)).hide();"		
-					   + "			}"	
+					   + "				jQuery(headers.get(position)).hide();"
+					   + "			}"
 					   + "		}"
 					   + "	}else{"
 					   + "		var loupeHiddenInput = jQuery(\"input[id*='"+dataTablesMappedProperty+"_loupe_input']\");"
@@ -1189,21 +1204,21 @@ var GvNIX_Editing;
 					   + "			loupeHiddenInput.val(\""+dataTablesMappedValue+"\").trigger('change');"
 					   + "			loupeHiddenInput.parent().parent().hide();"
 					   + "			var parent = loupeHiddenInput.parent().parent().parent();"
-					   + "			var childrens = parent.children();"	
+					   + "			var childrens = parent.children();"
 					   + "			var position;"
 					   + "			for(var i = 0; i < childrens.length; i++){"
 					   + "				if(jQuery(childrens[i]).css('display') == 'none'){"
 					   + " 					position = i;"
 					   + "					var headers = parent.parent().parent().find(\"th\");"
-					   + "					jQuery(headers.get(position)).hide();"		
-					   + "				}"	
+					   + "					jQuery(headers.get(position)).hide();"
+					   + "				}"
 					   + "			}"
 					   + "		}"
 					   + "	}"
 					   + "});"
 					   + "</script>";
 			}
-			
+
 		   return scriptText;
 		},
 
@@ -1587,12 +1602,19 @@ var GvNIX_Editing;
 		 */
 		"fnUpdateEditingTools" : function() {
 			if (this.fnHasEditingRow()) {
-				this._data.$submitButton.show();
-				this._data.$cancelButton.show();
+				if(this._data.$submitButton !== null) {
+					this._data.$submitButton.show();
+				}
+				if(this._data.$cancelButton !== null) {
+					this._data.$cancelButton.show();
+				}
 			} else {
-				this._data.$submitButton.hide();
-				this._data.$cancelButton.hide();
-
+				if(this._data.$submitButton !== null) {
+					this._data.$submitButton.hide();
+				}
+				if(this._data.$cancelButton !== null) {
+					this._data.$cancelButton.hide();
+				}
 			}
 			this._fnUpdateInfo();
 		},
@@ -1737,7 +1759,7 @@ var GvNIX_Editing;
 		 * @param oErrors of the refered row
 		 */
 		"_fnShowBindingCreateErrors" : function(oCreatingRow, oErrors) {
-			var aCreateColumnField = this._data.aCreateColumnField;
+			var aColumnField = this._data.aCreateColumnField;
 			var fnErrorDrawer = this._options.bindingErrorDrawer;
 			var nRow = this.fnGetCreationRowById(oCreatingRow.sRowId);
 
