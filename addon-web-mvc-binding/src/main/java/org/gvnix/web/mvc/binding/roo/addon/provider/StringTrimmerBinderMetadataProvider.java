@@ -18,6 +18,8 @@
  */
 package org.gvnix.web.mvc.binding.roo.addon.provider;
 
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -37,6 +39,9 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Provides {@link StringTrimmerBinderMetadata}. This type is called by Roo to
@@ -51,6 +56,9 @@ import org.springframework.roo.project.ProjectOperations;
 public final class StringTrimmerBinderMetadataProvider extends
         AbstractItdMetadataProvider {
 
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(StringTrimmerBinderMetadataProvider.class);
+
     private static final JavaType GVNIX_STRING_TRIMMER_BINDER = new JavaType(
             GvNIXStringTrimmerBinder.class.getName());
 
@@ -58,7 +66,6 @@ public final class StringTrimmerBinderMetadataProvider extends
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference
     private ProjectOperations projectOperations;
 
     /**
@@ -69,8 +76,9 @@ public final class StringTrimmerBinderMetadataProvider extends
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(GVNIX_STRING_TRIMMER_BINDER);
@@ -85,7 +93,7 @@ public final class StringTrimmerBinderMetadataProvider extends
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(GVNIX_STRING_TRIMMER_BINDER);
@@ -134,10 +142,9 @@ public final class StringTrimmerBinderMetadataProvider extends
                 .getJavaType(metadataIdentificationString);
         LogicalPath path = StringTrimmerBinderMetadata
                 .getPath(metadataIdentificationString);
-        return PhysicalTypeIdentifier.createIdentifier(
-                javaType,
-                LogicalPath.getInstance(path.getPath(),
-                        projectOperations.getFocusedModuleName()));
+        return PhysicalTypeIdentifier.createIdentifier(javaType, LogicalPath
+                .getInstance(path.getPath(), getProjectOperations()
+                        .getFocusedModuleName()));
     }
 
     @Override
@@ -147,5 +154,30 @@ public final class StringTrimmerBinderMetadataProvider extends
 
     public String getProvidesType() {
         return StringTrimmerBinderMetadata.getMetadataIdentiferType();
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on StringTrimmerBinderMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
     }
 }

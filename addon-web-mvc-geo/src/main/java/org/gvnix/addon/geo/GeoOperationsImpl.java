@@ -69,6 +69,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of GEO Addon operations
@@ -80,6 +85,9 @@ import org.w3c.dom.NodeList;
 @Service
 public class GeoOperationsImpl extends AbstractOperations implements
         GeoOperations {
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(GeoOperationsImpl.class);
 
     private static final String LABEL = "label";
 
@@ -108,28 +116,22 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     private static final String OBJECT_MAPPER = "org.gvnix.web.json.ConversionServiceObjectMapper";
 
-    @Reference
+    private ComponentContext cContext;
+
     private PathResolver pathResolver;
 
-    @Reference
     private TypeLocationService typeLocationService;
 
-    @Reference
     private MetadataService metadataService;
 
-    @Reference
     private I18nSupport i18nSupport;
 
-    @Reference
     private PropFileOperations propFileOperations;
 
-    @Reference
     private ProjectOperations projectOperations;
 
-    @Reference
     private MenuOperations menuOperations;
 
-    @Reference
     private TypeManagementService typeManagementService;
 
     private static final JavaType SCAFFOLD_ANNOTATION = new JavaType(
@@ -144,8 +146,10 @@ public class GeoOperationsImpl extends AbstractOperations implements
     private static final JavaType MAP_VIEWER_ANNOTATION = new JavaType(
             GvNIXMapViewer.class.getName());
 
-    private static final Logger LOGGER = HandlerUtils
-            .getLogger(GeoOperationsImpl.class);
+    protected void activate(final ComponentContext componentContext) {
+        cContext = componentContext;
+        context = cContext.getBundleContext();
+    }
 
     /**
      * This method checks if setup command is available
@@ -154,10 +158,10 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     @Override
     public boolean isSetupCommandAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule("gvnix-geo-persistence")
-                && projectOperations
-                        .isFeatureInstalledInFocusedModule("gvnix-jquery");
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-geo-persistence")
+                && getProjectOperations().isFeatureInstalledInFocusedModule(
+                        "gvnix-jquery");
     }
 
     /**
@@ -220,8 +224,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Installing all necessary components
         installComponents();
         // Install Bootstrap if necessary
-        if (projectOperations
-                .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+        if (getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-bootstrap")) {
             updateGeoAddonToBootstrap();
         }
     }
@@ -236,8 +240,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 .getFullyQualifiedPackageName();
         // Doing a previous setup to install necessary components and annotate
         // ApplicationConversionService
-        if (!projectOperations
-                .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_GEO_WEB_MVC)) {
+        if (!getProjectOperations().isFeatureInstalledInFocusedModule(
+                FEATURE_NAME_GVNIX_GEO_WEB_MVC)) {
             setup();
         }
         // Adding new controller with annotated class
@@ -251,7 +255,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 .toLowerCase());
         // Add new menu entry for this new map view
         String finalPath = path.getReadableSymbolName().toLowerCase();
-        menuOperations.addMenuItem(new JavaSymbolName("map_menu_category"),
+        getMenuOperations().addMenuItem(
+                new JavaSymbolName("map_menu_category"),
                 new JavaSymbolName(path.getReadableSymbolName()
                         + "_map_menu_entry"), path.getReadableSymbolName(),
                 "global_generic", "/" + finalPath, null, getWebappPath());
@@ -281,7 +286,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
                 // Getting map controller
                 ClassOrInterfaceTypeDetails mapController = GeoUtils
-                        .getMapControllerByPath(typeLocationService,
+                        .getMapControllerByPath(getTypeLocationService(),
                                 currentPath);
                 // If mapController is null show an error
                 Validate.notNull(
@@ -318,7 +323,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 "Controller is necessary to execute this operation");
 
         // Checking that the specified controller is a valid controller
-        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+        ClassOrInterfaceTypeDetails controllerDetails = getTypeLocationService()
                 .getTypeDetails(controller);
 
         // Getting scaffold annotation
@@ -333,7 +338,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Check if is valid GEO Entity
         boolean isValidEntity = GeoUtils.isGeoEntity(scaffoldAnnotation,
-                typeLocationService);
+                getTypeLocationService());
 
         Validate.isTrue(isValidEntity, String
                 .format("Specified entity \"%s\" has not GEO fields",
@@ -344,7 +349,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         JavaType entity = (JavaType) scaffoldAnnotation.getAttribute(
                 new JavaSymbolName("formBackingObject")).getValue();
 
-        ClassOrInterfaceTypeDetails entityDetails = typeLocationService
+        ClassOrInterfaceTypeDetails entityDetails = getTypeLocationService()
                 .getTypeDetails(entity);
         AnnotationMetadata gvNIXEntityMapLayerAnnotation = entityDetails
                 .getAnnotation(GVNIX_ENTITY_MAP_LAYER_ANNOTATION);
@@ -366,7 +371,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
                 // Getting map controller
                 ClassOrInterfaceTypeDetails mapController = GeoUtils
-                        .getMapControllerByPath(typeLocationService,
+                        .getMapControllerByPath(getTypeLocationService(),
                                 currentPath);
                 // If mapController is null show an error
                 Validate.notNull(
@@ -405,7 +410,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         Validate.notNull(controller, "Valid controller is necessary");
 
         // Getting controller Details
-        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+        ClassOrInterfaceTypeDetails controllerDetails = getTypeLocationService()
                 .getTypeDetails(controller);
 
         // Getting roo web scaffold annotation
@@ -434,12 +439,12 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Checking if current entity has Geo fields
         Validate.isTrue(GeoUtils.isGeoEntity(rooWebScaffoldAnnotation,
-                typeLocationService), String.format(
+                getTypeLocationService()), String.format(
                 "Current entity '%s' doesn't have GEO fields.",
                 relatedEntity.getSimpleTypeName()));
 
         // Getting entity details
-        ClassOrInterfaceTypeDetails entityDetails = typeLocationService
+        ClassOrInterfaceTypeDetails entityDetails = getTypeLocationService()
                 .getTypeDetails(relatedEntity);
 
         // Getting declared fields
@@ -460,17 +465,17 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 "Current field '%s' is not a valid GEO field", fieldName));
 
         // Getting create.jspx
-        final String createPath = pathResolver.getFocusedIdentifier(
+        final String createPath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP,
                 String.format("WEB-INF/views/%s/create.jspx", path));
 
         // Getting update.jspx
-        final String updatePath = pathResolver.getFocusedIdentifier(
+        final String updatePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP,
                 String.format("WEB-INF/views/%s/update.jspx", path));
 
         // Getting show.jspx
-        final String showPath = pathResolver.getFocusedIdentifier(
+        final String showPath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, String.format(SHOW_VIEW, path));
 
         updateCRU(path, createPath, fieldName, fieldType, color, weight,
@@ -635,8 +640,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Getting paths to add base layer
         Map<String, String> pathsMap = new HashMap<String, String>();
 
-        Set<ClassOrInterfaceTypeDetails> controllerDetails = typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(MAP_VIEWER_ANNOTATION);
+        Set<ClassOrInterfaceTypeDetails> controllerDetails = getTypeLocationService()
+                .findClassesOrInterfaceDetailsWithAnnotation(
+                        MAP_VIEWER_ANNOTATION);
 
         for (ClassOrInterfaceTypeDetails controller : controllerDetails) {
             String controllerPath = (String) controller
@@ -677,7 +683,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         addToolToMaps(name, pathsMap, toolAttr, type);
 
-        propFileOperations.addProperties(getWebappPath(),
+        getPropFileOperations().addProperties(getWebappPath(),
                 "WEB-INF/i18n/application.properties", propertyList, true,
                 false);
 
@@ -700,7 +706,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Getting all maps
         for (Entry mapPath : pathsMap.entrySet()) {
-            String viewPath = pathResolver.getFocusedIdentifier(
+            String viewPath = getPathResolver().getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP,
                     String.format(SHOW_VIEW, mapPath.getKey()));
 
@@ -787,8 +793,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Getting paths to add base layer
         Map<String, String> pathsMap = new HashMap<String, String>();
 
-        Set<ClassOrInterfaceTypeDetails> controllerDetails = typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(MAP_VIEWER_ANNOTATION);
+        Set<ClassOrInterfaceTypeDetails> controllerDetails = getTypeLocationService()
+                .findClassesOrInterfaceDetailsWithAnnotation(
+                        MAP_VIEWER_ANNOTATION);
 
         for (ClassOrInterfaceTypeDetails controller : controllerDetails) {
             String controllerPath = (String) controller
@@ -829,7 +836,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         addBaseLayerToMaps(name, pathsMap, baseLayerAttr, type);
 
-        propFileOperations.addProperties(getWebappPath(),
+        getPropFileOperations().addProperties(getWebappPath(),
                 "WEB-INF/i18n/application.properties", propertyList, true,
                 false);
 
@@ -852,7 +859,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Getting all maps
         for (Entry mapPath : pathsMap.entrySet()) {
-            String viewPath = pathResolver.getFocusedIdentifier(
+            String viewPath = getPathResolver().getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP,
                     String.format(SHOW_VIEW, mapPath.getKey()));
 
@@ -947,8 +954,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
         uriMap.put("xmlns:geofield",
                 "urn:jsptagdir:/WEB-INF/tags/geo/form/fields");
 
-        WebProjectUtils.addTagxUriInJspx(path, type, uriMap, projectOperations,
-                fileManager);
+        WebProjectUtils.addTagxUriInJspx(path, type, uriMap,
+                getProjectOperations(), fileManager);
 
         // Updating file
         if (fileManager.exists(viewPath)) {
@@ -1093,9 +1100,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         // Obtain all map controllers
         List<JavaType> mapControllers = GeoUtils
-                .getAllMapsControllers(typeLocationService);
+                .getAllMapsControllers(getTypeLocationService());
 
-        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+        ClassOrInterfaceTypeDetails controllerDetails = getTypeLocationService()
                 .getTypeDetails(controller);
 
         // Generating annotation
@@ -1109,7 +1116,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
         detailsBuilder.updateTypeAnnotation(annotationBuilder.build());
 
         // Save changes to disk
-        typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder.build());
+        getTypeManagementService().createOrUpdateTypeOnDisk(
+                detailsBuilder.build());
 
         // / Update necessary map controllers with current entity
         // If developer specify map path add on it
@@ -1120,11 +1128,11 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 String currentPath = pathIterator.next();
                 // Getting map controller for current path
                 JavaType mapController = GeoUtils.getMapControllerByPath(
-                        currentPath, typeLocationService);
+                        currentPath, getTypeLocationService());
 
                 // Annotate map controllers adding current entity
-                annotateMapController(mapController, typeLocationService,
-                        typeManagementService, controllerDetails.getType());
+                annotateMapController(mapController, getTypeLocationService(),
+                        getTypeManagementService(), controllerDetails.getType());
 
             }
         }
@@ -1133,8 +1141,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
             // current entityController
             for (JavaType mapController : mapControllers) {
                 // Annotate map controllers adding current entity
-                annotateMapController(mapController, typeLocationService,
-                        typeManagementService, controllerDetails.getType());
+                annotateMapController(mapController, getTypeLocationService(),
+                        getTypeManagementService(), controllerDetails.getType());
             }
         }
 
@@ -1147,15 +1155,16 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     public void annotateAllGeoEntityControllers(List<String> paths) {
         // Getting all entity controllers annotated with @RooWebScaffold
-        Set<ClassOrInterfaceTypeDetails> entityControllers = typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(ROO_WEB_SCAFFOLD_ANNOTATION);
+        Set<ClassOrInterfaceTypeDetails> entityControllers = getTypeLocationService()
+                .findClassesOrInterfaceDetailsWithAnnotation(
+                        ROO_WEB_SCAFFOLD_ANNOTATION);
 
         Validate.notNull(entityControllers,
                 "Controllers with @RooWebScaffold annotation doesn't found");
 
         // Obtain all map controllers
         List<JavaType> mapControllers = GeoUtils
-                .getAllMapsControllers(typeLocationService);
+                .getAllMapsControllers(getTypeLocationService());
 
         Iterator<ClassOrInterfaceTypeDetails> it = entityControllers.iterator();
         while (it.hasNext()) {
@@ -1168,7 +1177,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
             // Getting entity asociated
             Object entity = scaffoldAnnotation
                     .getAttribute("formBackingObject").getValue();
-            ClassOrInterfaceTypeDetails entityDetails = typeLocationService
+            ClassOrInterfaceTypeDetails entityDetails = getTypeLocationService()
                     .getTypeDetails((JavaType) entity);
 
             // Checking if geo finders are added to entity
@@ -1206,9 +1215,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
                                 .build());
 
                         // Save changes to disk
-                        typeManagementService
-                                .createOrUpdateTypeOnDisk(detailsBuilder
-                                        .build());
+                        getTypeManagementService().createOrUpdateTypeOnDisk(
+                                detailsBuilder.build());
 
                         // Update necessary map controllers with current entity
                         // If developer specify map path add on it
@@ -1220,13 +1228,13 @@ public class GeoOperationsImpl extends AbstractOperations implements
                                 // Getting map controller for current path
                                 JavaType mapController = GeoUtils
                                         .getMapControllerByPath(currentPath,
-                                                typeLocationService);
+                                                getTypeLocationService());
 
                                 // Annotate map controllers adding current
                                 // entity
                                 annotateMapController(mapController,
-                                        typeLocationService,
-                                        typeManagementService,
+                                        getTypeLocationService(),
+                                        getTypeManagementService(),
                                         entityController.getType());
 
                             }
@@ -1239,8 +1247,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
                                 // Annotate map controllers adding current
                                 // entity
                                 annotateMapController(mapController,
-                                        typeLocationService,
-                                        typeManagementService,
+                                        getTypeLocationService(),
+                                        getTypeManagementService(),
                                         entityController.getType());
                             }
                         }
@@ -1259,7 +1267,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     public void createViews(String controllerPackage, JavaSymbolName path,
             ProjectionCRSTypes projection) {
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
 
         String finalPath = path.getReadableSymbolName().toLowerCase();
 
@@ -1267,7 +1275,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         final String viewsPath = pathResolver.getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP,
                 String.format("WEB-INF/views/%s/views.xml", finalPath));
-        final String showPath = pathResolver.getFocusedIdentifier(
+        final String showPath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, String.format(SHOW_VIEW, finalPath));
 
         // Copying views.xml
@@ -1288,8 +1296,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 writer.println("<tiles-definitions>");
 
                 // Depens of Bootstrap change extends layout
-                if (projectOperations
-                        .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+                if (getProjectOperations().isFeatureInstalledInFocusedModule(
+                        "gvnix-bootstrap")) {
                     writer.println(String
                             .format("   <definition extends=\"default-map\" name=\"%s/show\">",
                                     finalPath));
@@ -1399,12 +1407,12 @@ public class GeoOperationsImpl extends AbstractOperations implements
             JavaSymbolName path, ProjectionCRSTypes projection) {
         // Getting all classes with @GvNIXMapViewer annotation
         // and checking that not exists another with the specified path
-        for (JavaType mapViewer : typeLocationService
+        for (JavaType mapViewer : getTypeLocationService()
                 .findTypesWithAnnotation(MAP_VIEWER_ANNOTATION)) {
 
             Validate.notNull(mapViewer, "@GvNIXMapViewer required");
 
-            ClassOrInterfaceTypeDetails mapViewerController = typeLocationService
+            ClassOrInterfaceTypeDetails mapViewerController = getTypeLocationService()
                     .getTypeDetails(mapViewer);
 
             // Getting RequestMapping annotations
@@ -1455,10 +1463,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
         final String declaredByMetadataId = PhysicalTypeIdentifier
                 .createIdentifier(target,
-                        pathResolver.getFocusedPath(Path.SRC_MAIN_JAVA));
-        File targetFile = new File(
-                typeLocationService
-                        .getPhysicalTypeCanonicalPath(declaredByMetadataId));
+                        getPathResolver().getFocusedPath(Path.SRC_MAIN_JAVA));
+        File targetFile = new File(getTypeLocationService()
+                .getPhysicalTypeCanonicalPath(declaredByMetadataId));
         Validate.isTrue(!targetFile.exists(), "Type '%s' already exists",
                 target);
 
@@ -1491,8 +1498,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
         final List<ClassAttributeValue> entityAttributes = new ArrayList<ClassAttributeValue>();
 
         // Looking for all entities annotated with @GvNIXEntityMapLayer
-        for (ClassOrInterfaceTypeDetails entity : typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION)) {
+        for (ClassOrInterfaceTypeDetails entity : getTypeLocationService()
+                .findClassesOrInterfaceDetailsWithAnnotation(
+                        GVNIX_WEB_ENTITY_MAP_LAYER_ANNOTATION)) {
 
             // Getting map layer annotation
             AnnotationMetadata mapLayerAnnotation = entity
@@ -1549,7 +1557,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
         // Set annotations
         cidBuilder.setAnnotations(annotations);
 
-        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
+        getTypeManagementService().createOrUpdateTypeOnDisk(cidBuilder.build());
     }
 
     /**
@@ -1572,7 +1580,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     public void annotateApplicationConversionService() {
         // Validate that exists web layer
-        Set<JavaType> controllers = typeLocationService
+        Set<JavaType> controllers = getTypeLocationService()
                 .findTypesWithAnnotation(SCAFFOLD_ANNOTATION);
 
         Validate.notEmpty(
@@ -1580,12 +1588,12 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 "There's not exists any web layer on this gvNIX application. Execute 'web mvc all --package ~.web' to create web layer.");
 
         // Getting all classes with @RooConversionService annotation
-        for (JavaType conversorService : typeLocationService
+        for (JavaType conversorService : getTypeLocationService()
                 .findTypesWithAnnotation(CONVERSION_SERVICE_ANNOTATION)) {
 
             Validate.notNull(conversorService, "RooConversionService required");
 
-            ClassOrInterfaceTypeDetails applicationConversionService = typeLocationService
+            ClassOrInterfaceTypeDetails applicationConversionService = getTypeLocationService()
                     .getTypeDetails(conversorService);
 
             // Only for @RooConversionService annotated controllers
@@ -1617,8 +1625,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
             detailsBuilder.addAnnotation(annotationBuilder.build());
 
             // Save changes to disk
-            typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder
-                    .build());
+            getTypeManagementService().createOrUpdateTypeOnDisk(
+                    detailsBuilder.build());
         }
     }
 
@@ -1627,67 +1635,68 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     public void updatePomDependencies() {
         final Element configuration = XmlUtils.getConfiguration(getClass());
-        GeoUtils.updatePom(configuration, projectOperations, metadataService);
+        GeoUtils.updatePom(configuration, getProjectOperations(),
+                getMetadataService());
     }
 
     /**
      * This method install necessary components on correct folders
      */
     public void installComponents() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
         LogicalPath webappPath = getWebappPath();
 
         // Copy Javascript files and related resources
         OperationUtils.updateDirectoryContents("scripts/leaflet/*.js",
                 pathResolver.getIdentifier(webappPath, "/scripts/leaflet"),
-                fileManager, context, getClass());
+                fileManager, cContext, getClass());
         OperationUtils.updateDirectoryContents("scripts/leaflet/images/*.png",
                 pathResolver.getIdentifier(webappPath,
-                        "/scripts/leaflet/images"), fileManager, context,
+                        "/scripts/leaflet/images"), fileManager, cContext,
                 getClass());
         // Copy Styles files and related resources
         OperationUtils.updateDirectoryContents("styles/leaflet/*.css",
                 pathResolver.getIdentifier(webappPath, "/styles/leaflet"),
-                fileManager, context, getClass());
+                fileManager, cContext, getClass());
         OperationUtils.updateDirectoryContents("styles/leaflet/images/*.png",
                 pathResolver
                         .getIdentifier(webappPath, "/styles/leaflet/images"),
-                fileManager, context, getClass());
+                fileManager, cContext, getClass());
         // Copy necessary fonts
         OperationUtils.updateDirectoryContents("styles/fonts/*.*",
                 pathResolver.getIdentifier(webappPath, "/styles/fonts"),
-                fileManager, context, getClass());
+                fileManager, cContext, getClass());
         // Copy images into images folder
         OperationUtils.updateDirectoryContents("images/*.*",
                 pathResolver.getIdentifier(webappPath, "/images"), fileManager,
-                context, getClass());
+                cContext, getClass());
         // Copy tags into tags folder
         OperationUtils.updateDirectoryContents("tags/geo/*.tagx",
                 pathResolver.getIdentifier(webappPath, "/WEB-INF/tags/geo"),
-                fileManager, context, getClass());
+                fileManager, cContext, getClass());
         OperationUtils.updateDirectoryContents("tags/geo/layers/*.tagx",
                 pathResolver.getIdentifier(webappPath,
-                        "/WEB-INF/tags/geo/layers"), fileManager, context,
+                        "/WEB-INF/tags/geo/layers"), fileManager, cContext,
                 getClass());
         OperationUtils.updateDirectoryContents("tags/geo/tools/*.tagx",
                 pathResolver.getIdentifier(webappPath,
-                        "/WEB-INF/tags/geo/tools"), fileManager, context,
+                        "/WEB-INF/tags/geo/tools"), fileManager, cContext,
                 getClass());
         OperationUtils.updateDirectoryContents("tags/geo/form/fields/*.tagx",
                 pathResolver.getIdentifier(webappPath,
-                        "/WEB-INF/tags/geo/form/fields"), fileManager, context,
-                getClass());
+                        "/WEB-INF/tags/geo/form/fields"), fileManager,
+                cContext, getClass());
         // Copy necessary layouts files
         OperationUtils.updateDirectoryContents("layouts/*.jspx",
                 pathResolver.getIdentifier(webappPath, "/WEB-INF/layouts"),
-                fileManager, context, getClass());
+                fileManager, cContext, getClass());
         OperationUtils.updateDirectoryContents("layouts/*.xml",
                 pathResolver.getIdentifier(webappPath, "/WEB-INF/layouts"),
-                fileManager, context, getClass());
+                fileManager, cContext, getClass());
 
         // Add JS sources to loadScripts
-        if (projectOperations
-                .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+        if (getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-bootstrap")) {
             addToLoadScripts("js_leaflet_geo_js",
                     "/resources/scripts/leaflet/leaflet_bootstrap.js", false);
         }
@@ -1727,8 +1736,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 "/resources/scripts/leaflet/leaflet.draw-src.js", false);
 
         // Add CSS Sources to Load Scripts
-        if (projectOperations
-                .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+        if (getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-bootstrap")) {
             addToLoadScripts("styles_leaflet_geo_css",
                     "/resources/styles/leaflet/leaflet.bootstrap.css", true);
             addToLoadScripts("styles_gvnix_leaflet_geo_css",
@@ -1766,7 +1775,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     public void addToLoadScripts(String varName, String url, boolean isCSS) {
         // Modify Roo load-scripts.tagx
-        String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
+        String docTagxPath = getPathResolver().getIdentifier(getWebappPath(),
                 "WEB-INF/tags/util/load-scripts.tagx");
 
         Validate.isTrue(fileManager.exists(docTagxPath),
@@ -1808,27 +1817,27 @@ public class GeoOperationsImpl extends AbstractOperations implements
     public void addI18nComponentsProperties() {
         // Check if Valencian_Catalan language is supported and add properties
         // if so
-        Set<I18n> supportedLanguages = i18nSupport.getSupportedLanguages();
+        Set<I18n> supportedLanguages = getI18nSupport().getSupportedLanguages();
         for (I18n i18n : supportedLanguages) {
             if (i18n.getLocale().equals(new Locale("ca"))) {
                 MessageBundleUtils.installI18nMessages(
-                        new ValencianCatalanLanguage(), projectOperations,
+                        new ValencianCatalanLanguage(), getProjectOperations(),
                         fileManager);
                 MessageBundleUtils.addPropertiesToMessageBundle("ca",
-                        getClass(), propFileOperations, projectOperations,
-                        fileManager);
+                        getClass(), getPropFileOperations(),
+                        getProjectOperations(), fileManager);
                 break;
             }
         }
         // Add properties to Spanish messageBundle
         MessageBundleUtils.installI18nMessages(new SpanishLanguage(),
-                projectOperations, fileManager);
+                getProjectOperations(), fileManager);
         MessageBundleUtils.addPropertiesToMessageBundle("es", getClass(),
-                propFileOperations, projectOperations, fileManager);
+                getPropFileOperations(), getProjectOperations(), fileManager);
 
         // Add properties to default messageBundle
         MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
-                propFileOperations, projectOperations, fileManager);
+                getPropFileOperations(), getProjectOperations(), fileManager);
     }
 
     /**
@@ -1851,7 +1860,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
                         controllerPackage.replaceAll("[.]", "_"), path),
                 "Layers");
 
-        propFileOperations.addProperties(getWebappPath(),
+        getPropFileOperations().addProperties(getWebappPath(),
                 "WEB-INF/i18n/application.properties", propertyList, true,
                 false);
 
@@ -1927,9 +1936,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 .updateTypeAnnotation(annotationBuilder);
 
         // Save controller changes to disk
-        typeManagementService
-                .createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder
-                        .build());
+        getTypeManagementService().createOrUpdateTypeOnDisk(
+                classOrInterfaceTypeDetailsBuilder.build());
 
     }
 
@@ -1941,8 +1949,8 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     private void updateWebMvcConfig() {
         LogicalPath webappPath = WebProjectUtils
-                .getWebappPath(projectOperations);
-        String webMvcXmlPath = projectOperations.getPathResolver()
+                .getWebappPath(getProjectOperations());
+        String webMvcXmlPath = getProjectOperations().getPathResolver()
                 .getIdentifier(webappPath, "WEB-INF/spring/webmvc-config.xml");
         Validate.isTrue(fileManager.exists(webMvcXmlPath),
                 "webmvc-config.xml not found");
@@ -1991,7 +1999,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     public boolean checkExistsMapElement() {
         // If not exists any class with @GvNIXMapViewer annotation, return false
-        return !typeLocationService
+        return !getTypeLocationService()
                 .findClassesOrInterfaceDetailsWithAnnotation(
                         MAP_VIEWER_ANNOTATION).isEmpty();
     }
@@ -2015,7 +2023,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
      * @return
      */
     public LogicalPath getWebappPath() {
-        return WebProjectUtils.getWebappPath(projectOperations);
+        return WebProjectUtils.getWebappPath(getProjectOperations());
     }
 
     // Feature methods -----
@@ -2035,7 +2043,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     @Override
     public boolean isInstalledInModule(String moduleName) {
-        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+        String dirPath = getPathResolver().getIdentifier(getWebappPath(),
                 "scripts/leaflet/leaflet.js");
         return fileManager.exists(dirPath);
     }
@@ -2053,11 +2061,11 @@ public class GeoOperationsImpl extends AbstractOperations implements
                 "/resources/styles/leaflet/gvnix.leaflet.bootstrap.css", true);
 
         // Getting all maps and update layouts to use Bootstrap layout
-        Set<ClassOrInterfaceTypeDetails> mapViews = typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(new JavaType(
-                        "org.gvnix.addon.geo.GvNIXMapViewer"));
+        Set<ClassOrInterfaceTypeDetails> mapViews = getTypeLocationService()
+                .findClassesOrInterfaceDetailsWithAnnotation(
+                        new JavaType("org.gvnix.addon.geo.GvNIXMapViewer"));
 
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
 
         for (ClassOrInterfaceTypeDetails mapView : mapViews) {
 
@@ -2149,7 +2157,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
      */
     public void updateLoadScripts(String varName, String url, boolean isCSS) {
         // Modify Roo load-scripts.tagx
-        String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
+        String docTagxPath = getPathResolver().getIdentifier(getWebappPath(),
                 "WEB-INF/tags/util/load-scripts.tagx");
 
         Validate.isTrue(fileManager.exists(docTagxPath),
@@ -2217,6 +2225,206 @@ public class GeoOperationsImpl extends AbstractOperations implements
             XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
         }
 
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on GeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+    }
+
+    public TypeLocationService getTypeLocationService() {
+        if (typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on GeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeLocationService;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on GeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public I18nSupport getI18nSupport() {
+        if (i18nSupport == null) {
+            // Get all Services implement I18nSupport interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(I18nSupport.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (I18nSupport) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load I18nSupport on GeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return i18nSupport;
+        }
+    }
+
+    public PropFileOperations getPropFileOperations() {
+        if (propFileOperations == null) {
+            // Get all Services implement PropFileOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PropFileOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PropFileOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PropFileOperations on GeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return propFileOperations;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on GeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public MenuOperations getMenuOperations() {
+        if (menuOperations == null) {
+            // Get all Services implement MenuOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MenuOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MenuOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MenuOperations on GeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return menuOperations;
+        }
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on GeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
     }
 
 }

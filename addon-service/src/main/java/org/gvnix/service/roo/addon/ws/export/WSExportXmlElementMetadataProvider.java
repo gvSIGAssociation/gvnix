@@ -20,6 +20,7 @@ package org.gvnix.service.roo.addon.ws.export;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -43,6 +44,10 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * <p>
@@ -55,20 +60,21 @@ import org.springframework.roo.project.LogicalPath;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component(immediate = true)
+@Component
 @Service
 public class WSExportXmlElementMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(WSExportXmlElementMetadataProvider.class);
+
     private WSConfigService wSConfigService;
-    @Reference
     private JavaParserService javaParserService;
 
-    protected void activate(ComponentContext context) {
-
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
         // Notify when physical type with gvNIX xml element annotation modified
-        metadataDependencyRegistry.registerDependency(
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXXmlElement.class.getName()));
@@ -121,7 +127,7 @@ public class WSExportXmlElementMetadataProvider extends
             String itdFilename) {
 
         // Install web service (dependencies, properties, plugins and config)
-        wSConfigService.install(WsType.EXPORT);
+        getWSConfigService().install(WsType.EXPORT);
 
         // We know governor type details are non-null and can be safely cast
 
@@ -146,14 +152,15 @@ public class WSExportXmlElementMetadataProvider extends
 
         // We need to be informed if our dependent metadata changes
         // TODO What is this for ?
-        metadataDependencyRegistry.registerDependency(physicalTypeId, id);
+        getMetadataDependencyRegistry().registerDependency(physicalTypeId, id);
 
         AnnotationMetadata annotation = typeDetails
                 .getTypeAnnotation(new JavaType(GvNIXXmlElement.class.getName()));
 
         // Create metaData with field list values.
         return new WSExportXmlElementMetadata(id, aspectName, physicalType,
-                getDeclaredFields(typeDetails, annotation), javaParserService);
+                getDeclaredFields(typeDetails, annotation),
+                getJavaParserService());
     }
 
     /**
@@ -187,9 +194,9 @@ public class WSExportXmlElementMetadataProvider extends
                     .getValue()) {
 
                 // Add field as declared into list
-                declaredFields.add(javaParserService.getFieldByNameInAll(
-                        typeDetails.getName(), new JavaSymbolName(
-                                elementListName.getValue())));
+                declaredFields.add(getJavaParserService().getFieldByNameInAll(
+                        typeDetails.getName(),
+                        new JavaSymbolName(elementListName.getValue())));
             }
         }
 
@@ -217,6 +224,56 @@ public class WSExportXmlElementMetadataProvider extends
 
         // Get metadata identifier for this annotation
         return WSExportXmlElementMetadata.getMetadataIdentiferType();
+    }
+
+    public WSConfigService getWSConfigService() {
+        if (wSConfigService == null) {
+            // Get all Services implement WSConfigService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WSConfigService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WSConfigService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WSConfigService on WSConfigServiceImpl.");
+                return null;
+            }
+        }
+        else {
+            return wSConfigService;
+        }
+    }
+
+    public JavaParserService getJavaParserService() {
+        if (javaParserService == null) {
+            // Get all Services implement JavaParserService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JavaParserService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JavaParserService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JavaParserService on WSConfigServiceImpl.");
+                return null;
+            }
+        }
+        else {
+            return javaParserService;
+        }
     }
 
 }

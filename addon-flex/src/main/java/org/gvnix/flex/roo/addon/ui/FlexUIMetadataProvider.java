@@ -28,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -76,6 +77,10 @@ import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * {@link MetadataProvider} for the user interface scaffolding for a Flex
@@ -83,39 +88,38 @@ import org.w3c.dom.Element;
  * 
  * @author Jeremy Grelle
  */
-@Component(immediate = true)
+@Component
 @Service
 public class FlexUIMetadataProvider implements MetadataProvider,
         MetadataNotificationListener {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(FlexUIMetadataProvider.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private PathResolver pathResolver;
 
-    @Reference
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference
     private FileManager fileManager;
 
-    @Reference
     private MetadataService metadataService;
 
-    @Reference
     private ASMutablePhysicalTypeMetadataProvider asPhysicalTypeProvider;
 
-    @Reference
     private FlexOperations flexOperations;
 
-    @Reference
     private MemberDetailsScanner memberDetailsScanner;
 
-    @Reference
     private ProjectOperations projectOperations;
 
     private StringTemplateGroup templateGroup;
 
-    protected void activate(ComponentContext context) {
-        this.metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 FlexScaffoldMetadata.getMetadataIdentiferType(),
                 getProvidesType());
         this.templateGroup = new StringTemplateGroup(
@@ -123,7 +127,7 @@ public class FlexUIMetadataProvider implements MetadataProvider,
     }
 
     protected void deactivate(ComponentContext context) {
-        this.metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 FlexScaffoldMetadata.getMetadataIdentiferType(),
                 getProvidesType());
     }
@@ -140,44 +144,46 @@ public class FlexUIMetadataProvider implements MetadataProvider,
         LogicalPath path = FlexUIMetadata.getPath(metadataId);
         String flexScaffoldMetadataKey = FlexScaffoldMetadata.createIdentifier(
                 javaType, path);
-        FlexScaffoldMetadata flexScaffoldMetadata = (FlexScaffoldMetadata) this.metadataService
+        FlexScaffoldMetadata flexScaffoldMetadata = (FlexScaffoldMetadata) getMetadataService()
                 .get(flexScaffoldMetadataKey);
-        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService
-                .get(ProjectMetadata.getProjectIdentifier(projectOperations
-                        .getFocusedModuleName()));
+        ProjectMetadata projectMetadata = (ProjectMetadata) getMetadataService()
+                .get(ProjectMetadata
+                        .getProjectIdentifier(getProjectOperations()
+                                .getFocusedModuleName()));
 
         if (flexScaffoldMetadata == null || !flexScaffoldMetadata.isValid()
                 || projectMetadata == null || !projectMetadata.isValid()) {
             return null;
         }
 
-        String presentationPackage = projectOperations
-                .getTopLevelPackage(projectOperations.getFocusedModuleName())
+        String presentationPackage = getProjectOperations().getTopLevelPackage(
+                getProjectOperations().getFocusedModuleName())
                 + ".presentation";
         String entityPresentationPackage = presentationPackage + "."
                 + flexScaffoldMetadata.getEntityReference().toLowerCase();
 
         // Install the root application MXML document if it doesn't already
         // exist
-        String scaffoldAppFileId = this.pathResolver.getIdentifier(
+        String scaffoldAppFileId = getPathResolver().getIdentifier(
                 LogicalPath.getInstance(Path.ROOT, ""),
                 "src/main/flex/"
-                        + projectOperations.getProjectName(projectOperations
-                                .getFocusedModuleName()) + "_scaffold.mxml");
-        if (!this.fileManager.exists(scaffoldAppFileId)) {
-            this.flexOperations.createScaffoldApp();
+                        + getProjectOperations().getProjectName(
+                                getProjectOperations().getFocusedModuleName())
+                        + "_scaffold.mxml");
+        if (!getFileManager().exists(scaffoldAppFileId)) {
+            getFlexOperations().createScaffoldApp();
         }
 
         updateScaffoldIfNecessary(scaffoldAppFileId, flexScaffoldMetadata);
 
-        String flexConfigFileId = this.pathResolver.getIdentifier(
+        String flexConfigFileId = getPathResolver().getIdentifier(
                 LogicalPath.getInstance(Path.ROOT, ""),
                 "src/main/flex/"
-                        + projectOperations.getProjectName(projectOperations
-                                .getFocusedModuleName())
+                        + getProjectOperations().getProjectName(
+                                getProjectOperations().getFocusedModuleName())
                         + "_scaffold-config.xml");
-        if (!this.fileManager.exists(flexConfigFileId)) {
-            this.flexOperations.createFlexCompilerConfig();
+        if (!getFileManager().exists(flexConfigFileId)) {
+            getFlexOperations().createFlexCompilerConfig();
         }
 
         updateCompilerConfigIfNecessary(flexConfigFileId,
@@ -188,8 +194,8 @@ public class FlexUIMetadataProvider implements MetadataProvider,
                 entityPresentationPackage + "."
                         + flexScaffoldMetadata.getEntity().getSimpleTypeName()
                         + "Event");
-        if (!StringUtils.isNotBlank(this.asPhysicalTypeProvider
-                .findIdentifier(entityEventType))) {
+        if (!StringUtils.isNotBlank(getAsPhysicalTypeProvider().findIdentifier(
+                entityEventType))) {
             createEntityEventType(entityEventType, flexScaffoldMetadata);
         }
 
@@ -197,9 +203,9 @@ public class FlexUIMetadataProvider implements MetadataProvider,
         String listViewRelativePath = (entityPresentationPackage + "."
                 + flexScaffoldMetadata.getEntity().getSimpleTypeName() + "View")
                 .replace('.', File.separatorChar) + ".mxml";
-        String listViewPath = this.pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/"
-                        + listViewRelativePath);
+        String listViewPath = getPathResolver().getIdentifier(
+                LogicalPath.getInstance(Path.ROOT, ""),
+                "src/main/flex/" + listViewRelativePath);
         writeToDiskIfNecessary(
                 listViewPath,
                 buildListViewDocument(
@@ -211,9 +217,9 @@ public class FlexUIMetadataProvider implements MetadataProvider,
         String formRelativePath = (entityPresentationPackage + "."
                 + flexScaffoldMetadata.getEntity().getSimpleTypeName() + "Form")
                 .replace('.', File.separatorChar) + ".mxml";
-        String formPath = this.pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/"
-                        + formRelativePath);
+        String formPath = getPathResolver().getIdentifier(
+                LogicalPath.getInstance(Path.ROOT, ""),
+                "src/main/flex/" + formRelativePath);
         writeToDiskIfNecessary(
                 formPath,
                 buildFormDocument(
@@ -230,7 +236,7 @@ public class FlexUIMetadataProvider implements MetadataProvider,
 
         Document scaffoldDoc;
         try {
-            scaffoldMutableFile = this.fileManager
+            scaffoldMutableFile = getFileManager()
                     .updateFile(scaffoldAppFileId);
             scaffoldDoc = XmlUtils.getDocumentBuilder().parse(
                     scaffoldMutableFile.getInputStream());
@@ -286,8 +292,8 @@ public class FlexUIMetadataProvider implements MetadataProvider,
 
         Document flexConfigDoc;
         try {
-            flexConfigMutableFile = this.fileManager
-                    .updateFile(flexConfigFileId);
+            flexConfigMutableFile = getFileManager().updateFile(
+                    flexConfigFileId);
             flexConfigDoc = XmlUtils.getDocumentBuilder().parse(
                     flexConfigMutableFile.getInputStream());
         }
@@ -363,7 +369,7 @@ public class FlexUIMetadataProvider implements MetadataProvider,
             // is not already registered
             // (if it's already registered, the event will be delivered directly
             // later on)
-            if (this.metadataDependencyRegistry.getDownstream(
+            if (getMetadataDependencyRegistry().getDownstream(
                     upstreamDependency).contains(downstreamDependency)) {
                 return;
             }
@@ -381,10 +387,10 @@ public class FlexUIMetadataProvider implements MetadataProvider,
                         + "' to this provider (which uses '"
                         + getProvidesType() + "'");
 
-        this.metadataService.evict(downstreamDependency);
+        getMetadataService().evict(downstreamDependency);
         if (get(downstreamDependency) != null) {
-            this.metadataDependencyRegistry
-                    .notifyDownstream(downstreamDependency);
+            getMetadataDependencyRegistry().notifyDownstream(
+                    downstreamDependency);
         }
 
     }
@@ -402,10 +408,10 @@ public class FlexUIMetadataProvider implements MetadataProvider,
 
         String relativePath = entityEventType.getFullyQualifiedTypeName()
                 .replace('.', File.separatorChar) + ".as";
-        String fileIdentifier = this.pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/"
-                        + relativePath);
-        this.fileManager.createOrUpdateTextFileIfRequired(fileIdentifier,
+        String fileIdentifier = getPathResolver().getIdentifier(
+                LogicalPath.getInstance(Path.ROOT, ""),
+                "src/main/flex/" + relativePath);
+        getFileManager().createOrUpdateTextFileIfRequired(fileIdentifier,
                 entityEventTemplate.toString(), true);
     }
 
@@ -489,7 +495,7 @@ public class FlexUIMetadataProvider implements MetadataProvider,
 
     private ASMutableClassOrInterfaceTypeDetails getASClassDetails(
             String metadataId) {
-        ASPhysicalTypeMetadata metadata = (ASPhysicalTypeMetadata) this.metadataService
+        ASPhysicalTypeMetadata metadata = (ASPhysicalTypeMetadata) getMetadataService()
                 .get(metadataId);
         if (metadata == null) {
             return null;
@@ -565,9 +571,9 @@ public class FlexUIMetadataProvider implements MetadataProvider,
                                 .getPackage()
                                 .getFullyQualifiedPackageName()
                                 .startsWith(
-                                        projectOperations
+                                        getProjectOperations()
                                                 .getTopLevelPackage(
-                                                        projectOperations
+                                                        getProjectOperations()
                                                                 .getFocusedModuleName())
                                                 .getFullyQualifiedPackageName())) {
                     // Never include id field
@@ -634,10 +640,10 @@ public class FlexUIMetadataProvider implements MetadataProvider,
         // out the contents of jspContent to the
         // file
         MutableFile mutableFile = null;
-        if (this.fileManager.exists(mxmlFilename)) {
+        if (getFileManager().exists(mxmlFilename)) {
             InputStream inStream = null;
             try {
-                inStream = this.fileManager.getInputStream(mxmlFilename);
+                inStream = getFileManager().getInputStream(mxmlFilename);
                 original = XmlUtils.getDocumentBuilder().parse(inStream);
             }
             catch (Exception e) {
@@ -668,12 +674,12 @@ public class FlexUIMetadataProvider implements MetadataProvider,
                                                                            // allow
                                                                            // non-destructive
                                                                            // editing
-                mutableFile = this.fileManager.updateFile(mxmlFilename);
+                mutableFile = getFileManager().updateFile(mxmlFilename);
             }
         }
         else {
             original = proposed;
-            mutableFile = this.fileManager.createFile(mxmlFilename);
+            mutableFile = getFileManager().createFile(mxmlFilename);
             Validate.notNull(mutableFile, "Could not create MXML file '"
                     .concat(mxmlFilename).concat("'"));
         }
@@ -727,7 +733,7 @@ public class FlexUIMetadataProvider implements MetadataProvider,
 
     private MemberDetails scanForMemberDetails(
             ClassOrInterfaceTypeDetails entityClassOrInterfaceDetails) {
-        return memberDetailsScanner.getMemberDetails(getClass().getName(),
+        return getMemberDetailsScanner().getMemberDetails(getClass().getName(),
                 entityClassOrInterfaceDetails);
     }
 
@@ -910,6 +916,211 @@ public class FlexUIMetadataProvider implements MetadataProvider,
                 return false;
             }
             return true;
+        }
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on FlexUIMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataDependencyRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on FlexUIMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on FlexUIMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on FlexUIMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public ASMutablePhysicalTypeMetadataProvider getAsPhysicalTypeProvider() {
+        if (asPhysicalTypeProvider == null) {
+            // Get all Services implement ASMutablePhysicalTypeMetadataProvider
+            // interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ASMutablePhysicalTypeMetadataProvider.class
+                                        .getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ASMutablePhysicalTypeMetadataProvider) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ASMutablePhysicalTypeMetadataProvider on FlexUIMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return asPhysicalTypeProvider;
+        }
+    }
+
+    public FlexOperations getFlexOperations() {
+        if (flexOperations == null) {
+            // Get all Services implement FlexOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                FlexOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FlexOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FlexOperations on FlexUIMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return flexOperations;
+        }
+    }
+
+    public MemberDetailsScanner getMemberDetailsScanner() {
+        if (memberDetailsScanner == null) {
+            // Get all Services implement MemberDetailsScanner interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MemberDetailsScanner.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MemberDetailsScanner) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MemberDetailsScanner on FlexUIMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return memberDetailsScanner;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on FlexUIMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
         }
     }
 }

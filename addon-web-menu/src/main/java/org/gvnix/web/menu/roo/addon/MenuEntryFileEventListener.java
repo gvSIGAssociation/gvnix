@@ -19,6 +19,8 @@
 
 package org.gvnix.web.menu.roo.addon;
 
+import java.util.logging.Logger;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -26,6 +28,11 @@ import org.springframework.roo.file.monitor.event.FileEvent;
 import org.springframework.roo.file.monitor.event.FileEventListener;
 import org.springframework.roo.file.monitor.event.FileOperation;
 import org.springframework.roo.process.manager.FileManager;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Changes the menu management component of Roo with the gvNIX menu management
@@ -43,21 +50,29 @@ import org.springframework.roo.process.manager.FileManager;
  */
 
 // Immediate required to avoid invalid gvNIX menu activation
-@Component(immediate = true)
+@Component
 @Service
 public class MenuEntryFileEventListener implements FileEventListener {
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(MenuEntryFileEventListener.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
 
     /**
      * Use addon operations to delegate operations
      */
-    @Reference
     private MenuEntryOperations operations;
 
     /**
      * Use FileManager to modify the underlying disk storage
      */
-    @Reference
     private FileManager fileManager;
+
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
 
     /*
      * (non-Javadoc)
@@ -79,10 +94,62 @@ public class MenuEntryFileEventListener implements FileEventListener {
         }
 
         // If gvNIX menu is installed: disable OSGI Roo menu component
-        if (fileManager.exists(operations.getMenuConfigFile())) {
+        if (getFileManager().exists(getOperations().getMenuConfigFile())) {
 
-            operations.disableRooMenuOperations();
+            getOperations().disableRooMenuOperations();
         }
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on MenuEntryFileEventListener.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+
+    }
+
+    public MenuEntryOperations getOperations() {
+        if (operations == null) {
+            // Get all Services implement MenuEntryOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MenuEntryOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MenuEntryOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MenuEntryOperations on MenuEntryFileEventListener.");
+                return null;
+            }
+        }
+        else {
+            return operations;
+        }
+
     }
 
 }

@@ -20,6 +20,7 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
@@ -44,6 +45,10 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * This Listener produces MVC artifacts for a given PatternJspMetadata
@@ -54,47 +59,34 @@ import org.springframework.roo.project.ProjectOperations;
  *         Transport</a>
  * @since 0.8
  */
-@Component(immediate = true)
+@Component
 @Service
 public class PatternJspMetadataListener extends
         AbstractPatternJspMetadataListener {
 
-    @Reference
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(PatternJspMetadataListener.class);
+
     private MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference
     private MetadataService metadataService;
-    @Reference
     private WebMetadataService webMetadataService;
-    @Reference
     private FileManager fileManager;
-    @Reference
     private TilesOperations tilesOperations;
-    @Reference
     private MenuOperations menuOperations;
-    @Reference
     private ProjectOperations projectOperations;
-    @Reference
     private PropFileOperations propFileOperations;
-    @Reference
     WebScreenOperations webScreenOperations;
-    @Reference
     private PathResolver pathResolver;
-    @Reference
     private TypeLocationService typeLocationService;
     private final Map<JavaType, String> formBackingObjectTypesToLocalMids = new HashMap<JavaType, String>();
 
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PatternMetadata.getMetadataIdentiferType(), getProvidesType());
-        _fileManager = fileManager;
-        _tilesOperations = tilesOperations;
-        _menuOperations = menuOperations;
-        _projectOperations = projectOperations;
-        _propFileOperations = propFileOperations;
-        _webScreenOperations = webScreenOperations;
-        _metadataService = metadataService;
-        _pathResolver = pathResolver;
-        _typeLocationService = typeLocationService;
     }
 
     public MetadataItem get(String metadataIdentificationString) {
@@ -180,14 +172,15 @@ public class PatternJspMetadataListener extends
             // is not already registered
             // (if it's already registered, the event will be delivered directly
             // later on)
-            if (metadataDependencyRegistry.getDownstream(upstreamDependency)
-                    .contains(downstreamDependency)) {
+            if (getMetadataDependencyRegistry().getDownstream(
+                    upstreamDependency).contains(downstreamDependency)) {
                 return;
             }
         }
         else {
             // This is the generic fallback listener, ie from
-            // MetadataDependencyRegistry.addListener(this) in the activate()
+            // getMetadataDependencyRegistry().addListener(this) in the
+            // activate()
             // method
 
             // Get the metadata that just changed
@@ -232,4 +225,30 @@ public class PatternJspMetadataListener extends
         return PatternJspMetadata.getMetadataIdentiferType();
     }
 
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataDependencyRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on PatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+    }
 }

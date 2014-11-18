@@ -18,6 +18,8 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -38,6 +40,9 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Metadata provider for {@link WSExportExceptionMetadata}
@@ -47,20 +52,22 @@ import org.apache.commons.lang3.StringUtils;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component(immediate = true)
+@Component
 @Service
 public class WSExportExceptionMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(WSExportExceptionMetadataProvider.class);
+
     private WSConfigService wSConfigService;
-    @Reference
     private WSExportValidationService wSExportValidationService;
 
-    protected void activate(ComponentContext context) {
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
         // Ensure we're notified of all metadata related to physical Java types,
         // in particular their initial creation
-        metadataDependencyRegistry.registerDependency(
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXWebFault.class.getName()));
@@ -113,7 +120,7 @@ public class WSExportExceptionMetadataProvider extends
         WSExportExceptionMetadata exceptionMetadata = null;
 
         // Install configuration to export services if it's not installed.
-        wSConfigService.install(WsType.EXPORT);
+        getWSConfigService().install(WsType.EXPORT);
 
         // Check if Web Service definition is correct.
         PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
@@ -183,9 +190,8 @@ public class WSExportExceptionMetadataProvider extends
 
         correctNamespace = (namespaceAttributeValue != null)
                 && StringUtils.isNotBlank(namespaceAttributeValue.getValue())
-                && wSExportValidationService
-                        .checkNamespaceFormat(namespaceAttributeValue
-                                .getValue());
+                && getWSExportValidationService().checkNamespaceFormat(
+                        namespaceAttributeValue.getValue());
 
         Validate.isTrue(
                 correctNamespace,
@@ -229,6 +235,57 @@ public class WSExportExceptionMetadataProvider extends
      */
     public String getProvidesType() {
         return WSExportExceptionMetadata.getMetadataIdentiferType();
+    }
+
+    public WSExportValidationService getWSExportValidationService() {
+        if (wSExportValidationService == null) {
+            // Get all Services implement WSExportValidationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WSExportValidationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WSExportValidationService) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WSExportValidationService on WSExportExceptionMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return wSExportValidationService;
+        }
+    }
+
+    public WSConfigService getWSConfigService() {
+        if (wSConfigService == null) {
+            // Get all Services implement WSConfigService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WSConfigService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WSConfigService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WSConfigService on WSExportExceptionMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return wSConfigService;
+        }
     }
 
 }

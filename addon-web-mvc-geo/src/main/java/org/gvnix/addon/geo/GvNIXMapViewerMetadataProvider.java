@@ -19,6 +19,7 @@ package org.gvnix.addon.geo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -39,6 +40,10 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link GvNIXMapViewerMetadata}.
@@ -51,10 +56,11 @@ import org.springframework.roo.project.ProjectOperations;
 public final class GvNIXMapViewerMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(GvNIXMapViewerMetadataProvider.class);
+
     private ProjectOperations projectOperations;
 
-    @Reference
     private PropFileOperations propFileOperations;
 
     /**
@@ -62,8 +68,9 @@ public final class GvNIXMapViewerMetadataProvider extends
      * 
      * @param context the component context
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXMapViewer.class.getName()));
@@ -75,7 +82,7 @@ public final class GvNIXMapViewerMetadataProvider extends
      * @param context the component context
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXMapViewer.class.getName()));
@@ -92,7 +99,7 @@ public final class GvNIXMapViewerMetadataProvider extends
         JavaType javaType = GvNIXMapViewerMetadata
                 .getJavaType(metadataIdentificationString);
 
-        ClassOrInterfaceTypeDetails controller = typeLocationService
+        ClassOrInterfaceTypeDetails controller = getTypeLocationService()
                 .getTypeDetails(javaType);
 
         // Getting @RequestMapping annotation
@@ -138,8 +145,9 @@ public final class GvNIXMapViewerMetadataProvider extends
         }
 
         return new GvNIXMapViewerMetadata(metadataIdentificationString,
-                aspectName, governorPhysicalTypeMetadata, projectOperations,
-                propFileOperations, typeLocationService, this.fileManager,
+                aspectName, governorPhysicalTypeMetadata,
+                getProjectOperations(), getPropFileOperations(),
+                getTypeLocationService(), getFileManager(),
                 entitiesToVisualize, path, mapId, projection);
     }
 
@@ -166,5 +174,55 @@ public final class GvNIXMapViewerMetadataProvider extends
 
     public String getProvidesType() {
         return GvNIXMapViewerMetadata.getMetadataIdentiferType();
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on GvNIXWebEntityMapLayerMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public PropFileOperations getPropFileOperations() {
+        if (propFileOperations == null) {
+            // Get all Services implement PropFileOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PropFileOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PropFileOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PropFileOperations on GvNIXWebEntityMapLayerMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return propFileOperations;
+        }
     }
 }

@@ -48,8 +48,9 @@ public final class JpaQueryMetadataProvider extends AbstractItdMetadataProvider 
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXJpaQuery.class.getName()));
@@ -64,7 +65,7 @@ public final class JpaQueryMetadataProvider extends AbstractItdMetadataProvider 
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXJpaQuery.class.getName()));

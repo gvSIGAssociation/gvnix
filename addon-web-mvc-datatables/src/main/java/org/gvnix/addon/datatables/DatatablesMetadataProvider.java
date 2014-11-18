@@ -1,6 +1,6 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  * Copyright (C) 2013 Generalitat Valenciana
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -67,6 +68,10 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link DatatablesMetadata}.
@@ -79,10 +84,11 @@ import org.springframework.roo.project.ProjectOperations;
 public final class DatatablesMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(DatatablesMetadataProvider.class);
+
     private WebMetadataService webMetadataService;
 
-    @Reference
     protected ProjectOperations projectOperations;
 
     /**
@@ -90,8 +96,9 @@ public final class DatatablesMetadataProvider extends
      * 
      * @param context the component context
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXDatatables.class.getName()));
@@ -103,7 +110,7 @@ public final class DatatablesMetadataProvider extends
      * @param context the component context
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXDatatables.class.getName()));
@@ -128,11 +135,11 @@ public final class DatatablesMetadataProvider extends
         // Get webScaffoldMetadata
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
                 javaType, path);
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) getMetadataService()
                 .get(webScaffoldMetadataId);
         // register dependency to Roo Web Scaffold
-        metadataDependencyRegistry.registerDependency(webScaffoldMetadataId,
-                metadataIdentificationString);
+        getMetadataDependencyRegistry().registerDependency(
+                webScaffoldMetadataId, metadataIdentificationString);
 
         if (webScaffoldMetadata == null) {
             return null;
@@ -145,11 +152,11 @@ public final class DatatablesMetadataProvider extends
         // Get formBackingObject and its logical path
         JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
         LogicalPath entityPath = PhysicalTypeUtils.getPath(entity,
-                typeLocationService);
+                getTypeLocationService());
 
         String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
                 entityPath);
-        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
+        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) getMetadataService()
                 .get(jpaMetadataId);
         if (jpaMetadata == null) {
             // Unsupported type (by now)
@@ -157,29 +164,29 @@ public final class DatatablesMetadataProvider extends
         }
 
         // register dependency to JPA Active record
-        metadataDependencyRegistry.registerDependency(jpaMetadataId,
+        getMetadataDependencyRegistry().registerDependency(jpaMetadataId,
                 metadataIdentificationString);
 
         // Get batch service (if any)
         String webJpaBatchMetadataId = WebJpaBatchMetadata.createIdentifier(
                 javaType, path);
-        WebJpaBatchMetadata webJpaBatchMetadata = (WebJpaBatchMetadata) metadataService
+        WebJpaBatchMetadata webJpaBatchMetadata = (WebJpaBatchMetadata) getMetadataService()
                 .get(webJpaBatchMetadataId);
 
         // register dependency to Batch service
-        metadataDependencyRegistry.registerDependency(webJpaBatchMetadataId,
-                metadataIdentificationString);
+        getMetadataDependencyRegistry().registerDependency(
+                webJpaBatchMetadataId, metadataIdentificationString);
 
         // Get jpa query metadata
         String jpaQueryMetadataId = JpaQueryMetadata.createIdentifier(entity,
                 path);
-        JpaQueryMetadata jpaQueryMetadata = (JpaQueryMetadata) metadataService
+        JpaQueryMetadata jpaQueryMetadata = (JpaQueryMetadata) getMetadataService()
                 .get(jpaQueryMetadataId);
         // register dependency to JPA Query
-        metadataDependencyRegistry.registerDependency(jpaQueryMetadataId,
+        getMetadataDependencyRegistry().registerDependency(jpaQueryMetadataId,
                 metadataIdentificationString);
 
-        List<FieldMetadata> identifiers = persistenceMemberLocator
+        List<FieldMetadata> identifiers = getPersistenceMemberLocator()
                 .getIdentifierFields(entity);
 
         if (identifiers.isEmpty()) {
@@ -195,7 +202,7 @@ public final class DatatablesMetadataProvider extends
         // check if has metadata types
         final MemberDetails entityMemberDetails = getMemberDetails(entity);
 
-        final Map<JavaSymbolName, DateTimeFormatDetails> datePatterns = webMetadataService
+        final Map<JavaSymbolName, DateTimeFormatDetails> datePatterns = getWebMetadataService()
                 .getDatePatterns(entity, entityMemberDetails,
                         metadataIdentificationString);
 
@@ -203,10 +210,10 @@ public final class DatatablesMetadataProvider extends
         Map<FinderMetadataDetails, QueryHolderTokens> findersRegistered = null;
         String webFinderMetadataId = WebFinderMetadata.createIdentifier(
                 javaType, path);
-        WebFinderMetadata webFinderMetadata = (WebFinderMetadata) metadataService
+        WebFinderMetadata webFinderMetadata = (WebFinderMetadata) getMetadataService()
                 .get(webFinderMetadataId);
         // register dependency to Roo Web finder
-        metadataDependencyRegistry.registerDependency(webFinderMetadataId,
+        getMetadataDependencyRegistry().registerDependency(webFinderMetadataId,
                 metadataIdentificationString);
 
         if (webFinderMetadata != null) {
@@ -223,7 +230,7 @@ public final class DatatablesMetadataProvider extends
                 entityManagerMethodName, datePatterns, webScaffoldAspectName,
                 webJpaBatchMetadata, jpaQueryMetadata,
                 webScaffoldAnnotationValues, findersRegistered,
-                webMetadataService, projectOperations);
+                getWebMetadataService(), getProjectOperations());
     }
 
     /**
@@ -252,7 +259,7 @@ public final class DatatablesMetadataProvider extends
         // Get finder metadata
         final String finderMetadataKey = FinderMetadata.createIdentifier(
                 entity, path);
-        final FinderMetadata finderMetadata = (FinderMetadata) metadataService
+        final FinderMetadata finderMetadata = (FinderMetadata) getMetadataService()
                 .get(finderMetadataKey);
         if (finderMetadata == null) {
             return null;
@@ -570,5 +577,55 @@ public final class DatatablesMetadataProvider extends
         }
 
         return parameterNames;
+    }
+
+    public WebMetadataService getWebMetadataService() {
+        if (webMetadataService == null) {
+            // Get all Services implement WebMetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebMetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebMetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebMetadataService on DatatablesMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return webMetadataService;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement WebMetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on DatatablesMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
     }
 }

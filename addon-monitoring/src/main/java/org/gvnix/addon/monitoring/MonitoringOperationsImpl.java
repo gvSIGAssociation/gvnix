@@ -19,6 +19,11 @@ import org.springframework.roo.project.*;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.*;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of operations this add-on offers.
@@ -29,14 +34,21 @@ import org.w3c.dom.*;
 @Service
 public class MonitoringOperationsImpl implements MonitoringOperations {
 
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(MonitoringOperationsImpl.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
+
     private static final String MONITORING = "monitoring";
     private static final String BEAN_TAG = "bean";
     private static final String CLASS_TAG = "class";
     private static final String NAME_TAG = "name";
     private static final String JM_ANN_POINTCUT = "net.bull.javamelody.MonitoredWithAnnotationPointcut";
-
-    private static final Logger LOGGER = HandlerUtils
-            .getLogger(MonitoringOperationsImpl.class);
 
     private static final JavaType SPRING_MONITORING_ANNOTATION = new JavaType(
             "net.bull.javamelody.MonitoredWithSpring");
@@ -50,47 +62,29 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
     private static final JavaType SPRING_SERVICE = new JavaType(
             "org.springframework.stereotype.Service");
 
-    @Reference
     private MenuOperations menuOperations;
 
-    @Reference
     protected FileManager fileManager;
 
-    @Reference
     private PathResolver pathResolver;
 
-    @Reference
     private PropFileOperations propFileOperations;
 
-    /**
-     * Use ProjectOperations to install new dependencies, plugins, properties,
-     * etc into the project configuration
-     */
-    @Reference
     private ProjectOperations projectOperations;
 
-    /**
-     * Use TypeLocationService to find types which are annotated with a given
-     * annotation in the project
-     */
-    @Reference
     private TypeLocationService typeLocationService;
 
-    /**
-     * Use TypeManagementService to change types
-     */
-    @Reference
     private TypeManagementService typeManagementService;
 
     /** {@inheritDoc} */
     public boolean isCommandAvailable() {
         // Check if a project has been created
-        return projectOperations.isFocusedProjectAvailable();
+        return getProjectOperations().isFocusedProjectAvailable();
     }
 
     public boolean isAddAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_MONITORING);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                FEATURE_NAME_GVNIX_MONITORING);
     }
 
     /** {@inheritDoc} */
@@ -114,10 +108,11 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      */
     public void addMenuEntry() {
         String finalPath = MONITORING;
-        menuOperations.addMenuItem(new JavaSymbolName(
-                "monitoring_menu_category"), new JavaSymbolName(
-                "monitoring_menu_entry"), "JMelody Monitoring",
-                "global_generic", "/" + finalPath, null, getWebappPath());
+        getMenuOperations().addMenuItem(
+                new JavaSymbolName("monitoring_menu_category"),
+                new JavaSymbolName("monitoring_menu_entry"),
+                "JMelody Monitoring", "global_generic", "/" + finalPath, null,
+                getWebappPath());
     }
 
     /**
@@ -131,7 +126,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
         propertyList.put("menu_category_monitoring_menu_category_label",
                 MONITORING);
 
-        propFileOperations.addProperties(getWebappPath(),
+        getPropFileOperations().addProperties(getWebappPath(),
                 "WEB-INF/i18n/application.properties", propertyList, true,
                 false);
 
@@ -141,13 +136,13 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      * This method updates ApplicationContext.xml to enable SQL monitoring
      */
     public void updateAppContextSQL() {
-        String appContextPath = pathResolver.getFocusedIdentifier(
+        String appContextPath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES,
                 "META-INF/spring/applicationContext.xml");
 
-        if (fileManager.exists(appContextPath)) {
+        if (getFileManager().exists(appContextPath)) {
             Document docXml = WebProjectUtils.loadXmlDocument(appContextPath,
-                    fileManager);
+                    getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -177,7 +172,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             docRoot.appendChild(beanElement);
 
             // Saving changes
-            fileManager.createOrUpdateTextFileIfRequired(appContextPath,
+            getFileManager().createOrUpdateTextFileIfRequired(appContextPath,
                     XmlUtils.nodeToString(docXml), true);
         }
 
@@ -188,12 +183,12 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      * JavaMelody to work
      */
     public void updatePersistence() {
-        String persistencePath = pathResolver.getFocusedIdentifier(
+        String persistencePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml");
 
-        if (fileManager.exists(persistencePath)) {
+        if (getFileManager().exists(persistencePath)) {
             Document docXml = WebProjectUtils.loadXmlDocument(persistencePath,
-                    fileManager);
+                    getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -254,7 +249,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             propertiesElement.appendChild(property);
 
             // Saving result
-            fileManager.createOrUpdateTextFileIfRequired(persistencePath,
+            getFileManager().createOrUpdateTextFileIfRequired(persistencePath,
                     XmlUtils.nodeToString(docXml), true);
 
         }
@@ -267,12 +262,12 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      * @param pathString
      */
     public void updateWebXML(String pathString) {
-        String webPath = pathResolver.getFocusedIdentifier(
+        String webPath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml");
 
-        if (fileManager.exists(webPath)) {
+        if (getFileManager().exists(webPath)) {
             Document docXml = WebProjectUtils.loadXmlDocument(webPath,
-                    fileManager);
+                    getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -375,7 +370,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             docRoot.appendChild(filterMappingElement);
             docRoot.appendChild(listenerElement);
 
-            fileManager.createOrUpdateTextFileIfRequired(webPath,
+            getFileManager().createOrUpdateTextFileIfRequired(webPath,
                     XmlUtils.nodeToString(docXml), true);
         }
 
@@ -395,7 +390,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
         }
 
         // Add all new dependencies to pom.xml
-        projectOperations.addDependencies("", dependencies);
+        getProjectOperations().addDependencies("", dependencies);
 
     }
 
@@ -406,7 +401,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      * @return
      */
     public LogicalPath getWebappPath() {
-        return WebProjectUtils.getWebappPath(projectOperations);
+        return WebProjectUtils.getWebappPath(getProjectOperations());
     }
 
     /**
@@ -414,7 +409,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      */
     @Override
     public void all() {
-        addPackage(projectOperations.getFocusedTopLevelPackage());
+        addPackage(getProjectOperations().getFocusedTopLevelPackage());
     }
 
     /**
@@ -433,13 +428,13 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                 SPRING_MONITORING_ANNOTATION);
 
         // Getting all entity, controllers and services
-        Set<ClassOrInterfaceTypeDetails> entities = typeLocationService
+        Set<ClassOrInterfaceTypeDetails> entities = getTypeLocationService()
                 .findClassesOrInterfaceDetailsWithAnnotation(ROO_JAVABEAN);
 
-        Set<ClassOrInterfaceTypeDetails> controllers = typeLocationService
+        Set<ClassOrInterfaceTypeDetails> controllers = getTypeLocationService()
                 .findClassesOrInterfaceDetailsWithAnnotation(SPRING_CONTROLLER);
 
-        Set<ClassOrInterfaceTypeDetails> services = typeLocationService
+        Set<ClassOrInterfaceTypeDetails> services = getTypeLocationService()
                 .findClassesOrInterfaceDetailsWithAnnotation(SPRING_SERVICE);
 
         // Annotating all entities if they exists
@@ -458,8 +453,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                     builder.updateTypeAnnotation(annotationBuilder.build());
 
                     // Save changes to disk
-                    typeManagementService.createOrUpdateTypeOnDisk(builder
-                            .build());
+                    getTypeManagementService().createOrUpdateTypeOnDisk(
+                            builder.build());
                 }
             }
         }
@@ -480,8 +475,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                     builder.updateTypeAnnotation(annotationBuilder.build());
 
                     // Save changes to disk
-                    typeManagementService.createOrUpdateTypeOnDisk(builder
-                            .build());
+                    getTypeManagementService().createOrUpdateTypeOnDisk(
+                            builder.build());
                 }
             }
         }
@@ -502,8 +497,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                     builder.updateTypeAnnotation(annotationBuilder.build());
 
                     // Save changes to disk
-                    typeManagementService.createOrUpdateTypeOnDisk(builder
-                            .build());
+                    getTypeManagementService().createOrUpdateTypeOnDisk(
+                            builder.build());
                 }
             }
         }
@@ -517,18 +512,18 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
     public void createMonitoringConfig() {
 
         // Getting Application Context path
-        String appContextPath = pathResolver.getFocusedIdentifier(
+        String appContextPath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES,
                 "META-INF/spring/applicationContext.xml");
         // Getting Web Config Path
-        String webPath = pathResolver.getFocusedIdentifier(
+        String webPath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml");
 
         // Building configuration for annotation support in both context if
         // needed
         createMonitoringAutoProxy(appContextPath);
         createMonitoringAdvisor(appContextPath);
-        if (fileManager.exists(webPath)) { // If web mvc exists
+        if (getFileManager().exists(webPath)) { // If web mvc exists
             createMonitoringAutoProxy(webPath);
             createMonitoringAdvisor(webPath);
         }
@@ -541,9 +536,9 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      * @param appContextPath
      */
     public void createMonitoringAdvisor(String appContextPath) {
-        if (fileManager.exists(appContextPath)) {
+        if (getFileManager().exists(appContextPath)) {
             Document docXml = WebProjectUtils.loadXmlDocument(appContextPath,
-                    fileManager);
+                    getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -607,7 +602,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                                     property.appendChild(bean2Element);
 
                                     // Saving changes and exit
-                                    fileManager
+                                    getFileManager()
                                             .createOrUpdateTextFileIfRequired(
                                                     appContextPath,
                                                     XmlUtils.nodeToString(docXml),
@@ -629,7 +624,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                         bean.appendChild(propertyElement);
 
                         // Saving changes and exit
-                        fileManager.createOrUpdateTextFileIfRequired(
+                        getFileManager().createOrUpdateTextFileIfRequired(
                                 appContextPath, XmlUtils.nodeToString(docXml),
                                 true);
                     }
@@ -655,7 +650,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             docRoot.appendChild(beanElement);
 
             // Saving changes
-            fileManager.createOrUpdateTextFileIfRequired(appContextPath,
+            getFileManager().createOrUpdateTextFileIfRequired(appContextPath,
                     XmlUtils.nodeToString(docXml), true);
         }
     }
@@ -666,9 +661,9 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      * @param appContextPath
      */
     public void createMonitoringAutoProxy(String appContextPath) {
-        if (fileManager.exists(appContextPath)) {
+        if (getFileManager().exists(appContextPath)) {
             Document docXml = WebProjectUtils.loadXmlDocument(appContextPath,
-                    fileManager);
+                    getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -699,7 +694,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             docRoot.appendChild(beanElement);
 
             // Saving changes
-            fileManager.createOrUpdateTextFileIfRequired(appContextPath,
+            getFileManager().createOrUpdateTextFileIfRequired(appContextPath,
                     XmlUtils.nodeToString(docXml), true);
         }
     }
@@ -727,7 +722,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
         builder.updateTypeAnnotation(annotationBuilder.build());
 
         // Save changes to disk
-        typeManagementService.createOrUpdateTypeOnDisk(builder.build());
+        getTypeManagementService().createOrUpdateTypeOnDisk(builder.build());
 
     }
 
@@ -765,8 +760,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                 builder.updateTypeAnnotation(annotationBuilder.build());
 
                 // Save changes to disk
-                typeManagementService.createOrUpdateTypeOnDisk(classBuilder
-                        .build());
+                getTypeManagementService().createOrUpdateTypeOnDisk(
+                        classBuilder.build());
 
             }
         }
@@ -791,7 +786,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      * @return
      */
     private ClassOrInterfaceTypeDetails getControllerDetails(JavaType controller) {
-        ClassOrInterfaceTypeDetails existing = typeLocationService
+        ClassOrInterfaceTypeDetails existing = getTypeLocationService()
                 .getTypeDetails(controller);
 
         Validate.notNull(existing, "Can't get Type details");
@@ -819,12 +814,12 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
     @Override
     public boolean isInstalledInModule(String moduleName) {
         // If its installed provider is net.bull.javamelody.JpaPersistence
-        String persistencePath = pathResolver.getFocusedIdentifier(
+        String persistencePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml");
 
-        if (fileManager.exists(persistencePath)) {
+        if (getFileManager().exists(persistencePath)) {
             Document docXml = WebProjectUtils.loadXmlDocument(persistencePath,
-                    fileManager);
+                    getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -845,6 +840,188 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             }
         }
         return false;
+    }
+
+    public MenuOperations getMenuOperations() {
+        if (menuOperations == null) {
+            // Get all Services implement MenuOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MenuOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MenuOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MenuOperations on MonitoringOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return menuOperations;
+        }
+
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on MonitoringOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on MonitoringOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+
+    }
+
+    public PropFileOperations getPropFileOperations() {
+        if (propFileOperations == null) {
+            // Get all Services implement PropFileOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PropFileOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PropFileOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PropFileOperations on MonitoringOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return propFileOperations;
+        }
+
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on MonitoringOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+
+    }
+
+    public TypeLocationService getTypeLocationService() {
+        if (typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on MonitoringOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeLocationService;
+        }
+
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on MonitoringOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
+
     }
 
 }

@@ -37,6 +37,8 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.logging.HandlerUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Provides {@link JpaAuditMetadata}. This type is called by Roo to retrieve the
@@ -54,7 +56,6 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
     private static final Logger LOGGER = HandlerUtils
             .getLogger(JpaAuditMetadataProvider.class);
 
-    @Reference
     private JpaAuditOperationsMetadata operations;
 
     /**
@@ -65,8 +66,9 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXJpaAudit.class.getName()));
@@ -81,7 +83,7 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXJpaAudit.class.getName()));
@@ -103,10 +105,10 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
                 .getPath(metadataIdentificationString);
 
         // Gets active revisionLog provider
-        RevisionLogProvider logProvider = operations
+        RevisionLogProvider logProvider = getOperations()
                 .getActiveRevisionLogProvider();
 
-        JavaType userService = operations.getUserServiceType();
+        JavaType userService = getOperations().getUserServiceType();
 
         if (userService == null) {
             // No user type defined
@@ -150,16 +152,17 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
         }
 
         // Add dependency with JPA metadata
-        metadataDependencyRegistry.registerDependency(jpaMetadataId,
+        getMetadataDependencyRegistry().registerDependency(jpaMetadataId,
                 metadataIdentificationString);
 
         // Makes all downstrean dependents of class dependents of it
-        Set<String> dependentsOfJpa = metadataDependencyRegistry
-                .getDownstream(getGovernorPhysicalTypeIdentifier(metadataIdentificationString));
+        Set<String> dependentsOfJpa = getMetadataDependencyRegistry()
+                .getDownstream(
+                        getGovernorPhysicalTypeIdentifier(metadataIdentificationString));
         for (String downstreamId : dependentsOfJpa) {
             if (!metadataIdentificationString.equals(downstreamId)
                     && !jpaMetadataId.equals(downstreamId)) {
-                metadataDependencyRegistry.registerDependency(
+                getMetadataDependencyRegistry().registerDependency(
                         metadataIdentificationString, downstreamId);
                 // Cleans metadata already generated from governor
                 // so it could generate taking account of JpaAudit
@@ -169,7 +172,7 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
         }
 
         // Add dependency with UserService metadata
-        metadataDependencyRegistry.registerDependency(userServiceId,
+        getMetadataDependencyRegistry().registerDependency(userServiceId,
                 metadataIdentificationString);
 
         // Gets the plural of current entity
@@ -205,8 +208,8 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
             }
             if (useRevisionLog) {
                 // Use revision log: require builder to provider
-                revisionLogBuilder = logProvider.getMetadataBuilder(operations,
-                        governorPhysicalTypeMetadata);
+                revisionLogBuilder = logProvider.getMetadataBuilder(
+                        getOperations(), governorPhysicalTypeMetadata);
             }
             // otherwise: pass revisionLogBuilder as null: don't use revision
             // log
@@ -247,5 +250,33 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
 
     public String getProvidesType() {
         return JpaAuditMetadata.getMetadataIdentiferType();
+    }
+
+    public JpaAuditOperationsMetadata getOperations() {
+        if (operations == null) {
+            // Get all Services implement JpaAuditOperationsMetadata interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JpaAuditOperationsMetadata.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JpaAuditOperationsMetadata) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JpaAuditOperationsMetadata on JpaAuditMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return operations;
+        }
+
     }
 }

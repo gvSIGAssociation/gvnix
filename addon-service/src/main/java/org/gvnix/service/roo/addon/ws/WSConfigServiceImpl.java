@@ -60,6 +60,11 @@ import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Utilities to manage the CXF web services library.
@@ -76,6 +81,12 @@ import org.w3c.dom.Node;
 @Service
 public class WSConfigServiceImpl implements WSConfigService {
 
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(WSConfigServiceImpl.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private static final String POM_FILE_NOT_FOUND = "pom.xml configuration file not found.";
     private static final String GOAL2 = "goal";
     private static final String GOALS2 = "goals";
@@ -90,17 +101,11 @@ public class WSConfigServiceImpl implements WSConfigService {
     private static final String IMPL = "Impl";
     private static final String ADDRESS2 = "address";
     private static final String MUST_BE_DEFINED = "' must be defined.";
-    @Reference
     private MetadataService metadataService;
-    @Reference
     private FileManager fileManager;
-    @Reference
     private ProjectOperations projectOperations;
-    @Reference
     private SecurityService securityService;
-    @Reference
     private AnnotationsService annotationsService;
-    @Reference
     private MavenOperations mavenOperations;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
@@ -108,13 +113,17 @@ public class WSConfigServiceImpl implements WSConfigService {
     private static final Logger logger = Logger.getLogger(WSConfigService.class
             .getName());
 
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
+
     /**
      * {@inheritDoc}
      */
     public boolean install(WsType type) {
 
         // Add repository and dependency with this addon
-        annotationsService.addAddonDependency();
+        getAnnotationsService().addAddonDependency();
 
         // Installs jax2ws plugin in project
         if (type != WsType.IMPORT_RPC_ENCODED) {
@@ -147,7 +156,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     protected void addCxfConfig() {
 
         String webFilePath = getWebConfigFilePath();
-        if (fileManager.exists(webFilePath)) {
+        if (getFileManager().exists(webFilePath)) {
 
             // Create CXF configuration file
             createCxfConfigurationFile();
@@ -170,7 +179,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         String relativePath = getCxfConfigRelativeFilePath();
 
         // Checks for src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
-        return projectOperations.getPathResolver()
+        return getProjectOperations().getPathResolver()
                 .getIdentifier(
                         LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         relativePath);
@@ -197,13 +206,14 @@ public class WSConfigServiceImpl implements WSConfigService {
     private String getProjectName() {
 
         // Project metadata from project identifier
-        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier(projectOperations
-                        .getFocusedModuleName()));
+        ProjectMetadata projectMetadata = (ProjectMetadata) getMetadataService()
+                .get(ProjectMetadata
+                        .getProjectIdentifier(getProjectOperations()
+                                .getFocusedModuleName()));
         Validate.isTrue(projectMetadata != null, "Project metadata required");
 
-        return projectOperations.getProjectName(projectOperations
-                .getFocusedModuleName());
+        return getProjectOperations().getProjectName(
+                getProjectOperations().getFocusedModuleName());
     }
 
     /**
@@ -217,7 +227,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Configuration file already exists ? Nothing to do
         String cxfFilePath = getCxfConfigAbsoluteFilePath();
-        if (fileManager.exists(cxfFilePath)) {
+        if (getFileManager().exists(cxfFilePath)) {
             return;
         }
 
@@ -227,7 +237,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         try {
             inputStream = FileUtils.getInputStream(getClass(),
                     "cxf-template.xml");
-            outputStream = fileManager.createFile(cxfFilePath)
+            outputStream = getFileManager().createFile(cxfFilePath)
                     .getOutputStream();
             IOUtils.copy(inputStream, outputStream);
         }
@@ -241,7 +251,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         }
 
         // TODO What is it for ?
-        fileManager.scan();
+        getFileManager().scan();
     }
 
     /**
@@ -253,8 +263,8 @@ public class WSConfigServiceImpl implements WSConfigService {
     protected boolean dependenciesRegistered(WsType type) {
 
         // Get project to check installed dependencies
-        ProjectMetadata project = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier(projectOperations
+        ProjectMetadata project = (ProjectMetadata) getMetadataService().get(
+                ProjectMetadata.getProjectIdentifier(getProjectOperations()
                         .getFocusedModuleName()));
         if (project == null) {
             return false;
@@ -350,8 +360,9 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Get all dependencies and add them to project (pom.xml)
         for (Element dependency : getDependencies(type)) {
-            projectOperations.addDependency(projectOperations
-                    .getFocusedModuleName(), new Dependency(dependency));
+            getProjectOperations().addDependency(
+                    getProjectOperations().getFocusedModuleName(),
+                    new Dependency(dependency));
         }
     }
 
@@ -399,7 +410,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Add property if not exists or update if exists and newer
         return DependenciesVersionManager.managePropertyVersion(
-                metadataService, projectOperations, properties);
+                getMetadataService(), getProjectOperations(), properties);
     }
 
     /**
@@ -416,7 +427,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     protected void updateWebConfigurationFile() {
 
         // Get web configuration file document and root XML representation
-        MutableFile file = fileManager.updateFile(getWebConfigFilePath());
+        MutableFile file = getFileManager().updateFile(getWebConfigFilePath());
         Document web = getInputDocument(file.getInputStream());
         Element root = web.getDocumentElement();
 
@@ -528,7 +539,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      */
     protected String getWebConfigFilePath() {
 
-        return projectOperations.getPathResolver().getIdentifier(
+        return getProjectOperations().getPathResolver().getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/web.xml");
     }
@@ -615,9 +626,10 @@ public class WSConfigServiceImpl implements WSConfigService {
             updateFullyQualifiedTypeName = true;
         }
 
-        if (fileManager.exists(cxfXmlPath)) {
+        if (getFileManager().exists(cxfXmlPath)) {
 
-            MutableFile cxfXmlMutableFile = fileManager.updateFile(cxfXmlPath);
+            MutableFile cxfXmlMutableFile = getFileManager().updateFile(
+                    cxfXmlPath);
             Document cxfXml = getInputDocument(cxfXmlMutableFile
                     .getInputStream());
 
@@ -929,7 +941,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         String pomPath = getPomFilePath();
         Validate.isTrue(pomPath != null,
                 "Cxf configuration file not found, export again the service.");
-        MutableFile pomMutableFile = fileManager.updateFile(pomPath);
+        MutableFile pomMutableFile = getFileManager().updateFile(pomPath);
         Document pom = getInputDocument(pomMutableFile.getInputStream());
         Element root = pom.getDocumentElement();
 
@@ -1129,14 +1141,14 @@ public class WSConfigServiceImpl implements WSConfigService {
     protected void addPlugin() {
 
         // Get the plugin from the template and write into de project (pom.xml)
-        projectOperations.updateBuildPlugin(
-                projectOperations.getFocusedModuleName(),
+        getProjectOperations().updateBuildPlugin(
+                getProjectOperations().getFocusedModuleName(),
                 new Plugin(XmlUtils.findFirstElement("/jaxws-plugin/plugin",
                         XmlUtils.getRootElement(this.getClass(),
                                 "dependencies-export-jaxws-plugin.xml"))));
 
         // What is this for ?
-        fileManager.commit();
+        getFileManager().commit();
     }
 
     /**
@@ -1145,13 +1157,13 @@ public class WSConfigServiceImpl implements WSConfigService {
     public void installWsdl2javaPlugin() {
 
         // Add plugin and write this modifications to disk
-        projectOperations.updateBuildPlugin(
-                projectOperations.getFocusedModuleName(),
+        getProjectOperations().updateBuildPlugin(
+                getProjectOperations().getFocusedModuleName(),
                 new Plugin(XmlUtils.findFirstElement(
                         "/cxf-codegen/cxf-codegen-plugin/plugin",
                         XmlUtils.getRootElement(this.getClass(),
                                 "dependencies-export-wsdl2java-plugin.xml"))));
-        fileManager.commit();
+        getFileManager().commit();
     }
 
     /**
@@ -1205,7 +1217,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         Validate.notNull(pomPath, POM_FILE_NOT_FOUND);
 
         // Get a mutable pom.xml reference to modify it
-        MutableFile pomMutableFile = fileManager.updateFile(pomPath);
+        MutableFile pomMutableFile = getFileManager().updateFile(pomPath);
         Document pom = getInputDocument(pomMutableFile.getInputStream());
         Element root = pom.getDocumentElement();
 
@@ -1388,7 +1400,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         MutableFile pomMutableFile = null;
         Document pom;
         try {
-            pomMutableFile = fileManager.updateFile(pomPath);
+            pomMutableFile = getFileManager().updateFile(pomPath);
             pom = XmlUtils.getDocumentBuilder().parse(
                     pomMutableFile.getInputStream());
         }
@@ -1471,16 +1483,17 @@ public class WSConfigServiceImpl implements WSConfigService {
                         "dependencies-import-codegen-plugin.xml"));
 
         // Add plugin
-        projectOperations.updateBuildPlugin(projectOperations
-                .getFocusedModuleName(), new Plugin(pluginTemplate));
-        fileManager.commit();
+        getProjectOperations().updateBuildPlugin(
+                getProjectOperations().getFocusedModuleName(),
+                new Plugin(pluginTemplate));
+        getFileManager().commit();
 
         // Get pom.xml
         String pomPath = getPomFilePath();
         Validate.notNull(pomPath, POM_FILE_NOT_FOUND);
 
         // Get a mutable pom.xml reference to modify it
-        MutableFile pomMutableFile = fileManager.updateFile(pomPath);
+        MutableFile pomMutableFile = getFileManager().updateFile(pomPath);
         Document pom = getInputDocument(pomMutableFile.getInputStream());
 
         Element root = pom.getDocumentElement();
@@ -1496,7 +1509,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                 "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Check URL connection and WSDL format
-        Element rootElement = securityService.getWsdl(wsdlLocation)
+        Element rootElement = getSecurityService().getWsdl(wsdlLocation)
                 .getDocumentElement();
 
         // The wsdl location already exists on old plugin format ?
@@ -1621,16 +1634,17 @@ public class WSConfigServiceImpl implements WSConfigService {
                         "dependencies-import-axistools-plugin.xml"));
 
         // Add plugin
-        projectOperations.updateBuildPlugin(
-                projectOperations.getFocusedModuleName(), new Plugin(plugin));
-        fileManager.commit();
+        getProjectOperations().updateBuildPlugin(
+                getProjectOperations().getFocusedModuleName(),
+                new Plugin(plugin));
+        getFileManager().commit();
 
         // Get pom.xml
         String pomPath = getPomFilePath();
         Validate.notNull(pomPath, POM_FILE_NOT_FOUND);
 
         // Get a mutable pom.xml reference to modify it
-        MutableFile pomMutableFile = fileManager.updateFile(pomPath);
+        MutableFile pomMutableFile = getFileManager().updateFile(pomPath);
         Document pom = getInputDocument(pomMutableFile.getInputStream());
 
         Element root = pom.getDocumentElement();
@@ -1646,7 +1660,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                 "Axistools plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Check URL connection and WSDL format
-        Element rootElement = securityService.getWsdl(wsdlLocation)
+        Element rootElement = getSecurityService().getWsdl(wsdlLocation)
                 .getDocumentElement();
 
         // The wsdl location already exists on old plugin format ?
@@ -1744,7 +1758,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         logger.log(Level.INFO, message + " ...");
         try {
 
-            mavenOperations.executeMvnCommand(parameters);
+            getMavenOperations().executeMvnCommand(parameters);
         }
         catch (IOException e) {
             logger.log(Level.WARNING, message + " error !");
@@ -1768,19 +1782,21 @@ public class WSConfigServiceImpl implements WSConfigService {
     private String getPomFilePath() {
 
         // Project ID
-        String prjId = ProjectMetadata.getProjectIdentifier(projectOperations
-                .getFocusedModuleName());
-        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+        String prjId = ProjectMetadata
+                .getProjectIdentifier(getProjectOperations()
+                        .getFocusedModuleName());
+        ProjectMetadata projectMetadata = (ProjectMetadata) getMetadataService()
                 .get(prjId);
         Validate.isTrue(projectMetadata != null, "Project metadata required");
 
         String pomFileName = "pom.xml";
 
         // Checks for pom.xml
-        String pomPath = projectOperations.getPathResolver().getIdentifier(
-                LogicalPath.getInstance(Path.ROOT, ""), pomFileName);
+        String pomPath = getProjectOperations().getPathResolver()
+                .getIdentifier(LogicalPath.getInstance(Path.ROOT, ""),
+                        pomFileName);
 
-        boolean pomInstalled = fileManager.exists(pomPath);
+        boolean pomInstalled = getFileManager().exists(pomPath);
 
         if (pomInstalled) {
 
@@ -1816,6 +1832,156 @@ public class WSConfigServiceImpl implements WSConfigService {
             }
         }
         return sb.toString();
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on WSConfigServiceImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on WSConfigServiceImpl.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on WSConfigServiceImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public SecurityService getSecurityService() {
+        if (securityService == null) {
+            // Get all Services implement SecurityService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                SecurityService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (SecurityService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load SecurityService on WSConfigServiceImpl.");
+                return null;
+            }
+        }
+        else {
+            return securityService;
+        }
+    }
+
+    public AnnotationsService getAnnotationsService() {
+        if (annotationsService == null) {
+            // Get all Services implement SecurityService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                AnnotationsService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (AnnotationsService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load AnnotationsService on WSConfigServiceImpl.");
+                return null;
+            }
+        }
+        else {
+            return annotationsService;
+        }
+    }
+
+    public MavenOperations getMavenOperations() {
+        if (mavenOperations == null) {
+            // Get all Services implement MavenOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MavenOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MavenOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MavenOperations on WSConfigServiceImpl.");
+                return null;
+            }
+        }
+        else {
+            return mavenOperations;
+        }
     }
 
 }

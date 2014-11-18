@@ -22,6 +22,7 @@ import static org.springframework.roo.classpath.customdata.CustomDataKeys.PERSIS
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -43,6 +44,9 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link JpaBatchMetadata}. Prepares all required information to
@@ -57,7 +61,9 @@ import org.springframework.roo.project.LogicalPath;
 public final class JpaBatchMetadataProvider extends
         AbstractMemberDiscoveringItdMetadataProvider {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(JpaBatchMetadataProvider.class);
+
     private JpaOrmEntityListenerOperations entityListenerOperations;
 
     private Map<JavaType, String> entityToBatchMidMap = new HashMap<JavaType, String>();
@@ -70,8 +76,9 @@ public final class JpaBatchMetadataProvider extends
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXJpaBatch.class.getName()));
@@ -86,7 +93,7 @@ public final class JpaBatchMetadataProvider extends
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXJpaBatch.class.getName()));
@@ -133,14 +140,14 @@ public final class JpaBatchMetadataProvider extends
         String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(
                 targetEntity, path);
 
-        List<FieldMetadata> identifiers = persistenceMemberLocator
+        List<FieldMetadata> identifiers = getPersistenceMemberLocator()
                 .getIdentifierFields(targetEntity);
 
-        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService
+        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) getMetadataService()
                 .get(entityMetadataKey);
 
         // register downstream dependency (entityActiveRecord --> jpaBatch)
-        metadataDependencyRegistry.registerDependency(entityMetadataKey,
+        getMetadataDependencyRegistry().registerDependency(entityMetadataKey,
                 metadataIdentificationString);
 
         JpaCrudAnnotationValues crudAnnotationValues = new JpaCrudAnnotationValues(
@@ -149,14 +156,14 @@ public final class JpaBatchMetadataProvider extends
         // check if entity use audit
         String auditMetatadaKey = JpaAuditMetadata.createIdentifier(
                 targetEntity, path);
-        JpaAuditMetadata auditMetada = (JpaAuditMetadata) metadataService
+        JpaAuditMetadata auditMetada = (JpaAuditMetadata) getMetadataService()
                 .get(auditMetatadaKey);
 
         // Register dependency with audit metadata
-        metadataDependencyRegistry.registerDependency(auditMetatadaKey,
+        getMetadataDependencyRegistry().registerDependency(auditMetatadaKey,
                 metadataIdentificationString);
 
-        boolean hasEntityListeners = entityListenerOperations
+        boolean hasEntityListeners = getEntityListenerOperations()
                 .hasAnyListener(targetEntity);
 
         // TODO get more data
@@ -238,5 +245,34 @@ public final class JpaBatchMetadataProvider extends
             }
         }
         return null;
+    }
+
+    public JpaOrmEntityListenerOperations getEntityListenerOperations() {
+        if (entityListenerOperations == null) {
+            // Get all Services JpaOrmEntityListenerOperations
+            // interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JpaOrmEntityListenerOperations.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JpaOrmEntityListenerOperations) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JpaOrmEntityListenerOperations on JpaBatchMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return entityListenerOperations;
+        }
+
     }
 }

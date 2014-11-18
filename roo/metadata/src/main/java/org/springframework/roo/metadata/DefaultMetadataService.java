@@ -29,7 +29,7 @@ import org.springframework.roo.metadata.internal.AbstractMetadataCache;
  * @author Ben Alex
  * @since 1.0
  */
-@Component(immediate = true)
+@Component
 @Service
 @Reference(name = "metadataProvider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = MetadataProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class DefaultMetadataService extends AbstractMetadataCache implements
@@ -274,12 +274,10 @@ public class DefaultMetadataService extends AbstractMetadataCache implements
                             if (metadataLogger.getTraceLevel() > 0) {
                                 metadataLogger.log("Retrying " + retryMid);
                             }
-                            // DISID #13495 Avoid infinite recursion loop
-                            if (ObjectUtils.equals(retryMid, metadataIdentificationString)) {
-                                continue;
-                            }
-                            // /DISID #13495 Avoid infinite recursion loop
-
+                        	if (ObjectUtils.equals(retryMid, metadataIdentificationString)) {
+                        		// Avoid infinite recursion loop
+                        		continue;
+                        	}
                             getInternal(retryMid, false, false);
                         }
                         if (metadataLogger.getTraceLevel() > 0

@@ -19,7 +19,7 @@
 package org.gvnix.service.roo.addon.security;
 
 import javax.security.auth.callback.CallbackHandler;
-
+import java.util.logging.Logger;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -35,6 +35,10 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * <p>
@@ -67,13 +71,13 @@ import org.springframework.roo.project.ProjectOperations;
 public final class WSServiceSecurityMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(WSServiceSecurityMetadataProvider.class);
+
     private SecurityService securityService;
 
-    @Reference
     private WSImportOperations operationsService;
 
-    @Reference
     private ProjectOperations projectOperations;
 
     /**
@@ -84,8 +88,9 @@ public final class WSServiceSecurityMetadataProvider extends
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXWebServiceSecurity.class.getName()));
@@ -100,7 +105,7 @@ public final class WSServiceSecurityMetadataProvider extends
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(
@@ -130,12 +135,14 @@ public final class WSServiceSecurityMetadataProvider extends
             String itdFilename) {
 
         // Setup project
-        securityService.setupWSSJ4();
+        getSecurityService().setupWSSJ4();
 
         JavaType serviceClass = governorPhysicalTypeMetadata.getType();
-        String serviceName = operationsService.getServiceName(serviceClass);
+        String serviceName = getOperationsService()
+                .getServiceName(serviceClass);
 
-        String certificate = operationsService.getCertificate(serviceClass);
+        String certificate = getOperationsService()
+                .getCertificate(serviceClass);
 
         // create Metadata
         WSServiceSecurityMetadata metadata = new WSServiceSecurityMetadata(
@@ -145,8 +152,8 @@ public final class WSServiceSecurityMetadataProvider extends
         // Check properties file
         String propertiesPath = WSServiceSecurityMetadata
                 .getPropertiesPath(serviceClass);
-        String propertiesAbsolutePath = projectOperations.getPathResolver()
-                .getIdentifier(
+        String propertiesAbsolutePath = getProjectOperations()
+                .getPathResolver().getIdentifier(
                         LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
                         propertiesPath);
 
@@ -159,8 +166,8 @@ public final class WSServiceSecurityMetadataProvider extends
 
         // Checks for certificated file
         String certificatePath = metadata.getCertificatePath();
-        String certificateAbsolutePath = projectOperations.getPathResolver()
-                .getIdentifier(
+        String certificateAbsolutePath = getProjectOperations()
+                .getPathResolver().getIdentifier(
                         LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
                         certificatePath);
 
@@ -200,5 +207,80 @@ public final class WSServiceSecurityMetadataProvider extends
 
     public String getProvidesType() {
         return WSServiceSecurityMetadata.getMetadataIdentiferType();
+    }
+
+    public SecurityService getSecurityService() {
+        if (securityService == null) {
+            // Get all Services implement SecurityService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                SecurityService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (SecurityService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load SecurityService on WSServiceSecurityMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return securityService;
+        }
+    }
+
+    public WSImportOperations getOperationsService() {
+        if (operationsService == null) {
+            // Get all Services implement WSImportOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WSImportOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WSImportOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WSImportOperations on WSServiceSecurityMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return operationsService;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on WSServiceSecurityMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
     }
 }

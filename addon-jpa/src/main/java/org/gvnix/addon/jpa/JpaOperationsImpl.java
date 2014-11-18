@@ -19,6 +19,7 @@ package org.gvnix.addon.jpa;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -33,6 +34,11 @@ import org.springframework.roo.project.Repository;
 import org.springframework.roo.project.maven.Pom;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of operations this add-on offers.
@@ -45,19 +51,27 @@ import org.w3c.dom.Element;
 @Service
 public class JpaOperationsImpl implements JpaOperations {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(JpaOperationsImpl.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private ProjectOperations projectOperations;
 
-    @Reference
     private MetadataService metadataService;
+
+    protected void activate(final ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
 
     /** {@inheritDoc} */
     public boolean isSetupAvailable() {
         // Check if JPA is installed
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(FeatureNames.JPA)
-                && !projectOperations
-                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_JPA);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                FeatureNames.JPA)
+                && !getProjectOperations().isFeatureInstalledInFocusedModule(
+                        FEATURE_NAME_GVNIX_JPA);
     }
 
     public void setup() {
@@ -68,8 +82,8 @@ public class JpaOperationsImpl implements JpaOperations {
         List<Element> repos = XmlUtils.findElements(
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
-            projectOperations.addRepositories(
-                    projectOperations.getFocusedModuleName(),
+            getProjectOperations().addRepositories(
+                    getProjectOperations().getFocusedModuleName(),
                     Collections.singleton(new Repository(repo)));
         }
 
@@ -77,16 +91,17 @@ public class JpaOperationsImpl implements JpaOperations {
         List<Element> properties = XmlUtils.findElements(
                 "/configuration/gvnix/properties/*", configuration);
         for (Element property : properties) {
-            projectOperations.addProperty(projectOperations
-                    .getFocusedModuleName(), new Property(property));
+            getProjectOperations().addProperty(
+                    getProjectOperations().getFocusedModuleName(),
+                    new Property(property));
         }
 
         // Install dependencies
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", configuration);
 
-        DependenciesVersionManager.manageDependencyVersion(metadataService,
-                projectOperations, depens);
+        DependenciesVersionManager.manageDependencyVersion(
+                getMetadataService(), getProjectOperations(), depens);
     }
 
     /**
@@ -105,7 +120,7 @@ public class JpaOperationsImpl implements JpaOperations {
      * @return true if given feature name is installed, otherwise returns false
      */
     public boolean isInstalledInModule(final String moduleName) {
-        final Pom pom = projectOperations.getPomFromModuleName(moduleName);
+        final Pom pom = getProjectOperations().getPomFromModuleName(moduleName);
         if (pom == null) {
             return false;
         }
@@ -117,5 +132,59 @@ public class JpaOperationsImpl implements JpaOperations {
             }
         }
         return false;
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services ProjectOperations getMetadataService()
+            // interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on JpaOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services MetadataService
+            // interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on JpaOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+
     }
 }

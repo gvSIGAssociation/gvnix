@@ -55,7 +55,7 @@ import org.springframework.roo.support.logging.HandlerUtils;
  *         Transport</a>
  * @see MenuOperationsProxy
  */
-@Component(immediate = true)
+@Component
 @Service
 public class FilterMenuOperationsHook implements FindHook {
 

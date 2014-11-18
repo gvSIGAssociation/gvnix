@@ -43,6 +43,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 @Component
 @Service
@@ -51,19 +56,17 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     private static final JavaType JPA_ACTIVE_RECORD_ANNOTATION = new JavaType(
             "org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord");
 
-    @Reference
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private FileManager fileManager;
 
-    @Reference
     private PathResolver pathResolver;
 
-    @Reference
     private TypeLocationService typeLocationService;
 
-    @Reference
     private TypeManagementService typeManagementService;
 
-    @Reference
     private ProjectOperations projectOperations;
 
     /**
@@ -83,6 +86,10 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     private static final JavaType GVNIX_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
             "org.gvnix.addon.jpa.geo.providers.hibernatespatial.GvNIXEntityMapLayer");
 
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
+
     /**
      * If HIBERNATE is setted as persistence provider, the command will be
      * available
@@ -91,7 +98,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     public boolean isAvailablePersistence(FileManager fileManager,
             PathResolver pathResolver) {
         return HibernateSpatialGeoUtils.isHibernateProviderPersistence(
-                fileManager, pathResolver);
+                getFileManager(), getPathResolver());
     }
 
     /**
@@ -101,7 +108,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     public boolean isGeoPersistenceInstalled(FileManager fileManager,
             PathResolver pathResolver) {
         return HibernateSpatialGeoUtils.isHibernateSpatialPersistenceInstalled(
-                fileManager, pathResolver, getClass());
+                getFileManager(), getPathResolver(), getClass());
     }
 
     /**
@@ -126,7 +133,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     @Override
     public void addField(JavaSymbolName fieldName, FieldGeoTypes fieldGeoType,
             JavaType entity) {
-        final ClassOrInterfaceTypeDetails cid = typeLocationService
+        final ClassOrInterfaceTypeDetails cid = getTypeLocationService()
                 .getTypeDetails(entity);
         final String physicalTypeIdentifier = cid.getDeclaredByMetadataId();
 
@@ -142,7 +149,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
         // Generating package-info.java if necessary
         JavaPackage entityPackage = entity.getPackage();
         HibernateSpatialGeoUtils.generatePackageInfoIfNotExists(entityPackage,
-                pathResolver, fileManager);
+                getPathResolver(), getFileManager());
 
         // Adding Annotation @Type
         List<AnnotationMetadataBuilder> fieldAnnotations = new ArrayList<AnnotationMetadataBuilder>();
@@ -160,7 +167,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
                 fieldDetails);
 
         // Adding field to entity
-        typeManagementService.addField(fieldBuilder.build());
+        getTypeManagementService().addField(fieldBuilder.build());
 
     }
 
@@ -171,8 +178,9 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     public void addFinderGeoAll() {
 
         // Getting all entities annotated with @RooJpaActiveRecord
-        Set<ClassOrInterfaceTypeDetails> entities = typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(JPA_ACTIVE_RECORD_ANNOTATION);
+        Set<ClassOrInterfaceTypeDetails> entities = getTypeLocationService()
+                .findClassesOrInterfaceDetailsWithAnnotation(
+                        JPA_ACTIVE_RECORD_ANNOTATION);
 
         for (ClassOrInterfaceTypeDetails entity : entities) {
             annotateEntityWithGeoFields(entity);
@@ -189,7 +197,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
                 entity);
 
         // Validate @RooJpaActiveRecord annotation
-        ClassOrInterfaceTypeDetails entityDetails = typeLocationService
+        ClassOrInterfaceTypeDetails entityDetails = getTypeLocationService()
                 .getTypeDetails(entity);
 
         AnnotationMetadata activeRecordAnnotation = entityDetails
@@ -239,8 +247,8 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
                 detailsBuilder.updateTypeAnnotation(annotationBuilder.build());
 
                 // Save changes to disk
-                typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder
-                        .build());
+                getTypeManagementService().createOrUpdateTypeOnDisk(
+                        detailsBuilder.build());
 
                 return true;
             }
@@ -258,10 +266,12 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
         final Element configuration = XmlUtils.getConfiguration(getClass());
         // Add POM Repositories
         HibernateSpatialGeoUtils.updateRepositories(configuration,
-                "/configuration/repositories/repository", projectOperations);
+                "/configuration/repositories/repository",
+                getProjectOperations());
         // Add POM dependencies
         HibernateSpatialGeoUtils.updateDependencies(configuration,
-                "/configuration/dependencies/dependency", projectOperations);
+                "/configuration/dependencies/dependency",
+                getProjectOperations());
     }
 
     /**
@@ -272,13 +282,13 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     public void updatePersistenceDialect() {
         boolean runTime = false;
         // persistence.xml file
-        final String persistenceFile = pathResolver.getFocusedIdentifier(
+        final String persistenceFile = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml");
         // if persistence.xml doesn't exists show a WARNING
-        if (fileManager.exists(persistenceFile)) {
+        if (getFileManager().exists(persistenceFile)) {
             // Getting document
             final Document persistenceXmlDocument = XmlUtils
-                    .readXml(fileManager.getInputStream(persistenceFile));
+                    .readXml(getFileManager().getInputStream(persistenceFile));
             final Element persistenceElement = persistenceXmlDocument
                     .getDocumentElement();
             // Getting all persistence-unit
@@ -357,7 +367,8 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
             }
 
             if (totalModified != 0) {
-                fileManager.createOrUpdateTextFileIfRequired(persistenceFile,
+                getFileManager().createOrUpdateTextFileIfRequired(
+                        persistenceFile,
                         XmlUtils.nodeToString(persistenceXmlDocument), false);
 
                 // Showing WARNING informing that if you install a different
@@ -392,7 +403,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
         String entityPackageFolder = entityPackage.replaceAll("[.]", "/");
 
         // Setting types.xml location using entity package
-        final String typesXmlPath = pathResolver.getFocusedIdentifier(
+        final String typesXmlPath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_RESOURCES,
                 String.format("/%s/types.xml", entityPackageFolder));
 
@@ -400,8 +411,8 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
         OutputStream outputStream = null;
         try {
             inputStream = FileUtils.getInputStream(getClass(), "types.xml");
-            if (!fileManager.exists(typesXmlPath)) {
-                outputStream = fileManager.createFile(typesXmlPath)
+            if (!getFileManager().exists(typesXmlPath)) {
+                outputStream = getFileManager().createFile(typesXmlPath)
                         .getOutputStream();
             }
             if (outputStream != null) {
@@ -511,6 +522,136 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     @Override
     public String getDescription() {
         return DESCRIPTION;
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on HibernateSpatialGeoProvider.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on HibernateSpatialGeoProvider.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+
+    }
+
+    public TypeLocationService getTypeLocationService() {
+        if (typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on HibernateSpatialGeoProvider.");
+                return null;
+            }
+        }
+        else {
+            return typeLocationService;
+        }
+
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on HibernateSpatialGeoProvider.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
+
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on HibernateSpatialGeoProvider.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+
     }
 
 }

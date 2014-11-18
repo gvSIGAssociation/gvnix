@@ -17,6 +17,8 @@
  */
 package org.gvnix.addon.gva.security.providers.safe;
 
+import java.util.logging.Logger;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -29,6 +31,7 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link DatatablesMetadata}.
@@ -41,10 +44,11 @@ import org.springframework.roo.project.ProjectOperations;
 public final class SafeSecurityProviderPasswordMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(SafeSecurityProviderPasswordMetadataProvider.class);
+
     private WebMetadataService webMetadataService;
 
-    @Reference
     protected ProjectOperations projectOperations;
 
     /**
@@ -52,8 +56,9 @@ public final class SafeSecurityProviderPasswordMetadataProvider extends
      * 
      * @param context the component context
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(
@@ -66,7 +71,7 @@ public final class SafeSecurityProviderPasswordMetadataProvider extends
      * @param context the component context
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(

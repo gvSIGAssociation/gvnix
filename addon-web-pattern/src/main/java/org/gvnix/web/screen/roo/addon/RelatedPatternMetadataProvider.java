@@ -56,6 +56,11 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
+
 /**
  * Provides {@link RelatedPatternMetadata}. This type is called by Roo to
  * retrieve the metadata for this add-on. Use this type to reference external
@@ -72,7 +77,7 @@ import org.springframework.roo.support.logging.HandlerUtils;
  *         Transport</a>
  * @since 0.8
  */
-@Component(immediate = true)
+@Component
 @Service
 public final class RelatedPatternMetadataProvider extends
         AbstractPatternMetadataProvider {
@@ -80,11 +85,8 @@ public final class RelatedPatternMetadataProvider extends
     private static final Logger LOGGER = HandlerUtils
             .getLogger(RelatedPatternMetadataProvider.class);
 
-    @Reference
     private ProjectOperations projectOperations;
-    @Reference
     private WebMetadataService webMetadataService;
-    @Reference
     private PatternService patternService;
 
     private final Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
@@ -99,14 +101,14 @@ public final class RelatedPatternMetadataProvider extends
      *        OSGi container (ie find out if certain bundles are active)
      */
     @Override
-    protected void activate(ComponentContext context) {
-
-        _patternService = patternService;
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        _patternService = getPatternService();
 
         // next line adding a notification listener over this class allow method
         // getLocalMidToRequest(ItdTypeDetails) to be invoked
-        metadataDependencyRegistry.addNotificationListener(this);
-        metadataDependencyRegistry.registerDependency(
+        getMetadataDependencyRegistry().addNotificationListener(this);
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(PatternService.RELATED_PATTERN_ANNOTATION);
@@ -123,8 +125,8 @@ public final class RelatedPatternMetadataProvider extends
     @Override
     protected void deactivate(ComponentContext context) {
 
-        metadataDependencyRegistry.removeNotificationListener(this);
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().removeNotificationListener(this);
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(PatternService.RELATED_PATTERN_ANNOTATION);
@@ -184,11 +186,11 @@ public final class RelatedPatternMetadataProvider extends
                 "Governor failed to provide class type details, in violation of superclass contract");
 
         // Check if there are pattern names used more than once in project
-        Validate.isTrue(!patternService.existsMasterPatternDuplicated(),
+        Validate.isTrue(!getPatternService().existsMasterPatternDuplicated(),
                 "There is a pattern name used more than once in the project");
 
         // Get pattern attributes of the controller
-        List<StringAttributeValue> patternList = patternService
+        List<StringAttributeValue> patternList = getPatternService()
                 .getControllerRelatedPatternsValueAttributes(controllerType);
 
         // Lookup the form backing object's metadata and check that
@@ -206,7 +208,7 @@ public final class RelatedPatternMetadataProvider extends
         MemberHoldingTypeDetails entityPersistentDetails = MemberFindingUtils
                 .getMostConcreteMemberHoldingTypeDetailsWithTag(entityDetails,
                         CustomDataKeys.PERSISTENT_TYPE);
-        SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities = webMetadataService
+        SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities = getWebMetadataService()
                 .getRelatedApplicationTypeMetadata(entity, entityDetails, mid);
         if (entityPersistentDetails == null || relatedEntities == null
                 || relatedEntities.get(entity) == null
@@ -229,19 +231,19 @@ public final class RelatedPatternMetadataProvider extends
 
         MemberDetails controllerDetails = getMemberDetails(controllerMetadata);
 
-        Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes = webMetadataService
+        Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes = getWebMetadataService()
                 .getDatePatterns(entity, entityDetails, mid);
 
         // Install Dialog Bean
         OperationUtils.installWebDialogClass(aspect.getPackage()
                 .getFullyQualifiedPackageName().concat(".dialog"),
-                projectOperations.getPathResolver(), fileManager);
+                getProjectOperations().getPathResolver(), fileManager);
 
         // Related fields and dates
         SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields = getRelationFieldsDetails(
-                mid, controllerMetadata, entity, webMetadataService);
+                mid, controllerMetadata, entity, getWebMetadataService());
         Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates = getRelationFieldsDateFormat(
-                mid, controllerMetadata, entity, webMetadataService);
+                mid, controllerMetadata, entity, getWebMetadataService());
 
         // Get master entity, if not exists nothing to do
         JavaType masterEntity = getMasterEntity(entity, relatedEntities);
@@ -255,7 +257,7 @@ public final class RelatedPatternMetadataProvider extends
 
         // Get entity fields names defined into relations pattern annotation on
         // its related controller
-        List<String> relationsFields = patternService
+        List<String> relationsFields = getPatternService()
                 .getEntityRelationsPatternsFields(masterEntity);
 
         // Get master entity details
@@ -344,6 +346,81 @@ public final class RelatedPatternMetadataProvider extends
     public String getProvidesType() {
 
         return RelatedPatternMetadata.getMetadataIdentiferType();
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on RelatedPatternMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public WebMetadataService getWebMetadataService() {
+        if (webMetadataService == null) {
+            // Get all Services implement WebMetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebMetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebMetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebMetadataService on RelatedPatternMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return webMetadataService;
+        }
+    }
+
+    public PatternService getPatternService() {
+        if (patternService == null) {
+            // Get all Services implement PatternService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PatternService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PatternService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PatternService on RelatedPatternMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return patternService;
+        }
     }
 
 }

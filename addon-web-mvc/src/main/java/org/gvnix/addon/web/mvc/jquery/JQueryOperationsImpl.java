@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -56,6 +58,12 @@ import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
+
 /**
  * Implementation of operations this add-on offers.
  * 
@@ -66,6 +74,9 @@ import org.w3c.dom.Element;
 @Service
 public class JQueryOperationsImpl extends AbstractOperations implements
         JQueryOperations {
+
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(JQueryOperationsImpl.class);
 
     private static final String PATH_IS_NOT_SPECIFIED = "Path is not specified in the @RooWebScaffold annotation for '";
 
@@ -83,25 +94,27 @@ public class JQueryOperationsImpl extends AbstractOperations implements
 
     private static final String XMLNS_FIELD = "xmlns:field";
 
+    private ComponentContext cContext;
+
+    protected void activate(final ComponentContext componentContext) {
+        cContext = componentContext;
+        context = cContext.getBundleContext();
+    }
+
     private static final JavaType SCAFFOLD_ANNOTATION = new JavaType(
             RooWebScaffold.class.getName());
 
     private static final JavaType JQUERY_ANNOTATION = new JavaType(
             GvNIXWebJQuery.class.getName());
 
-    @Reference
     private ProjectOperations projectOperations;
 
-    @Reference
     private MvcOperations mvcOperations;
 
-    @Reference
     private TypeLocationService typeLocationService;
 
-    @Reference
     private TypeManagementService typeManagementService;
 
-    @Reference
     private WebMetadataService webMetadataService;
 
     /**
@@ -114,15 +127,15 @@ public class JQueryOperationsImpl extends AbstractOperations implements
      * install them if they are missing
      */
     public boolean isSetupAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(FeatureNames.MVC)
-                && !projectOperations
-                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_JQUERY);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                FeatureNames.MVC)
+                && !getProjectOperations().isFeatureInstalledInFocusedModule(
+                        FEATURE_NAME_GVNIX_JQUERY);
     }
 
     public boolean isAddAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_JQUERY);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                FEATURE_NAME_GVNIX_JQUERY);
     }
 
     public boolean isUpdateTagsAvailable() {
@@ -132,8 +145,8 @@ public class JQueryOperationsImpl extends AbstractOperations implements
     public void annotateAll() {
 
         // Locate all controllers and annotate it
-        for (JavaType type : typeLocationService
-                .findTypesWithAnnotation(SCAFFOLD_ANNOTATION)) {
+        for (JavaType type : getTypeLocationService().findTypesWithAnnotation(
+                SCAFFOLD_ANNOTATION)) {
             annotateController(type);
         }
     }
@@ -170,7 +183,8 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         detailsBuilder.addAnnotation(annotationBuilder.build());
 
         // Save changes to disk
-        typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder.build());
+        getTypeManagementService().createOrUpdateTypeOnDisk(
+                detailsBuilder.build());
     }
 
     /**
@@ -210,7 +224,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         for (String jspxName : pageList) {
             WebProjectUtils.updateTagxUriInJspx(
                     "WEB-INF/views/".concat(jspxName).concat(".jspx"),
-                    rooUriMap, uriMap, projectOperations, fileManager);
+                    rooUriMap, uriMap, getProjectOperations(), fileManager);
         }
     }
 
@@ -263,7 +277,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         // do the update
         for (String jspxName : pageList) {
             WebProjectUtils.updateTagxUriInJspx(controllerPath, jspxName,
-                    rooUriMap, uriMap, projectOperations, fileManager);
+                    rooUriMap, uriMap, getProjectOperations(), fileManager);
         }
     }
 
@@ -291,11 +305,11 @@ public class JQueryOperationsImpl extends AbstractOperations implements
 
         // Get Java type details
         JavaType formBackingType = annotationValues.getFormBackingObject();
-        MemberDetails memberDetails = webMetadataService
-                .getMemberDetails(formBackingType);
+        MemberDetails memberDetails = getWebMetadataService().getMemberDetails(
+                formBackingType);
 
         // This controller is annotated with @RooWebFinder
-        final Set<FinderMetadataDetails> finderMethodsDetails = webMetadataService
+        final Set<FinderMetadataDetails> finderMethodsDetails = getWebMetadataService()
                 .getDynamicFinderMethodsAndFields(formBackingType,
                         memberDetails, finderMetadata.getId());
 
@@ -331,7 +345,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
             WebProjectUtils.updateTagxUriInJspx(
                     "WEB-INF/views/".concat(controllerPath).concat("/")
                             .concat(finderName).concat(".jspx"), rooUriMap,
-                    uriMap, projectOperations, fileManager);
+                    uriMap, getProjectOperations(), fileManager);
         }
     }
 
@@ -341,7 +355,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
      */
     protected ClassOrInterfaceTypeDetails getControllerDetails(
             JavaType controller) {
-        ClassOrInterfaceTypeDetails existing = typeLocationService
+        ClassOrInterfaceTypeDetails existing = getTypeLocationService()
                 .getTypeDetails(controller);
 
         Validate.notNull(existing, "Can't get Type details");
@@ -362,9 +376,9 @@ public class JQueryOperationsImpl extends AbstractOperations implements
     public void setup() {
 
         // If gvNIX MVC dependencies are not installed, install them
-        if (!projectOperations
-                .isFeatureInstalledInFocusedModule(MvcOperations.FEATURE_NAME_GVNIX_MVC)) {
-            mvcOperations.setup();
+        if (!getProjectOperations().isFeatureInstalledInFocusedModule(
+                MvcOperations.FEATURE_NAME_GVNIX_MVC)) {
+            getMvcOperations().setup();
         }
 
         // Install tags modified for jQuery support
@@ -380,7 +394,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
     public void updateLoadScriptsTag() {
 
         // Modify Roo load-scripts.tagx
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
         String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
                 "WEB-INF/tags/util/load-scripts.tagx");
 
@@ -500,12 +514,12 @@ public class JQueryOperationsImpl extends AbstractOperations implements
      * @return true if given feature name is installed, otherwise returns false
      */
     public boolean isInstalledInModule(final String moduleName) {
-        final Pom pom = projectOperations.getPomFromModuleName(moduleName);
+        final Pom pom = getProjectOperations().getPomFromModuleName(moduleName);
         if (pom == null) {
             return false;
         }
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(MvcOperations.FEATURE_NAME_GVNIX_MVC)
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                MvcOperations.FEATURE_NAME_GVNIX_MVC)
                 && hasJQueryTags();
     }
 
@@ -518,7 +532,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
      * @return
      */
     private LogicalPath getWebappPath() {
-        return WebProjectUtils.getWebappPath(projectOperations);
+        return WebProjectUtils.getWebappPath(getProjectOperations());
     }
 
     /**
@@ -528,7 +542,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
      * @return
      */
     private boolean hasJQueryTags() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
                 "WEB-INF/tags/jquery");
         String jsPath = pathResolver.getIdentifier(getWebappPath(),
@@ -538,7 +552,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
 
     @Override
     public void updateTags() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
         LogicalPath webappPath = getWebappPath();
 
         // Copy Javascript files and related resources
@@ -559,12 +573,12 @@ public class JQueryOperationsImpl extends AbstractOperations implements
                 "scripts/jquery/skins/lightgray/fonts/*.*", pathResolver
                         .getIdentifier(webappPath,
                                 "/scripts/jquery/skins/lightgray/fonts"),
-                fileManager, context, getClass());
+                fileManager, cContext, getClass());
         OperationUtils.updateDirectoryContents(
                 "scripts/jquery/skins/lightgray/img/*.*", pathResolver
                         .getIdentifier(webappPath,
                                 "/scripts/jquery/skins/lightgray/img"),
-                fileManager, context, getClass());
+                fileManager, cContext, getClass());
 
         // Copy CSS files and related resources
         copyDirectoryContents("styles/jquery/*.css",
@@ -572,8 +586,8 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         OperationUtils
                 .updateDirectoryContents("styles/jquery/images/*.*",
                         pathResolver.getIdentifier(webappPath,
-                                "/styles/jquery/images"), fileManager, context,
-                        getClass());
+                                "/styles/jquery/images"), fileManager,
+                        cContext, getClass());
 
         // Copy Tagx files
         copyDirectoryContents("tags/jquery/form/*.tagx",
@@ -585,5 +599,130 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         copyDirectoryContents("tags/jquery/util/*.tagx",
                 pathResolver.getIdentifier(webappPath,
                         "/WEB-INF/tags/jquery/util"), true);
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on JQueryOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public MvcOperations getMvcOperations() {
+        if (mvcOperations == null) {
+            // Get all Services implement MvcOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(MvcOperations.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MvcOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MvcOperations on JQueryOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return mvcOperations;
+        }
+    }
+
+    public TypeLocationService getTypeLocationService() {
+        if (typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on JQueryOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeLocationService;
+        }
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on JQueryOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
+    }
+
+    public WebMetadataService getWebMetadataService() {
+        if (webMetadataService == null) {
+            // Get all Services implement WebMetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebMetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebMetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebMetadataService on JQueryOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return webMetadataService;
+        }
     }
 }

@@ -32,6 +32,8 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.logging.HandlerUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Provides {@link JpaAuditRevisionEntityMetadata}. This type is called by Roo
@@ -50,7 +52,6 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
     private static final Logger LOGGER = HandlerUtils
             .getLogger(JpaAuditRevisionEntityMetadataProvider.class);
 
-    @Reference
     private JpaAuditOperationsMetadata operations;
 
     /**
@@ -61,8 +62,9 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(
@@ -78,7 +80,7 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXJpaAudit.class.getName()));
@@ -96,7 +98,7 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
         final JpaAuditRevisionEntityAnnotationValues annotationValues = new JpaAuditRevisionEntityAnnotationValues(
                 governorPhysicalTypeMetadata);
 
-        RevisionLogProvider logProvider = operations
+        RevisionLogProvider logProvider = getOperations()
                 .getActiveRevisionLogProvider();
 
         if (logProvider == null) {
@@ -111,7 +113,7 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
         LogicalPath path = JpaAuditRevisionEntityMetadata
                 .getPath(metadataIdentificationString);
 
-        JavaType userService = operations.getUserServiceType();
+        JavaType userService = getOperations().getUserServiceType();
         if (userService == null) {
             // No user type: do nothing
             return null;
@@ -129,11 +131,11 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
         }
 
         // Add dependency with UserService metadata
-        metadataDependencyRegistry.registerDependency(userServiceId,
+        getMetadataDependencyRegistry().registerDependency(userServiceId,
                 metadataIdentificationString);
 
         RevisionLogRevisionEntityMetadataBuilder revisionLogBuilder = logProvider
-                .getRevisonEntityMetadataBuilder(operations,
+                .getRevisonEntityMetadataBuilder(getOperations(),
                         governorPhysicalTypeMetadata);
 
         // Pass dependencies required by the metadata in through its constructor
@@ -179,5 +181,33 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
      */
     public String getProvidesType() {
         return JpaAuditRevisionEntityMetadata.getMetadataIdentiferType();
+    }
+
+    public JpaAuditOperationsMetadata getOperations() {
+        if (operations == null) {
+            // Get all Services implement JpaAuditOperationsMetadata interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JpaAuditOperationsMetadata.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JpaAuditOperationsMetadata) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JpaAuditOperationsMetadata on JpaAuditRevisionEntityMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return operations;
+        }
+
     }
 }

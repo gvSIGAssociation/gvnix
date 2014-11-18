@@ -58,6 +58,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of operations this add-on offers.
@@ -70,31 +75,25 @@ import org.w3c.dom.Node;
 @Service
 public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
-    @Reference
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private FileManager fileManager;
 
-    @Reference
     private PathResolver pathResolver;
 
-    @Reference
     private I18nSupport i18nSupport;
 
-    @Reference
     private ProjectOperations projectOperations;
 
-    @Reference
     private PropFileOperations propFileOperations;
 
-    @Reference
     private TypeLocationService typeLocationService;
 
-    @Reference
     private TypeManagementService typeManagementService;
 
-    @Reference
     private MetadataService metadataService;
 
-    @Reference
     private PersistenceMemberLocator persistenceMemberLocator;
 
     private static final Logger LOGGER = HandlerUtils
@@ -103,27 +102,31 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     private static final JavaType ANNOTATION_LOUPE_CONTROLLER = new JavaType(
             "org.gvnix.addon.loupefield.GvNIXLoupeController");
 
+    protected void activate(final ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
+
     /** {@inheritDoc} */
     public boolean isSetupCommandAvailable() {
         // If jQuery is installed, setup command is available
-        return projectOperations
-                .isFeatureInstalledInFocusedModule("gvnix-jquery")
-                && !projectOperations
-                        .isFeatureInstalledInFocusedModule("gvnix-loupe");
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-jquery")
+                && !getProjectOperations().isFeatureInstalledInFocusedModule(
+                        "gvnix-loupe");
     }
 
     /** {@inheritDoc} */
     public boolean isUpdateCommandAvailable() {
         // If loupefields addon is installed, update command is available
-        return projectOperations
-                .isFeatureInstalledInFocusedModule("gvnix-loupe");
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-loupe");
     }
 
     /** {@inheritDoc} */
     public boolean isSetCommandAvailable() {
         // If loupefields addon is installed, set command is available
-        return projectOperations
-                .isFeatureInstalledInFocusedModule("gvnix-loupe");
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-loupe");
     }
 
     /** {@inheritDoc} */
@@ -186,7 +189,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         Validate.notNull(controller, "Controller Java Type required");
 
         // Getting existing controller and webscaffold annotation values
-        ClassOrInterfaceTypeDetails existingController = typeLocationService
+        ClassOrInterfaceTypeDetails existingController = getTypeLocationService()
                 .getTypeDetails(controller);
         WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
                 existingController);
@@ -207,7 +210,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         }
 
         // Getting Related entity and its fields
-        ClassOrInterfaceTypeDetails relatedEntity = typeLocationService
+        ClassOrInterfaceTypeDetails relatedEntity = getTypeLocationService()
                 .getTypeDetails(fieldType);
 
         if (relatedEntity == null) {
@@ -245,7 +248,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         }
 
         // Getting identifiers
-        List<FieldMetadata> identifiers = persistenceMemberLocator
+        List<FieldMetadata> identifiers = getPersistenceMemberLocator()
                 .getIdentifierFields(fieldType);
 
         if (identifiers.isEmpty()) {
@@ -258,7 +261,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         }
 
         // Getting plural
-        final PluralMetadata pluralMetadata = (PluralMetadata) metadataService
+        final PluralMetadata pluralMetadata = (PluralMetadata) getMetadataService()
                 .get(PluralMetadata.createIdentifier(fieldType,
                         PhysicalTypeIdentifier.getPath(relatedEntity
                                 .getDeclaredByMetadataId())));
@@ -303,16 +306,16 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      */
     public void addTagx() {
 
-        final String filePath = pathResolver.getFocusedIdentifier(
+        final String filePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/loupefield/loupe.tagx");
 
-        if (!fileManager.exists(filePath)) {
+        if (!getFileManager().exists(filePath)) {
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {
                 inputStream = FileUtils.getInputStream(getClass(),
                         "tag/loupe.tagx");
-                outputStream = fileManager.createFile(filePath)
+                outputStream = getFileManager().createFile(filePath)
                         .getOutputStream();
                 IOUtils.copy(inputStream, outputStream);
             }
@@ -332,7 +335,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      */
     public void updateTagx() {
 
-        final String filePath = pathResolver.getFocusedIdentifier(
+        final String filePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/loupefield/loupe.tagx");
 
         InputStream inputStream = null;
@@ -340,12 +343,12 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         try {
             inputStream = FileUtils
                     .getInputStream(getClass(), "tag/loupe.tagx");
-            if (!fileManager.exists(filePath)) {
-                outputStream = fileManager.createFile(filePath)
+            if (!getFileManager().exists(filePath)) {
+                outputStream = getFileManager().createFile(filePath)
                         .getOutputStream();
             }
             else {
-                outputStream = fileManager.updateFile(filePath)
+                outputStream = getFileManager().updateFile(filePath)
                         .getOutputStream();
             }
             IOUtils.copy(inputStream, outputStream);
@@ -365,17 +368,17 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      * scripts folder
      */
     public void addLoupeFunctions() {
-        final String filePath = pathResolver.getFocusedIdentifier(
+        final String filePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP,
                 "scripts/loupefield/jquery.loupeField.ext.gvnix.js");
 
-        if (!fileManager.exists(filePath)) {
+        if (!getFileManager().exists(filePath)) {
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {
                 inputStream = FileUtils.getInputStream(getClass(),
                         "scripts/jquery.loupeField.ext.gvnix.js");
-                outputStream = fileManager.createFile(filePath)
+                outputStream = getFileManager().createFile(filePath)
                         .getOutputStream();
                 IOUtils.copy(inputStream, outputStream);
             }
@@ -394,16 +397,16 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      * styles folder
      */
     public void addLoupeStyles() {
-        final String filePath = pathResolver.getFocusedIdentifier(
+        final String filePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "styles/loupefield/loupeField.css");
 
-        if (!fileManager.exists(filePath)) {
+        if (!getFileManager().exists(filePath)) {
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {
                 inputStream = FileUtils.getInputStream(getClass(),
                         "styles/loupeField.css");
-                outputStream = fileManager.createFile(filePath)
+                outputStream = getFileManager().createFile(filePath)
                         .getOutputStream();
                 IOUtils.copy(inputStream, outputStream);
             }
@@ -423,15 +426,15 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      */
     public void addCallbacksFile() {
         // Adding callbacks .js file
-        final String filePath = pathResolver.getFocusedIdentifier(
+        final String filePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "scripts/loupefield/loupe-callbacks.js");
-        if (!fileManager.exists(filePath)) {
+        if (!getFileManager().exists(filePath)) {
             InputStream inputStream = null;
             OutputStream outputStream = null;
             try {
                 inputStream = FileUtils.getInputStream(getClass(),
                         "scripts/loupe-callbacks.js");
-                outputStream = fileManager.createFile(filePath)
+                outputStream = getFileManager().createFile(filePath)
                         .getOutputStream();
                 IOUtils.copy(inputStream, outputStream);
             }
@@ -455,7 +458,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      * current version
      */
     public void updateLoupeFunctions() {
-        final String filePath = pathResolver.getFocusedIdentifier(
+        final String filePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP,
                 "scripts/loupefield/jquery.loupeField.ext.gvnix.js");
 
@@ -464,12 +467,12 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         try {
             inputStream = FileUtils.getInputStream(getClass(),
                     "scripts/jquery.loupeField.ext.gvnix.js");
-            if (!fileManager.exists(filePath)) {
-                outputStream = fileManager.createFile(filePath)
+            if (!getFileManager().exists(filePath)) {
+                outputStream = getFileManager().createFile(filePath)
                         .getOutputStream();
             }
             else {
-                outputStream = fileManager.updateFile(filePath)
+                outputStream = getFileManager().updateFile(filePath)
                         .getOutputStream();
             }
             IOUtils.copy(inputStream, outputStream);
@@ -488,7 +491,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      * styles folder
      */
     public void updateLoupeStyles() {
-        final String filePath = pathResolver.getFocusedIdentifier(
+        final String filePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "styles/loupefield/loupeField.css");
 
         InputStream inputStream = null;
@@ -496,7 +499,8 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         try {
             inputStream = FileUtils.getInputStream(getClass(),
                     "styles/loupeField.css");
-            outputStream = fileManager.createFile(filePath).getOutputStream();
+            outputStream = getFileManager().createFile(filePath)
+                    .getOutputStream();
             IOUtils.copy(inputStream, outputStream);
         }
         catch (final IOException ioe) {
@@ -514,27 +518,29 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     public void addI18nProperties() {
         // Check if Valencian_Catalan language is supported and add properties
         // if so
-        Set<I18n> supportedLanguages = i18nSupport.getSupportedLanguages();
+        Set<I18n> supportedLanguages = getI18nSupport().getSupportedLanguages();
         for (I18n i18n : supportedLanguages) {
             if (i18n.getLocale().equals(new Locale("ca"))) {
                 MessageBundleUtils.installI18nMessages(
-                        new ValencianCatalanLanguage(), projectOperations,
-                        fileManager);
+                        new ValencianCatalanLanguage(), getProjectOperations(),
+                        getFileManager());
                 MessageBundleUtils.addPropertiesToMessageBundle("ca",
-                        getClass(), propFileOperations, projectOperations,
-                        fileManager);
+                        getClass(), getPropFileOperations(),
+                        getProjectOperations(), getFileManager());
                 break;
             }
         }
         // Add properties to Spanish messageBundle
         MessageBundleUtils.installI18nMessages(new SpanishLanguage(),
-                projectOperations, fileManager);
+                getProjectOperations(), getFileManager());
         MessageBundleUtils.addPropertiesToMessageBundle("es", getClass(),
-                propFileOperations, projectOperations, fileManager);
+                getPropFileOperations(), getProjectOperations(),
+                getFileManager());
 
         // Add properties to default messageBundle
         MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
-                propFileOperations, projectOperations, fileManager);
+                getPropFileOperations(), getProjectOperations(),
+                getFileManager());
     }
 
     /**
@@ -543,17 +549,17 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      */
     public void addToLoadScripts(String varName, String url, boolean isCss) {
         // Modify Roo load-scripts.tagx
-        String docTagxPath = pathResolver.getIdentifier(getWebappPath(),
+        String docTagxPath = getPathResolver().getIdentifier(getWebappPath(),
                 "WEB-INF/tags/util/load-scripts.tagx");
 
-        Validate.isTrue(fileManager.exists(docTagxPath),
+        Validate.isTrue(getFileManager().exists(docTagxPath),
                 "load-script.tagx not found: ".concat(docTagxPath));
 
         MutableFile docTagxMutableFile = null;
         Document docTagx;
 
         try {
-            docTagxMutableFile = fileManager.updateFile(docTagxPath);
+            docTagxMutableFile = getFileManager().updateFile(docTagxPath);
             docTagx = XmlUtils.getDocumentBuilder().parse(
                     docTagxMutableFile.getInputStream());
         }
@@ -580,7 +586,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     private LogicalPath getWebappPath() {
-        return WebProjectUtils.getWebappPath(projectOperations);
+        return WebProjectUtils.getWebappPath(getProjectOperations());
     }
 
     /**
@@ -592,7 +598,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         Validate.notNull(controller, "Controller required");
 
         // Getting current controller
-        ClassOrInterfaceTypeDetails existingController = typeLocationService
+        ClassOrInterfaceTypeDetails existingController = getTypeLocationService()
                 .getTypeDetails(controller);
 
         // Get @Controller annotation
@@ -618,8 +624,8 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
             detailsBuilder.addAnnotation(annotationBuilder.build());
 
             // Save changes to disk
-            typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder
-                    .build());
+            getTypeManagementService().createOrUpdateTypeOnDisk(
+                    detailsBuilder.build());
         }
 
     }
@@ -635,8 +641,8 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         List<Element> repos = XmlUtils.findElements(
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
-            projectOperations.addRepositories(
-                    projectOperations.getFocusedModuleName(),
+            getProjectOperations().addRepositories(
+                    getProjectOperations().getFocusedModuleName(),
                     Collections.singleton(new Repository(repo)));
         }
 
@@ -644,16 +650,17 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         List<Element> properties = XmlUtils.findElements(
                 "/configuration/gvnix/properties/*", configuration);
         for (Element property : properties) {
-            projectOperations.addProperty(projectOperations
-                    .getFocusedModuleName(), new Property(property));
+            getProjectOperations().addProperty(
+                    getProjectOperations().getFocusedModuleName(),
+                    new Property(property));
         }
 
         // Install dependencies
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", configuration);
 
-        DependenciesVersionManager.manageDependencyVersion(metadataService,
-                projectOperations, depens);
+        DependenciesVersionManager.manageDependencyVersion(
+                getMetadataService(), getProjectOperations(), depens);
     }
 
     /**
@@ -665,7 +672,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         Map<String, String> uriMap = new HashMap<String, String>(1);
         uriMap.put("xmlns:loupefield", "urn:jsptagdir:/WEB-INF/tags/loupefield");
 
-        ClassOrInterfaceTypeDetails existingController = typeLocationService
+        ClassOrInterfaceTypeDetails existingController = getTypeLocationService()
                 .getTypeDetails(controller);
         WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
                 existingController);
@@ -691,7 +698,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
         if (controllerPath != null) {
             WebProjectUtils.addTagxUriInJspx(controllerPath, jspxName, uriMap,
-                    projectOperations, fileManager);
+                    getProjectOperations(), getFileManager());
         }
     }
 
@@ -703,9 +710,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
      */
     private boolean existsView(String path) {
         String viewFileName = path.concat(".jspx");
-        final String filePath = pathResolver.getFocusedIdentifier(
+        final String filePath = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "WEB-INF/views/".concat(viewFileName));
-        if (!fileManager.exists(filePath)) {
+        if (!getFileManager().exists(filePath)) {
             LOGGER.log(
                     Level.INFO,
                     "View '".concat(viewFileName).concat(
@@ -741,7 +748,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
             JavaSymbolName field) {
         JavaType entity = annotationValues.getFormBackingObject();
 
-        final ClassOrInterfaceTypeDetails cid = typeLocationService
+        final ClassOrInterfaceTypeDetails cid = getTypeLocationService()
                 .getTypeDetails(entity);
 
         if (cid == null) {
@@ -870,11 +877,12 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         String relativePath = "WEB-INF/views/".concat(path).concat("/")
                 .concat(viewName).concat(".jspx");
 
-        String docJspx = pathResolver.getIdentifier(
-                WebProjectUtils.getWebappPath(projectOperations), relativePath);
+        String docJspx = getPathResolver().getIdentifier(
+                WebProjectUtils.getWebappPath(getProjectOperations()),
+                relativePath);
 
         Document docJspXml = WebProjectUtils.loadXmlDocument(docJspx,
-                fileManager);
+                getFileManager());
         if (docJspXml == null) {
             LOGGER.log(Level.INFO,
                     "Could not locate file '".concat(relativePath).concat("'"));
@@ -950,7 +958,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         form.removeChild(element);
 
         DomUtils.removeTextNodes(docJspXml);
-        fileManager.createOrUpdateTextFileIfRequired(docJspx,
+        getFileManager().createOrUpdateTextFileIfRequired(docJspx,
                 XmlUtils.nodeToString(docJspXml), true);
 
     }
@@ -966,8 +974,234 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     @Override
     public boolean isInstalledInModule(String moduleName) {
-        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+        String dirPath = getPathResolver().getIdentifier(getWebappPath(),
                 "scripts/loupefield/jquery.loupeField.ext.gvnix.js");
-        return fileManager.exists(dirPath);
+        return getFileManager().exists(dirPath);
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on LoupeFieldOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on LoupeFieldOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+    }
+
+    public I18nSupport getI18nSupport() {
+        if (i18nSupport == null) {
+            // Get all Services implement I18nSupport interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(I18nSupport.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (I18nSupport) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load I18nSupport on LoupeFieldOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return i18nSupport;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on LoupeFieldOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public PropFileOperations getPropFileOperations() {
+        if (propFileOperations == null) {
+            // Get all Services implement PropFileOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PropFileOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PropFileOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PropFileOperations on LoupeFieldOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return propFileOperations;
+        }
+    }
+
+    public TypeLocationService getTypeLocationService() {
+        if (typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on LoupeFieldOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeLocationService;
+        }
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on LoupeFieldOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on LoupeFieldOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public PersistenceMemberLocator getPersistenceMemberLocator() {
+        if (persistenceMemberLocator == null) {
+            // Get all Services implement PersistenceMemberLocator interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PersistenceMemberLocator.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PersistenceMemberLocator) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PersistenceMemberLocator on LoupeFieldOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return persistenceMemberLocator;
+        }
     }
 }

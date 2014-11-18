@@ -22,6 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
@@ -68,16 +70,26 @@ import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.CollectionUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * {@link MetadataProvider} for mappings between Java and ActionScript entities.
  * 
  * @author Jeremy Grelle
  */
-@Component(immediate = true)
+@Component
 @Service
 public class ActionScriptEntityMetadataProvider implements MetadataProvider,
         MetadataNotificationListener {
+
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(ActionScriptEntityMetadataProvider.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
 
     /**
      * TODO - If the entity implements an interface, should we generate the
@@ -93,38 +105,33 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
 
     private static final String ALIAS_ATTR = "alias";
 
-    @Reference
     private PathResolver pathResolver;
 
-    @Reference
     private MetadataService metadataService;
 
-    @Reference
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference
     private ASMutablePhysicalTypeMetadataProvider asPhysicalTypeProvider;
 
-    @Reference
     protected MemberDetailsScanner memberDetailsScanner;
 
-    @Reference
     protected TypeManagementService typeManagementService;
 
-    protected void activate(ComponentContext context) {
-        this.metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        this.metadataDependencyRegistry.registerDependency(
+        getMetadataDependencyRegistry().registerDependency(
                 ASPhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
     }
 
     protected void deactivate(ComponentContext context) {
-        this.metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        this.metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 ASPhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
     }
@@ -138,7 +145,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
         ActionScriptType asType = ActionScriptMappingUtils
                 .toActionScriptType(javaType);
 
-        String asEntityId = this.asPhysicalTypeProvider.findIdentifier(asType);
+        String asEntityId = getAsPhysicalTypeProvider().findIdentifier(asType);
         if (StringUtils.isNotBlank(asEntityId)) {
             // TODO - If we add Roo-specific meta-tag, we could add it and then
             // trigger off of it in the notification
@@ -221,7 +228,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
         ASPhysicalTypeMetadata asMetadata = new DefaultASPhysicalTypeMetadata(
                 asEntityId, getPhysicalLocationCanonicalPath(asEntityId),
                 asDetails);
-        this.asPhysicalTypeProvider.createPhysicalType(asMetadata);
+        getAsPhysicalTypeProvider().createPhysicalType(asMetadata);
 
         // Now trigger the creation of any related types
         while (!relatedTypes.isEmpty()) {
@@ -232,7 +239,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
     }
 
     private ClassOrInterfaceTypeDetails getClassDetails(String metadataId) {
-        PhysicalTypeMetadata metadata = (PhysicalTypeMetadata) this.metadataService
+        PhysicalTypeMetadata metadata = (PhysicalTypeMetadata) getMetadataService()
                 .get(metadataId);
         if (metadata == null) {
             return null;
@@ -246,7 +253,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
 
     private ASMutableClassOrInterfaceTypeDetails getASClassDetails(
             String metadataId) {
-        ASPhysicalTypeMetadata metadata = (ASPhysicalTypeMetadata) this.metadataService
+        ASPhysicalTypeMetadata metadata = (ASPhysicalTypeMetadata) getMetadataService()
                 .get(metadataId);
         if (metadata == null) {
             return null;
@@ -264,7 +271,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
                 ASPhysicalTypeIdentifier.isValid(physicalTypeIdentifier),
                 "Physical type identifier is invalid");
         Validate.notNull(
-                this.pathResolver,
+                getPathResolver(),
                 "Cannot computed metadata ID of a type because the path resolver is presently unavailable");
         ActionScriptType asType = ASPhysicalTypeIdentifier
                 .getActionScriptType(physicalTypeIdentifier);
@@ -273,7 +280,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
         String relativePath = asType.getFullyQualifiedTypeName().replace('.',
                 File.separatorChar)
                 + ".as";
-        String physicalLocationCanonicalPath = this.pathResolver.getIdentifier(
+        String physicalLocationCanonicalPath = getPathResolver().getIdentifier(
                 path, "src/main/flex/" + relativePath);
         return physicalLocationCanonicalPath;
     }
@@ -370,8 +377,8 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
 
         fields.addAll(mutableTypeDetailsBuilder.getDeclaredFields());
         mutableTypeDetailsBuilder.setDeclaredFields(fields);
-        typeManagementService
-                .createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
+        getTypeManagementService().createOrUpdateTypeOnDisk(
+                mutableTypeDetailsBuilder.build());
 
     }
 
@@ -485,7 +492,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
             ASFieldMetadata asField) {
         List<TypeMapping> relatedTypes = new ArrayList<TypeMapping>();
         if (ActionScriptMappingUtils.isMappableType(asField.getFieldType())) {
-            if (!StringUtils.isNotBlank(this.asPhysicalTypeProvider
+            if (!StringUtils.isNotBlank(getAsPhysicalTypeProvider()
                     .findIdentifier(asField.getFieldType()))) {
                 String relatedEntityId = ASPhysicalTypeIdentifier
                         .createIdentifier(asField.getFieldType(),
@@ -503,7 +510,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
                     .getParameters()) {
                 ActionScriptType asParamType = ActionScriptMappingUtils
                         .toActionScriptType(javaParamType);
-                if (!StringUtils.isNotBlank(this.asPhysicalTypeProvider
+                if (!StringUtils.isNotBlank(getAsPhysicalTypeProvider()
                         .findIdentifier(asField.getFieldType()))) {
                     String relatedEntityId = ASPhysicalTypeIdentifier
                             .createIdentifier(asParamType, "src/main/flex");
@@ -533,7 +540,162 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
 
     private MemberDetails scanForMemberDetails(
             ClassOrInterfaceTypeDetails entityClassOrInterfaceDetails) {
-        return memberDetailsScanner.getMemberDetails(getClass().getName(),
+        return getMemberDetailsScanner().getMemberDetails(getClass().getName(),
                 entityClassOrInterfaceDetails);
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataDependencyRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on ActionScriptEntityMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on ActionScriptEntityMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on ActionScriptEntityMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public ASMutablePhysicalTypeMetadataProvider getAsPhysicalTypeProvider() {
+        if (asPhysicalTypeProvider == null) {
+            // Get all Services implement ASMutablePhysicalTypeMetadataProvider
+            // interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ASMutablePhysicalTypeMetadataProvider.class
+                                        .getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ASMutablePhysicalTypeMetadataProvider) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ASMutablePhysicalTypeMetadataProvider on ActionScriptEntityMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return asPhysicalTypeProvider;
+        }
+    }
+
+    public MemberDetailsScanner getMemberDetailsScanner() {
+        if (memberDetailsScanner == null) {
+            // Get all Services implement MemberDetailsScanner interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MemberDetailsScanner.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MemberDetailsScanner) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MemberDetailsScanner on ActionScriptEntityMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return memberDetailsScanner;
+        }
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on ActionScriptEntityMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
     }
 }

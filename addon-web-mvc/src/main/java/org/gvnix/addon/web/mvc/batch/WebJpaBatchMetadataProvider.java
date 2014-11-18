@@ -57,8 +57,9 @@ public final class WebJpaBatchMetadataProvider extends
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXWebJpaBatch.class.getName()));
@@ -73,7 +74,7 @@ public final class WebJpaBatchMetadataProvider extends
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXWebJpaBatch.class.getName()));
@@ -96,7 +97,7 @@ public final class WebJpaBatchMetadataProvider extends
         }
 
         // get target service MID
-        final String serviceMid = typeLocationService
+        final String serviceMid = getTypeLocationService()
                 .getPhysicalTypeIdentifier(service);
         if (serviceMid == null) {
             return null;
@@ -111,10 +112,10 @@ public final class WebJpaBatchMetadataProvider extends
         String serviceMetadataKey = JpaBatchMetadata.createIdentifier(service,
                 path);
         // register downstream dependency (service --> jpaBatch)
-        metadataDependencyRegistry.registerDependency(serviceMetadataKey,
+        getMetadataDependencyRegistry().registerDependency(serviceMetadataKey,
                 metadataIdentificationString);
 
-        JpaBatchMetadata serviceMetadata = (JpaBatchMetadata) metadataService
+        JpaBatchMetadata serviceMetadata = (JpaBatchMetadata) getMetadataService()
                 .get(serviceMetadataKey);
 
         return new WebJpaBatchMetadata(metadataIdentificationString,
@@ -178,7 +179,7 @@ public final class WebJpaBatchMetadataProvider extends
      * @return see above
      */
     private String getRelatedEntityComponent(final JavaType governor) {
-        final ClassOrInterfaceTypeDetails governorTypeDetails = typeLocationService
+        final ClassOrInterfaceTypeDetails governorTypeDetails = getTypeLocationService()
                 .getTypeDetails(governor);
         if (governorTypeDetails != null) {
             for (final JavaType type : governorTypeDetails.getLayerEntities()) {

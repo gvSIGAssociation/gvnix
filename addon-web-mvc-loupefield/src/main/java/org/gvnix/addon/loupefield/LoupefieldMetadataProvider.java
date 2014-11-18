@@ -45,8 +45,9 @@ public final class LoupefieldMetadataProvider extends
      * 
      * @param context the component context
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXLoupeController.class.getName()));
@@ -58,7 +59,7 @@ public final class LoupefieldMetadataProvider extends
      * @param context the component context
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXLoupeController.class.getName()));
@@ -80,11 +81,12 @@ public final class LoupefieldMetadataProvider extends
         // Get webScaffoldMetadata
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
                 javaType, path);
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) getMetadataService()
                 .get(webScaffoldMetadataId);
         // register dependency to Roo Web Scaffold
-        metadataDependencyRegistry.registerDependency(webScaffoldMetadataId,
-                metadataIdentificationString);
+        getMetadataDependencyRegistry().registerDependency(
+                webScaffoldMetadataId, metadataIdentificationString);
 
         if (webScaffoldMetadata == null) {
             return null;

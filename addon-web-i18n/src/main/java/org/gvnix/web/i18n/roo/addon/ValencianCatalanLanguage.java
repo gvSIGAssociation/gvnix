@@ -11,7 +11,7 @@ import org.springframework.roo.support.util.FileUtils;
 /**
  * Valencian/Catalan language support.
  */
-@Component(immediate = true)
+@Component
 @Service
 public class ValencianCatalanLanguage extends AbstractLanguage {
 

@@ -24,6 +24,12 @@ import org.w3c.dom.Element;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.gvnix.support.WebProjectUtils;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
+
 /**
  * Implementation of Bootstrap Addon operations
  * 
@@ -33,43 +39,42 @@ import org.gvnix.support.WebProjectUtils;
 @Service
 public class BootstrapOperationsImpl implements BootstrapOperations {
 
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private static final String VIEWS = "views/";
 
-    @Reference
     private FileManager fileManager;
 
-    @Reference
     private PathResolver pathResolver;
 
-    @Reference
     private MetadataService metadataService;
 
-    /**
-     * Use ProjectOperations to install new dependencies, plugins, properties,
-     * etc into the project configuration
-     */
-    @Reference
     private ProjectOperations projectOperations;
 
     private static final Logger LOGGER = Logger
             .getLogger(BootstrapOperationsImpl.class.getName());
 
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
+
     /**
      * If JQuery is installed, the command is available
      */
     public boolean isSetupCommandAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule("gvnix-jquery")
-                && !projectOperations
-                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_BOOTSTRAP);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-jquery")
+                && !getProjectOperations().isFeatureInstalledInFocusedModule(
+                        FEATURE_NAME_GVNIX_BOOTSTRAP);
     }
 
     /**
      * If bootstrap is installed, the command is available
      */
     public boolean isUpdateCommandAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_BOOTSTRAP);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                FEATURE_NAME_GVNIX_BOOTSTRAP);
     }
 
     /** {@inheritDoc} */
@@ -99,8 +104,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         addImageResources();
 
         // Updating all views to use jQuery
-        BootstrapUtils.updateJSPViewsToUseJQuery(pathResolver, getWebappPath(),
-                projectOperations, fileManager);
+        BootstrapUtils.updateJSPViewsToUseJQuery(getPathResolver(),
+                getWebappPath(), getProjectOperations(), getFileManager());
 
     }
 
@@ -128,8 +133,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         restoreImageResources();
 
         // Updating all views to use jQuery
-        BootstrapUtils.updateJSPViewsToUseJQuery(pathResolver, getWebappPath(),
-                projectOperations, fileManager);
+        BootstrapUtils.updateJSPViewsToUseJQuery(getPathResolver(),
+                getWebappPath(), getProjectOperations(), getFileManager());
     }
 
     /**
@@ -142,8 +147,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", configuration);
 
-        DependenciesVersionManager.manageDependencyVersion(metadataService,
-                projectOperations, depens);
+        DependenciesVersionManager.manageDependencyVersion(
+                getMetadataService(), getProjectOperations(), depens);
     }
 
     /**
@@ -160,11 +165,11 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         while (scriptsFolderIterator.hasNext()) {
             String fileName = scriptsFolderIterator.next();
-            final String scriptFile = pathResolver
+            final String scriptFile = getPathResolver()
                     .getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
                             "scripts/bootstrap/".concat(fileName));
 
-            BootstrapUtils.createFilesInLocationIfNotExists(fileManager,
+            BootstrapUtils.createFilesInLocationIfNotExists(getFileManager(),
                     getClass(), scriptFile, fileName, "scripts/bootstrap/");
         }
     }
@@ -183,12 +188,12 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         while (scriptsFolderIterator.hasNext()) {
             String fileName = scriptsFolderIterator.next();
-            final String scriptFile = pathResolver
+            final String scriptFile = getPathResolver()
                     .getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
                             "scripts/bootstrap/".concat(fileName));
 
             BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
-                    fileManager, getClass(), scriptFile, fileName,
+                    getFileManager(), getClass(), scriptFile, fileName,
                     "scripts/bootstrap/");
         }
     }
@@ -214,10 +219,10 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         while (stylesFolderIterator.hasNext()) {
             String fileName = stylesFolderIterator.next();
-            final String styleFile = pathResolver.getFocusedIdentifier(
+            final String styleFile = getPathResolver().getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "styles/".concat(fileName));
 
-            BootstrapUtils.createFilesInLocationIfNotExists(fileManager,
+            BootstrapUtils.createFilesInLocationIfNotExists(getFileManager(),
                     getClass(), styleFile, fileName, "styles/");
 
         }
@@ -244,11 +249,12 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         while (stylesFolderIterator.hasNext()) {
             String fileName = stylesFolderIterator.next();
-            final String styleFile = pathResolver.getFocusedIdentifier(
+            final String styleFile = getPathResolver().getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "styles/".concat(fileName));
 
             BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
-                    fileManager, getClass(), styleFile, fileName, "styles/");
+                    getFileManager(), getClass(), styleFile, fileName,
+                    "styles/");
 
         }
     }
@@ -259,11 +265,12 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
     public void replaceOldStyles() {
 
-        final String styleFile = pathResolver.getFocusedIdentifier(
+        final String styleFile = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "styles/standard.css");
 
         BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
-                fileManager, getClass(), styleFile, "standard.css", "styles/");
+                getFileManager(), getClass(), styleFile, "standard.css",
+                "styles/");
     }
 
     /**
@@ -295,11 +302,11 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         while (tagsFolderIterator.hasNext()) {
             String fileName = tagsFolderIterator.next();
-            final String tagFile = pathResolver.getFocusedIdentifier(
+            final String tagFile = getPathResolver().getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/".concat(fileName));
 
             BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
-                    fileManager, getClass(), tagFile, fileName, "tags/");
+                    getFileManager(), getClass(), tagFile, fileName, "tags/");
 
         }
     }
@@ -309,11 +316,11 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * project
      */
     public void addLoadScriptsNoDatatables() {
-        final String tagFile = pathResolver.getFocusedIdentifier(
+        final String tagFile = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP,
                 "WEB-INF/tags/bootstrap/util/load-scripts-bootstrap.tagx");
 
-        BootstrapUtils.createFilesInLocationIfNotExists(fileManager,
+        BootstrapUtils.createFilesInLocationIfNotExists(getFileManager(),
                 getClass(), tagFile,
                 "load-scripts-bootstrap-no-datatables.tagx",
                 "tags/bootstrap/util/");
@@ -333,11 +340,12 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         while (layoutsFolderIterator.hasNext()) {
             String fileName = layoutsFolderIterator.next();
-            final String layoutFile = pathResolver.getFocusedIdentifier(
+            final String layoutFile = getPathResolver().getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "WEB-INF/layouts/".concat(fileName));
 
             BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
-                    fileManager, getClass(), layoutFile, fileName, "layouts/");
+                    getFileManager(), getClass(), layoutFile, fileName,
+                    "layouts/");
 
         }
     }
@@ -356,10 +364,10 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         while (viewsFolderIterator.hasNext()) {
             String fileName = viewsFolderIterator.next();
-            final String viewFile = pathResolver.getFocusedIdentifier(
+            final String viewFile = getPathResolver().getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "WEB-INF/views/".concat(fileName));
 
-            BootstrapUtils.updateFilesInLocationIfExists(fileManager,
+            BootstrapUtils.updateFilesInLocationIfExists(getFileManager(),
                     getClass(), viewFile, fileName, VIEWS);
         }
     }
@@ -376,11 +384,12 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         while (imageFolderIterator.hasNext()) {
             String fileName = imageFolderIterator.next();
-            final String imageFile = pathResolver.getFocusedIdentifier(
+            final String imageFile = getPathResolver().getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "images/".concat(fileName));
 
             BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
-                    fileManager, getClass(), imageFile, fileName, "images/");
+                    getFileManager(), getClass(), imageFile, fileName,
+                    "images/");
         }
     }
 
@@ -396,11 +405,12 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         while (imageFolderIterator.hasNext()) {
             String fileName = imageFolderIterator.next();
-            final String imageFile = pathResolver.getFocusedIdentifier(
+            final String imageFile = getPathResolver().getFocusedIdentifier(
                     Path.SRC_MAIN_WEBAPP, "images/".concat(fileName));
 
             BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
-                    fileManager, getClass(), imageFile, fileName, "images/");
+                    getFileManager(), getClass(), imageFile, fileName,
+                    "images/");
         }
     }
 
@@ -408,10 +418,10 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * This method update security views to use bootstrap
      */
     public void updateSecurityAddonToBootstrap() {
-        final String viewFile = pathResolver.getFocusedIdentifier(
+        final String viewFile = getPathResolver().getFocusedIdentifier(
                 Path.SRC_MAIN_WEBAPP, "WEB-INF/views/login.jspx");
         BootstrapUtils.createFilesInLocationIfNotExistsUpdateIfExists(
-                fileManager, getClass(), viewFile, "login.jspx", VIEWS);
+                getFileManager(), getClass(), viewFile, "login.jspx", VIEWS);
     }
 
     /**
@@ -421,9 +431,9 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
     @Override
     public boolean isLoginModified() {
-        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+        String dirPath = getPathResolver().getIdentifier(getWebappPath(),
                 "WEB-INF/views/login.jspx");
-        final Document document = XmlUtils.readXml(fileManager
+        final Document document = XmlUtils.readXml(getFileManager()
                 .getInputStream(dirPath));
         final Element config = document.getDocumentElement();
         final Element urlElement = DomUtils.findFirstElementByName("div",
@@ -437,9 +447,9 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
     @Override
     public boolean isTypicalSecurityInstalled() {
-        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+        String dirPath = getPathResolver().getIdentifier(getWebappPath(),
                 "WEB-INF/views/changepassword/index.jspx");
-        return fileManager.exists(dirPath);
+        return getFileManager().exists(dirPath);
     }
 
     /**
@@ -449,7 +459,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * @return
      */
     public LogicalPath getWebappPath() {
-        return WebProjectUtils.getWebappPath(projectOperations);
+        return WebProjectUtils.getWebappPath(getProjectOperations());
     }
 
     // Feature methods -----
@@ -469,8 +479,108 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      */
     @Override
     public boolean isInstalledInModule(String moduleName) {
-        String dirPath = pathResolver.getIdentifier(getWebappPath(),
+        String dirPath = getPathResolver().getIdentifier(getWebappPath(),
                 "scripts/bootstrap/bootstrap.min.js");
-        return fileManager.exists(dirPath);
+        return getFileManager().exists(dirPath);
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on BootstrapOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on BootstrapOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on BootstrapOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on BootstrapOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
     }
 }

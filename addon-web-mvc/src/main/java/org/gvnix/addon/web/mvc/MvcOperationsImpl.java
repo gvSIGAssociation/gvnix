@@ -19,6 +19,7 @@ package org.gvnix.addon.web.mvc;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -33,6 +34,12 @@ import org.springframework.roo.project.maven.Pom;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
+
 /**
  * Implementation of operations this add-on offers.
  * <p/>
@@ -45,11 +52,19 @@ import org.w3c.dom.Element;
 @Service
 public class MvcOperationsImpl implements MvcOperations {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(MvcOperationsImpl.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private ProjectOperations projectOperations;
 
-    @Reference
     private MetadataService metadataService;
+
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
 
     /**
      * {@inheritDoc}
@@ -58,10 +73,10 @@ public class MvcOperationsImpl implements MvcOperations {
      * have not been installed yet.
      */
     public boolean isSetupAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(FeatureNames.MVC)
-                && !projectOperations
-                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_MVC);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                FeatureNames.MVC)
+                && !getProjectOperations().isFeatureInstalledInFocusedModule(
+                        FEATURE_NAME_GVNIX_MVC);
     }
 
     public void setup() {
@@ -72,8 +87,8 @@ public class MvcOperationsImpl implements MvcOperations {
         List<Element> repos = XmlUtils.findElements(
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
-            projectOperations.addRepositories(
-                    projectOperations.getFocusedModuleName(),
+            getProjectOperations().addRepositories(
+                    getProjectOperations().getFocusedModuleName(),
                     Collections.singleton(new Repository(repo)));
         }
 
@@ -81,8 +96,8 @@ public class MvcOperationsImpl implements MvcOperations {
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", configuration);
 
-        DependenciesVersionManager.manageDependencyVersion(metadataService,
-                projectOperations, depens);
+        DependenciesVersionManager.manageDependencyVersion(
+                getMetadataService(), getProjectOperations(), depens);
     }
 
     /**
@@ -101,7 +116,7 @@ public class MvcOperationsImpl implements MvcOperations {
      * @return true if given feature name is installed, otherwise returns false
      */
     public boolean isInstalledInModule(final String moduleName) {
-        final Pom pom = projectOperations.getPomFromModuleName(moduleName);
+        final Pom pom = getProjectOperations().getPomFromModuleName(moduleName);
         if (pom == null) {
             return false;
         }
@@ -113,5 +128,55 @@ public class MvcOperationsImpl implements MvcOperations {
             }
         }
         return false;
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on MvcOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on MvcOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
     }
 }

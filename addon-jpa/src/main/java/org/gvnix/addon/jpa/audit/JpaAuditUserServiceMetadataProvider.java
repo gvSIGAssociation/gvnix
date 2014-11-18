@@ -34,6 +34,9 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link JpaAuditUserServiceMetadata}. Prepares all required
@@ -51,7 +54,6 @@ public final class JpaAuditUserServiceMetadataProvider extends
     private static final JavaType SEC_USER_DETAILS = new JavaType(
             "org.springframework.security.core.userdetails.UserDetails");
 
-    @Reference
     private JpaAuditOperationsMetadata operations;
 
     /**
@@ -62,8 +64,9 @@ public final class JpaAuditUserServiceMetadataProvider extends
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(
@@ -79,7 +82,7 @@ public final class JpaAuditUserServiceMetadataProvider extends
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(
@@ -144,12 +147,12 @@ public final class JpaAuditUserServiceMetadataProvider extends
             }
         }
 
-        operations.evictUserServiceInfoCache();
+        getOperations().evictUserServiceInfoCache();
 
         // Generate metadata
         return new JpaAuditUserServiceMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, annotationValues,
-                userType, operations.isSpringSecurityInstalled(),
+                userType, getOperations().isSpringSecurityInstalled(),
                 userTypeIsUserDetails, userTypeIsEntity, usePattern,
                 dateTimePattern, dateTimeStyle);
     }
@@ -177,5 +180,33 @@ public final class JpaAuditUserServiceMetadataProvider extends
 
     public String getProvidesType() {
         return JpaAuditUserServiceMetadata.getMetadataIdentiferType();
+    }
+
+    public JpaAuditOperationsMetadata getOperations() {
+        if (operations == null) {
+            // Get all Services implement JpaAuditOperationsMetadata interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JpaAuditOperationsMetadata.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JpaAuditOperationsMetadata) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JpaAuditOperationsMetadata on JpaAuditUserServiceMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return operations;
+        }
+
     }
 }

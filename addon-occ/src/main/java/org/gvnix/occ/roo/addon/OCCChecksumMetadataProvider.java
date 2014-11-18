@@ -56,6 +56,9 @@ import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.logging.HandlerUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * gvNIX OCCChecksum Metadata provider
@@ -70,27 +73,22 @@ import org.springframework.roo.support.logging.HandlerUtils;
 public class OCCChecksumMetadataProvider implements
         ItdTriggerBasedMetadataProvider, MetadataNotificationListener {
 
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private static final Logger LOGGER = HandlerUtils
             .getLogger(FinderOperationsImpl.class);
 
     // From AbstractItdMetadataProvider
     private boolean governorTypeDetail = true;
     private boolean governorBeingAClass = true;
-    @Reference
     private MetadataService metadataService;
-    @Reference
     private MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference
     private FileManager fileManager;
-
-    // DiSiD: Used to get the type members
-    @Reference
     private MemberDetailsScanner memberDetailsScanner;
 
-    @Reference
     private PersistenceMemberLocator persistenceMemberLocator;
 
-    @Reference
     private TypeManagementService typeManagementService;
 
     /**
@@ -102,10 +100,11 @@ public class OCCChecksumMetadataProvider implements
     /** We don't care about trigger annotations; we always produce metadata */
     private boolean ignoreTriggerAnnotations = false;
 
-    protected void activate(ComponentContext context) {
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
         // Ensure we're notified of all metadata related to physical Java types,
         // in particular their initial creation
-        metadataDependencyRegistry.registerDependency(
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXEntityOCCChecksum.class.getName()));
@@ -178,13 +177,13 @@ public class OCCChecksumMetadataProvider implements
                 entityType, LogicalPath.getInstance(path, ""));
 
         // We get governor's Entity
-        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService
+        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) getMetadataService()
                 .get(entityMetadataKey);
         if (entityMetadata == null) {
             return null;
         }
 
-        FieldMetadata versionField = persistenceMemberLocator
+        FieldMetadata versionField = getPersistenceMemberLocator()
                 .getVersionField(entityType);
 
         if (versionField != null) {
@@ -202,7 +201,7 @@ public class OCCChecksumMetadataProvider implements
             }
         }
 
-        List<FieldMetadata> idFields = persistenceMemberLocator
+        List<FieldMetadata> idFields = getPersistenceMemberLocator()
                 .getIdentifierFields(entityType);
 
         if (idFields.isEmpty()) {
@@ -215,8 +214,8 @@ public class OCCChecksumMetadataProvider implements
         OCCChecksumMetadata metadata = new OCCChecksumMetadata(
                 metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, entityMetadata,
-                memberDetailsScanner, typeManagementService,
-                persistenceMemberLocator, idField, versionField);
+                getMemberDetailsScanner(), getTypeManagementService(),
+                getPersistenceMemberLocator(), idField, versionField);
 
         return metadata;
     }
@@ -248,8 +247,8 @@ public class OCCChecksumMetadataProvider implements
             // is not already registered
             // (if it's already registered, the event will be delivered directly
             // later on)
-            if (metadataDependencyRegistry.getDownstream(upstreamDependency)
-                    .contains(downstreamDependency)) {
+            if (getMetadataDependencyRegistry().getDownstream(
+                    upstreamDependency).contains(downstreamDependency)) {
                 return;
             }
         }
@@ -266,9 +265,10 @@ public class OCCChecksumMetadataProvider implements
                         + "' to this provider (which uses '"
                         + getProvidesType() + "'");
 
-        metadataService.evict(downstreamDependency);
+        getMetadataService().evict(downstreamDependency);
         if (get(downstreamDependency) != null) {
-            metadataDependencyRegistry.notifyDownstream(downstreamDependency);
+            getMetadataDependencyRegistry().notifyDownstream(
+                    downstreamDependency);
         }
     }
 
@@ -326,15 +326,15 @@ public class OCCChecksumMetadataProvider implements
 
         // Remove the upstream dependencies for this instance (we'll be
         // recreating them later, if needed)
-        metadataDependencyRegistry
-                .deregisterDependencies(metadataIdentificationString);
+        getMetadataDependencyRegistry().deregisterDependencies(
+                metadataIdentificationString);
 
         // Compute the identifier for the Physical Type Metadata we're
         // correlated with
         String governorPhysicalTypeIdentifier = getGovernorPhysicalTypeIdentifier(metadataIdentificationString);
 
         // Obtain the physical type
-        PhysicalTypeMetadata governorPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+        PhysicalTypeMetadata governorPhysicalTypeMetadata = (PhysicalTypeMetadata) getMetadataService()
                 .get(governorPhysicalTypeIdentifier);
 
         if (governorPhysicalTypeMetadata == null
@@ -401,7 +401,7 @@ public class OCCChecksumMetadataProvider implements
             // metadata
             // (this is needed so changes to the inheritance hierarchies are
             // eventually notified to us)
-            metadataDependencyRegistry.registerDependency(
+            getMetadataDependencyRegistry().registerDependency(
                     governorPhysicalTypeMetadata.getId(),
                     metadataIdentificationString);
 
@@ -421,7 +421,7 @@ public class OCCChecksumMetadataProvider implements
                 if (itd.length() > 0) {
 
                     MutableFile mutableFile = null;
-                    if (fileManager.exists(itdFilename)) {
+                    if (getFileManager().exists(itdFilename)) {
                         // First verify if the file has even changed
                         File newFile = new File(itdFilename);
                         String existing = null;
@@ -436,12 +436,13 @@ public class OCCChecksumMetadataProvider implements
                         }
 
                         if (!itd.equals(existing)) {
-                            mutableFile = fileManager.updateFile(itdFilename);
+                            mutableFile = getFileManager().updateFile(
+                                    itdFilename);
                         }
 
                     }
                     else {
-                        mutableFile = fileManager.createFile(itdFilename);
+                        mutableFile = getFileManager().createFile(itdFilename);
                         Validate.notNull(mutableFile,
                                 "Could not create ITD file '" + itdFilename
                                         + "'");
@@ -479,8 +480,8 @@ public class OCCChecksumMetadataProvider implements
             // Delete the ITD if we determine deletion is appropriate
             // DiSiD: Removed because in shell restart some AJ files deleted
             // and not recreated
-            // if (metadata.isValid() && fileManager.exists(itdFilename)) {
-            // fileManager.delete(itdFilename);
+            // if (metadata.isValid() && getFileManager().exists(itdFilename)) {
+            // getFileManager().delete(itdFilename);
             // }
 
             return metadata;
@@ -529,6 +530,159 @@ public class OCCChecksumMetadataProvider implements
      */
     public void setDependsOnGovernorBeingAClass(boolean governorBeingAClass) {
         this.governorBeingAClass = governorBeingAClass;
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataDependencyRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on OCCChecksumMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on OCCChecksumMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on OCCChecksumMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+    }
+
+    public MemberDetailsScanner getMemberDetailsScanner() {
+        if (memberDetailsScanner == null) {
+            // Get all Services implement MemberDetailsScanner interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MemberDetailsScanner.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MemberDetailsScanner) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MemberDetailsScanner on OCCChecksumMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return memberDetailsScanner;
+        }
+    }
+
+    public PersistenceMemberLocator getPersistenceMemberLocator() {
+        if (persistenceMemberLocator == null) {
+            // Get all Services implement PersistenceMemberLocator interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PersistenceMemberLocator.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PersistenceMemberLocator) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PersistenceMemberLocator on OCCChecksumMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return persistenceMemberLocator;
+        }
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on OCCChecksumMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
     }
 
 }

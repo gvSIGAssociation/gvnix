@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 
@@ -58,6 +59,10 @@ import org.springframework.roo.support.util.XmlUtils;
 import org.springframework.uaa.client.util.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.osgi.framework.BundleContext;
+import org.springframework.roo.support.logging.HandlerUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Implementation of Metadata listener.
@@ -68,26 +73,23 @@ import org.w3c.dom.Element;
  *         Transport</a>
  * @since 0.6
  */
-@Component(immediate = true)
+@Component
 @Service
 public final class ReportJspMetadataListener implements MetadataProvider,
         MetadataNotificationListener {
-    // private static final Logger logger =
-    // HandlerUtils.getLogger(ReportJspMetadataListener.class);
 
-    @Reference
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(ReportJspMetadataListener.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference
     private MetadataService metadataService;
-    @Reference
     private FileManager fileManager;
-    @Reference
     private TilesOperations tilesOperations;
-    @Reference
     private MenuOperations menuOperations;
-    @Reference
     private PathResolver pathResolver;
-    @Reference
     private PropFileOperations propFileOperations;
 
     private WebScaffoldMetadata webScaffoldMetadata;
@@ -95,8 +97,9 @@ public final class ReportJspMetadataListener implements MetadataProvider,
     private JavaType javaType;
     private JavaType formbackingObject;
 
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 ReportMetadata.getMetadataIdentiferType(), getProvidesType());
     }
 
@@ -106,7 +109,7 @@ public final class ReportJspMetadataListener implements MetadataProvider,
                 .getPath(metadataIdentificationString);
         String reportMetadataKey = ReportMetadata.createIdentifier(javaType,
                 path);
-        ReportMetadata reportMetadata = (ReportMetadata) metadataService
+        ReportMetadata reportMetadata = (ReportMetadata) getMetadataService()
                 .get(reportMetadataKey);
         if (reportMetadata == null || !reportMetadata.isValid()) {
             return null;
@@ -118,9 +121,9 @@ public final class ReportJspMetadataListener implements MetadataProvider,
         formbackingObject = webScaffoldMetadata.getAnnotationValues()
                 .getFormBackingObject();
 
-        entityMetadata = (JpaActiveRecordMetadata) metadataService
-                .get(JpaActiveRecordMetadata.createIdentifier(
-                        formbackingObject, path));
+        entityMetadata = (JpaActiveRecordMetadata) getMetadataService().get(
+                JpaActiveRecordMetadata.createIdentifier(formbackingObject,
+                        path));
         Assert.notNull(entityMetadata,
                 "Could not determine entity metadata for type: "
                         + formbackingObject.getFullyQualifiedTypeName());
@@ -146,11 +149,11 @@ public final class ReportJspMetadataListener implements MetadataProvider,
         String controllerPath = webScaffoldMetadata.getAnnotationValues()
                 .getPath();
         // Make the holding directory for this controller
-        String destinationDirectory = pathResolver.getIdentifier(
+        String destinationDirectory = getPathResolver().getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/views/" + controllerPath);
-        if (!fileManager.exists(destinationDirectory)) {
-            fileManager.createDirectory(destinationDirectory);
+        if (!getFileManager().exists(destinationDirectory)) {
+            getFileManager().createDirectory(destinationDirectory);
         }
         else {
             File file = new File(destinationDirectory);
@@ -160,24 +163,27 @@ public final class ReportJspMetadataListener implements MetadataProvider,
 
         Document document = getReportFormJsp(reportNameFormat[0],
                 controllerPath);
-        writeToDiskIfNecessary(pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/views/" + controllerPath + "/" + reportNameFormat[0]
-                        + ".jspx"), document);
+        writeToDiskIfNecessary(
+                getPathResolver().getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        "WEB-INF/views/" + controllerPath + "/"
+                                + reportNameFormat[0] + ".jspx"), document);
 
         Map<String, String> properties = new HashMap<String, String>();
 
-        tilesOperations.addViewDefinition(controllerPath,
+        getTilesOperations().addViewDefinition(
+                controllerPath,
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 controllerPath + "/" + reportNameFormat[0],
-                TilesOperationsImpl.DEFAULT_TEMPLATE, "/WEB-INF/views/"
-                        + controllerPath + "/" + reportNameFormat[0] + ".jspx");
-        menuOperations.addMenuItem(
+                TilesOperationsImpl.DEFAULT_TEMPLATE,
+                "/WEB-INF/views/" + controllerPath + "/" + reportNameFormat[0]
+                        + ".jspx");
+        getMenuOperations().addMenuItem(
                 new JavaSymbolName(formbackingObject.getSimpleTypeName()),
-                new JavaSymbolName(reportNameFormat[0] + "_report"), "menu_"
-                        + formbackingObject.getSimpleTypeName().toLowerCase()
-                        + "_" + reportNameFormat[0] + "_report", "/"
-                        + controllerPath + "/reports/" + reportNameFormat[0]
+                new JavaSymbolName(reportNameFormat[0] + "_report"),
+                "menu_" + formbackingObject.getSimpleTypeName().toLowerCase()
+                        + "_" + reportNameFormat[0] + "_report",
+                "/" + controllerPath + "/reports/" + reportNameFormat[0]
                         + "?form", MenuOperations.DEFAULT_MENU_ITEM_PREFIX,
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""));
         properties.put("menu_"
@@ -192,7 +198,7 @@ public final class ReportJspMetadataListener implements MetadataProvider,
                 + " " + reportNameFormat[0] + " Report");
 
         // Add the message error to the application.properties
-        propFileOperations
+        getPropFileOperations()
                 .addProperties(
                         LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/i18n/application.properties", properties,
@@ -355,7 +361,7 @@ public final class ReportJspMetadataListener implements MetadataProvider,
         properties.put("label_report_" + controllerPath + "_" + reportName,
                 "Report " + reportName);
 
-        propFileOperations
+        getPropFileOperations()
                 .addProperties(
                         LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/i18n/application.properties", properties,
@@ -388,8 +394,8 @@ public final class ReportJspMetadataListener implements MetadataProvider,
             // is not already registered
             // (if it's already registered, the event will be delivered directly
             // later on)
-            if (metadataDependencyRegistry.getDownstream(upstreamDependency)
-                    .contains(downstreamDependency)) {
+            if (getMetadataDependencyRegistry().getDownstream(
+                    upstreamDependency).contains(downstreamDependency)) {
                 return;
             }
         }
@@ -406,9 +412,10 @@ public final class ReportJspMetadataListener implements MetadataProvider,
                         + "' to this provider (which uses '"
                         + getProvidesType() + "'");
 
-        metadataService.evict(downstreamDependency);
+        getMetadataService().evict(downstreamDependency);
         if (get(downstreamDependency) != null) {
-            metadataDependencyRegistry.notifyDownstream(downstreamDependency);
+            getMetadataDependencyRegistry().notifyDownstream(
+                    downstreamDependency);
         }
 
     }
@@ -424,10 +431,10 @@ public final class ReportJspMetadataListener implements MetadataProvider,
         // If mutableFile becomes non-null, it means we need to use it to write
         // out the contents of jspContent to the file
         MutableFile mutableFile = null;
-        if (fileManager.exists(jspFilename)) {
+        if (getFileManager().exists(jspFilename)) {
             try {
                 original = XmlUtils.getDocumentBuilder().parse(
-                        fileManager.getInputStream(jspFilename));
+                        getFileManager().getInputStream(jspFilename));
             }
             catch (Exception e) {
                 throw new IllegalStateException("Could not parse file: "
@@ -435,12 +442,12 @@ public final class ReportJspMetadataListener implements MetadataProvider,
             }
             Assert.notNull(original, "Unable to parse " + jspFilename);
             if (XmlRoundTripUtils.compareDocuments(original, proposed)) {
-                mutableFile = fileManager.updateFile(jspFilename);
+                mutableFile = getFileManager().updateFile(jspFilename);
             }
         }
         else {
             original = proposed;
-            mutableFile = fileManager.createFile(jspFilename);
+            mutableFile = getFileManager().createFile(jspFilename);
             Assert.notNull(mutableFile, "Could not create JSP file '"
                     + jspFilename + "'");
         }
@@ -477,6 +484,190 @@ public final class ReportJspMetadataListener implements MetadataProvider,
 
         // A file existed, but it contained the same content, so we return false
         return false;
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataDependencyRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on ReportJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on ReportJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on ReportJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+
+    }
+
+    public TilesOperations getTilesOperations() {
+        if (tilesOperations == null) {
+            // Get all Services implement TilesOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TilesOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TilesOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TilesOperations on ReportJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return tilesOperations;
+        }
+
+    }
+
+    public MenuOperations getMenuOperations() {
+        if (menuOperations == null) {
+            // Get all Services implement MenuOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MenuOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MenuOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MenuOperations on ReportJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return menuOperations;
+        }
+
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on ReportJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+
+    }
+
+    public PropFileOperations getPropFileOperations() {
+        if (propFileOperations == null) {
+            // Get all Services implement PropFileOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PropFileOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PropFileOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PropFileOperations on ReportJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return propFileOperations;
+        }
+
     }
 
 }

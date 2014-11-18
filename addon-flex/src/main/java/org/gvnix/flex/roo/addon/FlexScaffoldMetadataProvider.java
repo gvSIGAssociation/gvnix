@@ -16,6 +16,8 @@
 
 package org.gvnix.flex.roo.addon;
 
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -33,21 +35,27 @@ import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.support.logging.HandlerUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * {@link MetadataProvider} for scaffolded Flex remoting destinations.
  * 
  * @author Jeremy Grelle
  */
-@Component(immediate = true)
+@Component
 @Service
 public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
 
-    @Reference
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(FlexScaffoldMetadataProvider.class);
+
     private WebMetadataService webMetadataService;
 
-    protected void activate(ComponentContext context) {
-        this.metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(RooFlexScaffold.class.getName()));
@@ -99,7 +107,7 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
         }
 
         // We need to be informed if our dependent metadata changes
-        this.metadataDependencyRegistry.registerDependency(entityMetadataKey,
+        getMetadataDependencyRegistry().registerDependency(entityMetadataKey,
                 metadataIdentificationString);
 
         PhysicalTypeMetadata entityPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
@@ -117,9 +125,10 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
 
         return new FlexScaffoldMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, annotationValues,
-                entityMetadata,
-                webMetadataService.getDynamicFinderMethodsAndFields(entityType,
-                        entityMemberDetails, metadataIdentificationString),
+                entityMetadata, getWebMetadataService()
+                        .getDynamicFinderMethodsAndFields(entityType,
+                                entityMemberDetails,
+                                metadataIdentificationString),
                 persistenceMemberLocator);
     }
 
@@ -129,6 +138,31 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
 
     public String getProvidesType() {
         return FlexScaffoldMetadata.getMetadataIdentiferType();
+    }
+
+    public WebMetadataService getWebMetadataService() {
+        if (webMetadataService == null) {
+            // Get all Services implement WebMetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebMetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebMetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebMetadataService on FlexScaffoldMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return webMetadataService;
+        }
     }
 
 }

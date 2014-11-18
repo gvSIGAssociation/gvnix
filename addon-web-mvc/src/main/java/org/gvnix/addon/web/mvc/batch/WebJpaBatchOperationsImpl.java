@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
@@ -57,6 +58,12 @@ import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
+
 /**
  * Implementation of {@link WebJpaBatchOperations}
  * 
@@ -66,6 +73,9 @@ import org.w3c.dom.Element;
 @Service
 public class WebJpaBatchOperationsImpl extends AbstractOperations implements
         WebJpaBatchOperations {
+
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(WebJpaBatchOperationsImpl.class);
 
     private static final String JACKSON2_RM_HANDLER_ADAPTER = "org.gvnix.web.json.Jackson2RequestMappingHandlerAdapter";
     private static final String OBJECT_MAPPER = "org.gvnix.web.json.ConversionServiceObjectMapper";
@@ -81,20 +91,19 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
 
     private static final String WEBMCV_DATABINDER_BEAN_ID = "dataBinderRequestMappingHandlerAdapter";
 
-    @Reference
     private ProjectOperations projectOperations;
 
-    @Reference
     private MvcOperations mvcOperations;
 
-    @Reference
     private TypeLocationService typeLocationService;
 
-    @Reference
     private TypeManagementService typeManagementService;
 
-    @Reference
     private MetadataService metadataService;
+
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
 
     /**
      * {@inheritDoc}
@@ -103,12 +112,12 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
      * MVC dependencies are installed
      */
     public boolean isCommandAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(FeatureNames.MVC)
-                && projectOperations
-                        .isFeatureInstalledInFocusedModule(JpaOperations.FEATURE_NAME_GVNIX_JPA)
-                && projectOperations
-                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_MVC_BATCH);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                FeatureNames.MVC)
+                && getProjectOperations().isFeatureInstalledInFocusedModule(
+                        JpaOperations.FEATURE_NAME_GVNIX_JPA)
+                && getProjectOperations().isFeatureInstalledInFocusedModule(
+                        FEATURE_NAME_GVNIX_MVC_BATCH);
     }
 
     /**
@@ -121,20 +130,20 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
      * setup and it will be not available in
      */
     public boolean isSetupAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(FeatureNames.MVC)
-                && projectOperations
-                        .isFeatureInstalledInFocusedModule(JpaOperations.FEATURE_NAME_GVNIX_JPA)
-                && !projectOperations
-                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_MVC_BATCH);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                FeatureNames.MVC)
+                && getProjectOperations().isFeatureInstalledInFocusedModule(
+                        JpaOperations.FEATURE_NAME_GVNIX_JPA)
+                && !getProjectOperations().isFeatureInstalledInFocusedModule(
+                        FEATURE_NAME_GVNIX_MVC_BATCH);
     }
 
     /** {@inheritDoc} */
     public void setup() {
         // If gvNIX MVC dependencies are not installed, install them
-        if (!projectOperations
-                .isFeatureInstalledInFocusedModule(MvcOperations.FEATURE_NAME_GVNIX_MVC)) {
-            mvcOperations.setup();
+        if (!getProjectOperations().isFeatureInstalledInFocusedModule(
+                MvcOperations.FEATURE_NAME_GVNIX_MVC)) {
+            getMvcOperations().setup();
         }
 
         installDependencies();
@@ -151,16 +160,17 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
         List<Element> properties = XmlUtils.findElements(
                 "/configuration/gvnix/properties/*", configuration);
         for (Element property : properties) {
-            projectOperations.addProperty(projectOperations
-                    .getFocusedModuleName(), new Property(property));
+            getProjectOperations().addProperty(
+                    getProjectOperations().getFocusedModuleName(),
+                    new Property(property));
         }
 
         // Install dependencies
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", configuration);
 
-        DependenciesVersionManager.manageDependencyVersion(metadataService,
-                projectOperations, depens);
+        DependenciesVersionManager.manageDependencyVersion(
+                getMetadataService(), getProjectOperations(), depens);
     }
 
     /**
@@ -171,8 +181,8 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
      */
     private void updateWebMvcConfig() {
         LogicalPath webappPath = WebProjectUtils
-                .getWebappPath(projectOperations);
-        String webMvcXmlPath = projectOperations.getPathResolver()
+                .getWebappPath(getProjectOperations());
+        String webMvcXmlPath = getProjectOperations().getPathResolver()
                 .getIdentifier(webappPath, "WEB-INF/spring/webmvc-config.xml");
         Validate.isTrue(fileManager.exists(webMvcXmlPath),
                 "webmvc-config.xml not found");
@@ -218,9 +228,9 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
     public void addAll() {
         Set<JavaType> jpaBatchServices = new HashSet<JavaType>(
                 getJpaBatchServices());
-        for (JavaType controller : typeLocationService
+        for (JavaType controller : getTypeLocationService()
                 .findTypesWithAnnotation(RooJavaType.ROO_WEB_SCAFFOLD)) {
-            ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+            ClassOrInterfaceTypeDetails controllerDetails = getTypeLocationService()
                     .getTypeDetails(controller);
 
             // check for if there is jpa batch service
@@ -244,8 +254,8 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
     }
 
     private Set<JavaType> getJpaBatchServices() {
-        return typeLocationService
-                .findTypesWithAnnotation(JPA_BATCH_SERVICE_ANNOTATIONS);
+        return getTypeLocationService().findTypesWithAnnotation(
+                JPA_BATCH_SERVICE_ANNOTATIONS);
     }
 
     /**
@@ -275,7 +285,7 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
      * @return
      */
     private JavaType getJpaBatchEntity(JavaType service) {
-        ClassOrInterfaceTypeDetails serviceDatils = typeLocationService
+        ClassOrInterfaceTypeDetails serviceDatils = getTypeLocationService()
                 .getTypeDetails(service);
         JpaBatchAnnotationValues jpaBatchValues = new JpaBatchAnnotationValues(
                 serviceDatils);
@@ -302,7 +312,7 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
      * @return
      */
     private JavaType getFormBackingObject(JavaType controller) {
-        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+        ClassOrInterfaceTypeDetails controllerDetails = getTypeLocationService()
                 .getTypeDetails(controller);
         return getFormBackingObject(controllerDetails);
     }
@@ -330,7 +340,7 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
         Validate.notNull(controller, "Controller required");
         Validate.notNull(service, "Service required");
 
-        ClassOrInterfaceTypeDetails existing = typeLocationService
+        ClassOrInterfaceTypeDetails existing = getTypeLocationService()
                 .getTypeDetails(controller);
 
         // Get controller annotation
@@ -355,8 +365,8 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
             detailsBuilder.addAnnotation(annotationBuilder.build());
 
             // Save changes to disk
-            typeManagementService.createOrUpdateTypeOnDisk(detailsBuilder
-                    .build());
+            getTypeManagementService().createOrUpdateTypeOnDisk(
+                    detailsBuilder.build());
         }
     }
 
@@ -372,7 +382,7 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
      * @return true if given feature name is installed, otherwise returns false
      */
     public boolean isInstalledInModule(final String moduleName) {
-        final Pom pom = projectOperations.getPomFromModuleName(moduleName);
+        final Pom pom = getProjectOperations().getPomFromModuleName(moduleName);
         if (pom == null) {
             return false;
         }
@@ -384,5 +394,130 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
             }
         }
         return false;
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on WebJpaBatchOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public MvcOperations getMvcOperations() {
+        if (mvcOperations == null) {
+            // Get all Services implement MvcOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(MvcOperations.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MvcOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MvcOperations on WebJpaBatchOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return mvcOperations;
+        }
+    }
+
+    public TypeLocationService getTypeLocationService() {
+        if (typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on WebJpaBatchOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeLocationService;
+        }
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on WebJpaBatchOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on WebJpaBatchOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
     }
 }

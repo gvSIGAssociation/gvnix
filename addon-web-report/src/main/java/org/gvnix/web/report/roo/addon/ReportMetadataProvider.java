@@ -33,6 +33,8 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Provides {@link ReportMetadata}. This type is called by Roo to retrieve the
@@ -42,28 +44,22 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * 
  * @since 1.1
  */
-@Component(immediate = true)
+@Component
 @Service
 public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
     private static final Logger logger = HandlerUtils
             .getLogger(ReportMetadataProvider.class);
 
-    @Reference
     protected TypeLocationService typeLocationService;
 
-    @Reference
     protected WebScaffoldMetadataProvider webScaffoldMetadataProvider;
 
-    @Reference
     protected ProjectOperations projectOperations;
 
-    @Reference
     protected PropFileOperations propFileOperations;
 
-    @Reference
     protected WebMetadataService webMetadataService;
 
-    @Reference
     protected ReportConfigService reportConfigService;
 
     /**
@@ -74,12 +70,13 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        webScaffoldMetadataProvider.addMetadataTrigger(new JavaType(
-                GvNIXReports.class.getName()));
+        getWebScaffoldMetadataProvider().addMetadataTrigger(
+                new JavaType(GvNIXReports.class.getName()));
         addMetadataTrigger(new JavaType(GvNIXReports.class.getName()));
     }
 
@@ -92,11 +89,11 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        webScaffoldMetadataProvider.removeMetadataTrigger(new JavaType(
-                GvNIXReports.class.getName()));
+        getWebScaffoldMetadataProvider().removeMetadataTrigger(
+                new JavaType(GvNIXReports.class.getName()));
         removeMetadataTrigger(new JavaType(GvNIXReports.class.getName()));
     }
 
@@ -109,7 +106,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
         // Setup JasperReports support
-        reportConfigService.setup();
+        getReportConfigService().setup();
 
         JavaType javaType = ReportMetadata
                 .getJavaType(metadataIdentificationString);
@@ -120,7 +117,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
         Validate.notNull(
                 controllerCoID,
                 "Governor failed to provide class type details, in violation of superclass contract");
-        MemberDetails controllerMemberDetails = memberDetailsScanner
+        MemberDetails controllerMemberDetails = getMemberDetailsScanner()
                 .getMemberDetails(getClass().getName(), controllerCoID);
 
         List<StringAttributeValue> definedReports = new ArrayList<StringAttributeValue>();
@@ -164,9 +161,9 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
         LogicalPath path = ReportMetadata.getPath(metadataIdentificationString);
         String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
                 javaType, path);
-        metadataDependencyRegistry.registerDependency(webScaffoldMetadataKey,
-                metadataIdentificationString);
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) webScaffoldMetadataProvider
+        getMetadataDependencyRegistry().registerDependency(
+                webScaffoldMetadataKey, metadataIdentificationString);
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) getWebScaffoldMetadataProvider()
                 .get(webScaffoldMetadataKey);
         if (webScaffoldMetadata == null) {
             logger.warning("The report can not be created over a Controlloer without "
@@ -178,10 +175,10 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
         // Pass dependencies required by the metadata in through its constructor
         return new ReportMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata,
-                controllerMemberDetails.getMethods(), metadataService,
-                memberDetailsScanner, metadataDependencyRegistry,
-                webScaffoldMetadata, webMetadataService, fileManager,
-                projectOperations, propFileOperations, definedReports);
+                controllerMemberDetails.getMethods(), getMetadataService(),
+                getMemberDetailsScanner(), getMetadataDependencyRegistry(),
+                webScaffoldMetadata, getWebMetadataService(), getFileManager(),
+                getProjectOperations(), getPropFileOperations(), definedReports);
     }
 
     /**
@@ -246,6 +243,138 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
 
     public String getProvidesType() {
         return ReportMetadata.getMetadataIdentiferType();
+    }
+
+    public WebScaffoldMetadataProvider getWebScaffoldMetadataProvider() {
+        if (webScaffoldMetadataProvider == null) {
+            // Get all Services implement WebScaffoldMetadataProvider interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebScaffoldMetadataProvider.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebScaffoldMetadataProvider) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                logger.warning("Cannot load WebScaffoldMetadataProvider on ReportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return webScaffoldMetadataProvider;
+        }
+
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                logger.warning("Cannot load ProjectOperations on ReportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+
+    }
+
+    public PropFileOperations getPropFileOperations() {
+        if (propFileOperations == null) {
+            // Get all Services implement PropFileOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PropFileOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PropFileOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                logger.warning("Cannot load PropFileOperations on ReportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return propFileOperations;
+        }
+
+    }
+
+    public WebMetadataService getWebMetadataService() {
+        if (webMetadataService == null) {
+            // Get all Services implement WebMetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebMetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebMetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                logger.warning("Cannot load WebMetadataService on ReportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return webMetadataService;
+        }
+
+    }
+
+    public ReportConfigService getReportConfigService() {
+        if (reportConfigService == null) {
+            // Get all Services implement ReportConfigService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ReportConfigService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ReportConfigService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                logger.warning("Cannot load ReportConfigService on ReportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return reportConfigService;
+        }
+
     }
 
 }

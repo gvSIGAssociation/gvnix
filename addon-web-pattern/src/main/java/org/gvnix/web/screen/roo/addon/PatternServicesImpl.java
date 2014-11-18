@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
@@ -47,6 +48,12 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
+
 /**
  * Provide common services to Screen Pattern management components.
  * 
@@ -63,12 +70,19 @@ import org.springframework.roo.project.Path;
 @Service
 public class PatternServicesImpl implements PatternService {
 
-    @Reference
+    private static final Logger LOGGER = Logger
+            .getLogger(PatternServicesImpl.class.getName());
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private MetadataService metadataService;
-    @Reference
     private MemberDetailsScanner memberDetailsScanner;
-    @Reference
     private TypeLocationService typeLocationService;
+
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
 
     /** {@inheritDoc} */
     public boolean existsMasterPatternDefined(String patternName) {
@@ -116,7 +130,7 @@ public class PatternServicesImpl implements PatternService {
 
         List<String> patternNames = new ArrayList<String>();
 
-        for (ClassOrInterfaceTypeDetails typeDetails : typeLocationService
+        for (ClassOrInterfaceTypeDetails typeDetails : getTypeLocationService()
                 .findClassesOrInterfaceDetailsWithAnnotation(PATTERN_ANNOTATION)) {
 
             patternNames.addAll(getMasterPatternsNames(typeDetails));
@@ -231,7 +245,7 @@ public class PatternServicesImpl implements PatternService {
     public ClassOrInterfaceTypeDetails getControllerTypeDetails(
             JavaType controller) {
 
-        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+        ClassOrInterfaceTypeDetails controllerDetails = getTypeLocationService()
                 .getTypeDetails(controller);
 
         // The Java source type exists ?
@@ -348,11 +362,11 @@ public class PatternServicesImpl implements PatternService {
 
         List<FieldMetadata> toManyFields = new ArrayList<FieldMetadata>();
 
-        ClassOrInterfaceTypeDetails entityTypeDetails = typeLocationService
+        ClassOrInterfaceTypeDetails entityTypeDetails = getTypeLocationService()
                 .getTypeDetails(entity);
         Validate.notNull(entityTypeDetails, "Cannot locate Metadata for '"
                 .concat(entity.getFullyQualifiedTypeName()).concat("'."));
-        MemberDetails entityMemberDetails = memberDetailsScanner
+        MemberDetails entityMemberDetails = getMemberDetailsScanner()
                 .getMemberDetails(getClass().getName(), entityTypeDetails);
         List<FieldMetadata> entityFields = entityMemberDetails.getFields();
 
@@ -393,8 +407,9 @@ public class PatternServicesImpl implements PatternService {
 
         List<String> patternNames = new ArrayList<String>();
 
-        for (ClassOrInterfaceTypeDetails typeDetails : typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(RELATED_PATTERN_ANNOTATION)) {
+        for (ClassOrInterfaceTypeDetails typeDetails : getTypeLocationService()
+                .findClassesOrInterfaceDetailsWithAnnotation(
+                        RELATED_PATTERN_ANNOTATION)) {
 
             patternNames.addAll(getControllerRelatedPatternNames(typeDetails
                     .getType()));
@@ -643,11 +658,11 @@ public class PatternServicesImpl implements PatternService {
         PhysicalTypeMetadata controller = null;
 
         if (entity != null) {
-            Set<JavaType> controllers = typeLocationService
-                    .findTypesWithAnnotation(new JavaType(RooWebScaffold.class
-                            .getName()));
+            Set<JavaType> controllers = getTypeLocationService()
+                    .findTypesWithAnnotation(
+                            new JavaType(RooWebScaffold.class.getName()));
             for (JavaType tmpComtroller : controllers) {
-                PhysicalTypeMetadata tmpControllerMetadata = (PhysicalTypeMetadata) metadataService
+                PhysicalTypeMetadata tmpControllerMetadata = (PhysicalTypeMetadata) getMetadataService()
                         .get(PhysicalTypeIdentifier.createIdentifier(
                                 tmpComtroller,
                                 LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
@@ -659,6 +674,81 @@ public class PatternServicesImpl implements PatternService {
         }
 
         return controller;
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on PatternServicesImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public MemberDetailsScanner getMemberDetailsScanner() {
+        if (memberDetailsScanner == null) {
+            // Get all Services implement MemberDetailsScanner interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MemberDetailsScanner.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MemberDetailsScanner) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MemberDetailsScanner on PatternServicesImpl.");
+                return null;
+            }
+        }
+        else {
+            return memberDetailsScanner;
+        }
+    }
+
+    public TypeLocationService getTypeLocationService() {
+        if (typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on PatternServicesImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeLocationService;
+        }
     }
 
 }

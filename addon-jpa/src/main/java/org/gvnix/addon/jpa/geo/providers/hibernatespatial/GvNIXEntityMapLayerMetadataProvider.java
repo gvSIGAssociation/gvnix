@@ -19,6 +19,7 @@ package org.gvnix.addon.jpa.geo.providers.hibernatespatial;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -37,6 +38,9 @@ import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link GvNIXEntityMapLayerMetadata}.
@@ -49,7 +53,9 @@ import org.springframework.roo.project.LogicalPath;
 public final class GvNIXEntityMapLayerMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(GvNIXEntityMapLayerMetadataProvider.class);
+
     TypeManagementService typeManagementService;
 
     /**
@@ -57,8 +63,9 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
      * 
      * @param context the component context
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXEntityMapLayer.class.getName()));
@@ -70,7 +77,7 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
      * @param context the component context
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXEntityMapLayer.class.getName()));
@@ -88,15 +95,15 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
                 .getJavaType(metadataIdentificationString);
 
         // Getting entity details
-        ClassOrInterfaceTypeDetails entityDetails = typeLocationService
+        ClassOrInterfaceTypeDetails entityDetails = getTypeLocationService()
                 .getTypeDetails(javaType);
 
         LogicalPath entityPath = PhysicalTypeUtils.getPath(javaType,
-                typeLocationService);
+                getTypeLocationService());
 
         String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(
                 javaType, entityPath);
-        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
+        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) getMetadataService()
                 .get(jpaMetadataId);
         if (jpaMetadata == null) {
             // Unsupported type (by now)
@@ -121,8 +128,9 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
         }
 
         return new GvNIXEntityMapLayerMetadata(metadataIdentificationString,
-                aspectName, governorPhysicalTypeMetadata, typeLocationService,
-                typeManagementService, javaType, plural, geoFieldNames);
+                aspectName, governorPhysicalTypeMetadata,
+                getTypeLocationService(), getTypeManagementService(), javaType,
+                plural, geoFieldNames);
     }
 
     /**
@@ -148,5 +156,31 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
 
     public String getProvidesType() {
         return GvNIXEntityMapLayerMetadata.getMetadataIdentiferType();
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on GvNIXEntityMapLayer.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
+
     }
 }

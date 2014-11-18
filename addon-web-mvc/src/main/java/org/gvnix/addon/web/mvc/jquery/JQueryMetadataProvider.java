@@ -17,6 +17,8 @@
  */
 package org.gvnix.addon.web.mvc.jquery;
 
+import java.util.logging.Logger;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
@@ -30,6 +32,11 @@ import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
+
 /**
  * Provides the {@link JQueryMetadata}, that is, this class collects from OSGi
  * services the needed info to create the {@link JQueryMetadata}.
@@ -40,6 +47,9 @@ import org.springframework.roo.project.LogicalPath;
 @Component
 @Service
 public final class JQueryMetadataProvider extends AbstractItdMetadataProvider {
+
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(JQueryMetadataProvider.class);
 
     /**
      * Registers {@link JQueryMetadata} identifier into the
@@ -57,30 +67,13 @@ public final class JQueryMetadataProvider extends AbstractItdMetadataProvider {
      * 
      * @param context the component context
      */
-    protected void activate(ComponentContext context) {
-
-        // Register this Provider as type generator, in particular for
-        // provided type (see getProvidesType() method)
-        // When a change occur in provided type, Roo calls
-        // {@link AbstractItdMetadataProvider#notify()} method, given as
-        // upstream parameter the meta-data identifier of notifier and
-        // as downstream parameter the meta-data identifier of the target
-        // that will take the actions as response to that type change, i.e.
-        // generate the ITD file (.aj)
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
 
-        // At least one annotation must be registered, otherwise the Provider
-        // won't generate any ITD (.aj)
-        // Only ITD (.aj) for Java types annotated with this annotation will
-        // be generated
         addMetadataTrigger(new JavaType(GvNIXWebJQuery.class.getName()));
-
-        // The handler for stream dependencies ( registerDependency() method )
-        // register is Provider#notify() method
-        // Whereas the handler for meta-data triggers ( addMetadataTrigger()
-        // method ) is Provider#get() of Provider#getMetadata() method
     }
 
     /**
@@ -89,7 +82,7 @@ public final class JQueryMetadataProvider extends AbstractItdMetadataProvider {
      * @param context the component context
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXWebJQuery.class.getName()));
@@ -118,7 +111,7 @@ public final class JQueryMetadataProvider extends AbstractItdMetadataProvider {
         // Create the ID to get the annotation
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
                 javaType, path);
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) getMetadataService()
                 .get(webScaffoldMetadataId);
         WebScaffoldAnnotationValues webScaffoldAnnotationValues = webScaffoldMetadata
                 .getAnnotationValues();

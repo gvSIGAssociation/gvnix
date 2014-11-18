@@ -21,6 +21,7 @@ package org.gvnix.web.exception.handler.roo.addon;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
@@ -42,6 +43,9 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.support.logging.HandlerUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Provides {@link ModalDialogMetadata}. This type is called by Roo to retrieve
@@ -60,13 +64,14 @@ import org.springframework.roo.project.PathResolver;
 public final class ModalDialogMetadataProvider extends
         AbstractItdMetadataProvider {
 
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(ModalDialogMetadataProvider.class);
+
     private static final JavaSymbolName VALUE = new JavaSymbolName("value");
     private static final JavaType MODAL_DIALOGS = new JavaType(
             GvNIXModalDialogs.class.getName());
 
-    @Reference
     private PathResolver pathResolver;
-    @Reference
     private WebModalDialogOperations webModalDialogOperations;
 
     /**
@@ -77,8 +82,9 @@ public final class ModalDialogMetadataProvider extends
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(
@@ -97,7 +103,7 @@ public final class ModalDialogMetadataProvider extends
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(
@@ -120,12 +126,12 @@ public final class ModalDialogMetadataProvider extends
         MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
         JavaType controllerType = ModalDialogMetadata
                 .getJavaType(metadataIdentificationString);
-        webModalDialogOperations
-                .addDefaultModalDialogAnnotation(controllerType);
+        getWebModalDialogOperations().addDefaultModalDialogAnnotation(
+                controllerType);
         List<String> definedModalDialogs = getDefinedModalDialogsIfAny(controllerType);
         return new ModalDialogMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, memberDetails,
-                definedModalDialogs, fileManager, pathResolver);
+                definedModalDialogs, getFileManager(), getPathResolver());
     }
 
     private List<String> getDefinedModalDialogsIfAny(JavaType aspectName) {
@@ -185,14 +191,14 @@ public final class ModalDialogMetadataProvider extends
     private boolean isModalDialogSupported(JavaType aspectName) {
         String aspectPackage = aspectName.getPackage()
                 .getFullyQualifiedPackageName();
-        String modalDialogTypePath = pathResolver.getIdentifier(
+        String modalDialogTypePath = getPathResolver().getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                 File.separator.concat(
                         aspectPackage.replace(".", File.separator)).concat(
                         "/dialog/Dialog.java"));
 
-        return fileManager.exists(modalDialogTypePath)
-                && webModalDialogOperations.isMessageBoxOfTypeModal();
+        return getFileManager().exists(modalDialogTypePath)
+                && getWebModalDialogOperations().isMessageBoxOfTypeModal();
     }
 
     public String getItdUniquenessFilenameSuffix() {
@@ -216,6 +222,57 @@ public final class ModalDialogMetadataProvider extends
         LogicalPath path = ModalDialogMetadata
                 .getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on ModalDialogMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+    }
+
+    public WebModalDialogOperations getWebModalDialogOperations() {
+        if (webModalDialogOperations == null) {
+            // Get all Services implement WebModalDialogOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebModalDialogOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebModalDialogOperations) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebModalDialogOperations on ModalDialogMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return webModalDialogOperations;
+        }
     }
 
 }

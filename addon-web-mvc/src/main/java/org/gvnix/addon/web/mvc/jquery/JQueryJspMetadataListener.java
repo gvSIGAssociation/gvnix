@@ -17,6 +17,8 @@
  */
 package org.gvnix.addon.web.mvc.jquery;
 
+import java.util.logging.Logger;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -31,6 +33,11 @@ import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Listener that is invoked when implementation of {@link JQueryMetadata} or
@@ -53,18 +60,21 @@ import org.springframework.roo.project.LogicalPath;
  * @author gvNIX Team
  * @since 1.1.0
  */
-@Component(immediate = true)
+@Component
 @Service
 public class JQueryJspMetadataListener implements MetadataProvider,
         MetadataNotificationListener {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(JQueryJspMetadataListener.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference
     private MetadataService metadataService;
 
-    @Reference
     private JQueryOperations operations;
 
     /**
@@ -79,14 +89,15 @@ public class JQueryJspMetadataListener implements MetadataProvider,
      * 
      * @param context
      */
-    protected void activate(final ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(final ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 JQueryMetadata.getMetadataIdentiferType(),
                 JQueryJspMetadata.getMetadataIdentiferType());
-        metadataDependencyRegistry.registerDependency(
+        getMetadataDependencyRegistry().registerDependency(
                 WebFinderMetadata.getMetadataIdentiferType(),
                 JQueryJspMetadata.getMetadataIdentiferType());
-        metadataDependencyRegistry.addNotificationListener(this);
+        getMetadataDependencyRegistry().addNotificationListener(this);
     }
 
     /**
@@ -98,13 +109,13 @@ public class JQueryJspMetadataListener implements MetadataProvider,
      * @param context
      */
     protected void deactivate(final ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 JQueryMetadata.getMetadataIdentiferType(),
                 JQueryJspMetadata.getMetadataIdentiferType());
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 WebFinderMetadata.getMetadataIdentiferType(),
                 JQueryJspMetadata.getMetadataIdentiferType());
-        metadataDependencyRegistry.removeNotificationListener(this);
+        getMetadataDependencyRegistry().removeNotificationListener(this);
     }
 
     /**
@@ -130,7 +141,7 @@ public class JQueryJspMetadataListener implements MetadataProvider,
         // Get the meta-data means the given Java type has the specified
         // meta-data, otherwise the ID was valid but the metadata is
         // not currently available
-        final JQueryMetadata jqueryMetadata = (JQueryMetadata) metadataService
+        final JQueryMetadata jqueryMetadata = (JQueryMetadata) getMetadataService()
                 .get(jqueryMetadataKey);
 
         // If we created a valid JQueryMetada, given meta-data ID refers to
@@ -138,7 +149,7 @@ public class JQueryJspMetadataListener implements MetadataProvider,
         if (jqueryMetadata != null && jqueryMetadata.isValid()) {
 
             // Call to operations for update pages
-            operations.updateCrudJsp(controller, jqueryMetadata);
+            getOperations().updateCrudJsp(controller, jqueryMetadata);
         }
         // JQueryMetadata is required, that is, if given Java type hasn't
         // it there is nothing to do, neither in CRUD jspx nor finder jspx
@@ -154,7 +165,7 @@ public class JQueryJspMetadataListener implements MetadataProvider,
         // Get the meta-data means the given Java type has the specified
         // meta-data, otherwise the ID was valid but the metadata is
         // not currently available
-        final WebFinderMetadata finderMetadata = (WebFinderMetadata) metadataService
+        final WebFinderMetadata finderMetadata = (WebFinderMetadata) getMetadataService()
                 .get(finderMetadataKey);
 
         // Moreover, if we created a valid WebFinderMetadata, given meta-data
@@ -162,7 +173,7 @@ public class JQueryJspMetadataListener implements MetadataProvider,
         if (finderMetadata != null) {
             if (finderMetadata.isValid()) {
                 // Call to operations for update pages
-                operations.updateFindJsp(controller, finderMetadata);
+                getOperations().updateFindJsp(controller, finderMetadata);
             }
             else {
                 // Finder meta-data is not valid
@@ -216,8 +227,8 @@ public class JQueryJspMetadataListener implements MetadataProvider,
             // is not already registered
             // (if it's already registered, the event will be delivered directly
             // later on)
-            if (metadataDependencyRegistry.getDownstream(upstreamDependency)
-                    .contains(downstreamDependency)) {
+            if (getMetadataDependencyRegistry().getDownstream(
+                    upstreamDependency).contains(downstreamDependency)) {
                 return;
             }
 
@@ -228,7 +239,84 @@ public class JQueryJspMetadataListener implements MetadataProvider,
             // Note that evictAndGet method register downstreamDependency below
             // related to current upstreamDependency automatically, so next
             // method executions the if condition above will be true
-            metadataService.evictAndGet(downstreamDependency);
+            getMetadataService().evictAndGet(downstreamDependency);
+        }
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataDependencyRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on JQueryJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on JQueryJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public JQueryOperations getOperations() {
+        if (operations == null) {
+            // Get all Services implement JQueryOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JQueryOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JQueryOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JQueryOperations on JQueryJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return operations;
         }
     }
 

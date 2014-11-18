@@ -1,5 +1,7 @@
 package org.gvnix.flex.roo.addon;
 
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -18,10 +20,21 @@ import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 
-@Component(immediate = true)
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
+
+@Component
 @Service
 public class FlexProjectMetadataProvider implements MetadataProvider,
         FileEventListener {
+
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(FlexProjectMetadataProvider.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
 
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(MetadataIdentificationUtils
@@ -30,26 +43,23 @@ public class FlexProjectMetadataProvider implements MetadataProvider,
 
     // private static final String FLEX_GROUP = "org.springframework.flex";
 
-    @Reference
     private MetadataService metadataService;
 
-    @Reference
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference
     private FileManager fileManager;
 
-    @Reference
     private PathResolver pathResolver;
 
     private String flexServicesConfigIndentifier;
 
-    protected void activate(ComponentContext context) {
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
     }
 
     private String getFlexServicesConfigIndentifier() {
         if (flexServicesConfigIndentifier == null) {
-            flexServicesConfigIndentifier = pathResolver.getIdentifier(
+            flexServicesConfigIndentifier = getPathResolver().getIdentifier(
                     LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                     "WEB-INF/flex/services-config.xml");
         }
@@ -63,11 +73,11 @@ public class FlexProjectMetadataProvider implements MetadataProvider,
                 "Unexpected metadata request '" + metadataIdentificationString
                         + "' for this provider");
 
-        if (!fileManager.exists(getFlexServicesConfigIndentifier())) {
+        if (!getFileManager().exists(getFlexServicesConfigIndentifier())) {
             return null;
         }
 
-        return new FlexProjectMetadata(pathResolver);
+        return new FlexProjectMetadata(getPathResolver());
     }
 
     /*
@@ -80,7 +90,7 @@ public class FlexProjectMetadataProvider implements MetadataProvider,
      * if (upstreamDependency.equals(ProjectMetadata.getProjectIdentifier())) {
      * //recalculate the FlexProjectMetadata and notify
      * metadataService.get(FlexProjectMetadata.getProjectIdentifier(), true);
-     * metadataDependencyRegistry
+     * getMetadataDependencyRegistry()
      * .notifyDownstream(FlexProjectMetadata.getProjectIdentifier()); } }
      */
 
@@ -102,10 +112,112 @@ public class FlexProjectMetadataProvider implements MetadataProvider,
 
             // Otherwise let everyone know something has happened of interest,
             // plus evict any cached entries from the MetadataService
-            metadataService.evictAndGet(FlexProjectMetadata
-                    .getProjectIdentifier());
-            metadataDependencyRegistry.notifyDownstream(FlexProjectMetadata
-                    .getProjectIdentifier());
+            getMetadataService().evictAndGet(
+                    FlexProjectMetadata.getProjectIdentifier());
+            getMetadataDependencyRegistry().notifyDownstream(
+                    FlexProjectMetadata.getProjectIdentifier());
+        }
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataDependencyRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on FlexProjectMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on FlexProjectMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on FlexProjectMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on FlexProjectMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
         }
     }
 }

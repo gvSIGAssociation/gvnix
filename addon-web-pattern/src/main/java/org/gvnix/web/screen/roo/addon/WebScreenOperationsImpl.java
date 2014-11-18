@@ -76,6 +76,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.osgi.service.component.ComponentContext;
+
 /**
  * Implementation of web MVC screen patterns operations.
  * 
@@ -144,6 +146,13 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     /** {@link OneToMany} JavaType */
     public static final JavaType MANYTOMANY_ANNOTATION = new JavaType(
             "javax.persistence.ManyToMany");
+
+    private ComponentContext cContext;
+
+    protected void activate(final ComponentContext componentContext) {
+        cContext = componentContext;
+        context = cContext.getBundleContext();
+    }
 
     /**
      * MetadataService offers access to Roo's metadata model, use it to retrieve
@@ -1017,7 +1026,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
             OperationUtils.updateDirectoryContents("images/pattern/*.*",
                     pathResolver.getIdentifier(
                             LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                            "/images/pattern"), fileManager, context,
+                            "/images/pattern"), fileManager, cContext,
                     getClass());
         }
         else {

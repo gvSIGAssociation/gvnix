@@ -17,6 +17,8 @@
  */
 package org.gvnix.addon.datatables;
 
+import java.util.logging.Logger;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -31,44 +33,52 @@ import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * @author gvNIX Team
  */
-@Component(immediate = true)
+@Component
 @Service
 public class DatatablesJspMetadataListener implements MetadataProvider,
         MetadataNotificationListener {
 
-    @Reference
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(DatatablesJspMetadataListener.class);
+
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference
     private MetadataService metadataService;
 
-    @Reference
     private DatatablesOperations operations;
 
-    protected void activate(final ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(final ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 DatatablesMetadata.getMetadataIdentiferType(),
                 getProvidesType());
-        metadataDependencyRegistry
+        getMetadataDependencyRegistry()
                 .registerDependency(
                         WebFinderMetadata.getMetadataIdentiferType(),
                         getProvidesType());
-        metadataDependencyRegistry.addNotificationListener(this);
+        getMetadataDependencyRegistry().addNotificationListener(this);
     }
 
     protected void deactivate(final ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 DatatablesMetadata.getMetadataIdentiferType(),
                 getProvidesType());
-        metadataDependencyRegistry
+        getMetadataDependencyRegistry()
                 .deregisterDependency(
                         WebFinderMetadata.getMetadataIdentiferType(),
                         getProvidesType());
-        metadataDependencyRegistry.removeNotificationListener(this);
+        getMetadataDependencyRegistry().removeNotificationListener(this);
     }
 
     public MetadataItem get(final String datatablesJspMetadataId) {
@@ -81,7 +91,7 @@ public class DatatablesJspMetadataListener implements MetadataProvider,
         final String datatablesMetadataKey = DatatablesMetadata
                 .createIdentifier(controller,
                         DatatablesJspMetadata.getPath(datatablesJspMetadataId));
-        final DatatablesMetadata datatablesMetadata = (DatatablesMetadata) metadataService
+        final DatatablesMetadata datatablesMetadata = (DatatablesMetadata) getMetadataService()
                 .get(datatablesMetadataKey);
 
         // Check datatables metadata
@@ -93,7 +103,8 @@ public class DatatablesJspMetadataListener implements MetadataProvider,
         }
 
         // Call to operations for update pages
-        operations.updateControllerJspPages(controller, datatablesMetadata);
+        getOperations()
+                .updateControllerJspPages(controller, datatablesMetadata);
 
         return new DatatablesJspMetadata(datatablesJspMetadataId,
                 datatablesMetadata);
@@ -122,8 +133,8 @@ public class DatatablesJspMetadataListener implements MetadataProvider,
                 // register dependency with JPS Metadata
                 String jspMetadataId = JspMetadata.createIdentifier(controller,
                         path);
-                metadataDependencyRegistry.registerDependency(jspMetadataId,
-                        downstreamDependency);
+                getMetadataDependencyRegistry().registerDependency(
+                        jspMetadataId, downstreamDependency);
 
             }
             else if (WebFinderMetadata.isValid(upstreamDependency)) {
@@ -137,8 +148,8 @@ public class DatatablesJspMetadataListener implements MetadataProvider,
                 // register dependency with JPS Metadata
                 String jspMetadataId = JspMetadata.createIdentifier(controller,
                         path);
-                metadataDependencyRegistry.registerDependency(jspMetadataId,
-                        downstreamDependency);
+                getMetadataDependencyRegistry().registerDependency(
+                        jspMetadataId, downstreamDependency);
             }
             else if (JspMetadata.isValid(upstreamDependency)) {
                 final JavaType controller = WebFinderMetadata
@@ -157,11 +168,88 @@ public class DatatablesJspMetadataListener implements MetadataProvider,
             // is not already registered
             // (if it's already registered, the event will be delivered directly
             // later on)
-            if (metadataDependencyRegistry.getDownstream(upstreamDependency)
-                    .contains(downstreamDependency)) {
+            if (getMetadataDependencyRegistry().getDownstream(
+                    upstreamDependency).contains(downstreamDependency)) {
                 return;
             }
-            metadataService.evictAndGet(downstreamDependency);
+            getMetadataService().evictAndGet(downstreamDependency);
+        }
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataDependencyRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on DatatablesJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on DatatablesJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public DatatablesOperations getOperations() {
+        if (operations == null) {
+            // Get all Services implement DatatablesOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                DatatablesOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (DatatablesOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load DatatablesOperations on DatatablesJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return operations;
         }
     }
 

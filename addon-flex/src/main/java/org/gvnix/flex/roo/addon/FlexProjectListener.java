@@ -47,7 +47,7 @@ import org.springframework.roo.project.UndoableMonitoringRequest;
  * 
  * @author Jeremy Grelle
  */
-@Component(immediate = true)
+@Component
 @Service
 public class FlexProjectListener implements MetadataNotificationListener {
 

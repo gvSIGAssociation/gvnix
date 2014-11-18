@@ -37,7 +37,7 @@ import org.springframework.roo.project.ProjectOperations;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component(immediate = true)
+@Component
 @Service
 public class DependencyListenerImpl implements MetadataNotificationListener {
 

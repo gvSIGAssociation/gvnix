@@ -3,6 +3,7 @@ package org.gvnix.addon.jpa.geo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -19,6 +20,11 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of GEO Addon operations
@@ -30,23 +36,24 @@ import org.springframework.roo.project.ProjectOperations;
 @Reference(name = "provider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = GeoProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class JpaGeoOperationsImpl implements JpaGeoOperations {
 
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(JpaGeoOperationsImpl.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private List<GeoProvider> providers = new ArrayList<GeoProvider>();
     private List<GeoProviderId> providersId = null;
 
-    @Reference
     private FileManager fileManager;
 
-    @Reference
     private PathResolver pathResolver;
 
-    @Reference
-    private TypeLocationService typeLocationService;
-
-    @Reference
-    private TypeManagementService typeManagementService;
-
-    @Reference
     private ProjectOperations projectOperations;
+
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
 
     /**
      * If some available provider is setted as persistence provider, the command
@@ -57,7 +64,8 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
         for (GeoProvider provider : providers) {
             // If some provider says that his needed persistence
             // is installed, command is available
-            if (provider.isAvailablePersistence(fileManager, pathResolver)) {
+            if (provider.isAvailablePersistence(getFileManager(),
+                    getPathResolver())) {
                 return true;
             }
         }
@@ -71,14 +79,15 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
     @Override
     public boolean isFieldCommandAvailable() {
         // If no project, command is not available
-        if (!projectOperations.isFocusedProjectAvailable()) {
+        if (!getProjectOperations().isFocusedProjectAvailable()) {
             return false;
         }
         // Getting all providers
         for (GeoProvider provider : providers) {
             // If some provider says that his GEO persistence is installed,
             // field command is available
-            if (provider.isGeoPersistenceInstalled(fileManager, pathResolver)) {
+            if (provider.isGeoPersistenceInstalled(getFileManager(),
+                    getPathResolver())) {
                 return true;
             }
         }
@@ -134,8 +143,8 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
         for (GeoProvider tmpProvider : providers) {
             // If some provider says that his GEO persistence is installed
             // execute field geo for this provider
-            if (tmpProvider
-                    .isGeoPersistenceInstalled(fileManager, pathResolver)) {
+            if (tmpProvider.isGeoPersistenceInstalled(getFileManager(),
+                    getPathResolver())) {
                 provider = tmpProvider;
                 break;
             }
@@ -160,8 +169,8 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
         for (GeoProvider tmpProvider : providers) {
             // If some provider says that his GEO persistence is installed
             // execute field geo for this provider
-            if (tmpProvider
-                    .isGeoPersistenceInstalled(fileManager, pathResolver)) {
+            if (tmpProvider.isGeoPersistenceInstalled(getFileManager(),
+                    getPathResolver())) {
                 provider = tmpProvider;
                 break;
             }
@@ -185,8 +194,8 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
         for (GeoProvider tmpProvider : providers) {
             // If some provider says that his GEO persistence is installed
             // execute field geo for this provider
-            if (tmpProvider
-                    .isGeoPersistenceInstalled(fileManager, pathResolver)) {
+            if (tmpProvider.isGeoPersistenceInstalled(getFileManager(),
+                    getPathResolver())) {
                 provider = tmpProvider;
                 break;
             }
@@ -261,6 +270,84 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
     public boolean isInstalledInModule(String moduleName) {
         // If field command is available, GEO Persistence is installed
         return isFieldCommandAvailable();
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on JpaGeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on JpaGeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on JpaGeoOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+
     }
 
 }

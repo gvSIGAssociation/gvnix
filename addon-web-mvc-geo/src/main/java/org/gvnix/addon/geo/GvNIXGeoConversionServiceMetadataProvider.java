@@ -17,6 +17,8 @@
  */
 package org.gvnix.addon.geo;
 
+import java.util.logging.Logger;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
@@ -28,6 +30,10 @@ import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link GeoConversionServiceMetadata}.
@@ -40,13 +46,17 @@ import org.springframework.roo.project.LogicalPath;
 public final class GvNIXGeoConversionServiceMetadataProvider extends
         AbstractItdMetadataProvider {
 
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(GvNIXGeoConversionServiceMetadataProvider.class);
+
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
      * 
      * @param context the component context
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(
@@ -59,7 +69,7 @@ public final class GvNIXGeoConversionServiceMetadataProvider extends
      * @param context the component context
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(
@@ -83,7 +93,7 @@ public final class GvNIXGeoConversionServiceMetadataProvider extends
         String conversionServiceMetadataId = PhysicalTypeIdentifierNamingUtils
                 .createIdentifier(ConversionServiceMetadata.class.getName(),
                         javaType, path);
-        ConversionServiceMetadata conversionServiceMetadata = (ConversionServiceMetadata) metadataService
+        ConversionServiceMetadata conversionServiceMetadata = (ConversionServiceMetadata) getMetadataService()
                 .get(conversionServiceMetadataId);
 
         // Getting ConversionServiceMetadata Aspect Name

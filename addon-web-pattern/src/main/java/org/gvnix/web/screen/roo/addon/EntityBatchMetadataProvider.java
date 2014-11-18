@@ -18,6 +18,8 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -33,6 +35,7 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link EntityBatchMetadataProvider}.
@@ -48,17 +51,16 @@ import org.springframework.roo.project.ProjectOperations;
 public final class EntityBatchMetadataProvider extends
         AbstractItdMetadataProvider {
 
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(RelatedPatternMetadataProvider.class);
+
     private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(
             GvNIXEntityBatch.class.getName());
 
-    @Reference
     ProjectOperations projectOperations;
 
-    @Reference
     PropFileOperations propFileOperations;
 
-    /* For project setup */
-    @Reference
     WebScreenConfigService config;
 
     /**
@@ -69,8 +71,9 @@ public final class EntityBatchMetadataProvider extends
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(ENTITY_BATCH_ANNOTATION);
@@ -85,7 +88,7 @@ public final class EntityBatchMetadataProvider extends
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(ENTITY_BATCH_ANNOTATION);

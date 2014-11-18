@@ -19,6 +19,7 @@
 package org.gvnix.service.roo.addon.ws.importt;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -43,6 +44,9 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
 import org.w3c.dom.Element;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * <p>
@@ -55,24 +59,24 @@ import org.w3c.dom.Element;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component(immediate = true)
+@Component
 @Service
 public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(WSImportMetadataProvider.class);
+
     private WSConfigService wSConfigService;
 
-    @Reference
     private SecurityService securityService;
 
-    @Reference
     private ProjectOperations projectOperations;
 
-    protected void activate(ComponentContext context) {
-
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
         // Ensure we're notified of all metadata related to physical Java types,
         // in particular their initial creation
-        metadataDependencyRegistry.registerDependency(
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXWebServiceProxy.class.getName()));
@@ -129,7 +133,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
         // Import service if project has required prerequisites
         if (OperationUtils.isProjectAvailable(metadataService,
-                projectOperations)) {
+                getProjectOperations())) {
 
             // Check if Web Service definition is correct.
             PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
@@ -161,21 +165,21 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
             try {
 
                 // Check URL connection and WSDL format
-                Element root = securityService.getWsdl(url.getValue())
+                Element root = getSecurityService().getWsdl(url.getValue())
                         .getDocumentElement();
 
                 boolean generate;
                 if (WsdlParserUtils.isRpcEncoded(root)) {
 
                     // Generate service infraestructure to import the service
-                    generate = wSConfigService.importService(
+                    generate = getWSConfigService().importService(
                             governorTypeDetails.getName(), url.getValue(),
                             WsType.IMPORT_RPC_ENCODED);
                 }
                 else {
 
                     // Generate service infraestructure to import the service
-                    generate = wSConfigService.importService(
+                    generate = getWSConfigService().importService(
                             governorTypeDetails.getName(), url.getValue(),
                             WsType.IMPORT);
                 }
@@ -183,14 +187,14 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
                 // Generate source code client classes if necessary
                 if (generate) {
 
-                    wSConfigService.mvn(WSConfigService.GENERATE_SOURCES,
+                    getWSConfigService().mvn(WSConfigService.GENERATE_SOURCES,
                             WSConfigService.GENERATE_SOURCES_INFO);
                 }
 
                 // Create metadata
                 metadata = new WSImportMetadata(metadataIdentificationString,
                         aspectName, governorPhysicalTypeMetadata,
-                        securityService);
+                        getSecurityService());
 
             }
             catch (IOException e) {
@@ -222,6 +226,81 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
     public String getProvidesType() {
 
         return WSImportMetadata.getMetadataIdentiferType();
+    }
+
+    public WSConfigService getWSConfigService() {
+        if (wSConfigService == null) {
+            // Get all Services implement WSConfigService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WSConfigService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WSConfigService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WSConfigService on WSImportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return wSConfigService;
+        }
+    }
+
+    public SecurityService getSecurityService() {
+        if (securityService == null) {
+            // Get all Services implement SecurityService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                SecurityService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (SecurityService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load SecurityService on WSImportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return securityService;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on WSImportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
     }
 
 }

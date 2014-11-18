@@ -40,6 +40,9 @@ import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.logging.HandlerUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link JpaAuditListenerMetadata}. Prepares all required information
@@ -57,10 +60,8 @@ public final class JpaAuditListenerMetadataProvider extends
     private static final Logger LOGGER = HandlerUtils
             .getLogger(JpaAuditListenerMetadataProvider.class);
 
-    @Reference
     private JpaOrmEntityListenerRegistry entityListenerRegistry;
 
-    @Reference
     private JpaAuditOperationsMetadata operations;
 
     private Map<JavaType, String> entityToAuditMidMap = new HashMap<JavaType, String>();
@@ -73,11 +74,12 @@ public final class JpaAuditListenerMetadataProvider extends
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        entityListenerRegistry.registerListenerMetadata(getProvidesType());
+        getEntityListenerRegistry().registerListenerMetadata(getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXJpaAuditListener.class.getName()));
     }
 
@@ -90,10 +92,11 @@ public final class JpaAuditListenerMetadataProvider extends
      *        OSGi container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        entityListenerRegistry.deregisterListenerMetadata(getProvidesType());
+        getEntityListenerRegistry().deregisterListenerMetadata(
+                getProvidesType());
         removeMetadataTrigger(new JavaType(
                 GvNIXJpaAuditListener.class.getName()));
     }
@@ -113,7 +116,7 @@ public final class JpaAuditListenerMetadataProvider extends
         LogicalPath path = JpaAuditListenerMetadata
                 .getPath(metadataIdentificationString);
 
-        JavaType userService = operations.getUserServiceType();
+        JavaType userService = getOperations().getUserServiceType();
 
         if (userService == null) {
             // No user type defined
@@ -173,7 +176,7 @@ public final class JpaAuditListenerMetadataProvider extends
         }
 
         // register downstream dependency (JpaAudit --> JpaAuditListener)
-        metadataDependencyRegistry.registerDependency(auditMetadataKey,
+        getMetadataDependencyRegistry().registerDependency(auditMetadataKey,
                 metadataIdentificationString);
 
         // Generate metadata
@@ -255,5 +258,61 @@ public final class JpaAuditListenerMetadataProvider extends
             }
         }
         return null;
+    }
+
+    public JpaOrmEntityListenerRegistry getEntityListenerRegistry() {
+        if (entityListenerRegistry == null) {
+            // Get all Services implement JpaOrmEntityListenerRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JpaOrmEntityListenerRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JpaOrmEntityListenerRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JpaOrmEntityListenerRegistry on JpaAuditListenerMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return entityListenerRegistry;
+        }
+
+    }
+
+    public JpaAuditOperationsMetadata getOperations() {
+        if (operations == null) {
+            // Get all Services implement JpaAuditOperationsMetadata interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JpaAuditOperationsMetadata.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JpaAuditOperationsMetadata) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JpaAuditOperationsMetadata on JpaAuditListenerMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return operations;
+        }
+
     }
 }

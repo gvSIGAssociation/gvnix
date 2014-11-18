@@ -20,6 +20,7 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
@@ -44,6 +45,10 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * This Listener produces MVC artifacts for a given RelatedPatternJspMetadata
@@ -54,48 +59,35 @@ import org.springframework.roo.project.ProjectOperations;
  *         Transport</a>
  * @since 0.8
  */
-@Component(immediate = true)
+@Component
 @Service
 public class RelatedPatternJspMetadataListener extends
         AbstractPatternJspMetadataListener {
 
-    @Reference
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(RelatedPatternMetadataProvider.class);
+
     private MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference
     private MetadataService metadataService;
-    @Reference
     private WebMetadataService webMetadataService;
-    @Reference
     private FileManager fileManager;
-    @Reference
     private TilesOperations tilesOperations;
-    @Reference
     private MenuOperations menuOperations;
-    @Reference
     private ProjectOperations projectOperations;
-    @Reference
     private PropFileOperations propFileOperations;
-    @Reference
     WebScreenOperations webScreenOperations;
-    @Reference
     private PathResolver pathResolver;
-    @Reference
     private TypeLocationService typeLocationService;
     private final Map<JavaType, String> fBackObjType2LocMids = new HashMap<JavaType, String>();
 
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 RelatedPatternMetadata.getMetadataIdentiferType(),
                 getProvidesType());
-        _fileManager = fileManager;
-        _tilesOperations = tilesOperations;
-        _menuOperations = menuOperations;
-        _projectOperations = projectOperations;
-        _propFileOperations = propFileOperations;
-        _webScreenOperations = webScreenOperations;
-        _metadataService = metadataService;
-        _pathResolver = pathResolver;
-        _typeLocationService = typeLocationService;
     }
 
     public MetadataItem get(String metadataIdentificationString) {
@@ -105,7 +97,7 @@ public class RelatedPatternJspMetadataListener extends
                 .getPath(metadataIdentificationString);
         String patternMetadataKey = RelatedPatternMetadata.createIdentifier(
                 javaType, path);
-        RelatedPatternMetadata relatedPatternMetadata = (RelatedPatternMetadata) metadataService
+        RelatedPatternMetadata relatedPatternMetadata = (RelatedPatternMetadata) getMetadataService()
                 .get(patternMetadataKey);
 
         if (relatedPatternMetadata == null || !relatedPatternMetadata.isValid()) {
@@ -124,9 +116,9 @@ public class RelatedPatternJspMetadataListener extends
         Validate.notNull(formbackingType, "formbackingType required");
         entityName = uncapitalize(formbackingType.getSimpleTypeName());
 
-        MemberDetails memberDetails = webMetadataService
-                .getMemberDetails(formbackingType);
-        JavaTypeMetadataDetails formBackingTypeMetadataDetails = webMetadataService
+        MemberDetails memberDetails = getWebMetadataService().getMemberDetails(
+                formbackingType);
+        JavaTypeMetadataDetails formBackingTypeMetadataDetails = getWebMetadataService()
                 .getJavaTypeMetadataDetails(formbackingType, memberDetails,
                         metadataIdentificationString);
         Validate.notNull(
@@ -135,8 +127,9 @@ public class RelatedPatternJspMetadataListener extends
                         + formbackingType.getFullyQualifiedTypeName());
         fBackObjType2LocMids.put(formbackingType, metadataIdentificationString);
 
-        eligibleFields = webMetadataService.getScaffoldEligibleFieldMetadata(
-                formbackingType, memberDetails, metadataIdentificationString);
+        eligibleFields = getWebMetadataService()
+                .getScaffoldEligibleFieldMetadata(formbackingType,
+                        memberDetails, metadataIdentificationString);
 
         if (eligibleFields.size() == 0) {
             return null;
@@ -183,18 +176,20 @@ public class RelatedPatternJspMetadataListener extends
             // is not already registered
             // (if it's already registered, the event will be delivered directly
             // later on)
-            if (metadataDependencyRegistry.getDownstream(upstreamDependency)
-                    .contains(downstreamDependency)) {
+            if (getMetadataDependencyRegistry().getDownstream(
+                    upstreamDependency).contains(downstreamDependency)) {
                 return;
             }
         }
         else {
             // This is the generic fallback listener, ie from
-            // MetadataDependencyRegistry.addListener(this) in the activate()
+            // getMetadataDependencyRegistry().addListener(this) in the
+            // activate()
             // method
 
             // Get the metadata that just changed
-            MetadataItem metadataItem = metadataService.get(upstreamDependency);
+            MetadataItem metadataItem = getMetadataService().get(
+                    upstreamDependency);
 
             // We don't have to worry about physical type metadata, as we
             // monitor the relevant .java once the DOD governor is first
@@ -218,12 +213,12 @@ public class RelatedPatternJspMetadataListener extends
             String localMid = fBackObjType2LocMids.get(itdTypeDetails
                     .getGovernor().getName());
             if (localMid != null) {
-                metadataService.evictAndGet(localMid);
+                getMetadataService().evictAndGet(localMid);
             }
             return;
         }
 
-        metadataService.evictAndGet(downstreamDependency);
+        getMetadataService().evictAndGet(downstreamDependency);
     }
 
     @Override
@@ -233,6 +228,283 @@ public class RelatedPatternJspMetadataListener extends
 
     public String getProvidesType() {
         return RelatedPatternJspMetadata.getMetadataIdentiferType();
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataDependencyRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public WebMetadataService getWebMetadataService() {
+        if (webMetadataService == null) {
+            // Get all Services implement WebMetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebMetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebMetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebMetadataService on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return webMetadataService;
+        }
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
+        }
+    }
+
+    public TilesOperations getTilesOperations() {
+        if (tilesOperations == null) {
+            // Get all Services implement TilesOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TilesOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TilesOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TilesOperations on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return tilesOperations;
+        }
+    }
+
+    public MenuOperations getMenuOperations() {
+        if (menuOperations == null) {
+            // Get all Services implement MenuOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MenuOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MenuOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MenuOperations on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return menuOperations;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public PropFileOperations getPropFileOperations() {
+        if (propFileOperations == null) {
+            // Get all Services implement PropFileOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PropFileOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PropFileOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PropFileOperations on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return propFileOperations;
+        }
+    }
+
+    public WebScreenOperations getWebScreenOperations() {
+        if (webScreenOperations == null) {
+            // Get all Services implement WebScreenOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebScreenOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebScreenOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebScreenOperations on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return webScreenOperations;
+        }
+    }
+
+    public PathResolver getPathResolver() {
+        if (pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return pathResolver;
+        }
+    }
+
+    public TypeLocationService getTypeLocationService() {
+        if (typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on RelatedPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return typeLocationService;
+        }
     }
 
 }

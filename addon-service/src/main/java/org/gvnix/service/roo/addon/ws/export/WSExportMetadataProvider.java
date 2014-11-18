@@ -55,6 +55,9 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * <p>
@@ -67,9 +70,12 @@ import org.apache.commons.lang3.StringUtils;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component(immediate = true)
+@Component
 @Service
 public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
+
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(WSExportMetadataProvider.class);
 
     private static final String JSYMBOL_NAMESPACE = "targetNamespace";
     private static final String JSYMBOL_NAME = "name";
@@ -81,22 +87,19 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
     private static final String DEF_IN_CLASS = " defined in class: '";
     private static final String TOBE_WEB_SERV_OP = "' to be exported as web Service operation.";
 
-    @Reference
     private WSExportValidationService wSExportValidationService;
-    @Reference
     private WSConfigService wSConfigService;
-    @Reference
     private AnnotationsService annotationsService;
-    @Reference
     private JavaParserService javaParserService;
 
     private static Logger logger = Logger
             .getLogger(WSExportMetadataProvider.class.getName());
 
-    protected void activate(ComponentContext context) {
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
         // Ensure we're notified of all metadata related to physical Java types,
         // in particular their initial creation
-        metadataDependencyRegistry.registerDependency(
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXWebService.class.getName()));
@@ -149,7 +152,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
         WSExportMetadata serviceLayerMetadata = null;
 
         // Configures project
-        wSConfigService.install(WsType.EXPORT);
+        getWSConfigService().install(WsType.EXPORT);
 
         // Check if Web Service definition is correct.
         PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
@@ -185,8 +188,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                         + governorTypeDetails.getName() + "'");
 
         // Update CXF XML
-        boolean updtGvNIXWServAnn = wSConfigService.publishClassAsWebService(
-                governorTypeDetails.getName(), gvNIXWebServiceAnnotation);
+        boolean updtGvNIXWServAnn = getWSConfigService()
+                .publishClassAsWebService(governorTypeDetails.getName(),
+                        gvNIXWebServiceAnnotation);
 
         // Define Jax-WS plugin and creates and execution build for this
         // service to generate the wsdl file to check errors before deploy.
@@ -199,7 +203,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
         StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) gvNIXWebServiceAnnotation
                 .getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
 
-        wSConfigService.addToJava2wsPlugin(governorTypeDetails.getName(),
+        getWSConfigService().addToJava2wsPlugin(governorTypeDetails.getName(),
                 serviceName.getValue(), address.getValue(),
                 fullyQualifiedTypeName.getValue());
 
@@ -227,17 +231,18 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
             // parameters hasn't to be checked
             if (!exported.getValue()) {
 
-                MethodMetadata method = javaParserService.getMethodByNameInAll(
-                        governorTypeDetails.getName(),
-                        methodMetadata.getMethodName());
+                MethodMetadata method = getJavaParserService()
+                        .getMethodByNameInAll(governorTypeDetails.getName(),
+                                methodMetadata.getMethodName());
 
                 // Add gvNIX xml element annotation to method return and
                 // parameters project types
-                wSExportValidationService.addGvNixXmlElementToTypes(method);
+                getWSExportValidationService()
+                        .addGvNixXmlElementToTypes(method);
 
                 // Add gvNIX web fault annotation to method exceptions
-                wSExportValidationService.addGvNixWebFaultToExceptions(method,
-                        webServiceTargetNamespace);
+                getWSExportValidationService().addGvNixWebFaultToExceptions(
+                        method, webServiceTargetNamespace);
 
                 // Checks @GvNIXWebMethod has attributes.
                 Validate.isTrue(
@@ -282,7 +287,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
             gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
                     .getAttribute(new JavaSymbolName("exported")));
 
-            annotationsService.addJavaTypeAnnotation(
+            getAnnotationsService().addJavaTypeAnnotation(
                     governorTypeDetails.getName(),
                     GvNIXWebService.class.getName(), gvNixAnnotationAttributes,
                     true);
@@ -291,7 +296,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
         serviceLayerMetadata = new WSExportMetadata(
                 metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, methodMetadataList,
-                javaParserService);
+                getJavaParserService());
 
         return serviceLayerMetadata;
     }
@@ -329,9 +334,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
         Validate.isTrue(
                 targetNamespace != null
-                        && wSExportValidationService
-                                .checkNamespaceFormat(targetNamespace
-                                        .getValue()),
+                        && getWSExportValidationService().checkNamespaceFormat(
+                                targetNamespace.getValue()),
                 "The namespace for Web Service has to start with 'http://'.\ni.e.: http://name.of.namespace/");
 
         // serviceName
@@ -479,9 +483,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
             Validate.isTrue(
                     resultNamespace != null
-                            && wSExportValidationService
-                                    .checkNamespaceFormat(resultNamespace
-                                            .getValue()),
+                            && getWSExportValidationService()
+                                    .checkNamespaceFormat(
+                                            resultNamespace.getValue()),
                     "Attribute 'resultNamespace' in annotation @GvNIXWebMethod defined in method '"
                             + methodMetadata.getMethodName()
                             + IN_CLASS
@@ -518,9 +522,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
             Validate.isTrue(
                     responseWrapperNamespace != null
-                            && wSExportValidationService
-                                    .checkNamespaceFormat(responseWrapperNamespace
-                                            .getValue()),
+                            && getWSExportValidationService()
+                                    .checkNamespaceFormat(
+                                            responseWrapperNamespace.getValue()),
                     "Attribute 'responseWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
                             + methodMetadata.getMethodName()
                             + IN_CLASS
@@ -575,9 +579,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
             Validate.isTrue(
                     requestWrapperName != null
-                            && wSExportValidationService
-                                    .checkNamespaceFormat(requestWrapperNamespace
-                                            .getValue()),
+                            && getWSExportValidationService()
+                                    .checkNamespaceFormat(
+                                            requestWrapperNamespace.getValue()),
                     "Attribute 'requestWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
                             + methodMetadata.getMethodName()
                             + IN_CLASS
@@ -774,9 +778,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                 if (targetNamespaceAttribute != null) {
 
                     Validate.isTrue(
-                            wSExportValidationService
-                                    .checkNamespaceFormat(targetNamespaceAttribute
-                                            .getValue()),
+                            getWSExportValidationService()
+                                    .checkNamespaceFormat(
+                                            targetNamespaceAttribute.getValue()),
                             "Attribute 'targetNamespace' in annotation @WebParam annotation to: "
                                     + inputParameter.getJavaType()
                                             .getFullyQualifiedTypeName()
@@ -844,8 +848,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                 continue;
             }
 
-            metadataDependencyRegistry.registerDependency(metadataItem.getId(),
-                    metadataIdentificationString);
+            getMetadataDependencyRegistry().registerDependency(
+                    metadataItem.getId(), metadataIdentificationString);
 
             // Include its accessors
             memberHoldingTypeDetails.add(itdTypeDetailsMd
@@ -872,6 +876,107 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
      */
     public String getProvidesType() {
         return WSExportMetadata.getMetadataIdentiferType();
+    }
+
+    public WSConfigService getWSConfigService() {
+        if (wSConfigService == null) {
+            // Get all Services implement WSConfigService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WSConfigService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WSConfigService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WSConfigService on WSExportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return wSConfigService;
+        }
+    }
+
+    public JavaParserService getJavaParserService() {
+        if (javaParserService == null) {
+            // Get all Services implement JavaParserService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JavaParserService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JavaParserService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JavaParserService on WSExportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return javaParserService;
+        }
+    }
+
+    public AnnotationsService getAnnotationsService() {
+        if (annotationsService == null) {
+            // Get all Services implement AnnotationsService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                AnnotationsService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (AnnotationsService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load AnnotationsService on WSExportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return annotationsService;
+        }
+    }
+
+    public WSExportValidationService getWSExportValidationService() {
+        if (wSExportValidationService == null) {
+            // Get all Services implement WSExportValidationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WSExportValidationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WSExportValidationService) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WSExportValidationService on WSExportMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return wSExportValidationService;
+        }
     }
 
 }

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -83,6 +84,10 @@ import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of operations this add-on offers.
@@ -94,6 +99,9 @@ import org.w3c.dom.Node;
 @Service
 public class DatatablesOperationsImpl extends AbstractOperations implements
         DatatablesOperations {
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(DatatablesOperationsImpl.class);
 
     private static final String ARGUMENT_RESOLVERS = "argument-resolvers";
 
@@ -111,52 +119,22 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
     private static final String DATATABLES_CRITERIA_RESOLVER = "com.github.dandelion.datatables.extras.spring3.ajax.DatatablesCriteriasResolver";
 
-    /**
-     * Reference to ProjectOperations
-     */
-    @Reference
+    private ComponentContext cContext;
+
     private ProjectOperations projectOperations;
 
-    /**
-     * Reference to TypeLocationService
-     */
-    @Reference
     private TypeLocationService typeLocationService;
 
-    /**
-     * Reference to TypeManagementService
-     */
-    @Reference
     private TypeManagementService typeManagementService;
 
-    /**
-     * Reference to MetadataService
-     */
-    @Reference
     private MetadataService metadataService;
 
-    /**
-     * Reference to MenuOperations
-     */
-    @Reference
     private MenuOperations menuOperations;
 
-    /**
-     * Reference to I18nSupport
-     */
-    @Reference
     private I18nSupport i18nSupport;
 
-    /**
-     * Reference to PropFileOperations
-     */
-    @Reference
     private PropFileOperations propFileOperations;
 
-    /**
-     * Reference to WebMvcOperations
-     */
-    @Reference
     private WebMvcOperations webMvcOperations;
 
     /**
@@ -164,29 +142,31 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * 
      * @param context the component context
      */
-    protected void activate(ComponentContext context) {
-        super.activate(context);
+    protected void activate(ComponentContext componentContext) {
+        cContext = componentContext;
+        context = cContext.getBundleContext();
+        /*super.activate(componentContext);
         // Check if setup is already executed
         if (isAddAvailable()) {
             // Update dependencies
             setupProjectPom();
-        }
+        }*/
     }
 
     /** {@inheritDoc} */
     public boolean isAddAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_DATATABLES);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                FEATURE_NAME_GVNIX_DATATABLES);
     }
 
     /** {@inheritDoc} */
     public boolean isSetupAvailable() {
-        return projectOperations
-                .isFeatureInstalledInFocusedModule(FeatureNames.MVC)
-                && projectOperations
-                        .isFeatureInstalledInFocusedModule(JQueryOperations.FEATURE_NAME_GVNIX_JQUERY)
-                && !projectOperations
-                        .isFeatureInstalledInFocusedModule(FEATURE_NAME_GVNIX_DATATABLES);
+        return getProjectOperations().isFeatureInstalledInFocusedModule(
+                FeatureNames.MVC)
+                && getProjectOperations().isFeatureInstalledInFocusedModule(
+                        JQueryOperations.FEATURE_NAME_GVNIX_JQUERY)
+                && !getProjectOperations().isFeatureInstalledInFocusedModule(
+                        FEATURE_NAME_GVNIX_DATATABLES);
     }
 
     /** {@inheritDoc} */
@@ -232,7 +212,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         // Check is JPA active record (currently add-on only supports this
         // entities)
         JavaType entityValueType = getControllerFormBackingObject(controllerAnnotation);
-        ClassOrInterfaceTypeDetails entity = typeLocationService
+        ClassOrInterfaceTypeDetails entity = getTypeLocationService()
                 .getTypeDetails(entityValueType);
         final boolean isActiveRecord = MemberFindingUtils.getAnnotationOfType(
                 entity.getAnnotations(), JPA_ACTIVE_RECORD_ANNOTATION) != null;
@@ -268,7 +248,8 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             builder.addAnnotation(annotationBuilder.build());
 
             // Save changes to disk
-            typeManagementService.createOrUpdateTypeOnDisk(builder.build());
+            getTypeManagementService()
+                    .createOrUpdateTypeOnDisk(builder.build());
 
             // doUpdateListMenuUrl(javaType, controllerAnnotation);
         }
@@ -344,11 +325,11 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         builder.updateTypeAnnotation(datatablesAnnotationBuilder);
 
         // Save controller changes to disk
-        typeManagementService.createOrUpdateTypeOnDisk(builder.build());
+        getTypeManagementService().createOrUpdateTypeOnDisk(builder.build());
     }
 
     private ClassOrInterfaceTypeDetails getControllerDetails(JavaType controller) {
-        ClassOrInterfaceTypeDetails existing = typeLocationService
+        ClassOrInterfaceTypeDetails existing = getTypeLocationService()
                 .getTypeDetails(controller);
 
         Validate.notNull(existing, "Can't get Type details");
@@ -456,7 +437,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
         if (controllerPath != null) {
             WebProjectUtils.updateTagxUriInJspx(controllerPath, jspxName,
-                    uriMap, projectOperations, fileManager);
+                    uriMap, getProjectOperations(), fileManager);
         }
     }
 
@@ -498,8 +479,8 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     /** {@inheritDoc} */
     public void annotateAll(boolean ajax) {
         // Locate all controllers and annotate it
-        for (JavaType type : typeLocationService
-                .findTypesWithAnnotation(SCAFFOLD_ANNOTATION)) {
+        for (JavaType type : getTypeLocationService().findTypesWithAnnotation(
+                SCAFFOLD_ANNOTATION)) {
             annotateController(type, ajax);
         }
     }
@@ -529,8 +510,8 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         updateWebXmlFile();
 
         // Installing bootstrap components if necessary
-        if (projectOperations
-                .isFeatureInstalledInFocusedModule("gvnix-bootstrap")) {
+        if (getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-bootstrap")) {
             updateDatatablesAddonToBootstrap();
         }
     }
@@ -546,8 +527,8 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         List<Element> repos = XmlUtils.findElements(
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
-            projectOperations.addRepositories(
-                    projectOperations.getFocusedModuleName(),
+            getProjectOperations().addRepositories(
+                    getProjectOperations().getFocusedModuleName(),
                     Collections.singleton(new Repository(repo)));
         }
 
@@ -555,28 +536,29 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         List<Element> properties = XmlUtils.findElements(
                 "/configuration/gvnix/properties/*", configuration);
         for (Element property : properties) {
-            projectOperations.addProperty(projectOperations
-                    .getFocusedModuleName(), new Property(property));
+            getProjectOperations().addProperty(
+                    getProjectOperations().getFocusedModuleName(),
+                    new Property(property));
         }
 
         // Install dependencies
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", configuration);
 
-        DependenciesVersionManager.manageDependencyVersion(metadataService,
-                projectOperations, depens);
+        DependenciesVersionManager.manageDependencyVersion(
+                getMetadataService(), getProjectOperations(), depens);
     }
 
     @Override
     public void updateTags() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
         LogicalPath webappPath = WebProjectUtils
-                .getWebappPath(projectOperations);
+                .getWebappPath(getProjectOperations());
 
         // images
         OperationUtils.updateDirectoryContents("images/datatables/*.*",
                 pathResolver.getIdentifier(webappPath, "/images/datatables"),
-                fileManager, context, getClass());
+                fileManager, cContext, getClass());
 
         // install js
         copyDirectoryContents("scripts/datatables/*.js",
@@ -646,7 +628,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         menuOperations.cleanUpMenuItem(categoryName, listMenuItemId,
                 MenuOperations.DEFAULT_MENU_ITEM_PREFIX, webappPath);
 
-        menuOperations.addMenuItem(categoryName, listMenuItemId,
+        getMenuOperations().addMenuItem(categoryName, listMenuItemId,
                 "global_menu_list", "/" + controllerPath,
                 MenuOperations.DEFAULT_MENU_ITEM_PREFIX, webappPath);
     }
@@ -707,14 +689,14 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 "/resources/scripts/datatables/jquery.dataTables.ext.gvnix.advancedfilter.js"));
 
         WebProjectUtils.addJsAndCssToLoadScriptsTag(cssList, jsList,
-                projectOperations, fileManager);
+                getProjectOperations(), fileManager);
     }
 
     @Override
     public void updateWebMvcConfigFile(JavaPackage destinationPackage) {
         LogicalPath webappPath = WebProjectUtils
-                .getWebappPath(projectOperations);
-        String webMvcXmlPath = projectOperations.getPathResolver()
+                .getWebappPath(getProjectOperations());
+        String webMvcXmlPath = getProjectOperations().getPathResolver()
                 .getIdentifier(webappPath, "WEB-INF/spring/webmvc-config.xml");
         Validate.isTrue(fileManager.exists(webMvcXmlPath),
                 "webmvc-config.xml not found");
@@ -744,7 +726,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                 throw new IllegalStateException(
                         "No conversion service found on webmvc-config.xml: package parameter is required.");
             }
-            webMvcOperations.installConversionService(destinationPackage);
+            getWebMvcOperations().installConversionService(destinationPackage);
 
             // commit fileManager changes (so get final webmvc-config.xml
             // content)
@@ -815,9 +797,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     @Override
     public void updateWebXmlFile() {
         LogicalPath webappPath = WebProjectUtils
-                .getWebappPath(projectOperations);
-        String webXmlPath = projectOperations.getPathResolver().getIdentifier(
-                webappPath, "WEB-INF/web.xml");
+                .getWebappPath(getProjectOperations());
+        String webXmlPath = getProjectOperations().getPathResolver()
+                .getIdentifier(webappPath, "WEB-INF/web.xml");
         Validate.isTrue(fileManager.exists(webXmlPath), "web.xml not found");
 
         MutableFile webXmlMutableFile = null;
@@ -928,11 +910,11 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
 
     @Override
     public void copyPropertiesFile() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
 
         LogicalPath resouresPath = LogicalPath.getInstance(
-                Path.SRC_MAIN_RESOURCES,
-                projectOperations.getFocusedModuleName());
+                Path.SRC_MAIN_RESOURCES, getProjectOperations()
+                        .getFocusedModuleName());
 
         copyDirectoryContents("resources/*.properties",
                 pathResolver.getIdentifier(resouresPath, "/"), true);
@@ -943,28 +925,28 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     public void addI18nKeys() {
         // Check if Valencian_Catalan language is supported and add properties
         // if so
-        Set<I18n> supportedLanguages = i18nSupport.getSupportedLanguages();
+        Set<I18n> supportedLanguages = getI18nSupport().getSupportedLanguages();
         for (I18n i18n : supportedLanguages) {
             if (i18n.getLocale().equals(new Locale("ca"))) {
                 MessageBundleUtils.installI18nMessages(
-                        new ValencianCatalanLanguage(), projectOperations,
+                        new ValencianCatalanLanguage(), getProjectOperations(),
                         fileManager);
                 MessageBundleUtils.addPropertiesToMessageBundle("ca",
-                        getClass(), propFileOperations, projectOperations,
-                        fileManager);
+                        getClass(), getPropFileOperations(),
+                        getProjectOperations(), fileManager);
                 break;
             }
         }
 
         // Add properties to Spanish messageBundle
         MessageBundleUtils.installI18nMessages(new SpanishLanguage(),
-                projectOperations, fileManager);
+                getProjectOperations(), fileManager);
         MessageBundleUtils.addPropertiesToMessageBundle("es", getClass(),
-                propFileOperations, projectOperations, fileManager);
+                getPropFileOperations(), getProjectOperations(), fileManager);
 
         // Add properties to default messageBundle
         MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
-                propFileOperations, projectOperations, fileManager);
+                getPropFileOperations(), getProjectOperations(), fileManager);
     }
 
     /**
@@ -974,7 +956,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * @return
      */
     public LogicalPath getWebappPath() {
-        return WebProjectUtils.getWebappPath(projectOperations);
+        return WebProjectUtils.getWebappPath(getProjectOperations());
     }
 
     /**
@@ -993,7 +975,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * @return true if given feature name is installed, otherwise returns false
      */
     public boolean isInstalledInModule(final String moduleName) {
-        final Pom pom = projectOperations.getPomFromModuleName(moduleName);
+        final Pom pom = getProjectOperations().getPomFromModuleName(moduleName);
         if (pom == null) {
             return false;
         }
@@ -1014,7 +996,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
     @Override
     public void updateDatatablesAddonToBootstrap() {
 
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
         /**
          * Installing script datatables files
          */
@@ -1114,7 +1096,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
      * @return
      */
     public boolean isLoadScriptsModified() {
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
         String dirPath = pathResolver.getIdentifier(getWebappPath(),
                 "WEB-INF/tags/bootstrap/util/load-scripts-bootstrap.tagx");
         final Document document = XmlUtils.readXml(fileManager
@@ -1125,5 +1107,205 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         String value = urlElement.getAttribute("value");
 
         return value.contains("dataTables.bootstrap.css");
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement WebMetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on DatatablesOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public TypeLocationService getTypeLocationService() {
+        if (typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on DatatablesOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeLocationService;
+        }
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on DatatablesOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on DatatablesOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public MenuOperations getMenuOperations() {
+        if (menuOperations == null) {
+            // Get all Services implement MenuOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MenuOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MenuOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MenuOperations on DatatablesOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return menuOperations;
+        }
+    }
+
+    public I18nSupport getI18nSupport() {
+        if (i18nSupport == null) {
+            // Get all Services implement I18nSupport interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(I18nSupport.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (I18nSupport) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load I18nSupport on DatatablesOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return i18nSupport;
+        }
+    }
+
+    public PropFileOperations getPropFileOperations() {
+        if (propFileOperations == null) {
+            // Get all Services implement PropFileOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PropFileOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PropFileOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PropFileOperations on DatatablesOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return propFileOperations;
+        }
+    }
+
+    public WebMvcOperations getWebMvcOperations() {
+        if (webMvcOperations == null) {
+            // Get all Services implement WebMvcOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebMvcOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebMvcOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebMvcOperations on DatatablesOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return webMvcOperations;
+        }
     }
 }

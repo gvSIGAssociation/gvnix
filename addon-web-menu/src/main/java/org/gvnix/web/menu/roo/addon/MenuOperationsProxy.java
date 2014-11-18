@@ -58,7 +58,7 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * @see FilterMenuOperationsHook
  * @see MenuOperationsImpl
  */
-@Component(immediate = true)
+@Component
 @Service
 public class MenuOperationsProxy implements MenuOperations {
 
@@ -67,13 +67,6 @@ public class MenuOperationsProxy implements MenuOperations {
 
     private static final String MENU_OPERATION_NAME = MenuOperations.class
             .getName();
-
-    /*
-     * =========================================================== VERY
-     * IMPORTANT: This class **MUST HAS NONE** @Reference property to assure
-     * this component is really loaded immediately
-     * ===========================================================
-     */
 
     /**
      * Property to identify this service in {@link FilterMenuOperationsHook} and
@@ -110,22 +103,22 @@ public class MenuOperationsProxy implements MenuOperations {
     private BundleContext context;
 
     /** {@inheritDoc} */
-    protected void activate(ComponentContext context) {
+    protected void activate(ComponentContext cContext) {
         logger.finer("MenuOperation proxy activated");
-        this.context = context.getBundleContext();
+        context = cContext.getBundleContext();
     }
 
     /** {@inheritDoc} */
-    protected void deactivate(ComponentContext context) {
+    protected void deactivate(ComponentContext cContext) {
         // unget from gvNIX menu operation
-        gvNIXOperations = null;
-        context.getBundleContext().ungetService(gvNIXOperationsService);
+        /*gvNIXOperations = null;
+        context.ungetService(gvNIXOperationsService);
         gvNIXOperationsService = null;
 
         // unget from original menu operation
         rooOperations = null;
-        context.getBundleContext().ungetService(rooOperationsService);
-        rooOperationsService = null;
+        context.ungetService(rooOperationsService);
+        rooOperationsService = null;*/
     }
 
     /**

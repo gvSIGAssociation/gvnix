@@ -74,6 +74,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.osgi.service.component.ComponentContext;
+
 /**
  * Theme management operations for Spring MVC web layer:
  * <ul>
@@ -131,6 +133,13 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     private static final String VAR_ATTRIBUTE = "var";
 
     private static final String VALUE_ATTRIBUTE = "value";
+
+    private ComponentContext cContext;
+
+    protected void activate(final ComponentContext componentContext) {
+        cContext = componentContext;
+        context = cContext.getBundleContext();
+    }
 
     /**
      * MetadataService offers access to Roo's metadata model, use it to retrieve
@@ -1021,7 +1030,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     private Collection<URL> findBundleThemeDescriptors() {
 
         // URLs to theme descriptors in OSGi bundles
-        return OSGiUtils.findEntriesByPattern(context.getBundleContext(),
+        return OSGiUtils.findEntriesByPattern(context,
                 "/**/WEB-INF/views/theme.xml");
     }
 
@@ -1210,9 +1219,8 @@ public class ThemeOperationsImpl extends AbstractOperations implements
 
             // iterate over bundle entries in the given URI path and add them
             // to URLs to be copied to target dir
-            Enumeration<URL> entries = context.getBundleContext()
-                    .getBundle(bundleId)
-                    .findEntries(sourceDirectory.getPath(), "*.*", true);
+            Enumeration<URL> entries = context.getBundle(bundleId).findEntries(
+                    sourceDirectory.getPath(), "*.*", true);
             while (entries.hasMoreElements()) {
                 urls.add(entries.nextElement());
             }
@@ -1336,9 +1344,8 @@ public class ThemeOperationsImpl extends AbstractOperations implements
 
             // iterate over bundle entries in the given URI path and add them
             // to URLs to be copied to target dir
-            Enumeration<URL> entries = context.getBundleContext()
-                    .getBundle(bundleId)
-                    .findEntries(sourceDirectory.getPath(), "*.*", true);
+            Enumeration<URL> entries = context.getBundle(bundleId).findEntries(
+                    sourceDirectory.getPath(), "*.*", true);
             while (entries.hasMoreElements()) {
                 try {
                     uris.add(entries.nextElement().toURI());

@@ -17,6 +17,8 @@
  */
 package org.gvnix.addon.geo;
 
+import java.util.logging.Logger;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -32,6 +34,10 @@ import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Provides {@link GvNIXWebEntityMapLayerMetadata}.
@@ -44,7 +50,9 @@ import org.springframework.roo.project.LogicalPath;
 public final class GvNIXWebEntityMapLayerMetadataProvider extends
         AbstractItdMetadataProvider {
 
-    @Reference
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(GvNIXWebEntityMapLayerMetadataProvider.class);
+
     TypeManagementService typeManagementService;
 
     /**
@@ -52,8 +60,9 @@ public final class GvNIXWebEntityMapLayerMetadataProvider extends
      * 
      * @param context the component context
      */
-    protected void activate(ComponentContext context) {
-        metadataDependencyRegistry.registerDependency(
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+        getMetadataDependencyRegistry().registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXWebEntityMapLayer.class.getName()));
@@ -65,7 +74,7 @@ public final class GvNIXWebEntityMapLayerMetadataProvider extends
      * @param context the component context
      */
     protected void deactivate(ComponentContext context) {
-        metadataDependencyRegistry.deregisterDependency(
+        getMetadataDependencyRegistry().deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(
@@ -89,7 +98,7 @@ public final class GvNIXWebEntityMapLayerMetadataProvider extends
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
                 javaType, path);
 
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) getMetadataService()
                 .get(webScaffoldMetadataId);
 
         WebScaffoldAnnotationValues webScaffoldAnnotationValues = webScaffoldMetadata
@@ -99,11 +108,11 @@ public final class GvNIXWebEntityMapLayerMetadataProvider extends
         JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
 
         LogicalPath entityPath = PhysicalTypeUtils.getPath(entity,
-                typeLocationService);
+                getTypeLocationService());
 
         String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
                 entityPath);
-        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
+        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) getMetadataService()
                 .get(jpaMetadataId);
         if (jpaMetadata == null) {
             // Unsupported type (by now)
@@ -114,8 +123,9 @@ public final class GvNIXWebEntityMapLayerMetadataProvider extends
         String plural = jpaMetadata.getPlural();
 
         return new GvNIXWebEntityMapLayerMetadata(metadataIdentificationString,
-                aspectName, governorPhysicalTypeMetadata, typeLocationService,
-                typeManagementService, javaType, entity, plural);
+                aspectName, governorPhysicalTypeMetadata,
+                getTypeLocationService(), getTypeManagementService(), javaType,
+                entity, plural);
     }
 
     /**
@@ -141,5 +151,30 @@ public final class GvNIXWebEntityMapLayerMetadataProvider extends
 
     public String getProvidesType() {
         return GvNIXWebEntityMapLayerMetadata.getMetadataIdentiferType();
+    }
+
+    public TypeManagementService getTypeManagementService() {
+        if (typeManagementService == null) {
+            // Get all Services implement TypeManagementService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeManagementService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeManagementService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeManagementService on GvNIXWebEntityMapLayerMetadataProvider.");
+                return null;
+            }
+        }
+        else {
+            return typeManagementService;
+        }
     }
 }

@@ -18,6 +18,7 @@
 package org.gvnix.addon.jpa.entitylistener;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Component;
@@ -34,39 +35,46 @@ import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Metadata listener which handles metadata reltated to jpa entity listeners
  * 
  * @author gvNIX Team
  */
-@Component(immediate = true)
+@Component
 @Service
 public class JpaOrmEntityListenerMetadataListener implements MetadataProvider,
         MetadataNotificationListener {
 
-    @Reference
+    protected final static Logger LOGGER = HandlerUtils
+            .getLogger(JpaOrmEntityListenerMetadataListener.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference
     private MetadataService metadataService;
 
-    @Reference
     private JpaOrmEntityListenerRegistry registry;
 
-    @Reference
     private JpaOrmEntityListenerOperations operations;
 
-    protected void activate(final ComponentContext context) {
+    protected void activate(final ComponentContext cContext) {
+        context = cContext.getBundleContext();
         // We don't need register anything: this is done on
         // JpaOrmEntityListenerRegistry
-        metadataDependencyRegistry.addNotificationListener(this);
+        getMetadataDependencyRegistry().addNotificationListener(this);
     }
 
     protected void deactivate(final ComponentContext context) {
         // We don't need register anything: this is done on
         // JpaOrmEntityListenerRegistry
-        metadataDependencyRegistry.removeNotificationListener(this);
+        getMetadataDependencyRegistry().removeNotificationListener(this);
     }
 
     public MetadataItem get(final String jpaOrmEntityListenerMetadataId) {
@@ -82,7 +90,7 @@ public class JpaOrmEntityListenerMetadataListener implements MetadataProvider,
                 .getSorceId(jpaOrmEntityListenerMetadataId);
         final String sourceMetadataKey = createProviderIdentifierKey(
                 sourceMetadataProvider, listenerJavaType, listenerPath);
-        final JpaOrmEntityListener sourceMetadata = (JpaOrmEntityListener) metadataService
+        final JpaOrmEntityListener sourceMetadata = (JpaOrmEntityListener) getMetadataService()
                 .get(sourceMetadataKey);
 
         // Check source metadata
@@ -103,7 +111,8 @@ public class JpaOrmEntityListenerMetadataListener implements MetadataProvider,
         }
 
         // Add entity-listener to orm.xml thru operations
-        operations.addEntityListener(sourceMetadata, sourceMetadataProvider);
+        getOperations().addEntityListener(sourceMetadata,
+                sourceMetadataProvider);
 
         return new JpaOrmEntityListenerMetadata(jpaOrmEntityListenerMetadataId,
                 sourceMetadata);
@@ -123,8 +132,8 @@ public class JpaOrmEntityListenerMetadataListener implements MetadataProvider,
                 // Get entity
                 JavaType entity = JpaActiveRecordMetadata
                         .getJavaType(upstreamDependency);
-                // Call operations to perform clean up
-                operations.cleanUpEntityListeners(entity);
+                // Call getOperations() to perform clean up
+                getOperations().cleanUpEntityListeners(entity);
             }
         }
 
@@ -136,7 +145,7 @@ public class JpaOrmEntityListenerMetadataListener implements MetadataProvider,
             // been
 
             // Gets provider registered
-            List<String> resiteredListeners = registry.getListenerOrder();
+            List<String> resiteredListeners = getRegistry().getListenerOrder();
 
             boolean found = false;
 
@@ -174,13 +183,13 @@ public class JpaOrmEntityListenerMetadataListener implements MetadataProvider,
             // is not already registered
             // (if it's already registered, the event will be delivered directly
             // later on)
-            if (metadataDependencyRegistry.getDownstream(upstreamDependency)
-                    .contains(downstreamDependency)) {
+            if (getMetadataDependencyRegistry().getDownstream(
+                    upstreamDependency).contains(downstreamDependency)) {
                 return;
             }
 
             // produces metadata
-            metadataService.evictAndGet(downstreamDependency);
+            getMetadataService().evictAndGet(downstreamDependency);
         }
     }
 
@@ -257,5 +266,117 @@ public class JpaOrmEntityListenerMetadataListener implements MetadataProvider,
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 getMetadaClass(sourceMetadataProvider), listenerJavaType,
                 listenerPath);
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataDependencyRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on JpaOrmEntityListenerMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on JpaOrmEntityListenerMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+
+    }
+
+    public JpaOrmEntityListenerRegistry getRegistry() {
+        if (registry == null) {
+            // Get all Services JpaOrmEntityListenerRegistry MetadataService
+            // interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JpaOrmEntityListenerRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JpaOrmEntityListenerRegistry) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JpaOrmEntityListenerRegistry on JpaOrmEntityListenerMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return registry;
+        }
+
+    }
+
+    public JpaOrmEntityListenerOperations getOperations() {
+        if (operations == null) {
+            // Get all Services JpaOrmEntityListenerOperations MetadataService
+            // interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                JpaOrmEntityListenerOperations.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JpaOrmEntityListenerOperations) this.context
+                            .getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JpaOrmEntityListenerOperations on JpaOrmEntityListenerMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return operations;
+        }
+
     }
 }
