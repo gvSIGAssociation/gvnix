@@ -1,0 +1,22 @@
+script --file clinic.roo
+
+security setup
+security provider add --name SAFE --package com.springsource.petclinic.security.safe
+
+configuration create --name dev
+
+configuration property add --name wsdl.SAFE.location 
+configuration property add --name wsdl.SAFEAutorizacion.location 
+configuration property add --name security.SAFE.alias.password 
+configuration property add --name security.SAFE.appId 
+configuration property add --name security.SAFE.environment 
+configuration property add --name security.SAFE.keystore.alias 
+configuration property add --name security.SAFE.keystore.file
+configuration property add --name security.SAFE.keystore.password 
+configuration property add --name security.SAFE.keystore.type.keystore 
+configuration property add --name security.SAFE.mapRoles 
+configuration property add --name security.SAFE.active
+
+configuration export
+
+hint

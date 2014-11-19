@@ -980,14 +980,14 @@
 ##  echo gvnix-multimodule end
 	
 	## tiendavirtual
-   # echo "======================================================"
-   # echo "------------------------------------------------------"
-	# echo tiendavirtual start
-	# mkdir tiendavirtual
-	# cd tiendavirtual
-	# $1/gvnix.sh script --file $2/code/src/main/resources/tiendavirtual.roo --lineNumbers true
+   echo "======================================================"
+    echo "------------------------------------------------------"
+	echo tiendavirtual start
+	mkdir tiendavirtual
+	cd tiendavirtual
+	$1/gvnix.sh script --file $2/code/src/main/resources/tiendavirtual.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	# $1/gvnix.sh hint
+	$1/gvnix.sh hint
 	# Request the home URL
 	#wget --retry-connrefused -O target/home.html "http://localhost:8080/tiendavirtual/" &	
     # Get no entities dialog message
@@ -1006,48 +1006,68 @@
 	#wget --retry-connrefused -O target/patterntabularen.html "http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=en" &
 	#wget --retry-connrefused -O target/patternregistrotabularen.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1&lang=en" &
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+	cd ..
+	echo tiendavirtual end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
+	## safe 
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo safe start
+	mkdir safe
+	cd safe
+	$1/gvnix.sh script --file $2/code/src/test/resources/security-safe.roo --lineNumbers true
+	mvn test tomcat:run &
+	mkdir target
+	# Request the home URL
+	#wget --retry-connrefused -O target/home.html http://localhost:8080/safe-trunk/
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo safe end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+	## aplusu (database required)
+  #  echo "======================================================"
+  #  echo "------------------------------------------------------"
+	# echo aplusu start
+	# mkdir aplusu
+	# cd aplusu
+	# $1/gvnix.sh script --file $2/code/src/test/resources/aplusu.roo --lineNumbers true
+	# mvn test tomcat:run &
+	# mkdir target
+	# Request the home URL
+	#wget --retry-connrefused -O target/home.html http://localhost:8080/aplusu-trunk/
+  #  MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+  #  kill -9 $MVN_TOMCAT_PID
 	#cd ..
-	#echo tiendavirtual end
+	#echo aplusu end
   #  echo "------------------------------------------------------"
   #  echo "======================================================"
   #  echo .
 
-	## aplusu (database required)
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo aplusu start
-	mkdir aplusu
-	cd aplusu
-	$1/gvnix.sh script --file $2/code/src/test/resources/aplusu.roo --lineNumbers true
-	mvn test tomcat:run &
-	mkdir target
-	# Request the home URL
-	#wget --retry-connrefused -O target/home.html http://localhost:8080/aplusu-trunk/
-    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
-    kill -9 $MVN_TOMCAT_PID
-	cd ..
-	echo aplusu end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
-
 	## regproy (database required)
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo regproy start
-	mkdir regproy
-	cd regproy
-	$1/gvnix.sh script --file $2/code/src/test/resources/regproy.roo --lineNumbers true
+  #  echo "======================================================"
+  #  echo "------------------------------------------------------"
+	# echo regproy start
+	# mkdir regproy
+	# cd regproy
+	# $1/gvnix.sh script --file $2/code/src/test/resources/regproy.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh hint
-	mvn test tomcat:run & 
-	mkdir target
+	# $1/gvnix.sh hint
+	# mvn test tomcat:run & 
+	# mkdir target
 	# Request the home URL
 	#wget --retry-connrefused -O target/home.html http://localhost:8080/registro_proyectos/
-    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
-    kill -9 $MVN_TOMCAT_PID
-    cd ..
-	echo regproy end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
+  #  MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+  #  kill -9 $MVN_TOMCAT_PID
+  #  cd ..
+	#echo regproy end
+  #  echo "------------------------------------------------------"
+  #  echo "======================================================"
+  #  echo .
