@@ -132,7 +132,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
         WSImportMetadata metadata = null;
 
         // Import service if project has required prerequisites
-        if (OperationUtils.isProjectAvailable(metadataService,
+        if (OperationUtils.isProjectAvailable(getMetadataService(),
                 getProjectOperations())) {
 
             // Check if Web Service definition is correct.

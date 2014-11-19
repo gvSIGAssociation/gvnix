@@ -67,32 +67,32 @@
     echo .
 
 	## expenses
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo expenses start
-	mkdir expenses
-	cd expenses
-	$1/gvnix.sh script --file expenses.roo --lineNumbers true
-	mvn test tomcat:run -Dmaven.tomcat.fork=true 
-	cd ..
-	echo expenses end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
+   # echo "======================================================"
+    #echo "------------------------------------------------------"
+	#echo expenses start
+	#mkdir expenses
+	#cd expenses
+	#$1/gvnix.sh script --file expenses.roo --lineNumbers true
+	#mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	#cd ..
+	#echo expenses end
+  #  echo "------------------------------------------------------"
+   # echo "======================================================"
+    #echo .
 
 	## gae-expenses
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo gae-expenses start
-	mkdir gae-expenses
-	cd gae-expenses
-	$1/gvnix.sh script --file gae-expenses.roo --lineNumbers true
-	mvn test tomcat:run -Dmaven.tomcat.fork=true 
-	cd ..
-	echo gae-expenses end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
+  #  echo "======================================================"
+  #  echo "------------------------------------------------------"
+	#echo gae-expenses start
+	#mkdir gae-expenses
+	#cd gae-expenses
+	#$1/gvnix.sh script --file gae-expenses.roo --lineNumbers true
+	#mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	#cd ..
+	#echo gae-expenses end
+  #  echo "------------------------------------------------------"
+  #  echo "======================================================"
+  #  echo .
 
 	## multimodule
     echo "======================================================"
@@ -169,29 +169,29 @@
     echo .
 
 ##
-## gvNIX cit security add-on
+## gvNIX cit security add-on DEPRECATED
 ##
 
 	## cit-security
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo cit-security start
-	mkdir cit-security
-	cd cit-security
-	$1/gvnix.sh script --file $2/code/addon-cit-security/src/test/resources/cit-security.roo --lineNumbers true
-	mvn test tomcat:run &
-	mkdir target
+  #  echo "======================================================"
+  #  echo "------------------------------------------------------"
+	#echo cit-security start
+	#mkdir cit-security
+	#cd cit-security
+	#$1/gvnix.sh script --file $2/code/addon-cit-security/src/test/resources/cit-security.roo --lineNumbers true
+	#mvn test tomcat:run &
+	#mkdir target
 	# Get login page when accessing a not allowed page and login in es and en languages
 	#wget --retry-connrefused -O target/loginredirect.html http://localhost:8080/petclinic/pets
 	#wget --retry-connrefused -O target/logines.html http://localhost:8080/petclinic/login?lang=es
 	#wget --retry-connrefused -O target/loginen.html http://localhost:8080/petclinic/login?lang=en
-    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
-    kill -9 $MVN_TOMCAT_PID
-	cd ..
-	echo cit-security end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
+   # MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+   # kill -9 $MVN_TOMCAT_PID
+	#cd ..
+	#echo cit-security end
+  #  echo "------------------------------------------------------"
+  #  echo "======================================================"
+  #  echo .
 
 ##
 ## gvNIX configuration add-on
@@ -980,14 +980,14 @@
 ##  echo gvnix-multimodule end
 	
 	## tiendavirtual
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo tiendavirtual start
-	mkdir tiendavirtual
-	cd tiendavirtual
-	$1/gvnix.sh script --file $2/code/src/main/resources/tiendavirtual.roo --lineNumbers true
+   # echo "======================================================"
+   # echo "------------------------------------------------------"
+	# echo tiendavirtual start
+	# mkdir tiendavirtual
+	# cd tiendavirtual
+	# $1/gvnix.sh script --file $2/code/src/main/resources/tiendavirtual.roo --lineNumbers true
 ##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh hint
+	# $1/gvnix.sh hint
 	# Request the home URL
 	#wget --retry-connrefused -O target/home.html "http://localhost:8080/tiendavirtual/" &	
     # Get no entities dialog message
@@ -1006,11 +1006,11 @@
 	#wget --retry-connrefused -O target/patterntabularen.html "http://localhost:8080/tiendavirtual/clientes?gvnixpattern=clientes&lang=en" &
 	#wget --retry-connrefused -O target/patternregistrotabularen.html "http://localhost:8080/tiendavirtual/pedidoes?gvnixform&gvnixpattern=pedido&index=1&lang=en" &
 	#mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
-	cd ..
-	echo tiendavirtual end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
+	#cd ..
+	#echo tiendavirtual end
+  #  echo "------------------------------------------------------"
+  #  echo "======================================================"
+  #  echo .
 
 	## aplusu (database required)
     echo "======================================================"
