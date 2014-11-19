@@ -137,7 +137,7 @@ public final class ModalDialogMetadataProvider extends
     private List<String> getDefinedModalDialogsIfAny(JavaType aspectName) {
         // Get mutableTypeDetails from controllerClass. Also checks javaType is
         // a controller
-        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService
+        ClassOrInterfaceTypeDetails controllerDetails = getTypeLocationService()
                 .getTypeDetails(aspectName);
         if (controllerDetails == null) {
             return null;

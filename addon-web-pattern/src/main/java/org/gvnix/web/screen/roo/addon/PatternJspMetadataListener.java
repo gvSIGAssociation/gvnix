@@ -64,9 +64,6 @@ import org.springframework.roo.support.logging.HandlerUtils;
 public class PatternJspMetadataListener extends
         AbstractPatternJspMetadataListener {
 
-    // ------------ OSGi component attributes ----------------
-    private BundleContext context;
-
     private static final Logger LOGGER = HandlerUtils
             .getLogger(PatternJspMetadataListener.class);
 
@@ -96,7 +93,7 @@ public class PatternJspMetadataListener extends
                 .getPath(metadataIdentificationString);
         String patternMetadataKey = PatternMetadata.createIdentifier(javaType,
                 path);
-        PatternMetadata patternMetadata = (PatternMetadata) metadataService
+        PatternMetadata patternMetadata = (PatternMetadata) getMetadataService()
                 .get(patternMetadataKey);
 
         if (patternMetadata == null || !patternMetadata.isValid()) {
@@ -115,9 +112,9 @@ public class PatternJspMetadataListener extends
         Validate.notNull(formbackingType, "formbackingType required");
         entityName = uncapitalize(formbackingType.getSimpleTypeName());
 
-        MemberDetails memberDetails = webMetadataService
-                .getMemberDetails(formbackingType);
-        JavaTypeMetadataDetails formBackingTypeMetadataDetails = webMetadataService
+        MemberDetails memberDetails = getWebMetadataService().getMemberDetails(
+                formbackingType);
+        JavaTypeMetadataDetails formBackingTypeMetadataDetails = getWebMetadataService()
                 .getJavaTypeMetadataDetails(formbackingType, memberDetails,
                         metadataIdentificationString);
         Validate.notNull(
@@ -127,8 +124,9 @@ public class PatternJspMetadataListener extends
         formBackingObjectTypesToLocalMids.put(formbackingType,
                 metadataIdentificationString);
 
-        eligibleFields = webMetadataService.getScaffoldEligibleFieldMetadata(
-                formbackingType, memberDetails, metadataIdentificationString);
+        eligibleFields = getWebMetadataService()
+                .getScaffoldEligibleFieldMetadata(formbackingType,
+                        memberDetails, metadataIdentificationString);
 
         if (eligibleFields.isEmpty()) {
             return null;
@@ -184,7 +182,8 @@ public class PatternJspMetadataListener extends
             // method
 
             // Get the metadata that just changed
-            MetadataItem metadataItem = metadataService.get(upstreamDependency);
+            MetadataItem metadataItem = getMetadataService().get(
+                    upstreamDependency);
 
             // We don't have to worry about physical type metadata, as we
             // monitor the relevant .java once the DOD governor is first
@@ -208,12 +207,12 @@ public class PatternJspMetadataListener extends
             String localMid = formBackingObjectTypesToLocalMids
                     .get(itdTypeDetails.getGovernor().getName());
             if (localMid != null) {
-                metadataService.evictAndGet(localMid);
+                getMetadataService().evictAndGet(localMid);
             }
             return;
         }
 
-        metadataService.evictAndGet(downstreamDependency);
+        getMetadataService().evictAndGet(downstreamDependency);
     }
 
     @Override
@@ -249,6 +248,56 @@ public class PatternJspMetadataListener extends
         }
         else {
             return metadataDependencyRegistry;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on PatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return metadataService;
+        }
+    }
+
+    public WebMetadataService getWebMetadataService() {
+        if (webMetadataService == null) {
+            // Get all Services implement WebMetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebMetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebMetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebMetadataService on PatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return webMetadataService;
         }
     }
 }

@@ -126,7 +126,7 @@ public final class JpaAuditListenerMetadataProvider extends
         String userServiceId = JpaAuditUserServiceMetadata.createIdentifier(
                 userService, path);
 
-        JpaAuditUserServiceMetadata userServiceMetadata = (JpaAuditUserServiceMetadata) metadataService
+        JpaAuditUserServiceMetadata userServiceMetadata = (JpaAuditUserServiceMetadata) getMetadataService()
                 .get(userServiceId);
 
         if (userServiceMetadata == null) {
@@ -153,7 +153,7 @@ public final class JpaAuditListenerMetadataProvider extends
         }
 
         // get target entity class MID and Logical path
-        final String domainTypeMid = typeLocationService
+        final String domainTypeMid = getTypeLocationService()
                 .getPhysicalTypeIdentifier(targetEntity);
         if (domainTypeMid == null) {
             return null;
@@ -164,7 +164,7 @@ public final class JpaAuditListenerMetadataProvider extends
                 targetEntity, path);
 
         // get JpaAudit metadata of target entity
-        JpaAuditMetadata auditMetadata = (JpaAuditMetadata) metadataService
+        JpaAuditMetadata auditMetadata = (JpaAuditMetadata) getMetadataService()
                 .get(auditMetadataKey);
 
         if (auditMetadata == null) {
@@ -241,7 +241,7 @@ public final class JpaAuditListenerMetadataProvider extends
      * @return see above
      */
     private String getRelatedEntityComponent(final JavaType governor) {
-        final ClassOrInterfaceTypeDetails governorTypeDetails = typeLocationService
+        final ClassOrInterfaceTypeDetails governorTypeDetails = getTypeLocationService()
                 .getTypeDetails(governor);
         if (governorTypeDetails != null) {
             for (final JavaType type : governorTypeDetails.getLayerEntities()) {

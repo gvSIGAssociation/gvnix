@@ -195,7 +195,7 @@ public abstract class AbstractPatternMetadataProvider extends
             JavaType type, String mid, WebMetadataService webMetadataService) {
 
         // Get field metadata, field details and field persistent details
-        PhysicalTypeMetadata typeMetadata = (PhysicalTypeMetadata) metadataService
+        PhysicalTypeMetadata typeMetadata = (PhysicalTypeMetadata) getMetadataService()
                 .get(PhysicalTypeIdentifier.createIdentifier(type,
                         LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
         Validate.notNull(

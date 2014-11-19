@@ -99,7 +99,7 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
                 entityType, LogicalPath.getInstance(path, ""));
 
         // We need to lookup the metadata we depend on
-        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) this.metadataService
+        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) getMetadataService()
                 .get(entityMetadataKey);
         // We need to abort if we couldn't find dependent metadata
         if (entityMetadata == null || !entityMetadata.isValid()) {
@@ -110,7 +110,7 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
         getMetadataDependencyRegistry().registerDependency(entityMetadataKey,
                 metadataIdentificationString);
 
-        PhysicalTypeMetadata entityPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+        PhysicalTypeMetadata entityPhysicalTypeMetadata = (PhysicalTypeMetadata) getMetadataService()
                 .get(PhysicalTypeIdentifier.createIdentifier(entityType,
                         LogicalPath.getInstance(path, "")));
         Validate.notNull(
@@ -119,7 +119,7 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
                         + entityType.getFullyQualifiedTypeName());
         ClassOrInterfaceTypeDetails entityClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) entityPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
-        MemberDetails entityMemberDetails = memberDetailsScanner
+        MemberDetails entityMemberDetails = getMemberDetailsScanner()
                 .getMemberDetails(getClass().getName(),
                         entityClassOrInterfaceDetails);
 
@@ -129,7 +129,7 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
                         .getDynamicFinderMethodsAndFields(entityType,
                                 entityMemberDetails,
                                 metadataIdentificationString),
-                persistenceMemberLocator);
+                getPersistenceMemberLocator());
     }
 
     public String getItdUniquenessFilenameSuffix() {

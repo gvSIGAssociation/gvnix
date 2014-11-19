@@ -122,7 +122,7 @@ public final class JpaAuditRevisionEntityMetadataProvider extends
         String userServiceId = JpaAuditUserServiceMetadata.createIdentifier(
                 userService, path);
 
-        JpaAuditUserServiceMetadata userServiceMetadata = (JpaAuditUserServiceMetadata) metadataService
+        JpaAuditUserServiceMetadata userServiceMetadata = (JpaAuditUserServiceMetadata) getMetadataService()
                 .get(userServiceId);
 
         if (userServiceMetadata == null) {

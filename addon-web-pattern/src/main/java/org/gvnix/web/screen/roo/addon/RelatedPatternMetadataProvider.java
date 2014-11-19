@@ -169,7 +169,7 @@ public final class RelatedPatternMetadataProvider extends
         LogicalPath path = RelatedPatternMetadata.getPath(mid);
         String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
                 controllerType, path);
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) getMetadataService()
                 .get(webScaffoldMetadataKey);
         if (webScaffoldMetadata == null) {
 
@@ -197,7 +197,7 @@ public final class RelatedPatternMetadataProvider extends
         JavaType entity = annotationValues.getFormBackingObject();
 
         // Get and validate required details and metadatas
-        PhysicalTypeMetadata entityMetadata = (PhysicalTypeMetadata) metadataService
+        PhysicalTypeMetadata entityMetadata = (PhysicalTypeMetadata) getMetadataService()
                 .get(PhysicalTypeIdentifier.createIdentifier(entity,
                         LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
         Validate.notNull(
@@ -237,7 +237,7 @@ public final class RelatedPatternMetadataProvider extends
         // Install Dialog Bean
         OperationUtils.installWebDialogClass(aspect.getPackage()
                 .getFullyQualifiedPackageName().concat(".dialog"),
-                getProjectOperations().getPathResolver(), fileManager);
+                getProjectOperations().getPathResolver(), getFileManager());
 
         // Related fields and dates
         SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields = getRelationFieldsDetails(
@@ -295,7 +295,7 @@ public final class RelatedPatternMetadataProvider extends
             Iterator<JavaType> it = keySet.iterator();
             while (it.hasNext()) {
                 JavaType type = it.next();
-                cid = typeLocationService.getTypeDetails(type);
+                cid = getTypeLocationService().getTypeDetails(type);
                 if (!cid.getEnumConstants().isEmpty()) {
                     tempMap.remove(type);
                 }

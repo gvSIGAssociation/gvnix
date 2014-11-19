@@ -122,7 +122,7 @@ public final class JpaAuditUserServiceMetadataProvider extends
 
         boolean userTypeIsUserDetails = false;
         boolean userTypeIsEntity = false;
-        ClassOrInterfaceTypeDetails userTypeDetails = typeLocationService
+        ClassOrInterfaceTypeDetails userTypeDetails = getTypeLocationService()
                 .getTypeDetails(userType);
         if (userTypeDetails != null) {
             // Try to identify if userType implements UserDetails

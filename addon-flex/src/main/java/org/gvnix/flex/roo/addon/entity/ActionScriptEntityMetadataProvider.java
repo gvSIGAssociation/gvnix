@@ -526,7 +526,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider,
     }
 
     private MemberDetails getMemberDetails(JavaType entityType) {
-        PhysicalTypeMetadata entityPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+        PhysicalTypeMetadata entityPhysicalTypeMetadata = (PhysicalTypeMetadata) getMetadataService()
                 .get(PhysicalTypeIdentifier.createIdentifier(entityType,
                         LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
         Validate.notNull(

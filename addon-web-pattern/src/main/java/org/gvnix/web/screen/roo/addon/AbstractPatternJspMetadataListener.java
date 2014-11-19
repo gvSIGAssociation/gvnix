@@ -30,9 +30,11 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import org.apache.felix.scr.annotations.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.roo.addon.plural.PluralMetadata;
@@ -75,6 +77,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.springframework.roo.support.logging.HandlerUtils;
+import org.osgi.service.component.ComponentContext;
 
 /**
  * This Abstract Listener gives support for install/create/modify MVC artifacts
@@ -85,8 +92,12 @@ import org.w3c.dom.NodeList;
  *         Transport</a>
  * @since 0.8
  */
+@Component(componentAbstract = true)
 public abstract class AbstractPatternJspMetadataListener implements
         MetadataProvider, MetadataNotificationListener {
+
+    // ------------ OSGi component attributes ----------------
+    public BundleContext context;
 
     private static final String TRUE_VALUE = "true";
     private static final String FIELD_ATTRIBUTE = "field";
@@ -126,6 +137,10 @@ public abstract class AbstractPatternJspMetadataListener implements
     protected List<FieldMetadata> eligibleFields;
     protected WebScaffoldAnnotationValues webScaffoldAnnotationValues;
 
+    protected void activate(final ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
+
     /**
      * For the given pattern it install needed MVC artifacts and generates the
      * pattern JSPx
@@ -135,7 +150,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     protected void installMvcArtifacts(String pattern) {
         String[] patternNameType = pattern.split("=");
 
-        PathResolver pathResolver = _projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
         String controllerPath = webScaffoldMetadata.getAnnotationValues()
                 .getPath();
         Validate.notNull(controllerPath, PATH_IS_NOT_SPECIFIED
@@ -149,8 +164,8 @@ public abstract class AbstractPatternJspMetadataListener implements
         String destinationDirectory = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/views/" + controllerPath);
-        if (!_fileManager.exists(destinationDirectory)) {
-            _fileManager.createDirectory(destinationDirectory);
+        if (!getFileManager().exists(destinationDirectory)) {
+            getFileManager().createDirectory(destinationDirectory);
         }
         else {
             File file = new File(destinationDirectory);
@@ -212,11 +227,13 @@ public abstract class AbstractPatternJspMetadataListener implements
         writeToDiskIfNecessary(patternPath, jspDoc);
 
         // add view to views.xml
-        _tilesOperations.addViewDefinition(controllerPath,
+        getTilesOperations().addViewDefinition(
+                controllerPath,
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 controllerPath + "/" + patternName,
-                TilesOperations.DEFAULT_TEMPLATE, "/WEB-INF/views/"
-                        + controllerPath + "/" + patternName + ".jspx");
+                TilesOperations.DEFAULT_TEMPLATE,
+                "/WEB-INF/views/" + controllerPath + "/" + patternName
+                        + ".jspx");
         // add entry to menu.jspx
         JavaSymbolName categoryName = new JavaSymbolName(
                 formbackingType.getSimpleTypeName());
@@ -228,11 +245,14 @@ public abstract class AbstractPatternJspMetadataListener implements
                 patternName).concat(
                 "&index=${empty param.index ? 1 : param.index}");
         if (!isRelatedPattern()) {
-            _menuOperations.addMenuItem(categoryName, menuItemId, "menu_list_"
-                    .concat(patternTypeStr).concat("_").concat(patternName),
+            getMenuOperations().addMenuItem(
+                    categoryName,
+                    menuItemId,
+                    "menu_list_".concat(patternTypeStr).concat("_")
+                            .concat(patternName),
                     "/" + controllerPath + queryString,
                     MenuOperations.DEFAULT_MENU_ITEM_PREFIX,
-                    _pathResolver.getFocusedPath(Path.SRC_MAIN_WEBAPP));
+                    getPathResolver().getFocusedPath(Path.SRC_MAIN_WEBAPP));
         }
         // add needed properties
         Map<String, String> properties = new LinkedHashMap<String, String>();
@@ -252,7 +272,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                             .getReadableSymbolName()
                             + " list ".concat(patternTypeStr).concat(" ")
                             + patternName);
-            _propFileOperations.addProperties(
+            getPropFileOperations().addProperties(
                     LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                     "/WEB-INF/i18n/application.properties", properties, true,
                     false);
@@ -503,7 +523,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         // and "mappedBy" attribute has some value
         String masterField = null;
 
-        PhysicalTypeMetadata masterEntityDetails = (PhysicalTypeMetadata) _metadataService
+        PhysicalTypeMetadata masterEntityDetails = (PhysicalTypeMetadata) getMetadataService()
                 .get(PhysicalTypeIdentifier.createIdentifier(formbackingType,
                         LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
         List<FieldMetadata> masterFields = masterEntityDetails
@@ -606,13 +626,13 @@ public abstract class AbstractPatternJspMetadataListener implements
                 && !fieldEntity.getParameters().isEmpty()) {
             fieldEntity = fieldEntity.getParameters().get(0);
         }
-        ClassOrInterfaceTypeDetails cid = _typeLocationService
+        ClassOrInterfaceTypeDetails cid = getTypeLocationService()
                 .getTypeDetails(fieldEntity);
         JavaType javaType = cid.getName();
         LogicalPath path = PhysicalTypeIdentifier.getPath(cid
                 .getDeclaredByMetadataId());
 
-        PluralMetadata pluralMetadata = (PluralMetadata) _metadataService
+        PluralMetadata pluralMetadata = (PluralMetadata) getMetadataService()
                 .get(PluralMetadata.createIdentifier(javaType, path));
 
         return pluralMetadata.getPlural().toLowerCase();
@@ -683,18 +703,18 @@ public abstract class AbstractPatternJspMetadataListener implements
             controllerPath = "/".concat(controllerPath);
         }
 
-        PathResolver pathResolver = _projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
         String docJspx = pathResolver.getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/views" + controllerPath + "/" + rooJspx.name()
                         + ".jspx");
 
-        if (!_fileManager.exists(docJspx)) {
+        if (!getFileManager().exists(docJspx)) {
             // create.jspx doesn't exist, so nothing to do
             return;
         }
 
-        InputStream docJspxIs = _fileManager.getInputStream(docJspx);
+        InputStream docJspxIs = getFileManager().getInputStream(docJspx);
 
         Document docJspXml;
         try {
@@ -835,7 +855,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             form.appendChild(divContentPane);
         }
         DomUtils.removeTextNodes(docJspXml);
-        _fileManager.createOrUpdateTextFileIfRequired(docJspx,
+        getFileManager().createOrUpdateTextFileIfRequired(docJspx,
                 XmlUtils.nodeToString(docJspXml), true);
         // writeToDiskIfNecessary(docJspx, docJspXml);
     }
@@ -1396,17 +1416,17 @@ public abstract class AbstractPatternJspMetadataListener implements
      */
     private void writeToDiskIfNecessary(String jspFilename, Document proposed) {
         Document original = null;
-        if (_fileManager.exists(jspFilename)) {
-            original = XmlUtils.readXml(_fileManager
-                    .getInputStream(jspFilename));
+        if (getFileManager().exists(jspFilename)) {
+            original = XmlUtils.readXml(getFileManager().getInputStream(
+                    jspFilename));
             if (XmlRoundTripUtils.compareDocuments(original, proposed)) {
                 DomUtils.removeTextNodes(original);
-                _fileManager.createOrUpdateTextFileIfRequired(jspFilename,
+                getFileManager().createOrUpdateTextFileIfRequired(jspFilename,
                         XmlUtils.nodeToString(original), false);
             }
         }
         else {
-            _fileManager.createOrUpdateTextFileIfRequired(jspFilename,
+            getFileManager().createOrUpdateTextFileIfRequired(jspFilename,
                     XmlUtils.nodeToString(proposed), false);
         }
     }
@@ -1418,5 +1438,230 @@ public abstract class AbstractPatternJspMetadataListener implements
     }
 
     protected abstract boolean isRelatedPattern();
+
+    public FileManager getFileManager() {
+        if (_fileManager == null) {
+            // Get all Services implement FileManager interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on AbstractPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return _fileManager;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (_projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (ProjectOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on AbstractPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return _projectOperations;
+        }
+    }
+
+    public TilesOperations getTilesOperations() {
+        if (_tilesOperations == null) {
+            // Get all Services implement TilesOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TilesOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TilesOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TilesOperations on AbstractPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return _tilesOperations;
+        }
+    }
+
+    public MenuOperations getMenuOperations() {
+        if (_menuOperations == null) {
+            // Get all Services implement MenuOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MenuOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MenuOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MenuOperations on AbstractPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return _menuOperations;
+        }
+    }
+
+    public PropFileOperations getPropFileOperations() {
+        if (_propFileOperations == null) {
+            // Get all Services implement PropFileOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                PropFileOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PropFileOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PropFileOperations on AbstractPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return _propFileOperations;
+        }
+    }
+
+    public MetadataService getMetadataService() {
+        if (_metadataService == null) {
+            // Get all Services implement MetadataService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MetadataService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataService on AbstractPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return _metadataService;
+        }
+    }
+
+    public WebScreenOperations getWebScreenOperations() {
+        if (_webScreenOperations == null) {
+            // Get all Services implement WebScreenOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebScreenOperations.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (WebScreenOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebScreenOperations on AbstractPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return _webScreenOperations;
+        }
+    }
+
+    public PathResolver getPathResolver() {
+        if (_pathResolver == null) {
+            // Get all Services implement PathResolver interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(PathResolver.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (PathResolver) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load PathResolver on AbstractPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return _pathResolver;
+        }
+    }
+
+    public TypeLocationService getTypeLocationService() {
+        if (_typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on AbstractPatternJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return _typeLocationService;
+        }
+    }
 
 }

@@ -169,7 +169,7 @@ public final class PatternMetadataProvider extends
         LogicalPath path = PatternMetadata.getPath(mid);
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(
                 controllerType, path);
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) getMetadataService()
                 .get(webScaffoldMetadataId);
         if (webScaffoldMetadata == null) {
 
@@ -197,7 +197,7 @@ public final class PatternMetadataProvider extends
         JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
 
         // Get and validate required details and metadatas
-        PhysicalTypeMetadata entityMetadata = (PhysicalTypeMetadata) metadataService
+        PhysicalTypeMetadata entityMetadata = (PhysicalTypeMetadata) getMetadataService()
                 .get(PhysicalTypeIdentifier.createIdentifier(entity,
                         LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
         Validate.notNull(
@@ -238,7 +238,7 @@ public final class PatternMetadataProvider extends
         // Install Dialog Bean
         OperationUtils.installWebDialogClass(aspect.getPackage()
                 .getFullyQualifiedPackageName().concat(".dialog"),
-                getProjectOperations().getPathResolver(), fileManager);
+                getProjectOperations().getPathResolver(), getFileManager());
 
         // Related fields and dates
         SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields = getRelationFieldsDetails(

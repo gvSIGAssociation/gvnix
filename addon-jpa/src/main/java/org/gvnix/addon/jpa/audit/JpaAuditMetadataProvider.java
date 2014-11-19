@@ -118,7 +118,7 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
         String userServiceId = JpaAuditUserServiceMetadata.createIdentifier(
                 userService, path);
 
-        JpaAuditUserServiceMetadata userServiceMetadata = (JpaAuditUserServiceMetadata) metadataService
+        JpaAuditUserServiceMetadata userServiceMetadata = (JpaAuditUserServiceMetadata) getMetadataService()
                 .get(userServiceId);
 
         if (userServiceMetadata == null) {
@@ -134,7 +134,7 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
         String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
                 path);
 
-        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) metadataService
+        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) getMetadataService()
                 .get(jpaMetadataId);
 
         if (jpaMetadata == null) {
@@ -143,7 +143,7 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
         }
 
         // Gets entity identifier field definition
-        List<FieldMetadata> identifiers = persistenceMemberLocator
+        List<FieldMetadata> identifiers = getPersistenceMemberLocator()
                 .getIdentifierFields(entity);
 
         if (identifiers == null || identifiers.isEmpty()) {
@@ -167,7 +167,7 @@ public final class JpaAuditMetadataProvider extends AbstractItdMetadataProvider 
                 // Cleans metadata already generated from governor
                 // so it could generate taking account of JpaAudit
                 // ITD generation
-                metadataService.evict(downstreamId);
+                getMetadataService().evict(downstreamId);
             }
         }
 

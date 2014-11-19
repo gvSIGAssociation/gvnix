@@ -117,7 +117,7 @@ public final class EntityBatchMetadataProvider extends
                 .getPath(metadataIdentificationString);
         String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(
                 entityType, path);
-        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService
+        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) getMetadataService()
                 .get(entityMetadataKey);
         if (entityMetadata == null) {
             // Metadata not available yet, do nothing on this invoke
