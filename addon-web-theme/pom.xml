@@ -30,8 +30,9 @@
   </licenses>
   <parent>
     <groupId>org.gvnix</groupId>
-    <artifactId>org.gvnix.root</artifactId>
+    <artifactId>org.gvnix.osgi.bundles</artifactId>
     <version>1.4.0-SNAPSHOT</version>
+    <relativePath>../gvnix-osgi-bundles</relativePath>
   </parent>
   <artifactId>org.gvnix.web.theme.roo.addon</artifactId>
   <packaging>bundle</packaging>

@@ -45,10 +45,11 @@
 
   <modules>
     <!-- TODO: Modules order is important for googlecode repository upload (validate it) -->
+    <module>gvnix-osgi-bundles</module>
     <module>support</module>
-    <!-- <module>taglib-datatables</module>-->
-    <!-- <module>util-datatables</module>-->
-    <!-- <module>util-web-mvc-jackson-binder</module>-->
+    <module>taglib-datatables</module>
+    <module>util-datatables</module>
+    <module>util-web-mvc-jackson-binder</module>
     <module>addon-jpa</module>
     <module>addon-web-mvc</module>
     <module>addon-web-mvc-bootstrap</module>
@@ -878,6 +879,28 @@
   </dependencyManagement>
 
   <build>
+  
+  <pluginManagement>
+  	<plugins>
+          <plugin>
+           <groupId>org.apache.felix</groupId>
+           <artifactId>maven-scr-plugin</artifactId>
+           <version>${scr.plugin.version}</version>
+           <executions>
+               <execution>
+                   <id>generate-scr-scrdescriptor</id>
+                   <!-- <phase>compile</phase> -->
+                   <goals>
+                       <goal>scr</goal>
+                   </goals>
+               </execution>
+           </executions>
+           <configuration>
+               <parseJavaDoc>false</parseJavaDoc>
+           </configuration>
+       </plugin>
+  	</plugins>
+  </pluginManagement>
     <extensions>
       <extension>
         <groupId>org.springframework.build.aws</groupId>
@@ -894,28 +917,6 @@
 
     </extensions>
     <plugins>
-
-
-      <!-- Old osgi-roo-bundle module plugins -->
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-scr-plugin</artifactId>
-        <version>${scr.plugin.version}</version>
-        <executions>
-          <execution>
-            <id>generate-scr-scrdescriptor</id>
-            <!-- <phase>compile</phase> -->
-            <goals>
-              <goal>scr</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <parseJavaDoc>false</parseJavaDoc>
-        </configuration>
-      </plugin>
-
-
       <!-- Old osgi-bundle module plugins -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
