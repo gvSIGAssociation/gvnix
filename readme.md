@@ -150,17 +150,10 @@ Package gvNIX
 
 * Create the tag for the gvNIX version we want to build using STS
 
-* Config your maven file conf/settings.xml to deploy to google code.
+* Config your maven file conf/settings.xml to deploy to maven central following this documentation:
 
-  []
-    <server>
-      <id>Google Code</id>
-      <username>gvnixscm@gmail.com</username>
-      <password>XXXXXXXXXXX</password>
-    </server>
-  []
-  
-  Get password from redmine project wiki.
+http://central.sonatype.org/pages/apache-maven.html
+
   
 * Copy your conf/settings.xml to .m2/ folder 
 
