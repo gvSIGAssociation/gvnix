@@ -23,7 +23,7 @@ DESCRIPTION:
     Creates the release ZIP. Automates building deployment ZIPs and deployment.
 
 REQUIRES:
-    roo-deploy.sh
+    roo-deploy-dist.sh
 EOF
 }
 
@@ -69,9 +69,9 @@ mvn clean install
 cd deployment-support
 mvn clean site
 if [ "$TEST" = "1" ]; then
-	./roo-deploy.sh -c assembly -tv
+	./roo-deploy-dist.sh -c assembly -tv
 else 
-	./roo-deploy.sh -c assembly -v
+	./roo-deploy-dist.sh -c assembly -v
 fi
 cd ..
 mvn clean package
@@ -98,9 +98,9 @@ cd roo/deployment-support
 # Build site documentation and execute deployment script
 mvn clean site
 if [ "$TEST" = "1" ]; then
-	./roo-deploy.sh -c assembly -Tv
+	./roo-deploy-dist.sh -c assembly -Tv
 else
-	./roo-deploy.sh -c assembly -v
+	./roo-deploy-dist.sh -c assembly -v
 fi
 
 # Change to gvNIX folder
