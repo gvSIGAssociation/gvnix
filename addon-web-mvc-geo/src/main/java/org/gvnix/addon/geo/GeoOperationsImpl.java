@@ -407,6 +407,13 @@ public class GeoOperationsImpl extends AbstractOperations implements
             String color, String weight, String center, String zoom,
             String maxZoom) {
 
+        // Doing a previous setup to install necessary components and annotate
+        // ApplicationConversionService
+        if (!getProjectOperations().isFeatureInstalledInFocusedModule(
+                FEATURE_NAME_GVNIX_GEO_WEB_MVC)) {
+            setup();
+        }
+
         Validate.notNull(controller, "Valid controller is necessary");
 
         // Getting controller Details
@@ -1020,7 +1027,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
                         }
                     }
                     else if (fieldType.equals(new JavaType(
-                            "com.vividsolutions.jts.geom.Polygon"))) {
+                            "com.vividsolutions.jts.geom.Polygon"))
+                            || fieldType.equals(new JavaType(
+                                    "com.vividsolutions.jts.geom.Geometry"))) {
                         mapControl = createDoc
                                 .createElement("geofield:map-polygon");
                         if (StringUtils.isNotBlank(color)) {

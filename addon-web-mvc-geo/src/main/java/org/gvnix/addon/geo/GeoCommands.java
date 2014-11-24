@@ -150,7 +150,17 @@ public class GeoCommands implements CommandMarker {
             @CliOption(key = "map", mandatory = false, help = "Map where you want to add all entities. If blank, adds all GEO entities to all available maps") MapsProperty path) {
         // Checking if path was selected
         if (path != null) {
-            operations.all(new JavaSymbolName(path.getValue()));
+
+            String pathController = null;
+
+            if (path.getKey() == null) {
+                pathController = path.getValue();
+            }
+            else {
+                pathController = path.getKey();
+            }
+            operations.all(new JavaSymbolName(pathController));
+
         }
         else {
             operations.all(null);
