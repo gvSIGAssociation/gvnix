@@ -82,7 +82,7 @@ public class DatatablesCommands implements CommandMarker {
     public void add(
             @CliOption(key = "type", mandatory = true, help = "The controller to apply this component to") JavaType target,
             @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "true (default) to load data using AJAX, otherwise the data are loaded on page render time") boolean ajax,
-            @CliOption(key = "inline", mandatory = false, unspecifiedDefaultValue = "false", help = "Allow user to modify data in-line, that is, enable in-line editing") boolean inline,
+            @CliOption(key = "inline", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false", help = "Allow user to modify data in-line, that is, enable in-line editing") boolean inline,
             @CliOption(key = "mode", mandatory = false, unspecifiedDefaultValue = GvNIXDatatables.TABLE, help = "Visualization mode: if empty (default) renders a table, otherwise create one-row-per-page + one-cell-per-row datatable will be created. On each cell the content of given mode will be rendered, that is, by setting mode == show, each cell will have the show.jspx containing the data of the current entity") String mode,
             @CliOption(key = "baseFilter", mandatory = false, help = "Add a default base filter to this datatable.  Using the following format: nameEQjohnAndageGT26") JavaSymbolName baseFilter) {
         if (baseFilter != null
