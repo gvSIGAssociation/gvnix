@@ -23,6 +23,9 @@ readtime:         true
 # whether working locally or remotely. Start Jekyll with: jekyll serve --baseurl ''
 url: http://github.com/disid/gvnix
 
+# Context path in the remote website (usually /<project>), will be prepended to absolute URLs for static resources
+baseurl: /gvnix
+
 # Settings for comments helper
 # Set 'provider' to the comment provider you want to use.
 # Set 'provider' to false to turn commenting off globally.
