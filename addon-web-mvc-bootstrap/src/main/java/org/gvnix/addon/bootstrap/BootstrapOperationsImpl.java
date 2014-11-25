@@ -1,34 +1,23 @@
 package org.gvnix.addon.bootstrap;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.WebProjectUtils;
+import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
+import org.osgi.framework.*;
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.FeatureNames;
-import org.springframework.roo.project.LogicalPath;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.*;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
-import org.gvnix.support.WebProjectUtils;
-
-import org.osgi.service.component.ComponentContext;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of Bootstrap Addon operations
@@ -213,7 +202,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                 "fonts/glyphicons-halflings-regular.ttf",
                 "fonts/glyphicons-halflings-regular.woff", "fonts/README.txt",
                 "images/sort_asc.png", "images/sort_both.png",
-                "images/sort_desc.png");
+                "images/sort_desc.png", "print.css");
 
         Iterator<String> stylesFolderIterator = stylesFolderFiles.iterator();
 
@@ -226,6 +215,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                     getClass(), styleFile, fileName, "styles/");
 
         }
+        addToLoadScripts("styles_bootstrap_print", "styles/print.css", true);
     }
 
     /**
@@ -583,4 +573,69 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
             return projectOperations;
         }
     }
+
+    /**
+     * This method adds reference in laod-script.tagx to use
+     * jquery.loupeField.ext.gvnix.js
+     */
+    public void addToLoadScripts(String varName, String url, boolean isCSS) {
+        // Modify Roo load-scripts.tagx
+        String docTagxPath = getPathResolver().getIdentifier(getWebappPath(),
+                "WEB-INF/tags/util/load-scripts.tagx");
+
+        Validate.isTrue(getFileManager().exists(docTagxPath),
+                "load-script.tagx not found: ".concat(docTagxPath));
+
+        MutableFile docTagxMutableFile = null;
+        Document docTagx;
+
+        try {
+            docTagxMutableFile = getFileManager().updateFile(docTagxPath);
+            docTagx = XmlUtils.getDocumentBuilder().parse(
+                    docTagxMutableFile.getInputStream());
+        }
+        catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        Element root = docTagx.getDocumentElement();
+
+        boolean modified = false;
+
+        if (isCSS) {
+            modified = addCssToTag(docTagx, root, varName, url) || modified;
+        }
+        else {
+            modified = WebProjectUtils.addJSToTag(docTagx, root, varName, url)
+                    || modified;
+        }
+
+        if (modified) {
+            XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
+        }
+
+    }
+
+    private static boolean addCssToTag(Document docTagx, Element root,
+            String varName, String location) {
+        boolean modified = false;
+
+        // add url resolution
+        modified = WebProjectUtils
+                .addUrlToTag(docTagx, root, varName, location);
+
+        // Add link
+        Element cssElement = XmlUtils.findFirstElement(
+                String.format("link[@href='${%s}']", varName), root);
+        if (cssElement == null) {
+            cssElement = docTagx.createElement("link");
+            cssElement.setAttribute("rel", "stylesheet");
+            cssElement.setAttribute("type", "text/css");
+            cssElement.setAttribute("media", "screen,print");
+            cssElement.setAttribute("href", "${".concat(varName).concat("}"));
+            root.appendChild(cssElement);
+            modified = true;
+        }
+        return modified;
+    }
+
 }

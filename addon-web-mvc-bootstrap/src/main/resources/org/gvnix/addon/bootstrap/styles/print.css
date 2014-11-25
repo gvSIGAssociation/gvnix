@@ -1,0 +1,47 @@
+/********************************/
+/****** Styles for Printer ******/
+/********************************/
+
+@page{
+    margin-right: 1cm;
+    margin-left: 1cm;
+}
+
+@media print {
+    a:after {
+        content: none !important;
+    }
+    header, footer{
+        display: none !important;
+    }
+    body {
+        padding-top: 0px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+        min-width: 768px;
+    }
+    .printxs{
+        width: 50% !important;
+        float: left;
+    }
+    .col-xs-offset-1{
+        margin-left: 8.333333333333332%;
+    }
+    .container {
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+      }
+    input[type=button] {
+        display: none !important;
+    }
+    .only-for-print {
+        display: inherit !important;
+    }
+    .not-print {
+        display: none !important;
+    }
+}
