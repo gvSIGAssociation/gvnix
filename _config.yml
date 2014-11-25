@@ -21,10 +21,10 @@ readtime:         true
 # Change url to your domain. Leave localhost server or blank when working locally.
 # or use the hint from http://jekyllrb.com/docs/github-pages/ to keep this the same
 # whether working locally or remotely. Start Jekyll with: jekyll serve --baseurl ''
-url: http://github.com/disid/gvnix
+url: http://disid.github.io/gvnix/
 
 # Context path in the remote website (usually /<project>), will be prepended to absolute URLs for static resources
-baseurl: /gvnix
+#baseurl: /gvnix
 
 # Settings for comments helper
 # Set 'provider' to the comment provider you want to use.

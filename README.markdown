@@ -106,8 +106,11 @@ However, the subdirectory-like URL structure GitHub uses for Project Pages compl
 Here is an approach to utilizing the GitHub Project Page URL structure (username.github.io/project-name/)
 whilst maintaining the ability to preview your Jekyll site locally.
 
-Iif you’d like to preview your site before committing/deploying using jekyll serve,
-be sure to pass an empty string to the --baseurl option,
-so that you can view everything at localhost:4000 normally
-(without /project-name at the beginning):
-`jekyll serve --baseurl ''`
+* When referencing JS or CSS files, do it like this:
+  {{ site.baseurl }}/path/to/css.css – note the slash immediately following the variable (just before “path”).
+
+* If you’d like to preview your site before committing/deploying using jekyll serve,
+  be sure to pass an empty string to the --baseurl option,
+  so that you can view everything at localhost:4000 normally
+  (without /project-name at the beginning):
+  `jekyll serve --baseurl ''`

@@ -5,12 +5,12 @@
   <!-- Jekyll Bootstrap 1.10 -->
   <script type="text/javascript" src="{{ ASSET_PATH }}/resources/jquery/jquery.min.js"></script>
   <!-- theme agency 1.11-->
-  <!-- <script type="text/javascript" src="{{ site.baseurl }}{{ ASSET_PATH }}/js/jquery-1.11.0.js"></script> -->
-<script>window.jQuery || document.write('<script src="{{ site.baseurl }}{{ ASSET_PATH }}/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+  <!-- <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery-1.11.0.js"></script> -->
+<script>window.jQuery || document.write('<script src="{{ site.url }}{{ ASSET_PATH }}/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
 
-<script src="{{ site.baseurl }}{{ ASSET_PATH }}/js/scripts.min.js"></script>
-<script type="text/javascript" src="{{ site.baseurl }}{{ ASSET_PATH }}/js/waypoints.min.js"></script>
-<script type="text/javascript" src="{{ site.baseurl }}{{ ASSET_PATH }}/js/script.js"></script>
+<script src="{{ site.url }}{{ ASSET_PATH }}/js/scripts.min.js"></script>
+<script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/waypoints.min.js"></script>
+<script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/script.js"></script>
 <script type='text/javascript'>console.log("HMFaysal Omega Theme Version 2.0 - custom by DISID");</script>
 <script type='text/javascript'>$(document).ready(function(){$(".time").text(function(a,b){return Math.round(parseFloat(b))})});</script>
 
@@ -18,16 +18,16 @@
  <script type="text/javascript" src="{{ ASSET_PATH }}/resources/bootstrap/js/bootstrap.min.js"></script>
 
 <!--  test include github file -->
-<!-- <script type="text/javascript" src="{{ site.baseurl }}{{ ASSET_PATH }}/js/plugins/ghembedder.js"></script> -->
-<!-- <script type="text/javascript" src="{{ site.baseurl }}{{ ASSET_PATH }}/js/plugins/github-files.js"></script> -->
+<!-- <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/plugins/ghembedder.js"></script> -->
+<!-- <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/plugins/github-files.js"></script> -->
 
 <!-- menu animated -->
-<script type="text/javascript" src="{{ site.baseurl }}{{ ASSET_PATH }}/js/plugins/jquery.easing.min.js"></script>
-<script type="text/javascript" src="{{ site.baseurl }}{{ ASSET_PATH }}/js/plugins/classie.js"></script>
-<script type="text/javascript" src="{{ site.baseurl }}{{ ASSET_PATH }}/js/plugins/cbpAnimatedHeader.js"></script>
+<script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/plugins/jquery.easing.min.js"></script>
+<script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/plugins/classie.js"></script>
+<script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/plugins/cbpAnimatedHeader.js"></script>
 
 <!-- animated home sections -->
-<script type="text/javascript" src="{{ site.baseurl }}{{ ASSET_PATH }}/js/plugins/scrollview.js"></script>
+<script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/plugins/scrollview.js"></script>
 
 
 
@@ -62,7 +62,7 @@ $("a#click-pages").click(function(){
 <script>
   $(document).ready(function() {
       $('.search-field').simpleJekyllSearch({
-          jsonFile : '{{ site.baseurl }}/search.json',
+          jsonFile : '{{ site.url }}/search.json',
           searchResults : '.search-results',
           template : '<li><article><a href="{url}">{title} <span class="entry-date"><time datetime="{date}">{shortdate}</time></span></a></article></li>',
           noResults: '<p>Nothing found.</p>'

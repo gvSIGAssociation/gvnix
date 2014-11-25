@@ -4,7 +4,7 @@
 {% assign posts=site.posts | where:"date", page.date %}
   {% for post in posts %}
     {% if post.lang != page.lang %}
-      <link rel="alternate" hreflang="{{post.lang}}" href="{{ site.baseurl }}{{ post.url }}" />
+      <link rel="alternate" hreflang="{{post.lang}}" href="{{ site.url }}{{ post.url }}" />
     {% endif %}
   {% endfor %}
 <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.t[page.lang].description }} {% endif %}">
@@ -13,9 +13,9 @@
 {% if site.owner.twitter %}
 <!-- Twitter Cards -->
 {% if page.imagefeature %}<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="{{ site.baseurl }}{{ ASSET_PATH }}/images/{{ page.imagefeature }}">
+<meta name="twitter:image" content="{{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }}">
 {% else %}<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="{% if page.image.thumb %}{{ site.baseurl }}{{ ASSET_PATH }}/images/{{ page.image.thumb }}{% else %}{{ site.baseurl }}{{ ASSET_PATH }}/images/{{ site.logo }}{% endif %}">{% endif %}
+<meta name="twitter:image" content="{% if page.image.thumb %}{{ site.url }}{{ ASSET_PATH }}/images/{{ page.image.thumb }}{% else %}{{ site.url }}{{ ASSET_PATH }}/images/{{ site.logo }}{% endif %}">{% endif %}
 <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
 <meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.t[page.lang].description }} {% endif %}">
 <meta name="twitter:creator" content="@{{ site.owner.twitter }}">{% endif %}
@@ -25,16 +25,16 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
 <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.t[page.lang].description }} {% endif %}">
-<meta property="og:url" content="{{ site.baseurl }}{{ page.url }}">
+<meta property="og:url" content="{{ site.url }}{{ page.url }}">
 <meta property="og:site_name" content="{{ site.title }}">
-{% if page.imagefeature %}<meta property="og:image" content="{{ ASSET_PATH }}/images/{{ page.imagefeature }}">{% else %}<meta property="og:image" content="{{ site.baseurl }}{{ ASSET_PATH }}/images/{{ site.default_bg }}">{% endif %}
+{% if page.imagefeature %}<meta property="og:image" content="{{ ASSET_PATH }}/images/{{ page.imagefeature }}">{% else %}<meta property="og:image" content="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }}">{% endif %}
 
 {% if site.google_verify %}<meta name="google-site-verification" content="{{ site.google_verify }}">{% endif %}
 {% if site.bing_verify %}<meta name="msvalidate.01" content="{{ site.bing_verify }}">{% endif %}
 
-{% capture canonical %}{{ site.baseurl }}{% if site.permalink contains '.html' %}{{ page.url }}{% else %}{{ page.url | remove:'index.html' | strip_slash }}{% endif %}{% endcapture %}
+{% capture canonical %}{{ site.url }}{% if site.permalink contains '.html' %}{{ page.url }}{% else %}{{ page.url | remove:'index.html' | strip_slash }}{% endif %}{% endcapture %}
 <link rel="canonical" href="{{ canonical }}">
-<link href="{{ site.baseurl }}/feed.xml" type="application/atom+xml" rel="alternate" title="{{ site.title }} Feed">
+<link href="{{ site.url }}/feed.xml" type="application/atom+xml" rel="alternate" title="{{ site.title }} Feed">
 {% if site.owner.google_plus %}<link rel="author" href="{{ site.owner.google_plus }}?rel=author">{% endif %}
 
 <!-- http://t.co/dKP3o1e -->
@@ -59,7 +59,7 @@
 
  <!-- Icons -->
 <!-- all formats -->
-<link rel="shortcut icon" href="{{ site.baseurl }}/favicon.ico">
+<link rel="shortcut icon" href="{{ site.url }}/favicon.ico">
 <link rel="apple short icon" href="{{ ASSET_PATH }}/images/favicon.ico" />
 
 <!-- atom & rss feed -->
