@@ -61,7 +61,7 @@
   <!-- ====================================== -->
 
   <jsp:directive.attribute name="info" type="java.lang.String" rtexprvalue="true" required="false" description="(true|false) Enable or disable the table information display. This shows information about the data that is currently visible on the page, including information about filtered data if that action is being performed.  (Default : true, see http://datatables.net/ref#bInfo)" />
-  <jsp:directive.attribute name="paginate" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable pagination.  (Default : true, see http://datatables.net/ref#bPaginate)" />
+  <jsp:directive.attribute name="paginate" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable pagination. Only works if list mode is set. (Default : true, see http://datatables.net/ref#bPaginate)" />
   <jsp:directive.attribute name="lengthChange" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) If paginate is enabled, allows the end user to select the size of a formatted page from a select menu (sizes are 10, 25, 50 and 100). (Default : true, see http://datatables.net/ref#bLengthChange)" />
   <jsp:directive.attribute name="paginationType" type="java.lang.String" rtexprvalue="true" required="false" description="(two_button|full_numbers) Choice between the two different built-in pagination interaction methods ('two_button' or 'full_numbers') which present different page controls to the end user. Default: full_numbers (More info: http://datatables.net/ref#sPaginationType)" />
   <jsp:directive.attribute name="filter" type="java.lang.Boolean" rtexprvalue="true" required="false" description="(true|false) Enable or disable filtering of data.  (Default : true, see http://datatables.net/ref#bFilter)" />
@@ -90,7 +90,7 @@
   <!-- ====================================== -->
   <!-- Extra features -->
   <!-- ====================================== -->
-  
+
   <!-- State Save And Load -->
   <jsp:directive.attribute name="statePrefix" type="java.lang.String" rtexprvalue="true" required="false" description="Prefix to add on localStorage to identify the table" />
 
@@ -346,7 +346,7 @@
    </c:when>
 
   <c:otherwise>
-  
+
   <!-- ******* Begin inline creation panel ********** -->
   <c:set var="inlineCreating" value="false" />
   <c:if test="${serverSide and datatablesInlineCreating}">
@@ -368,7 +368,7 @@
     </c:set>
   </c:if>
   <!-- ******* End inline creation panel ********** -->
-  
+
   <!--
   *******	Tabular views configuration ******
    -->
@@ -602,10 +602,10 @@
                       /* ... */
 		        function ${removeColumnId}_selected(aId) {
 		        	var $table = jQuery('#${id}').dataTable();
-              
+
               // Get the table GvNIX_Selection object
               var $selection = $table.fnSelection();
-		        	
+
 		          if (aId == null || aId === undefined || aId == '') {
 			        	var selCount = $selection.fnSelectionCount();
 			        	if ( selCount > 1) {
@@ -662,13 +662,13 @@
 		        				</c:otherwise>
 	        				</c:choose>
 	        				$selection.fnSelectNone();
-	        				
+
 	        				if($table.fnHasRowClick()){
 	        					// Save state clearing previous selection
 	        					$table.fnRowClick().fnSaveState(true);
 	        					location.reload();
 	        				}
-								        				
+
 		        		}
 					  ).fail( function (data) {
 		        			log('delete ERROR: ' + data.status + ' ' + data.statusText + '-' + data.responseText);
@@ -858,11 +858,11 @@
       colReorder="${colReorder}"
       data-stateprefix="${statePrefix}"
     >
-    
+
     <!-- Adding extra configuration into Datatables -->
     <spring:url var="extraConf_var" value="" />
     <datatables:extraConf src="${extraConf_var}/resources/scripts/datatables/jquery.dataTables.extraConf.js"/>
-    
+
 			<c:choose>
 
             <!-- On register view mode add a datatables column only, checkbox,
