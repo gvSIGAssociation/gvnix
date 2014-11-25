@@ -110,6 +110,4 @@ Iif you’d like to preview your site before committing/deploying using jekyll s
 be sure to pass an empty string to the --baseurl option,
 so that you can view everything at localhost:4000 normally
 (without /project-name at the beginning):
-jekyll serve --baseurl ''
-jekyll serve --baseurl 'http://github.com/disid/gvnix'
-
+`jekyll serve --baseurl ''`
