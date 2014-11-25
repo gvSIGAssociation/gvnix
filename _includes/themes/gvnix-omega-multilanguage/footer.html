@@ -1,0 +1,68 @@
+    <!-- Smooth Page Scroll to Top with jQuery
+    ================================================== -->
+  <a class="scrollup" href="#" rel="tooltip" data-original-title=""  data-placement="left"></a>
+
+{% if page.imagefeature %}
+<footer id="footer"  class="blog-background overlay text-center align-middle animated from-top" style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }})" >
+{% else %}
+<footer id="footer"  class="blog-background overlay text-center align-middle animated from-top" style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }})" >
+{% endif %}
+
+    <div class="inner">
+        <div class="container">
+
+            <ul class="social-icons">
+            {% if site.owner.twitter %}<li>
+                <a href="{{ site.owner.twitter }}" data-toggle="tooltip" title="{{ site.owner.name}} on Twitter" target="_blank">
+                    <i class="icon-twitter"></i>
+                </a>
+            </li>{% endif %}
+            {% if site.owner.facebook %}<li>
+                <a href="{{ site.owner.facebook }}" data-toggle="tooltip" title="{{ site.owner.name}} on Facebook" target="_blank">
+                    <i class="icon-facebook"></i>
+                </a>
+            </li>{% endif %}
+            {% if site.owner.google_plus %}<li>
+                <a href="{{ site.owner.google_plus }}" data-toggle="tooltip" title="{{ site.owner.name}} on Google+" target="_blank">
+                    <i class="icon-google-plus"></i>
+                </a>
+            </li>{% endif %}
+            {% if site.owner.stackoverflow %}<li>
+                <a href="{{ site.owner.stackoverflow }}" data-toggle="tooltip" title="{{ site.owner.name}} on StackOverflow" target="_blank">
+                    <i class="icon-stackexchange"></i>
+                </a>
+            </li>{% endif %}
+            {% if site.owner.linkedin %}<li>
+                <a href="{{ site.owner.linkedin }}" data-toggle="tooltip" title="{{ site.owner.name}} on LinkedIn" target="_blank">
+                    <i class="icon-linkedin"></i>
+                </a>
+            </li>{% endif %}
+            {% if site.owner.instagram %}<li>
+                <a href="http://instagram.com/{{ site.owner.instagram }}" data-toggle="tooltip" title="{{ site.owner.name}} on Instagram" target="_blank">
+                    <i class="icon-instagram"></i>
+                </a>
+            </li>{% endif %}
+            {% if site.owner.flickr %}<li>
+                <a href="http://www.flickr.com/photos/{{ site.owner.flickr }}" data-toggle="tooltip" title="{{ site.owner.name}} on Flickr" target="_blank">
+                    <i class="icon-flickr"></i>
+                </a>
+            </li>{% endif %}
+            {% if site.owner.github %}<li>
+                <a href="{{ site.owner.github }}" data-toggle="tooltip" title="{{ site.owner.name}} on Github" target="_blank">
+                    <i class="icon-github"></i>
+                </a>
+            </li>{% endif %}
+        </ul>
+            <div>
+                <p class="rss-subscribe text-center">
+                subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}" target="_blank">via RSS</a> |
+                 <a href="{{ site.url }}/es/aviso-legal/">{{ site.t[page.lang].legal-notice }}</a>
+                </p>
+                <p class="rss-subscribe text-center">
+                  {{ site.owner.name }} &copy; {{ site.time | date: '%Y' }} &bull; Generalitat Valenciana &bull; Conselleria de Infraestructuras, Territorio y Medio Ambiente
+                </p>
+            </div>
+        </div>
+    </div>
+
+</footer>

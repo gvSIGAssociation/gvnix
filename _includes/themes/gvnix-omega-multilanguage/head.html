@@ -1,0 +1,105 @@
+<meta charset="utf-8">
+<title>{% if page.title %}{{ page.title }} &#8211; {% endif %}{{ site.title }}</title>
+<!-- multilanguage -->
+{% assign posts=site.posts | where:"date", page.date %}
+  {% for post in posts %}
+    {% if post.lang != page.lang %}
+      <link rel="alternate" hreflang="{{post.lang}}" href="{{ site.url }}{{ post.url }}" />
+    {% endif %}
+  {% endfor %}
+<meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.t[page.lang].description }} {% endif %}">
+<!-- <meta name="description" content="{% if page.type == 'pages' %}{{ site.t[page.lang].description }}{% else %}{{ page.excerpt | strip_html | replace: "[[", " ("  | replace: "]]", ")" }}{% endif %}"> -->
+{% if page.tags %}<meta name="keywords" content="{{ page.tags | join: ', ' }}">{% endif %}
+{% if site.owner.twitter %}
+<!-- Twitter Cards -->
+{% if page.imagefeature %}<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }}">
+{% else %}<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="{% if page.image.thumb %}{{ site.url }}{{ ASSET_PATH }}/images/{{ page.image.thumb }}{% else %}{{ site.url }}{{ ASSET_PATH }}/images/{{ site.logo }}{% endif %}">{% endif %}
+<meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
+<meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.t[page.lang].description }} {% endif %}">
+<meta name="twitter:creator" content="@{{ site.owner.twitter }}">{% endif %}
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
+<meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.t[page.lang].description }} {% endif %}">
+<meta property="og:url" content="{{ site.url }}{{ page.url }}">
+<meta property="og:site_name" content="{{ site.title }}">
+{% if page.imagefeature %}<meta property="og:image" content="{{ ASSET_PATH }}/images/{{ page.imagefeature }}">{% else %}<meta property="og:image" content="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }}">{% endif %}
+
+{% if site.google_verify %}<meta name="google-site-verification" content="{{ site.google_verify }}">{% endif %}
+{% if site.bing_verify %}<meta name="msvalidate.01" content="{{ site.bing_verify }}">{% endif %}
+
+{% capture canonical %}{{ site.url }}{% if site.permalink contains '.html' %}{{ page.url }}{% else %}{{ page.url | remove:'index.html' | strip_slash }}{% endif %}{% endcapture %}
+<link rel="canonical" href="{{ canonical }}">
+<link href="{{ site.url }}/feed.xml" type="application/atom+xml" rel="alternate" title="{{ site.title }} Feed">
+{% if site.owner.google_plus %}<link rel="author" href="{{ site.owner.google_plus }}?rel=author">{% endif %}
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<!-- Enable responsive viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+<!--[if lt IE 9]>
+<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+ <!-- styles Jekyll Bootstrap -->
+ <link href="{{ ASSET_PATH }}/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+ <link href="{{ ASSET_PATH }}/resources/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+ <link href="{{ ASSET_PATH }}/resources/bootstrap.vertical-tabs/bootstrap.vertical-tabs.min.css" rel="stylesheet" type="text/css">
+ <link href="{{ ASSET_PATH }}/resources/syntax/syntax.css" rel="stylesheet" type="text/css">
+ <link href="{{ ASSET_PATH }}/css/style.css" rel="stylesheet" type="text/css">
+ <!-- animated divs on scroll -->
+ <link href="{{ ASSET_PATH }}/css/animated.css" rel="stylesheet" type="text/css">
+
+ <!-- Icons -->
+<!-- all formats -->
+<link rel="shortcut icon" href="{{ site.url }}/favicon.ico">
+<link rel="apple short icon" href="{{ ASSET_PATH }}/images/favicon.ico" />
+
+<!-- atom & rss feed -->
+<link href="{{ BASE_PATH }}{{ site.JB.atom_path }}" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+<link href="{{ BASE_PATH }}{{ site.JB.rss_path }}" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+{% if site.search %}
+<div class="search-wrapper">
+    <div class="search-form">
+        <input type="text" class="search-field" placeholder="Search...">
+        <i class="icon-remove-sign"></i>
+        <ul class="search-results post-list"></ul><!-- /.search-results -->
+    </div><!-- /.search-form -->
+</div><!-- ./search-wrapper -->
+{% endif %}
+
+{% if page.mathjax %}
+<!--Load Mathjax-->
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script>
+        MathJax.Hub.Config({
+            config: ["MMLorHTML.js"],
+            extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+            jax: ["input/TeX"],
+            tex2jax: {
+                inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+                processEscapes: false
+            },
+            TeX: {
+                TagSide: "right",
+                TagIndent: ".8em",
+                MultLineWidth: "85%",
+                equationNumbers: {
+                   autoNumber: "AMS",
+                },
+                unicode: {
+                   fonts: "STIXGeneral,'Arial Unicode MS'"
+                }
+            },
+            showProcessingMessages: false
+        });
+    </script>{% endif %}

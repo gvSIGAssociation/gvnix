@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang }}">
+<head>
+{% include themes/gvnix-omega-multilanguage/head.html %}
+</head>
+
+<body class="home-template" itemscope itemtype="http://schema.org/WebPage">
+  <div id="fade"></div>
+  <a id="slide" class="animated fade"></a>
+
+  <aside id="sidebar">
+    {% include themes/gvnix-omega-multilanguage/navigation.html %}
+  </aside>
+
+  <!-- header -->
+  {% if page.imagefeature %}
+    <header id="masthead" class="blog-background overlay align-left align-middle animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }})" itemscope itemtype="http://schema.org/Organization">
+  {% else %}
+  <header id="masthead" class="blog-background overlay align-left align-middle animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }})" itemscope itemtype="http://schema.org/Organization">
+  {% endif %}
+
+<!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+
+            <!-- nav links -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                 <ul class="nav navbar-nav navbar-right">
+                  <li class="hidden">
+                        <a href="#page-top"></a>
+                  </li>
+                  <!-- scroll home sections -->
+                    <li>
+                      <a class="page-scroll" href="#featured">{{ site.t[page.lang].home-features }}</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#portfolio">{{ site.t[page.lang].home-case-studies }}</a>
+                    </li>
+                  <!-- categories for language filter -->
+                  {% for link in site.links[page.lang] %}
+                    <li>{% if link.external %}
+                      <a href="{{ link.url }}">{{ link.title }}</a>
+                      {% else %}
+                      <a href="{{ link[1].url }}">{{ link[1].title }}</a>
+                      {% endif %}
+                    </li>
+                   {% endfor %}
+                   <!-- language select -->
+                   <li class="lang">
+                    {% if page.lang == "en" %}
+                    <ul class="nav navbar-nav">
+                      <li><a href="{{ page.url }}" class="{{ page.lang }}">EN</a></li>
+                      <li class="divider-vertical"></li>
+                      <li><a href="{{ page.url | replace: '/en/','/es/' | replace: 'index.html','es/index.html' }}">ES</a></li>
+                    </ul>
+                    {% endif %}
+                    {% if page.lang == "es" %}
+                    <ul class="nav navbar-nav">
+                      <li><a href="{{ page.url | replace: '/es/','/en/' | replace: 'en/index.html','index.html' }}">EN</a></li>
+                      <li class="divider-vertical"></li>
+                      <li><a href="{{ page.url }}" class="{{ page.lang }}">ES</a></li>
+                    </ul>
+                    {% endif %}
+                   </li>
+                  </ul>
+            </div>
+        </div>
+    </nav>
+
+  {% if site.search %}
+      <button class="menu-button animated fade dosearch">
+          <i class="icon-search"></i>
+      </button>
+  {% endif %}
+
+  {% if site.t[page.lang].description %}
+    <div class="inner">
+        <div class="container col-lg-9">
+            <a class="brand light" href="{{ site.url }}" role="banner" itemprop="url">
+                {% if site.logo %}
+                  <img itemprop="logo" src="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.logo }}" alt="{{ site.title }} Logo" />
+                {% endif %}
+            </a>
+            <h2 class="light" itemprop="description">{{ site.t[page.lang].description }} </h2>
+            {% if site.t[page.lang].headline %}
+            <h3 class="blog-description light">{{ site.t[page.lang].headline }}</h3>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="inner">
+        <div class="container">
+            <a class="brand" href="{{ site.url }}" role="banner" itemprop="url">
+                    <img itemprop="logo" src="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.logo }}" alt="{{ site.title }} Logo" />
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+
+</header>
+
+<div id="main" class="content homepage" role="main" itemprop="mainContentOfPage">
+
+    <!-- ribbon github -->
+    <a href="https://github.com/disid/gvnix">
+      <img style="position: absolute; top: 0; right: 0; border: 0;"
+      src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
+      alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+    </a>
+
+    <!-- call out -->
+    <div class="callout dark">
+      <div class="container">
+              <div class="row">
+                <div class="col-md-offset-8 col-lg-offset-9 col-sm-3 col-lg-3">
+                  <a href="{{ site.download-last-version-url }}" rel="nofollow" target="_self" class="btn btn-lg btn-gvnix-orange">{{ site.t[page.lang].callout-btn-home }}</a>
+                </div>
+              </div>
+            </div>
+    </div>
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="page-body" itemprop="description">
+
+            <!--  {{ content }} -->
+            <!-- es posible html/md -->
+
+            {% if page.lang == "en" %}
+              {% include themes/gvnix-omega-multilanguage/home/services.html %}
+              {% include themes/gvnix-omega-multilanguage/home/featured.html %}
+              {% include themes/gvnix-omega-multilanguage/home/icon-tabs.html %}
+              {% include themes/gvnix-omega-multilanguage/home/projects_grid.html %}
+              {% include themes/gvnix-omega-multilanguage/home/social.html %}
+              {% include themes/gvnix-omega-multilanguage/home/clients.html %}
+            {% endif %}
+
+            {% if page.lang == "es" %}
+                {% include themes/gvnix-omega-multilanguage/home/services-es.html %}
+                {% include themes/gvnix-omega-multilanguage/home/featured-es.html %}
+                {% include themes/gvnix-omega-multilanguage/home/icon-tabs-es.html %}
+                {% include themes/gvnix-omega-multilanguage/home/projects_grid.html %}
+                {% include themes/gvnix-omega-multilanguage/home/social.html %}
+                {% include themes/gvnix-omega-multilanguage/home/clients-es.html %}
+            {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+    {% include themes/gvnix-omega-multilanguage/footer.html %}
+    {% include  themes/gvnix-omega-multilanguage/home/modals.html %}
+
+{% include themes/gvnix-omega-multilanguage/scripts.html %}
+
+
+</body>
+</html>

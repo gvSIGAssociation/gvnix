@@ -1,0 +1,20 @@
+---
+title: gvCarrera
+subtitle: Gestión del desempeño del personal funcionario de carrera de la Administración de la GVA
+layout: home
+modal-id: 2
+#date: 2014-07-17
+img: gvcarrera.png
+thumbnail: gvcarrera-thumbnail.png
+alt: image-alt
+#project-date: April 2014
+client: Conselleria de Hacienda y Administración Pública
+client-url: http://www.chap.gva.es/
+description: Aplicación informática accesible en la sede electrónica de la Generalitat tanto desde ordenador, como tablets o móviles, dónde el personal funcionario de carrera de la Administración de la Generalitat puede solicitar la regulación y evaluación del desempeño del personal. Parte del plan Carrera Profesional Horizontal.
+category:
+    - es
+    - project
+lang: es
+---
+
+

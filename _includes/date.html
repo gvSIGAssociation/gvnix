@@ -1,0 +1,34 @@
+{% if include.mode != 'month' %}
+  {% assign d = include.date | date: "%-d" %}
+  {% if page.lang == 'es' %}
+    {{ d }}{% if d == "1" %}<sup>er</sup>{% endif %}
+  {% else %}
+    {{ d }}<sup>{% case d %}
+      {% when '1' or '21' or '31' %}st
+      {% when '2' or '22' %}nd
+      {% when '3' or '23' %}rd
+      {% else %}th
+    {% endcase %}</sup> of
+  {% endif %}
+{% endif %}
+
+{% if page.lang == 'es' %}
+ {% assign m = include.date | date: "%-m" %}
+ {% case m %}
+    {% when '1' %}enero
+    {% when '2' %}febrero
+    {% when '3' %}marzo
+    {% when '4' %}abril
+    {% when '5' %}mmayo
+    {% when '6' %}junio
+    {% when '7' %}julio
+    {% when '8' %}agosto
+    {% when '9' %}septiembre
+    {% when '10' %}octubre
+    {% when '11' %}noviembre
+    {% when '12' %}diciembre
+  {% endcase %}
+{% else %}
+  {{ include.date | date: "%B"}}
+{% endif %}
+{{ include.date | date: "%Y"}}

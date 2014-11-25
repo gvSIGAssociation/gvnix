@@ -1,0 +1,364 @@
+title:            gvNIX
+logo:             logo-negativo-300.png
+disqus_shortname: gvNIX
+mail-to:          mailto:pargudo@disid.com
+download-last-version-url: http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download
+
+# Assign a default image for your site's header and footer
+default_bg:       default_bg.png
+search:           true
+share:            true
+
+# Read Time is a calculator tp provide post read-time based on word count. Usage is recommended.
+readtime:         true
+
+# Turn on or off the fin animations in the header and footer
+#triangleheader:		false
+#animated_fins:	  false
+# Specify the fin color in RGB value
+#fin_color:        "255,255,255"
+
+# Change url to your domain. Leave localhost server or blank when working locally.
+# or use the hint from http://jekyllrb.com/docs/github-pages/ to keep this the same
+# whether working locally or remotely. Start Jekyll with: jekyll serve --baseurl ''
+url: http://github.com/disid/gvnix
+
+# Settings for comments helper
+# Set 'provider' to the comment provider you want to use.
+# Set 'provider' to false to turn commenting off globally.
+#
+comments :
+  provider : disqus
+  disqus :
+    short_name : gvnix
+
+# Owner/author information
+owner:
+  name:           gvNIX
+  avatar:         profile-gvnix.jpg
+  email:          pargudo@disid.com
+
+  # Use the coder's toolbox at http://coderstoolbox.net/string/#!encoding=xml&action=encode&charset=us_ascii to encode your description into XML string
+  #description:    Some Details about yourself
+
+# Social networking links used in footer. Update and remove as you like.
+  twitter: http://twitter.com/gvnix
+  facebook: http://facebook.com/Disid.corp
+  github: http://github.com/disid/gvnix
+  stackoverflow: http://stackoverflow.com/questions/tagged/gvnix
+  linkedin: https://www.linkedin.com/groups/gvNIX-entorno-desarrollo-rápido-aplicaciones-3878961
+
+  # For Google Authorship https://plus.google.com/authorship
+  #  google_plus:    "http://plus.google.com/123123123123132123"
+
+# Analytics and webmaster tools stuff goes here
+google_analytics:
+google_verify:
+
+# https://ssl.bing.com/webmaster/configure/verify/ownership Option 2 content= goes here
+bing_verify:
+
+# http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone:    Europe/Madrid
+
+#
+# Jekyll Configuration
+#
+future:      true
+highlighter: pygments
+markdown:    kramdown
+paginate:    2
+paginate_path: "blog/page:num"
+
+kramdown:
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  use_coderay: false
+
+  coderay:
+    coderay_line_numbers:
+    coderay_line_numbers_start: 1
+    coderay_tab_width: 4
+    coderay_bold_every: 10
+    coderay_css: class
+
+
+include: [".htaccess, .adoc, .asciidoc"]
+exclude: ["lib", "config.rb", "Gemfile", "Capfile", "Gemfile.lock", "config", "log", "Rakefile", "Rakefile.rb", "tmp", "less", "*.sublime-project", "*.sublime-workspace", "test", "spec", "Gruntfile.js", "package.json", "node_modules"]
+
+# Production config
+
+# The production_url is only used when full-domain names are needed
+# such as sitemap.txt
+# Most places will/should use BASE_PATH to make the urls
+#
+# If you have set a CNAME (pages.github.com) set your custom domain here.
+# Else if you are pushing to username.github.io, replace with your username.
+# Finally if you are pushing to a GitHub project page, include the project name at the end.
+#
+production_url : http://www.gvnix.org
+
+#JB Configuration
+# All Jekyll-Bootstrap specific configurations are namespaced into this hash
+#
+JB :
+  version : 0.3.0
+
+  # All links will be namespaced by BASE_PATH if defined.
+  # Links in your website should always be prefixed with {{BASE_PATH}}
+  # however this value will be dynamically changed depending on your deployment situation.
+  #
+  # CNAME (http://yourcustomdomain.com)
+  #   DO NOT SET BASE_PATH
+  #   (urls will be prefixed with "/" and work relatively)
+  #
+  # GitHub Pages (http://username.github.io)
+  #   DO NOT SET BASE_PATH
+  #   (urls will be prefixed with "/" and work relatively)
+  #
+  # GitHub Project Pages (http://username.github.io/project-name)
+  #
+  #   A GitHub Project site exists in the `gh-pages` branch of one of your repositories.
+  #  REQUIRED! Set BASE_PATH to: http://username.github.io/project-name
+  #
+
+  # CAUTION:
+  #   - When in Localhost, your site will run from root "/" regardless of BASE_PATH
+  #   - Only the following values are falsy: ["", null, false]
+  #   - When setting BASE_PATH it must be a valid url.
+  #     This means always setting the protocol (http|https) or prefixing with "/"
+  # BASE_PATH : false
+
+  # By default, the asset_path is automatically defined relative to BASE_PATH plus the enabled theme.
+  # ex: [BASE_PATH]/assets/themes/[THEME-NAME]
+  #
+  # Override this by defining an absolute path to assets here.
+  # ex:
+  #   http://s3.amazonaws.com/yoursite/themes/watermelon
+  #   /assets
+  #
+  # ASSET_PATH : false
+  # These paths are to the main pages Jekyll-Bootstrap ships with.
+  # Some JB helpers refer to these paths; change them here if needed.
+  #
+  # archive_path: /archive.html
+  # categories_path : /categories.html
+  # tags_path : /tags.html
+  # atom_path : /atom.xml
+  # rss_path : /rss.xml
+
+#
+# Languages integration
+# for categories es/en
+#
+
+permalink: /:categories/:title/
+
+defaults:
+  -
+    scope:
+      path: ""
+    values:
+      lang: es
+      layout:
+  -
+    scope:
+      path: _posts/en
+    values:
+      lang: en
+
+# Links to include in top navigation
+# For external links add external: true
+links:
+  en:
+    doc:
+      title: Documentation
+      url: /en/documentation
+      external: false
+    training:
+      title: Training
+      url: /en/training
+      external: false
+    blog:
+      title: "Blog"
+      url:   "/en/blog"
+      external: false
+  es:
+    doc:
+      title: Documentación
+      url: /es/documentation
+      external: false
+    training:
+      title: Formación
+      url: /es/training
+    blog:
+      title: "Blog"
+      url:   "/es/blog"
+      external: false
+
+linksextra:
+  en:
+    featured:
+      title: <i class="icon-star"></i> Featured
+      url: /en/featured
+      external: false
+    codefont:
+      title: <i class="fa fa-code"></i> Source code
+      url: https://github.com/DISID/gvnix/
+      external: true
+    archive:
+      title: <i class="fa fa-archive"></i> Archive
+      url: /en/archive
+      external: false
+    releases:
+      title: <i class="fa fa-download"></i> Releases
+      url: https://github.com/DISID/gvnix/releases
+      external: true
+    downloads:
+      title: <i class="fa fa-download"></i> Downloads
+      url: http://sourceforge.net/projects/gvnix/files/
+      external: true
+    install:
+      title: <i class="fa fa-download"></i> Install gvNIX
+      url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX.adoc
+      external: true
+    learn:
+      title: <i class="fa fa-download"></i> Learn gvNIX
+      url:   https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
+      external: true
+    springroo:
+      title: Spring Roo
+      url:   http://projects.spring.io/spring-roo/
+      external: true
+    contact:
+      title: "Contact"
+      url:   "/en/contact"
+      external: false
+  es:
+    featured:
+      title: <i class="icon-star"></i> Destacados
+      url: /es/featured
+      external: false
+    codefont:
+      title: <i class="fa fa-code"></i> Código Fuente
+      url: https://github.com/DISID/gvnix/
+      external: true
+    archive:
+      title: <i class="fa fa-archive"></i> Archivo
+      url: /es/archive
+      external: false
+    releases:
+      title: <i class="fa fa-download"></i> Releases
+      url: https://github.com/DISID/gvnix/releases
+      external: true
+    downloads:
+      title: <i class="fa fa-download"></i> Descargas
+      url: http://sourceforge.net/projects/gvnix/files/
+      external: true
+    install:
+      title: Instala gvNIX
+      url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX.adoc
+      external: true
+    learn:
+      title: Aprende gvNIX
+      url:   https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
+      external: true
+    springroo:
+      title: Spring Roo
+      url:   http://projects.spring.io/spring-roo/
+      external: true
+    contact:
+      title: "Contacto"
+      url:   "/es/contact"
+      external: false
+
+
+t:
+  en:
+    description: Spring Roo based RAD tool for web developers
+    headline: gvNIX is an Spring Roo distribution that focuses both enterprise knowledge and enterprise standards to build Java applications.
+    created: "Published por"
+    author: "DISID"
+    status: "Share this Status"
+    status-posted: "Status posted "
+    share-quote: "Share this Quote"
+    share-twitter: "Share on Twitter"
+    share-facebook: "Share on Facebook"
+    share-google: "Share on Google plus"
+    related-category: "Other posts from this category"
+    read-more: "Read more about"
+    read: "Read more ..."
+    newer: "Newer Posts"
+    older: "Older Posts"
+    tagged: "Tagged with"
+    posts-tagged: "Posts tagged with"
+    post-featured: "Featured"
+    post-changelog: "Changelog"
+    post-training: "Training"
+    callout-btn-home: "Download now"
+    latest-news: "Latest news"
+    legal-notice: "Legal notice"
+    back-to-blog: "Back to"
+    tr-banner-title: Interested in a customized course in gvNIX?
+    tr-banner-btn: Contact us
+    tr-banner-txt: We will contact you for a personalized training.
+    doc-samples: Sample Projects
+    doc-guides: Getting Started Guides
+    doc-tutorials: Tutorials
+    doc-links: Links
+    doc-versions: All versions
+    home-features: Features
+    home-case-estudies: Case studies
+    grid-title: gvNIX Projects
+    grid-text: Some successful cases
+    close: Close
+
+  es:
+    description: Herramienta de desarrollo rápido de aplicaciones web
+    headline: gvNIX es una distribución Spring Roo que se centra tanto en el conocimiento como en los estándares de la empresa para construir aplicaciones Java.
+    created: "Publicado por"
+    author: "DISID"
+    status: "Comparte esta entrada"
+    status-posted: "Entrada publicada en "
+    share-quote: "Comparte esta cita"
+    share-twitter: "Compartir en Twitter"
+    related-category: "Otras entradas de esta categoría"
+    read-more: "Leer más sobre"
+    read: "Leer más ..."
+    newer: "Entradas más recientes"
+    older: "Entradas más antiguas"
+    tagged: "Etiquetado como"
+    posts-tagged: "Entradas etiquetadas con"
+    post-featured: "Destacado"
+    post-changelog: "Control de cambios"
+    post-training: "Formación"
+    callout-btn-home: "Descargar ahora"
+    latest-news: "Últimas noticias"
+    legal-notice: "Aviso legal"
+    back-to-blog: "Volver atrás"
+    tr-banner-title: ¿Te interesa un curso personalizado sobre gvNIX?
+    tr-banner-btn: Contacta
+    tr-banner-txt: Nos pondremos en contacto contigo para una formación personalizada.
+    doc-samples: Proyectos demo
+    doc-guides: Guías de inicio
+    doc-tutorials: Tutoriales
+    doc-links: Enlaces
+    doc-versions: Todas las versiones
+    home-features: Características
+    home-case-studies: Casos de éxito
+    grid-title: Proyectos con gvNIX
+    grid-text: Algunos casos de éxito
+    close: Cerrar
+
+##{{ site.t[page.lang].grid-title }}
+
+# Change the directory where Jekyll will read files
+#source:
+
+# Change the directory where Jekyll will write files
+#destination:
+
+#custom variables
+#quickstart-app-url: https://github.com/DISID/gvnix-samples/tree/master/quickstart-app

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    
+    <url>
+        <loc>http://localhost:4000</loc>
+    </url>
+    <url>
+        <loc>http://localhost:4000</loc>
+    </url>
+
+    
+    <url>
+        <loc>http://localhost:4000/en/contact/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/contact/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/en/documentation/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/documentation/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/en/training-program/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/training-program/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/taller-gvnix-jornadas-gvsig/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/soporte-stackoverflow/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/concurso-portalprogramas/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/project/project-1/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/project/project-2/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/project/project-3/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/seminario-upv/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/release-1-3-1/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/en/release-1-3-1/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/en/release-1-3-0/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/release-1-3-0/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/semana-informatica/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/release-1-2-0/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/en/release-1-2-0/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/release-1-1-0/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/en/release-1-1-0/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/en/release-1-0-0/</loc>
+    </url>
+    
+    <url>
+        <loc>http://localhost:4000/es/release-1-0-0/</loc>
+    </url>
+    
+</urlset>

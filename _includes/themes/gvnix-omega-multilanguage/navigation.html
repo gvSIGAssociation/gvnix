@@ -1,0 +1,18 @@
+<div class="navigation-extra">
+    <ul class="nav">
+
+      <!-- categories for language filter -->
+      {% for link in site.linksextra[page.lang] %}
+      <li>{% if link.external %}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {% else %}
+      <a href="{{ link[1].url }}">{{ link[1].title }}</a>
+      {% endif %}
+      </li>
+      {% endfor %}
+
+     <li><a href="{{ site.url }}/tags" title="Tags"><i class="fa fa-check-square-o"></i> Tags</a></li>
+     <hr>
+     <li><a href="{{ site.url }}/feed.xml" title="Atom/RSS feed"><i class="icon-rss"></i> Feed</a></li>
+    </ul>
+</div>

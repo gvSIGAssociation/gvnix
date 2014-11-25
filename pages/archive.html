@@ -1,0 +1,16 @@
+---
+layout: pageminimal
+title : Archive
+headline : Post Archive
+permalink: /en/archive/
+lang: en
+---
+
+  {% assign collection = site.posts | where:"lang", page.lang %}
+  {% for post in collection %}
+
+   <ul class="post-list">
+    <li><article><a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %d, %Y" }}</time></span></a></article></li>
+  </ul>
+  {% endfor %}
+

@@ -1,0 +1,120 @@
+<div id="fade"></div>
+<a id="slide" class="animated fade"></a>
+
+<aside id="sidebar">
+      {% include themes/gvnix-omega-multilanguage/navigation.html %}
+</aside>
+
+<!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+
+            <!-- nav links -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                 <ul class="nav navbar-nav navbar-right">
+                  <li class="hidden">
+                        <a href="#page-top"></a>
+                  </li>
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                  <!-- categories for language filter -->
+                  {% for link in site.links[page.lang] %}
+                    <li>{% if link.external %}
+                      <a href="{{ link.url }}">{{ link.title }}</a>
+                      {% else %}
+                      <a href="{{ link[1].url }}">{{ link[1].title }}</a>
+                      {% endif %}
+                    </li>
+                   {% endfor %}
+                   <!-- language select -->
+                   <li class="lang">
+                    {% if page.lang == "en" %}
+                    <ul class="nav navbar-nav">
+                      <li><a href="{{ page.url }}" class="{{ page.lang }}">EN</a></li>
+                      <li class="divider-vertical"></li>
+                      <li><a href="{{ page.url | replace: '/en/','/es/' | replace: 'index.html','es/index.html' }}">ES</a></li>
+                    </ul>
+                    {% endif %}
+                    {% if page.lang == "es" %}
+                    <ul class="nav navbar-nav">
+                      <li><a href="{{ page.url | replace: '/es/','/en/' | replace: 'en/index.html','index.html' }}">EN</a></li>
+                      <li class="divider-vertical"></li>
+                      <li><a href="{{ page.url }}" class="{{ page.lang }}">ES</a></li>
+                    </ul>
+                    {% endif %}
+                   </li>
+                  </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+
+
+<!-- Header -->
+
+{% if page.imagefeature %}
+  <header id="masthead" class="blog-background overlay align-center align-middle animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }})" itemscope itemtype="http://schema.org/Organization">{% if page.imagecredit %}<span class="image-credit">Photo Credit: <a href="{{ page.imagecreditlink }}" target="_blank">{{ page.imagecredit }}</a></span>{% endif %}
+{% else %}
+  <header id="masthead" class="blog-background overlay align-center align-middle animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }})" itemscope itemtype="http://schema.org/Organization">
+{% endif %}
+
+{% if site.search %}
+    <button id="search" class="menu-button animated fade dosearch">
+        <i class="icon-search"></i>
+    </button>
+{% endif %}
+
+{% if page.headline %}
+    <div class="inner">
+        <div class="container">
+            <a class="brand light" href="{{ site.url }}" role="banner" itemprop="url">
+                {% if site.logo %}<img itemprop="logo" src="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.logo }}" alt="{{ site.title }} Logo" />{% endif %}
+            </a>
+            <h2 class="blog-description light bordered bordered-top" itemprop="description">
+                {{ page.headline }}
+            </h2>
+        </div>
+    </div>
+    {% else %}
+    <div class="inner">
+        <div class="container">
+            <a class="brand" href="{{ site.url }}" role="banner" itemprop="url">
+
+                {% if site.logo %}<img itemprop="logo" src="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.logo }}" alt="{{ site.title }} Logo" />{% endif %}
+
+            <h2 class="blog-description light bordered bordered-top" itemprop="description">
+                {{ site.t[page.lang].description }}
+            </h2>
+
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+
+ <!-- ribbon github -->
+
+ <a href="https://github.com/disid/gvnix">
+   <img style="position: absolute; top: 100%; right: 0; border: 0;"
+   src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
+   alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+ </a>
+
+</header>
+
+
+

@@ -1,0 +1,18 @@
+---
+title: Aplusu
+subtitle: Gestión de los permisos de acceso de usuarios de aplicaciones
+layout: home
+modal-id: 3
+#date: 2014-07-16
+img: aplusu.png
+thumbnail: aplusu-thumbnail.png
+alt: Aplusu
+#project-date: April 2014
+client: CITMA
+client-url: http://www.citma.gva.es/
+description: Gestiona las aplicaciones, usuarios y módulos de la Conselleria de Infraestructuras, Transporte y Medio Ambiente (CITMA), la relación entre ellos y los permisos y roles de acceso entre usuarios y aplicaciones.
+category:
+    - es
+    - project
+lang: es
+---

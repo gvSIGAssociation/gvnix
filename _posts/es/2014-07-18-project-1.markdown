@@ -1,0 +1,20 @@
+---
+title: gvSIG Roads
+subtitle:  Gestión integral de las infraestructuras viarias
+layout: home
+modal-id: 1
+#date: 2014-07-18
+img: gvsigroads.png
+thumbnail: gvsigroads-thumbnail.png
+alt: gvSIG Roads
+#project-date: April 2014
+client: Diputación de Valencia
+client-url: http://www.dival.es/
+description: Desarrollo de una aplicación de gestión de la conservación de carreteras para mantener una homogeneidad entre las demarcaciones en la forma de trabajar, en la presentación de documentación, coordinación con las empresas contratistas, así como el acceso a la información desde los órganos directores. Una proyecto de cartografía y gestión de datos sobre gvSIG desktop.
+category:
+    - es
+    - project
+lang: es
+---
+
+

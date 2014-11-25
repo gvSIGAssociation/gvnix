@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang }}">
+<head>
+{% include themes/gvnix-omega-multilanguage/head.html %}
+</head>
+<body class="page-template" itemscope itemtype="http://schema.org/WebPage">
+{% include themes/gvnix-omega-multilanguage/header.html %}
+<div id="main" class="content" role="main" itemprop="mainContentOfPage">
+    <div class="container">
+
+        <div class="row">
+            <article class="page col-md-8">
+
+                    <div class="page-body" itemprop="description">
+                      {{ content }}
+                    </div>
+            </article>
+
+            <!-- sidebar -->
+             <div class="col-md-4">
+                    {% include themes/gvnix-omega-multilanguage/sidebar.html %}
+             </div>
+
+        </div>
+    </div>
+</div>
+
+   {% include themes/gvnix-omega-multilanguage/footer.html %}
+
+
+{% include themes/gvnix-omega-multilanguage/scripts.html %}
+</body>
+</html>

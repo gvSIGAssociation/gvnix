@@ -1,0 +1,34 @@
+
+{% assign posts=site.posts | where:"lang", page.lang %}
+
+<!-- SOCIAL AREA -->
+ <div class="area-social">
+      <div class="container">
+         <div class="row">
+            <div class="col-md-6">
+               <h3 class="section-title"><i class="fa fa-rss"></i> {{ site.t[page.lang].latest-news }}</h3>
+               <ul class="nav">
+               {% for post in posts limit:4 %}
+                  <li>
+                     <p>
+                        <a href="{{ post.url }}">{{ post.title }}</a>
+                        <br />
+                        <small>{{ post.date | date: "%Y/%m/%d" }}</small>
+                     </p>
+                     <p>
+                        {{ post.content | strip_html | truncatewords: 20 }}
+                     </p>
+                  </li>
+               {% endfor %}
+               </ul>
+            </div>
+            <div class="col-md-6 hidden-phone">
+               <h3 class="section-title"><i class="fa fa-twitter"></i> Social</h3>
+               <div>
+                <a class="twitter-timeline" href="https://twitter.com/gvNIX" data-chrome="noheader transparent noscrollbar nofooter" data-widget-id="534301468442914816">Tweets @gvNIX.</a>
+                <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>

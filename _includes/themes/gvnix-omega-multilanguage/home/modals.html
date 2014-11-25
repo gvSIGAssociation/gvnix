@@ -1,0 +1,37 @@
+{% assign posts=site.posts | where:"lang", page.lang %}
+
+ <!-- Portfolio Modals -->
+ {% for post in posts %}
+    <div class="portfolio-modal modal fade" id="portfolioModal{{ post.modal-id }}" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>{{ post.title }}</h2>
+                            <hr class="star-primary">
+                            <img src="{{ site.url }}/images/portfolio/{{ post.img }}" class="img-responsive img-centered" alt="{{ post.alt }}">
+                            <p>{{ post.description }}</p>
+                            <ul class="list-inline item-details">
+                                <li>
+                                    <strong><a target="_blank" href="{{ post.client-url }}">{{ post.client }}</a>
+                                    </strong>
+                                </li>
+                                <li>
+                                    <strong>{{ post.project-date }}</strong>
+                                </li>
+                            </ul>
+                            <button type="button" class="btn btn-lg btn-gvnix" data-dismiss="modal"><i class="fa fa-times"></i> {{ site.t[page.lang].close }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}

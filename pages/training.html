@@ -1,0 +1,23 @@
+---
+layout: training
+permalink: /en/training/
+title: Training Posts
+description: "An archive of posts sorted by training."
+lang: en
+---
+
+<ul class="post-list">
+  {% assign collection = site.posts | where:"lang", page.lang %}
+  {% for post in collection %}
+  {% if post.training %}
+    <li>
+      <article>
+      <i class="fa fa-graduation-cap"></i> <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date"
+      ><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %d, %Y" }}</time></span>
+      </a>
+      </article>
+    </li>
+  {% endif %}
+  {% endfor %}
+</ul>
+

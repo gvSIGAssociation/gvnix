@@ -1,0 +1,31 @@
+{% capture compress %}
+{% assign temp1 = content | split: '<pre>' %}
+{% for temp2 in temp1 %}
+{% assign temp3 = temp2 | split: '</pre>' %}
+
+{% if temp3.size == 2 %}
+
+{% assign pre = temp3.first %}
+{% assign pre = pre | newline_to_br  | replace: "<br />", "</code><code>" %}
+<pre>{{ pre }}</pre>
+
+{% endif %}
+
+{% assign t = temp3.last %}
+
+{% assign t = t | replace: '&#39;', '’' | replace: '~', '&nbsp;' %}
+{% assign t = t | replace: '[[', '<span class="as"></span><span class="br"> (</span><span class="mar">' %}
+{% assign t = t | replace: ']]', '</span><span class="br">)</span>' %}
+
+{% if page.lang == 'es' %}
+{% assign t = t | replace: '&ldquo;' , '«&#160;' | replace: '&rdquo;' , '&#160;»' %}
+{% assign t = t | replace: ' :',       '&#160;:' | replace: ' %',       '&#160;%' %}
+{% assign t = t | replace: ' ;', '<span style="white-space:nowrap">&thinsp;</span>;' %}
+{% assign t = t | replace: ' !', '<span style="white-space:nowrap">&thinsp;</span>!' %}
+{% assign t = t | replace: ' ?', '<span style="white-space:nowrap">&thinsp;</span>?' %}
+{% endif %}
+
+{{ t | split: ' ' | join: ' '}}
+
+{% endfor %}
+{% endcapture %}{{ compress | strip_newlines | replace: "<code></code>", "" }}

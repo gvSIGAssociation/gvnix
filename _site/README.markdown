@@ -85,31 +85,4 @@ Once you're satisified with your edits, commit your changes and push the
 That's it! After not more than a few minutes,
 you should be able to see your site at http://project.github.io/{your-project}
 
-# Deploying Jekyll to GitHub Pages
-
-GitHub Pages work by looking at certain branches of repositories on GitHub.
-There are two basic types available: user/organization pages and project pages.
-The way to deploy these two types of sites are nearly identical, except for a few minor details.
-
-## Project Pages
-
-Unlike user and organization Pages, Project Pages are kept in the same repository as the project they are for,
-except that the website content is stored in a specially named gh-pages branch.
-The content of this branch will be rendered using Jekyll,
-and the output will become available under a subpath of your user pages subdomain,
- such as username.github.io/project (unless a custom domain is specified—see below).
-
-### Project Page URL Structure
-
-Sometimes it’s nice to preview your Jekyll site before you push your gh-pages branch to GitHub.
-However, the subdirectory-like URL structure GitHub uses for Project Pages complicates the proper resolution of URLs.
-Here is an approach to utilizing the GitHub Project Page URL structure (username.github.io/project-name/)
-whilst maintaining the ability to preview your Jekyll site locally.
-
-Iif you’d like to preview your site before committing/deploying using jekyll serve,
-be sure to pass an empty string to the --baseurl option,
-so that you can view everything at localhost:4000 normally
-(without /project-name at the beginning):
-jekyll serve --baseurl ''
-jekyll serve --baseurl 'http://github.com/disid/gvnix'
 
