@@ -1,5 +1,0 @@
-
-script clinic.roo
-
-// Install Valencian/Catalan language
-web mvc install language --code ca

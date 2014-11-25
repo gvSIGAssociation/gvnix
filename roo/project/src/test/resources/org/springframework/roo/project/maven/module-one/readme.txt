@@ -1,1 +1,0 @@
-This directory is required by PomFactoryImplTest.

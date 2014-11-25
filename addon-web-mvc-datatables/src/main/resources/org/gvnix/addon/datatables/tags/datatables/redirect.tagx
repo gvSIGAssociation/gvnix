@@ -1,8 +1,0 @@
-<jsp:root xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
-  <jsp:output omit-xml-declaration="yes"/>
-  
-  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)"/>
-  
-  <input id="datatablesRedirect" name="datatablesRedirect" type="hidden" value="${param['datatablesRedirect']}" />
-  <input id="dtt_table_id_hash" name="dtt_table_id_hash" type="hidden" value="${param['dtt_table_id_hash']}" />
-</jsp:root>

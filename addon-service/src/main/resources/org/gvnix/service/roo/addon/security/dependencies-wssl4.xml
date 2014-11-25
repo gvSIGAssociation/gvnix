@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<dependencies>
-    <dependency>
-      <groupId>org.apache.ws.security</groupId>
-      <artifactId>wss4j</artifactId>
-      <version>1.6.9</version>
-    </dependency> 
-</dependencies>

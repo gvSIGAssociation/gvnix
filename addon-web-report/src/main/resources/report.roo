@@ -1,5 +1,0 @@
-
-script clinic.roo
-
-// Create Pet report
-web report add --controller ~.web.PetController --reportName petlist  --format pdf,xls,html,csv

@@ -1,3 +1,0 @@
-
-script --file clinic.roo
-web mvc binding stringTrimmer --emptyAsNull

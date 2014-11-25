@@ -1,7 +1,0 @@
-package org.myPackage;
-
-
-public enum AEnumerate {
-
-    MALE, FEMALE;
-}

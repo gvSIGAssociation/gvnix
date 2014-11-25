@@ -1,7 +1,0 @@
-
-// SLIDE XX: JSON
-
-// Creará los métodos necesarios en la entidad para convertir el objeto al formato JSON y vicevera
-json add --class ~.domain.Producto
-
-backup

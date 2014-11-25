@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/jquery/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/jquery/form" version="2.0">
-    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
-    <jsp:output omit-xml-declaration="yes"/>
-    <page:show id="ps_com_springsource_petclinic_domain_UserRole" object="${userrole}" path="/userroles" z="ou6VBAc4JE1xV1QMlSSlZN6e7Kk=">
-        <field:display field="userEntry" id="s_com_springsource_petclinic_domain_UserRole_userEntry" object="${userrole}" z="JGUK7CGcBPDWsd2Ve5VPGh14rFg="/>
-        <field:display field="roleEntry" id="s_com_springsource_petclinic_domain_UserRole_roleEntry" object="${userrole}" z="ozyZhp6eP/65sQvyTARJDoBbVHg="/>
-    </page:show>
-</div>
