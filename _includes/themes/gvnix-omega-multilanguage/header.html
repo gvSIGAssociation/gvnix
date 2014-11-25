@@ -39,7 +39,7 @@
                     <li>{% if link.external %}
                       <a href="{{ link.url }}">{{ link.title }}</a>
                       {% else %}
-                      <a href="{{ link[1].url }}">{{ link[1].title }}</a>
+                      <a href="{{ site.url }}{{ link[1].url }}">{{ link[1].title }}</a>
                       {% endif %}
                     </li>
                    {% endfor %}
