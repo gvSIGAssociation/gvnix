@@ -26,15 +26,20 @@
                   <li class="hidden">
                         <a href="#page-top"></a>
                   </li>
-                    <li>
-                        <a href="/">Home</a>
+                  <li>
+                     {% if page.lang == "en" %}
+                        <a href="{{ site.url }}/en/index.html">Home</a>
+                      {% endif %}
+                     {% if page.lang == "es" %}
+                      <a href="{{ site.url }}/es/index.html">Inicio</a>
+                     {% endif %}
                     </li>
                   <!-- categories for language filter -->
                   {% for link in site.links[page.lang] %}
                     <li>{% if link.external %}
                       <a href="{{ link.url }}">{{ link.title }}</a>
                       {% else %}
-                      <a href="{{ link[1].url }}">{{ link[1].title }}</a>
+                      <a href="{{ site.url }}{{ link[1].url }}">{{ link[1].title }}</a>
                       {% endif %}
                     </li>
                    {% endfor %}
@@ -42,16 +47,16 @@
                    <li class="lang">
                     {% if page.lang == "en" %}
                     <ul class="nav navbar-nav">
-                      <li><a href="{{ site.url }}/{{ page.url }}" class="{{ page.lang }}">EN</a></li>
+                      <li><a href="{{ site.url }}{{ page.url }}" class="{{ page.lang }}">EN</a></li>
                       <li class="divider-vertical"></li>
-                      <li><a href="{{ site.url }}/{{ page.url | replace: '/en/','/es/' | replace: 'index.html','es/index.html' }}">ES</a></li>
+                      <li><a href="{{ site.url }}{{ page.url | replace: '/en/','/es/' | replace: 'index.html','es/index.html' }}">ES</a></li>
                     </ul>
                     {% endif %}
                     {% if page.lang == "es" %}
                     <ul class="nav navbar-nav">
-                      <li><a href="{{ site.url }}/{{ page.url | replace: '/es/','/en/' | replace: 'en/index.html','index.html' }}">EN</a></li>
+                      <li><a href="{{ site.url }}{{ page.url | replace: '/es/','/en/' | replace: 'en/index.html','index.html' }}">EN</a></li>
                       <li class="divider-vertical"></li>
-                      <li><a href="{{ site.url }}/{{ page.url }}" class="{{ page.lang }}">ES</a></li>
+                      <li><a href="{{ site.url }}{{ page.url }}" class="{{ page.lang }}">ES</a></li>
                     </ul>
                     {% endif %}
                    </li>
