@@ -3,7 +3,7 @@
   <!-- theme -->
   <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
   <!-- Jekyll Bootstrap 1.10 -->
-  <script type="text/javascript" src="{{ ASSET_PATH }}/resources/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/resources/jquery/jquery.min.js"></script>
   <!-- theme agency 1.11-->
   <!-- <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery-1.11.0.js"></script> -->
 <script>window.jQuery || document.write('<script src="{{ site.url }}{{ ASSET_PATH }}/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
@@ -15,7 +15,7 @@
 <script type='text/javascript'>$(document).ready(function(){$(".time").text(function(a,b){return Math.round(parseFloat(b))})});</script>
 
 {% include JB/analytics %}
- <script type="text/javascript" src="{{ ASSET_PATH }}/resources/bootstrap/js/bootstrap.min.js"></script>
+ <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/resources/bootstrap/js/bootstrap.min.js"></script>
 
 <!--  test include github file -->
 <!-- <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/plugins/ghembedder.js"></script> -->
@@ -94,7 +94,7 @@ $("a#click-pages").click(function(){
 </script>
 {% endif %}
 
-<!-- {% if site.google_analytics %}
+{% if site.google_analytics %}
 
 Asynchronous Google Analytics snippet
 <script>
@@ -111,7 +111,7 @@ Asynchronous Google Analytics snippet
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
 </script>
-{% endif %} -->
+{% endif %}
 
 {% if page.comments %}
   {% include themes/gvnix-omega-multilanguage/disqus_comments.html %}
