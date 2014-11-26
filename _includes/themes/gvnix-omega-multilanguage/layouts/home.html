@@ -69,12 +69,12 @@
                     <ul class="nav navbar-nav">
                       <li><a href="{{ site.url }}{{ page.url }}" class="{{ page.lang }}">EN</a></li>
                       <li class="divider-vertical"></li>
-                      <li><a href="{{ site.url }}{{ page.url | replace: '/en/','/es/' | replace: 'index.html','es/index.html' }}">ES</a></li>
+                      <li><a href="{{ site.url }}{{ page.url | replace: '/en/','/es/'}}">ES</a></li>
                     </ul>
                     {% endif %}
                     {% if page.lang == "es" %}
                     <ul class="nav navbar-nav">
-                      <li><a href="{{ site.url }}{{ page.url | replace: '/es/','/en/' | replace: 'en/index.html','index.html' }}">EN</a></li>
+                      <li><a href="{{ site.url }}/en{{ page.url }}">EN</a></li>
                       <li class="divider-vertical"></li>
                       <li><a href="{{ site.url }}{{ page.url }}" class="{{ page.lang }}">ES</a></li>
                     </ul>
