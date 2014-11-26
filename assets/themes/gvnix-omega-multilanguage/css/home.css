@@ -29,9 +29,7 @@
 }
 
 @media(min-width:768px) {
-    .home-template section {
-        padding: 150px 0;
-    }
+    .home-template section {}
 }
 
 .bg-light-gray {
