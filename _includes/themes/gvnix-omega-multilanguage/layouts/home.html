@@ -43,12 +43,12 @@
                         <a href="#page-top"></a>
                   </li>
                   <!-- scroll home sections -->
-                    <li>
+                  <!-- <li>
                       <a class="page-scroll" href="#featured">{{ site.t[page.lang].home-features }}</a>
                     </li>
                     <li>
                         <a class="page-scroll" href="#portfolio">{{ site.t[page.lang].home-case-studies }}</a>
-                    </li>
+                    </li> -->
                   <!-- categories for language filter -->
                   {% for link in site.links[page.lang] %}
                     <li>{% if link.external %}
@@ -142,19 +142,11 @@
             <!-- es posible html/md -->
 
             {% if page.lang == "en" %}
-              {% include themes/gvnix-omega-multilanguage/home/services.html %}
-              {% include themes/gvnix-omega-multilanguage/home/featured.html %}
-              {% include themes/gvnix-omega-multilanguage/home/icon-tabs.html %}
-              {% include themes/gvnix-omega-multilanguage/home/projects_grid.html %}
               {% include themes/gvnix-omega-multilanguage/home/social.html %}
               {% include themes/gvnix-omega-multilanguage/home/clients.html %}
             {% endif %}
 
             {% if page.lang == "es" %}
-                {% include themes/gvnix-omega-multilanguage/home/services-es.html %}
-                {% include themes/gvnix-omega-multilanguage/home/featured-es.html %}
-                {% include themes/gvnix-omega-multilanguage/home/icon-tabs-es.html %}
-                {% include themes/gvnix-omega-multilanguage/home/projects_grid.html %}
                 {% include themes/gvnix-omega-multilanguage/home/social.html %}
                 {% include themes/gvnix-omega-multilanguage/home/clients-es.html %}
             {% endif %}
@@ -164,7 +156,6 @@
     </div>
 </div>
     {% include themes/gvnix-omega-multilanguage/footer.html %}
-    {% include  themes/gvnix-omega-multilanguage/home/modals.html %}
 
 {% include themes/gvnix-omega-multilanguage/scripts.html %}
 

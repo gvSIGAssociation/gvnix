@@ -176,30 +176,30 @@ defaults:
 # For external links add external: true
 links:
   en:
-    doc:
-      title: Documentation
-      url: /en/documentation
-      external: false
-    training:
-      title: Training
-      url: /en/training
-      external: false
-    blog:
-      title: "Blog"
-      url:   "/en/blog"
-      external: false
+#    doc:
+#      title: Documentation
+#      url: /en/documentation
+#      external: false
+#    training:
+#      title: Training
+#      url: /en/training
+#      external: false
+#    blog:
+#      title: "Blog"
+#      url:   "/en/blog"
+#      external: false
   es:
-    doc:
-      title: Documentación
-      url: /es/documentation
-      external: false
-    training:
-      title: Formación
-      url: /es/training
-    blog:
-      title: "Blog"
-      url:   "/es/blog"
-      external: false
+#    doc:
+#      title: Documentación
+#      url: /es/documentation
+#      external: false
+#    training:
+#      title: Formación
+#      url: /es/training
+#    blog:
+#      title: "Blog"
+#      url:   "/es/blog"
+#      external: false
 
 linksextra:
   en:
@@ -312,11 +312,11 @@ t:
     doc-tutorials: Tutorials
     doc-links: Links
     doc-versions: All versions
-    home-features: Features
-    home-case-estudies: Case studies
-    grid-title: gvNIX Projects
-    grid-text: Some successful cases
-    close: Close
+#    home-features: Features
+#    home-case-estudies: Case studies
+#    grid-title: gvNIX Projects
+#    grid-text: Some successful cases
+#    close: Close
 
   es:
     description: Herramienta de desarrollo rápido de aplicaciones web
@@ -349,11 +349,11 @@ t:
     doc-tutorials: Tutoriales
     doc-links: Enlaces
     doc-versions: Todas las versiones
-    home-features: Características
-    home-case-studies: Casos de éxito
-    grid-title: Proyectos con gvNIX
-    grid-text: Algunos casos de éxito
-    close: Cerrar
+#    home-features: Características
+#    home-case-studies: Casos de éxito
+#    grid-title: Proyectos con gvNIX
+#    grid-text: Algunos casos de éxito
+#    close: Cerrar
 
 ##{{ site.t[page.lang].grid-title }}
 
