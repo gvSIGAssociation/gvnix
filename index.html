@@ -1,7 +1,118 @@
 ---
 layout: home
-title: Bienvenido a gvNIX, herramienta de desarrollo rápido de aplicaciones Java
-lang: es
+# The name of your project
+title: Spring Roo
+
+badges:
+
+  # Specify your project's twitter handle, if any. Delete if none.
+  twitter: SpringRoo
+
+  # Customize your project's badges. Delete any entries that do not apply.
+  custom:
+    - name: Source (GitHub)
+      url:  https://github.com/spring-projects/spring-roo
+      icon: github
+
+    - name: Issues (JIRA)
+      url:  http://jira.springframework.org/browse/ROO
+      icon: tracking
+
+    - name: StackOverflow
+      url:  http://stackoverflow.com/questions/tagged/spring-roo
+      icon: stackoverflow
+
 ---
 
+<!-- Specify the parent of this project (or delete if none) to influence the rendering of the breadcrumb -->
+
+{% capture billboard_description %}
+
+A next-generation rapid application development tool for Java developers. With Roo you can easily build full Java applications in minutes.
+
+{% endcapture %}
+
+{% capture main_content %}
+
+Spring Roo differs from other productivity tools by focusing on:
+
+* Rapid results
+* 100% develop in Java
+* Easy-to-use
+* Fast and simple to remove
+* Totally compromise free
+* Active, helpful community
+* Comprehensive technology integrations
+* Extension points via Roo add-ons
+* Spring-certified architecture
+
+## Instant Results - Making Java Fun
+
+Spring Roo is a lightweight developer tool that makes it fast and easy to deliver instant results. Best of all, you code 100% in Java and get to reuse all your existing Java knowledge, skills and experience.
+
+Read the book [Getting Started with Roo](http://shop.oreilly.com/product/0636920020981.do) written by Josh Long and Steve Mayzak.
+
+Ken Rimple and Srini Penchikala have also written the definitive Roo reference book called [Spring Roo in Action](http://www.manning.com/rimple/) available for purchase from Manning Publications.
+
+## Exciting Features - SOLR, CLOUD, FLEX,...
+
+MVC applications with JPA are a breeze with Roo, but it also eases your journey into the next generation of technology. We already support cool features like Solr for search server integration and cloud deployment like Google App Engine. Plus we have incremental database introspection, Flex, Spring Integration and much more actively in development.
+
+## Zero Risks - Productivity Without Compromise
+
+With Roo you still program everything in Java. Its innovative approach operates entirely at compile-time and is completely compatible with your IDE. Plus because there's no runtime portion, adoption is also simplified and low risk. All your Java developers will feel comfortable and be productive from day one. Roo really represents productivity without compromise.
+
+
+
+<span id="quick-start"></span>
+## Quick Start
+
+Download [Spring Roo 1.3.1.RC1](http://spring-roo-repository.springsource.org.s3.amazonaws.com/milestone/ROO/spring-roo-1.3.1.RC1.zip).
+
+After downloading, unpacking, and installing Roo, try out the following steps to create an application:
+
+```sh
+mkdir hello
+cd hello
+roo
+roo> hint
+roo> project --topLevelPackage com.foo
+roo> jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+roo> entity jpa --class ~.domain.Timer --testAutomatically
+roo> field string --fieldName message --notNull
+roo> hint web mvc
+roo> web mvc setup
+roo> web mvc all --package ~.web
+roo> selenium test --controller ~.web.TimerController
+roo> security setup
+roo> perform tests
+roo> quit
+```
+
+{% endcapture %}
+
+{% capture related_resources %}
+
+### Additional Documentation
+
+* [Reference (PDF)](http://docs.spring.io/spring-roo/docs/current/reference/pdf/spring-roo-docs.pdf)
+
+### Videos
+
+* [Roo in Five Minutes](http://s3.springsource.com/MRKT/roo/2010-01-Five_Minutes_Roo.mov)
+
+### Books
+
+* [Spring Roo in Action](http://www.manning.com/rimple/)
+* [Getting Started with Roo](http://shop.oreilly.com/product/0636920020981.do)
+* [Spring Roo 1.1 Cookbook](http://oreilly.com/catalog/0636920020981)
+
+### Project Lead
+
+* [DISID Corporation](http://www.disid.com/)
+
+{% endcapture %}
+
+
+{% include project_page.html %}
 

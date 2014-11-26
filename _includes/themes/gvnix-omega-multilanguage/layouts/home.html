@@ -137,9 +137,13 @@
 
         <div class="row">
             <div class="page-body" itemprop="description">
+            <section>
+              <div class="container">
 
-            <!--  {{ content }} -->
-            <!-- es posible html/md -->
+                {{ content }}
+
+              </div>
+            </section>
 
             {% if page.lang == "en" %}
               {% include themes/gvnix-omega-multilanguage/home/social.html %}
