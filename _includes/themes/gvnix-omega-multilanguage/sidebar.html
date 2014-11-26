@@ -1,4 +1,5 @@
-<div class="sidebar right">
+
+<div class="sidebar">
 
     <div class="doc-samples">
        {% for badge in page.badges.samples %}
@@ -14,6 +15,7 @@
         </ul>
         {% endfor %}
     </div>
+
     <div class="doc-guides">
        {% for badge in page.badges.guides %}
        <h3>{{ site.t[page.lang].doc-guides }}</h3>
@@ -62,8 +64,7 @@
 
 </div>
 
-
-
+<!-- posts documentation posts -->
 <div class="sidebar">
 
 <h3>{{ site.t[page.lang].doc-versions }}</h3>
@@ -86,3 +87,8 @@
       {% endfor %}
     </ul>
 </div>
+
+<div class="sidebar">
+  {% include themes/gvnix-omega-multilanguage/home/news.html %}
+</div>
+

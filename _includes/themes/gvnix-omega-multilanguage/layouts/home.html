@@ -28,7 +28,6 @@
       <img style="position: absolute; top: 0; left: 0; border: 0; z-index: 30" src="https://camo.githubusercontent.com/567c3a48d796e2fc06ea80409cc9dd82bf714434/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png">
     </a>
 
-
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
 
@@ -136,20 +135,41 @@
             <div class="page-body" itemprop="description">
             <section>
               <div class="container">
+                <div class="row">
+                  <article class="page col-md-8">
 
-                {{ content }}
+                          <div class="page-body" itemprop="description">
+                            {{ content }}
+                          </div>
+                  </article>
+
+                  <!-- sidebar -->
+                   <div class="col-md-4">
+                          {% include themes/gvnix-omega-multilanguage/sidebar.html %}
+                   </div>
+
+              </div>
 
               </div>
             </section>
 
+
             {% if page.lang == "en" %}
+              <section>
               {% include themes/gvnix-omega-multilanguage/home/social.html %}
+              </section>
+              <section>
               {% include themes/gvnix-omega-multilanguage/home/clients.html %}
+              </section>
             {% endif %}
 
             {% if page.lang == "es" %}
+                <section>
                 {% include themes/gvnix-omega-multilanguage/home/social.html %}
+                </section>
+                <section>
                 {% include themes/gvnix-omega-multilanguage/home/clients-es.html %}
+                </section>
             {% endif %}
 
             </div>
