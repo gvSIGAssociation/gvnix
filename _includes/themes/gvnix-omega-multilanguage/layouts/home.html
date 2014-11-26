@@ -54,15 +54,18 @@
                     <li>
                         <a class="page-scroll" href="#portfolio">{{ site.t[page.lang].home-case-studies }}</a>
                     </li> -->
+
                   <!-- categories for language filter -->
-                  {% for link in site.links[page.lang] %}
-                    <li>{% if link.external %}
+
+                  <!-- { for link in site.links[page.lang] }
+                    <li>{ if link.external }
                       <a href="{{ link.url }}">{{ link.title }}</a>
-                      {% else %}
+                      { else }
                       <a href="{{ site.url }}{{ link[1].url }}">{{ link[1].title }}</a>
-                      {% endif %}
+                      { endif }
                     </li>
-                   {% endfor %}
+                   { endfor } -->
+
                    <!-- language select -->
                    <li class="lang">
                     {% if page.lang == "en" %}
@@ -175,8 +178,8 @@
             {% endif %}
 
             {% if page.lang == "es" %}
-                <section>
-                {% include themes/gvnix-omega-multilanguage/home/social.html %}
+                <section class="bg-light-gray">
+                {% include themes/gvnix-omega-multilanguage/home/social-es.html %}
                 </section>
                 <section>
                 {% include themes/gvnix-omega-multilanguage/home/clients-es.html %}

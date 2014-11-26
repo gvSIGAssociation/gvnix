@@ -179,12 +179,12 @@ defaults:
 # For external links add external: true
 links:
   en:
-#    doc:
-#      title: Documentation
+    doc:
+      title: Documentation
 #      url: /en/documentation
 #      external: false
-#    training:
-#      title: Training
+    training:
+      title: Events
 #      url: /en/training
 #      external: false
 #    blog:
@@ -192,12 +192,12 @@ links:
 #      url:   "/en/blog"
 #      external: false
   es:
-#    doc:
-#      title: Documentación
+    doc:
+      title: Documentación
 #      url: /es/documentation
 #      external: false
-#    training:
-#      title: Formación
+    training:
+      title: Eventos
 #      url: /es/training
 #    blog:
 #      title: "Blog"
@@ -207,29 +207,9 @@ links:
 linksextra:
   en:
     featured:
-      title: <i class="icon-star"></i> Featured
-      url: /en/featured
-      external: false
-    codefont:
-      title: <i class="fa fa-code"></i> Source code
-      url: https://github.com/DISID/gvnix/
-      external: true
-    archive:
-      title: <i class="fa fa-archive"></i> Archive
-      url: /en/archive
-      external: false
-    releases:
-      title: <i class="fa fa-download"></i> Releases
-      url: https://github.com/DISID/gvnix/releases
-      external: true
-    downloads:
-      title: <i class="fa fa-download"></i> Downloads
-      url: http://sourceforge.net/projects/gvnix/files/
-      external: true
-    install:
-      title: <i class="fa fa-download"></i> Install gvNIX
-      url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX.adoc
-      external: true
+      title: Featured
+#      url: /en/featured
+#      external: false
     springroo:
       title: Spring Roo
       url:   http://projects.spring.io/spring-roo/
@@ -245,29 +225,9 @@ linksextra:
       tooltip: Lead Project website
   es:
     featured:
-      title: <i class="icon-star"></i> Destacados
-      url: /es/featured
-      external: false
-    codefont:
-      title: <i class="fa fa-code"></i> Código Fuente
-      url: https://github.com/DISID/gvnix/
-      external: true
-    archive:
-      title: <i class="fa fa-archive"></i> Archivo
-      url: /es/archive
-      external: false
-    releases:
-      title: <i class="fa fa-download"></i> Releases
-      url: https://github.com/DISID/gvnix/releases
-      external: true
-    downloads:
-      title: <i class="fa fa-download"></i> Descargas
-      url: http://sourceforge.net/projects/gvnix/files/
-      external: true
-    install:
-      title: Instala gvNIX
-      url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX.adoc
-      external: true
+      title: Destacados
+#      url: /es/featured
+#      external: false
     springroo:
       title: Spring Roo
       url:   http://projects.spring.io/spring-roo/
@@ -308,15 +268,15 @@ t:
     callout-btn-quickstart: "Quickstart"
     callout-btn-download: "Download now"
     latest-news: "Latest news"
+    all-news: "All news"
     legal-notice: "Legal notice"
-    back-to-blog: "Back to"
+    back-to-blog: "Back"
 #    tr-banner-title: Interested in a customized course in gvNIX?
 #    tr-banner-btn: Contact us
 #    tr-banner-txt: We will contact you for a personalized training.
     doc-samples: Sample Projects
     doc-guides: Getting Started Guides
     doc-tutorials: Tutorials
-    doc-versions: All versions
     doc-reference: Reference
     doc: Documentation
 #    home-features: Features
@@ -348,6 +308,7 @@ t:
     callout-btn-quickstart: "Empieza ahora"
     callout-btn-download: "Descargar"
     latest-news: "Últimas noticias"
+    all-news: "Todas las noticias"
     legal-notice: "Aviso legal"
     back-to-blog: "Volver atrás"
 #    tr-banner-title: ¿Te interesa un curso personalizado sobre gvNIX?
@@ -358,7 +319,6 @@ t:
     doc-tutorials: Tutoriales
     doc-reference: Referencia
     doc: Documentación
-    doc-versions: Todas las versiones
 #    home-features: Características
 #    home-case-studies: Casos de éxito
 #    grid-title: Proyectos con gvNIX

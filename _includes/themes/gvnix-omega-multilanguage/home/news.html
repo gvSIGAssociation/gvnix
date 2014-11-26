@@ -2,9 +2,9 @@
 {% assign posts=site.posts | where:"lang", page.lang %}
 
 <!-- news -->
- <div class="">
+ <div class="news">
   <h3 class="section-title"><i class="fa fa-rss"></i> {{ site.t[page.lang].latest-news }}</h3>
-               <ul class="nav">
+               <!-- <ul class="nav">
                {% for post in posts limit:4 %}
                   <li>
                      <p>
@@ -17,5 +17,26 @@
                      </p>
                   </li>
                {% endfor %}
-               </ul>
+               </ul> -->
+
+  <ul class="post-list">
+  {% assign collection = site.posts | where:"lang", page.lang %}
+  {% for post in collection limit:5 %}
+    <li>
+      <span class="block">
+      <i class="fa fa-graduation-cap"></i>
+        <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date">
+        <time datetime="{{ post.date | date_to_xmlschema }}"><small>{{ post.date | date: "%b %d, %Y" }}</small></time></span>
+        </a>
+      </span>
+        <p> {{ post.content | strip_html | truncatewords: 10 }} </p>
+    </li>
+  {% endfor %}
+</ul>
+
+ <p class="block">
+ <a class="btn btn-gvnix pull-right" target="_top" href="{{site.url}}/{{page.lang}}/blog">{{ site.t[page.lang].all-news }}</a>
+ </p>
+
  </div>
+

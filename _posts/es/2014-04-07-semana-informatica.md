@@ -18,7 +18,7 @@ profesionales de las TI de la Comunidad Valenciana organizado por el
 [COIICV][], y nosotros allí estaremos con el seminario**: “gvNIX, el
 estándar de desarrollo Java de la Generalitat”.**
 
-Martes 8 de abril a las 16.30h - Sala Polivalente del COIICV\
+Martes 8 de abril a las 16.30h - Sala Polivalente del COIICV
  A cargo de Enrique Ruiz, Director de I+D de DISID
 
 
