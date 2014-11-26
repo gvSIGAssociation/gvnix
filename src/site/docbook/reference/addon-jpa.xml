@@ -611,9 +611,6 @@ public class Pet {
             bases de datos:
            	<itemizedlist>
        			<listitem>
-       				<para xml:lang="es">H2_IN_MEMORY</para>
-       			</listitem>
-       			<listitem>
        				<para xml:lang="es">POSTGRES</para>
        			</listitem>
        			<listitem>

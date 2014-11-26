@@ -23,7 +23,6 @@ import org.springframework.roo.shell.event.ShellStatus.Status;
 import org.springframework.roo.shell.event.ShellStatusListener;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.logging.LoggingOutputStream;
-import org.osgi.framework.BundleContext;
 
 /**
  * Delegates to commands provided via Felix's Shell API.
@@ -36,7 +35,7 @@ import org.osgi.framework.BundleContext;
 @Component
 @Service
 public class FelixDelegator implements CommandMarker, ShellStatusListener {
-    private BundleContext context;
+    private ComponentContext context;
     @Reference private Shell rooShell;
     @Reference private CommandProcessor commandProcessor;
     @Reference private StaticFieldConverter staticFieldConverter;
@@ -44,8 +43,8 @@ public class FelixDelegator implements CommandMarker, ShellStatusListener {
     protected static final Logger LOGGER = HandlerUtils
             .getLogger(LoggingOutputStream.class);
 
-    protected void activate(final ComponentContext cContext) {
-        context = cContext.getBundleContext();
+    protected void activate(final ComponentContext context) {
+        this.context = context;
         rooShell.addShellStatusListener(this);
         staticFieldConverter.add(LogLevel.class);
         staticFieldConverter.add(PsOptions.class);
@@ -68,7 +67,7 @@ public class FelixDelegator implements CommandMarker, ShellStatusListener {
         }
         else {
             perform("headers "
-                    + bsn.findBundleIdWithoutFail(context));
+                    + bsn.findBundleIdWithoutFail(context.getBundleContext()));
         }
     }
 
@@ -147,35 +146,35 @@ public class FelixDelegator implements CommandMarker, ShellStatusListener {
         perform("start " + bsn.getKey());
     }
 
-    @CliCommand(value = "osgi obr url add", help = "Adds a new OSGi Bundle Repository (OBR) repository file URL")
-    public void obrUrlAdd(
-            @CliOption(key = "url", mandatory = true, help = "The URL to add (eg http://felix.apache.org/obr/releases.xml)") final String url)
-            throws Exception {
+	@CliCommand(value = "osgi obr url add", help = "Adds a new OSGi Bundle Repository (OBR) repository file URL")
+	public void obrUrlAdd(
+			@CliOption(key = "url", mandatory = true, help = "The URL to add (eg http://felix.apache.org/obr/releases.xml)") final String url)
+			throws Exception {
 
-        perform("obr:repos add " + url);
-    }
+		perform("obr:repos add " + url);
+	}
 
-    @CliCommand(value = "osgi obr url list", help = "Lists the currently-configured OSGi Bundle Repository (OBR) repository file URLs")
-    public void obrUrlList() throws Exception {
-        perform("obr:repos list");
-    }
+	@CliCommand(value = "osgi obr url list", help = "Lists the currently-configured OSGi Bundle Repository (OBR) repository file URLs")
+	public void obrUrlList() throws Exception {
+		perform("obr:repos list");
+	}
 
-    @CliCommand(value = "osgi obr url refresh", help = "Refreshes an existing OSGi Bundle Repository (OBR) repository file URL")
-    public void obrUrlRefresh(
-            @CliOption(key = "url", mandatory = true, help = "The URL to refresh (list existing URLs via 'osgi obr url list')") final String url)
-            throws Exception {
+	@CliCommand(value = "osgi obr url refresh", help = "Refreshes an existing OSGi Bundle Repository (OBR) repository file URL")
+	public void obrUrlRefresh(
+			@CliOption(key = "url", mandatory = true, help = "The URL to refresh (list existing URLs via 'osgi obr url list')") final String url)
+			throws Exception {
 
-        perform("obr:repos refresh " + url);
-    }
+		perform("obr:repos refresh " + url);
+	}
 
-    @CliCommand(value = "osgi obr url remove", help = "Removes an existing OSGi Bundle Repository (OBR) repository file URL")
-    public void obrUrlRemove(
-            @CliOption(key = "url", mandatory = true, help = "The URL to remove (list existing URLs via 'osgi obr url list')") final String url)
-            throws Exception {
+	@CliCommand(value = "osgi obr url remove", help = "Removes an existing OSGi Bundle Repository (OBR) repository file URL")
+	public void obrUrlRemove(
+			@CliOption(key = "url", mandatory = true, help = "The URL to remove (list existing URLs via 'osgi obr url list')") final String url)
+			throws Exception {
 
-        perform("obr:repos remove " + url);
-    }
-
+		perform("obr:repos remove " + url);
+	}
+    
     public void onShellStatusChange(final ShellStatus oldStatus,
             final ShellStatus newStatus) {
         if (newStatus.getStatus().equals(Status.SHUTTING_DOWN)) {
@@ -200,7 +199,7 @@ public class FelixDelegator implements CommandMarker, ShellStatusListener {
 
     private void perform(final String commandLine) throws Exception {
         if("shutdown".equals(commandLine)) {
-            context.getBundle(0).stop();
+            context.getBundleContext().getBundle(0).stop();
             return;
         }
 
@@ -245,7 +244,7 @@ public class FelixDelegator implements CommandMarker, ShellStatusListener {
             throws Exception {
 
         perform("resolve "
-                + bsn.findBundleIdWithoutFail(context));
+                + bsn.findBundleIdWithoutFail(context.getBundleContext()));
     }
 
     @CliCommand(value = "osgi scr config", help = "Lists the current SCR configuration")
@@ -287,7 +286,7 @@ public class FelixDelegator implements CommandMarker, ShellStatusListener {
         }
         else {
             perform("scr:list "
-                    + bsn.findBundleIdWithoutFail(context));
+                    + bsn.findBundleIdWithoutFail(context.getBundleContext()));
         }
     }
 
@@ -313,7 +312,7 @@ public class FelixDelegator implements CommandMarker, ShellStatusListener {
             throws Exception {
 
         perform("uninstall "
-                + bsn.findBundleIdWithoutFail(context));
+                + bsn.findBundleIdWithoutFail(context.getBundleContext()));
     }
 
     @CliCommand(value = "osgi update", help = "Updates a specific bundle")
@@ -322,7 +321,7 @@ public class FelixDelegator implements CommandMarker, ShellStatusListener {
             @CliOption(key = "url", mandatory = false, help = "The URL to obtain the updated bundle from") final String url)
             throws Exception {
 
-        final Long id = bsn.findBundleIdWithoutFail(context);
+        final Long id = bsn.findBundleIdWithoutFail(context.getBundleContext());
         if (url == null) {
             perform("update " + id);
         }

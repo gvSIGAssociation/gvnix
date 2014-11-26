@@ -4,7 +4,7 @@
     <groupId>org.springframework.roo</groupId>
     <artifactId>org.springframework.roo.root</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.0.RELEASE</version>
+    <version>2.0.0.BUILD-SNAPSHOT</version>
     <name>Spring Roo</name>
     <url>http://projects.spring.io/spring-roo/</url>
     <licenses>
@@ -949,7 +949,7 @@
     </build>
     <properties>
         <powermock.version>1.4.12</powermock.version>
-        <spring.version>3.1.3.RELEASE</spring.version>
+        <spring.version>3.2.8.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <osgi.version>5.0.0</osgi.version>
         <scr.plugin.version>1.20.0</scr.plugin.version>
