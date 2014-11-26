@@ -1,0 +1,24 @@
+<div class="right-pane-widget--container no-top-border">
+    <div class="project-sub-link--wrapper">
+        {% if page.badges.twitter %}
+        <div class="project-sub-link">
+            <a href="https://twitter.com/{{ page.badges.twitter }}">
+                <div class="spring-icon project-badges twitter" alt="Twitter" title="Twitter">
+                </div>
+            </a>
+        </div>
+        {% endif %}
+        {% for badge in page.badges.custom %}
+        <div class="project-sub-link">
+            <a href="{{ badge.url }}">
+                <div class="spring-icon project-badges {{ badge.icon }}" alt="{{ badge.name }}" title="{{ badge.name }}">
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+<div class="right-pane-widget--container no-top-border project-sidebar-resource--wrapper">
+    {{ related_resources | markdownify }}
+</div>
