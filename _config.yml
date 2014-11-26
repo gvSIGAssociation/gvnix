@@ -4,7 +4,7 @@ disqus_shortname: gvNIX
 mail-to:          mailto:pargudo@disid.com
 download:         http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download
 quickstart:       https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
-demo-geo:         http://gvnixquickstart-disid.rhcloud.com/
+demo-geo:         http://geo-gvnix.rhcloud.com/
 
 # Assign a default image for your site's header and footer
 default_bg:       default_bg.png
@@ -48,7 +48,7 @@ owner:
 
 # Social networking links used in footer. Update and remove as you like.
   twitter: http://twitter.com/gvnix
-  facebook: http://facebook.com/Disid.corp
+  facebook:
   github: http://github.com/disid/gvnix
   stackoverflow: http://stackoverflow.com/questions/tagged/gvnix
   linkedin: https://www.linkedin.com/groups/gvNIX-entorno-desarrollo-rápido-aplicaciones-3878961
@@ -229,18 +229,19 @@ linksextra:
       title: <i class="fa fa-download"></i> Install gvNIX
       url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX.adoc
       external: true
-    learn:
-      title: <i class="fa fa-download"></i> Learn gvNIX
-      url:   https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
-      external: true
     springroo:
       title: Spring Roo
       url:   http://projects.spring.io/spring-roo/
-      external: true
+      tooltip: Spring Roo Framework website
+#      external: true
     contact:
       title: "Contact"
-      url:   "/en/contact"
-      external: false
+#      url:   "/en/contact"
+#      external: false
+    disid:
+      title: DISID Corporation
+      url:   http://www.disid.com
+      tooltip: Lead Project website
   es:
     featured:
       title: <i class="icon-star"></i> Destacados
@@ -266,19 +267,19 @@ linksextra:
       title: Instala gvNIX
       url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX.adoc
       external: true
-    learn:
-      title: Aprende gvNIX
-      url:   https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
-      external: true
     springroo:
       title: Spring Roo
       url:   http://projects.spring.io/spring-roo/
-      external: true
+      tooltip: Sitio web framework Spring Roo
+#      external: true
     contact:
       title: "Contacto"
-      url:   "/es/contact"
-      external: false
-
+#      url:   "/es/contact"
+#      external: false
+    disid:
+      title: DISID Corporation
+      url:   http://www.disid.com
+      tooltip: Sitio web empresa líder del proyecto
 
 t:
   en:

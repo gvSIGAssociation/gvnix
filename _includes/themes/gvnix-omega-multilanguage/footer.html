@@ -56,10 +56,15 @@
             <div>
                 <p class="rss-subscribe text-center">
                 subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}" target="_blank">via RSS</a> |
-                 <a href="{{ site.url }}/es/aviso-legal/">{{ site.t[page.lang].legal-notice }}</a>
+                 <a href="{{ site.url }}/{{ page.lang }}/aviso-legal/">{{ site.t[page.lang].legal-notice }}</a> |
+                 <a href="{{ site.url }}/{{ page.lang }}/contacto/">{{ site.linksextra[page.lang].contact.title }}</a>
                 </p>
                 <p class="rss-subscribe text-center">
                   {{ site.owner.name }} &copy; {{ site.time | date: '%Y' }} &bull; Generalitat Valenciana &bull; Conselleria de Infraestructuras, Territorio y Medio Ambiente
+                </p>
+                <p class="rss-subscribe text-center">
+                <a href="{{ site.linksextra[page.lang].disid.url }}" target="_blank" data-toggle="tooltip" title="{{ site.linksextra[page.lang].disid.tooltip }}">{{ site.linksextra[page.lang].disid.title }}</a> |
+                 <a href="{{ site.linksextra[page.lang].springroo.url }}" target="_blank" data-toggle="tooltip" title="{{ site.linksextra[page.lang].springroo.tooltip }}">{{ site.linksextra[page.lang].springroo.title }}</a>
                 </p>
             </div>
         </div>
