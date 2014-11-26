@@ -4,7 +4,7 @@ disqus_shortname: gvNIX
 mail-to:          mailto:pargudo@disid.com
 download:         http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download
 quickstart:       https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
-demo-geo:         http://geo-gvnix.rhcloud.com/
+demo-geo:         http://geo-gvnix.rhcloud.com/login?lang=en
 
 # Assign a default image for your site's header and footer
 default_bg:       default_bg.png
@@ -23,7 +23,7 @@ readtime:         true
 # Change url to your domain. Leave localhost server or blank when working locally.
 # or use the hint from http://jekyllrb.com/docs/github-pages/ to keep this the same
 # whether working locally or remotely. Start Jekyll with: jekyll serve --baseurl ''
-url: http://disid.github.io/gvnix
+#url: http://disid.github.io/gvnix
 
 # Context path in the remote website (usually /<project>), will be prepended to absolute URLs for static resources
 #baseurl: /gvnix
@@ -315,7 +315,7 @@ t:
     doc-samples: Sample Projects
     doc-guides: Getting Started Guides
     doc-tutorials: Tutorials
-    doc-links: Links
+#    doc-links: Links
     doc-versions: All versions
 #    home-features: Features
 #    home-case-estudies: Case studies
@@ -354,7 +354,7 @@ t:
     doc-samples: Proyectos demo
     doc-guides: Guías de inicio
     doc-tutorials: Tutoriales
-    doc-links: Enlaces
+#    doc-links: Enlaces
     doc-versions: Todas las versiones
 #    home-features: Características
 #    home-case-studies: Casos de éxito

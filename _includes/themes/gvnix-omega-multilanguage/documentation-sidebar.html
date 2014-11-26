@@ -1,0 +1,92 @@
+
+<div class="sidebar">
+
+    <div class="doc-samples">
+       {% for badge in page.badges.samples %}
+       <h3>{{ site.t[page.lang].doc-samples }}</h3>
+        <ul class="nav">
+          <li>
+             <a href="{{ badge.url }}">
+                <div class="" alt="{{ badge.name }}" title="{{ badge.name }}">
+                <i class="fa fa-{{ badge.icon }}"></i> {{ badge.name }}
+              </div>
+            </a>
+          </li>
+        </ul>
+        {% endfor %}
+    </div>
+
+    <div class="doc-guides">
+       {% for badge in page.badges.guides %}
+       <h3>{{ site.t[page.lang].doc-guides }}</h3>
+        <ul class="nav">
+          <li>
+             <a href="{{ badge.url }}">
+                <div class="" alt="{{ badge.name }}" title="{{ badge.name }}">
+                <i class="fa fa-{{ badge.icon }}"></i> {{ badge.name }}
+              </div>
+            </a>
+          </li>
+        </ul>
+        {% endfor %}
+    </div>
+
+    <div class="doc-tutorials">
+
+       {% for badge in page.badges.tutorials %}
+        <h3>{{ site.t[page.lang].doc-tutorials }}</h3>
+        <ul class="nav">
+          <li>
+             <a href="{{ badge.url }}">
+                <div class="" alt="{{ badge.name }}" title="{{ badge.name }}">
+                <i class="fa fa-{{ badge.icon }}"></i> {{ badge.name }}
+              </div>
+            </a>
+          </li>
+        </ul>
+        {% endfor %}
+     </div>
+
+     <div class="doc-links">
+       <h3>{{ site.t[page.lang].doc-links }}</h3>
+        <ul class="nav">
+         {% for badge in page.badges.links %}
+          <li>
+             <a href="{{ badge.url }}">
+                <div alt="{{ badge.name }}" title="{{ badge.name }}">
+                <i class="fa fa-{{ badge.icon }}"></i>
+              </div>
+            </a>
+          </li>
+         {% endfor %}
+        </ul>
+     </div>
+
+</div>
+
+
+
+
+<!-- posts documentation posts -->
+<div class="sidebar">
+
+<h3>{{ site.t[page.lang].doc-versions }}</h3>
+
+<ul class="post-list">
+  {% assign collection = site.posts | where:"lang", page.lang %}
+    {% for post in collection %}
+      {% if post.documentation %}
+      <li>
+           <article>
+                          <i class="fa fa-graduation-cap"></i>
+                          <a href="{{ site.url }}{{ post.url }}">{{ post.title }}
+                          <span class="entry-date">
+                            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %d, %Y" }}</time>
+                          </span>
+                          </a>
+           </article>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+</div>

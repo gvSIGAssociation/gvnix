@@ -4329,27 +4329,36 @@ li.lang ul li.divider-vertical {
 .sidebar{
   border: 1px solid #ccc;
   box-shadow: 0 -4px 0 #34302d;
-  padding: 40px;
+  padding: 20px 40px;
+}
+.sidebar + .sidebar {
+  margin-top: 40px;
 }
 
-.sidebar div.doc-links ul li{
+/* socialmedia */
+
+.home-template .doc-links{
+  margin: 40px 0;
+}
+
+div.doc-links ul li{
   display: inline;
   float: left;
 }
-
-.sidebar div.doc-links ul li a{
-  font-size: 22px;
+div.doc-links ul li a{
+  font-size: 32px;
 }
-.sidebar div.doc-links .nav>li>a:hover,
-.sidebar div.doc-links .nav>li>a:focus {
+div.doc-links .nav>li>a:hover,
+div.doc-links .nav>li>a:focus {
   text-decoration: none;
   background-color: transparent;
   color: #4b731d;
 }
 
-.sidebar + .sidebar {
-  margin-top: 40px;
-}
+/* news */
+
+
+
 
 /** styles base **/
 
