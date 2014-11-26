@@ -6,17 +6,19 @@
 
 <body class="home-template" itemscope itemtype="http://schema.org/WebPage">
   <div id="fade"></div>
-  <a id="slide" class="animated fade"></a>
-<!--
+
+  <!-- navigation sidebar -->
+  <!-- <a id="slide" class="animated fade"></a> -->
+  <!--
   <aside id="sidebar">
      include themes/gvnix-omega-multilanguage/navigation.html
   </aside> -->
 
   <!-- header -->
   {% if page.imagefeature %}
-    <header id="masthead" class="blog-background overlay align-left align-middle animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }})" itemscope itemtype="http://schema.org/Organization">
+    <header id="masthead" class="blog-background overlay align-center align-bottom animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }})" itemscope itemtype="http://schema.org/Organization">
   {% else %}
-  <header id="masthead" class="blog-background overlay align-left align-middle animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }})" itemscope itemtype="http://schema.org/Organization">
+  <header id="masthead" class="blog-background overlay align-center align-bottom animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }})" itemscope itemtype="http://schema.org/Organization">
   {% endif %}
 
 <!-- Navigation -->
@@ -86,7 +88,7 @@
 
   {% if site.t[page.lang].description %}
     <div class="inner">
-        <div class="container col-lg-9">
+        <div class="container">
             <a class="brand light" href="{{ site.url }}" role="banner" itemprop="url">
                 {% if site.logo %}
                   <img itemprop="logo" src="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.logo }}" alt="{{ site.title }} Logo" />

@@ -1,6 +1,7 @@
 <div id="fade"></div>
-<a id="slide" class="animated fade"></a>
 
+<!-- navigation sidebar -->
+<!-- <a id="slide" class="animated fade"></a> -->
 <!-- <aside id="sidebar">
       include themes/gvnix-omega-multilanguage/navigation.html
 </aside> -->
@@ -67,14 +68,12 @@
         <!-- /.container-fluid -->
     </nav>
 
-
-
 <!-- Header -->
 
 {% if page.imagefeature %}
-  <header id="masthead" class="blog-background overlay align-center align-middle animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }})" itemscope itemtype="http://schema.org/Organization">{% if page.imagecredit %}<span class="image-credit">Photo Credit: <a href="{{ page.imagecreditlink }}" target="_blank">{{ page.imagecredit }}</a></span>{% endif %}
+  <header id="masthead" class="blog-background overlay align-center align-bottom animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }})" itemscope itemtype="http://schema.org/Organization">{% if page.imagecredit %}<span class="image-credit">Photo Credit: <a href="{{ page.imagecreditlink }}" target="_blank">{{ page.imagecredit }}</a></span>{% endif %}
 {% else %}
-  <header id="masthead" class="blog-background overlay align-center align-middle animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }})" itemscope itemtype="http://schema.org/Organization">
+  <header id="masthead" class="blog-background overlay align-center align-bottom animated from-bottom"  style="background-image: url({{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }})" itemscope itemtype="http://schema.org/Organization">
 {% endif %}
 
 {% if site.search %}
@@ -84,7 +83,7 @@
 {% endif %}
 
 {% if page.headline %}
-    <div class="inner">
+    <div class="align-bottom inner">
         <div class="container">
             <a class="brand light" href="{{ site.url }}" role="banner" itemprop="url">
                 {% if site.logo %}<img itemprop="logo" src="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.logo }}" alt="{{ site.title }} Logo" />{% endif %}
@@ -95,7 +94,7 @@
         </div>
     </div>
     {% else %}
-    <div class="inner">
+    <div class="align-bottom inner">
         <div class="container">
             <a class="brand" href="{{ site.url }}" role="banner" itemprop="url">
 
@@ -104,7 +103,9 @@
             <h2 class="blog-description light bordered bordered-top" itemprop="description">
                 {{ site.t[page.lang].description }}
             </h2>
-
+            {% if site.t[page.lang].headline %}
+            <h3 class="blog-description light">{{ site.t[page.lang].headline }}</h3>
+            {% endif %}
             </a>
         </div>
     </div>

@@ -281,7 +281,7 @@ linksextra:
 t:
   en:
     description: Spring Roo based RAD tool for web developers
-    headline: gvNIX is an Spring Roo distribution that focuses both enterprise knowledge and enterprise standards to build Java applications.
+    headline: TBC
     created: "Published por"
     author: "DISID"
     status: "Share this Status"
@@ -320,7 +320,7 @@ t:
 
   es:
     description: Herramienta de desarrollo rápido de aplicaciones web
-    headline: gvNIX es una distribución Spring Roo que se centra tanto en el conocimiento como en los estándares de la empresa para construir aplicaciones Java.
+    headline: Mayor productividad gracias a sus componentes de alto valor funcional para aplicaciones corporativas. Nos permite crear, integrar y configurar frameworks y librerías. Proporciona patrones y buenas prácticas. Focaliza en la lógica de negocio. Homogeneidad definida por la herramienta de desarrollo.
     created: "Publicado por"
     author: "DISID"
     status: "Comparte esta entrada"
