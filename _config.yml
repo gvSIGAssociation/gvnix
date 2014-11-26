@@ -23,7 +23,8 @@ readtime:         true
 # Change url to your domain. Leave localhost server or blank when working locally.
 # or use the hint from http://jekyllrb.com/docs/github-pages/ to keep this the same
 # whether working locally or remotely. Start Jekyll with: jekyll serve --baseurl ''
-#url: http://disid.github.io/gvnix
+url: http://disid.github.io/gvnix
+#url: http://localhost:4000
 
 # Context path in the remote website (usually /<project>), will be prepended to absolute URLs for static resources
 #baseurl: /gvnix
@@ -315,8 +316,9 @@ t:
     doc-samples: Sample Projects
     doc-guides: Getting Started Guides
     doc-tutorials: Tutorials
-#    doc-links: Links
     doc-versions: All versions
+    doc-reference: Reference
+    doc: Documentation
 #    home-features: Features
 #    home-case-estudies: Case studies
 #    grid-title: gvNIX Projects
@@ -354,7 +356,8 @@ t:
     doc-samples: Proyectos demo
     doc-guides: Guías de inicio
     doc-tutorials: Tutoriales
-#    doc-links: Enlaces
+    doc-reference: Referencia
+    doc: Documentación
     doc-versions: Todas las versiones
 #    home-features: Características
 #    home-case-studies: Casos de éxito

@@ -6,6 +6,7 @@
 @import url(http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic);
 
 @import url( home.css);
+@import url( projects.css.css);
 /* @import url( featured.css); */
 
 /*!
@@ -4333,6 +4334,11 @@ li.lang ul li.divider-vertical {
 }
 .sidebar + .sidebar {
   margin-top: 40px;
+}
+.block{
+  clear: both;
+  display: table;
+  width: 100%;
 }
 
 /* socialmedia */
