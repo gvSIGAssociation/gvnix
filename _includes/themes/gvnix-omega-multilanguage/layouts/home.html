@@ -54,15 +54,18 @@
                     <li>
                         <a class="page-scroll" href="#portfolio">{{ site.t[page.lang].home-case-studies }}</a>
                     </li> -->
+
                   <!-- categories for language filter -->
-                  {% for link in site.links[page.lang] %}
-                    <li>{% if link.external %}
+
+                  <!-- { for link in site.links[page.lang] }
+                    <li>{ if link.external }
                       <a href="{{ link.url }}">{{ link.title }}</a>
-                      {% else %}
+                      { else }
                       <a href="{{ site.url }}{{ link[1].url }}">{{ link[1].title }}</a>
-                      {% endif %}
+                      { endif }
                     </li>
-                   {% endfor %}
+                   { endfor } -->
+
                    <!-- language select -->
                    <li class="lang">
                     {% if page.lang == "en" %}

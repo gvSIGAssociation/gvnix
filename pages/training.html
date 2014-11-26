@@ -1,5 +1,5 @@
 ---
-layout: pageminimal
+layout: page
 permalink: /en/training/
 title: Training Posts
 description: "An archive of posts sorted by training."
@@ -12,12 +12,16 @@ lang: en
   {% if post.training %}
     <li>
       <article>
-      <i class="fa fa-graduation-cap"></i> <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date"
-      ><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %d, %Y" }}</time></span>
+      <i class="fa fa-calendar"></i> <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date"
+      ><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time></span>
       </a>
       </article>
     </li>
   {% endif %}
   {% endfor %}
 </ul>
+
+ <p class="block">
+ <a class="btn btn-gvnix pull-right" target="_top" href="{{site.url}}/{{page.lang}}/blog">{{ site.t[page.lang].all-news }}</a>
+ </p>
 

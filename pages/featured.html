@@ -1,8 +1,7 @@
 ---
-layout: pageminimal
+layout: page
 title: Featured Posts
 description: "An archive of posts sorted by date."
-headline:
 permalink: /en/featured/
 lang: en
 ---
@@ -11,7 +10,10 @@ lang: en
   {% assign collection = site.posts | where:"lang", page.lang %}
   {% for post in collection %}
   {% if post.featured %}
-    <li><article><i class="icon-star-half-empty"></i> <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %d, %Y" }}</time></span></a></article></li>
+    <li><article><i class="icon-star-half-empty"></i> <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time></span></a></article></li>
   {% endif %}
   {% endfor %}
 </ul>
+ <p class="block">
+ <a class="btn btn-gvnix pull-right" target="_top" href="{{site.url}}/{{page.lang}}/blog">{{ site.t[page.lang].all-news }}</a>
+ </p>

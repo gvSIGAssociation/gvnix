@@ -1,15 +1,15 @@
 ---
 layout: page
-title: Entradas destacadas
-description: Archivo de entradas destacadas
-permalink: /es/featured/
+title: Control de cambios
+description: Archivo de entradas de control de cambios
+permalink: /es/documentation/
 lang: es
 ---
 
 <ul class="post-list">
   {% assign collection = site.posts | where:"lang", page.lang %}
   {% for post in collection %}
-  {% if post.featured %}
+  {% if post.documentation %}
     <li><article><i class="icon-star-half-empty"></i> <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time></span></a></article></li>
   {% endif %}
   {% endfor %}
