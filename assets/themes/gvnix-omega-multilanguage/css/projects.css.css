@@ -1,0 +1,73 @@
+/**
+** Part of css styles from spring projects
+** custom by DISID
+**/
+
+
+.project-documentation--container {
+  border-color: #34302d;
+}
+
+.item-dropdown-widget {
+text-align: left;
+z-index: 800;
+position: relative;
+}
+
+.project-documentation--container .item-dropdown--title {
+background-color: transparent;
+border-bottom: 1px solid #eee;
+padding: 20px;
+font-family: "Montserrat",sans-serif;
+font-size: 14px;
+line-height: 14px;
+}
+
+.project-documentation--container .item--dropdown {
+display: block;
+position: relative;
+width: 100%;
+padding: 0;
+border: none;
+background-color: transparent;
+}
+
+.item--dropdown .item--body-title {
+border-bottom: 1px solid #4a4440;
+font-size: 12px;
+line-height: 12px;
+text-transform: uppercase;
+}
+
+.project-documentation--container .item--dropdown .item--body-title {
+padding-top: 15px;
+color: #34302d;
+margin: 0 20px;
+border-color: #d7d5d3;
+font-size: 12px;
+line-height: 22px;
+}
+
+.item--dropdown .item--left-column, .item--dropdown .item--right-column {
+width: 45%;
+display: inline-block;
+vertical-align: top;
+}
+
+.item--dropdown .item--body .item--body--version {
+border-bottom: 1px solid #4a4540;
+padding: 7px 0;
+}
+
+.project-documentation--container .item--dropdown .item--body--version {
+margin: 0 20px;
+border-color: #d7d5d3;
+}
+.project-documentation--container .item--dropdown .item--body--version:last-child {
+margin-bottom: 20px;
+}
+
+.project-documentation--container .item--dropdown .item--body--version p{
+  line-height: 12px;
+  margin:0;
+}
