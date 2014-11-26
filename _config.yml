@@ -2,7 +2,9 @@ title:            gvNIX
 logo:             logo-negativo-300.png
 disqus_shortname: gvNIX
 mail-to:          mailto:pargudo@disid.com
-download-last-version-url: http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download
+download:         http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download
+quickstart:       https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
+demo-geo:         http://gvnixquickstart-disid.rhcloud.com/
 
 # Assign a default image for your site's header and footer
 default_bg:       default_bg.png
@@ -300,13 +302,15 @@ t:
     post-featured: "Featured"
     post-changelog: "Changelog"
     post-training: "Training"
-    callout-btn-home: "Download now"
+    callout-btn-demo: "Online demo"
+    callout-btn-quickstart: "Quickstart"
+    callout-btn-download: "Download now"
     latest-news: "Latest news"
     legal-notice: "Legal notice"
     back-to-blog: "Back to"
-    tr-banner-title: Interested in a customized course in gvNIX?
-    tr-banner-btn: Contact us
-    tr-banner-txt: We will contact you for a personalized training.
+#    tr-banner-title: Interested in a customized course in gvNIX?
+#    tr-banner-btn: Contact us
+#    tr-banner-txt: We will contact you for a personalized training.
     doc-samples: Sample Projects
     doc-guides: Getting Started Guides
     doc-tutorials: Tutorials
@@ -337,13 +341,15 @@ t:
     post-featured: "Destacado"
     post-changelog: "Control de cambios"
     post-training: "Formación"
-    callout-btn-home: "Descargar ahora"
+    callout-btn-demo: "Demo online"
+    callout-btn-quickstart: "Empieza ahora"
+    callout-btn-download: "Descargar"
     latest-news: "Últimas noticias"
     legal-notice: "Aviso legal"
     back-to-blog: "Volver atrás"
-    tr-banner-title: ¿Te interesa un curso personalizado sobre gvNIX?
-    tr-banner-btn: Contacta
-    tr-banner-txt: Nos pondremos en contacto contigo para una formación personalizada.
+#    tr-banner-title: ¿Te interesa un curso personalizado sobre gvNIX?
+#    tr-banner-btn: Contacta
+#    tr-banner-txt: Nos pondremos en contacto contigo para una formación personalizada.
     doc-samples: Proyectos demo
     doc-guides: Guías de inicio
     doc-tutorials: Tutoriales
@@ -363,5 +369,4 @@ t:
 # Change the directory where Jekyll will write files
 #destination:
 
-#custom variables
-#quickstart-app-url: https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
+

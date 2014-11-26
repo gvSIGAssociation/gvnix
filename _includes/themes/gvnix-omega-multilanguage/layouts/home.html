@@ -120,11 +120,22 @@
 <div id="main" class="content homepage" role="main" itemprop="mainContentOfPage">
     <!-- call out -->
     <div class="callout dark">
-      <div class="container">
+      <div class="container-fluid">
               <div class="row">
-                <div class="col-md-offset-8 col-lg-offset-9 col-sm-3 col-lg-3">
-                  <a href="{{ site.download-last-version-url }}" rel="nofollow" target="_self" class="btn btn-lg btn-gvnix-orange">{{ site.t[page.lang].callout-btn-home }}</a>
-                </div>
+                <div class="col-sm-12 col-lg-12">
+                  <div class="col-sm-4 col-lg-4">
+                    <a href="{{ site.demo-geo }}" target="_blank">
+                    {{ site.t[page.lang].callout-btn-demo }}</a>
+                  </div>
+                  <div class="col-sm-4 col-lg-4">
+                    <a href="{{ site.quickstart }}" target="_blank">
+                    {{ site.t[page.lang].callout-btn-quickstart }}</a>
+                  </div>
+                  <div class="col-sm-4 col-lg-4">
+                    <a href="{{ site.download }}" target="_blank">
+                    {{ site.t[page.lang].callout-btn-download }}</a>
+                  </div>
+                 </div>
               </div>
             </div>
     </div>

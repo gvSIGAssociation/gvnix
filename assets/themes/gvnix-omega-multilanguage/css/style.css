@@ -6,7 +6,7 @@
 @import url(http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic);
 
 @import url( home.css);
-@import url( featured.css);
+/* @import url( featured.css); */
 
 /*!
  * HMFAYSAL OMEGA v1.0.1
@@ -4041,8 +4041,6 @@ body.slide{
 .callout {
   z-index:10;
   background-color:#F6F6F6;
-  padding:10px 0;
-/*   margin-bottom: 72px; */
 }
 .callout h2,
 .callout h3,
@@ -4067,7 +4065,6 @@ body.slide{
 .callout.dark p {
   color:#fff;
   background-color:#252525;
-/*   background-color: #4b731d; */
 }
 
 .callout.dark p {
@@ -4075,6 +4072,32 @@ body.slide{
   font-size:17px;
   max-width:960px;
   margin:auto;
+}
+
+.callout.dark a{
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  color: #e5e5e5;
+  padding-right: 20px;
+  padding: 10px 0;
+  display: table;
+  width: 100%;
+}
+.callout.dark a:hover{
+  text-decoration: none;
+  }
+.callout.dark .col-sm-4.col-lg-4:first-child{
+   border-left: 1px solid rgba(255,255,255,0.2);
+}
+.callout.dark .col-sm-4.col-lg-4{
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.2);
+}
+
+.callout.dark .col-sm-4.col-lg-4:hover{
+  background: #8FC84A;
+  color: #fff;
+  border-left: 1px solid rgba(255,255,255,0.2);
+  border-right: 1px solid rgba(255,255,255,0.2);
 }
 
 @media only screen and (max-width: 990px) {
