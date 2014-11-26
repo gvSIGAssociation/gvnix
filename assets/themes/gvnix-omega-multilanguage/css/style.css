@@ -4297,6 +4297,7 @@ li.lang ul li.divider-vertical {
     .navbar-default.navbar-shrink {
         padding: 10px 0;
         background-color: #222;
+        height: 70px;
     }
 }
 
