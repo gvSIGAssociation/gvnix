@@ -167,6 +167,15 @@ geoportal in which all data are managed from the display
 application as different layers as well as integration with the rest of
 application pages.
 
+<br>
+
+<div class="pull-left">
+<span class="fa-stack fa-3x">
+<i class="fa fa-circle fa-stack-2x text-primary"></i>
+<i class="fa fa-dektop fa-stack-1x fa-inverse"></i>
+</span>
+</div>
+
 # Technology
 
 gvNIX lets you build the data model of an application using forward and reverse
