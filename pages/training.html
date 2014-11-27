@@ -13,7 +13,7 @@ lang: en
     <li>
       <article>
       <i class="fa fa-calendar"></i> <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date"
-      ><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time></span>
+      ><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d" }} {% include date.html date=post.date mode="month"%}</time></span>
       </a>
       </article>
     </li>

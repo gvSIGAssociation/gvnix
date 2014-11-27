@@ -93,7 +93,7 @@ lang: es
                           </li>
                       </ul>
                       <div class="post-info text-center small">
-                          {{ site.t[page.lang].status-posted }}<time datetime="{{ post.date | date_to_xmlschema }}" class="post-time">{{ post.date | date: "%d %b %Y" }}</time>{% if post.modified %}{% if modifiedtime != posttime %} and <code>last modified on <time datetime="{{ post.modified | date: "%Y-%m-%d" }}" itemprop="dateModified">{{ post.modified | date: "%d %b %Y" }}</time></code>{% endif %}{% endif %}
+                          {{ site.t[page.lang].status-posted }}<time datetime="{{ post.date | date_to_xmlschema }}" class="post-time">{{ post.date | date: "%d" }} {% include date.html date=post.date mode="month"%}</time>{% if post.modified %}{% if modifiedtime != posttime %} and <code>last modified on <time datetime="{{ post.modified | date: "%Y-%m-%d" }}" itemprop="dateModified">{{ post.modified | date: "%d %b %Y" }}</time></code>{% endif %}{% endif %}
                           <!-- in <span class="post-tags">
                           {% for tag in post.categories %}
                           <a href="{{ site.url }}/categories/index.html#{{ post.categories | cgi_encode }}" data-toggle="tooltip" title="Other posts from the {{ tag | capitalize }} category" rel="tag">
@@ -120,7 +120,7 @@ lang: es
                       {% endif %}
                       </h2>
                       <div class="post-info text-center small">
-                          <time datetime="{{ post.date | date_to_xmlschema }}" class="post-time">{{ post.date | date: "%d %b %Y" }}</time>{% if post.modified %}{% if modifiedtime != posttime %} and <code>last modified on <time datetime="{{ post.modified | date: "%Y-%m-%d" }}" itemprop="dateModified">{{ post.modified | date: "%d %b %Y" }}</time></code>{% endif %}{% endif %}
+                          <time datetime="{{ post.date | date_to_xmlschema }}" class="post-time">{{ post.date | date: "%d" }} {% include date.html date=post.date mode="month"%}</time>{% if post.modified %}{% if modifiedtime != posttime %} and <code>last modified on <time datetime="{{ post.modified | date: "%Y-%m-%d" }}" itemprop="dateModified">{{ post.modified | date: "%d %b %Y" }}</time></code>{% endif %}{% endif %}
                           <!-- in <span class="post-tags">{% for tag in post.categories %}
                           <a href="{{ site.url }}/categories/index.html#{{ post.categories | cgi_encode }}" data-toggle="tooltip" title="Other posts from the {{ tag | capitalize }} category" rel="tag">
                           {{ tag | capitalize }}
@@ -167,7 +167,7 @@ lang: es
                       {% endif %}
                       </h2>
                       <div class="post-info text-center small">
-                          <time datetime="{{ post.date | date_to_xmlschema }}" class="post-time">{{ post.date | date: "%d %b %Y" }}</time>{% if post.modified %}{% if modifiedtime != posttime %} and <code>last modified on <time datetime="{{ post.modified | date: "%Y-%m-%d" }}" itemprop="dateModified">{{ post.modified | date: "%d %b %Y" }}</time></code>{% endif %}{% endif %}
+                          <time datetime="{{ post.date | date_to_xmlschema }}" class="post-time">{{ post.date | date: "%d" }} {% include date.html date=post.date mode="month"%}</time>{% if post.modified %}{% if modifiedtime != posttime %} and <code>last modified on <time datetime="{{ post.modified | date: "%Y-%m-%d" }}" itemprop="dateModified">{{ post.modified | date: "%d %b %Y" }}</time></code>{% endif %}{% endif %}
                           <!-- in <span class="post-tags">{% for tag in post.categories %}
                           <a href="{{ site.url }}/categories/index.html#{{ post.categories | cgi_encode }}" data-toggle="tooltip" title="Other posts from the {{ tag | capitalize }} category" rel="tag">
                           {{ tag | capitalize }}
@@ -209,7 +209,7 @@ lang: es
                       {% endif %}
                       </h2>
                       <div class="post-info text-center small">
-                          <time datetime="{{ post.date | date_to_xmlschema }}" class="post-time">{{ post.date | date: "%d %b %Y" }}</time>{% if post.modified %}{% if modifiedtime != posttime %} and <code>last modified on <time datetime="{{ post.modified | date: "%Y-%m-%d" }}" itemprop="dateModified">{{ post.modified | date: "%d %b %Y" }}</time></code>{% endif %}{% endif %}
+                          <time datetime="{{ post.date | date_to_xmlschema }}" class="post-time">{{ post.date | date: "%d" }} {% include date.html date=post.date mode="month"%}</time>{% if post.modified %}{% if modifiedtime != posttime %} and <code>last modified on <time datetime="{{ post.modified | date: "%Y-%m-%d" }}" itemprop="dateModified">{{ post.modified | date: "%d %b %Y" }}</time></code>{% endif %}{% endif %}
                           <!-- in <span class="post-tags">{% for tag in post.categories %}
                           <a href="{{ site.url }}/categories/index.html#{{ post.categories | cgi_encode }}" data-toggle="tooltip" title="Other posts from the {{ tag | capitalize }} category" rel="tag">
                           {{ tag | capitalize }}

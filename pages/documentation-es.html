@@ -10,7 +10,7 @@ lang: es
   {% assign collection = site.posts | where:"lang", page.lang %}
   {% for post in collection %}
   {% if post.documentation %}
-    <li><article><i class="icon-star-half-empty"></i> <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %d, %Y" }}</time></span></a></article></li>
+    <li><article><i class="icon-star-half-empty"></i> <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d" }} {% include date.html date=post.date mode="month"%}</time></span></a></article></li>
   {% endif %}
   {% endfor %}
 </ul>
