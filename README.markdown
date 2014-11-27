@@ -43,8 +43,6 @@ Edit this file and follow the instructions within.
 You'll find "YAML front matter" at the top of the file, i.e. everything between the triple dashes that look like `---`.
 This section contains some basic metadata.
 
-TBC details for our theme
-
 
 ## View the site locally
 
