@@ -43,9 +43,7 @@ a personas con diversos perfiles y niveles de conocimiento del lenguaje Java.
 
 ## Fechas y lugares
 
-Presentación del programa de Formación gvNIX, Valencia, 05 de octubre 2011
-
-Certificado gvNIX Developer - WEB, Valencia, 17 octubre-26 octubre 2011
+TBC
 
 
 **TBC Itinerario: Certified gvNIX Developer-Web**
