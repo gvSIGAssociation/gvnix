@@ -121,7 +121,6 @@ record created in first position, selection always visible...
 Create patterns and details
 [Dandelion DataTables] (http://dandelion.github.io/datatables/)
 
-<<<<<<< HEAD
 ## Loupe component
 
 Allows to use loupe type components in applications. Thanks to these
@@ -233,7 +232,4 @@ You can do get your requests, request support and suggestions that you
 
 Of course you will find us on social networks either following a '@gvNIX'
 or including the `#gvnix` in your tweets.
-=======
 
-
->>>>>>> branch 'gh-pages' of https://github.com/DISID/gvnix
