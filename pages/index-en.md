@@ -172,7 +172,7 @@ application pages.
 <div class="pull-left">
 <span class="fa-stack fa-3x">
 <i class="fa fa-circle fa-stack-2x text-primary"></i>
-<i class="fa fa-dektop fa-stack-1x fa-inverse"></i>
+<i class="fa fa-desktop fa-stack-1x fa-inverse"></i>
 </span>
 </div>
 
