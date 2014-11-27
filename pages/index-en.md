@@ -1,39 +1,44 @@
 ---
 layout: home
-title: Welcome to gvNIX, Spring Roo based RAD tool for Java developers
+title: gvNIX, Spring Roo based RAD tool for Java developers
 permalink: en/index.html
 lang: en
+
 
 badges:
 
   # Customize the documentation links. Delete any entries that do not apply.
+
+  releases:
+    - name: 1.4.0
+      guide: gvnix-1.4-0-reference-docs.pdf
+    - name: 1.3.1
+      guide: release-1.3.1-index.pdf
+    - name: 1.3.0
+      guide: release-1.3.0-index.pdf
+    - name: 1.2.0
+      guide: release-1.2.0-index.pdf
+    - name: 1.1.0
+      guide: release-1.1.0-index.pdf
+    - name: 1.0.0
+      guide: release-1.0.0-index.pdf
+
   samples:
-    - name: Ejemplo en github
-      url:  https://github.com/disid/gvnix
-      icon: cubes
-
-  guides:
-    - name: Guía Documentación
-      url:  https://github.com/disid/gvnix
-      icon: book
-
-  tutorials:
-    - name: Tutorial
-      url:  https://github.com/disid/gvnix
-      icon: list
+    - name: Demo Petclinic
+      url:  http://petclinic-gvnix.rhcloud.com/
+      icon: globe
+    - name: Demo Geo
+      url:  http://geo-gvnix.rhcloud.com/
+      icon: globe
 
   links:
-    - name: Código ejecutable
-      url:  http://spring-roo-repository.springsource.org.s3.amazonaws.com/release/ROO/spring-roo-1.3.0.RELEASE.zip
+    - name: Executable code
+      url:  http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download
       icon: arrow-circle-down
 
-    - name: Código (GitHub)
+    - name: Source code
       url:  https://github.com/DISID/gvnix
       icon: github
-
-    - name: Issues (JIRA)
-      url:  
-      icon: leaf
 
     - name: StackOverflow
       url:  http://stackoverflow.com/questions/tagged/gvnix
