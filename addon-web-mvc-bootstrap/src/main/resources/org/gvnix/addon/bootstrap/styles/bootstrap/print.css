@@ -31,10 +31,10 @@
     input[type=button] {
         display: none !important;
     }
-    .only-for-print {
+    .show-on-print {
         display: inherit !important;
     }
-    .not-print {
+    .hide-on-print {
         display: none !important;
     }
 }

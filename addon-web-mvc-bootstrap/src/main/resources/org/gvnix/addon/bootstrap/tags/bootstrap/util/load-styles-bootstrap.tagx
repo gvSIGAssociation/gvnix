@@ -9,4 +9,7 @@
 	<spring:url value="/resources/styles/bootstrap/offcanvas.css" var="offcanvas_css_url" />
 	<link href="${offcanvas_css_url}" media="screen" rel="stylesheet" type="text/css" />
 
+	<spring:url value="/resources/styles/bootstrap/print.css" var="bootstrap_print_css_url" />
+	<link href="${bootstrap_print_css_url}" media="screen,print" rel="stylesheet" type="text/css" />
+
 </jsp:root>

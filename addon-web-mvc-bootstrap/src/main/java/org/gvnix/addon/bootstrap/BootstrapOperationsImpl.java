@@ -193,7 +193,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     public void addBootstrapStyles() {
 
         List<String> stylesFolderFiles = new ArrayList<String>();
-        Collections.addAll(stylesFolderFiles, "bootstrap/bootstrap.min.css",
+        Collections.addAll(stylesFolderFiles, "bootstrap/print.css",
+                "bootstrap/bootstrap.min.css",
                 "bootstrap/jquery-ui.bootstrap.css", "bootstrap/offcanvas.css",
                 "bootstrap/images/ui-bg_glass_75_ffffff_1x400.png",
                 "bootstrap/images/ui-icons_222222_256x240.png",
@@ -202,7 +203,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                 "fonts/glyphicons-halflings-regular.ttf",
                 "fonts/glyphicons-halflings-regular.woff", "fonts/README.txt",
                 "images/sort_asc.png", "images/sort_both.png",
-                "images/sort_desc.png", "print.css");
+                "images/sort_desc.png");
 
         Iterator<String> stylesFolderIterator = stylesFolderFiles.iterator();
 
@@ -215,7 +216,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
                     getClass(), styleFile, fileName, "styles/");
 
         }
-        addToLoadScripts("styles_bootstrap_print", "styles/print.css", true);
     }
 
     /**
@@ -224,7 +224,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     public void restoreBootstrapStyles() {
 
         List<String> stylesFolderFiles = new ArrayList<String>();
-        Collections.addAll(stylesFolderFiles, "bootstrap/bootstrap.min.css",
+        Collections.addAll(stylesFolderFiles, "bootstrap/print.css",
+                "bootstrap/bootstrap.min.css",
                 "bootstrap/jquery-ui.bootstrap.css", "bootstrap/offcanvas.css",
                 "bootstrap/images/ui-bg_glass_75_ffffff_1x400.png",
                 "bootstrap/images/ui-icons_222222_256x240.png",
@@ -573,69 +574,4 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
             return projectOperations;
         }
     }
-
-    /**
-     * This method adds reference in laod-script.tagx to use
-     * jquery.loupeField.ext.gvnix.js
-     */
-    public void addToLoadScripts(String varName, String url, boolean isCSS) {
-        // Modify Roo load-scripts.tagx
-        String docTagxPath = getPathResolver().getIdentifier(getWebappPath(),
-                "WEB-INF/tags/util/load-scripts.tagx");
-
-        Validate.isTrue(getFileManager().exists(docTagxPath),
-                "load-script.tagx not found: ".concat(docTagxPath));
-
-        MutableFile docTagxMutableFile = null;
-        Document docTagx;
-
-        try {
-            docTagxMutableFile = getFileManager().updateFile(docTagxPath);
-            docTagx = XmlUtils.getDocumentBuilder().parse(
-                    docTagxMutableFile.getInputStream());
-        }
-        catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        Element root = docTagx.getDocumentElement();
-
-        boolean modified = false;
-
-        if (isCSS) {
-            modified = addCssToTag(docTagx, root, varName, url) || modified;
-        }
-        else {
-            modified = WebProjectUtils.addJSToTag(docTagx, root, varName, url)
-                    || modified;
-        }
-
-        if (modified) {
-            XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
-        }
-
-    }
-
-    private static boolean addCssToTag(Document docTagx, Element root,
-            String varName, String location) {
-        boolean modified = false;
-
-        // add url resolution
-        modified = WebProjectUtils
-                .addUrlToTag(docTagx, root, varName, location);
-
-        // Add link
-        Element cssElement = XmlUtils.findFirstElement(
-                String.format("link[@href='${%s}']", varName), root);
-        if (cssElement == null) {
-            cssElement = docTagx.createElement("link");
-            cssElement.setAttribute("rel", "stylesheet");
-            cssElement.setAttribute("type", "text/css");
-            cssElement.setAttribute("media", "screen,print");
-            cssElement.setAttribute("href", "${".concat(varName).concat("}"));
-            root.appendChild(cssElement);
-            modified = true;
-        }
-        return modified;
-    }
-
 }
