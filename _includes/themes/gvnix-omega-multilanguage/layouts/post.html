@@ -48,11 +48,11 @@
 
                             {% if site.readtime %}
                               &nbsp;<span class="post-tags">
-                              <i class="icon-time"></i>&nbsp;{% if readtime > 1 and readtime < 1.5 %}1 minute read{% endif %}{% if readtime > 1.5 %}
-                              <span class="time">{{ readtime }}</span> minutes read
+                              <i class="icon-time"></i>&nbsp;{% if readtime > 1 and readtime < 1.5 %}{{ site.t[page.lang].1-minute }}{% endif %}{% if readtime > 1.5 %}
+                              <span class="time">{{ readtime }}</span> {{ site.t[page.lang].read }}
                             {% endif %}
                             {% if readtime < 1 %}
-                              Less than 1 minute read
+                              {{ site.t[page.lang].less-1 }}
                             {% endif %}</span>{% endif %}
                         </div>
                     </header>
