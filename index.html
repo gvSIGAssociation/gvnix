@@ -45,6 +45,8 @@ badges:
 
 {% capture main_content %}
 
+# Qué es gvNIX
+
 gvNIX es un entorno de trabajo Java de código abierto para el desarrollo rápido
 de aplicaciones web, altamente productivo, flexible y que no compromete la
 calidad de los proyectos.
@@ -64,9 +66,7 @@ con una estructura de proyectos única para cualquier tipo de proyecto.
 
 <p class="lead text-center">gvNIX = productividad</p>
 <p class="text-center">Crea un proyecto en segundos.</p>
-
-
-# Cómo funciona
+<br>
 
 gvNIX te permite construir el modelo de datos de una aplicación mediante ingeniería
 directa e inversa y generar una aplicación de gestión (web o no) en múltiples
@@ -84,9 +84,49 @@ que destaca su núcleo, Spring Roo. La tecnología que incluye gvNIX
 es la tecnología más utilizada en la actualidad con un 40% de la población de
 estudio emplea Spring MVC como framework.
 
+---
 
-# Qué aporta a tu proyecto
+Algunas de sus características destacadas:
 
+* <i class="icon-check"></i> Análisis -> *Scaffolding*. Construye automáticamente
+la aplicación gestionando la información representada por el modelo de entidades.
+
+* Seguridad *autorización* y *autenticación*. Sistema de proveedores (Drivers)
+para conectar a distintos sistemas de gestión de usuarios: *SAFE*, *APLUSU*, ...
+
+* Exportar/Importar *servicios web*
+
+* *Pruebas* unitarias y funcionales. Genera automáticamente pruebas de calidad
+de código, tanto unitarias con Junit como funcionales con Selenium.
+
+* *Informes*. Instala JasperReports para generar informes.
+
+* *Ingeniería inversa de datos*
+
+* Control de *concurrencia* optimista no intrusivo. En entornos multiusuario,
+como las aplicaciones web, es frecuente que dos usuarios accedan simultáneamente al mismo registro para editarlo.
+
+* *Auditoría* e *histórico* de cambios en base de datos
+
+
+# Por qué gvNIX
+
+
+## Multiplataforma
+
+gvNIX es fácil de instalar tanto como herramienta independiente que funciona
+en Windows, Mac OSX, Linux o como herramienta integrada en un entorno de
+desarrollo: STS o Eclipse.
+
+Los únicos requerimientos son Java 6 SDK y Apache Maven 3. Una vez
+instalados, se descarga la distribución de gvNIX, se descomprime y se añade
+al PATH del sistema y lanzamos el entorno con el comando gvnix.
+
+## Internacionalización
+
+Permite añadir soporte para nuevos idiomas en el proyecto. Al incluir un nuevo
+idioma, se añaden en la aplicación de forma automática y infraestructura
+necesaria y los textos traducidos a dicho idioma.
 
 ## Intérprete de comandos
 
@@ -95,53 +135,89 @@ Desde el punto de vista de su uso, gvNIX está diseñado como un intérprete de 
 Para facilitar su uso tiene autocompletado de los comandos y ayuda contextual.
 
 
-## dandelion datatables
+
+## Interfaz usuario *adaptativa* (responsive UI)
+
+Integra frameworks de desarrollo web, entre ellos con [Bootstrap](http://getbootstrap.com/),
+en la aplicación para generar la vista con una estructura HTML5 y CSS3
+adaptativa, es decir, automáticamente se adaptan para su visualización desde
+múltiples dispositivos: tabletas, móviles, portátiles, PCs ...
+
+Además, estos frameworks de desarrollo utilizan estándares web de tal forma que
+se sientan las bases de sitios web accesibles para personas que utilizan
+tecnologías de apoyo para navegar.
+
+## Spring MVC - Integración de jQuery
+
+Convierte proyectos basados en *Dojo* en proyectos sobre *jQuery UI*.
+
+Añade soporte para la validación de formularios y optimiza el código JavaScript
+incluido en el documento HTML.
 
 
+## Integración de Dandelion Datatables
 
-## Interfaz usuario adaptativa (responsive UI) con [Bootstrap](http://getbootstrap.com/)
+Integra componentes de tablas más dinámicas y funcionales: paginación,
+búsqueda global, filtrado por columna, ordenación, diversas fuentes de
+datos: AJAX, DOM, etc;
 
+Permite la visualización en modo registro, edición en línea, edición y
+borrado múltiple, conjunto predefinido de operaciones,
+registro creado a primera posición, selección siempre visible...
 
-## Internacionalización
-
-
-## Componentes avanzados: tablas AJAX, lupa
-
-## Informes
-
-
-
-
-
-# Funcionalidades
-
-TBC
-
-* Maestro → detalle multinivel
+Crea patrones y detalles con
+[Dandelion Datatables](http://dandelion.github.io/datatables/)
 
 
+## Componente lupa
 
-# Características
+Permite utilizar componentes de tipo lupa en las aplicaciones. Gracias a estos
+componentes, podemos buscar registros de forma sencilla de campos relacionados
+sin tener que visualizar todos los datos en un desplegable.
 
-TBC
+##  Maestro detalle multinivel
 
-* gvNIX puede generar cualquiera de las capas de la arquitectura de la aplicación:
-  sólo modelo, modelo-controlador o modelo-vista-controlador.
-  De esta forma gvNIX ayuda en aquello que necesita el proyecto
-  y permite integrar otras tecnologías en una aplicación desarrollada con gvNIX.
-  Por ejemplo, se puede desarrollar una aplicación con gvNIX cuya vista esté desarrollada con ExtJS.
+Permite definir patrones de visualización sobre entidades y sus relaciones:
+permitiendo cualquier combinación [maestro-tabular | maestro-registro] con
+[detalle-tabular | detalle-registro], sin límite en el número de relaciones
+tanto directas como indirectas.
 
-* Diferencia explícita entre desarrolladores de aplicaciones como el usuario
-tipo de gvNIX, y usuarios finales de la aplicaciones desarrolladas.
+## Monitorización rendimiento en producción
 
-* No interfiere en el despliegue de las soluciones ni crea dependencias con el producto final
-  resulta transparente para el despliegue en producción al no contener ningún componente en tiempo de ejecución.
+Integra un sistema de monitorización para aplicaciones web en producción.
 
----
+Se crea la infraestructura necesaria para registrar tiempos de ejecución de
+los distintos elementos de la aplicación: generación de vista, consultas SQL,
+ejecución de métodos, petición HTTP.
 
-- Genera cualquiera de las capas de la arquitectura de la  aplicación.
-- Diferencia clara entre desarrolladores y usuarios finales.
-- Transparente para el despliegue en producción.
+Además se crea una página desde donde podemos ver estadísticas de los
+datos recopilados.
+
+## Asistente para filtros
+
+Los sistemas de filtrado de datos de la tabla permiten no sólo comparar texto
+plano sino que permite definir operaciones de filtrado como *CONTIENE()*,
+*>=*, *FECHA()*, etc
+
+Al activar el filtrado por columna se integra automáticamente un asistente
+que permite al usuario elegir la operación de filtrado por columna.
+
+
+## Componente geográfica
+
+gvNIX genera automáticamente páginas para la visualización, listado,
+búsqueda, creación y edición de datos alfanuméricos y además incorpora la
+visualización sobre un mapa de estos mismos datos.
+
+Permite la edición de la localización de elementos, la localización del dato que
+ se está editando mediante la selección de un punto sobre un mapa.
+
+Permite ,la generación de geoportales. Cualquier aplicación gvNIX puede incorporar
+un geoportal en el que se muestren todos los datos que se gestionan desde la
+aplicación como diferentes capas así como la integración con el resto de
+páginas de la aplicación.
+
+<br>
 
 <div class="pull-left">
 <span class="fa-stack fa-3x">
@@ -165,6 +241,7 @@ Esto le proporciona un amplio apoyo por parte de importantes organizaciones como
   se pueden corregir en la propia aplicación y posteriormente se reporta al
   proyecto gvNIX para incluir la mejora en futuras versiones.
 
+<br>
 
 <div class="pull-left">
 <span class="fa-stack fa-3x">
