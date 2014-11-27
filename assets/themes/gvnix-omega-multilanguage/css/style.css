@@ -414,8 +414,7 @@ a {
   border-color: #807f83;
 }
 a:hover {
-  color: #67666a;
-  border-color: #67666a;
+  color: #4b731d;
 }
 blockquote:before {
   background: #57ad68;
@@ -479,6 +478,12 @@ blockquote:before {
 #masthead p {
   color: #fff;
 }
+
+#footer a:hover,
+#masthead a:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
 /* ----------- */
 /* BLOG HEADER */
 /* ----------- */
