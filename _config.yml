@@ -279,11 +279,13 @@ t:
     doc-tutorials: Tutorials
     doc-reference: Reference
     doc: Documentation
+    source-code: Source code
 #    home-features: Features
 #    home-case-estudies: Case studies
 #    grid-title: gvNIX Projects
 #    grid-text: Some successful cases
 #    close: Close
+
 
   es:
     description: Herramienta de desarrollo rápido de aplicaciones web
@@ -319,11 +321,13 @@ t:
     doc-tutorials: Tutoriales
     doc-reference: Referencia
     doc: Documentación
+    source-code: Código fuente
 #    home-features: Características
 #    home-case-studies: Casos de éxito
 #    grid-title: Proyectos con gvNIX
 #    grid-text: Algunos casos de éxito
 #    close: Cerrar
+
 
 ##{{ site.t[page.lang].grid-title }}
 
