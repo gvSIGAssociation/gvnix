@@ -144,11 +144,11 @@ lang: en
                   <div class="text-center">
                       {% if post.description %}
                     <a href="{{ site.url }}{{ post.url }}" data-toggle="tooltip" title="{{ post.description }}" class="more-link btn btn-gvnix btn-large">
-                        <i class="icon-link"></i> see more...
+                        <i class="icon-link"></i> {{ site.t[page.lang].see-more }}
                     </a>
                     {% else %}
                     <a href="{{ site.url }}{{ post.url }}" data-toggle="tooltip" title=" {{ site.t[page.lang].read-more }} {{ post.title }}" class="more-link btn btn-gvnix btn-large">
-                        <i class="icon-link"></i> see more...
+                        <i class="icon-link"></i> {{ site.t[page.lang].see-more }}
                     </a>
                     {% endif %}
                 </div>
@@ -183,11 +183,11 @@ lang: en
                       <div class="text-center">
                       {% if post.description %}
                     <a href="{{ site.url }}{{ post.url }}" data-toggle="tooltip" title="{{ post.description }}" class="more-link btn btn-gvnix btn-large">
-                        <i class="icon-link"></i>  {{ site.t[page.lang].read }}
+                        <i class="icon-link"></i>  {{ site.t[page.lang].see-more }}
                     </a>
                     {% else %}
                     <a href="{{ site.url }}{{ post.url }}" data-toggle="tooltip" title=" {{ site.t[page.lang].read-more }} {{ post.title }}" class="more-link btn btn-gvnix btn-large">
-                        <i class="icon-link"></i>  {{ site.t[page.lang].read }}
+                        <i class="icon-link"></i>  {{ site.t[page.lang].see-more }}
                     </a>
                     {% endif %}
                     </div>
@@ -227,11 +227,11 @@ lang: en
                       <div class="text-center">
                       {% if post.description %}
                     <a href="{{ site.url }}{{ post.url }}" data-toggle="tooltip" title="{{ post.description }}" class="more-link btn btn-gvnix btn-large">
-                        <i class="icon-link"></i>  {{ site.t[page.lang].read }}
+                        <i class="icon-link"></i>  {{ site.t[page.lang].see-more }}
                     </a>
                     {% else %}
                     <a href="{{ site.url }}{{ post.url }}" data-toggle="tooltip" title=" {{ site.t[page.lang].read-more }} {{ post.title }}" class="more-link btn btn-gvnix btn-large">
-                        <i class="icon-link"></i>  {{ site.t[page.lang].read }}
+                        <i class="icon-link"></i>  {{ site.t[page.lang].see-more }}
                     </a>
                     {% endif %}
                     </div>
