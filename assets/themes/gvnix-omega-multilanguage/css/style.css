@@ -4339,7 +4339,7 @@ li.lang ul li.divider-vertical {
 .sidebar{
   border: 1px solid #ccc;
   box-shadow: 0 -4px 0 #34302d;
-  padding: 20px 40px;
+  padding: 20px 20px;
 }
 .sidebar + .sidebar {
   margin-top: 40px;

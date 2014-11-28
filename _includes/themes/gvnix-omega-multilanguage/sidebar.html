@@ -36,24 +36,31 @@
             <div class="item--dropdown">
                 <div class="item--body">
                    <div class="block">
-                      <ul class="nav navbar-nav navbar-right">
                       {% for badge in page.badges.samples %}
-                        <li>
-                          <a href="{{ badge.url }}" data-toggle="tooltip" title="{{ badge.name }}" target="_blank" >
+                        <div class="item--body--version">
+                        <div class="item--left-column">
+                            <a href="{{ badge.url }}" data-toggle="tooltip" title="{{ badge.name }}" target="_blank" >
                              <div alt="{{ badge.name }}" title="{{ badge.name }}">
-                                <i class="fa fa-{{ badge.icon }}"></i> {{ badge.name }}
+                                {{ badge.name }}
+                             </div>
+                            </a>
+                        </div>
+                        <div class="item--right-column">
+                          <a href="{{ badge.url-code }}" data-toggle="tooltip" title="{{ badge.name }}" target="_blank" >
+                             <div alt="{{ badge.name }}" title="{{ badge.name }}">
+                                {{ site.t[page.lang].source-code }}
                              </div>
                           </a>
-                        </li>
+                        </div>
+                        </div>
                          {% endfor %}
-                      </ul>
                     </div>
                 </div>
             </div>
         </div>
-         <p class="block">
-          <a class="btn btn-gvnix pull-right" target="_top" href="https://github.com/DISID/gvnix-samples">{{ site.t[page.lang].source-code }}</a>
-         </p>
+<!--          <p class="block">
+          <a class="btn btn-gvnix pull-right" target="_top" href="https://github.com/DISID/gvnix-samples"></a>
+         </p> -->
 
   </div>
 

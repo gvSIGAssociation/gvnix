@@ -42,7 +42,7 @@ text-transform: uppercase;
 .project-documentation--container .item--dropdown .item--body-title {
 padding-top: 15px;
 color: #34302d;
-margin: 0 20px;
+margin: 0;
 border-color: #d7d5d3;
 font-size: 12px;
 line-height: 22px;
@@ -60,7 +60,7 @@ padding: 7px 0;
 }
 
 .project-documentation--container .item--dropdown .item--body--version {
-margin: 0 20px;
+margin: 0;
 border-color: #d7d5d3;
 }
 .project-documentation--container .item--dropdown .item--body--version:last-child {

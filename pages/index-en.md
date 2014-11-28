@@ -24,10 +24,10 @@ badges:
       guide: release-1.0.0-index.pdf
 
   samples:
-    - name: Demo Petclinic
+    - name: Petclinic
       url:  http://petclinic-gvnix.rhcloud.com/
       icon: globe
-    - name: Demo Geo
+    - name: Geo
       url:  http://geo-gvnix.rhcloud.com/
       icon: globe
 
