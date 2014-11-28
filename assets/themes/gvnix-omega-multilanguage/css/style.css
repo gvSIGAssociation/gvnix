@@ -4435,4 +4435,8 @@ ul.ds-btn { display: table; }
 .ds-btn li a span small{width:100%; display:inline-block; text-align:left;}
 
 
-
+/*tags*/
+.entry-tags em{
+  text-transform: uppercase;
+  color: #4b731d;
+}

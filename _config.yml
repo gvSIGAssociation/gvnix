@@ -237,6 +237,7 @@ t:
     less-1: Less than 1 minute read
     1-minute: 1 minute read
     read: minutes read
+    see-more: Read more...
 
   es:
     description: Herramienta de desarrollo rápido de aplicaciones web
@@ -281,6 +282,7 @@ t:
     less-1: Leído hace menos de 1 minuto
     1-minute: Leído hace un minuto
     read: minutos hace que fue leído
+    see-more: Leer más...
 
 
 ##{{ site.t[page.lang].grid-title }}

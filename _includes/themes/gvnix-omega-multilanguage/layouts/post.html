@@ -67,7 +67,11 @@
                     {% if tagsize != 0 %}
                     <div class="entry-tags text-center">
 
-                        <i class="icon-tags"></i>&nbsp; {{ site.t[page.lang].tagged }} {% for tag in page.tags %}<a href="{{ site.url }}/tags/index.html#{{ tag | cgi_encode }}" data-toggle="tooltip" title=" {{ site.t[page.lang].posts-tagged }} {{ tag }}" rel="tag">{{ tag }}</a>{% unless forloop.last %}&nbsp;&bull;&nbsp;{% endunless %}{% endfor %}
+                        <i class="icon-tags"></i>&nbsp; {{ site.t[page.lang].tagged }} {% for tag in page.tags %}
+                        <!-- <a href="{{ site.url }}/tags/index.html#{{ tag | cgi_encode }}" data-toggle="tooltip" title=" {{ site.t[page.lang].posts-tagged }} {{ tag }}" rel="tag"> -->
+                        <em>{{ tag }}</em>
+                       <!--  </a> -->
+                        {% unless forloop.last %}&nbsp;&bull;&nbsp;{% endunless %}{% endfor %}
 
                     </div>
                     {% endif %}
