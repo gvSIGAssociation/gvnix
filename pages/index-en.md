@@ -40,7 +40,7 @@ badges:
       url:  https://github.com/DISID/gvnix
       icon: github
 
-    - name: StackOverflow
+    - name: Support
       url:  http://stackoverflow.com/questions/tagged/gvnix
       icon: stack-overflow
 ---
