@@ -1,7 +1,7 @@
 title:            gvNIX
 logo:             logo-negativo-300.png
 disqus_shortname: gvNIX
-mail-to:          mailto:pargudo@disid.com
+mail-to:          mailto:gvnixscm@gmail.com
 download:         http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download
 quickstart:       https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
 demo-geo:         http://geo-gvnix.rhcloud.com/login?lang=en
@@ -36,7 +36,7 @@ comments :
 owner:
   name:           gvNIX
   avatar:         profile-gvnix.jpg
-  email:          pargudo@disid.com
+  email:          gvnixscm@gmail.com
 
   # Use the coder's toolbox at http://coderstoolbox.net/string/#!encoding=xml&action=encode&charset=us_ascii to encode your description into XML string
   #description:    Some Details about yourself
