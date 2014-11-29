@@ -49,44 +49,46 @@ badges:
 
 # Qué es gvNIX
 
-gvNIX es un entorno de trabajo Java de código abierto para el desarrollo rápido
-de aplicaciones web, altamente productivo, flexible y que no compromete la
-calidad de los proyectos.
+gvNIX es una herramienta de código abierto para el desarrollo ágil de aplicaciones Java (RAD) que permite construir aplicaciones web en tan solo unos minutos.
 
-Es la herramienta de desarrollo que te va a proporcionar todos los
-beneficios de un herramienta de desarrollo para crear aplicaciones web.
-
-Crea aplicaciones basadas en varios frameworks e integra, configura esos
-frameworks y configura cómo se relacionan. gvNIX te proporciona patrones
- y buenas prácticas más allá de cada framework o librería que emplees.
-
-Con un ciclo de vida para tus aplicaciones que va desde el análisis hasta el
-mantenimiento.
-
-Dedica el tiempo a la lógica de negocio y homogeneíza tu aplicación
-con una estructura de proyectos única para cualquier tipo de proyecto.
+Es una distribución de <a href="http://projects.spring.io/spring-roo/">Spring Roo</a> que además de las herramientas propias de Roo, ofrece un conjunto de funcionalidades que permiten incrementar la productividad del desarrollo y mejorar la experiencia de usuario gracias a frameworks como jQuery, Bootstrap 3, Leaflet, Datatables, Dandelion Datatables, entre otras.
 
 <p class="lead text-center">gvNIX = productividad</p>
-<p class="text-center">Crea un proyecto en segundos.</p>
-<br>
+<p class="text-center">Crea aplicaciones en minutos.</p>
 
-# Por qué gvNIX
+<br/>
 
-## Multiplataforma
+# Características
+
+## Multiplataforma y fácil de instalar
 
 gvNIX es fácil de instalar tanto como herramienta independiente que funciona
 en Windows, Mac OSX, Linux o como herramienta integrada en un entorno de
 desarrollo: STS o Eclipse.
 
-Los únicos requerimientos son Java 6 SDK y Apache Maven 3. Una vez
-instalados, se descarga la distribución de gvNIX, se descomprime y se añade
-al PATH del sistema y lanzamos el entorno con el comando gvnix.
+Los únicos requerimientos son Java (6 o superior) SDK y Apache Maven 3.
 
-## Internacionalización
+## Generación no-intrusiva de código
 
-Permite añadir soporte para nuevos idiomas en el proyecto. Al incluir un nuevo
-idioma, se añaden en la aplicación de forma automática, con la infraestructura
-necesaria y los textos traducidos a dicho idioma.
+Crea código en unidades de compilación separadas del código fuente creado
+por los desarrolladores, de esta forma, la generación de código es 
+totalmente inocua porque independiza el ciclo de vida del código generado del
+ciclo de vida del código mantenido por los desarrolladores.
+
+## Buenas prácticas desde análisis
+
+Todo proyecto de gvNIX comienza por un análisis del dominio del problema
+plasmado sobre un modelo de clases que sirve como punto de partida del
+proyecto.
+
+## Proyectos JEE estándar
+
+Los proyectos creados con gvNIX son aplicaciones Java que cumplen con el 
+estándar JEE.
+
+## No añade dependencias de componentes
+
+gvNIX no añade ningún tipo de librería requerida en tiempo de ejecución, las aplicaciones creadas son totalmente independientes de gvNIX.
 
 ## Intérprete de comandos
 
@@ -94,25 +96,83 @@ Desde el punto de vista de su uso, gvNIX está diseñado como un intérprete de 
 
 Para facilitar su uso tiene autocompletado de los comandos y ayuda contextual.
 
+<div class="text-center">
+<figure>
+  <img src="{{ site.url }}/images/gvnix-shell-eclipse.png" width="25%"/>
+</figure>
+</div>
+
+# Funcionalidades
+
+## Exportar/Importar servicios web
+
+Genera automáticamente servicios web tanto a partir de código Java como a partir de archivos WSDL.
+
+También genera automáticamente clientes de servicios web simplemente indicando
+la URL donde está publicado el WSDL genera las clases *Stub* en nuestra
+aplicación que permitirá que el resto de clases puedan invocar esos servicios
+remotos como si de llamadas a servicios locales se tratara.
+
+## Informes
+
+Instala JasperReports para generar informes.
+
+Cada informe es accesible desde el menú de la aplicación y genera un formulario previo para especificar los parámetros de filtrado.
+
+Los informes son totalmente funcionales desde su creación, incluyendo la generación de la plantilla .jrxml para permitir una personalización cómoda y fácil.
+
+## Ingeniería inversa de base de datos
+
+Permite crear el modelo completo de entidades Java de la aplicación vía la introspección de la base de datos del proyecto. Además, incrementalmente mantiene el modelo de entidades sincronizado con todos los cambios realizados en el modelo de datos.
+
+## Control de concurrencia optimista no intrusivo
+
+En entornos multiusuario, como las aplicaciones web, es frecuente que dos usuarios accedan simultáneamente al mismo registro para editarlo. El control de concurrencia permite evitar que se pierdan los cambios del primero que guarde.
+
+El patrón de control de concurrencia más aceptado en entornos web es el conocido
+como control de concurrencia optimista. La forma más habitual de implementarlo es utilizar un campo de versión que debe incluirse en todas las tablas del modelo de datos.
+
+En grandes organizaciones el modelo de datos sigue unas políticas de seguridad muy rigurosas y es frecuente que no se pueda añadir un nuevo campo de versión.
+
+gvNIX proporciona una implementación del control de concurrencia optimista 
+*basado en el estado de los objetos*, igualmente efectivo pero no intrusivo.
+
+## Auditoría de cambios en base de datos
+
+Añade soporte a la aplicación para hacer auditoría de cambios en datos de las
+entidades del modelo: registrar quien y cuándo crea o modifica una instancia,
+o en términos de base de datos quien y cuándo modifica un registro
+
+## Histórico de cambios de base de datos
+
+Esta funcionalidad almacena todos los cambios sufridos por las entidades 
+auditadas de forma que sea posible identificar qué, quién y cuándo se 
+produjeron, incluyendo las eliminaciones de los registros.
+
 ## Interfaz usuario *adaptativa* (responsive UI)
 
-Integra frameworks de desarrollo web, entre ellos [Bootstrap](http://getbootstrap.com/),
-en la aplicación para generar la vista adaptativa con una estructura HTML5 y CSS3,
- es decir, automáticamente se adaptan para su visualización desde
-múltiples dispositivos: tabletas, móviles, portátiles, PCs ...
+Integra frameworks de desarrollo web, entre ellos [Bootstrap](http://getbootstrap.com/), en la aplicación para generar la vista adaptativa con una estructura HTML5 y CSS3, es decir, las aplicaciones se adaptan automáticamente para su visualización desde múltiples dispositivos: tabletas, móviles, portátiles, PCs ...
 
 Además, estos frameworks de desarrollo utilizan estándares web de tal forma que
 se sientan las bases de sitios web accesibles para personas que utilizan
 tecnologías de apoyo para navegar.
 
-## Spring MVC - Integración de jQuery
+## Integración de jQuery
 
 Convierte proyectos basados en *Dojo* en proyectos sobre *jQuery UI*.
 
 Añade soporte para la validación de formularios y optimiza el código JavaScript
 incluido en el documento HTML.
 
-## Integración de Dandelion Datatables
+## Componentes visuales avanzados
+
+### Componente Lupa
+
+Permite utilizar componentes de tipo lupa en las aplicaciones. Gracias a estos
+componentes, podemos buscar registros de forma sencilla de campos relacionados
+sin tener que visualizar todos los datos en un desplegable.
+
+### Dandelion Datatables
 
 Integra componentes de tablas más dinámicas y funcionales: paginación,
 búsqueda global, filtrado por columna, ordenación, diversas fuentes de
@@ -125,13 +185,7 @@ registro creado a primera posición, selección siempre visible...
 Crea patrones y detalles con
 [Dandelion Datatables](http://dandelion.github.io/datatables/)
 
-## Componente lupa
-
-Permite utilizar componentes de tipo lupa en las aplicaciones. Gracias a estos
-componentes, podemos buscar registros de forma sencilla de campos relacionados
-sin tener que visualizar todos los datos en un desplegable.
-
-##  Maestro detalle multinivel
+## Maestro detalle multinivel
 
 Permite definir patrones de visualización sobre entidades y sus relaciones:
 permitiendo cualquier combinación [maestro-tabular | maestro-registro] con
@@ -161,66 +215,17 @@ que permite al usuario elegir la operación de filtrado por columna.
 ## Componente geográfica
 
 gvNIX genera automáticamente páginas para la visualización, listado,
-búsqueda, creación y edición de datos alfanuméricos y además incorpora la
-visualización sobre un mapa de estos mismos datos.
+búsqueda, creación y edición de datos alfanuméricos y geoespaciales. 
 
-Permite la edición de la localización de elementos, la localización del dato que
- se está editando mediante la selección de un punto sobre un mapa.
+gvNIX permite integrar en una misma aplicación la gestión
+de la información alfanumérica y geográfica para que los propios usuarios
+pudian explotar dicha información sin necesidad de utilizar otras
+aplicaciones específicas.
 
-Permite ,la generación de geoportales. Cualquier aplicación gvNIX puede incorporar
-un geoportal en el que se muestren todos los datos que se gestionan desde la
-aplicación como diferentes capas así como la integración con el resto de
-páginas de la aplicación.
+Genera autómaticamente geoportales tanto independientes como integrados en las 
+aplicaciones.
 
-<br>
-
-<div class="pull-left">
-<span class="fa-stack fa-3x">
-<i class="fa fa-circle fa-stack-2x text-primary"></i>
-<i class="fa fa-desktop fa-stack-1x fa-inverse"></i>
-</span>
-</div>
-
-# Tecnología
-
-gvNIX te permite construir el modelo de datos de una aplicación mediante ingeniería
-directa e inversa y generar una aplicación de gestión (web o no) en múltiples
-tecnologías de visualización (Spring MVC, Flex, JSF, Vaddin..)
-
-gvNIX ha sido implementado con lenguaje Java y sigue un modelo de arquitectura
-orientado a componentes sobre plataforma **OSGi** en el que cada funcionalidad
-que ofrece el framework es implementada como un componente o add-on que colabora
-con el resto en las distintas tareas de generación.
-
-Está compuesto de un conjunto de herramientas de código abierto entra las
-que destaca su núcleo, Spring Roo. La tecnología que incluye gvNIX
-es la tecnología más utilizada en la actualidad con un 40% de la población de
-estudio emplea Spring MVC como framework.
-
-<br>
-
-<div class="pull-left">
-<span class="fa-stack fa-3x">
-<i class="fa fa-circle fa-stack-2x text-primary"></i>
-<i class="fa fa-code fa-stack-1x fa-inverse"></i>
-</span>
-</div>
-
-# Proyecto de código abierto
-
-Herramienta software libre y de código abierto entra las que destaca su núcleo, Spring Roo.
-Esto le proporciona un amplio apoyo por parte de importantes organizaciones como Spring Source y VMWare.
-
-## Beneficios
-
-* La evolucion de las aplicaciones no está bloqueda por la evolución de gvNIX.
-  Integrar una nueva funcionalidad en una aplicación no requiere que previamente se añada a gvNIX.
-
-* Corregir incidencias en la aplicación no depende de gvNIX,
-  se pueden corregir en la propia aplicación y posteriormente se reporta al
-  proyecto gvNIX para incluir la mejora en futuras versiones.
-
-<br>
+<br/>
 
 <div class="pull-left">
 <span class="fa-stack fa-3x">
@@ -237,12 +242,7 @@ a las aportaciones de nuestra comunidad de desarrolladores.
 
 Podéis hacer llegar vuestras peticiones de ayuda relacionadas con el uso de la
 herramienta, así como las sugerencias que consideréis oportunas para su mejora
-mediante múltiples métodos de comunicación:
-
-* Cuestiones/Bugs en [Stackoverflow](http://stackoverflow.com/questions/tagged/gvnix).
-  Recuerda emplear la etiqueta #gvnix o #gvnix-es
-
-* [Lista de correo GVA](http://listserv.gva.es/cgi-bin/mailman/listinfo/gvNIX_soporte)
+mediante en [Stackoverflow](http://stackoverflow.com/questions/tagged/gvnix). Recuerda emplear la etiqueta #gvnix o #gvnix-es.
 
 Por supuesto nos encontrarás en las redes sociales ya sea siguiendo a '@gvNIX' o
 incluyendo la etiqueta `#gvnix` en tus tuits.
