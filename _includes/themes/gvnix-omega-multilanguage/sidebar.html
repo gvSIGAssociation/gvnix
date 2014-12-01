@@ -28,6 +28,21 @@
 
 </div>
 
+ <!-- socialmedia -->
+  <div class="doc-links block">
+        <ul class="nav navbar-nav navbar-right">
+         {% for badge in page.badges.links %}
+          <li>
+             <a href="{{ badge.url }}" data-toggle="tooltip" title="{{ badge.name }}" target="_blank">
+                <div alt="{{ badge.name }}" title="{{ badge.name }}">
+                <i class="fa fa-{{ badge.icon }}"></i>
+              </div>
+            </a>
+          </li>
+         {% endfor %}
+        </ul>
+   </div>
+
 <div class="sidebar">
  <!-- demos -->
  <div class="project-documentation--container">
@@ -58,31 +73,35 @@
                 </div>
             </div>
         </div>
-<!--          <p class="block">
-          <a class="btn btn-gvnix pull-right" target="_top" href="https://github.com/DISID/gvnix-samples"></a>
-         </p> -->
+  </div>
+</div>
 
+<div class="sidebar">
+ <!-- quickstart -->
+ <div class="project-documentation--container">
+        <div class="item-dropdown-widget">
+            <div class="item-dropdown--title text-center">{{ site.t[page.lang].additional-doc }}</div>
+            <div class="item--dropdown">
+                <div class="item--body">
+                   <div class="block">
+                      <ul class="nav">
+                         {% for badge in page.badges.additional %}
+                          <li>
+                             <a href="{{ badge.url }}" title="{{ badge.name }}" target="_blank">
+                                <div alt="{{ badge.name }}" title="{{ badge.name }}">
+                                {{ badge.name }}
+                              </div>
+                            </a>
+                          </li>
+                         {% endfor %}
+                        </ul>
+                   </div>
+                </div>
+            </div>
+        </div>
   </div>
 
 </div>
-
- <!-- socialmedia -->
-  <div class="doc-links block">
-        <ul class="nav navbar-nav navbar-right">
-         {% for badge in page.badges.links %}
-          <li>
-             <a href="{{ badge.url }}" data-toggle="tooltip" title="{{ badge.name }}" target="_blank">
-                <div alt="{{ badge.name }}" title="{{ badge.name }}">
-                <i class="fa fa-{{ badge.icon }}"></i>
-              </div>
-            </a>
-          </li>
-         {% endfor %}
-        </ul>
-   </div>
-
-
-
 
 
 <div class="sidebar">

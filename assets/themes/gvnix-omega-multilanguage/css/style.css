@@ -4349,8 +4349,10 @@ li.lang ul li.divider-vertical {
   display: table;
   width: 100%;
 }
-
 .sidebar a { color: #4b731d;}
+
+.sidebar ul.nav li {border-bottom: 1px solid #eee;}
+
 
 /* socialmedia */
 

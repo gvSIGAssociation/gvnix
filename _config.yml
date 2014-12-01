@@ -220,20 +220,13 @@ t:
     all-news: "All news"
     legal-notice: "Legal notice"
     back-to-blog: "Back"
-#    tr-banner-title: Interested in a customized course in gvNIX?
-#    tr-banner-btn: Contact us
-#    tr-banner-txt: We will contact you for a personalized training.
     doc-samples: Sample Projects
     doc-guides: Getting Started Guides
     doc-tutorials: Tutorials
     doc-reference: Reference
     doc: Documentation
+    additional-doc: Additional Documentation
     source-code: Source code
-#    home-features: Features
-#    home-case-estudies: Case studies
-#    grid-title: gvNIX Projects
-#    grid-text: Some successful cases
-#    close: Close
     less-1: Less than 1 minute read
     1-minute: 1 minute read
     read: minutes read
@@ -265,20 +258,13 @@ t:
     all-news: "Todas las noticias"
     legal-notice: "Aviso legal"
     back-to-blog: "Volver atrás"
-#    tr-banner-title: ¿Te interesa un curso personalizado sobre gvNIX?
-#    tr-banner-btn: Contacta
-#    tr-banner-txt: Nos pondremos en contacto contigo para una formación personalizada.
     doc-samples: Proyectos demo
     doc-guides: Guías de inicio
     doc-tutorials: Tutoriales
     doc-reference: Referencia
     doc: Documentación
+    additional-doc: Documentación adicional
     source-code: Código fuente
-#    home-features: Características
-#    home-case-studies: Casos de éxito
-#    grid-title: Proyectos con gvNIX
-#    grid-text: Algunos casos de éxito
-#    close: Cerrar
     less-1: Leído hace menos de 1 minuto
     1-minute: Leído hace un minuto
     read: minutos hace que fue leído

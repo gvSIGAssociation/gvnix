@@ -26,10 +26,21 @@ badges:
   samples:
     - name: Petclinic
       url:  http://petclinic-gvnix.rhcloud.com/
+      url-code: https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
       icon: globe
     - name: Geo
       url:  http://geo-gvnix.rhcloud.com/
+      url-code: https://github.com/DISID/gvnix-samples/tree/master/quickstart-geo-app
       icon: globe
+
+  additional:
+    - name: gvNIX quick start application
+      url: https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
+    - name: gvNIX quick start GEO application
+      url: https://github.com/DISID/gvnix-samples/tree/master/quickstart-geo-app
+    - name: Installing gvNIX <i>(Video)</i>
+      url: http://www.youtube.com/watch?v=3SxfUcIy2sM
+
 
   links:
     - name: Executable code

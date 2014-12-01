@@ -24,12 +24,20 @@ badges:
   samples:
     - name: Petclinic
       url:  http://petclinic-gvnix.rhcloud.com/
-      url-code:
+      url-code: https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
       icon: globe
     - name: Geo
       url:  http://geo-gvnix.rhcloud.com/
-      url-code:
+      url-code: https://github.com/DISID/gvnix-samples/tree/master/quickstart-geo-app
       icon: globe
+
+  additional:
+    - name: Inicio rápido de una aplicación en gvNIX <i>(En inglés)</i>
+      url: https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
+    - name: Inicio rápido de una aplicación GEO en gvNIX <i>(En inglés)</i>
+      url: https://github.com/DISID/gvnix-samples/tree/master/quickstart-geo-app
+    - name: Instalando gvNIX <i>(Video)</i>
+      url: http://www.youtube.com/watch?v=3SxfUcIy2sM
 
   links:
     - name: Código ejecutable
@@ -71,7 +79,7 @@ Los únicos requerimientos son Java (6 o superior) SDK y Apache Maven 3.
 ## Generación no-intrusiva de código
 
 Crea código en unidades de compilación separadas del código fuente creado
-por los desarrolladores, de esta forma, la generación de código es 
+por los desarrolladores, de esta forma, la generación de código es
 totalmente inocua porque independiza el ciclo de vida del código generado del
 ciclo de vida del código mantenido por los desarrolladores.
 
@@ -83,7 +91,7 @@ proyecto.
 
 ## Proyectos JEE estándar
 
-Los proyectos creados con gvNIX son aplicaciones Java que cumplen con el 
+Los proyectos creados con gvNIX son aplicaciones Java que cumplen con el
 estándar JEE.
 
 ## No añade dependencias de componentes
@@ -134,7 +142,7 @@ como control de concurrencia optimista. La forma más habitual de implementarlo 
 
 En grandes organizaciones el modelo de datos sigue unas políticas de seguridad muy rigurosas y es frecuente que no se pueda añadir un nuevo campo de versión.
 
-gvNIX proporciona una implementación del control de concurrencia optimista 
+gvNIX proporciona una implementación del control de concurrencia optimista
 *basado en el estado de los objetos*, igualmente efectivo pero no intrusivo.
 
 ## Auditoría de cambios en base de datos
@@ -145,8 +153,8 @@ o en términos de base de datos quien y cuándo modifica un registro
 
 ## Histórico de cambios de base de datos
 
-Esta funcionalidad almacena todos los cambios sufridos por las entidades 
-auditadas de forma que sea posible identificar qué, quién y cuándo se 
+Esta funcionalidad almacena todos los cambios sufridos por las entidades
+auditadas de forma que sea posible identificar qué, quién y cuándo se
 produjeron, incluyendo las eliminaciones de los registros.
 
 ## Interfaz usuario *adaptativa* (responsive UI)
@@ -215,14 +223,14 @@ que permite al usuario elegir la operación de filtrado por columna.
 ## Componente geográfica
 
 gvNIX genera automáticamente páginas para la visualización, listado,
-búsqueda, creación y edición de datos alfanuméricos y geoespaciales. 
+búsqueda, creación y edición de datos alfanuméricos y geoespaciales.
 
 gvNIX permite integrar en una misma aplicación la gestión
 de la información alfanumérica y geográfica para que los propios usuarios
 pudian explotar dicha información sin necesidad de utilizar otras
 aplicaciones específicas.
 
-Genera autómaticamente geoportales tanto independientes como integrados en las 
+Genera autómaticamente geoportales tanto independientes como integrados en las
 aplicaciones.
 
 <br/>

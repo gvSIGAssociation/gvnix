@@ -61,7 +61,7 @@ padding: 7px 0;
 
 .project-documentation--container .item--dropdown .item--body--version {
 margin: 0;
-border-color: #d7d5d3;
+border-color: #eee;
 }
 .project-documentation--container .item--dropdown .item--body--version:last-child {
 margin-bottom: 20px;
