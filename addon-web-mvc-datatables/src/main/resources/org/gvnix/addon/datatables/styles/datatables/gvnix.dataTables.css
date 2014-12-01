@@ -32,7 +32,6 @@ div.dataTables_filter label {
 /* Smaller filter input field. */
 div.dataTables_filter input {
   width: 160px;
-  height: 14px;
   font-size: 12px;
 }
 
