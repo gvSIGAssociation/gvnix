@@ -7,7 +7,7 @@
 		  "category"   : "{{ post.category }}",
 		  "url"        : "{{ site.url }}{{ post.url }}",
 		  "date"       : "{{ post.date }}",
-		  "shortdate"  : "{{ post.date | date: '%B %d, %Y' }}"
+		  "shortdate"  : " {{ post.date | date: "%d" }} {% include date.html date=post.date mode="month"%}"
 		} {% if forloop.last %}{% else %},{% endif %}
 	{% endfor %}
 ]
