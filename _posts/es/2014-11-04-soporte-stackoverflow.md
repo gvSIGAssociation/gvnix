@@ -2,7 +2,6 @@
 layout: post
 title: Soporte gvNIX sobre StackOverflow
 description: Nuevo canal de comunicación para la comunidad de gvNIX
-headline: Soporte
 tags: [soporte, stackoverflow]
 featured: true
 comments: true

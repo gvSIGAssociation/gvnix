@@ -2,7 +2,6 @@
 layout: pageminimal
 title: Aviso Legal
 description: Condiciones de uso de la información contenida en este portal
-headline: Aviso Legal
 permalink: es/legal-notice/
 category:
     - es

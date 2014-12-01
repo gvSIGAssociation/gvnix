@@ -2,7 +2,6 @@
 layout: post
 title: gvNIX nominado a los Premios PortalProgramas al Software Libre
 description: Software con mayor potencial de crecimiento y esencial para la tecnología
-headline: Software Libre
 tags: [software libre]
 comments: true
 share: true

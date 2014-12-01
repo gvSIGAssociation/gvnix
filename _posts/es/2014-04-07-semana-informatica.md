@@ -2,7 +2,6 @@
 layout: post
 type: photo
 title: Semana Informática 2014
-headline: Formación
 description: Semana Informática 2014
 tags: [cursos, formación, COOICV, DISID]
 imagefeature: /post/semana-informatica.png

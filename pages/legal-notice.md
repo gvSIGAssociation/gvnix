@@ -2,7 +2,6 @@
 layout: pageminimal
 title: Legal Notice
 description: Conditions of use of the information contained in this website
-headline: Legal Notice
 permalink: en/legal-notice/
 category:
     - es

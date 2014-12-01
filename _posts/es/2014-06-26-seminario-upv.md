@@ -2,7 +2,6 @@
 layout: post
 title: Seminario gratuito de gvNIX en la UPV
 description: Software con mayor potencial de crecimiento y esencial para la tecnología
-headline: Formación
 tags: [software libre]
 comments: true
 training: true

@@ -2,7 +2,6 @@
 layout: post
 title: gvNIX Training Program
 description: Itinerario formativo de tipo modular
-headline: Formación
 tags: [cursos, formación, COOICV, DISID]
 comments: true
 training: true
