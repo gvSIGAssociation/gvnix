@@ -56,43 +56,39 @@ badges:
       icon: stack-overflow
 ---
 
-# What is gvNIX
+gvNIX is an open source tool for rapid application development (RAD) with which you can create Java web applications in minutes.
 
-gvNIX is a open source tool for rapid development Java web applications,
-highly productive, flexible and that does not compromise project quality.
-
-It is the development tool that is going to provide you all benefits of a
-development tool for building web applications.
-
-gvNIX creates applications based on various frameworks and integrates,
-configure these frameworks and configures how they relate. gvNIX gives you
-patterns and best practices beyond each framework or library that you employ.
-
-With a life cycle for your applications that going from analysis to
-maintenance.
-Spend time to the business logic with a homogenised project with a unique
-structure for any type of project.
+It is a distribution of <a href="http://projects.spring.io/spring-roo/">Spring Roo</a> that provides the set of Spring Roo tools plus a suite of features that increase development productivity and improve the user experience by integrating frameworks like jQuery, Bootstrap 3, Leaflet, DataTables, Dandelion DataTables, among other.
 
 <p class="lead text-center">gvNIX = productivity</p>
-<p class="text-center">Create a project in seconds.</p>
-<br>
+<p class="text-center">Create web applications in minutes.</p>
+<br/>
 
-# Why gvNIX
+# Features
 
-## Multiplatform
+## Multiplatform and easy to install
 
-gvNIX is easy to install as a standalone tool that works on Windows, Mac OSX,
-Linux or as an integrated tool environment Development: STS or Eclipse.
+gvNIX is easy to install as a standalone tool that works
+on Windows, Mac OSX, Linux or as an integrated tool environment
+Development: STS or Eclipse.
 
-The only requirements are Java 6 SDK and Apache Maven 3. Once
-installed, gvNIX distribution is downloaded, unpacked and added
-the PATH system and launched the environment in gvnix command.
+The only requirements are Java (6 or higher) SDK and Apache Maven 3.
 
-## Internationalization
+## Non-intrusive code generation
 
-Include support for adding new languages in the project. When you include a new
-language is added automatically in the application with the necessary
-infrastructure and texts translated into that language.
+It takes on a different approach to code generation compared to other solutions. Instead of generating additional .java files (through the <a href="http://martinfowler.com/dslCatalog/generationGap.html">Generation Gap Pattern</a>), it generates so-called AspectJ inter-type declaration (ITD) .aj source files.
+
+Each generated inter-type declaration (ITD) type will "weave in" structural changes to its target class in compilation-time; for example to add new methods, attributes, etc.
+
+## Standard JEE projects
+
+TBC
+
+## No runtime dependency
+
+If you develop applications using Spring Roo, 
+
+At runtime gvNIX applications are only dependent on frameworks that you used for developing the application, nothing more, nothing less.
 
 ## Command Interpreter
 
