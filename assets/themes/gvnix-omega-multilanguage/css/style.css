@@ -499,8 +499,8 @@ html {
   display: table;
   text-align: center;
   width: 100%;
-  height: 60%;
-  padding: 42px 0 0;
+  height: 40%;
+  padding: 0;
   margin-bottom: 72px;
   box-sizing: border-box;
   border-bottom: 1px solid #333;
@@ -519,7 +519,7 @@ html {
 
 .post-template #masthead,
 .pageminimal-template #masthead{
-  padding: 72px 0 12px;
+  padding: 0;
   }
 
 #masthead.align-left {
