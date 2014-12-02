@@ -82,148 +82,156 @@ Each generated inter-type declaration (ITD) type will "weave in" structural chan
 
 ## Standard JEE projects
 
-TBC
+Projects created with gvNIX are Java applications that conform to the
+JEE standard.
 
 ## No runtime dependency
-
-If you develop applications using Spring Roo, 
 
 At runtime gvNIX applications are only dependent on frameworks that you used for developing the application, nothing more, nothing less.
 
 ## Command Interpreter
 
-From the point of view of its use, gvNIX is designed as an interactive
-shell-style Rails or Grails.
+gvNIX is designed to use it as an interactive shell-style Rails or Grails.
 
 For ease of use has autocomplete commands and context help.
 
-## User interface responsive
+<div class="text-center">
+<figure>
+  <img src="{{ site.url }}/images/gvnix-shell-eclipse.png" class="responsive"/>
+</figure>
+</div>
 
-Integrates web development frameworks, including [Bootstrap](http://getbootstrap.com/),
-in the application to generate the responsive view with HTML5 structure and CSS3
-that is automatically adapted for display in multiple devices: tablets,
-phones, laptops, PCs...
+# Functionalities
 
-In addition, these development frameworks using web standards in such a way that
-set accessible websites bases for people who use assistive technologies
-to navigate.
+## Export/Import Web Services
 
-## Spring MVC - Integration of jQuery
+gvNIX automatically generates web services from Java code and from WSDL files.
 
-Converts projects based on Dojo in projects on jQuery UI.
+It also automatically generates web service clients stating
+the URL where is published WSDL file. This generates *Stub* classes in our
+application to make possible that the other classes invoke these remote services
+as local services.
 
-Adds support for form validation and optimizes the JavaScript code included in
-the HTML document.
+## Reports
 
-## Integration of Dandelion DataTables
+gvNIX installs JasperReports to generate reports.
 
-Integrates more dynamic and functional components: pagination,
-global search, column filtering, sorting, various sources of
-Data: AJAX, DOM, etc;
+Each report is accessible from application menu and generates a previous form to specify the filter parameters.
 
-Allows the register mode view, inline edit, editing and
-deleting multiple,  set predefined of operations,
-record created in first position, selection always visible...
+All reports are fully functional since its inception, including the generation of .jrxml template for comfortable and easy customization.
 
-Create patterns and details
-[Dandelion DataTables] (http://dandelion.github.io/datatables/)
+## Database Reverse Engineering
 
-## Loupe component
+gvNIX allows to create a complete Java entity model using database introspection. In addition, gvNIX maintains the Java entity model synchronized with all changes in the data model.
 
-Allows to use loupe type components in applications. Thanks to these
-components, we can easily find records of fields related
-without viewing all data in a dropdown.
+## Nonintrusive Optimistic Concurrency Control 
 
-## Master detail multilevel
+In multi user environments, such as web applications, it is common that two users access to the same record at the same time to editing it. Concurrency control can prevent that some action interfere with other.
 
-Allows you to define display patterns on entities and their relationships:
-allowing any combination [Master-tabular | master-registration] with
-[Detail-tabular | detail-registration], with no limit on the number of relationships
+Most accepted concurrency control pattern in web environments is known 
+as optimistic concurrency control. Most common way to implement it is to use a version field to be included in all tables in the data model.
+
+In large organizations the data model follows very strict security policies and is frequent that you can't add new version fields.
+
+gvNIX provides an implementation of optimistic concurrency control *based on the objects state*, equally effective but non-intrusive.
+
+## Audit changes on Database
+
+gvNIX adds support on applications to make audit of data changes of the
+entities of the model: saves who and when it creates or modifies an instance,
+or in terms of database who and when modifying a record.
+
+## Historical changes on Database
+
+This functionality saves all audit entities changes. In this way it is possible to identify what, whom and when were produced, including records deletions.
+
+## Responsive UI
+
+gvNIX integrate web development frameworks, including [Bootstrap](http://getbootstrap.com/), in the application to generate Adaptive view with HTML5 and CSS3 structure. Applications adapt automatically for viewing from multiple devices: tablets, mobile, laptops, PCs...
+
+In addition, these development frameworks use web standards. That makes that all web applications generated using gvNIX  are accessible to people who use assistive technologies to navigate.
+
+<div class="text-center">
+<figure>
+  <img src="{{ site.url }}/images/responsive.png" class="responsive"/>
+</figure>
+</div>
+
+## jQuery integration
+
+gvNIX can migrate projects based on * Dojo * to projects based on * jQuery UI *.
+
+It adds support for form validation and optimize JavaScript code
+included in the HTML document.
+
+## Advanced Visual Components
+
+### Loupe Component
+
+gvNIX allows you to use loupe components in applications. Thanks to these
+components, we can search records in a simple way of related fields
+without having to display all the data in a drop-down.
+
+### Dandelion Datatables
+
+gvNIX integrates more dynamic and more functional tables: paging,
+overall, filter by column, sorting, various sources of
+data: AJAX, DOM, etc;
+
+This component allows register mode viewing, Online Edition, multiple edition and
+deletion, predefined set of operations,
+recent created record on first row, always visible selection...
+
+Create patterns and details with
+[Dandelion Datatables](http://dandelion.github.io/datatables/)
+
+## Multilevel Master-Detail
+
+gvNIX allows you to define viewing patterns on entities and their relationships:
+allowing any combination [master-list | master-registry] with
+[detail-list | detail-registry], no limit on the number of relations
 both direct and indirect.
 
-## Production performance monitoring
+## Monitoring performance in production
 
-Integrates a monitoring system for Web applications in production.
+It integrates a monitoring system for web applications in production.
 
-The necessary infrastructure is created to record runtimes for
-the different elements of the application: generation of view, SQL queries,
-execution methods, HTTP request.
+gvNIX creates the necessary infrastructure to record execution times of
+application elements: view generation time, SQL queries,
+implementation of methods, HTTP request...
 
-Also is created a page where we can see statistics data collected.
+Also, it creates a page from where you can see statistics of collected data.
 
 ## Filter Wizard
 
-Filtering systems table data allow not only compare text
-plane but to define filtering operations with * CONTAINS () *,
-*> = *, * DATE () *, etc.
+Table filtering data systems not only allow to compare text, gvNIX allows you to define filtering operations such as *CONTAINS()*,*&gt;=*, *DATE()*, etc.
 
-To enable filtering by column automatically integrates an assistant
-which allows the user to choose the filtering operation per column.
+gvNIX integrates a column filter wizard that allows you to select some of the previous functions and helps you to implement it.
 
-## Geographic Component
+## Geographic component
 
-gvNIX automatically generates pages for display, listing,
-search, create and edit alphanumeric data and also incorporates the
-view on a map of the same data.
+gvNIX automatically generates pages to display, list,
+Search, creation and editing of alphanumeric data and geospatial data.
 
-Allows editing of the location of elements, the location of data that
-being edited by selecting a point on a map.
+It allows you to integrate on a same application alphanumeric and geographic information that users can exploit such information without using other specific applications.
 
-Allows the generation of geoportals. Any gvNIX application may incorporate a
-geoportal in which all data are managed from the display
-application as different layers as well as integration with the rest of
-application pages.
+gvNIX automatilcally generates independent geoportals and/or application integrated geoportals.
 
-<br>
-
-<div class="pull-left">
-<span class="fa-stack fa-3x">
-<i class="fa fa-circle fa-stack-2x text-primary"></i>
-<i class="fa fa-desktop fa-stack-1x fa-inverse"></i>
-</span>
+<div class="text-center">
+<figure>
+  <img src="{{ site.url }}/images/geo-desktop.png" class="responsive"/>
+</figure>
 </div>
 
 # Technology
 
-gvNIX lets you build the data model of an application using forward and reverse
-engineer and generate a management application (web or not) in multiple
-display technologies (Spring MVC, Flex, JSF, Vaddin ..)
-
-gvNIX has been implemented with Java language and follow a model of
-component-oriented architecture of OSGi platform in which each functionality
-that provides the framework is implemented as a component or add-on that works
-with the rest in different generation tasks.
-
-It consists of a set of open source tools in particular its core, Spring Roo.
-The technology includes gvNIX is most often used today with 40% of the study
-population uses as Spring MVC framework technology.
-
-<br>
-
-<div class="pull-left">
-<span class="fa-stack fa-3x">
-<i class="fa fa-circle fa-stack-2x text-primary"></i>
-<i class="fa fa-code fa-stack-1x fa-inverse"></i>
-</span>
+<div class="text-center">
+<figure>
+  <img src="{{ site.url }}/images/tecno.png" class="responsive"/>
+</figure>
 </div>
 
-# Open Source Project
-
-Tool free and open source software based on Spring Roo.
-This gives you a wide support from important organizations like
-Spring Source and VMWare.
-
-## Benefits
-
-* The evolution of applications is not blocked by the evolution of gvNIX.
-Integrating new functionality in an application does not require previously
-be added to gvNIX.
-
-* Fix incidences in the application does not depend on gvNIX,
-can be solved in the application itself and then reports to
-gvNIX project to include as improvement in future versions.
-
-<br>
+<br/>
 
 <div class="pull-left">
 <span class="fa-stack fa-3x">
@@ -232,20 +240,19 @@ gvNIX project to include as improvement in future versions.
 </span>
 </div>
 
-# Community gvNX
 
-Know, modify and redistribute the gvNIX source code.
-The tool evolves, develops and improves continuously thanks
-to the contributions of our developer community.
 
-You can do get your requests, request support and suggestions that you
- consider necessary for improvements through multiple communication methods:
+# Comunidad gvNX
 
-* Issues / Bugs in [Stackoverflow] (http://stackoverflow.com/questions/tagged/gvnix).
-   Remember to use the label #gvnix or # gvnix-es
+Known, modify and redistribute the source code of gvNIX.
+The tool evolves, develops and improves form continued thanks the contributions of our community of developers.
 
-* [GVA Mailing List] (http://listserv.gva.es/cgi-bin/mailman/listinfo/gvNIX_soporte)
+You can send your support requests related to the use of the
+tool, as well as the suggestions that you consider appropriate for its improvement
+by on [Stackoverflow](http://stackoverflow.com/questions/tagged/gvnix). Remember to use the tag #gvnix or #gvnix-es.
 
-Of course you will find us on social networks either following a '@gvNIX'
-or including the `#gvnix` in your tweets.
+Of course you will find us on the social networks either according to '@gvNIX' or
+including the `#gvnix` tag in your tweets.
+
+
 
