@@ -108,7 +108,7 @@ For ease of use has autocomplete commands and context help.
 gvNIX automatically generates web services from Java code and from WSDL files.
 
 It also automatically generates web service clients stating
-the URL where is published WSDL file. This generates *Stub* classes in our
+the URL where the WSDL file is published. This generates *Stub* classes in our
 application to make possible that the other classes invoke these remote services
 as local services.
 
@@ -124,9 +124,9 @@ All reports are fully functional since its inception, including the generation o
 
 gvNIX allows to create a complete Java entity model using database introspection. In addition, gvNIX maintains the Java entity model synchronized with all changes in the data model.
 
-## Nonintrusive Optimistic Concurrency Control 
+## Non-intrusive Optimistic Concurrency Control 
 
-In multi user environments, such as web applications, it is common that two users access to the same record at the same time to editing it. Concurrency control can prevent that some action interfere with other.
+In multi user environments, such as web applications, it is common that two users access to the same record at the same time to edit it. Concurrency control can prevent that some action interfere with other.
 
 Most accepted concurrency control pattern in web environments is known 
 as optimistic concurrency control. Most common way to implement it is to use a version field to be included in all tables in the data model.
@@ -138,18 +138,18 @@ gvNIX provides an implementation of optimistic concurrency control *based on the
 ## Audit changes on Database
 
 gvNIX adds support on applications to make audit of data changes of the
-entities of the model: saves who and when it creates or modifies an instance,
+domain entities: saves who and when it creates or modifies an instance,
 or in terms of database who and when modifying a record.
 
 ## Historical changes on Database
 
-This functionality saves all audit entities changes. In this way it is possible to identify what, whom and when were produced, including records deletions.
+This functionality lets you to store the history of changes made to the entities. You can retrieve and query historical data without much effort: what, whom and when a change was done, including record deletion.
 
 ## Responsive UI
 
-gvNIX integrate web development frameworks, including [Bootstrap](http://getbootstrap.com/), in the application to generate Adaptive view with HTML5 and CSS3 structure. Applications adapt automatically for viewing from multiple devices: tablets, mobile, laptops, PCs...
+gvNIX integrate web development frameworks, including [Bootstrap](http://getbootstrap.com/), in the application to generate responsive UIs with HTML5 and CSS3 structure. Applications are automatically adapted by itself for displaying multiple devices: tablets, mobile, laptops, PCs...
 
-In addition, these development frameworks use web standards. That makes that all web applications generated using gvNIX  are accessible to people who use assistive technologies to navigate.
+In addition, these development frameworks use web standards. That makes all web applications generated using gvNIX  are accessible to people who use assistive technologies to navigate.
 
 <div class="text-center">
 <figure>
@@ -159,7 +159,7 @@ In addition, these development frameworks use web standards. That makes that all
 
 ## jQuery integration
 
-gvNIX can migrate projects based on * Dojo * to projects based on * jQuery UI *.
+gvNIX can migrate projects based on *Dojo* to projects based on *jQuery UI*.
 
 It adds support for form validation and optimize JavaScript code
 included in the HTML document.
@@ -240,19 +240,13 @@ gvNIX automatilcally generates independent geoportals and/or application integra
 </span>
 </div>
 
-
-
-# gvNX Community
+# gvNIX Community
 
 Known, modify and redistribute the source code of gvNIX.
-The tool evolves, develops and improves form continued thanks the contributions of our community of developers.
 
-You can send your support requests related to the use of the
-tool, as well as the suggestions that you consider appropriate for its improvement
-by on [Stackoverflow](http://stackoverflow.com/questions/tagged/gvnix). Remember to use the tag #gvnix or #gvnix-es.
+Feel free to help us to evolve, develop and improve gvNIX.
 
-Of course you will find us on the social networks either according to '@gvNIX' or
-including the `#gvnix` tag in your tweets.
+You can send your support requests related to gvNIX, as well as the suggestions that you consider appropiate for its improvement to [Stackoverflow](http://stackoverflow.com/questions/tagged/gvnix). Remember to use the tag #gvnix or #gvnix-es.
 
-
+Of course you will find us on the social networks either according to '@gvNIX' or including the `#gvnix` tag in your tweets.
 

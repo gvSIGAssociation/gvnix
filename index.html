@@ -155,14 +155,12 @@ gvNIX proporciona una implementación del control de concurrencia optimista
 ## Auditoría de cambios en base de datos
 
 Añade soporte a la aplicación para hacer auditoría de cambios en datos de las
-entidades del modelo: registrar quien y cuándo crea o modifica una instancia,
+entidades del dominio: registrar quien y cuándo crea o modifica una instancia,
 o en términos de base de datos quien y cuándo modifica un registro
 
 ## Histórico de cambios de base de datos
 
-Esta funcionalidad almacena todos los cambios sufridos por las entidades
-auditadas de forma que sea posible identificar qué, quién y cuándo se
-produjeron, incluyendo las eliminaciones de los registros.
+Esta funcionalidad permite almacenar la historia de los cambios realizados en las entidades. También permite recuperar y consultar datos históricos sin mucho esfuerzo: qué, quién y cuándo se hizo un cambio, incluyendo borrado de registros.
 
 ## Interfaz usuario *adaptativa* (responsive UI)
 
