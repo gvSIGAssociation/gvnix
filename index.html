@@ -55,14 +55,12 @@ badges:
 
 {% capture main_content %}
 
-# Qué es gvNIX
+gvNIX es una herramienta de código abierto para el desarrollo rápido de aplicaciones (RAD) con la que se puede crear aplicaciones web Java en apenas minutos.
 
-gvNIX es una herramienta de código abierto para el desarrollo ágil de aplicaciones Java (RAD) que permite construir aplicaciones web en tan solo unos minutos.
-
-Es una distribución de <a href="http://projects.spring.io/spring-roo/">Spring Roo</a> que además de las herramientas propias de Roo, ofrece un conjunto de funcionalidades que permiten incrementar la productividad del desarrollo y mejorar la experiencia de usuario gracias a frameworks como jQuery, Bootstrap 3, Leaflet, Datatables, Dandelion Datatables, entre otras.
+Es una distribución de <a href="http://projects.spring.io/spring-roo/">Spring Roo</a> que proporciona el conjunto de herramientas de Spring Roo, más un conjunto de funciones que aumentan la productividad de desarrollo y mejoran la experiencia del usuario mediante la integración de frameworks como jQuery, Bootstrap 3, Leaflet, Datatables, Dandelion Datatables, entre otras.
 
 <p class="lead text-center">gvNIX = productividad</p>
-<p class="text-center">Crea aplicaciones en minutos.</p>
+<p class="text-center">Crea aplicaciones web en minutos.</p>
 
 <br/>
 
@@ -78,25 +76,20 @@ Los únicos requerimientos son Java (6 o superior) SDK y Apache Maven 3.
 
 ## Generación no-intrusiva de código
 
-Crea código en unidades de compilación separadas del código fuente creado
-por los desarrolladores, de esta forma, la generación de código es
-totalmente inocua porque independiza el ciclo de vida del código generado del
-ciclo de vida del código mantenido por los desarrolladores.
+Aplica un enfoque diferente para la generación de código en comparación con otras soluciones. En lugar de generar archivos .java adicionales (que aplican el patrón _Generation Gap_), genera el código fuente en archivos .aj, archivos AspectJ ITD.
 
-## Buenas prácticas desde análisis
-
-Todo proyecto de gvNIX comienza por un análisis del dominio del problema
-plasmado sobre un modelo de clases que sirve como punto de partida del
-proyecto.
+Cada declaración Java generada en el archivo ITD añadirá esos cambios estructurales a la clase objetivo en tiempo de compilación; por ejemplo, para agregar nuevos métodos, atributos, etc.
 
 ## Proyectos JEE estándar
 
 Los proyectos creados con gvNIX son aplicaciones Java que cumplen con el
 estándar JEE.
 
-## No añade dependencias de componentes
+# No runtime dependency
 
-gvNIX no añade ningún tipo de librería requerida en tiempo de ejecución, las aplicaciones creadas son totalmente independientes de gvNIX.
+If you develop applications using Spring Roo, 
+
+At runtime gvNIX applications are only dependent on frameworks that you used for developing the application, nothing more, nothing less.
 
 ## Intérprete de comandos
 
