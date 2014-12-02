@@ -493,6 +493,7 @@ html {
   height: 100%;
   max-height: 100%;
 }
+
 /* - Blog and post headers - */
 #masthead {
   position: relative;
@@ -964,10 +965,12 @@ input[type="search"]::-webkit-search-decoration,input[type="search"]::-webkit-se
 
 body.search-overlay {
     overflow: hidden;
+    position: relative;
 }
 
 body.search-overlay:after {
-    position: absolute;
+/*     position: absolute; */
+    position: fixed;
     top: 0;
     left: 0;
     z-index: 9001;
@@ -984,7 +987,7 @@ body.search-overlay:after {
 }
 .search-wrapper {
     position: absolute;
-    top: 50px;
+    top: 30px;
     width: 100%;
     padding-right: 10%;
     padding-left: 10%;
@@ -1003,7 +1006,8 @@ body.search-overlay:after {
 
 @media only screen and (min-width:48em) {
     .search-wrapper {
-        top: 100px;
+        top: 70px;
+        padding-top: 30px;
     }
 }
 .post-list {
