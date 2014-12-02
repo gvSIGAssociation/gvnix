@@ -242,7 +242,7 @@ gvNIX automatilcally generates independent geoportals and/or application integra
 
 
 
-# Comunidad gvNX
+# gvNX Community
 
 Known, modify and redistribute the source code of gvNIX.
 The tool evolves, develops and improves form continued thanks the contributions of our community of developers.
