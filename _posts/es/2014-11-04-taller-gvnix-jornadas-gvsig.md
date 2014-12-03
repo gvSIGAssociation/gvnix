@@ -48,7 +48,26 @@ distintos ejercicios del mismo, los **requisitos previos** son:
 * Tener instalado STS y el entorno de desarrollo (Maven, distribución de gvNIX)
 * [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
 * [Maven 3.2](http://maven.apache.org/download.cgi)
-* [STS 3.6](https://spring.io/too)
+* [STS 3.6](https://spring.io/tools/sts/all)
+* Guía instalación gvNIX (https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX.adoc)
+* Tener instalado POSTGRESQL y la extensión espacial POSTGIS
+  * PostgreSQL 9.3: http://www.postgresql.org/download/
+  * PostGIS 2: http://postgis.net/install
+
+En cuanto a la parte práctica, en el taller se verá:
+
+* Crear base de datos POSTGRESQL con extensión POSTGIS
+* Configurar un proyecto para trabajar con componentes GEO
+* Crear un proyecto gvNIX basado en modelo de entidades con campos GEO
+* Generar capa web (Datatables, Bootstrap, jQuery, etc…)
+* Transformar capa web de campos GEO para guardar datos
+* mostración de creación, actualización y visualización de entidades con campos GEO
+* Generar mapa vacío
+* Añadir entidades al mapa
+* Añadir nuevas capas al mapa (Tiles y WMS)
+* Añadir nuevas herramientas al mapa (Personalizadas e incluídas en gvNIX)
+* Configuración de capas (filtrable, seleccionable, icono, colores, etc…)
+* Demostración de filtrado y selección utilizando componente Datatables
 
 
 
