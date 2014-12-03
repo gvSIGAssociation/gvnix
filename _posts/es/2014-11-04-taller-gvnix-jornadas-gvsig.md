@@ -7,6 +7,7 @@ featured: true
 training: true
 comments: true
 share: true
+#modified: 2014-12-03
 category:
     - es
 lang: es
@@ -16,16 +17,15 @@ link: http://blog.gvsig.org/2014/11/04/10as-jornadas-int-gvsig-taller-de-gvnix/
 
 # Taller de gvNIX en las 10as Jornadas Internacionales de gvSIG
 
+Dentro de las [10as Jornadas Internacionales de gvSIG](http://www.gvsig.org/web/community/events/jornadas-gvsig/10as)
+se presenta gvNIX 1.4.0 y su nueva funcionalidad GEO con la que gvNIX se incorpora como proyecto
+al catálogo de la Asociación gvSIG.
 
-gvNIX es una herramienta de **desarrollo rápido de aplicaciones web**
-**Java**. Es una herramienta de software libre (GNU/GPL v.3), altamente
-productiva, flexible y que no compromete la calidad de los proyectos. Y,
-claro, que **incluye componente GEO** … pero por componente GEO no
-estamos hablando de que nuestra aplicación muestre un mapa de Google
-Maps donde geoposicionamos información concreta de la aplicación,
-estamos hablando que nuestra aplicación permitirá a los usuarios
-finales, tanto si tienen conocimientos en geomática como si no los
-tienen:
+Con una ponencia y un taller dedicado, la empresa [DISID](http://www.disid.com)
+presenta gvNIX como herramienta para el desarrollo rápido de geoportales
+para visualización y gestión de datos.
+
+La aplicación permitirá a los usuarios finales:
 
 -   Editar datos de tipo GEO.
 -   Cruzar información de múltiples fuentes en un mapa.
@@ -41,30 +41,14 @@ tienen:
     herramientas: medición, zoom, escala, …
 -   Acceder desde cualquier dispositivo: tableta, móvil, PC …
 
-Precisamente **en el taller nos centraremos en esta componente GEO**.
-
-Llegados a este punto podemos ya comentar que este taller está
-especialmente orientado a desarrolladores.
 
 Para los que quieran asistir al taller y además quieran ir siguiendo los
 distintos ejercicios del mismo, los **requisitos previos** son:
 
-<ul>
-<li>
-Tener instalado STS y el entorno de desarrollo (Maven, distribución de
-gvNIX)
-<ul>
-<li>
-JDK 7:
-<http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html>
-</li>
-<li>
-Maven 3.2: <http://maven.apache.org/download.cgi>
-</li>
-<li>
-STS 3.6: <a href="https://spring.io/too">
+* Tener instalado STS y el entorno de desarrollo (Maven, distribución de gvNIX)
+* [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
+* [Maven 3.2](http://maven.apache.org/download.cgi)
+* [STS 3.6](https://spring.io/too)
 
-</div>
 
-  [**10as Jornadas Internacionales de gvSIG**]: http://www.gvsig.org/web/community/events/jornadas-gvsig/10as
-  [**gvNIX**]: http://www.gvnix.org/
+
