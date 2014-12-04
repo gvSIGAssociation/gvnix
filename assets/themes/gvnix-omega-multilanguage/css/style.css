@@ -482,6 +482,7 @@ blockquote:before {
 #masthead p {
   color: #fff;
 }
+#masthead a{ display: block;}
 
 #footer a:hover,
 #masthead a:hover {
