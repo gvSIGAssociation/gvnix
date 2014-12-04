@@ -11,9 +11,7 @@ share: true
 category:
     - es
 lang: es
-link: http://blog.gvsig.org/2014/11/04/10as-jornadas-int-gvsig-taller-de-gvnix/
 ---
-
 
 # Taller de gvNIX en las 10as Jornadas Internacionales de gvSIG
 
@@ -69,5 +67,5 @@ En cuanto a la parte práctica, en el taller se verá:
 * Configuración de capas (filtrable, seleccionable, icono, colores, etc…)
 * Demostración de filtrado y selección utilizando componente Datatables
 
-
+Toda la información en el blog de la [Asociación gvSIG](http://blog.gvsig.org/2014/11/04/10as-jornadas-int-gvsig-taller-de-gvnix/)
 
