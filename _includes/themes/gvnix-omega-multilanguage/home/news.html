@@ -24,7 +24,10 @@
   {% for post in collection limit:5 %}
     <li>
       <span class="block">
-        <a href="{{ site.url }}{{ post.url }}">{{ post.title }} <span class="entry-date">
+        {% if post.type == 'video' %}
+        <i class="fa fa-play-circle"></i>
+        {% endif %}
+        <a href="{{ site.url }}{{ post.url }}"> {{ post.title }}<span class="entry-date">
         <time datetime="{{ post.date | date_to_xmlschema }}"><small>{{ post.date | date: "%d" }} {% include date.html date=post.date mode="month"%}</small></time></span>
         </a>
       </span>
