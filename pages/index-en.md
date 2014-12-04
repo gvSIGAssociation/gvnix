@@ -42,7 +42,9 @@ badges:
     - name: gvNIX quick start GEO application
       url: https://github.com/DISID/gvnix-samples/tree/master/quickstart-geo-app
     - name: Installing gvNIX <i>(Video)</i>
-      url: http://www.youtube.com/watch?v=3SxfUcIy2sM
+      url: es/video-install-gvnix/
+    - name: Geoportal in gvNIX <i>(Video)</i>
+      url: /en/video-geoportal-gvnix/
 
 
   links:
