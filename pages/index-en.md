@@ -34,6 +34,9 @@ badges:
       icon: globe
 
   additional:
+  additional:
+    - name: gvNIX install guide
+      url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX.adoc
     - name: gvNIX quick start application
       url: https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
     - name: gvNIX quick start GEO application
@@ -124,11 +127,11 @@ All reports are fully functional since its inception, including the generation o
 
 gvNIX allows to create a complete Java entity model using database introspection. In addition, gvNIX maintains the Java entity model synchronized with all changes in the data model.
 
-## Non-intrusive Optimistic Concurrency Control 
+## Non-intrusive Optimistic Concurrency Control
 
 In multi user environments, such as web applications, it is common that two users access to the same record at the same time to edit it. Concurrency control can prevent that some action interfere with other.
 
-Most accepted concurrency control pattern in web environments is known 
+Most accepted concurrency control pattern in web environments is known
 as optimistic concurrency control. Most common way to implement it is to use a version field to be included in all tables in the data model.
 
 In large organizations the data model follows very strict security policies and is frequent that you can't add new version fields.
