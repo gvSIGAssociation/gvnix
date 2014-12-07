@@ -242,7 +242,7 @@ La implementación del add tendrá los siguientes componentes:
 
 * Anotaciones:
 
-  - ``GvNIXAudit``: Para la entidad. Tendrá el parámetro ``revisionLog`` (``Boolean`` [ *Ojo **NO** ``boolean``* ])
+  - ``GvNIXAudit``: Para la entidad. Tendrá el parámetro ``revisionLog`` (``Boolean`` [ *Ojo **NO** ``boolean`` ])
 
   - ``GvNIXAuditListener``: Para la clase listener. Tendrá como parámetro la entidad
 
