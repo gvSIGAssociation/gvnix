@@ -5,7 +5,7 @@ title: "Install gvNIX"
 description: "gvNIX install guide"
 category: en
 tags: [install, video]
-video: https://www.youtube.com/watch?v=dtsbz_SBdBs
+video: https://www.youtube.com/watch?v=h_Ir31WRuNk
 comments: true
 share: true
 ---
