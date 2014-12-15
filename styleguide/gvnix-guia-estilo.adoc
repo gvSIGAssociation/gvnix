@@ -1,0 +1,3269 @@
+//
+// Pre-requisites
+// ===================
+//
+// 1. Install Bootstrap 4.2.0 backend
+//
+//    Read how to do it at http://laurent-laville.org/asciidoc/bootstrap/manual/current/en/getting-started.html
+//
+// 2. Install gvNIX stylesheet for Bootstrap backend for 4.2.0 version
+//
+//    Copy CSS file ./asciidoc-bootstrap.gvnix.css to $HOME/.asciidoc/backends/bootstrap/stylesheets
+//
+//
+// Build the document
+// ===================
+//
+//   asciidoc gvnix-guia-estilo.adoc
+//   asciidoc -a data-uri gvnix-guia-estilo.adoc # Embed images in XHTML
+
+= {title}
+:title:       	    Guía de estilos gvNIX
+:description: 	    Elementos visuales disponibles en gvNIX
+:author:      	    DISID TECHNOLOGIES S.L.
+:authorsite:        www.disid.com
+:owner:             DGTI - GVA
+:copyright:         CC BY-NC-SA 3.0
+:gvnixsite:         www.gvnix.org
+:backend:     	    bootstrap
+:lang:        	    es
+:jumbotron:
+:jumbotron-fullwidth:
+:keywords:   	    gvNIX, Bootstrap
+:revnumber:   	    $Rev: 2792 $
+:revdate:     	    $Date: 2014-12-15 10:18:34 +0100 (lun, 15 dic 2014) $
+:toc2:
+:tocaffix!:
+:toc-placement:     right
+:toclevels: 	    2
+:navinfo!:
+:footer!:
+:footer-fullwidth:
+:glyphicons: 	     http://glyphicons.com[Glyphicons]
+:source-highlighter: pygments
+:theme:               gvnix
+:toTop:
+:span1offset:         col-md-offset-1
+:span2offset:         col-md-offset-2
+:span5:               col-md-5
+:span6:               col-md-6
+:span8:               col-md-8
+:span10:              col-md-10
+:options:             responsive
+
+
+Este documento es una guía de referencia de los elementos de interfaz de
+usuario que ofrece gvNIX. Esta guía está dirigida a analistas funcionales,
+diseñadores gráficos y desarrolladores de aplicaciones.
+
+Esta guía se estructura en 5 apartados:
+
+* *Elementos visuales*: indicada para *analistas funcionales* y
+  perfiles que quieran conocer los fundamentos de los componentes y opciones
+  visuales de las aplicaciones generadas con gvNIX.
+  El objetivo es facilitar la comprensión de las distintas opciones que se
+  disponen para la elaboración de propuestas funcionales de las pantallas de
+  las aplicaciones desarrolladas con gvNIX.
+* *Diseño de temas*: indicada para *diseñadores gráficos* y roles que
+  quieran saber cómo crear nuevos temas visuales, los cuales permiten
+  cambiar las características por defecto de los _Elementos
+  visuales_. Los temas en gvNIX son adecuados para definir el estilo
+  de una organización, de tal forma que todas las aplicaciones tendran el
+  mismo aspecto visual simplemente aplicando un mismo tema.
+* *Personalización de la aplicación*: dirigido a *desarrolladores* para
+  aprender a personalizar la estructura y elementos visuales de un _Tema_
+  instalado en una aplicación. La personalización de la aplicación permite
+  modificar aquellos aspectos del tema visual que sean específicos a una
+  aplicación en concreto.
+* *Página de inicio*: Presentación gráfica de las posibilidades de
+  personalización de la página de inicio de las aplicaciones desarrolladas con
+  gvNIX.
+* *Diseño adaptativo*: Breve explicación sobre el uso de _mediaqueries_ y
+  breve presentación de cómo las aplicaciones desarrolladas con gvNIX
+  serán visualizadas en los diferentes dispositivos.
+
+== Elementos visuales
+
+Durante el análisis y diseño de un programa casi siempre invertimos la mayor
+parte del tiempo en modelar las entidades del dominio del problema y la lógica
+de negocio. Sin embargo, debemos tener en cuenta que todo programa debe
+implementar una forma de comunicarse con el usuario final. A esta parte del
+programa que se encarga de la comunicación con el usuario se le llama Interfaz
+Gráfica de Usuario (_GUI_ por sus siglas en inglés).
+
+En las aplicaciones desarrolladas con gvNIX la estructura de la GUI es
+similar: página desglosada en cabecera, contenido central y pie de página.
+Además se dispone de un conjunto de componentes visuales que se pueden
+incluir en el contenido central de las pantallas de la aplicación.
+
+Veamos en detalle cada parte de esta estructura de página y cada uno de los
+componentes disponibles.
+
+=== Estructura de página
+
+Definimos una estructura de página o layout para indicar la distribución
+de los elementos del diseño de la aplicación. Nos permite decidir sobre la
+distribución de los contenidos fácilmente y mantener la coherencia de la
+disposición de los elementos en toda la aplicación.
+
+Las páginas de una aplicación gvNIX se dividen en tres áreas independientes:
+cabecera, contenido central y pie de página.
+
+image::images/gvnix/estructura.png[title="Vista página de inicio de una aplicación sobre gvNIX",role="thumbnail",style="{span5}",options="{options}"]
+image::images/layout/estructura-layout.png[title="Vista esquema de la estructura de página",role="thumbnail",style="{span1offset} {span5}",options="{options}"]
+unfloat::[]
+
+Esta estructura se repite en todas las páginas de la aplicación.
+La disposición de los elementos y sus diferentes posibilidades en cada una de
+estas tres áreas se explicarán detalladamente a continuación.
+
+==== Cabecera
+
+La cabecera ubicada en la parte superior de la página es dónde solemos situar los
+elementos visuales que necesitan ser siempre visualizados por y para el usuario.
+
+Normalmente suele englobar: el logotipo de la aplicación, el menú de navegación
+y el nombre de la aplicación con enlace a la página de inicio. Sin embargo, puede
+haber páginas de la aplicación en las que no sea necesario una cabecera definida.
+
+image::images/gvnix/layout-con-header.png[title="Layout con cabecera",role="thumbnail",style="{span5}",options="{options}"]
+image::images/gvnix/layout-sin-header.png[title="Layout sin cabecera",role="thumbnail",style="{span1offset} {span5}",options="{options}"]
+unfloat::[]
+
+La cabecera se puede configurar en función de nuestras necesidades y ajustar:
+
+* Ancho respecto a la página
+* Posición respecto a la página
+* Color
+* Logotipo
+* Nombre de la aplicación
+* Menú en la cabecera
+* Selector de idioma
+* Selector de tema gráfico
+* Alineación de los elementos
+* Otros componentes visuales
+
+===== Anchura
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-independiente.png[width=300] |*Ancho < 100%* |La
+cabecera es más corta que el ancho de la página comportandose como un
+elemento independiente de la página.
+|image:images/gvnix/header-estatico.png[width=300] |*Ancho 100%*
+|La cabecera ocupa todo el ancho de la página.
+|=======================================================================
+
+===== Posición
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-navbar-default.png[width=300] |*Posición por defecto* | La cabecera como elemento independiente. Los bordes aparecen redondeados.
+|image:images/gvnix/header-navbar-static.png[width=300] |*Posición estática* |La
+cabecera es visible al principio de la página. Los bordes aparecen rectos. class css navbar-static-top
+
+|image:images/gvnix/header-fixed.png[width=300] |*Posición fija* |La
+cabecera permanece fija en la parte superior de la página
+cuando se hace _scroll_
+|image:images/gvnix/header-fixed-bottom.png[width=300] |*Posición fija
+inferior* |La cabecera permanece fija en la parte inferior de la página cuando se hace
+_scroll_ en la página.
+|=======================================================================
+
+===== Color
+
+Es posible personalizar los colores de la cabecera a cada requerimiento.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-green.png[width=300] |*Tema gráfico verde* |Tema por defecto de gvNIX
+
+|image:images/gvnix/header-purple.png[width=300] |*Tema gráfico morado* |Tema corporativo Bootstrap
+
+|image:images/gvnix/header-navbar.png[width=300] |*Cabecera por defecto* | Estilo barra de navegación de Bootstrap
+
+|image:images/gvnix/header-navbar-inverse.png[width=300] |*Cabecera invertida* |Estilo cabecera invertida de Bootsrap
+
+|=======================================================================
+
+===== Logotipo
+
+También es posible personalizar las imágenes a mostrar en la cabecera para
+ajustar a cada imagen corporativa concreta.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-sanidad.png[width=300] |*Tema para Sanidad* |Ejemplo con el logotipo de la Conselleria de Sanidad
+|=======================================================================
+
+===== Nombre de la aplicación
+
+Es posible mostrar el nombre dado a la aplicación en la cabecera de la página.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-nombre.png[width=300] | Nombre de la aplicación visible
+|image:images/gvnix/header-nombre-sin.png[width=300] | Sin nombre de la aplicación visible
+|=======================================================================
+
+===== Menú
+
+Es posible incluir el menú de navegación en la cabecera de la página.
+Esto nos permite mantener siempre visible y accesible la navegación en
+la aplicación. Tiene un formato de menu desplegable
+para mostrar los elementos de segundo nivel.
+
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-menu-sin.png[width=400] | Cabecera sin menú
+|image:images/gvnix/header-open-menu.png[width=400] | Cabecera con menú, por defecto en una aplicación gvNIX
+|image:images/gvnix/header-menu-izquierda.png[width=400] | Menú alineado a la izquierda
+|image:images/gvnix/header-menu-derecha.png[width=400] | Menú alineado a la derecha
+|image:images/gvnix/header-menu-centro.png[width=400] | Menú centrado
+|=======================================================================
+
+===== Selector de idioma
+
+Muestra en los idiomas disponibles en los que está la aplicación en la cabecera.
+
+image::images/gvnix/header-idiomas.png[alt="Selector de idioma en la cabecera", role="thumbnail",style="col-md-offset-1 col-md-10",options="{options}"]
+unfloat::[]
+
+===== Selector de tema gráfico
+
+Muestra en la cabecera los temas disponibles de los que dispone la
+aplicación y que permite cambiar el estilo gráfico de las páginas.
+
+image::images/gvnix/header-tema.png[alt="Selector de tema gráfico en la cabecera", role="thumbnail",style="ccol-md-offset-1 col-md-10",options="{options}"]
+unfloat::[]
+
+===== Alineación de los elementos
+
+Podemos modificar cómo se disponen los elementos dentro de la cabecera. Modificar
+el menú a izquierda o derecha, la ubicación del logotipo y la posición del
+nombre de la aplicación.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-logo-derecha.png[width=300] |*Menú derecha* |Logotipo alineado a la derecha.
+|image:images/gvnix/header-nombre-izquierda.png[width=300] |*Menú izquierda*|Nombre alineado a la izquierda.
+|image:images/gvnix/header-nombre-logo-izquierda.png[width=300] |*Menú derecha* |Nombre y logotipo alineado a la izquierda.
+|=======================================================================
+
+===== Otros componentes visuales
+
+Es posible personalizar la aplicación añadiendo funcionalidades que
+pueda interesar tener siempre accesibles como, por ejemplo, el selector
+de idiomas, formulario de acceso a la aplicación, enlaces directos,
+enlaces destacados en formato botón, enlaces en formato icono...
+
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/bootstrap/header-custom.png[options="responsive", width="500"] |*Ejemplo de cabecera personalizada* |Cabecera con formulario de acceso de usuario e idiomas
+|=======================================================================
+
+==== Pie de página
+
+Empleamos el pie de página para mejorar la accesibilidad y usabilidad de la
+aplicación al cierre del contenido de la página.
+
+Se trata de una etiqueta que puede encerrar diferentes elementos visuales como,
+por ejemplo, enlaces a páginas destacadas de la aplicación, mapa web,
+aviso legal, selector de idioma o selector de tema gŕafico.
+
+Sin embargo, puede haber páginas de la aplicación en las que no sea necesario
+ un pie de página.
+
+image::images/gvnix/content-container.png[title="Layout con pie de página",role="thumbnail",style="{span5}",options="{options}"]
+image::images/gvnix/layout-sin-header-footer.png[title="Layout sin cabecera ni pie de página",role="thumbnail",style="{span1offset} {span5}",options="{options}"]
+unfloat::[]
+
+
+El pie de página se puede ajustar y configurar en función de nuestras necesidades:
+
+* Ancho respecto a la página
+* Color
+* Imágenes
+* Selector de idioma
+* Selector de tema gráfico
+* Alineación de los elementos
+* Otros componentes visuales
+
+
+===== Anchura
+
+Por defecto, el pie de página ocupa todo el ancho de la página. Es posible
+ajustar su anchura respecto al resto de elementos.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/footer-alineado.png[width=300] |*Ancho < 100%* |El pie de
+página es más corto que el ancho de la página.
+|image:images/gvnix/footer-bg-negro.png[width=300] |*Ancho 100%*
+|El pie de página ocupa todo el ancho de la página.
+|=======================================================================
+
+===== Color
+
+Es posible personalizar los colores del pie de página y así ajustar a la
+identidad corporativa del cliente.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/footer-bg-negro.png[options="responsive", width=380] | Pie de página con fondo negro
+|image:images/gvnix/footer-bg.png[options="responsive", width=380] | Pie de página con fondo verde
+|image:images/gvnix/tema-footer.png[options="responsive", width=380] | Pie de página con fondo gris
+
+|=======================================================================
+
+===== Imágenes
+
+Personaliza las imágenes a mostrar en el pie de página para ajustar a la
+imagen corporativa del cliente de la aplicación.
+
+image::images/gvnix/footer-logo-abajo.png[alt="Logotipo personalizado en el pie",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+===== Selector de idioma
+
+Muestra en el pie de página los idiomas disponibles en los que está la aplicación.
+
+image::images/gvnix/footer-idiomas.png[alt="selector de idioma en el pie de página", role="thumbnail",style="col-md-offset-1 col-md-10",options="{options}"]
+unfloat::[]
+
+===== Selector de tema gráfico
+
+Muestra en el pie de página los temas disponibles de los que dispone la
+aplicación y permite cambiar el estilo gráfico de las páginas.
+
+image::images/gvnix/footer-tema.png[alt="Selector de tema gráfico en el pie de página", role="thumbnail",style="col-md-offset-1 col-md-10",options="{options}"]
+unfloat::[]
+
+===== Alineación de los elementos
+
+Podemos modificar cómo se disponen los elementos dentro del pie de
+página. Por ejemplo, podemos modificar la ubicación del selector de
+idiomas respecto a los enlaces a páginas del portal y el logotipo.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/footer.png[options="responsive", width=300] | Selector de idioma alineado a la izquierda
+|image:images/gvnix/footer-alineado.png[options="responsive", width=300]| Selector de idioma alineado a la derecha
+|=======================================================================
+
+===== Añadir otros elementos
+
+Es posible incluir en el pie de página accesos directos mediante enlaces
+a páginas destacadas de la aplicación, por ejemplo, aviso legal,
+licencia, condiciones de uso, ayuda de la aplicación, enlaces externos a
+páginas externas...
+
+En el caso de tener en la aplicación el _addon Spring Security Login_, y una vez
+ logeado el usuario, se visualizarán los enlaces correspondientes a las páginas
+ del addon como, por ejemplo, _Cerrar sesión_ y _Cambiar contraseña_.
+
+image::images/gvnix/footer-paginas-login.png[alt="Enlaces en el pie de página",role="thumbnail",style="col-md-offset-3 col-md-6",options="{options}"]
+unfloat::[]
+
+
+==== Contenido central
+
+Espacio dedicado a las funcionalidades de la aplicación. Es en este área dónde
+incluimos los componentes de nuestra aplicación.
+
+Este espacio se define y limita en columnas y filas para organizar el espacio
+visible en la página y su disposición.
+
+===== Sistema de rejilla
+
+Para diseñar la estructura de contenidos de las página de nuestra aplicación
+debemos dividir el espacio en una retícula de 12 columnas. En base a estas
+columnas, disponemos el espacio que ocupan los elementos de la aplicación.
+
+Se trata de una retícula fluída pensada para diferentes resoluciones y que
+cumple con el diseño web _responsive_.
+
+[role="col-md-12"]
+image::images/gvnix/rejilla.png[title="Sistema de rejilla", options="responsive"]
+unfloat::[]
+
+===== Ejemplos de disposición de contenido central
+
+Partiendo del esquema de rejilla presentado anteriormente podemos
+crear diferentes diseños de página para nuestra aplicación.
+La siguiente lista muestra cómo crear algunos de los diseños
+más utilizados en las aplicaciones web actuales.
+
+[role="table table-bordered table-hover", options="header"]
+|=======================================================================
+|Imagen |Descripción | Estructura de columnas
+|image:images/gvnix/content-starter-template.png[options="responsive", width="380"] | Un único contenido central | image:images/layout/content-starter-layout.png[width="200"]
+|image:images/gvnix/content-jumbotron-3cols.png[options="responsive", width="380"] | 2 filas y 4 elementos | image:images/layout/content-jumbotron-3cols-layout.png[width="200"]
+|image:images/gvnix/content-container-col8.png[options="responsive", width="380"] |   2 filas y 3 elementos | image:images/layout/content-container-col8-layout.png[width="200"]
+|image:images/gvnix/content-container-sidebar.png[options="responsive", width="380"] | 2 filas y 5 elementos | image:images/layout/content-container-sidebar-layout.png[width="200"]
+|=======================================================================
+
+
+=== Componentes
+
+==== Textos
+
+Como uno de los principales elementos utilizados en los sitios y aplicaciones
+web, se incluyen estilos relacionados con la tipografía y textos como contenido.
+
+image::images/gvnix/heading.png[title="Ejemplo de encabezado de la aplicación",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Es posible añadir la familia tipográfica corporativa en el tema gráfico.
+
+image::images/gvnix/custom-tipo.png[title="Ejemplo de tipografías personalizadas",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Existen estilos por defecto para todos los niveles de titulares de las páginas,
+desde `<h1>` hasta `<h6>`. +
+
+image::images/bootstrap/headings.png[title="Ejemplo de encabezados",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Puede resultar de interés añadir textos de ayuda en las páginas de la aplicación.
+
+image::images/gvnix/sidebar-text.png[title="Vista de mensajes de ayuda", role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+==== Listas
+
+Empleamos listas para agrupar elementos, ordenados, sin ordenar y listas
+de definiciones.
+
+Cuando accedemos al detalle de un elemento de la aplicación el contenido se
+muestra en formato lista. Es posible añadir listas en sus diferentes formatos.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/list-display.png[width=480, title="Vista detalle de un elemento en formato lista"] | Vista detalle de un elemento en formato lista
+|image:images/gvnix/list.png[width=480, title="Listas en vertical"] | Ejemplo del formato vertical de un listado
+|image:images/gvnix/list-inline.png[width=480, title="Listas en línea"] |  Ejemplo del formato en línea de un listado
+|image:images/gvnix/list-horizontal.png[width=480, title="Listas en horizontal"] |  Ejemplo del formato horizontal de un listado
+|image:images/gvnix/list-group.png[width=480, title="Agrupación de listas"] |  Ejemplo del formato panel para agrupar listas
+
+|=======================================================================
+
+==== Etiquetas
+
+Elemento para destacar un contenido de la aplicación.
+Existen diferentes tamaños disponibles.
+
+image::images/bootstrap/labels-size.png[title="Ejemplo de etiquetas y tamaños",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Además, existen diferentes tipos de etiquetas predefinidas para clasificar el contenido destacado por colores.
+
+image::images/bootstrap/labels-types.png[title="Ejemplo de etiquetas y colores para clasificar",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+==== Banners
+
+Incluye el elemento Banner para destacar contenidos en las páginas de la
+aplicación.
+
+image::images/gvnix/jumbotron.png[title="Vista de banner de la home de gvNIX",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Por ejemplo, incorpóralo como banner en una columna lateral.
+
+image::images/gvnix/sidebar-banner.png[title="Vista con banner gvNIX",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Enlaces
+
+Emplea enlaces como elemento de conexión entre páginas de la aplicación o entre
+la aplicación y páginas externas.
+
+
+image::images/gvnix/link-user.png[title="Ejemplo de enlace a página de acceso de usuario",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+image::images/gvnix/link-img.png[title="Ejemplo de enlace a página externa sobre una imagen",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Añade enlaces a páginas concretas o accesos rápidos para el usuario a páginas
+destacadas de la aplicación.
+
+image::images/gvnix/link-footer.png[title="Nuevos enlaces en el pie de página",role="thumbnail",style="{span1offset} {span10}",options="{options}"]
+unfloat::[]
+
+
+==== Logotipo
+
+Añade el logotipo de la aplicación como contenido de las páginas, ya sea como
+elemento fijo en la cabecera o pie de página, así como elemento de alguna página
+de la aplicación como contenido central.
+
+Normalmente suele ser la imagen corporativa del cliente.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-logo-derecha-mark.png[width=480, title="Logotipo en la cabecera"] | Logotipo en la cabecera
+|image:images/gvnix/footer-logo-abajo.png[width=480, title="Logotipo en el pie de página"] | Logotipo en el pie de página
+|image:images/gvnix/content-logo.png[width=480, title="Logotipo en el contenido central"] | Logotipo en el contenido central
+|=======================================================================
+
+==== Nombre de la aplicación
+
+El nombre de la aplicación se toma de los parámetros de configuración que
+introducimos al generar la aplicación sobre gvNIX.
+
+Es posible situarlo como elemento fijo en la cabecera o pie de página, o como
+elemento del contenido central.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-nombre.png[width=480, title="Nombre de la aplicación en la cabecera"] | Nombre de la aplicación en la cabecera
+|image:images/gvnix/footer-nombre.png[width=480, title="Nombre de la aplicación en el pie de página"] | Nombre de la aplicación en el pie de página
+|image:images/gvnix/content-nombre.png[width=480, title="Nombre de la aplicación en el contenido central"] | Nombre de la aplicación en el contenido central
+|=======================================================================
+
+
+==== Imágenes
+
+Añade imágenes como contenido de la aplicación o de apoyo a los contenidos textuales.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-image.png[width=480, title="Imagen en la cabecera"] | Imagen en la cabecera
+|image:images/gvnix/footer-image.png[width=480, title="Imagen en el pie de página"] | Imagen en el pie de página
+|image:images/gvnix/carrusel-gvsigroads.png[width=480, title="Rotativo de imágenes en el contenido central"] | Rotativo de imágenes en el contenido central
+|=======================================================================
+
+==== Selector de idioma
+
+La aplicación puede presentarse en diferentes idiomas. Es por ello que debemos
+mostrar al usuario los diferentes idiomas en los que está disponible.
+
+image::images/gvnix/footer-idiomas-detalle.png[alt="Detalle de los idiomas disponibles", role="thumbnail",style="col-md-offset-5 col-md-2",options="{options}"]
+unfloat::[]
+
+Es posible personalizar el modo en que se muestran los idiomas, ya sea como texto,
+iconos o imágenes de las banderas.
+
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/language-flags.png[options="responsive", width=480] | Selector de idioma en formato banderas
+|image:images/gvnix/language-text.png[options="responsive", width=480] | Selector de idioma en formato texto
+|image:images/gvnix/language-text-abb.png[options="responsive", width=480] | Selector de idioma en formato abreviado
+|image:images/gvnix/language-select.png[options="responsive", width=480] | Selector de idioma en formato selector desplegable
+
+|=======================================================================
+
+Ubica el selector como elemento en la cabecera o pie de página, así como
+contenido central en las páginas de la aplicación.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-idiomas.png[options="responsive", width=480] | Selector de idioma en la cabecera
+|image:images/gvnix/footer-bg-negro.png[options="responsive", width=480] | Selector de idioma en el pie de página
+|image:images/gvnix/language-content.png[options="responsive", width=480] | Selector de idioma en el contenido central
+
+|=======================================================================
+
+
+==== Selector de tema gráfico
+
+Las aplicaciones sobre gvNIX permiten el desarrollo de temas gráficos para ajustar
+a la identidad corporativa de cada cliente.
+
+Es posible la inclusión del selector del tema gráfico con el que se visualizará
+las páginas de la aplicación. A través de esta selección se cargará una hoja de
+estilos u otra a petición del usuario. Al pulsar sobre ellos, se cargarán las
+hojas de estilos correspondientes y serán visisualizados en página.
+
+image::images/gvnix/footer-tema-detalle.png[alt="Selector de tema gráfico",role="thumbnail",style="col-md-offset-4 col-md-4",options="{options}"]
+unfloat::[]
+
+Por defecto se incluyen como enlaces. Es posible ajustar su visualización.
+
+image::images/gvnix/tema-select.png[title="Selector de tema en formato selector desplegable",role="thumbnail",style="{span1offset} {span10}",options="{options}"]
+unfloat::[]
+
+Es posible definir su ubicación.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/header-tema.png[options="responsive", width=480] | Selector de tema en la cabecera
+|image:images/gvnix/footer-tema.png[options="responsive", width=480] | Selector de tema en el pie de página
+|image:images/gvnix/content-tema.png[options="responsive", width=480] | Selector de tema en el contenido central
+
+|=======================================================================
+
+==== Menú
+
+Uno de los elementos más empleados en las aplicaciones web es el menú de navegación.
+Por defecto se muestra en la cabecera de la página.
+
+image::images/gvnix/estructura-container.png[title="Estructura por defecto con menú en la cabecera",role="thumbnail",style="{span2offset} {span6}",options="{options}"]
+unfloat::[]
+
+
+===== Menú en la columna lateral
+
+Uno de los casos más empleados en la disposición de página de las
+aplicaciones es la ubicación del menú en la columna
+lateral de la página.
+
+Es posible situar el menú de navegación en la columna lateral de la
+página. Marcamos la anchura y disposición de la columna.
+
+image::images/gvnix/sidebar-left.png[title="Vista con menú a la izquierda",role="thumbnail",style="{span5}",options="{options}"]
+image::images/gvnix/sidebar-list.png[title="Vista con menú a la derecha",role="thumbnail",style="{span1offset} {span5}",options="{options}"]
+unfloat::[]
+
+El menú puede ser fijo y mantenerse visible mientras hacemos scroll en
+la página.
+
+image::images/gvnix/sidebar-affix.png[title="Vista menú lateral fijo",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Además, se muestra el menú desplegable para los elementos de segundo nivel.
+
+image::images/gvnix/estructura-container-sidebar-panel.png[title="Menú abierto en columna lateral",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+==== Botones
+
+Existen diferentes botones de acción para su uso en las diferentes
+vistas de la aplicación.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|link:Defecto[role="default"]| Botón por defecto que señala una accción
+|link:Normal[role="primary"]|Proporcionar un peso visual extra e identifica la acción
+primaria en un conjunto de botones.
+|link:Info[role="info"]|Se usa como alternativa para estilos de defecto
+|link:Éxito[role="success"]|Indica una acción buena o positiva
+|link:Advertencia[role="warning"]|Indica que se deberír ir con cuidado con esta acción
+|link:Peligro[role="danger"]|Indica una acción peligrosa o muy negativa
+|link:Enlace[role="link"]|Texto plano como enlace
+
+|=======================================================================
+
+===== Dimensiones
+
+Es posible ajustar su tamaño.
+
+[role="col-md-offset-2 col-md-8"]
+
+link:Normal[role="primary btn-xs"]
+link:Info[role="info btn-sm"]
+link:Éxito[role="success btn-lg"]
+link:Advertencia[role="warning btn-xs"]
+link:Peligro[role="danger "]
+
+unfloat::[]
+
+===== Grupos de botones
+
+Es posible agrupar varios botones relacionados entre sí para mostrarlos
+en una única línea.
+
+image::images/gvnix/button-group-gvnix.png[title="Grupo de botones en gvNIX", role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+===== Botón block
+
+Los formularios de la aplicación de gvNIX se muestran en su
+formato _block_ ocupando el 100% de la anchura del formulario.
+
+image::images/gvnix/button-block.png[title="Botón block en formulario",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+===== Estados del botón
+
+Diferenciamos los diferentes estados del botón.
+
+[role="col-md-offset-2 col-md-10"]
+
+link:Activo[role="primary active"]
+link:Deshabilitado[role="primary disabled"]
+link:Activo[role="success active"]
+link:Deshabilitado[role="success disabled"]
+link:Activo[role="danger active"]
+link:Deshabilitado[role="danger disabled"]
+
+unfloat::[]
+
+
+===== Botones desplegables
+
+Es posible mostrar botones compuestos: el primero contiene la
+acción principal y el segundo muestra una flecha descendente y al
+pulsarla, se despliega para mostrar el menú de opciones.
+
+image::images/gvnix/button-group.png[title="Grupo de botones desplegables",role="thumbnail",style="{span2offset} {span6}",options="{options}"]
+unfloat::[]
+
+
+==== Paneles
+
+Cada vista de la aplicación se muestra con la misma aparencia gráfica de
+panel, es decir, una capa contenedora que engloba al contenido. Esta apareciencia se repite tanto en las
+vistas de creación, como en las edición y actualización de los datos.
+
+Dentro de esta distribución de contenidos mostramos un título y un bloque contenedor que
+agrupa el contenido a mostrar ya sea una tabla, un formulario o un buscador.
+
+image::images/gvnix/panel-edit.png[title="Panel por defecto en la vista de edición",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+image::images/gvnix/panel-list.png[title="Panel en la vista de listado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Las vistas pueden englobar diferentes bloques de contenido:
+
+image::images/dgti/list-pets.png[title="Ejemplo varios bloques de contenido en una misma vista",role="thumbnail",style="col-md-12",options="{options}"]
+unfloat::[]
+
+
+==== Formularios
+
+Diseña formularios con campos personalizados. Aplica diferentes estilos
+tanto para todo el formulario como para cada campo.
+
+En las aplicaciones sobre gvNIX encontraremos formularios de acceso de
+usuario, de creación de entidades, de edición y actualización de datos y
+formularios de creación en línea, es decir, la opción de añadir elementos
+sobre la propia vista de listado.
+
+===== Formulario horizontal
+
+Estilo aplicado como estilo génerico de los formularios en gvNIX.
+
+Nos permite optimizar el espacio en página alineando la etiqueta a la
+izquierda del campo.
+
+Los formularios de creación y edición de la aplicación se muestran por
+defecto en este formato horizontal.
+
+image::images/gvnix/form-horizontal-create.png[title="Vista de formulario de creación en gvNIX",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+===== Formulario en línea
+
+Para que el formulario ocupe el menor espacio posible, la etiqueta se
+muestra dentro de cada campo del formulario.
+
+Se emplea este formato en la creación en línea.
+
+image::images/gvnix/form-inline.png[title="Vista de formulario en línea gvNIX",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+===== Formulario destacado
+
+Muestra los campos alineados horizontalmente y sin márgenes entre ellos sobre un
+fondo de color.
+
+Estilo recomendado para formularios cortos dónde la etiqueta se muestra
+dentro de cada campo del formulario.
+
+Empleado en las páginas públicas de una aplicación sobre gvNIX con el _addon
+Spring Security Login_.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/form-signin-login.png[width=380,scaledwidth="50%", title="Vista de formulario de acceso de usuario"] | Vista de formulario de acceso de usuario
+|image:images/gvnix/form-signin-remember-pass.png[width=380,scaledwidth="50%", title="Vista de formulario de recordar contraseña"]| Vista de formulario de recordar contraseña
+|image:images/gvnix/form-signin-change-pass.png[width=380,scaledwidth="50%", title="Vista de formulario de cambiar contraseña"] | Vista de formulario de cambiar contraseña
+
+|=======================================================================
+
+===== Formulario sin estilos
+
+Es posible no definir el número de columnas que ocupan los campos del formulario
+y mostrar un formulario vertical dónde el campo aparece debajo de la etiqueta.
+
+image::images/gvnix/form-default.png[title="Vista de formulario por defecto",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+===== Listado de campos disponibles
+
+Listado de los tipos de campos que son posible incluir en el formulario
+de tu aplicación.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/inputs/checkbox.png[width=200,scaledwidth="50%", alt="Casilla de selección"] |*Casilla de selección* |Los checkboxes permiten elegir una o más opciones dentro de una lista.
+
+|image:images/gvnix/inputs/datetime.png[width=350,scaledwidth="50%", alt="Fecha"] |*Fecha* |Selección de día en el calendario
+
+|image:images/gvnix/inputs/display.png[width=300,scaledwidth="50%", alt=""] |*Presentación* |Se emplea
+en la vista _show_ de cada entidad y muestra el listado de datos.
+
+|image:images/gvnix/inputs/input.png[width=350,scaledwidth="50%", alt=""] |*Entrada de datos* |Los
+campos de tipo texto son los más numerosos.
+
+|image:images/gvnix/inputs/select.png[width=350,scaledwidth="50%", alt=""] |*Selector* |Permite seleccionar una o varias (multiple) de las opciones del desplegable.
+
+|image:images/gvnix/inputs/simple.png[width=350,scaledwidth="50%", alt=""] |*Texto* |Texto informativo
+que empleamos en los formularios.
+
+|image:images/gvnix/inputs/textarea.png[width=350,scaledwidth="50%", alt=""] |*Área de texto* |Utiliza
+este control para escribir textos largos.
+|=======================================================================
+
+===== Redimensionar campos de formulario
+
+Es posible modifica la altura por defecto de los campos.
+
+image::images/gvnix/select-lg.png[title="Ejemplo de campos modificados en gvNIX",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+===== Elementos de ayuda
+
+Aplicamos estilos para los diferentes estados de los campos del formulario.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/form-status.png[width=350,scaledwidth="50%", title="Estados sobre los campos del formulario"] |*Estados del formulario* | Muestra los diferentes estados del campo
+|image:images/gvnix/form-tooltip.png[width=350,scaledwidth="50%", title="Ayuda en el formulario"] |*Mensajes de ayuda* | A través de jQuery aparecen _tooltip_ de ayuda
+sobre cada campo del formulario. Estos consejos, además, indican si el campo es obligatorio o no para el envío de los datos.
+|image:images/gvnix/form-validate.png[width=350,scaledwidth="50%", title="Validación del formulario"] |*Validación del formulario* | A través de jQuery se validan
+los datos introducidos en el formulario. Si los campos introducidos son incorrectos, aparecerá el mensaje de error, alerta o información que corresponda.
+
+|=======================================================================
+
+===== Iconos y símbolos en el formulario
+
+Es posible personalizar los formularios de la aplicación incluyendo
+iconos y símbolos que sirvan de ayuda visual al usuario.
+
+image::images/gvnix/input-icon.png[title="Ejemplo de iconos y unidades junto a los inputs del formulario",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Tablas
+
+La aplicación gvNIX cuenta con la integración de http://dandelion.github.io/datatables/[Dandelion Datatables]
+para la visualización de la lista de elementos en formato tabla.
+
+image::images/gvnix/panel-tabla.png[title="Vista de un listado en tabla en gvNIX",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+==== Pestañas de navegación
+
+Es posible mostrar las entidades relacionadas en una misma vista mediante el desglose en diferentes pestañas de navegación.
+Mostramos toda la información relacionada en una misma vista de la aplicación.
+
+image::images/gvnix/tabs.png[title="Vista de pestañas de navegación en gvNIX",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+==== Iconos
+
+La libería Bootstrap incluye 180 iconos creados mediante una fuente
+especial llamada http://glyphicons.com/[_Glyphicon Halflings_].
+
+[role="col-md-12"]
+image::images/bootstrap/glyphicons.png[title="Listado de iconos disponibles", options="responsive"]
+
+unfloat::[]
+
+Como los iconos son vectoriales, se pueden emplear en cualquier elemento
+y a cualquier tamaño.
+Estos están disponibles en la aplicación para ser incluidos junto al
+resto de elementos y ofrecer información complementaria al elemento que
+acompañan.
+
+Por otra parte, estos iconos pueden ser empleados como
+enlaces o botones de forma independiente o en grupo. Es posible utilizarlos
+en botones, barras de navegación o incluso en campos de formulario.
+
+image::images/bootstrap/glyphicons-buttons.png[title="Grupo de botones con iconos y en diferentes tamaños", role="thumbnail",style="{span5}",options="{options}"]
+image::images/gvnix/iconos-botones.png[title="Vista sobre la aplicación gvNIX", role="thumbnail",style="{span1offset} {span5}",options="{options}"]
+unfloat::[]
+
+
+==== Diálogo modal
+
+Las confirmaciones de las acciones en la aplicación se muestran con el
+diálogo modal de Bootstrap.  +
+También aparecerán con este formato los errores sobre las acciones.
+
+image::images/gvnix/modal.png[title="Modal en gvNIX",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+== Diseño de temas
+
+Una vez creada la aplicación con la estructura de página y los elementos
+funcionales que la componen, es posible personalizar el aspecto y el
+comportamiento de sus elementos.
+
+image::images/tree/styles.png[title="Vista del árbol de archivos de las hojas de estilos",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Existen diferentes método de trabajo a la hora de personalizar las
+clases CSS de la aplicación:
+
+.Añadir propiedades en las hojas de estilos CSS existentes
+
+Adapta la hoja de estilos del framework gvNIX _standard.css_. Hoja de
+estilos de gvNIX ya adaptada para ser compatible con Bootstrap. Añade
+nuevas propiedades CSS o modifica las existentes.
+
+.*Hoja de estilos propia*
+
+Crea una nueva hoja de estilos CSS _custom.css_ y define de nuevo las
+clases CSS y sus propiedades. Partirás de 0 con las clases por defecto
+de Bootstrap. Los elementos personalizados serán superpuestos a las
+propiedades CSS por defecto de _standard.css_.
++
+Para ello, añade el nuevo fichero _custom.css_ en _../webapp/styles/_.
++
+Luego inclúyelo en _../webapp/WEB-INF/tags/util/load-scripts.tagx_
+para que sea cargado en la cabecera de la página dentro de `<head>` de
+este modo:
+
+[source,html]
+----
+<spring:url value="/resources/styles/custom.css" var="custom_css_url" />
+<link href="${custom_css_url}" media="screen" rel="stylesheet" type="text/css"/>
+----
+
+Te aconsejamos que mires el código fuente de gvNIX y copies los
+selectores del elemento que quieres modificar. Pega estos selectores en
+la hoja de estilos CSS de trabajo, se cargará después de todo el código
+de gvNIX, y así habrás redefinido los estilos de cada componente
+fácilmente. Este es el flujo de trabajo recomendado:
+
+. Para cada componente que quieras modificar, busca sus estilos en el
+archivo CSS.
+. Copia y pega los selectores de ese elemento. Por ejemplo, para
+personalizar la imagen o color de fondo de la barra de navegación, copia
+el selector `.navbar`.
+. Añade tu código CSS en la hoja de estilos, utilizando los selectores
+copiados anteriormente. De esta forma no es necesario que añadas más
+clases a tus selectores.
+. Repite este proceso para todos los componentes que quieras
+personalizar.
+
+
+.Crea un nuevo tema
+
+Es posible reemplazar el tema por defecto y partir de uno desde cero (siempre en base a la librería Bootstrap).
+
+Añadiremos nuestra propia hoja de estilos `custom.css` como única
+hoja de estilos de la aplicación y, por tanto, que sea la hoja de
+estilos principal que forma el tema gráfico dónde definimos propiedades
+y nuevas clases CSS.
+
+Esto implica que no se carge la hoja de estilos por defecto
+`standard.css`, por lo que habrá que realizar algunos ajustes y revisar que la
+aplicación se visualice correctamente.
+
+Para ello los pasos a seguir son:
+
+* Creamos un nuevo fichero _../webapp/WEB-INF/classes/custom.properties_
+* creamos un nuevo fichero en _../webapp/styles/custom.css_
+* Si existe selector de temas visible en página para el usuario
+deberemos incluir este etema en _../webapp/WEB-INF/tags/util/theme.tagx_
+* Definimos nuestro tema en
+_../webapp/WEB-INF/tags/util/load-scripts.tagx_
++
+De este modo:
++
+[source,html]
+----------------------------------------------------------------------------------
+<spring:theme code="custom" var="custom_css"/>
+<spring:url value="/${custom_css}" var="custom_css_url"/>
+<link href="${custom_css_url}" media="screen" rel="stylesheet" type="text/css"/>
+----------------------------------------------------------------------------------
++
+Sólo puede haber un theme definido por lo que revisa el código ya
+existente.
+
+De la misma forma se puede personalizar la forma en la que se imprime una
+página, para ello hay que modificar `print.css`, que se genera al usar la librería
+Bootstrap, y añadir o modificar los estilos que se generan por defecto para adecuarlos
+a nuestras necesidades.
+
+
+.Personaliza el favicon
+
+Incluimos como etiqueta HTML la imagen empleada como favicon en
+ _../webapp/WEB-INF/tags/util/load-scripts.tagx_.
+
+Primero incluímos el recurso y luego lo añadimos como etiqueta <link>
+para que sea cargado en la cabecera de la página dentro de `<head>` de este modo:
+
+[source,html]
+----
+  <spring:url value="/resources/images/favicon.ico" var="favicon"/>
+  <spring:url value="/resources/images/apple-touch-icon.png" var="favicon_apple"/>
+
+  <link href="${favicon}" rel="SHORTCUT ICON"/>
+  <link href="${favicon_apple}" rel="APPLE SHORT ICON"/>
+----
+
+Para reemplazar el favicon por defecto de la aplicación con la imagen corporativa
+del cliente accedemos a _../resources/images/_ dónde reemplazaremos el
+archivo _favicon.ico_ y _apple-touch-icon.png_ por la imagen correspondiente.
+
+image::images/tree/images.png[title="Directorio de imágenes",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+=== Estructura de página
+
+Para el diseño de una aplicación sobre gvNIX contamos con la habitual división
+en bloques de cabecera, contenido y pie de página.
+
+A partir del desarrollo de las hojas de estilos CSS podemos realizar
+diferentes diseños para esta misma estructura de página.
+
+Para ajustar la apariencia de nuestra aplicación tendremos en cuenta las
+siguientes etiquetas HTML y capas contenedoras:
+`<body>`, `<header>`, `<div class="container">`, `<div id="main">` y
+`<footer>`.
+
+Es posible personalizar las clases CSS sobre las capas contenedoras `#main` y
+`.container` y definir la anchura de la capa respecto a la página o modificar
+el color de fondo, por ejemplo.
+
+image::images/gvnix/container.png[title="Estructura de página por defecto",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Estas clases CSS mantienen el diseño adaptativo en todas las resoluciones.
+Cualquier modificación en sus propiedades de anchura deberá validarse en
+las hojas de estilos y sus clases definidas para 'mediaqueries'.
+
+==== Cabecera
+
+La cabecera de la aplicación se corresponde con las clase CSS `.navbar`
+sobre la etiqueta `<header>`.
+
+Para su personalización tendremos en cuenta las siguientes clases CSS aplicadas:
+
+Anchura de página::
+La cabecera ocupa el 100% de la anchura de página. Para añadir
+márgenes, los elementos están englobados bajo una capa contenedora con
+la clase CSS `.container`.
+Posición::
+  Posicionamos la cabecera respecto al resto de elementos de la página
+  con la clase CSS `.navbar-fixed-top` que la mantiene fija en la parte
+  superior.
+Color::
+  Empleamos la clase CSS `.navbar-inverse` para identificar la versión
+  negativo de la barra de navegación. Así, se ajustan los estilos de los
+  enlaces e iconos de la barra de navegación. +
+  Desde la hoja de estilos, personalizamos a los colores corporativos del cliente.
+Logotipo::
+  Bajo la etiqueta HTML `<img>` incluimos la imagen a emplear como logotipo de la
+  aplicación. +
+  Reemplaza con tu imagen corporativa en _../resources/images/_ sustituyendo el
+  archivo _logo_gvnix.png_ por tu imagen. +
+  Recomendamos unas medidas de 100x50px para no sobrepasar el espacio
+  dedicado a la cabecera. +
+Nombre::
+  Empleamos la clase CSS `.navbar-brand` para identificar la capa que
+  envuelve el nombre de la aplicación, situarlo y marcar sus
+  dimensiones.
+Menu de navegación::
+  El menú de la aplicación situado en la cabecera permite la
+  personalización sobre las clases CSS `.navbar-nav` y `.nav` para la
+  barra de navegación, `.dropdown` para el primer nivel del menú y
+  `.dropdown-menu` para el segundo nivel.
+  +
+  Personaliza sus elementos sobre estas clases CSS y los elementos HTML
+  `<ul> <li> <a>`.
+Alineación::
+  Empleamos las clase CSS `.pull-left` y `.pull-right` para alinear los
+  elementos dentro de la misma fila de la estructura de página.
+  +
+  Recomendamos no cambiar las propiedades de estas clases CSS ya que
+  afectarían a la disposición visual de otros elementos ya que se aplican
+  a otras capas.
+
+image::images/gvnix/tema-header.png[title="Ejemplo de una cabecera personalizada por estilos",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+[icons=None, caption="*"]
+NOTE: Los cambios en el logotipo, nombre de la aplicación y nuevas
+funcionalidades añadidas en la cabecera requieren acceder a ficheros de la aplicación,
+se presentan en la sección link:#componentes_3[_Personalización de la aplicación > Componentes_].
+
+==== Pie de página
+
+El pie de página de la aplicación se corresponde con las clase CSS
+`.bs-footer` sobre la etiqueta `<footer>`.
+
+Para su personalización tendremos en cuenta las siguientes clases CSS:
+
+Anchura de página::
+  Los elementos del pie de página se engloblan bajo una capa contenedora
+  con la clase CSS `.container` que da unas medidas exactas en píxeles, según
+  resolución, aportando márgenes laterales respecto a la anchura total de la
+  página.
+Color::
+  Empleamos la clase CSS `.bs-footer` para aplicar los estilos y
+  personalizar el pie a los colores corporativos del cliente.
+  +
+  Sobre `.bs-footer a` editamos el color de los enlaces del pie de
+  página.
+
+Alineación::
+  Se emplean las clases CSS en la estructura HTML
+  `<div class="col-xs-12 col-sm-9">` y
+  `<div class="col-xs-12 col-sm-3">` para marcar la disposición de los
+  elementos respecto a la anchura de la página en base al sistema de
+  rejilla de 12 columnas de Boostrap en las diferentes resoluciones.
+
+
+image::images/gvnix/tema-footer.png[title="Ejemplo de pie de página personalizado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Contenido central
+
+El área central de las páginas de la aplicación se engloba bajo una capa
+contenedora que determina los márgenes y anchura del contenido en la página.
+
+La estructura de página, por defecto, se engloba bajo la capa contenedora con
+clase CSS `.container` que determina los márgenes y anchura concreta en píxeles
+del contenido central de la página.
+
+Puedes personalizar las clases CSS sobre la capa y ajustar la anchura de la
+página o sobre la capa `#main` para ajustar la anchura del contenido central.
+
+Los bloques de contenido se disponen en varias filas y columnas y se enmarcan
+en diferentes capas contenedoras _divs_ con su correspondiente clase CSS
+definida en la hoja de estilos.
+
+Cada uno de los componentes de la página ocupará un espacio en esta distribución
+central y se definirá sobre ellos el número de columnas que ocupan.
+
+image::images/gvnix/css-container.png[title="Vista del espacio dedicado al contenido central",style="{span1offset} {span10}",options="{options}"]
+unfloat::[]
+
+
+=== Componentes
+
+==== Textos
+
+Los pasos seguidos para el diseño de los contenidos textuales en una aplicación
+sobre gvNIX es el siguiente:
+
+* Se establece a blanco el color de fondo del `body` con la propiedad
+`background-color: white;`
+* Se utiliza el valor de las clases `font-family`, `font-size` y
+`line-height` como atributos de las propiedades tipográficas de los
+elementos.
+* Se establece el color de los enlaces al valor de la clase `link-color`
+y sólo se muestran los enlaces subrayados en el estado `:hover`
+
+Si quieres añadir una familia tipográfica corporativa en tu tema gráfico puedes
+realizarlo definiendo `@font-face` en la hoja de estilos.
+
+image::images/gvnix/custom-tipo.png[title="Ejemplo de tipografías añadidas en un tema gráfico",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Se definen varias clases CSS para mostrar el tipo de contenido a través
+del color del texto. Es posible personalizar los colores. Emplea
+las existentes o añade nuevas propiedades CSS.
+
+image::images/bootstrap/headings-clases.png[title="Ejemplo de encabezados con clases CSS de Bootstrap",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Listas
+
+Encontrarás la clase CSS `.dl-horizontal` sobre la etiqueta `<dl>` en la listas
+de la vista detalle de una aplicación sobre gvNIX.
+
+Personaliza sus propiedades CSS en tu hoja de estilos para `<ul> <li>` o
+sobre `<dl> <dt> <dd>` para ajustar su diseño.
+
+image::images/gvnix/list-display-custom.png[title="Ejemplo de lista personalizada",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Etiquetas
+
+Existen diferentes clases CSS para definir los tipos de etiquetas con los que destacar el contenido.
+
+Es posible modificar las propiedades CSS ya existentes sobre la hoja de estilos y ajustar a las necesidades de cada tema gráfico.
+Las clases CSS existentes son:
+
+[role="col-md-offset-2 col-md-8"]
+
+[label label-primary]#.label-primary#
+[label label-success]#.label-success#
+[label label-info]#.label-info#
+[label label-warning]#.label-warning#
+[label label-danger]#.label-danger#
+
+unfloat::[]
+
+==== Banners
+
+Para mostrar banners en la aplicación añadimos a nuestra capa contenedora la clase CSS `<div class="jumbotron">`. +
+Ajusta sus propiedades o añade una imagen de fondo en la hoja de estilos.
+
+image::images/gvnix/tema-jumbotron.png[title="Ejemplo de banner con degradado de fondo",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+
+unfloat::[]
+
+
+==== Enlaces
+
+Aplica clases CSS sobre la etiqueta `<a>` o `<button>` y personaliza los estilos sobre los
+enlaces y botones de la aplicación. +
+Sobre los botones emplea `.btn .btn-link` para visualizar el formato texto y
+`.btn .btn-primary` para un diseño gráfico formato botón.
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/form-signin-login.png[width=480, title="Formato botón y enlaces por defecto"] |  Formato botón y enlaces por defecto
+|image:images/gvnix/form-signin-login-modified.png[width=480, title="Formato botón tipo link y enlaces tipo botón"] | Formato botón tipo link y enlaces tipo botón
+
+|=======================================================================
+
+
+==== Logotipo
+
+Incluimos como etiqueta HTML `<img>` la imagen logotipo de la aplicación. +
+
+Para reemplazar la imagen por defecto de la aplicación con la imagen corporativa
+del cliente accedemos a _../resources/images/_ dónde reemplazaremos el
+archivo _logo_gvnix.png_ por la imagen adecuada.
+
+Ajusta sus dimensiones, proporción y color de fondo con las clases CSS del tema
+visual.
+
+
+image::images/gvnix/header-sanidad.png[title="Logotipo personalizado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Nombre de la aplicación
+
+Empleamos la clase CSS `.navbar-brand` para identificar la capa que
+envuelve el nombre de la aplicación, situarlo y marcar sus
+dimensiones.
+
+image::images/gvnix/header-nombre.png[title="Nombre de la aplicación en la cabecera",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Imágenes
+
+Emplea la clase CSS `.img-responsive` para mostrar imágenes adaptables a la
+resolución del navegador. +
+Esta clase CSS aplica unas propiedades de `max-width: 100%; and height: auto;`
+para escalar de forma adecuada la imagen.
+
+[source,html]
+----------------------------------------
+<img src="..." class="img-responsive" alt="Responsive image">
+----------------------------------------
+
+Es posible aplicar estilos a las imágenes con las clases CSS `.img-rounded`,`.img-circle` y
+`.img-thumbnail`.
+
+[source,html]
+----------------------------------------
+<img src="..." alt="..." class="img-rounded">
+<img src="..." alt="..." class="img-circle">
+<img src="..." alt="..." class="img-thumbnail">
+----------------------------------------
+
+image::images/bootstrap/images-clases.png[title="Clases CSS para imágenes",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+Es posible emplear la clase `.thumbnail` para aplicar a otras etiquetas HTML
+que envuelven a la imagen y ajustan su tamaño.
+
+[source,html]
+----------------------------------------
+<div class="row">
+  <div class="col-xs-6 col-md-3">
+    <a href="#" class="thumbnail">
+      <img data-src="images/demo.png" alt="...">
+    </a>
+  </div>
+  ...
+</div>
+----------------------------------------
+
+image::images/bootstrap/images-thumbs.png[title="Clase miniatura para imágenes",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Para reemplazar las imágenes por defecto de la aplicación con las imágenes corporativas
+del cliente accede a _../resources/images/_ y reemplaza los archivos.
+
+image::images/tree/images.png[title="Directorio de imágenes",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+==== Selector de idioma
+
+El selector de idioma se muestra como un listado de elementos dispuesto en horizontal. +
+
+Es posible ajustar cada etiqueta `<span>` o añadir etiquetas `<ul>` o `<li>` y
+dar comportamiento por clases CSS al enlace sobre el elemento `<a>`.
+
+image::images/gvnix/language-select.png[title="Selector de idioma personalizado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Para el formato de banderas, reemplaza las imágenes accediendo a
+_../resources/images/_ y añade nuevos iconos que representen los idiomas disponibles.
+
+Ajusta sus dimensiones, proporción y color de fondo con las clases CSS del tema
+visual.
+
+==== Selector de tema gráfico
+
+Las opciones de selección de tema gráfico se muestran, por defecto, como enlaces. +
+Ajusta las clases CSS para su personalización.
+
+image::images/gvnix/tema-select.png[title="Selector de tema gráfico personalizado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+==== Menú
+
+Por defecto, el menú de navegación es visible en la cabecera de la
+página y en su opción desplegable (_dropdown_ de Bootstrap). +
+
+Permite la personalización sobre las clases CSS `.navbar-nav` y `.nav` para la barra de
+navegación, `.dropdown` para el primer nivel del menú y `.dropdown-menu` para
+el segundo nivel sobre la etiqueta de listado `<ul><li><a>`.
+
+Personaliza sus elementos sobre estas clases CSS y los elementos HTML
+`<ul> <li> <a>`.
+
+
+image::images/gvnix/tema-sidebar.png[title="Ejemplo de menu personalizado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Botones
+
+Se aplican las clases CSS sobre las etiquetas para
+mostrar botones: `<a>`, `<button>` e `<input>`.
+
+Es posible personalizar estas clases CSS para los botones y enlaces de
+accción. Modifica los existentes o añade nuevas propiedades CSS.
+
+[role="table table-hover", cols="<,<,<",options="header"]
+|=======================================================================
+|Botón |class |Descripción
+
+|link:Defecto[role="default"] |`btn btn-default` |Botón gris estándar con gradiente
+
+|link:Normal[role="primary"] |`btn btn-primary` |Proporcionar un peso visual extra e
+identifica la acción primaria en un conjunto de botones.
+
+|link:Info[role="info"] |`btn btn-info` |Se usa como alternativa para estilos de
+defecto
+
+|link:Éxito[role="success"] |`btn btn-success` |Indica una acción buena o positiva
+
+|link:Advertencia[role="warning"]|`btn btn-warning` |Indica que se deberír ir con cuidado
+con esta acción
+
+|link:Peligro[role="danger"] |`btn btn-danger` |Indica una acción peligrosa o muy negativa
+
+|=======================================================================
+
+Es posible personalizar las clases CSS para cada estado y ajustar
+su tamaño sobre las diferentes clases CSS que marcan sus dimensiones.
+
+image::images/bootstrap/buttons.png[title="Ejemplos de personalización de botones con clases CSS",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Convertimos el botón en un elemento de bloque para hacer que ocupe toda
+la anchura del elemento en el que se encuentre. Para ello, empleamos la
+clase `.btn-block`.
+
+image::images/bootstrap/buttons-block.png[title="Ejemplos botón al 100% de anchura",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Los botones desplegables se crean añadiendo un botón dentro de cualquier
+elemento con la clase `.btn-group`.
+
+image::images/gvnix/button-group-open.png[title="Botones desplegables",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+==== Paneles
+
+Cada vista de la aplicación se muestra con la misma aparencia gráfica de
+panel. Se emplean las clases CSS `.panel` y `.panel-default`.
+
+En esta estructura de contenido mostramos un título `.panel-heading` y un
+contenido `.panel-body` que agrupa el contenido a mostrar ya sea una
+tabla, un formulario o un buscador.
+
+Aplicamos clases CSS sobre este elemento.
+
+image::images/bootstrap/panels.png[title="Estilos gráficos existentes en Bootstrap",style="{span1offset} {span10}",options="{options}"]
+unfloat::[]
+
+
+==== Formularios
+
+Aplicamos estilos visuales a todos los componentes de los formularios.
+
+Bootstrap permite alinear los elementos y los campos de formulario
+mediante clases CSS. Son clases CSS comunes, utilizadas para definir las rejillas de los
+layouts como hemos visto en secciones anteriores de este documento. +
+Para ello trabajamos con las librerías Bootstrap y JQuery.
+
+Se añade la clase `.form-control` a los elementos `<input>`, `<textarea>`
+y `<select>`, su anchura se establece a width: 100%. Para optimizar el
+espaciado, utilizamos la clase `.form-group` para englobar cada campo de
+formulario con su `<label>`.
+
+Por otra parte, definimos por JavaScript el número de columnas del layout a ocupar con
+`<div class="col-xs-5 col-sm-4 col-md-3 col-lg-3">`.
+
+Esto permite alinear los elementos y los campos de formulario mediante
+las clases CSS utilizadas para definir las rejillas de las estructuras de página.
+
+Para cualquier modificación en sus estilos CSS deberemos trabajar
+revisando, copiando y modificando las propiedades de
+las clases CSS de _jquery-ui.bootstrap.css_.
+
+Véamos cada caso y cómo es posible ajustar la posición de los campos del formulario.
+
+===== Formulario horizontal
+
+Añadimos la clase `.form-horizontal` al formulario.
+
+Esta clase modifica la clase `.form-group` para que se comporte como la fila de una rejilla.
+En gvNIX es necesario definir el número de columnas que ocupa respecto a
+esta rejilla siguiendo la nomenclatura de Bootstrap tipo 'col-sm-x'.
+
+image::images/gvnix/tema-form-horizontal.png[title="Ejemplo formulario horizontal",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+===== Formulario en línea
+
+Añadimos la clase `.form-inline`. De este modo las etiquetas `<label>` se
+muestran dentro de cada campo del formulario como elemento `placeholder`.
+
+image::images/gvnix/tema-form-inline.png[title="Ejemplo formulario en línea",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+===== Formulario destacado
+
+Es posible añadir la clase CSS `.form-signin` para dar un estilo destacado a los
+campos del formulario sobre fondo de color.
+
+Personaliza el fondo de los formularios modificando la clase CSS
+`<div class="well">`. En gvNIX está clase CSS siempre se emplea enmarcando los
+formularios de acceso y acciones de usuario.
+
+Empleado en las páginas públicas de una aplicación sobre gvNIX con el _addon
+Spring Security Login_.
+
+image::images/gvnix/form-signin-login.png[title="Ejemplo formulario destacado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+===== Formulario sin estilos
+
+Es posible eliminar estas clases CSS aplicadas sobre los formularios y
+no definir el número de columnas para mostrar los formularios con los
+estilos por defecto de Bootstrap.
+
+image::images/gvnix/form-default.png[title="Vista de formulario por defecto sin clases CSS ni Javascript",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+===== Listado de campos disponibles
+
+Listado de las clases sobre los campos del formulario a las que es
+posible aplicar clases CSS personalizadas
+
+[role="table table-bordered table-hover"]
+|=======================================================================
+|image:images/gvnix/inputs/checkbox.png[title="",width=200] |*Casilla de selección* |`<div class="controls checkbox">`
+
+|image:images/gvnix/inputs/datetime.png[title="",width=300] |*Fecha* | `<label class="control-label">` +
+`<div class="controls datetime">` +
+`<input class="datepicker form-control">`
+
+|image:images/gvnix/inputs/display.png[title="",width=300] |*Presentación* |`<dl class="row dl-horizontal">`
+
+|image:images/gvnix/inputs/input.png[title="",width=300] |*Entrada de datos* |`<div class="controls datetime">` +
+`<label class="control-label">` +
+`<input class="form-control">`
+
+|image:images/gvnix/inputs/select.png[title="",width=300] |*Selector* |`<div class="controls datetime">` +
+`<label class="control-label">` +
+`<select class="form-control">`
+
+|image:images/gvnix/inputs/simple.png[title="",width=300] |*Texto* |`<label class="control-label">` +
+`<div class="controls">` +
+`<p class="text-info alert alert-info">`
+
+|image:images/gvnix/inputs/textarea.png[title="",width=300] |*Área de texto*|`<label class="control-label">` +
+`<div class="controls">` +
+`<textarea class="form-control">`
+
+|=======================================================================
+
+
+Destaca en la maquetación de estos elementos los siguientes puntos:
+
+* Siempre los campos estarán englobados bajo una capa contenedora con la clase CSS `.form-group`.
+* La etiqueta de formulario con la clase CSS `.control-label` para el formato de formularios horizontales.
+* 'Inputs' con la clase CSS `.form-control` para el formato de formularios horizontales.
+* Clases CSS `.alert .alert-info` a los párrafos que ya tienen la clase CSS `.text-info` necesaria para la validación.
+* Mensajes de error con las clases CSS `.alert .alert-warning` o `.alert-danger`.
+* La clase CSS `.input-sm` para la mejor visualización de los campos en la edición en fila.
+* La clase CSS `.sr-only` para los casos con 'checkbox', de modo que no se visualice en la página pero si se interpreta por el lector HTML.
+* Capa contenedora con la clase CSS `.checkbox` para los 'inputs' con este formato.
+* Para este formato 'checkbox' las etiquetas 'label' aparecen detrás del `input type="checkbox"`.
+* Para _display_ seguimos la estructura HTML `<ul>` y `<dl>` y columnas con diseño adaptativo.
+
+Para cualquier modificación en sus estilos CSS deberemos trabajar
+teniendo en cuenta sus clases CSS y sobreescribir las propiedades de
+`jquery-ui.bootstrap.css` en nuestra propia hoja de estilos `custom.css`.
+
+
+===== Estados del formulario
+
+Personaliza los estados del formulario desde el tema gráfico sobre la
+clase `focus` o el estado `disabled`.
+
+===== Validación del formulario
+
+Se emplea la librería Bootstrap y sus diferentes clases CSS para marcar en diferentes colores la clase `.alert` con `.alert-danger` y `.alert-info`. +
+Además, se personaliza y adapta para trabajar conjuntamente con la librería 'Datatables' su hoja de estilos _datatables.bootstrap.css_.
+
+image::images/bootstrap/form-validate.png[title="Ejemplos de alertas de validación de un formulario",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Personaliza los colores que marcan la validación de los campos del
+formulario.
+Modifica las clases CSS `.tooltip .tooltip-inner` si quieres ajustar el color
+de fondo de los mensajes de ayuda sobre cada campo del formulario.
+
+==== Tablas
+
+Trabajamos con la librería http://dandelion.github.io/datatables/[Dandelion Datatables] y su integración con
+http://getbootstrap.com/[Bootstrap].
+
+Aplicamos la clase CSS `.table` que delimita los bordes de las filas de la tabla.
+
+Para cualquier modificación en sus estilos CSS deberemos trabajar
+replicando las clases CSS y propiedades incluidas en _dataTables.bootstrap.css_.
+
+Además, contamos con las hojas de estilos _gvnix.dataTables.css_ y _jquery.dataTables.css_
+dónde se personalizan estos estilos para las aplicaciones sobre gvNIX y cuyas
+clases CSS deberemos tomar como referencia.
+
+Por ejemplo, personalizamos el color de fondo de la fila seleccionada:
+
+[source,css]
+----------------------------------------
+table.dataTable tr.odd.row_selected td {
+    background: rgb(164, 220, 228);
+}
+----------------------------------------
+
+image::images/gvnix/tema-form-datatables.png[title="Ejemplo de fila coloreada",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Pestañas de navegación
+
+gvNIX muestra en pestañas de navegación las entidades relacionadas en
+una misma vista a través de jQuery y Datatables. +
+Personaliza su color ajustando las clases CSS `.ui-tabs` o `.ui-tabs-nav li.ui-tabs-active a`.
+
+image::images/gvnix/tema-tabs.png[title="Ejemplo de pestaña de navegación coloreada",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Iconos
+
+Gracias a la integración de Bootstrap en gvNIX tenemos disponible un amplio catálogo de iconos.
+
+Personaliza sus estilos modificando las siguientes clases CSS:
+
+[role="col-md-12"]
+image::images/bootstrap/glyphicons-class.png[title="Listado de iconos y sus clases CSS", options="responsive"]
+unfloat::[]
+
+Puedes personalizar su color modificando las clases CSS `a.icon` y
+`.gvnix_dataTables_toolbar > a.icon`.
+
+image::images/gvnix/tema-icons.png[title="Ejemplo de color de iconos personalizado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+==== Diálogo modal
+
+Es posible personalizar la apariencia de los diálogos,
+para ello puedes modificar las clases CSS `.modal-content`, `.modal-header`, `.modal-body` o `.modal-footer`.
+
+image::images/gvnix/tema-modal.png[title="Ejemplo de cabecera del diálogo coloreada",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+== Personalización de la aplicación
+
+Personaliza la aplicación empleando la paleta de componentes visuales
+que ofrece gvNIX.
+Añade, reemplaza o modifica la disposición y apariencia de los elementos de
+tu aplicación.
+
+=== Estructura de página
+
+La estructura para las páginas de una aplicación sobre gvNIX se crea mediante
+layouts que definen la estructura visual de los contenidos.
+
+Es en este fichero dónde se añaden los elementos `<header>`,
+`<div class="container">` englobando al contenido central
+`<div id="main">` y `<footer>`.
+
+image::images/layout/estructura-layout-html.png[title="Etiquetas HTML que forman la estructura de página",role="thumbnail",style="{span2offset} {span5}",options="{options}"]
+unfloat::[]
+
+Quedando la estructura HTML así:
+
+[source,html]
+-------------------------------------------------
+<body class="tundra spring">
+    <header class="navbar">
+    ...
+    </header>
+
+    <div class="container">
+        <div id="main">
+        ...
+        </div>
+    </div>
+
+    <footer class="bs-footer" role="contentinfo">
+    ...
+    </footer>
+
+</body>
+-------------------------------------------------
+
+Contamos con más de un diseño de páginas disponibles para emplear en las
+diferentes páginas de la aplicación sobre gvNIX.
+
+Los layouts de la aplicación se definen en
+_../webapp/WEB-INF/layouts/.._. En este directorio es dónde incluimos los
+diferentes diseños de página.
+
+image::images/tree/layouts.png[title="Vista del árbol de archivos de los layouts",role="thumbnail",style="{span3offset} {span6}",options="{options}"]
+unfloat::[]
+
+Con gvNIX tienes disponibles los siguientes layouts:
+
+[role="table table-hover",cols="<,<,<",options="header"]
+|=======================================================================
+|Diseño |Layout |Archivo
+|image:images/gvnix/layout-default.png[width=340]|image:images/layout/estructura-layout-html.png[options="{options}"] | _default.jspx_
+|image:images/gvnix/layout-default-fluid.png[width=340]|image:images/layout/default-fluid.png[options="{options}"] | _default-fluid.jspx_
+|image:images/gvnix/layout-default-menu-cols.png[width=340]|image:images/layout/default-menu-cols.png[options="{options}"] | _default-menu-cols.jspx_
+|image:images/gvnix/layout-default-menu-cols-fluid.png[width=340]|image:images/layout/default-menu-cols-fluid.png[options="{options}"] | _default-menu-cols-fluid.jspx_
+|image:images/gvnix/layout-default-map.png[width=340]|image:images/layout/default-map.png[options="{options}"] | _default-map.jspx_ del _addon_ GEO
+
+|=======================================================================
+
+Podemos crear tantos cómo necesitemos, pero
+siempre tendremos que definirlos en _../webapp/WEB-INF/layouts/layouts.xml_
+de este modo:
+
+[source,html]
+--------------------------------------------------------------------------------
+<tiles-definitions>
+
+  <definition name="default" template="/WEB-INF/layouts/default-menu-cols.jspx">
+    <put-attribute name="header" value="/WEB-INF/views/header.jspx" />
+    <put-attribute name="menu" value="/WEB-INF/views/menu.jspx" />
+    <put-attribute name="footer" value="/WEB-INF/views/footer.jspx" />
+  </definition>
+
+  <definition name="public" template="/WEB-INF/layouts/default.jspx">
+    <put-attribute name="header" value="/WEB-INF/views/header.jspx" />
+    <put-attribute name="footer" value="/WEB-INF/views/footer.jspx" />
+  </definition>
+
+--------------------------------------------------------------------------------
+
+Englobamos como `name="default"` los elementos a mostrar en las páginas por defecto de la
+aplicación; engloblamos dentro de `name="public"` los elementos de las páginas que, contando con el
+_addon Spring Security Login_, son visibles sin necesidad de logearse el
+usuario.
+
+Estos serán empleados en los ficheros tipo _..views.xml_ para definir qué
+layout será empleado en las diferentes páginas existentes.
+
+image::images/tree/views.png[title="Vista del árbol de archivos de los views.xml",role="thumbnail",style="{span3offset} {span6}",options="{options}"]
+unfloat::[]
+
+Por ejemplo:
+
+[source,html]
+--------------------------------------------------------------------------------
+<tiles-definitions>
+
+  <definition extends="default" name="index">
+    <put-attribute name="body" value="/WEB-INF/views/index.jspx"/>
+  </definition>
+
+  <definition extends="public" name="dataAccessFailure">
+    <put-attribute name="body" value="/WEB-INF/views/dataAccessFailure.jspx"/>
+  </definition>
+
+  <definition extends="default-map" name="mapviewer/show">
+        <put-attribute name="body" value="/WEB-INF/views/mapviewer/show.jspx"/>
+   </definition>
+
+--------------------------------------------------------------------------------
+
+En cada uno de estos 'layouts' definidos, incluimos los componentes
+que queremos incluir: 'header, menu' y 'footer'. +
+
+Estos elementos existen como archivos independientes,
+nos permiten crear una estructura de página correcta y
+podemos incluirlos en cada definición de cada diseño de página
+formando un HTML válido.
+
+Para ello, en cada diseño de página en _.jspx_ debemos incluir estos elementos
+independientes así:
+
+[source,html]
+-----------------------------------------------------
+<tiles:insertAttribute ignore="true" name="header" />
+<tiles:insertAttribute ignore="true" name="menu" />
+<tiles:insertAttribute ignore="true" name="footer" />
+-----------------------------------------------------
+
+Cada uno de estos elementos independientes es incluido en el código HTML del
+layout de forma estructurada y pudiendo ser personalizadas las capas que lo
+contienen.
+
+Por ejemplo incluimos el 'footer' así:
+
+[source,html]
+--------------------------------------------------------------
+    <!-- Footer
+        ================================================== -->
+    <footer class="bs-footer" role="contentinfo">
+        <tiles:insertAttribute ignore="true" name="footer" />
+    </footer>
+--------------------------------------------------------------
+
+
+[icons=None, caption="*"]
+NOTE: *Recuerda*: para visualizar un cambio en el layout, deberemos reiniciar
+la aplicación. Recomendamos no modificar está estructura y los elementos que
+incluye sin conocer la funcionalidad de cada uno.
+
+
+==== Cabecera
+
+Se corresponde con el archivo _../webapp/WEB-INF/views/header.jspx_.
+
+[source,html]
+--------------------------------------------------------------------------------
+<div id="header">
+    <spring:url var="logo_gvnix" value="/resources/images/logo_gvnix.png" />
+
+    <div class="pull-left hidden-xs">
+        <img src="${logo_gvnix}" />
+    </div>
+
+    <div class="pull-right">
+
+        <spring:url var="home" value="/" />
+            <spring:message code="application_name"
+            var="project_name" htmlEscape="false" />
+        <spring:message code="button_home"
+        var="home_label" htmlEscape="false" />
+
+        <a class="navbar-brand nav navbar-nav navbar-right" href="${home}"
+           name="${fn:escapeXml(home_label)}"
+           title="${fn:escapeXml(home_label)}">${fn:escapeXml(project_name)}</a>
+
+    </div>
+</div>
+--------------------------------------------------------------------------------
+
+En caso de que nuestra aplicación, o alguna página de la aplicación, no requiera
+una cabecera, podemos dejar de incluir este archivo _header.jspx_ en la
+definición del layout.
+
+===== Anchura de página de la cabecera
+
+La cabecera está englobada bajo una capa contenedora con la clase CSS
+`.container`. Es posible modificarlo a `.container-fluid` para ocupar el
+100% de la página.
+
+===== Posición
+
+Existen diferentes clases CSS que nos permiten posicionar la cabecera:
+
+Por defecto::
+  Empleamos la clase CSS `.navbar-default` que mantiene la cabecera como
+  elemento independiente.
+Estática::
+  Empleamos la clase CSS `.navbar-static-top`. Ocuparará el 100% de la
+  anchura de página.
+Estática con márgenes::
+  Empleamos la clase CSS `.navbar-static-top` y añadimos la clase `.container`.
+Fija::
+  Empleamos la clase CSS `.navbar-fixed-top` que mantiene fija la
+  cabecera en la parte superior.
+Fija inferior::
+  Empleamos la clase CSS `.navbar-fixed-bottom` para el mismo
+  comportamiento pero en la parte inferior de la página. +
+  Este cambio supone modificar el 'padding' dado sobre `body` en las
+  hojas de estilos que, donde ahora, ya no será necesario este 'padding' y
+  deberemos ajustar las clases CSS relativas a `footer` para su correcta
+  visualización.
+
+===== Color
+
+Empleamos la clase CSS `.navbar-inverse` para definir la cabecera con color de
+fondo.
+La personalizaremos en nuestra hoja de estilos a los colores corporativos.
+
+Es posible modificar está clase CSS para emplear la barra de navegación
+en su estado por defecto de Bootstrap con `.navbar-default` o añadir una clase
+CSS propia.
+
+===== Alineación de los elementos
+
+Emplea las clase CSS `.pull-left` y `.pull-right` para alinear los
+elementos dentro de la misma fila de la estructura de página.
+Dependendiendo de los elementos flotantes, será necesario mover el orden
+de las capas contenedoras para que queden alineadas correctamente.
+
+Además, es posible emplear el sistema de rejilla para
+definir la anchura de las capas respecto a la anchura total de la página. Por
+ejemplo, podemos alinear dos elementos con `col-sm-6` + `col-sm-6`.
+
+===== Otros componentes y funcionalidades en la cabecera
+
+Te sugerimos emplear las variables que existen en la aplicación para enlazar
+elementos como el logotipo de la cabecera con la  página de inicio de la
+aplicación con `href="${home}"`.
+
+Es posible reemplazar las imágenes incluídas en la cabecera por otras.
+Para ello accede al directorio _/resources_ de la aplicación y reemplaza las
+imágenes existentes o incluye nuevos recursos.
+
+[source,html]
+--------------------------------------------------------------------------------
+<spring:url value="/resources/images/logotipo_cliente.png" var="logotipo"/>
+<img src="${logotipo}" />
+--------------------------------------------------------------------------------
+
+[icons=None, caption="*"]
+NOTE: Los cambios en el logotipo, nombre de la aplicación y más detalle de las
+funcionalidades añadidas en la cabecera están detallados en la sección
+link:#componentes_3[_Personalización de la aplicación > Componentes_].
+
+
+==== Pie de página
+
+Se corresponde con el archivo _../webapp/WEB-INF/views/footer.jspx_.
+
+[source,html]
+------------------------------------
+<div id="footer" class="container">
+    <div class="col-xs-12 col-sm-9">
+    ..
+    </div>
+    <div class="col-xs-12 col-sm-3">
+    ..
+    </div>
+</div>
+------------------------------------
+
+===== Anchura de página
+
+Los elementos del pie de página se engloban baja la capa contenedora
+con la clase CSS `.container` que puede modificarse a `.container-fluid`
+para ocupar el 100% de la anchura de página.
+
+===== Alineación de los elementos
+
+Es posible modificar el orden de las capas para cambiar su ubicación en
+la página o la anchura de página que ocupan, por ejemplo pasando a
+`<div class="col-sm-6">` y así ocupar el 50% cada elemento.
+
+Es posible añadir las clases CSS `.pull-left` y `.pull-right` para
+alinear los elementos dentro de la misma fila de la estructura de
+página.
+
+[icons=None, caption="*"]
+NOTE: Los cambios sobre imágenes, nombre de la aplicación y más detalle de las
+funcionalidades posibles a añadir en el pie de página están detallados en la
+sección link:#componentes_3[_Personalización de la aplicación > Componentes_].
+
+==== Contenido central
+
+La disposición del contenido central se define en el archivo
+_../webapp/WEB-INF/layouts/default.jspx_.
+
+[source,html]
+-------------------------------------------------
+<div class="container">
+        <div id="main">
+            <dialog:message-box />
+            <tiles:insertAttribute name="body" />
+        </div>
+</div>
+-------------------------------------------------
+
+Por defecto cuenta con un diseño de una sola columna con un ancho fijo en
+píxeles correspondiente a la clase CSS `.container`.
+
+Podemos definir diferentes layouts y disponer de distintos diseños de página
+para nuestra aplicación sobre gvNIX.
+Es el caso del layout _../webapp/WEB-INF/layouts/default-fluid.jspx_ dónde la
+clase CSS pasa a `.container-fluid` y ocupa el 100% de la anchura de página.
+
+image::images/gvnix/container.png[title="Diseño en píxeles con la clase CSS .container",role="thumbnail",style="{span5}",options="{options}"]
+image::images/gvnix/container-fluid.png[title="Diseño en porcentaje con la clase CSS .container-fluid",role="thumbnail",style="{span1offset} {span5}",options="{options}"]
+unfloat::[]
+
+Recomendamos no eliminar esta capa contenedora y sí modificar la clase que define
+su anchura y los elementos que engloba.
+
+La librería Bootstrap incluye clases CSS para utilizar la rejilla directamente
+sobre las capas contenedoras `div`.
+El diseño de página basado en rejilla se realiza mediante filas y
+columnas donde se colocan los contenidos:
+
+* Las filas siempre se definen dentro de un contenedor de tipo
+`.container` (anchura fija) o de tipo `.container-fluid` (anchura
+variable). De esta forma las filas se alinean y muestran el
+`padding` correcto.
+* Las filas se utilizan para agrupar horizontalmente a varias columnas.
+* El contenido siempre se coloca dentro de las columnas, ya que las
+filas sólo deben contener como _hijos_ elementos de tipo columna.
+* La librería Bootstrap nos proporciona diferentes clases CSS
+(como por ejemplo `.row` y `.col-sm-4`) para crear rejillas de forma cómoda.
+* Las columnas de la rejilla definen su anchura especificando cuántas de
+las 12 columnas de la fila ocupan. Si por ejemplo queremos dividir una
+fila en 3 columnas iguales, utilizaremos la clase `.col-sm-4` (el `4`
+indica que cada columna ocupa 4 de las 12 columnas en las que se divide
+cada fila).
+
+
+
+===== Columna lateral
+
+
+Es posible modificar la aplicación sobre gvNIX para mostrar una columna
+lateral en el layout de página.
+
+Por ejemplo, para la distribución de página con columna lateral añadimos
+esta disposición:
+
+[source,html]
+----------------------------------------------------------------------
+<div class="container" id="main">
+    <div class="row">
+
+        <dialog:message-box/>
+
+        <div class="col-xs-12 col-sm-9">
+            <tiles:insertAttribute name="body"/>
+        </div>
+
+        <div class="col-xs-6 col-sm-3" id="sidebar" role="navigation">
+            <tiles:insertAttribute ignore="true" name="menu-toggle"/>
+        </div>
+
+    </div>
+</div>
+----------------------------------------------------------------------
+
+
+Con esta opción podemos mostrar el menú de navegación en esta columna lateral de este modo:
+
+* Capa contenedora para crear una fila del sistema de rejilla
+`<div class="row row-offcanvas row-offcanvas-left">`;
+* Columna derecha de la página mediante la clase CSS
+`<div class="col-xs-12 col-sm-9">`;
+* Se visualizará el menú de navegación en la columna izquierda
+mediante
+`<div class="col-xs-6 col-sm-3" id="sidebar" role="navigation">`.
+
+Es posible personalizar está columna lateral y asignarle un fondo o
+modificar el formato del menú. Para ello personalizaremos las clases CSS
+`#sidebar-wrapper`, `.panel` y `.list-group-item`.
+
+image::images/gvnix/tema-sidebar.png[title="Ejemplo de menú personalizado en la columna lateral",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+
+===== Elementos flotantes
+
+Se definen dos clases CSS genéricas llamadas `.pull-left` y
+`.pull-right` que puedes aplicar sobre cualquier elemento.
+
+[source,html]
+--------------------------------------------------------------------
+<div class="pull-left">..</div>
+                                    <div class="pull-right">..</div>
+--------------------------------------------------------------------
+
+
+=== Componentes
+
+==== Textos
+
+Es posible añadir encabezados en las páginas de nuestra aplicación o
+cambiar los ya existentes.
+
+Recomendamos emplear la clase CSS de Bootstrap `.page-header` para los encabezados.
+Por ejemplo en las páginas del _addon Spring Security Login_ tenemos el código
+HTML siguiente:
+
+[source,html]
+------------------------------------------------
+  <div class="page-header">
+    <spring:url value="/signup" var="form_url"/>
+    <h1>SignUp Successful</h1>
+  </div>
+------------------------------------------------
+
+Modifica su apariencia añadiendo las clases CSS que aplican color a la
+fuente
+`.text-muted .text-primary .text-success .text-info .text-warning .text-danger`.
+
+image::images/gvnix/page-header-custom.png[title="Ejemplo de textos personalizados con el formato .text-success",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+Añade tus propios encabezados utilizando las etiquetas `<h1>-<h6>`.
+
+image::images/gvnix/heading.png[title="Ejemplo de encabezado personalizado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+.Alinear texto
+
+Emplea las clases CSS de Bootstrap para alinear de diferentes formas el
+contenido de texto de los elementos.
+
+[source,html]
+-------------------------------------------------------------------
+<p class="text-left text-info">Texto alineado a la izquierda.</p>
+<p class="text-center text-danger">Texto centrado.</p>
+<p class="text-right text-warning">Texto alineado a la derecha.</p>
+-------------------------------------------------------------------
+
+Si necesitas incluir nuevos textos multi-idioma, añade tus etiquetas en
+los archivos `.properties` del directorio
+_../main/webapp/WEB-INF/i18n/.._ Tras el reinicio de la aplicación serán
+visibles estas nuevas etiquetas de idioma.
+
+[source,html]
+----------------------------------------------------------------------------
+<div>
+    <h2><spring:message code="banner_by_h3"/></h2>
+    <p><spring:message code="banner_text"/></p>
+</div>
+----------------------------------------------------------------------------
+
+
+==== Listas
+
+La aplicación cuenta con el formato lista en el detalle de un elemento.
+
+Este componente se define en
+_../WEB-INF/tags/jquery/form/fields/display.tagx_ asignando mediante jQuery las
+clases CSS de Bootstrap.
+
+Luego, este componte se incluye como elemento del formulario
+en el archivo _show.jspx_ de cada módulo de la aplicación.
+
+Empleamos la clase CSS `.dl-horizontal` sobre la etiqueta `<dl>`.
+
+[source,html]
+--------------------------------------------------------------------------------
+    <dl class="row dl-horizontal" id="_${fn:escapeXml(id)}_id">
+            <dt><c:out value="${label}" />:</dt>
+            <dd>
+                <p>
+                <c:choose>
+                  <c:when test="${date}">
+                    <spring:escapeBody>
+                      <fmt:formatDate value="${object[field]}"
+                      pattern="${fn:escapeXml(dateTimePattern)}" />
+                    </spring:escapeBody>
+                  </c:when>
+                  <c:when test="${calendar}">
+                    <spring:escapeBody>
+                      <fmt:formatDate value="${object[field].time}"
+                      pattern="${fn:escapeXml(dateTimePattern)}" />
+                    </spring:escapeBody>
+                  </c:when>
+                  <c:otherwise>
+                    <spring:eval expression="object[field]" />
+                  </c:otherwise>
+                </c:choose>
+                </p>
+            </dd>
+    </dl>
+--------------------------------------------------------------------------------
+
+Es posible personalizar su maquetación HTML y clases CSS.
+
+image::images/bootstrap/listas.png[title="Etiquetas y clases CSS disponibles",role="thumbnail",style="col-md-12",options="{options}"]
+unfloat::[]
+
+.Grupos de lista
+
+Añade `ul class="list-group"` y `li class="list-group-item"` a la
+etiqueta `ul`. Permite personalizar el elemento activo con `.active`.
+
+image::images/gvnix/list-group.png[title="Formato panel para agrupar listas",role="thumbnail",style="col-md-offset-3 col-md-6",options="{options}"]
+unfloat::[]
+
+
+==== Etiquetas
+
+Edita las páginas de la aplicación e incluye las clases CSS correspondiente a
+cada tipo de etiqueta sobre las clases `.label`.
+
+Para ello deberás incluir:
+
+[role="table table-bordered table-hover", cols="<,<",options="header"]
+|===================================================================
+|Etiquetas |Código
+|[label label-default]#label# |`<span class="label label-default">Por Defecto</span>`
+|[label label-success]#label# |`<span class="label label-success">Éxito</span>`
+|[label label-warning]#label# |`<span class="label label-warning">Advertencia</span>`
+|[label label-danger]#label# |`<span class="label label-danger">Peligro</span>`
+|[label label-info]#label# |`<span class="label label-info">Información</span>`
+|===================================================================
+
+
+==== Banners
+
+Se trata de un componente para mostrar contenidos de forma muy destacada.
+
+En la página de inicio de la aplicación de gvNIX
+_../webapp/WEB-INF/views/index.jspx_ puedes encontrar este elemento.
+
+[source,html]
+--------------------------------------------------------------------------------
+      <div class="jumbotron">
+          <h3><spring:message arguments="${app_name}" code="welcome_h3"/></h3>
+          <p><spring:message code="welcome_text"/></p>
+      </div>
+--------------------------------------------------------------------------------
+
+Añádelo dentro de `.container` para añadir márgenes y centrar su
+disposición.
+
+Es posible incluir banners promocionales e imágenes destacadas. Personaliza
+su estilo, define el recurso e inclúyelo en _default.jspx_ y
+en el directorio de imágenes _../main/webapp/imagenes/.._.
+
+[source,html]
+----------------------------------------------------------------------------
+<div class="well">
+
+    <h2><spring:message code="banner_by_h3"/></h2>
+
+    <spring:url var="logo_gvnix" value="/resources/images/logo_gvNIX.png" />
+    <img class="img-responsive" src="${logo_gvnix}" />
+
+    <p><spring:message code="banner_text"/></p>
+
+</div>
+----------------------------------------------------------------------------
+
+image::images/gvnix/sidebar-banner.png[title="Ejemplo de banner personalizado en la columna lateral",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+==== Enlaces
+
+Crea y emplea variables de la aplicación para aplicar enlaces entre páginas sobre
+elementos de la aplicación. Por ejemplo, el logotipo de la cabecera con enlace
+hacia la  página de inicio de la aplicación empleando `href="${home}"`.
+
+Es posible añadir enlace a páginas concretas, accesos rápidos para el
+usuario a páginas destacadas de la aplicación.
+
+[source,html]
+----------------------------------------------
+  <spring:url value="/" var="home"/>
+  <div class="col-xs-12 col-sm-9">
+      <span>
+        <a href="${home}">
+          <spring:message code="button_home"/>
+        </a>
+      </span>
+      ..
+----------------------------------------------
+
+Añade enlaces en la cabecera o pie de la página para mantener el enlace
+siempre visible y fijo en la página.
+
+[source,html]
+----------------------------------------------
+  <spring:url value="http://www.gva.es" var="gva"/>
+  <div class= col-sm-3">
+        <a href="${gva}">
+          <spring:message code="link_gva"/>
+        </a>
+      ..
+----------------------------------------------
+
+==== Logotipo
+
+Define el recurso que será empleado como logotipo e inclúyelo como
+imagen
+
+[source,html]
+--------------------------------------------------------------------
+<spring:url var="logo_roo" value="/resources/images/logo_roo.png" />
+<img src="${logo_roo}" />
+--------------------------------------------------------------------
+
+==== Nombre de la aplicación
+
+El nombre de la aplicación que aparece en la cabecera se toma de los
+parámetros que introducimos al generar la aplicación sobre gvNIX.
+
+Se muestra en la cabecera a partir de la definición
+`<spring:message code="application_name" var="project_name" htmlEscape="false"/>`
+y se muestra incluyendo `${fn:escapeXml(project_name)}`.
+
+Por defecto, se muestra en la cabecera y es posible modificarlo sobre el archivo
+ _header.jspx_.
+
+Recomendamos su modificación desde el archivo dónde se define en
+_../webapp/WEB-INF/i18n/application.properties_. +
+
+[icons=None, caption="*"]
+NOTE: *Recuerda*: cualquier cambio en los archivos _properties_ será
+visible al reiniciar la aplicación.
+
+
+==== Imágenes
+
+Es posible reemplazar las imágenes incluídas en las páginas de la aplicación
+por otras ajustadas a las necesidades de tu cliente. +
+Para ello accede al directorio _/resources_ de la aplicación y reemplaza las
+imágenes existentes o incluye nuevos recursos.
+
+Define el recurso que será empleado como imagen e inclúyelo en la cabecera o pie
+de página como contenido fijo, o como otro elemento más de la página
+en el contenido central.
+
+[source,html]
+--------------------------------------------------------------------------------
+<spring:url value="/resources/images/logotipo_cliente.png" var="logotipo"/>
+
+<img src="${logotipo}" />
+--------------------------------------------------------------------------------
+
+Ajusta las clases CSS e incluye un enlace sobre la imagen, por ejemplo:
+
+[source,html]
+--------------------------------------------------------------------------------
+ <div class="col-xs-12 col-sm-3">
+
+      <spring:url value="/resources/images/springsource-logo.png" var="logo"/>
+      <spring:message code="global_sponsored"
+      htmlEscape="false" var="sponsored"/>
+
+      <span>
+        <a href="http://springsource.com" title="${fn:escapeXml(sponsored)}">
+          <img align="right" alt="${fn:escapeXml(sponsored)}" src="${logo}"/>
+        </a>
+      </span>
+
+  </div>
+--------------------------------------------------------------------------------
+
+Por ejemplo, una imagen como banner:
+
+[source,html]
+---------------------------------------------------------------
+<spring:url value="/resources/images/banner.png" var="banner"/>
+<img src="${banner}" />
+
+---------------------------------------------------------------
+
+==== Selector de idioma
+
+Incluimos los idiomas en los que está disponible la aplicación en _footer.jspx_:
+
+[source,html]
+----------------------------------------------------
+<span id="language">
+    <c:out value=" | "/>
+    <spring:message code="global_language"/>
+    <c:out value=": "/>
+
+    <util:language label="English" locale="en"/>
+    <util:language label="Deubuilderh" locale="de"/>
+    <util:language label="Espanol" locale="es"/>
+</span>
+----------------------------------------------------
+
+Por defecto esta funcionalidad es visible en el pie de la página de la aplicación
+siendo siempre visible y fija en la página.
+
+Es posible modificar el formato del selector accediendo a
+_../webapp/WEB-INF/tags/util/language.tagx_ y editando la estructura HTML sobre
+los enlaces de idioma:
+
+[source,html]
+----------------------------------------------------
+ <spring:url var="img" value="/resources/images/${locale}.png" />
+
+  <spring:message code="global_language_switch" arguments="${label}" var="lang_label" htmlEscape="false" />
+
+  <a href="${url}" title="${fn:escapeXml(lang_label)}">
+    <img class="flag" src="${img}" alt="${fn:escapeXml(lang_label)}" />
+  </a>
+----------------------------------------------------
+
+==== Selector de tema gráfico
+
+Se incluye en el pie de página de la aplicación mediante:
+
+[source,html]
+------------------------
+<util:theme/>
+------------------------
+
+Es posible modificar su maquetación HTML desde
+_WEB-INF/tags/util/theme.tagx_ así cómo definir y añadir nuevos temas
+gráficos disponibles a la elección del usuario. Por ejemplo:
+
+[source,html]
+----------------------------------------------------------------
+    <c:out value=" | " />
+
+    <spring:url var="url_theme3" value="">
+            <spring:param name="theme" value="custom" />
+
+            <c:if test="${not empty param.page}">
+              <spring:param name="page" value="${param.page}" />
+            </c:if>
+
+            <c:if test="${not empty param.size}">
+              <spring:param name="size" value="${param.size}" />
+            </c:if>
+
+      </spring:url>
+
+      <a href="${url_theme3}" title="custom">custom</a>
+----------------------------------------------------------------
+
+==== Menú
+
+Por defecto, el menú de navegación es visible en la cabecera de la
+página y en su opción desplegable (_dropdown_ de Bootstrap). +
+ En _default.jspx_ llamamos tanto a los archivos de 'header' como 'menu',
+ y ambos, cargan su estructura HTML definida.
+
+[source,html]
+---------------------------------------------------------------------
+<div class="container">
+  <tiles:insertAttribute ignore="true" name="header" />
+  <tiles:insertAttribute ignore="true" name="menu" />
+</div>
+---------------------------------------------------------------------
+
+Para realizar modificaciones sobre el menú accede al directorio
+_../WEB-INF/tags/menu/.._. +
+ Para ello:
+
+* Modifica _menu.tagx_. Cuenta con las clases CSS `.nav .navbar-nav`
+sobre la etiqueta de listado `<ul>`.
+* Modifica _category.tagx_. Cuenta con las etiquetas `<li> <a> <ul>` para el
+primer y segundo nivel de navegación e incluye los iconos de Bootstrap que indican
+la opción desplegable.
++
+[source,html]
+-------------------------------------------------------------------
+<li class="dropdown" id="${fn:escapeXml(id)}">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        <c:out value="${label}" />&#160;<b class="caret">&#160;</b>
+    </a>
+
+    <ul class="dropdown-menu">
+        <jsp:doBody />
+    </ul>
+</li>
+-------------------------------------------------------------------
+
+* Modifica _item.tagx_ si necesitas añadir clases CSS sobre las
+etiquetas `<li> y <a>` para el segundo nivel del menú.
+
+Es posible modificar la apariencia del menú y su comportamiento de
+apertura. Con la librería Bootstrap, hemos seleccionado la opción
+_dropdown_ pero es posible integrar las opciones _toggle_ o _scrollspy_,
+también muy empleadas en los menús de navegación de las aplicaciones.
+
+===== Menu en la columna lateral
+
+Si se precisa, es posible añadir una columna lateral en el archivo
+_../webapp/WEB-INF/layouts/default.jspx_ englobando la funcionalidad
+de menú.
+
+[source,html]
+--------------------------------------------------------------
+<div class="col-xs-6 col-sm-3" id="sidebar" role="navigation">
+    <tiles:insertAttribute ignore="true" name="menu-toggle"/>
+</div>
+--------------------------------------------------------------
+
+
+Para realizar modificaciones sobre el menú ubicado en la columna lateral
+accede al directorio _../WEB-INF/tags/menu-toggle/.._. +
+Para ello:
+
+* Modifica _menu.tagx_. Cuenta con las clases CSS `#sidebar-wrapper`,
+`.list-group .panel` y diferentes clases de alineación y anchura de
+página.
++
+
+[source,html]
+----------------------------------------------------------
+
+<div id="sidebar-wrapper" class="col-sm-2">
+    <ul id="${fn:escapeXml(id)}" class="list-group panel">
+        <jsp:doBody />
+    </ul>
+</div>
+
+----------------------------------------------------------
+* Modifica _category.tagx_. Cuenta con las etiquetas `<li> <a> <ul>` de
+primer nivel de navegación e incluye los iconos de Bootstrap que indican
+la opción desplegable. Además, marcamos el elemento que inicia el
+desplegable _toggle_ y qué elemento mostrará `#${label}`.
++
+
+[source,html]
+--------------------------------------------------------------------------------
+        <li class="list-group-item" id="${fn:escapeXml(id)}">
+
+            <a href="#${label}" data-toggle="collapse">
+                    <c:out value="${label}" /> &#160;<b class="caret">&#160;</b>
+            </a>
+
+            <ul class="collapse pos-absolute" id="${label}">
+                <jsp:doBody />
+            </ul>
+        </li>
+--------------------------------------------------------------------------------
+
+* Modifica _item.tagx_ si necesitas añadir clases CSS sobre las
+etiquetas `<li> y <a>` del de segundo nivel del menú desplegable.
++
+
+[source,html]
+--------------------------------------------------------------
+<li id="${fn:escapeXml(id)}">
+    <spring:url value="${url}" var="menu_item_url"/>
+    <a href="${menu_item_url}" title="${fn:escapeXml(label)}">
+            <c:out value="${label}"/>
+     </a>
+</li>
+--------------------------------------------------------------
+
+Es posible mantener fijo el menú en la página añadiendo la clase CSS
+`.affix`
+
+[source,html]
+----------------------------------------------------------
+<div id="sidebar-wrapper" class="affix col-sm-2">
+    <ul id="${fn:escapeXml(id)}" class="list-group panel">
+        <jsp:doBody />
+    </ul>
+</div>
+----------------------------------------------------------
+
+Añade clases CSS si quieres modificar la apariencia del menú o cambiar
+los iconos _Glyphicon Halflings_. Por ejemplo con el formato `.well`:
+
+[source,html]
+------------------------------------------------------
+<div id="sidebar-wrapper" class="affix col-sm-2">
+            <ul id="${fn:escapeXml(id)}" class="well">
+                <jsp:doBody />
+            </ul>
+</div>
+------------------------------------------------------
+
+En _category.tagx_ es posible cambiar la clase CSS de la etiqueta `<li>` o
+modificar el icono a mostrar:
+
+[source,html]
+------------------------------------------------------------
+<li class="list-unstyled" id="${fn:escapeXml(id)}">
+    <a href="#${label}" data-toggle="collapse">
+    <p>
+        <span class="glyphicon glyphicon-star">&#160;</span>
+            <c:out value="${label}" />
+------------------------------------------------------------
+
+image::images/gvnix/sidebar-well.png[title="Ejemplo de modificaciones sobre menú lateral",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+[icons=None, caption="*"]
+NOTE: Recuerda quitar esta funcionalidad menú de la cabecera (_header.jspx_).
+Recomendamos incluir el menú de navegación en un solo espacio, o en la
+cabecera o en la columna lateral.
+
+==== Botones
+
+Crea diferentes tipos de botones con ayuda de las clases CSS ya
+definidas por la librería Bootstrap.
+
+Por defecto en gvNIX aplicamos las clases CSS sobre el elemento `<input>`
+para su visualización en color azul con la clase CSS `.btn .btn-primary`
+y al 100% de la anchura del formulario con la clase CSS `.btn-block`:
+
+[source,html]
+--------------------------------------------------------------------------------
+<input id="proceed" type="submit" class="btn btn-primary btn-block"
+        value="${fn:escapeXml(save_button)}"/>
+--------------------------------------------------------------------------------
+
+Es posible cambiar estas clases CSS y cambiar su apariencia:
+
+[source,html]
+--------------------------------------------------------------------------------
+<input id="proceed" type="submit" class="btn btn-warning btn-block"
+        value="${fn:escapeXml(save_button)}"/>
+--------------------------------------------------------------------------------
+
+image::images/gvnix/btn-warning.png[title="Ejemplo de botón con clases CSS tipo advertencia",role="thumbnail",style="col-md-offset-3 {span5}",options="{options}"]
+unfloat::[]
+
+Es posible modificar su tamaño y posición:
+
+[source,html]
+--------------------------------------------------------------------------------
+<input id="proceed" type="submit" class="btn btn-success btn-xs pull-right"
+value="${fn:escapeXml(save_button)}"/>
+--------------------------------------------------------------------------------
+
+image::images/gvnix/btn-success-right.png[title="Ejemplo de botón en formato pequeño",role="thumbnail",style="col-md-offset-3 {span5}",options="{options}"]
+unfloat::[]
+
+===== Estado deshabilitado
+
+Para botones deshabilitados, deberemos añadir el atributo `disabled` para los
+elementos `<button>`.
+
+[source,html]
+--------------------------------------------------------------------------------
+<button id="reset" class="btn disabled btn-primary btn-sm btn-block"
+type="reset">
+  Reiniciar
+</button>
+--------------------------------------------------------------------------------
+
+image::images/gvnix/btn-disabled.png[title="Ejemplo de botón desactivado",role="thumbnail",style="col-md-offset-3 {span5}",options="{options}"]
+unfloat::[]
+
+===== Grupos de Botones
+
+Es posible agrupar varios botones relacionados entre sí para mostrarlos
+en una única línea.
+
+[source,html]
+-----------------------------------------------------------------
+<div class="btn-group">
+    <button type="button" class="btn btn-default">Left</button>
+    <button type="button" class="btn btn-default">Middle</button>
+    <button type="button" class="btn btn-default">Right</button>
+</div>
+-----------------------------------------------------------------
+
+image::images/bootstrap/form-inputs-group.png[title="Ejemplo de grupo de botones",role="thumbnail",style="col-md-offset-3 {span5}",options="{options}"]
+unfloat::[]
+
+
+===== Botones desplegables
+
+Los botones desplegables se crean añadiendo un botón dentro de cualquier
+elemento con las clases CSS `.btn-group`, botón con `.dropdown-toggle` y
+elementos del listado bajo `<ul class="dropdown-menu">`.
+
+[source,html]
+--------------------------------------------------------------------------------
+<div class="btn-group">
+
+    <button type="button" class="btn btn-default dropdown-toggle"
+    data-toggle="dropdown">Por defecto <span class="caret"></span></button>
+
+    <ul class="dropdown-menu" role="menu">
+        <li><a href="#">Action</a></li>
+        <li><a href="#">Another action</a></li>
+        <li><a href="#">Something else here</a></li>
+        <li class="divider"></li>
+        <li><a href="#">Separated link</a></li>
+    </ul>
+
+</div>
+--------------------------------------------------------------------------------
+
+image::images/bootstrap/form-inputs-dropdown.png[title="Ejemplo de botón desplegable",role="thumbnail",style="col-md-offset-3 {span5}",options="{options}"]
+unfloat::[]
+
+
+==== Paneles
+
+Hemos elegido el formato panel de Bootstrap ya que se ajusta y enmarca
+cada funcionalidad de la aplicación.
+
+Este _tag_ se incluye mediante la etiqueta `<util:panel>` y emplea
+jQuery. Si necesitas realizar modificaciones en su estructura HTML o
+modificar la clases CSS dadas, accede al archivo
+_../WEB-INF/tags/jquery/util/panel.tagx_.
+
+Por ejemplo, reemplazamos la clase CSS `.panel-default` por `.panel-info`:
+
+[source,html]
+----------------------------------------------------------------
+<section id="${sec_id}">
+       <div class="panel panel-info" id="_title_${sec_id}_id">
+          <div class="panel-heading">
+            <h3 class="panel-title">${title}</h3>
+          </div>
+          <div class="panel-body">
+            <jsp:doBody />
+          </div>
+        </div>
+</section>
+----------------------------------------------------------------
+
+image::images/gvnix/panel-info.png[title="Ejemplo de panel personalizado con clase CSS",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+==== Formularios
+
+Para la creación de formularios trabajamos con las librerías Bootstrap y
+jQuery.
+
+Si necesitas realizar modificaciones en su estructura HTML o modificar
+la clases CSS dadas, accede al directorio
+_../WEB-INF/tags/jquery/form/.._.
+Aquí encontrarás las vistas de cada
+formulario (_create.tagx_, _find.tagx_, _show.tagx_ y _update.tagx_) y
+es dónde definimos su formato horizontal, vertical, en línea o destacado.
+
+Puedes personalizar Las siguientes clases CSS:
+
+[role="table table-striped table-hover",cols="<,<,<",options="header"]
+|=======================================================================
+|Nombre |Clase |Descripción
+|Vertical (por defecto) |No requerida | Etiqueta alineada a la izquierda sobre los controles
+
+|En Línea |`.form-inline` |Etiqueta alineada a la izquierda y controles 'in line' para un estilo compacto
+
+|Horizontal |`.form-horizontal` |Etiqueta alineada a la izquierda, control alineado a la derecha, ambos en la misma línea
+
+|Destacado |`.form-signin` |Controles 'in line' con un fondo destacado y dimensiones grandes de los campos
+
+|=======================================================================
+
+Por ejemplo, en _create.tagx_ se ha seguido la siguiente estructura HTML con las siguientes clases CSS:
+
+[source,html]
+--------------------------------------------------------------------------------
+<form:form cssClass="form-horizontal"
+       action="${form_url}" method="POST" modelAttribute="${modelAttribute}"
+       enctype="${enctype}" onsubmit="${jsCall}">
+
+        <form:errors cssClass="errors alert alert-warning" delimiter="<p/>"/>
+
+        <c:if test="${not empty compositePkField}">
+         ..
+        </c:if>
+        <jsp:doBody />
+
+        <div class="submit" id="${fn:escapeXml(id)}_submit">
+          <spring:message code="button_save"
+          var="save_button" htmlEscape="false" />
+          <input id="proceed" type="submit" class="btn btn-primary btn-block"
+           value="${fn:escapeXml(save_button)}"/>
+        </div>
+</form:form>
+--------------------------------------------------------------------------------
+
+Destaca las clases CSS aplicadas sobre `form`, `form:errors` y
+`input type="submit"`. Es posible ajustarlas según requerimientos.
+
+Por otra parte, desde estos ficheros marcamos la disposición de los campos que
+serán incluidos en el formulario. Las columnas se crean con el sistema
+de rejilla de Bootstrap y sus clases CSS, es por esto, que marcamos por
+JavaScript el número de columnas que ocuparán los campos a la hora de
+visualizarse en el formulario:
+
+[source,html]
+--------------------------------------------------------------------------------
+<script type="text/javascript">
+      jQuery(document).ready(function() {
+          jQuery(".control-label").addClass("col-xs-5 col-sm-4 col-md-3
+          col-lg-3");
+          jQuery(".controls").addClass("col-xs-7 col-sm-8 col-md-9 col-lg-9");
+          jQuery(".box").addClass("col-xs-7 col-sm-8 col-md-9 col-lg-9");
+          jQuery(".controls.datetime").removeClass("col-xs-7 col-sm-8
+          col-md-9 col-lg-9").addClass("col-xs-7 col-xs-offset2 col-sm-5
+          col-sm-offset3 col-md-4 col-md-offset5 col-lg-3 col-lg-offset6");
+      });
+</script>
+--------------------------------------------------------------------------------
+
+Se trata de clases CSS para adaptar los _labels_ y los _inputs_ al
+formato de un formulario horizontal y con diseño adaptativo.
+
+[icons=None, caption="*"]
+NOTE: En Bootstrap no es necesario aplicar clases de columnas y filas a los
+campos del formulario, pero sobre gvNIX es necesario para poder trabajar con
+_tagx_. +
+Es importante no quitar las siguientes clases CSS ya existentes: +
+`.errors` para la validación de los formularios; y `.control-group` para la
+edición múltiple y en fila;
+
+
+===== Listado de campos disponibles
+
+Dentro de este mismo directorio se encuentra
+_../WEB-INF/tags/jquery/form/fields/.._ dónde definimos las clases CSS
+para cada elemento del formulario. Ajústalas según tus requerimientos.
+
+*Casilla de selección*::
+  _checkbox.tagx_
+*Fecha*::
+  _datetime.tagx_
+*Presentación*::
+  _display.tagx_
+*Entrada de datos*::
+  _input.tagx_
+*Selector*::
+  _select.tagx_
+*Texto*::
+  _simple.tagx_
+*Área de texto*::
+  _textarea.tagx_
+
+
+===== Elementos de ayuda
+
+La ayuda en los formularios se muestra mediante jQuery y precisa
+definirse tanto en el _tagx_ de cada campo del formulario:
+
+[source,html]
+--------------------------------------------------------------------------------
+<c:when test="${required}">
+ <spring:message code="field_required" var="field_required" htmlEscape="false"/>
+ <spring:message argumentSeparator="," arguments="${label},(${field_required})"
+  code="field_simple_validation" var="field_validation" htmlEscape="false" />
+</c:when>
+..
+<form:input class="form-control input-sm" id="_${sec_field}_id"
+    path="${sec_field}" disabled="${disabled}"
+    title="${sec_field_validation}" data-required="${required}"
+    data-invalid="${sec_field_invalid}" data-missing="${sec_field_required}"
+    data-regex="${validationRegex}"
+    />
+--------------------------------------------------------------------------------
+
+como en la definición del formulario de cada módulo, por ejemplo en
+_../webapp/WEB-INF/views/owners/create.jspx_, marcando si es obligatorio
+con la propiedad `required="true"`:
+
+[source,html]
+--------------------------------------------------------------------------------
+<field:input field="firstName"
+  id="c_com_springsource_petclinic_domain_Owner_firstName"
+  max="30" min="3" required="true" z="I+r9dvRDTn4Cw8NMKU5RsKCNiXM="/>
+--------------------------------------------------------------------------------
+
+===== Validación del formulario
+
+Por defecto en gvNIX empleamos las clases CSS `.alert .alert-danger`
+para mostrar los mensajes de error en la validación.
+
+Puedes modificar la clase CSS aplicada en cada campo _.tagx_
+para modificar su estilo.
+
+[source,html]
+--------------------------------------------------------------------------------
+<form:errors cssClass="errors alert alert-info" delimiter="</p>"/>
+--------------------------------------------------------------------------------
+
+image::images/gvnix/textarea-alert-info.png[title="Personalización del mensaje de error para los campos de tipo área de texto",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+===== Estados del formulario
+
+Para marcar un campo del formulario como campo deshabilitado
+deberemos añadir la propiedad `disable="true"` en la definición del formulario
+de cada módulo, por ejemplo, en _../webapp/WEB-INF/views/pets/create.jspx_:
+
+[source,html]
+--------------------------------------------------------------------------------
+<field:select field="type" id="c_com_springsource_petclinic_domain_Pet_type"
+items="${pettypes}" path="pettypes"
+disabled="true" required="true" z="+hDCnUp+Y+A1RlT+AjH07sgipOo="/>
+--------------------------------------------------------------------------------
+
+image::images/gvnix/select-disabled.png[title="Ejemplo de campo selector desplegable deshabilitado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+===== Iconos en el formulario
+
+Es posible personalizar los formularios de la aplicación incluyendo
+iconos que sirvan de ayuda visual al usuario. +
+
+Para ello añadiremos en la maquetación de cada campo _.tagx_ una nueva capa
+contenedora `<div class="input-group"> <div class="input-group-addon">` con el
+icono que precisemos, por ejemplo, `<span class="glyphicon-class">`. +
+Ejemplo:
+
+[source,html]
+--------------------------------------------------------------------------------
+<div class="form-group">
+  <div class="input-group">
+    <div class="input-group-addon">
+      <span class="glyphicon glyphicon-euro"></span>
+    </div>
+
+    <form:input class="form-control input-sm" id="_${sec_field}_id"
+      path="${sec_field}" disabled="${disabled}"
+      title="${sec_field_validation}" data-required="${required}"
+      data-invalid="${sec_field_invalid}" data-missing="${sec_field_required}"
+      data-regex="${validationRegex}" data-minlength="${min}"
+      data-maxlength="${max}" data-mindecimal="${decimalMin}"
+      data-maxdecimal="${decimalMax}" />
+  </div>
+</div>
+--------------------------------------------------------------------------------
+
+Nos puede servir también para añadir formatos y unidades como '@ € $ %' sin
+precisar de los iconos.
+
+image::images/gvnix/input-icon.png[title="Ejemplo de iconos y unidades junto a los inputs del formulario",role="thumbnail",style="{span1offset} {span10}",options="{options}"]
+unfloat::[]
+
+===== Formulario destacado
+
+Modifica la clase `.form-signin-heading` sobre la etiqueta `h2`
+para personalizar los títulos.
+
+image::images/gvnix/tema-form-well.png[title="Ejemplo de formulario personalizado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+===== Redimensionar campos de formulario
+
+En gvNIX hemos añadido las clases CSS a los campos del formulario incluyendo la clase CSS `.input-sm`
+que ajusta los campos del formulario  hasta la resolución para dispositivos pequeños ≥768px.
+
+Es posible modifica la altura por defecto de los campos con las clases CSS `.input-md` o `.input-lg` en
+la maquetación de cada campo _.tagx_.
+
+[source,html]
+--------------------------------------------------------------------------------
+<form:select class="form-control input-lg" id="_${sec_field}_id"
+  items="${items}" path="${sec_field}" disabled="${disabled}"
+  multiple="${multiple}" itemValue="${fn:escapeXml(itemValue)}"
+  itemLabel="${sec_itemLabel}" data-required="${required}" />
+--------------------------------------------------------------------------------
+
+image::images/bootstrap/form-inputs-size.png[title="Ejemplo de campos con diferentes tamaños y sus clases CSS",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+
+===== Formularios del addon Spring Security Login
+
+Existen formularios que pertenecen al _addon Spring Security Login_
+dónde la maquetación del formulario se incluye en sus propias páginas.
+
+En este 'addon' siempre empleamos la clase CSS `.form-signin`.
+Por ejemplo,  en la página de login de usuario _../webapp/WEB-INF/views/login.jspx_:
+
+[source,html]
+--------------------------------------------------------------------------------
+<form action="${fn:escapeXml(form_url)}" method="POST" name="f"
+  class="form-signin">
+
+  <h2 class="form-signin-heading">
+    <spring:message code="security_login_title"/>
+  </h2>
+  ..
+  <input class="form-control" type="text" placeholder="${name}"
+    autofocus="autofocus" id="j_username" name="j_username"
+    data-required="true" data-minlength="3" data-maxlength="30"
+    data-original-title="${name_msg}" />
+    ..
+
+    <div class="submit">
+      ..
+      <button type="submit" class="btn btn-primary btn-lg btn-block"
+      id="proceed">
+        <spring:message code="button_submit"/>
+      </button>
+      ..
+    </div>
+
+    ..
+</form>
+--------------------------------------------------------------------------------
+
+En estos casos, el atributo `data-original-title="${pwd_msg}"` es el se
+muestra como _tooltip_ de jQuery. Ajusta su estilo con clases CSS según
+tus requerimientos.
+
+image::images/gvnix/form-signin-login.png[title="Vista de la página de acceso de usuario",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+===== Añadir formulario de acceso de usuario
+
+
+Es posible añadir el formulario de acceso a la aplicación fijo en la
+barra de navegación. Esto nos permite que esta funcionalidad este
+siempre visible en la página, disponible para el usuario y su
+identificación.
+
+Para ello incluimos en _header.jspx_:
+
+[source,html]
+--------------------------------------------------------------------------
+<div class="col-sm-6 pull-right">
+
+    <spring:url value="/resources/j_spring_security_check" var="form_url"/>
+
+    <form class="form-inline" role="form" action="${fn:escapeXml(form_url)}" method="POST" name="f" >
+        <spring:message code="security_login_form_name" var="name" />
+        <spring:message code="security_login_form_name_message" htmlEscape="false" var="name_msg"/>
+
+        <div class="form-group">
+            <input class="form-control" type="text" placeholder="${name}" autofocus="autofocus" id="j_username" name="j_username" data-required="true" data-minlength="3" data-maxlength="30" data-original-title="${name_msg}" />
+        </div>
+
+        <div class="form-group">
+            <spring:message code="security_login_form_password" var="pass"/>
+            <spring:message code="security_login_form_password_message" htmlEscape="false" var="pwd_msg"/>
+            <input type="password" class="form-control" placeholder="${pass}" id="j_password" name="j_password" data-required="true" data-minlength="3" data-maxlength="30" data-original-title="${pwd_msg}" />
+        </div>
+
+        <script type="text/javascript">Spring.addDecoration(new Spring.ValidateAllDecoration({elementId:'proceed', event:'onclick'}));</script>
+
+        <button type="submit" class="btn btn-info" id="proceed">
+            <spring:message code="button_submit"/>
+        </button>
+    </form>
+
+</div>
+--------------------------------------------------------------------------
+
+image::images/gvnix/header-login.png[title="Formulario de login en la cabecera",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+[icons=None, caption="*"]
+NOTE: Para añadir este formulario de login de usuario es necesario
+tener _Spring Security Login_ en nuestra aplicación.
+
+
+==== Tablas
+
+Trabajamos con las librería Dandelion Datatables y su integración con
+Bootstrap.
+
+Las tablas se visualizan en las páginas _list.jspx_ (por ejemplo,
+_../webapp/WEB-INF/views/owners/list.jspx_) y se cargan las clases CSS
+mediante jQuery.
+
+jQuery Datatables::
+  _../webapp/scripts/datatables/jquery.dataTables.js_ dónde se asignan
+  las clases CSS a cada elemento de Datatables para trabajar sobre jQuery.
+  También están en este mismo directorio los scripts necesarios para la
+  integración de todos los elementos de gvNIX.
+Datatables Bootstrap::
+  _../webapp/scripts/bootstrap/dataTables.bootstrap.js_ dónde
+  personalizamos las clases de Datatables y su correspondencia con
+  Bootstrap.
+  +
+  Es aquí donde definimos el formulario en línea y las clases CSS de los
+  campos, enlaces y botones.
+  +
+
+  $.extend( $.fn.dataTableExt.oStdClasses, {
+     "sWrapper": "dataTables_wrapper form-signin",
+    "sFilterInput": "form-control input-sm",
+    "sLengthSelect": "form-control input-sm",
+  } );
+
+Para ajustar la aplicación a tus requerimientos ajusta las clases CSS
+mediante JavaScript en estos ficheros.
+
+Es posible añadir clases CSS de tabla sobre el componente _list.jspx_
+mediante la propiedad `cssClass`.
+
+[source,html]
+--------------------------------------------------------------------------------
+<table:table cssClass="table table-bordered" data="${owners}"
+  id="l_com_springsource_petclinic_domain_Owner" path="/owners"
+  z="cEQFC2rTMmyjCOpZyzGuOmA0SI8=">
+--------------------------------------------------------------------------------
+
+Las clases CSS existentes son:
+
+[role="table table-bordered table-hover",cols="<,<,<",options="header"]
+|=======================================================================
+|Nombre |Clase |Descripción
+|Básica |`.table` |Sólo líneas horizontales entre filas
+
+|Con bordes |`.table-bordered` |Esquinas redondeadas y añade un borde
+exterior
+
+|Rayas de cebra |`.table-striped` |Añade un fondo gris claro a las filas
+impares (1, 3, 5, etc)
+
+|Condensado |`.table-condensed` |Corta el relleno veritcal a la mitad,
+desde 8px a 4px, dentro de todos los elementos `td` y `th`
+
+|Estado hover |`.table-hover` |Añade un fondo gris claro al situarnos
+sobre la fila
+|=======================================================================
+
+Mediante Datatables se incluyen los elementos de paginación y
+botones de acción relacionados.
+
+==== Pestañas de navegación
+
+Trabajamos con las librería Dandelion Datatables, jQuery y su
+integración con Bootstrap.
+
+Las pestañas cargan sus clases CSS mediante jQuery
+_/webapp/scripts/jquery/jquery-ui.js_ y su hoja de estilos
+_../resources/styles/bootstrap/jquery-ui.bootstrap.css_.
+
+Por defecto se emplea la clase CSS `.ui-tabs-nav`.
+
+image::images/bootstrap/tabs.png[title="Ejemplo de pestañas de navegación",role="thumbnail",style="col-md-offset-3 {span5}",options="{options}"]
+unfloat::[]
+
+==== Iconos
+
+Con la integración de Bootstrap en gvNIX tenemos un amplio listado de
+iconos disponibles.
+
+Se utiliza una etiqueta `<span>` para todos los iconos, siempre cuentan con la
+clase CSS común `.glyphicon` más su clase propia que define el icono con el
+prefijo `glyphicon-` . Para usarlo, colocar el siguiente código en cualquier
+lugar:
+
+[source,html]
+--------------------------------------------------------------------------------
+<span class="glyphicon glyphicon-list"></span>
+--------------------------------------------------------------------------------
+
+Podemos incluirlos como:
+
+* icono de acceso rápido en la barra de navegación;
+* un menú de navegación puramente de iconos;
+* para botones con fuerte significado de una acción;
+* con enlaces para compartir contexto;
+* en botones, grupos de botones o para una barra de
+herramientas.
+
+image::images/bootstrap/icons.png[title="Ejemplo de iconos como elementos de la aplicación",role="thumbnail",style="{span1offset} {span10}",options="{options}"]
+unfloat::[]
+
+==== Diálogo modal
+
+Hemos elegido el formato modal de Bootstrap para los diálogos de la
+aplicación.
+
+Este _tag_ se incluye y emplea el _tag_ de Boostrap. Si necesitas
+realizar modificaciones en su estructura HTML o modificar la clases CSS
+dadas, accede al archivo
+_../WEB-INF/tags/bootstrap/dialog/modal/message-box.tagx_.
+
+Por ejemplo, añadimos `.alert-danger` en la cabecera del diálogo:
+
+[source,html]
+--------------------------------------------------------------------------------
+<div class="modal fade" id="${id}"
+  role="dialog" aria-labelledby="ErrorMessage" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="avisocorto modal-header alert-danger">
+        <button type="button" class="close" data-dismiss="modal"
+          aria-hidden="true">
+          &times;
+        </button>
+        <h4 class="modal-title">${title}</h4>
+      </div>
+      <div class="modal-body">
+      ..
+      </div>
+    </div>
+  </div>
+ </div>
+--------------------------------------------------------------------------------
+
+image::images/gvnix/modal-danger.png[title="Ejemplo con diálogo modal personalizado",role="thumbnail",style="{span2offset} {span8}",options="{options}"]
+unfloat::[]
+
+
+
+== Página de inicio
+
+Es posible personalizar la página de inicio de la aplicación a los
+requerimientos del cliente. Empleála según tus necesidades y ajusta su
+maquetación HTML con las múltiples opciones que ofrece Bootstrap para
+mostrar un diseño atractivo y funcional, ya sea con iconos o enlaces a
+las páginas más destacadas o mostrando los datos más relevantes de la
+aplicación.
+
+Para realizar cualquier modificación edita el archivo
+_../webapp/WEB-INF/views/index.jspx_.
+
+Te mostramos algunos ejemplos:
+
+[role="table table-bordered table-hover",cols="<,<,<",options="header",]
+|=======================================================================
+|Imagen |Nombre |Descripción
+|image:images/bootstrap/example-cover.jpg[width=380] |*Portada* |Plantilla
+para crear portadas destacadas al 100% de la página y con texto
+destacado.
+
+|image:images/bootstrap/example-carousel.jpg[width=380] |*Carrusel* |Página
+con un carrusel y una barra de navegación personalizados. Contenidos
+destacados en la parte inferior.
+
+|image:images/bootstrap/example-blog.jpg[width=380] |*Blog* |Página a dos
+columnas con cabecera y navegación personalizadas, con las últimas
+noticias o destacados de la aplicación.
+
+|image:images/bootstrap/example-dashboard.jpg[width=380] |*Dashboard*
+|Diseño para crear paneles de control utilizados en el backend de los
+sitios web. El diseño a dos columnas incluye una barra lateral fija.
+
+|image:images/bootstrap/example-sign-in.jpg[width=380] |*Login* |Página de
+_login_ con un formulario sencillo para introducir usuario y contraseña
+
+|image:images/bootstrap/example-justified-nav.jpg[width=380] |*Marketing*
+|Página con una barra de navegación personalizada y contenidos
+personalizados destacados con enlace a las diferentes secciones de la
+aplicación.
+
+|image:images/gvnix/gvsig-roads.png[width=380] |*Iconos* |Página con iconos
+como enlaces a las principales secciones de la aplicación.
+|=======================================================================
+
+== Diseño adaptativo
+
+gvNIX, con la librería Bootstrap, incluye utilidades para hacer que las
+páginas se adapten a las diferentes resoluciones y nos permite ajustar
+el diseño para su visualización en tablets y dispositivos móviles.
+
+Mediante _mediaqueries_ establecemos los diferentes puntos de ruptura
+en los que la rejilla se transforma para adaptarse a cada dispositivo.
+De este modo, mantenemos el diseño adaptativo a cada resolución, tanto
+de la página como de los elementos que en ella se encuentran.
+
+image::images/gvnix/form-1280.png[title="Resolución de 1280px",role="thumbnail",style="col-md-3",options="{options}"]
+image::images/gvnix/form-768.png[title="Resolución de 768px",role="thumbnail",style="{span1offset} col-md-3",options="{options}"]
+image::images/gvnix/form-480.png[title="Resolución de 480px",role="thumbnail",style="{span1offset} col-md-3",options="{options}"]
+unfloat::[]
+
+En la maquetación de los componentes de gvNIX empleamos diferentes
+clases CSS sobre un mismo elemento, por ejemplo,
+`<div class="col-xs-4 col-sm-3 col-lg-2">` definiendo qué disposición
+sobre el sistema de columnas de Bootstrap se aplicará en cada
+resolución.
+
+[float]
+=== Menús adaptables
+
+Los menús de la aplicación sobre gvNIX emplean `collapse.js` y la clase
+CSS `.row-offcanvas` de Bootstrap para mostrar los menús comprimidos en
+las resoluciones menores.
+
+Para ello integramos el menú y los botones de activación en:
+
+* _default-menu-cols.jspx_ para el botón que muestra el menú sidebar.
+  El menú de navegación aparece en el lateral y se oculta en dispositivos
+  de menor resolución.
+
+[source,html]
+--------------------------------------------------------------------------------
+<header class="navbar navbar-inverse navbar-fixed-top" role="banner">
+  <div class="container">
+
+    <tiles:insertAttribute ignore="true" name="header"/>
+
+    <!-- Toggle button for sidebar menu -->
+    <div class="col-sm-6 col-xs-3 pull-left">
+      <p class="visible-xs">
+        <button type="button" class="btn btn-success btn-xs"
+          data-toggle="offcanvas">Menu</button>
+      </p>
+    </div>
+  </div>
+</header>
+--------------------------------------------------------------------------------
+
+* _menu.tagx_ para el botón que muestra el menú de la cabecera.
+  El menú de navegación aparece en la cabecera y se comprime en dispositivos
+  de menor resolución.
+
+[source,html]
+--------------------------------------------------------------------------------
+  <div class="navbar-header pull-left">
+        <button type="button" class="navbar-toggle" data-toggle="collapse"
+          data-target=".navbar-collapse">
+          <span class="icon-bar">&#160;</span>
+          <span class="icon-bar">&#160;</span>
+          <span class="icon-bar">&#160;</span>
+        </button>
+  </div>
+
+  <div class="navbar-collapse collapse">
+        <ul id="${fn:escapeXml(id)}" class="nav navbar-nav">
+          <jsp:doBody />
+        </ul>
+  </div>
+--------------------------------------------------------------------------------
+
+image::images/bootstrap/header-collapse.png[title="Apariencia del menú superior en resoluciones inferiores",role="thumbnail",style="{span5}",options="{options}"]
+image::images/gvnix/content-container-offcanvas.png[title="Apariencia del menú lateral en resoluciones inferiores al pulsar sobre el botón",role="thumbnail",style="{span1offset} {span5}",options="{options}"]
+unfloat::[]
+
+[float]
+=== Imágenes adaptables
+
+Para adaptar el tamaño de las imágenes automáticamente se debe añadir la
+clase `.img-responsive` a cada imagen que quieras que se comporte de
+manera _responsive_. Esta clase incluye las propiedades
+`max-width: 100%;` y `height: auto;` para que la imagen se escale en
+función del tamaño del elemento en el que se encuentra.
+
