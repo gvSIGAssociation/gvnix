@@ -46,6 +46,8 @@ badges:
       url: es/video-install-gvnix/
     - name: Geoportal in gvNIX <i>(Video)</i>
       url: /en/video-geoportal-gvnix/
+    - name: Video tutorial de gvNIX <i>(Spanish video)</i>
+      url: /en/video-taller-gvnix-jornadas-gvsig/
 
 
   links:
