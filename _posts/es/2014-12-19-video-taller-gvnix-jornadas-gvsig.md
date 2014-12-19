@@ -1,11 +1,11 @@
 ---
 layout: post
 type:	video
-title: "Taller de gvNIX en las 10as Jornadas Int. gvSIG"
+title: "Video tutorial de gvNIX en las 10as Jornadas Int. gvSIG"
 description: "Taller gvNIX"
 category: es
 tags: [geoportal, tutorial, video]
-video: http://youtu.be/J1e7igmax0M
+video: https://www.youtube.com/watch?v=J1e7igmax0M
 comments: true
 share: true
 ---
