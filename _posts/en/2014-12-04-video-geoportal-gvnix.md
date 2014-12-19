@@ -5,7 +5,7 @@ title: "Geoportal with gvNIX"
 description: "Rapid development of geoportals for visualization and data management"
 category: en
 tags: [geoportal, video]
-video: https://www.youtube.com/watch?v=O_mmg9456uc
+video: https://www.youtube.com/watch?v=EhjamgaWMbg
 comments: true
 share: true
 ---
