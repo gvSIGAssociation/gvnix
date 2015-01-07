@@ -334,19 +334,19 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         if (annot instanceof NormalAnnotationExpr) {
 
             return includeFileValidAnnotName(file, type,
-                    ((NormalAnnotationExpr) annot).getName().getName());
+                    ((NormalAnnotationExpr) annot).getName().toString());
 
         }
         else if (annot instanceof MarkerAnnotationExpr) {
 
             return includeFileValidAnnotName(file, type,
-                    ((MarkerAnnotationExpr) annot).getName().getName());
+                    ((MarkerAnnotationExpr) annot).getName().toString());
 
         }
         else if (annot instanceof SingleMemberAnnotationExpr) {
 
             return includeFileValidAnnotName(file, type,
-                    ((SingleMemberAnnotationExpr) annot).getName().getName());
+                    ((SingleMemberAnnotationExpr) annot).getName().toString());
         }
 
         return false;
