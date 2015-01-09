@@ -15,3 +15,7 @@ support for applications with geographic component Geo in 1.4.0 Release.
 
 This new feature allows the rapid development of geoportals
 for visualization and data management.
+
+NOTE: The conference only is available in Spanish.
+
+
