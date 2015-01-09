@@ -15,3 +15,7 @@ presentó la versión 1.4.0 con soporte para aplicaciones con componente geográ
 
 Esta nueva funcionalidad permite el desarrollo rápido de geoportales
 para la visualización y gestión de datos.
+
+Más información sobre el material necesario para el taller en esta [entrada](http://www.gvnix.org/es/taller-gvnix-jornadas-gvsig/)
+
+
