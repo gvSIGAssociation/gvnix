@@ -1559,7 +1559,8 @@ public class DatatablesMetadata extends
 
         // Include Item in parameters to use spring's binder to get baseFilter
         // values
-        parameterNames.add(new JavaSymbolName(entityName));
+        parameterNames.add(new JavaSymbolName(StringUtils
+                .uncapitalize(entityName)));
 
         // Add method javadoc (not generated to disk because #10229)
         CommentStructure comments = new CommentStructure();
@@ -4031,7 +4032,8 @@ public class DatatablesMetadata extends
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(CRITERIA_PARAM_NAME);
-        parameterNames.add(new JavaSymbolName(entityName));
+        parameterNames.add(new JavaSymbolName(StringUtils
+                .uncapitalize(entityName)));
         parameterNames.add(REQUEST_PARAM_NAME);
 
         // Create the method body
@@ -4174,7 +4176,7 @@ public class DatatablesMetadata extends
     private String buildFindByCriteriaCallMethodBody(
             InvocableMemberBodyBuilder bodyBuilder, boolean baseSearch) {
         final String entityTypeName = helper.getFinalTypeName(entity);
-        JavaType serachResult = new JavaType(
+        JavaType searchResult = new JavaType(
                 SEARCH_RESULTS.getFullyQualifiedTypeName(), 0, DataType.TYPE,
                 null, Arrays.asList(entity));
 
@@ -4193,7 +4195,7 @@ public class DatatablesMetadata extends
                 bodyBuilder
                         .appendFormalLine(String
                                 .format("%s searchResult = %s.findByCriteria(entity, %s.%s(), %s, baseSearch);",
-                                        helper.getFinalTypeName(serachResult),
+                                        helper.getFinalTypeName(searchResult),
                                         helper.getFinalTypeName(DATATABLES_UTILS),
                                         entityTypeName,
                                         entityEntityManagerMethod
@@ -4210,7 +4212,8 @@ public class DatatablesMetadata extends
                         .appendFormalLine(String
                                 .format("%s baseSearchValuesMap = getPropertyMap(%s, request);",
                                         helper.getFinalTypeName(MAP_STRING_OBJECT),
-                                        entityName));
+                                        new JavaSymbolName(StringUtils
+                                                .uncapitalize(entityName))));
 
                 // setVisitFilters(baseSearchValuesMap);
                 bodyBuilder
@@ -4219,7 +4222,7 @@ public class DatatablesMetadata extends
                 bodyBuilder
                         .appendFormalLine(String
                                 .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.%s(), %s, baseSearchValuesMap, conversionService_dtt, messageSource_dtt);",
-                                        helper.getFinalTypeName(serachResult),
+                                        helper.getFinalTypeName(searchResult),
                                         helper.getFinalTypeName(DATATABLES_UTILS),
                                         entityTypeName, filterByInfo,
                                         orderByInfo, entityTypeName,
@@ -4238,7 +4241,7 @@ public class DatatablesMetadata extends
                 bodyBuilder
                         .appendFormalLine(String
                                 .format("%s searchResult = %s.findByCriteria(entity, %s.%s(), %s, baseSearch);",
-                                        helper.getFinalTypeName(serachResult),
+                                        helper.getFinalTypeName(searchResult),
                                         helper.getFinalTypeName(DATATABLES_UTILS),
                                         entityTypeName,
                                         entityEntityManagerMethod
@@ -4254,7 +4257,7 @@ public class DatatablesMetadata extends
                         .appendFormalLine(String
                                 .format("%s baseSearchValuesMap = getPropertyMap(%s, request);",
                                         helper.getFinalTypeName(MAP_STRING_OBJECT),
-                                        entityName));
+                                        StringUtils.uncapitalize(entityName)));
 
                 // setVisitFilters(baseSearchValuesMap);
                 bodyBuilder
@@ -4263,7 +4266,7 @@ public class DatatablesMetadata extends
                 bodyBuilder
                         .appendFormalLine(String
                                 .format("%s searchResult = %s.findByCriteria(%s.class, %s.%s(), %s, baseSearchValuesMap, conversionService_dtt, messageSource_dtt);",
-                                        helper.getFinalTypeName(serachResult),
+                                        helper.getFinalTypeName(searchResult),
                                         helper.getFinalTypeName(DATATABLES_UTILS),
                                         entityTypeName, entityTypeName,
                                         entityEntityManagerMethod
@@ -4648,10 +4651,10 @@ public class DatatablesMetadata extends
         throwsTypes.add(DATATABLES_EXPORT_EXCEPTION);
 
         // Define method parameter names
-        JavaSymbolName entityNameParam = new JavaSymbolName(entityName);
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(CRITERIA_PARAM_NAME);
-        parameterNames.add(entityNameParam);
+        parameterNames.add(new JavaSymbolName(StringUtils
+                .uncapitalize(entityName)));
         parameterNames.add(REQUEST_PARAM_NAME);
         parameterNames.add(RESPONSE_PARAM_NAME);
 
@@ -4666,7 +4669,7 @@ public class DatatablesMetadata extends
                 .concat(", new %s(), %s, %s);");
         bodyBuilder.appendFormalLine(String.format(format,
                 CRITERIA_PARAM_NAME.getSymbolName(),
-                entityNameParam.getSymbolName(),
+                StringUtils.uncapitalize(entityName),
                 helper.getFinalTypeName(DATATABLES_EXPORT_TYPE),
                 helper.getFinalTypeName(exportTypeJavaType),
                 REQUEST_PARAM_NAME.getSymbolName(),
@@ -4729,10 +4732,10 @@ public class DatatablesMetadata extends
         throwsTypes.add(DATATABLES_EXPORT_EXCEPTION);
 
         // Define method parameter names
-        JavaSymbolName entityNameParam = new JavaSymbolName(entityName);
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(CRITERIA_PARAM_NAME);
-        parameterNames.add(entityNameParam);
+        parameterNames.add(new JavaSymbolName(StringUtils
+                .uncapitalize(entityName)));
         parameterNames.add(DATATABLES_EXPORT_TYPE_NAME);
         parameterNames.add(DATATABLES_EXPORT_NAME);
         parameterNames.add(REQUEST_PARAM_NAME);
@@ -4754,8 +4757,9 @@ public class DatatablesMetadata extends
         String format = "%s data = retrieveData(%s, %s, %s);";
         bodyBuilder.appendFormalLine(String.format(format, helper
                 .getFinalTypeName(LIST_MAP_STRING_STRING), CRITERIA_PARAM_NAME
-                .getSymbolName(), new JavaSymbolName(entityName)
-                .getSymbolName(), REQUEST_PARAM_NAME.getSymbolName()));
+                .getSymbolName(),
+                new JavaSymbolName(StringUtils.uncapitalize(entityName)),
+                REQUEST_PARAM_NAME.getSymbolName()));
 
         /*
          * // 2. Build an instance of "ExportConf". ExportConf exportConf = new
@@ -4771,7 +4775,7 @@ public class DatatablesMetadata extends
                 helper.getFinalTypeName(DATATABLES_EXPORT_CONF),
                 DATATABLES_EXPORT_TYPE_NAME.getSymbolName(),
                 DATATABLES_EXPORT_NAME.getSymbolName(),
-                entityNameParam.getSymbolName()));
+                StringUtils.uncapitalize(entityName)));
 
         /*
          * // 3. Build an instance of "HtmlTable" HtmlTable table =
