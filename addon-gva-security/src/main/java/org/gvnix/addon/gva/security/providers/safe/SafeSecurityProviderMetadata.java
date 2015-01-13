@@ -45,7 +45,7 @@ import org.springframework.roo.project.LogicalPath;
 
 /**
  * ITD generator for {@link GvNIXPasswordHandlerSAFE} annotation.
- *
+ * 
  * @author gvNIX Team
  * @since 1.1.0
  */
@@ -199,7 +199,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Gets <code>additionalAuthenticationChecks</code> method. <br>
-     *
+     * 
      * @return
      */
     private MethodMetadata getAdditionalAuthenticationChecksMethod() {
@@ -252,7 +252,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Gets <code>retrieveUser</code> method. <br>
-     *
+     * 
      * @return
      */
     private MethodMetadata getRetrieveUserMethod() {
@@ -305,7 +305,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Gets <code>setSecurity</code> method. <br>
-     *
+     * 
      * @return
      */
     private MethodMetadata getSetSecurityMethod() {
@@ -352,7 +352,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Gets <code>convertWSInfoToUser</code> method. <br>
-     *
+     * 
      * @return
      */
     private MethodMetadata getConvertWSInfoToUserMethod() {
@@ -405,7 +405,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Gets <code>convertWSInfoToUserTodasAplicaciones</code> method. <br>
-     *
+     * 
      * @return
      */
     private MethodMetadata getConvertWSInfoToUserTodasAplicacionesMethod() {
@@ -458,7 +458,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Gets <code>additionalAuthenticationChecks</code> method. <br>
-     *
+     * 
      * @return
      */
     private MethodMetadata getConvertToApplicationRolMethod() {
@@ -503,7 +503,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Gets <code>getSafeProperties</code> method. <br>
-     *
+     * 
      * @return
      */
     private MethodMetadata getGetSafePropertiesMethod() {
@@ -548,7 +548,7 @@ public class SafeSecurityProviderMetadata extends
     /**
      * Builds body method for <code>buildAdditionalAuthenticationChecks</code>
      * method. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildAdditionalAuthenticationChecksMethodBody(
@@ -594,7 +594,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Builds body method for <code>retrieveUser</code> method. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildRetrieveUserMethodBody(
@@ -621,13 +621,13 @@ public class SafeSecurityProviderMetadata extends
         bodyBuilder.appendFormalLine("token = requestParts[1];");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
-        bodyBuilder.appendFormalLine("String presentedPassword = authentication.getCredentials().toString();");
+        bodyBuilder
+                .appendFormalLine("String presentedPassword = authentication.getCredentials().toString();");
         bodyBuilder.appendFormalLine("if(getActive()){");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("try {");
         bodyBuilder.appendFormalLine("");
         bodyBuilder.indent();
-
 
         // AutenticacionArangiService autService = new
         // AutenticacionArangiService(
@@ -984,7 +984,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Builds body method for <code>setSecurity</code> method. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildSetSecurityMethodBody(
@@ -1072,7 +1072,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Builds body method for <code>convertWsInfoUser</code> method. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildConvertWSInfoToUserMethodBody(
@@ -1192,7 +1192,7 @@ public class SafeSecurityProviderMetadata extends
     /**
      * Builds body method for <code>convertWSInfoToUserTodasAplicaciones</code>
      * method. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildConvertWSInfoToUserTodasAplicacionesMethodBody(
@@ -1310,7 +1310,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Builds body method for <code>convertToApplicationRol</code> method. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildConvertToApplicationRolMethodBody(
@@ -1381,7 +1381,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Builds body method for <code>getSafeProperties</code> method. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildGetSafePropertiesMethodBody(
@@ -1429,7 +1429,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Gets all getters methods. <br>
-     *
+     * 
      * @return
      */
     private MethodMetadata getGetterMethod(String propertyName,
@@ -1477,7 +1477,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Gets all setters methods. <br>
-     *
+     * 
      * @return
      */
     private MethodMetadata getSetterMethod(String propertyName,
@@ -1528,7 +1528,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Builds body method for all getters methods. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildGetterMethodBody(InvocableMemberBodyBuilder bodyBuilder,
@@ -1540,7 +1540,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Builds body method for all setters methods. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildSetterMethodBody(InvocableMemberBodyBuilder bodyBuilder,
@@ -1552,7 +1552,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Create metadata for a field definition.
-     *
+     * 
      * @return a FieldMetadata object
      */
     private FieldMetadata getField(String name, String value,
@@ -1568,7 +1568,7 @@ public class SafeSecurityProviderMetadata extends
      * Gets or creates a field based on parameters.<br>
      * First try to get a suitable field (by name and type). If not found create
      * a new one (adding a counter to name if it's needed)
-     *
+     * 
      * @param fielName
      * @param fieldType
      * @param initializer (String representation)
@@ -1630,7 +1630,7 @@ public class SafeSecurityProviderMetadata extends
 
     /**
      * Gets final names to use of a type in method body after import resolver.
-     *
+     * 
      * @param type
      * @return name to use in method body
      */
