@@ -40,6 +40,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.web.menu.roo.addon.listeners.MenuDependencyListener;
 import org.gvnix.web.menu.roo.addon.util.FilenameUtils;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
@@ -136,6 +137,12 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * gvNIX menu component already activated ?
      */
     private static boolean isRooMenuDisabled = false;
+
+    /**
+     * Uses to ensure that dependencyListener will be loaded
+     */
+    @Reference
+    private MenuDependencyListener dependencyListener;
 
     // Public operations -----
 

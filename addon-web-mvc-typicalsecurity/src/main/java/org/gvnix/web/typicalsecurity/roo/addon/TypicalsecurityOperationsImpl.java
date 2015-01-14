@@ -26,6 +26,8 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.WebProjectUtils;
+import org.gvnix.web.typicalsecurity.roo.addon.listeners.TypicalSecurityDependencyListener;
 import org.gvnix.web.typicalsecurity.roo.addon.utils.TokenReplacementFileCopyUtils;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.process.manager.FileManager;
@@ -43,8 +45,6 @@ import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import org.gvnix.support.WebProjectUtils;
 
 /**
  * Implementation of commands that are available via the Roo shell.
@@ -66,6 +66,12 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
     private ProjectOperations projectOperations;
     @Reference
     private Shell shell;
+
+    /**
+     * Uses to ensure that dependencyListener will be loaded
+     */
+    @Reference
+    private TypicalSecurityDependencyListener dependencyListener;
 
     /*
      * Not available since Roo 1.1.2 (See ROO-2066)

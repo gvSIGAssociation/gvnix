@@ -18,15 +18,19 @@
  */
 package org.gvnix.addon.datatables.listeners;
 
+import java.util.logging.Logger;
+
 import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.datatables.DatatablesOperations;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
-import org.springframework.roo.metadata.MetadataNotificationListener;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Check for Bootstrap dependency changes to update Datatables.
@@ -38,26 +42,30 @@ import org.springframework.roo.project.ProjectOperations;
  */
 @Component
 @Service
-public class DependencyListenerImpl implements MetadataNotificationListener {
+public class DependencyListenerImpl implements DatatablesDependencyListener {
 
-    @Reference
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(DependencyListenerImpl.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference
     private ProjectOperations projectOperations;
 
     /**
      * Use PageOperations to execute operations
      */
-    @Reference
     private DatatablesOperations operations;
 
-    protected void activate(ComponentContext context) {
-        this.metadataDependencyRegistry.addNotificationListener(this);
+    protected void activate(final ComponentContext context) {
+        this.context = context.getBundleContext();
+        getMetadataDependencyRegistry().addNotificationListener(this);
     }
 
     protected void deactivate(ComponentContext context) {
-        this.metadataDependencyRegistry.removeNotificationListener(this);
+        getMetadataDependencyRegistry().removeNotificationListener(this);
     }
 
     /**
@@ -67,12 +75,94 @@ public class DependencyListenerImpl implements MetadataNotificationListener {
     public void notify(String upstreamDependency, String downstreamDependency) {
         // Check if is project metadata
         if (ProjectMetadata.isValid(upstreamDependency)) {
-            if (projectOperations
-                    .isFeatureInstalledInFocusedModule("gvnix-bootstrap")
-                    && projectOperations
-                            .isFeatureInstalledInFocusedModule("gvnix-datatables")) {
-                operations.updateDatatablesAddonToBootstrap();
+            if (getProjectOperations().isFeatureInstalledInFocusedModule(
+                    "gvnix-bootstrap")
+                    && getProjectOperations()
+                            .isFeatureInstalledInFocusedModule(
+                                    "gvnix-datatables")) {
+                getDatatablesOperations().updateDatatablesAddonToBootstrap();
             }
+        }
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference[] references = context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference ref : references) {
+                    metadataDependencyRegistry = (MetadataDependencyRegistry) context
+                            .getService(ref);
+                    return metadataDependencyRegistry;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on DependencyListenerImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference[] references = context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference ref : references) {
+                    projectOperations = (ProjectOperations) context
+                            .getService(ref);
+                    return projectOperations;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on DependencyListenerImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public DatatablesOperations getDatatablesOperations() {
+        if (operations == null) {
+            // Get all Services implement DatatablesOperations interface
+            try {
+                ServiceReference[] references = context
+                        .getAllServiceReferences(
+                                DatatablesOperations.class.getName(), null);
+
+                for (ServiceReference ref : references) {
+                    operations = (DatatablesOperations) context.getService(ref);
+                    return operations;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load DatatablesOperations on DependencyListenerImpl.");
+                return null;
+            }
+        }
+        else {
+            return operations;
         }
     }
 }

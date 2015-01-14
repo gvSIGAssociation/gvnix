@@ -23,10 +23,14 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.geo.listeners.GeoDependencyListener;
 import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.OperationUtils;
 import org.gvnix.support.WebProjectUtils;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.converter.RooConversionService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
@@ -42,7 +46,6 @@ import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
@@ -69,11 +72,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of GEO Addon operations
@@ -145,6 +143,12 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     private static final JavaType MAP_VIEWER_ANNOTATION = new JavaType(
             GvNIXMapViewer.class.getName());
+
+    /**
+     * Uses to ensure that dependencyListener will be loaded
+     */
+    @Reference
+    private GeoDependencyListener dependencyListener;
 
     protected void activate(final ComponentContext componentContext) {
         cContext = componentContext;

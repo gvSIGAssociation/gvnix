@@ -16,33 +16,33 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.addon.geo.listeners;
+package org.gvnix.web.menu.roo.addon.listeners;
 
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.addon.geo.GeoOperations;
+import org.gvnix.web.menu.roo.addon.MenuEntryOperations;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.project.ProjectMetadata;
-import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
- * Check for Bootstrap dependency changes to update Geo Components.
+ * Check for Spring Security dependency changes to update menu artifacts.
  * 
- * @author Juan Carlos García( jcgarcia at disid dot com ) at <a
+ * @author Enrique Ruiz( eruiz at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
 @Component
 @Service
-public class DependencyListenerImpl implements GeoDependencyListener {
+public class DependencyListenerImpl implements MenuDependencyListener {
 
     private static final Logger LOGGER = HandlerUtils
             .getLogger(DependencyListenerImpl.class);
@@ -52,12 +52,12 @@ public class DependencyListenerImpl implements GeoDependencyListener {
 
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    private ProjectOperations projectOperations;
-
     /**
      * Use PageOperations to execute operations
      */
-    private GeoOperations operations;
+    private MenuEntryOperations operations;
+
+    private Boolean hasSpringSecurity = null;
 
     protected void activate(final ComponentContext context) {
         this.context = context.getBundleContext();
@@ -75,11 +75,16 @@ public class DependencyListenerImpl implements GeoDependencyListener {
     public void notify(String upstreamDependency, String downstreamDependency) {
         // Check if is project metadata
         if (ProjectMetadata.isValid(upstreamDependency)) {
-            if (getProjectOperations().isFeatureInstalledInFocusedModule(
-                    "gvnix-bootstrap")
-                    && getGeoOperations().isInstalledInModule(
-                            "gvnix-geo-component")) {
-                getGeoOperations().updateGeoAddonToBootstrap();
+            if (getMenuEntryOperations().isGvNixMenuAvailable()) {
+                // if dependency changes or its first call
+                if (!ObjectUtils.equals(getMenuEntryOperations()
+                        .isSpringSecurityInstalled(), hasSpringSecurity)) {
+                    LOGGER.finest("Spring Security changed or startup");
+                    // update hasSpringSecurity variable and update artifacts
+                    hasSpringSecurity = getMenuEntryOperations()
+                            .isSpringSecurityInstalled();
+                    getMenuEntryOperations().createWebArtefacts("~.web.menu");
+                }
             }
         }
     }
@@ -112,43 +117,16 @@ public class DependencyListenerImpl implements GeoDependencyListener {
         }
     }
 
-    public ProjectOperations getProjectOperations() {
-        if (projectOperations == null) {
-            // Get all Services implement ProjectOperations interface
+    public MenuEntryOperations getMenuEntryOperations() {
+        if (operations == null) {
+            // Get all Services implement MenuEntryOperations interface
             try {
                 ServiceReference[] references = context
                         .getAllServiceReferences(
-                                ProjectOperations.class.getName(), null);
+                                MenuEntryOperations.class.getName(), null);
 
                 for (ServiceReference ref : references) {
-                    projectOperations = (ProjectOperations) context
-                            .getService(ref);
-                    return projectOperations;
-                }
-
-                return null;
-
-            }
-            catch (InvalidSyntaxException e) {
-                LOGGER.warning("Cannot load ProjectOperations on DependencyListenerImpl.");
-                return null;
-            }
-        }
-        else {
-            return projectOperations;
-        }
-    }
-
-    public GeoOperations getGeoOperations() {
-        if (operations == null) {
-            // Get all Services implement GeoOperations interface
-            try {
-                ServiceReference[] references = context
-                        .getAllServiceReferences(GeoOperations.class.getName(),
-                                null);
-
-                for (ServiceReference ref : references) {
-                    operations = (GeoOperations) context.getService(ref);
+                    operations = (MenuEntryOperations) context.getService(ref);
                     return operations;
                 }
 
@@ -156,7 +134,7 @@ public class DependencyListenerImpl implements GeoDependencyListener {
 
             }
             catch (InvalidSyntaxException e) {
-                LOGGER.warning("Cannot load GeoOperations on DependencyListenerImpl.");
+                LOGGER.warning("Cannot load MenuEntryOperations on DependencyListenerImpl.");
                 return null;
             }
         }

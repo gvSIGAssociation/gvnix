@@ -1,19 +1,27 @@
 package org.gvnix.addon.bootstrap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.bootstrap.listener.BootstrapDependencyListener;
 import org.gvnix.support.WebProjectUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
-import org.osgi.framework.*;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.*;
+import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -40,6 +48,12 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     private MetadataService metadataService;
 
     private ProjectOperations projectOperations;
+
+    /**
+     * Uses to ensure that dependencyListener will be loaded
+     */
+    @Reference
+    private BootstrapDependencyListener dependencyListener;
 
     private static final Logger LOGGER = Logger
             .getLogger(BootstrapOperationsImpl.class.getName());

@@ -18,15 +18,19 @@
  */
 package org.gvnix.web.typicalsecurity.roo.addon.listeners;
 
+import java.util.logging.Logger;
+
 import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.web.typicalsecurity.roo.addon.TypicalsecurityOperations;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
-import org.springframework.roo.metadata.MetadataNotificationListener;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Check for Bootstrap dependency changes to update Datatables.
@@ -38,26 +42,31 @@ import org.springframework.roo.project.ProjectOperations;
  */
 @Component
 @Service
-public class DependencyListenerImpl implements MetadataNotificationListener {
+public class DependencyListenerImpl implements
+        TypicalSecurityDependencyListener {
 
-    @Reference
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(DependencyListenerImpl.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference
     private ProjectOperations projectOperations;
 
     /**
      * Use PageOperations to execute operations
      */
-    @Reference
     private TypicalsecurityOperations operations;
 
-    protected void activate(ComponentContext context) {
-        this.metadataDependencyRegistry.addNotificationListener(this);
+    protected void activate(final ComponentContext context) {
+        this.context = context.getBundleContext();
+        getMetadataDependencyRegistry().addNotificationListener(this);
     }
 
     protected void deactivate(ComponentContext context) {
-        this.metadataDependencyRegistry.removeNotificationListener(this);
+        getMetadataDependencyRegistry().removeNotificationListener(this);
     }
 
     /**
@@ -67,12 +76,96 @@ public class DependencyListenerImpl implements MetadataNotificationListener {
     public void notify(String upstreamDependency, String downstreamDependency) {
         // Check if is project metadata
         if (ProjectMetadata.isValid(upstreamDependency)) {
-            if (projectOperations
-                    .isFeatureInstalledInFocusedModule("gvnix-bootstrap")
-                    && operations.isTypicalSecurityInstalled()
-                    && !operations.isLoginModified()) {
-                operations.updateTypicalSecurityAddonToBootstrap();
+            if (getProjectOperations().isFeatureInstalledInFocusedModule(
+                    "gvnix-bootstrap")
+                    && getTypicalsecurityOperations()
+                            .isTypicalSecurityInstalled()
+                    && !getTypicalsecurityOperations().isLoginModified()) {
+                getTypicalsecurityOperations()
+                        .updateTypicalSecurityAddonToBootstrap();
             }
+        }
+    }
+
+    public MetadataDependencyRegistry getMetadataDependencyRegistry() {
+        if (metadataDependencyRegistry == null) {
+            // Get all Services implement MetadataDependencyRegistry interface
+            try {
+                ServiceReference[] references = context
+                        .getAllServiceReferences(
+                                MetadataDependencyRegistry.class.getName(),
+                                null);
+
+                for (ServiceReference ref : references) {
+                    metadataDependencyRegistry = (MetadataDependencyRegistry) context
+                            .getService(ref);
+                    return metadataDependencyRegistry;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MetadataDependencyRegistry on DependencyListenerImpl.");
+                return null;
+            }
+        }
+        else {
+            return metadataDependencyRegistry;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference[] references = context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference ref : references) {
+                    projectOperations = (ProjectOperations) context
+                            .getService(ref);
+                    return projectOperations;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on DependencyListenerImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public TypicalsecurityOperations getTypicalsecurityOperations() {
+        if (operations == null) {
+            // Get all Services implement TypicalsecurityOperations interface
+            try {
+                ServiceReference[] references = context
+                        .getAllServiceReferences(
+                                TypicalsecurityOperations.class.getName(), null);
+
+                for (ServiceReference ref : references) {
+                    operations = (TypicalsecurityOperations) context
+                            .getService(ref);
+                    return operations;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypicalsecurityOperations on DependencyListenerImpl.");
+                return null;
+            }
+        }
+        else {
+            return operations;
         }
     }
 }
