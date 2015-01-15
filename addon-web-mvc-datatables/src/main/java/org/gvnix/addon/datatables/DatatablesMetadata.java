@@ -4802,7 +4802,7 @@ public class DatatablesMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PRIVATE, EXPORT_METHOD_NAME,
+                getId(), Modifier.PUBLIC, EXPORT_METHOD_NAME,
                 JavaType.VOID_PRIMITIVE, parameterTypes, parameterNames,
                 bodyBuilder);
         methodBuilder.setThrowsTypes(throwsTypes);
