@@ -2632,9 +2632,9 @@ public class DatatablesMetadata extends
                             expBuilder.append(fHelper
                                     .getEqualExpression(fieldName));
                         }
-                        // filterCondition.and( {exp});
-                        bodyBuilder.appendFormalLine(fHelper
-                                .getDslAnd(expBuilder.toString()));
+                        // Creating Basesearch expression
+                        createBaseSearchExpressionWithNullCheck(bodyBuilder,
+                                fHelper, lastFieldToken, expBuilder, "and");
                         expBuilder = null;
                         isConditionApplied = true;
                     }
@@ -2644,15 +2644,19 @@ public class DatatablesMetadata extends
                             expBuilder.append(fHelper
                                     .getEqualExpression(fieldName));
                         }
-                        bodyBuilder.appendFormalLine(fHelper
-                                .getDslOr(expBuilder.toString()));
+                        // Creating Basesearch expression
+                        createBaseSearchExpressionWithNullCheck(bodyBuilder,
+                                fHelper, lastFieldToken, expBuilder, "or");
                         expBuilder = null;
                         isConditionApplied = true;
                     }
                     else if (reservedToken.equalsIgnoreCase("Between")) {
                         // use .between(minField,maxField) expression
-                        expBuilder.append(fHelper
-                                .getBetweenExpression(fieldName));
+                        createBaseSearchExpressionWithNullCheck(bodyBuilder,
+                                fHelper, lastFieldToken, expBuilder, "between");
+                        expBuilder = null;
+                        isConditionApplied = true;
+
                     }
                     else if (reservedToken.equalsIgnoreCase("Like")) {
                         // use .like() expression
@@ -2731,14 +2735,80 @@ public class DatatablesMetadata extends
             isConditionApplied = false;
         }
         if (!isConditionApplied) {
+            createBaseSearchExpressionWithNullCheck(bodyBuilder, fHelper,
+                    lastFieldToken, expBuilder, "and");
+        }
+    }
+
+    private void createBaseSearchExpressionWithNullCheck(
+            InvocableMemberBodyBuilder bodyBuilder, FinderToDslHelper fHelper,
+            FieldToken lastFieldToken, StringBuilder expBuilder,
+            String operation) {
+
+        // Getting fieldName and fieldType
+        String fieldName = lastFieldToken.getField().getFieldName()
+                .getSymbolName();
+        JavaType fieldType = lastFieldToken.getField().getFieldType();
+
+        // Booleans doesn't need null validation
+        if (JavaType.BOOLEAN_PRIMITIVE.equals(fieldType)
+                || JavaType.BOOLEAN_OBJECT.equals(fieldType)) {
+            bodyBuilder.appendFormalLine(fHelper.getDslAnd(expBuilder
+                    .toString()));
+        }
+        else {
+
+            String nullExpression = "";
+            String dslOperation = "";
+            String dslOperationNull = "";
+            String nullValidation = "";
+
+            if ("and".equals(operation)) {
+                nullExpression = String.format("entity%s.isNull()",
+                        fHelper.getDslGetterFor(fieldName, fieldType));
+                dslOperation = fHelper.getDslAnd(expBuilder.toString());
+                dslOperationNull = fHelper.getDslAnd(nullExpression);
+                nullValidation = String.format("if(%s != null){", fieldName);
+            }
+            else if ("or".equals(operation)) {
+                nullExpression = String.format("entity%s.isNull()",
+                        fHelper.getDslGetterFor(fieldName, fieldType));
+                dslOperation = fHelper.getDslOr(expBuilder.toString());
+                dslOperationNull = fHelper.getDslOr(nullExpression);
+                nullValidation = String.format("if(%s != null){", fieldName);
+            }
+            else if ("between".equals(operation)) {
+                // Getting min max variables
+                String capitalized = StringUtils.capitalize(fieldName);
+                String min = "min".concat(capitalized);
+                String max = "max".concat(capitalized);
+                // Generating expression
+                expBuilder.append(fHelper.getBetweenExpression(fieldName));
+                nullExpression = String.format("entity%s.isNull()",
+                        fHelper.getDslGetterFor(fieldName, fieldType));
+                dslOperation = fHelper.getDslAnd(expBuilder.toString());
+                dslOperationNull = fHelper.getDslAnd(nullExpression);
+                nullValidation = String.format("if(%s != null && %s != null){",
+                        min, max);
+            }
+
             // There is an expression not included in predicate yet.
             // Include it using "and" join
-            if (expBuilder != null) {
+            if (expBuilder != null && StringUtils.isNotBlank(nullExpression)) {
+                bodyBuilder.appendFormalLine(nullValidation);
                 // filterCondition.and( {exp});
-                bodyBuilder.appendFormalLine(fHelper.getDslAnd(expBuilder
-                        .toString()));
+                bodyBuilder.indent();
+                bodyBuilder.appendFormalLine(dslOperation);
+
+                bodyBuilder.indentRemove();
+                bodyBuilder.appendFormalLine("}else{");
+                bodyBuilder.indent();
+                bodyBuilder.appendFormalLine(dslOperationNull);
+                bodyBuilder.indentRemove();
+                bodyBuilder.appendFormalLine("}");
             }
         }
+
     }
 
     /**

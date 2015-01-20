@@ -58,7 +58,7 @@ public class FinderToDslHelper {
 
     public Object getLikeExpression(String fieldName) {
         return ".like(\"%\".concat(".concat(fieldName).concat(
-                ").concat(\"%\"))");
+                ").toLowerCase().concat(\"%\"))");
     }
 
     public Object getBetweenExpression(String fieldName) {
