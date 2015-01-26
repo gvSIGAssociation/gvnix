@@ -34,14 +34,19 @@
       <version>2.0.0.BUILD-SNAPSHOT</version>
       <relativePath>../gvnix-osgi-bundles</relativePath>
     </parent>
-	<artifactId>org.gvnix.flex.roo.addon</artifactId>
-	<packaging>bundle</packaging>
-	<name>gvNIX - Spring Roo - Addon - Flex</name>
+	<artifactId>org.gvnix.flex</artifactId>
+	<packaging>pom</packaging>
+	<name>gvNIX - Spring Roo - Parent - Flex</name>
 	<organization>
 	  <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
 	</organization>
 	<description>Generation of Spring based RIAs with Flex</description>
   	<url>http://www.gvnix.org</url>
+  	
+  	<modules>
+  		<module>addon</module>
+  		<module>annotations</module>
+  	</modules>
   	
   	<repositories>
 		<repository>
@@ -122,97 +127,6 @@
       </repository>
     </distributionManagement>
 
-	<build>
-	
-    	<!-- DiSiD: Add webdav extension to google code  -->
-        <extensions>
-          <extension>
-            <groupId>org.apache.maven.wagon</groupId>
-            <artifactId>wagon-webdav-jackrabbit</artifactId>
-            <version>2.3</version>
-          </extension>
-        </extensions>
-        
-        <plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>1.3.2</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<includes>
-									<include>antlr:antlr</include>
-									<include>org.antlr:*</include>
-									<include>uk.co.badgersinfoil.metaas:metaas</include>
-								</includes>
-							</artifactSet>
-							<relocations>
-								<relocation>
-									<pattern>antlr</pattern>
-									<shadedPattern>org.gvnix.flex.roo.addon.antlr2</shadedPattern>
-								</relocation>
-								<relocation>
-									<pattern>org.antlr</pattern>
-									<shadedPattern>org.gvnix.flex.roo.addon.antlr</shadedPattern>
-								</relocation>
-								<relocation>
-									<pattern>org.asdt</pattern>
-									<shadedPattern>org.gvnix.flex.roo.addon.asdt</shadedPattern>
-								</relocation>
-								<relocation>
-									<pattern>uk.co.badgersinfoil.metaas</pattern>
-									<shadedPattern>org.gvnix.flex.roo.addon.metaas</shadedPattern>
-								</relocation>
-							</relocations>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.3.6</version>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-						<Bundle-Copyright>Copyright ${project.organization.name}. All Rights Reserved.</Bundle-Copyright>
-			            <Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
-						<Bundle-DocURL>${project.url}</Bundle-DocURL>
-						<Export-Package>${project.artifactId}.*;version=${project.version}</Export-Package>
-						<Import-Package>!uk.co.badgersinfoil.*,!org.antlr.*,!antlr.*,*</Import-Package>
-					</instructions>
-		            <remoteOBR>true</remoteOBR>
-          			<bundleUrl>httppgp://${google.code.project.name}.googlecode.com/svn/repo/org/gvnix/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar</bundleUrl>
-				</configuration>
-			</plugin>
-		</plugins>
-		
-		<!-- DiSiD: Add build resources filtering -->
-	    <resources>
-	      <resource>
-	        <directory>src/main/resources</directory>
-	        <filtering>false</filtering>
-	        <excludes>
-	          <exclude>**/roo/addon/dependencies.xml</exclude>
-	        </excludes>
-	      </resource>
-	      <resource>
-	        <directory>src/main/resources</directory>
-	        <filtering>true</filtering>
-	        <includes>
-	          <include>**/roo/addon/dependencies.xml</include>
-	        </includes>
-	      </resource>
-	    </resources>
-
-	</build>
 
   	<!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
 	<properties>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <licenses>
+    <license>
+      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <distribution>repo</distribution>
+      <comments>
+      <![CDATA[
+      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+      i Transport - Generalitat Valenciana
+      Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program. If not, see <http://www.gnu.org/licenses />.
+      ]]>
+      </comments>
+    </license>
+  </licenses>
+    <parent>
+      <groupId>org.gvnix</groupId>
+   	  <artifactId>org.gvnix.flex</artifactId>
+      <version>2.0.0.BUILD-SNAPSHOT</version>
+      <relativePath>../../addon-flex</relativePath>
+    </parent>
+	<artifactId>org.gvnix.flex.addon</artifactId>
+	<packaging>bundle</packaging>
+	<name>gvNIX - Spring Roo - Addon - Flex</name>
+	<organization>
+	  <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
+	</organization>
+	<description>Generation of Spring based RIAs with Flex</description>
+  	<url>http://www.gvnix.org</url>
+  	
+
+  <properties>
+	<target.jar.directory>${basedir}/../../target/all</target.jar.directory>  
+	<devel.resources.path>../../devel-resources</devel.resources.path>
+  </properties>
+  
+  <dependencies>
+  	<dependency>
+  		<groupId>org.gvnix</groupId>
+  		<artifactId>org.gvnix.flex.annotations</artifactId>
+  		<version>${gvnix.version}</version>
+  	</dependency>
+  </dependencies>
+  
+  <build>
+	
+    	<!-- DiSiD: Add webdav extension to google code  -->
+        <extensions>
+          <extension>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-webdav-jackrabbit</artifactId>
+            <version>2.3</version>
+          </extension>
+        </extensions>
+        
+        <plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.3.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>antlr:antlr</include>
+									<include>org.antlr:*</include>
+									<include>uk.co.badgersinfoil.metaas:metaas</include>
+								</includes>
+							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>antlr</pattern>
+									<shadedPattern>org.gvnix.flex.addon.antlr2</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>org.antlr</pattern>
+									<shadedPattern>org.gvnix.flex.addon.antlr</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>org.asdt</pattern>
+									<shadedPattern>org.gvnix.flex.addon.asdt</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>uk.co.badgersinfoil.metaas</pattern>
+									<shadedPattern>org.gvnix.flex.addon.metaas</shadedPattern>
+								</relocation>
+							</relocations>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.6</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Copyright>Copyright ${project.organization.name}. All Rights Reserved.</Bundle-Copyright>
+			            <Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
+						<Bundle-DocURL>${project.url}</Bundle-DocURL>
+						<Export-Package>${project.artifactId}.*;version=${project.version}</Export-Package>
+						<Import-Package>!uk.co.badgersinfoil.*,!org.antlr.*,!antlr.*,*</Import-Package>
+					</instructions>
+		            <remoteOBR>true</remoteOBR>
+          			<bundleUrl>httppgp://${google.code.project.name}.googlecode.com/svn/repo/org/gvnix/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar</bundleUrl>
+				</configuration>
+			</plugin>
+		</plugins>
+		
+		<!-- DiSiD: Add build resources filtering -->
+	    <resources>
+	      <resource>
+	        <directory>src/main/resources</directory>
+	        <filtering>false</filtering>
+	        <excludes>
+	          <exclude>**/dependencies.xml</exclude>
+	        </excludes>
+	      </resource>
+	      <resource>
+	        <directory>src/main/resources</directory>
+	        <filtering>true</filtering>
+	        <includes>
+	          <include>**/dependencies.xml</include>
+	        </includes>
+	      </resource>
+	    </resources>
+
+	</build>
+
+</project>
