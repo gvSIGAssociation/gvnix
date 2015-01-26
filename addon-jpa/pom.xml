@@ -34,13 +34,18 @@
     <relativePath>../gvnix-osgi-bundles</relativePath>
   </parent>
   <artifactId>org.gvnix.addon.jpa</artifactId>
-  <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - JPA layer services</name>
+  <packaging>pom</packaging>
+  <name>gvNIX - Spring Roo - Parent - JPA layer services</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>
   <description>GvNIX functionalities for JPA layer</description>
   <url>http://www.gvnix.org</url>
+  
+  <modules>
+	<module>addon</module> 
+	<module>annotations</module> 
+  </modules>
 
   <dependencies>
 
@@ -149,6 +154,7 @@
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
   
 </project>

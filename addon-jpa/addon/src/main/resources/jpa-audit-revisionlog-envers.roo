@@ -1,0 +1,31 @@
+script --file clinic.roo
+
+// Setup gvNIX jpa
+jpa gvnix setup
+
+// Setup Spring Security
+security setup
+
+// Setup Audit
+jpa audit setup
+
+// Setup Audit on every entity
+jpa audit all --package ~.domain.audit
+
+// Setup revision log using Hibernate Envers module
+jpa audit revisionLog --provider H-ENVERS
+
+// Now all entities has methods to get revision log (there is no UI for it)
+
+// Exit to shell and do by hand:
+// $ mvn compile jetty:start
+
+// Use your browser:
+// 1. Connect to http://localhost:8080/petclinic
+// 2. login as admin/admin
+// 3. Create new owner --> Now you can see the audition fields (creation, createdBy, lastUdate, lastUdatedBy) filled
+// 4. logout and login as user/user
+// 5. Modify owner --> Now you can see the audition fields (lastUdate, lastUdatedBy) has been updated
+
+
+
