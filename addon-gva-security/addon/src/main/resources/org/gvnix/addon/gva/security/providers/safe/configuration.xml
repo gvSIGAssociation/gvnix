@@ -15,7 +15,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>org.gvnix</groupId>
-				<artifactId>org.gvnix.addon.gva.security</artifactId>
+				<artifactId>org.gvnix.addon.gva.security.annotations</artifactId>
 				<version>${gvnix.version}</version>
 				<type>jar</type>
 				<scope>provided</scope>
