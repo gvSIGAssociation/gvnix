@@ -1,0 +1,233 @@
+/* gvNIX updates to the datatables css files so the rendering
+   appears as expected in roo apps. */
+
+/* TABLE HEADER */
+
+/* A bit of padding between the pagination length and the table. */
+div.dataTables_length {
+  padding-bottom: 4px;
+}
+
+/* Show pagination number label in the same line as the pagination number combo */
+div.dataTables_length label {
+  float: none;
+}
+
+/* Smaller pagination length select field. */
+div.dataTables_length select {
+  font-size: 12px;
+}
+
+/* A bit of padding between the filter and the table. */
+div.dataTables_filter {
+  padding-bottom: 4px;
+}
+
+
+/* Show filter label in the same line as the filter input */
+div.dataTables_filter label {
+  float: none;
+}
+
+/* Smaller filter input field. */
+div.dataTables_filter input {
+  width: 160px;
+  font-size: 12px;
+}
+
+/* Add lower padding for the pagination buttons, so they appear into the parent panel */
+.tundra .dijitTitlePaneContentInner {
+    padding: 10px 10px 30px;
+}
+
+/* Make the column filter fields smaller */
+input.text_filter {
+  width: 100px;
+  height: 14px;
+  font-size: 12px;
+}
+
+select.select_filter {
+  font-size: 12px;
+  max-width: 100px;
+}
+
+table.dataTable thead th {
+  color: #666666;
+}
+
+table.dataTable td {
+	padding: 3px
+}
+
+/* Change the datatable footer to look like the header,
+   And remove padding, which is too much if there are
+   filtering input fields. */
+table.dataTable tfoot th {
+  color: #666666;
+  background: #ffffff;
+  font-style: italic;
+  padding: 2px;
+}
+
+table.dataTable thead th.sorting_disabled {
+  cursor: auto;
+  background: none repeat scroll 0 0 #FFFFFF;
+}
+
+/* Export links */
+a.icon {
+  /* If not block, the size cannot be set. */
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  /* Make the link text invisible. */
+  overflow: hidden;
+  text-indent: 100%;
+  white-space: nowrap;
+  background: none no-repeat scroll center center transparent;
+  cursor: pointer;
+}
+
+a.export_pdf {
+  background: url("../../images/datatables/page_white_acrobat.png") no-repeat scroll center center transparent;
+}
+
+a.export_xls {
+  background: url("../../images/datatables/page_lightning.png") no-repeat scroll center center transparent;
+}
+
+a.export_xlsx {
+  background: url("../../images/datatables/page_white_lightning.png") no-repeat scroll center center transparent;
+}
+
+a.export_csv {
+  background: url("../../images/datatables/page_white_text.png") no-repeat scroll center center transparent;
+}
+
+a.export_xml {
+  background: url("../../images/datatables/page_white_code.png") no-repeat scroll center center transparent;
+}
+
+/* TABLE FOOT */
+
+/* A bit of padding between the table info and the table.
+ Fixed size to avoid pagination goes down when filter is applied*/
+div.dataTables_info {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  max-width: 250px;
+}
+
+/* A bit of padding between the pagination and the table. */
+div.dataTables_paginate {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+
+/* Selection */
+
+
+table.dataTable tr.even.row_selected td {
+	background-color: #ffff7c;
+}
+
+table.dataTable tr.odd.row_selected td {
+	background-color: #ffff00;
+}
+
+a.select_all {
+	background: url("../../images/datatables/book_add.png") no-repeat scroll center center transparent;
+}
+a.select_none {
+	background: url("../../images/datatables/book_delete.png") no-repeat scroll center center transparent;
+}
+
+a.select_toggle {
+	background: url("../../images/datatables/tick.png") no-repeat scroll center center transparent;
+}
+
+
+
+a.update_entity {
+	background: url("../../images/update.png") no-repeat scroll center center transparent;
+}
+a.show_entity {
+	background: url("../../images/show.png") no-repeat scroll center center transparent;
+}
+a.create_entity {
+	background: url("../../images/create.png") no-repeat scroll center center transparent;
+}
+a.delete_entity {
+	background: url("../../images/delete.png") no-repeat scroll center center transparent;
+}
+a.submit_entity {
+	background: url("../../images/datatables/accept.png") no-repeat scroll center center transparent;
+}
+a.cancel_entity {
+	background: url("../../images/datatables/cancel.png") no-repeat scroll center center transparent;
+}
+
+a.open_wizard {
+	background: url("../../images/datatables/magic_wand.png") no-repeat scroll center center transparent;
+}
+
+/** RowClick and RowOnTop **/
+table.dataTable tr.row_clicked td[class*="sorting_"],
+table.dataTable tr.row_clicked td,
+table.dataTable tr.row_on_top td[class*="sorting_"],
+table.dataTable tr.row_on_top td
+ {
+	background-color: #baffb4;
+}
+
+/** RowEditing **/
+table.dataTable tr.row_editing_error td[class*="sorting_"],
+table.dataTable tr.row_editing_error td,
+table.table tr.row_editing_error td {
+	background-color: #ffa0a0;
+}
+
+form.create-form {
+  overflow: auto;
+}
+.create-div {
+  background-color: #FFFFFF;
+  border-color: #DDDDDD;
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+  box-shadow: none;
+  margin-left: 0;
+  margin-right: 0;
+  position: relative;
+  padding: 5px 5px 5px 5px;
+  margin-bottom: 10px;
+}
+.create-div h4 {
+  margin: 5px 0px 5px 0px;
+}
+
+span.errors {
+	margin-left: 10px;
+}
+.gvnix_dataTables_toolbar {
+    float: left;
+}
+
+.search-match{
+	background-color: #FFFF35;
+	border: 1px solid #000000;
+}
+
+input.filter_not_empty{
+	background-color: #FFFF35!important;
+}
+.wizard-help{
+		margin-left: 9px;
+		font-size: 9px;
+		vertical-align:super;
+		font-weight: bold;
+		cursor: help;
+}

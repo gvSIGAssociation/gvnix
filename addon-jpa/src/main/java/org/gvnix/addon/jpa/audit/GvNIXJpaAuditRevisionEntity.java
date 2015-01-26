@@ -22,8 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.gvnix.addon.jpa.audit.providers.RevisionLogProvider;
-
 /**
  * Trigger annotation for jpa audit revision log entity.
  * <p/>

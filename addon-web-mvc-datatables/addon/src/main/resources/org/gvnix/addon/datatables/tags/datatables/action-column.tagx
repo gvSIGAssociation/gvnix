@@ -1,0 +1,62 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixdtt="http://www.gvnix.org/gvnix-datatables" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <!-- Roo parameters -->
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
+
+  <!-- Datatables parameters -->
+  <jsp:directive.attribute name="uid" type="java.lang.String" required="false" rtexprvalue="true" description="Unique arbitrary id of the column, used in relation to the columnHead tag" />
+  <jsp:directive.attribute name="title" type="java.lang.String" required="false" rtexprvalue="true" description="Name of the attribute of the current object being iterated object on, regardless the data source (DOM or AJAX) (precedence over label property)" />
+  <jsp:directive.attribute name="cssStyle" type="java.lang.String" required="false" rtexprvalue="true" description="CSS style applied on header cell (th HTML tag)" />
+  <jsp:directive.attribute name="cssCellStyle" type="java.lang.String" required="false" rtexprvalue="true" description="CSS style applied on every table cell (td HTML tag)" />
+  <jsp:directive.attribute name="cssClass" type="java.lang.String" required="false" rtexprvalue="true" description="CSS class applied on header cell (th HTML tag)" />
+  <jsp:directive.attribute name="cssCellClass" type="java.lang.String" required="false" rtexprvalue="true" description="CSS class applied on every table cell (td HTML tag)" />
+  <jsp:directive.attribute name="display" type="java.lang.String" required="false" rtexprvalue="true" description="(ALL[,HTML|,XML|,CSV]) Comma-separated list of string which indicates in which view(s) the column's body will be displayed. (Default : ALL)" />
+  <jsp:directive.attribute name="renderFunction" type="java.lang.String" required="false" rtexprvalue="true" description="Name of an external Javascript function that will be used to render the column (AJAX only)" />
+  <jsp:directive.attribute name="format" type="java.lang.String" required="false" rtexprvalue="true" description="A MessageFormat pattern that will be used to format the property. (DOM only)" />
+  
+  
+  <!-- Default values -->
+  <c:if test="${empty dateTimePattern}">
+    <c:set value="MM/dd/yyyy" var="dateTimePattern" />
+  </c:if>
+
+  <!-- IMPORTANT:
+     To avoid empty/null problems in parameters pass to datatables:column
+     this tag must care about set default values in datatables parameters
+     when it are empty.
+  -->
+  
+  <c:if test="${empty display}">
+  	<!--  <c:set var="display" value="ALL" />  XXX This must be enougth to show this column -->
+  	<c:set var="display" value="HTML" />
+  </c:if>
+
+  <c:if test="${empty title}">
+  	<!--  <c:set var="display" value="ALL" />  XXX This must be enougth to show this column -->
+  	<c:set var="title" value=" "/> 
+  </c:if>
+  
+  <gvnixdtt:column
+  		id="${id}" 
+  		render="${empty render or render}"
+  		z="${z}"
+
+		uid="${uid}"
+  		title="${title}"
+  		sortable="false"
+  		filterable="false"
+  		searchable="fale"
+  		cssStyle="${cssStyle}"
+  		cssClass="${cssClass}"
+  		cssCellStyle="${cssCellStyle}"
+  		cssCellClass="${cssCellClass}"
+  		display="${display}"
+  		renderFunction="${renderFunction}"
+  		format="${format}"
+  		>
+  		<jsp:doBody />
+  </gvnixdtt:column>
+
+</jsp:root>

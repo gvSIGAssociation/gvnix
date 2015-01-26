@@ -1031,7 +1031,7 @@
             <phase>package</phase>
             <configuration>
               <target>
-                <copy todir="${project.build.directory}/../../target/all" preservelastmodified="true">
+                <copy todir="${target.jar.directory}" preservelastmodified="true">
                   <fileset dir="${project.build.directory}">
                     <include name="*.jar" />
                     <exclude name="*-tests.jar" />
@@ -1382,7 +1382,7 @@
           <version>0.4</version>
           <configuration>
               <lineEnding>LF</lineEnding>
-              <configFile>../devel-resources/java-conventions-eclipse-formatter.xml</configFile>
+              <configFile>${devel.resources.path}/java-conventions-eclipse-formatter.xml</configFile>
                <excludes>
                   <exclude>org/springframework/roo/bootstrap/Main.java</exclude>
                   <exclude>org/springframework/roo/bootstrap/AutoProcessor.java</exclude>
@@ -1508,5 +1508,7 @@
     <!-- DiSiD: Add google code project name -->
     <dandelion-datatables.version>0.9.3-GVNIX</dandelion-datatables.version>
     <google.code.project.name>gvnix</google.code.project.name>
+    <target.jar.directory>${project.build.directory}/all</target.jar.directory>
+    <devel.resources.path>../devel-resources</devel.resources.path>
   </properties>
 </project>

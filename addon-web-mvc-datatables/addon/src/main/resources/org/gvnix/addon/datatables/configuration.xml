@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<gvnix>
+		<repositories>
+			<repository>
+				<id>OSGEO GeoTools repo</id>
+				<url>http://download.osgeo.org/webdav/geotools</url>
+			</repository>
+			<repository>
+				<id>Hibernate Spatial repo</id>
+				<url>http://www.hibernatespatial.org/repository</url>
+			</repository>
+			<repository>
+				<id>gvNIX Add-on repository</id>
+				<name>gvNIX Add-on repository</name>
+				<url>https://gvnix.googlecode.com/svn/repo</url>
+			</repository>
+		</repositories>
+		<properties>
+			<querydsl.version>3.4.3</querydsl.version>
+		</properties>
+		<dependencies>
+			<dependency>
+				<groupId>org.gvnix</groupId>
+				<artifactId>org.gvnix.addon.datatables.annotations</artifactId>
+				<version>${gvnix.version}</version>
+				<type>jar</type>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.gvnix</groupId>
+				<artifactId>org.gvnix.datatables.tags</artifactId>
+				<version>${gvnix.version}</version>
+				<type>jar</type>
+			</dependency>
+			<dependency>
+				<groupId>org.gvnix</groupId>
+				<artifactId>org.gvnix.web.datatables</artifactId>
+				<version>${gvnix.version}</version>
+				<type>jar</type>
+			</dependency>
+			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-apt</artifactId>
+				<version>${querydsl.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-jpa</artifactId>
+				<version>${querydsl.version}</version>
+			</dependency>
+			<!-- Hibernate Spatial -->
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-spatial</artifactId>
+				<version>4.3</version>
+			</dependency>
+			<dependency>
+			  <groupId>com.mysema.querydsl</groupId>
+			  <artifactId>querydsl-spatial</artifactId>
+			  <version>${querydsl.version}</version>
+			  <exclusions>
+			  	<exclusion>
+			  		<groupId>org.geolatte</groupId>
+      				<artifactId>geolatte-geom</artifactId>
+			  	</exclusion>
+			  </exclusions>
+			</dependency>
+		</dependencies>
+	</gvnix>
+</configuration>

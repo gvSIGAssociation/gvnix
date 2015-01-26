@@ -1,0 +1,118 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:gvnixddt="http://www.gvnix.org/gvnix-datatables" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <!-- Roo parameters -->
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute name="property" type="java.lang.String" required="true" rtexprvalue="true" description="The property (field name) of the dataset to be displayed in a column (required)." />
+  <jsp:directive.attribute name="maxLength" type="java.lang.Integer" required="false" rtexprvalue="true" description="Max displayed text length (default '10'). Unlimited if negative" />
+  <jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The column label to be used in the table (optional)." />
+  <jsp:directive.attribute name="date" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(Ignored just for Roo compatibility)" />
+  <jsp:directive.attribute name="calendar" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(Ignored just for Roo compatibility)" />
+  <jsp:directive.attribute name="dateTimePattern" type="java.lang.String" required="false" rtexprvalue="true" description="The date / time pattern to use if the field is a date or calendar type" />
+  <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+  <!-- Datatables parameters -->
+  <jsp:directive.attribute name="uid" type="java.lang.String" required="false" rtexprvalue="true" description="Unique arbitrary id of the column, used in relation to the columnHead tag" />
+  <jsp:directive.attribute name="title" type="java.lang.String" required="false" rtexprvalue="true" description="Name of the attribute of the current object being iterated object on, regardless the data source (DOM or AJAX) (precedence over label property)" />
+  <jsp:directive.attribute name="defaultValue" type="java.lang.String" required="false" rtexprvalue="true" description="Default value if the property's value is null (Default : empty string)" />
+  <jsp:directive.attribute name="sortable" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable sorting on column. (Default : true)" />
+  <jsp:directive.attribute name="sortInit" type="java.lang.String" required="false" rtexprvalue="true" description="(asc|desc) If sortable is enabled, set the default sorting direction (Default : asc)" />
+  <jsp:directive.attribute name="sortDirection" type="java.lang.String" required="false" rtexprvalue="true" description="((asc|desc)[,(asc|desc)[...]])If sortable is enabled, allow to control the sorting direction(s) (default 'asc,desc') (related to asSorting js-datatables columnDef)" />
+  <jsp:directive.attribute name="filterable" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable filtering on column. (Default : true)" />
+  <jsp:directive.attribute name="searchable" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable filtering on column. (Default : true)" />
+  <jsp:directive.attribute name="filterType" type="java.lang.String" required="false" rtexprvalue="true" description="(SELECT|INPUT) If filterable is enabled, you can choose the filter type between 'SELECT' and 'INPUT', adding either select box or input field in the table's footer (Default : INPUT)" />
+  <jsp:directive.attribute name="filterValues" type="java.lang.String" required="false" rtexprvalue="true" description="Name of a Javascript array of string that will be used to populate a filtering drop-down list" />
+  <jsp:directive.attribute name="filterCssClass" type="java.lang.String" required="false" rtexprvalue="true" description="If filterable is enabled and filterType is 'INPUT', you can apply a CSS class to the input field with this attribute" />
+  <jsp:directive.attribute name="cssStyle" type="java.lang.String" required="false" rtexprvalue="true" description="CSS style applied on header cell (th HTML tag)" />
+  <jsp:directive.attribute name="cssCellStyle" type="java.lang.String" required="false" rtexprvalue="true" description="CSS style applied on every table cell (td HTML tag)" />
+  <jsp:directive.attribute name="cssClass" type="java.lang.String" required="false" rtexprvalue="true" description="CSS class applied on header cell (th HTML tag)" />
+  <jsp:directive.attribute name="cssCellClass" type="java.lang.String" required="false" rtexprvalue="true" description="CSS class applied on every table cell (td HTML tag)" />
+  <jsp:directive.attribute name="display" type="java.lang.String" required="false" rtexprvalue="true" description="(ALL[,HTML|,XML|,CSV]) Comma-separated list of string which indicates in which view(s) the column's body will be displayed. (Default : ALL)" />
+  <jsp:directive.attribute name="renderFunction" type="java.lang.String" required="false" rtexprvalue="true" description="Name of an external Javascript function that will be used to render the column (AJAX only)" />
+  <jsp:directive.attribute name="format" type="java.lang.String" required="false" rtexprvalue="true" description="A MessageFormat pattern that will be used to format the property. (DOM only)" />
+  <jsp:directive.attribute name="visible" type="java.lang.Boolean" required="false" rtexprvalue="true" description="(true|false) Enable or disable the display of the column. (Default : true)" />
+  <jsp:directive.attribute name="selector" type="java.lang.String" required="false" rtexprvalue="true" description="jQuery selector used to populate a placeholder with a filtering widget." />
+  <jsp:directive.attribute name="sortType" type="java.lang.String" required="false" rtexprvalue="true" description="Type of sorting function to apply on the column." />
+  
+  <!-- Default values -->
+  <c:if test="${empty dateTimePattern}">
+    <c:set value="MM/dd/yyyy" var="dateTimePattern" />
+  </c:if>
+
+  <c:if test="${empty title}">
+    <c:if test="${empty label}">
+      <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label" htmlEscape="false" />
+    </c:if>
+    <c:set var="title" value="${label}"/>
+  </c:if>
+  
+  <!-- IMPORTANT:
+     To avoid empty/null problems in parameters pass to datatables:column
+     this tag must care about set default values in datatables parameters
+     when it are empty.
+  -->
+  <c:if test="${empty sortDirection}">
+  	<c:set var="sortDirection" value="asc,desc" />
+  </c:if>
+  <c:if test="${empty filterType}">
+  	<c:set var="filterType" value="INPUT" />
+  </c:if>
+  <c:if test="${empty display}">
+  	<c:set var="display" value="ALL" />
+  </c:if>
+
+  <!-- Format property replacing "." by "_~~_" in order to support access to specific properties -->
+  <c:set var="property" value="${fn:replace(property, '.', '_~~_')}" />
+  
+  <!-- Prepare the variable to indicate which columns are exportable for each format (only used on AJAX) -->
+  <c:set var="display_lower" value="${fn:toLowerCase(display)}" />
+  <c:set var="display_formats" value="${fn:split(display_lower,',')}" />
+  <c:forEach items="${display_formats}" var="display_format">
+    <c:choose>
+      <c:when test="${empty datatables_export_columns[display_format]}">
+        <c:set target="${datatables_export_columns}" property="${display_format}" value="${property}" />
+      </c:when>
+      <c:otherwise>
+        <c:set target="${datatables_export_columns}" property="${display_format}" value="${datatables_export_columns[display_format]},${property}" />
+      </c:otherwise>
+    </c:choose>
+  </c:forEach>
+  
+  <!-- Prepare the variable to indicate the title of each columns to use for the
+       export files (only used on AJAX). Replace each 'comma' by '~~' symbols. -->
+  <c:set target="${datatables_export_columns_title}" property="${property}" value="${fn:replace(title, ',', '~~')}" />
+  
+  <gvnixddt:column
+  		id="${id}" 
+  		property="${property}" 
+  		maxLength="${empty maxLength ? 128 : maxLength}" 
+  		label="${label}"
+  		dateTimePattern="${dateTimePattern}"
+  		render="${empty render or render}"
+  		z="${z}"
+        data-property="${property}" 
+  		
+  		uid="${uid}"
+  		title="${title}"
+  		default="${defaultValue}"
+  		sortable="${empty sortable or sortable}"
+  		sortInit="${sortInit}"
+  		sortDirection="${sortDirection}"
+  		filterable="${filterable}"
+  		searchable="${empty searchable or searchable}"
+  		filterType="${filterType}"
+  		filterValues="${filterValues}"
+  		filterCssClass="${filterCssClass}"
+  		cssStyle="${cssStyle}"
+  		cssCellStyle="${cssCellStyle}"
+  		cssCellClass="${cssCellClass}"
+  		display="${display}"
+  		renderFunction="${renderFunction}"
+  		format="${format}"
+  		visible="${empty visible or visible}"
+  		selector="${selector}"
+  		sortType="${sortType}"
+  		/>
+
+</jsp:root>

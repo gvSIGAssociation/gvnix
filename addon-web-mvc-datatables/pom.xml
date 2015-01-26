@@ -34,13 +34,18 @@
     <relativePath>../gvnix-osgi-bundles</relativePath>
   </parent>
   <artifactId>org.gvnix.addon.datatables</artifactId>
-  <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Web Datatables support</name>
+  <packaging>pom</packaging>
+  <name>gvNIX - Spring Roo - Parent - Web Datatables Addon</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>
   <description>Datatables support for Spring MVC based projects. Allows replace the standart roo list view to use JQuery Datatables component based on Dandelion datatables (http://dandelion.github.com/datatables) taglib</description>
   <url>http://www.gvnix.org</url>
+  
+  <modules>
+  	<module>addon</module>
+  	<module>annotations</module>
+  </modules>
 
   <dependencies>
 
@@ -172,6 +177,7 @@
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
   
 </project>

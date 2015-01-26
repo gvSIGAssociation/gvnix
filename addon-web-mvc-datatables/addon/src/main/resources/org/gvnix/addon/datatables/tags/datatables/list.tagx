@@ -1,0 +1,112 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute name="items" type="java.util.Collection" required="true" rtexprvalue="true" description="The form backing object name" />
+  <jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this object, will default to a message bundle if not supplied" />
+  <jsp:directive.attribute name="labelPlural" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this object, will default to a message bundle if not supplied" />
+  <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
+  <jsp:directive.attribute name="openPane" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Control if the title pane is opened or closed by default (default: true)" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+  <!-- ====================================== -->
+  <!-- Extra features -->
+  <!-- ====================================== -->
+
+  <jsp:directive.attribute name="detail" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if detail datatables for N:M relations of this controller entity should be showed related for this datatables" />
+  <jsp:directive.attribute name="detailsList" type="java.util.Collection" required="false" rtexprvalue="true" description="Detail datatables references list to show for N:M relations of this controller entity related for this datatables (List&lt;Map&lt;String, String&gt;&gt; with path and mappedBy keys) (by default value set in controller)" />
+  <jsp:directive.attribute name="detailParentId" type="java.lang.String" required="false" rtexprvalue="true" description="Parent datatables identifier to be connected with detail datatables: if parent row selected, load their own details (by default value set in table.tagx)" />
+
+  <c:if test="${empty render or render}">
+    <c:if test="${empty label}">
+      <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label" htmlEscape="false" />
+    </c:if>
+    <c:if test="${empty labelPlural}">
+      <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_plural" var="labelPlural" htmlEscape="false" />
+    </c:if>
+    <spring:message arguments="${labelPlural}" code="entity_list_all" var="title_msg" htmlEscape="false" />
+    <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
+        <jsp:doBody />
+    </util:panel>
+
+    <!-- Get datatable details list from model (set on controller) if not set directly on tag -->
+    <c:if test="${not empty detailsList}">
+    	<c:set value="${detailsList}" var="detailsInfo" />
+    </c:if>
+
+    <!-- Get datatable parent id from table.tagx if not set directly on tag -->
+    <c:if test="${not empty detailParentId}">
+    	<c:set value="${detailParentId}" var="parentId" />
+    </c:if>
+
+    <!-- Show detail if not manually disabled and datatables details list defined -->
+    <c:if test="${(empty detail or detail) and fn:length(detailsInfo) gt 0}">
+
+    	<!-- Generate identifiers based on parent id -->
+    	<c:set value="${parentId}_${id}_detail" var="mainDatatablesId" />
+
+    	<!-- Start the JQuery HTML structure to show tabs -->
+    	<div id="${mainDatatablesId}">
+    	
+	    	<!-- Tabs headers -->
+	    	<ul>
+		    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
+		    	<c:set var="datatablesId">${mainDatatablesId}_${detailItem.property}</c:set>
+		    	<li><a id="${datatablesId}"><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${detailItem.property}" htmlEscape="false" /></a></li>
+			</c:forEach>
+			</ul>
+			
+	    	<!-- Tabs contents -->
+		    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
+
+				<!-- Generate this detail identifier with collection index to avoid collisions when multiple datatables tabs -->
+		    	<c:set value="${mainDatatablesId}_${detailItem.property}" var="datatablesId" />
+
+			    <spring:url value="${detailItem.path}/list" var="datatablesDetailUrl">
+			    	<spring:param name="datatablesMappedProperty" value="${detailItem.mappedBy}"/>
+			    </spring:url>
+
+			    <script type="text/javascript">
+
+			        var rowOnTop_${datatablesId} = "${dtt_row_on_top_ids}";
+					function callbackFunct${datatablesId} (selection, trId){
+						if (trId){
+							// Load details when exists a clicked row
+							loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}", "${datatablesDetailUrl}", "${detailItem.mappedBy}", rowOnTop_${datatablesId}, "${dtt_table_id_hash}", trId));
+							rowOnTop_${datatablesId} = null;
+						}
+					}
+
+					<c:if test="${datatablesStandardMode}">
+						GvNIX_RowClick.fnAddRowClickCallback("${parentId}", callbackFunct${datatablesId});
+					</c:if>
+
+			    </script>
+
+			</c:forEach>
+			<c:if test="${not datatablesStandardMode}">
+			<script type="text/javascript">
+				function rowCallback(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+					<c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
+					    <c:set value="${mainDatatablesId}_${detailItem.property}" var="datatablesId" />
+					    <spring:url javaScriptEscape="true" value="${detailItem.path}/list" var="datatablesDetailUrl">
+					    	<spring:param name="datatablesMappedProperty" value="${detailItem.mappedBy}"/>
+					    </spring:url>
+			    		loadDetail("${datatablesId}", "${mainDatatablesId}", getDetailUrl("${datatablesId}","${datatablesDetailUrl}", "${detailItem.mappedBy}", "${dtt_row_on_top_ids}", "${dtt_table_id_hash}", nRow.id));
+			    	</c:forEach>
+				}
+			</script>
+			</c:if>
+
+		<!-- End the JQuery HTML structure to show tabs -->
+		</div>
+
+		<!-- Initialize the JQuery HTML structure to draw it as tabs -->
+		<script type="text/javascript">
+		showDetailTabs("${mainDatatablesId}");
+		</script>
+
+    </c:if>
+
+  </c:if>
+</jsp:root>
