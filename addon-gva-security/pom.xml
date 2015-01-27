@@ -35,7 +35,7 @@
   </parent>
   <artifactId>org.gvnix.addon.gva.security</artifactId>
   <packaging>pom</packaging>
-  <name>gvNIX - Spring Roo - Parent - GVA Security Services</name>
+  <name>gvNIX - Parent - GVA Security Services</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>

@@ -36,7 +36,7 @@
     </parent>
 	<artifactId>org.gvnix.flex.addon</artifactId>
 	<packaging>bundle</packaging>
-	<name>gvNIX - Spring Roo - Addon - Flex</name>
+	<name>gvNIX - Addon - Flex</name>
 	<organization>
 	  <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
 	</organization>

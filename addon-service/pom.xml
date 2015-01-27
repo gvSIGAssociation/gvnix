@@ -36,7 +36,7 @@
   </parent>
   <artifactId>org.gvnix.service.roo.addon</artifactId>
   <packaging>pom</packaging>
-  <name>gvNIX - Spring Roo - Parent - Services Management</name>
+  <name>gvNIX - Parent - Services Management</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>

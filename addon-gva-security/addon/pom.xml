@@ -35,7 +35,7 @@
   </parent>
   <artifactId>org.gvnix.addon.gva.security.addon</artifactId>
   <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - GVA Security Services</name>
+  <name>gvNIX - Addon - GVA Security Services</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>

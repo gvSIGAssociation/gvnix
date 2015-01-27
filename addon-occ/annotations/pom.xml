@@ -36,7 +36,7 @@
   </parent>
   <artifactId>org.gvnix.occ.roo.addon.annotations</artifactId>
   <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Annotations - Optimistic Concurrency Control</name>
+  <name>gvNIX - Annotations - Optimistic Concurrency Control</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
