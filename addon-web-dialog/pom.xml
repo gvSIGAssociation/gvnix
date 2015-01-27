@@ -35,13 +35,18 @@
     <relativePath>../gvnix-osgi-bundles</relativePath>
   </parent>
   <artifactId>org.gvnix.web.exception.handler.roo.addon</artifactId>
-  <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Web MVC Dialogs</name>
+  <packaging>pom</packaging>
+  <name>gvNIX - Spring Roo - Parent - Web MVC Dialogs</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
   <description>Modal Dialogs and Uncaught Exception Handler Management for Spring MVC based web layer.</description>
   <url>http://www.gvnix.org</url>
+  
+  <modules>
+  	<module>addon</module>
+  	<module>annotations</module>
+  </modules>
 
   <dependencies>
 
@@ -174,6 +179,7 @@
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/web/exception/handler/roo/addon</repo.folder>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
 
 </project>
