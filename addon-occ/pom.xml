@@ -35,13 +35,18 @@
     <relativePath>../gvnix-osgi-bundles</relativePath>
   </parent>
   <artifactId>org.gvnix.occ.roo.addon</artifactId>
-  <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Optimistic Concurrency Control</name>
+  <packaging>pom</packaging>
+  <name>gvNIX - Spring Roo - Parent - Optimistic Concurrency Control</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
   <description>JPA Optimistic Control for Spring Roo. For those applications that starts with an unmodifiable schema and the tables don't have the column 'version' for concurrency control.</description>
   <url>http://www.gvnix.org</url>
+  
+  <modules>
+  	<module>addon</module>
+  	<module>annotations</module>
+  </modules>
   
   <dependencies>
 
@@ -146,6 +151,7 @@
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/occ/roo/addon</repo.folder>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
 
 </project>

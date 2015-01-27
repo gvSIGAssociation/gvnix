@@ -102,6 +102,7 @@
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/cit/security/roo/addon</repo.folder>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
   
 </project>

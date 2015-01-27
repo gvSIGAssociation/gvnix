@@ -4,7 +4,7 @@
     <dependencies>
       <dependency>
         <groupId>org.gvnix</groupId>
-        <artifactId>org.gvnix.occ.roo.addon</artifactId>
+        <artifactId>org.gvnix.occ.roo.addon.annotations</artifactId>
         <version>${gvnix.version}</version>
         <type>jar</type>
         <scope>provided</scope>
