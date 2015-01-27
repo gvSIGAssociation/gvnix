@@ -35,13 +35,18 @@
     <relativePath>../gvnix-osgi-bundles</relativePath>
   </parent>
   <artifactId>org.gvnix.service.roo.addon</artifactId>
-  <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Services Management</name>
+  <packaging>pom</packaging>
+  <name>gvNIX - Spring Roo - Parent - Services Management</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
   <description>Service Layer for Spring Roo. Includes management for: Local services management, import remote services to local services and export local services via WS.</description>
   <url>http://www.gvnix.org</url>
+  
+  <modules>
+  	<module>addon</module>
+  	<module>annotations</module>
+  </modules>
   
   <dependencies>
 
@@ -185,6 +190,7 @@
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/service/roo/addon</repo.folder>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
 
 </project>
