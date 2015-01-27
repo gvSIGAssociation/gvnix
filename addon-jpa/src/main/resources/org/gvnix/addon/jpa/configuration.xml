@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<gvnix>
+		<repositories>
+			<repository>
+				<id>gvNIX Add-on repository</id>
+				<name>gvNIX Add-on repository</name>
+				<url>https://gvnix.googlecode.com/svn/repo</url>
+			</repository>
+		</repositories>
+		<properties>
+			<querydsl.version>3.4.3</querydsl.version>
+		</properties>
+	    <dependencies>
+    		<dependency>
+        		<groupId>org.gvnix</groupId>
+				<artifactId>org.gvnix.addon.jpa</artifactId>
+		       	<version>${gvnix.version}</version>
+		       	<type>jar</type>
+		       	<scope>provided</scope>
+      		</dependency>
+      		
+      		<!--  QueryDSL library -->
+			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-apt</artifactId>
+				<version>${querydsl.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-jpa</artifactId>
+				<version>${querydsl.version}</version>
+			</dependency>
+			<dependency>
+			  <groupId>com.mysema.querydsl</groupId>
+			  <artifactId>querydsl-spatial</artifactId>
+			  <version>${querydsl.version}</version>
+			  <exclusions>
+			  	<exclusion>
+			  		<groupId>org.geolatte</groupId>
+      				<artifactId>geolatte-geom</artifactId>
+			  	</exclusion>
+			  </exclusions>
+			</dependency>
+    	</dependencies>
+	</gvnix>
+</configuration>
