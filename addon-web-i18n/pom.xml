@@ -36,7 +36,7 @@
   </parent>
   <artifactId>org.gvnix.web.i18n.roo.addon</artifactId>
   <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Co-official languages of Spain</name>
+  <name>gvNIX - Addon - Co-official languages of Spain</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
@@ -95,6 +95,7 @@
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/web/i18n/roo/addon</repo.folder>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
   
 </project>
