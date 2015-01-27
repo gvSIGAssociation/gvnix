@@ -2,13 +2,6 @@
 <configuration>
 		<gvnix>
 				<dependencies>
-						<dependency>
-								<groupId>org.gvnix</groupId>
-								<artifactId>org.gvnix.addon.monitoring</artifactId>
-								<version>${gvnix.version}</version>
-								<type>jar</type>
-								<scope>provided</scope>
-						</dependency>
 						<!-- javamelody-core -->
 						<dependency>
 								<groupId>net.bull.javamelody</groupId>

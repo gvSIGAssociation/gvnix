@@ -152,6 +152,7 @@
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
 
 </project>
