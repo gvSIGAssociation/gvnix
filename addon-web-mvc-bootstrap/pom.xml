@@ -35,7 +35,7 @@
   </parent>
   <artifactId>org.gvnix.addon.bootstrap</artifactId>
   <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Bootstrap3 support</name>
+  <name>gvNIX - Addon - Bootstrap3 support</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>
@@ -167,5 +167,6 @@
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
 </project>

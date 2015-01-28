@@ -82,8 +82,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /** {@inheritDoc} */
     public void setup() {
-        // Adding Bootstrap Dependency
-        addBootstrapDependency();
 
         // Adding Bootstrap libraries
         addBootstrapScriptsLibraries();
@@ -138,20 +136,6 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         // Updating all views to use jQuery
         BootstrapUtils.updateJSPViewsToUseJQuery(getPathResolver(),
                 getWebappPath(), getProjectOperations(), getFileManager());
-    }
-
-    /**
-     * This method adds bootstrap addon dependency on gvNIX Project
-     */
-    public void addBootstrapDependency() {
-        final Element configuration = XmlUtils.getConfiguration(getClass());
-
-        // Install dependencies
-        List<Element> depens = XmlUtils.findElements(
-                "/configuration/gvnix/dependencies/dependency", configuration);
-
-        DependenciesVersionManager.manageDependencyVersion(
-                getMetadataService(), getProjectOperations(), depens);
     }
 
     /**
