@@ -35,7 +35,7 @@
   </parent>
   <artifactId>org.gvnix.addon.datatables</artifactId>
   <packaging>pom</packaging>
-  <name>gvNIX - Spring Roo - Parent - Web Datatables Addon</name>
+  <name>gvNIX - Parent - Web Datatables Addon</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>

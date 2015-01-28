@@ -35,7 +35,7 @@
   </parent>
   <artifactId>org.gvnix.addon.datatables.addon</artifactId>
   <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Web Datatables Addon</name>
+  <name>gvNIX - Addon - Web Datatables Addon</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>
