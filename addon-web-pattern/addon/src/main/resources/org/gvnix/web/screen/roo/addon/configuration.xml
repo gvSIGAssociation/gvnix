@@ -11,7 +11,7 @@
 	    <dependencies>
     		<dependency>
         		<groupId>org.gvnix</groupId>
-				<artifactId>org.gvnix.web.screen.roo.addon</artifactId>
+				<artifactId>org.gvnix.web.screen.roo.addon.annotations</artifactId>
 		       	<version>${gvnix.version}</version>
 		       	<type>jar</type>
 		       	<scope>provided</scope>

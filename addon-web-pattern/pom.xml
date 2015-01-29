@@ -35,13 +35,18 @@
     <relativePath>../gvnix-osgi-bundles</relativePath>
   </parent>
   <artifactId>org.gvnix.web.screen.roo.addon</artifactId>
-  <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Web MVC Screen Patterns</name>
+  <packaging>pom</packaging>
+  <name>gvNIX - Parent - Web MVC Screen Patterns</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
   <description>MVC screen patterns management for Spring MVC based web layer. An screen pattern is ... TBC http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns</description>
   <url>http://www.gvnix.org</url>
+  
+  <modules>
+  	<module>addon</module>
+  	<module>annotations</module>
+  </modules>
   
   <dependencies>
 
@@ -156,6 +161,7 @@
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/web/screen/roo/addon</repo.folder>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
   
 </project>
