@@ -35,12 +35,17 @@
   </parent>
   <artifactId>org.gvnix.addon.jpa</artifactId>
   <packaging>pom</packaging>
-  <name>gvNIX - Addon - JPA layer services</name>
+  <name>gvNIX - Parent - JPA layer services</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>
   <description>GvNIX functionalities for JPA layer</description>
   <url>http://www.gvnix.org</url>
+  
+  <modules>
+  	<module>addon</module>
+  	<module>annotations</module>
+  </modules>
 
   <dependencies>
 
