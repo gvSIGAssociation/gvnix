@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <licenses>
+    <license>
+      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <distribution>repo</distribution>
+      <comments>
+      <![CDATA[
+      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+      i Transport - Generalitat Valenciana
+      Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program. If not, see <http://www.gnu.org/licenses />.
+      ]]>
+      </comments>
+    </license>
+  </licenses>
+  <parent>
+    <groupId>org.gvnix</groupId>
+    <artifactId>org.gvnix.web.report.roo.addon</artifactId>
+    <version>2.0.0.BUILD-SNAPSHOT</version>
+    <relativePath>../../addon-web-report</relativePath>
+  </parent>
+  <artifactId>org.gvnix.web.report.roo.addon.addon</artifactId>
+  <packaging>bundle</packaging>
+  <name>gvNIX - Addon - Web Report</name>
+  <organization>
+    <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
+  </organization>
+  <description>JasperReport support for Spring MVC based projects. With JasperReport support you give to the project the feature of create reports in several output formats</description>
+  <url>http://www.gvnix.org</url>
+  
+    <dependencies>
+  	<dependency>
+  		<groupId>org.gvnix</groupId>
+  		<artifactId>org.gvnix.web.report.roo.addon.annotations</artifactId>
+  		<version>${gvnix.version}</version>
+  	</dependency>
+  </dependencies>
+  
+  <properties>
+	<target.jar.directory>${basedir}/../../target/all</target.jar.directory>  
+	<devel.resources.path>../../devel-resources</devel.resources.path>
+  </properties>
+  
+</project>
