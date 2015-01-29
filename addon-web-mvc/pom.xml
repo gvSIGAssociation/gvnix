@@ -34,13 +34,18 @@
     <relativePath>../gvnix-osgi-bundles</relativePath>
   </parent>
   <artifactId>org.gvnix.addon.web.mvc</artifactId>
-  <packaging>bundle</packaging>
-  <name>gvNIX - Addon - Web MVC (JSP) layer services</name>
+  <packaging>pom</packaging>
+  <name>gvNIX - Parent - Web MVC (JSP) layer services</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>
   <description>GvNIX functionalities for Web MVC (JSP) layer</description>
   <url>http://www.gvnix.org</url>
+  
+  <modules>
+  	<module>addon</module>
+	<module>annotations</module>
+  </modules>
 
   <dependencies>
 
@@ -74,7 +79,7 @@
     </dependency>
     <dependency>
       <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.addon.jpa</artifactId>
+      <artifactId>org.gvnix.addon.jpa.addon</artifactId>
       <version>${gvnix.version}</version>
     </dependency>
   </dependencies>
@@ -154,6 +159,7 @@
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
   
 </project>
