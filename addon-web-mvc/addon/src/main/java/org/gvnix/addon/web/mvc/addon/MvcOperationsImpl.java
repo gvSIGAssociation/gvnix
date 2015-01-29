@@ -121,7 +121,8 @@ public class MvcOperationsImpl implements MvcOperations {
 
         // Look for gvnix web mvc dependency
         for (final Dependency dependency : pom.getDependencies()) {
-            if ("org.gvnix.addon.web.mvc".equals(dependency.getArtifactId())) {
+            if ("org.gvnix.addon.web.mvc.annotations".equals(dependency
+                    .getArtifactId())) {
                 return true;
             }
         }

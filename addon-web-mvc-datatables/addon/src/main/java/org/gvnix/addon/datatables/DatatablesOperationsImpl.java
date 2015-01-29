@@ -112,7 +112,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             GvNIXDatatables.class.getName());
 
     private static final JavaType JQUERY_ANNOTATION = new JavaType(
-            "org.gvnix.addon.web.mvc.jquery.GvNIXWebJQuery");
+            "org.gvnix.addon.web.mvc.addon.jquery.GvNIXWebJQuery");
 
     private static final JavaType JPA_ACTIVE_RECORD_ANNOTATION = new JavaType(
             RooJpaActiveRecord.class.getName());
