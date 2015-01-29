@@ -30,11 +30,12 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.addon.jpa.query.JpaQueryMetadata;
-import org.gvnix.addon.web.mvc.batch.WebJpaBatchMetadata;
+import org.gvnix.addon.jpa.addon.query.JpaQueryMetadata;
+import org.gvnix.addon.web.mvc.addon.batch.WebJpaBatchMetadata;
 import org.gvnix.support.PhysicalTypeUtils;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.finder.DynamicFinderServicesImpl;
 import org.springframework.roo.addon.finder.FieldToken;
@@ -68,9 +69,6 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.springframework.roo.support.logging.HandlerUtils;
 
 /**

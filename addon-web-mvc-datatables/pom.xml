@@ -84,12 +84,12 @@
     </dependency>
     <dependency>
       <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.addon.jpa</artifactId>
+      <artifactId>org.gvnix.addon.jpa.addon</artifactId>
       <version>${gvnix.version}</version>
     </dependency>
     <dependency>
       <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.addon.web.mvc</artifactId>
+      <artifactId>org.gvnix.addon.web.mvc.addon</artifactId>
       <version>${gvnix.version}</version>
     </dependency>
     <dependency>

@@ -34,7 +34,7 @@
     <relativePath>../../addon-web-mvc-loupefield</relativePath>
   </parent>
   <artifactId>org.gvnix.addon.loupefield.annotations</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>gvNIX - Annotations - Loupe Fields</name>
   <organization>
     <name>Generalitat Valenciana</name>

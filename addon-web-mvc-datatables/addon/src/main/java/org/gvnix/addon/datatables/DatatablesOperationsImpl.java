@@ -38,7 +38,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.datatables.listeners.DatatablesDependencyListener;
-import org.gvnix.addon.web.mvc.jquery.JQueryOperations;
+import org.gvnix.addon.web.mvc.addon.jquery.JQueryOperations;
 import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.OperationUtils;
 import org.gvnix.support.WebProjectUtils;
@@ -66,7 +66,6 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadataB
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.operations.AbstractOperations;
-import org.springframework.roo.metadata.MetadataNotificationListener;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaSymbolName;
