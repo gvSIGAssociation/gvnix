@@ -64,13 +64,14 @@
     <module>addon-service</module>
     <module>addon-occ</module>
     <module>addon-gva-security</module>
-    <!--[DEPRECATED] <module>addon-cit-security</module> [/DEPRECATED]-->
     <module>addon-web-pattern</module>
     <module>addon-web-mvc-binding</module>
     <module>addon-web-dialog</module>
     <module>addon-web-mvc-typicalsecurity</module>
     <module>addon-monitoring</module>
     <module>addon-flex</module>
+    <!-- Deprecated -->
+    <!-- <module>addon-cit-security</module>-->
   </modules>
 
   <!-- Note when doing releases: tagBase is set in release plugin configuration
@@ -159,7 +160,7 @@
     </developer>
     <developer>
       <name>Juan Carlos García</name>
-      <id>eruiz</id>
+      <id>jcgarcia</id>
       <email>jcgarcia at disid.com</email>
       <organization>DiSiD Corporation</organization>
       <timezone>+1</timezone>
