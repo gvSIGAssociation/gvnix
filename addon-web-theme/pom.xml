@@ -36,7 +36,7 @@
   </parent>
   <artifactId>org.gvnix.web.theme.roo.addon</artifactId>
   <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Web MVC Theme Management</name>
+  <name>gvNIX - Addon - Web MVC Theme Management</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
@@ -112,6 +112,7 @@
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/web/theme/roo/addon</repo.folder>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
 
 </project>
