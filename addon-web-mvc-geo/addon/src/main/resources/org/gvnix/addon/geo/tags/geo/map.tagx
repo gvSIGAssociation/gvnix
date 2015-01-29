@@ -1,0 +1,84 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+	<jsp:output omit-xml-declaration="yes" />
+
+	<jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+	<jsp:directive.attribute name="projection" type="java.lang.String" required="true" rtexprvalue="true" description="Projection to use on current map." />
+	<jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this object, will default to a message bundle if not supplied" />
+	<jsp:directive.attribute name="center" type="java.lang.String" required="false" rtexprvalue="true" description="The center point to display on the map" />
+	<jsp:directive.attribute name="zoom" type="java.lang.String" required="false" rtexprvalue="true" description="The initial zoom to use on the map" />
+	<jsp:directive.attribute name="maxZoom" type="java.lang.String" required="false" rtexprvalue="true" description="The max zoom to use on the map" />
+	<jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+	<c:if test="${empty label}">
+		<spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label" htmlEscape="false" />
+	</c:if>
+
+	<!-- Spain as default -->
+	<c:if test="${empty center}">
+		<c:set var="center" value="39.470, -0.39" />
+	</c:if>
+
+	<!-- Zoom 5 as default -->
+	<c:if test="${empty zoom}">
+		<c:set var="zoom" value="5" />
+	</c:if>
+
+	<!-- MaxZoom 21 as default -->
+	<c:if test="${empty maxZoom}">
+		<c:set var="maxZoom" value="21" />
+	</c:if>
+
+	<div>
+		<!-- Generating toc component with layers -->
+		<jsp:doBody />
+		<!-- Generating map -->
+		<div id="${id}" class="mapviewer_control" data-center="${center}" data-zoom="${zoom}" data-maxzoom="${maxZoom}" data-projection="${projection}">
+		</div>
+	</div>
+
+	<script>
+	
+		jQuery("#${id}").on("click", function(e){
+			L.DomEvent._skipped(e);
+		});
+	
+		jQuery(document).ready(function() {
+			resizeMap();
+		});
+		
+		jQuery(window).resize(function(){
+			resizeMap();
+		});
+		
+		function resizeMap(){
+			var windowHeight = jQuery(window).height();
+			var windowWidth = jQuery(window).width();
+			var menuHeight = jQuery(".navbar").height();
+			var finalHeight = windowHeight - menuHeight;
+			
+			jQuery(".mapviewer_control").css("height",
+					finalHeight + "px");
+			// Resizing map 
+			var mapId = jQuery('.mapviewer_control').attr("id");
+			var instance = GvNIX_Map_Leaflet.fnGetInstance(mapId);
+			var map = instance.fnGetMapObject();
+			map._onResize();
+			// Setting max height of layer control
+			jQuery(".mapviewer_layers").css("max-height", finalHeight - 90 + "px");
+			// Setting position of layer control collapse button
+			var layerControlWidth = jQuery(".mapviewer_layers").width();
+			var layerControlHeight = jQuery(".mapviewer_layers").height();
+			jQuery(".leaflet-control-layers-collapse-button").css("min-height", (layerControlHeight / 3) + "px" );
+			var buttonHeight = jQuery(".leaflet-control-layers-collapse-button").height();
+			jQuery(".leaflet-control-layers-collapse-button").css("top", (layerControlHeight / 2) - (buttonHeight/2) + "px" );
+			jQuery(".leaflet-control-layers-collapse-button").css("margin-left", layerControlWidth + 30 + "px" );
+			// Setting position of layer control collapse button image
+			var imageHeight = jQuery(".leaflet-control-layers-collapse-button > img").height();
+			jQuery(".leaflet-control-layers-collapse-button > img").css("margin-top",  (buttonHeight/2) -  (imageHeight/2) + "px");
+			// Setting max width of toolbar control
+			jQuery(".leaflet-control-toolbar").css("max-width", windowWidth - 20 + "px");
+		}
+		
+	</script>
+
+</jsp:root>

@@ -1,0 +1,199 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute name="field" type="java.lang.String" required="true" rtexprvalue="true" description="The field exposed from the form backing object" />
+  <jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this field, will default to a message bundle if not supplied" />
+  <jsp:directive.attribute name="labelCode" type="java.lang.String" required="false" rtexprvalue="true" description="Key for label message bundle if label is not supplied" />
+  <jsp:directive.attribute name="required" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicates if this field is required (default false)" />
+  <jsp:directive.attribute name="disabled" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Specify if this field should be enabled" />
+  <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+	
+  <!-- Map Options  -->
+  <jsp:directive.attribute name="center" type="java.lang.String" required="false" description="Used for apply map view center. On update, map center position is on marker center position. Format [lat , lng]. DEFAULT: [39.470, -0.39]" />
+  <jsp:directive.attribute name="zoom" type="java.lang.String" required="false" description="Used for apply initial zoom on map." />
+  <jsp:directive.attribute name="maxZoom" type="java.lang.String" required="false" description="Used for apply max zoom on map." />
+
+  <c:if test="${empty render or render}">
+  
+    <c:if test="${empty center}">
+    	<c:set var="center" value="[39.470, -0.39]" />
+    </c:if>
+    
+    <c:if test="${empty zoom}">
+    	<c:set var="zoom" value="5" />
+    </c:if>
+    
+    <c:if test="${empty maxZoom}">
+    	<c:set var="maxZoom" value="21" />
+    </c:if>
+
+    <c:if test="${empty label}">
+      <c:if test="${empty labelCode}">
+        <c:set var="labelCode" value="${fn:substringAfter(id,'_')}" />
+      </c:if>
+      <spring:message code="label_${fn:toLowerCase(labelCode)}" var="label" htmlEscape="false" />
+    </c:if>
+
+    <c:if test="${empty required}">
+      <c:set value="false" var="required" />
+    </c:if>
+
+    <c:set var="sec_field">
+      <spring:escapeBody javaScriptEscape="true" >${field}</spring:escapeBody>
+    </c:set>
+
+    <div id="_${fn:escapeXml(id)}_id" class="control-group form-group">
+      <label for="_${sec_field}_id" class="control-label">
+        <c:out value="${fn:escapeXml(label)}" />
+        :
+      </label>
+
+      <c:choose>
+        <c:when test="${required}">
+          <spring:message code="field_required" var="field_required" htmlEscape="false" />
+          <spring:message argumentSeparator="," arguments="${label},(${field_required})" code="field_simple_validation" var="field_validation" htmlEscape="false" />
+        </c:when>
+        <c:otherwise>
+          <spring:message argumentSeparator="," arguments="${label}, " code="field_simple_validation" var="field_validation" htmlEscape="false" />
+        </c:otherwise>
+      </c:choose>
+
+      <c:set var="sec_field_validation">
+        <spring:escapeBody javaScriptEscape="true">${field_validation}</spring:escapeBody>
+      </c:set>
+      <c:set var="sec_field_invalid">
+        <spring:escapeBody javaScriptEscape="true" htmlEscape="true">${field_invalid}</spring:escapeBody>
+      </c:set>
+      <c:set var="sec_field_required">
+        <spring:escapeBody javaScriptEscape="true">${field_required}</spring:escapeBody>
+      </c:set>
+
+      <!-- css and data- attributes contain the validation settings -->
+      <div class="controls">
+      	<div style="display:none;">
+	      	<form:input class="form-control input-sm" id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}"
+	                title="${sec_field_validation}" data-required="${required}"
+	                data-invalid="${sec_field_invalid}" data-missing="${sec_field_required}" />
+         </div>
+      	<div id="${id}_map_control" style="height:250px;">&amp;nbsp</div>
+      	
+      	<script>
+      		jQuery(document).ready(function(){
+      			
+      			// Initialise the FeatureGroup to store editable layers
+          		var drawnItems = new L.FeatureGroup();
+      			var map = null;
+      			// Checking if has current value
+          		var currentVal = jQuery("#_${sec_field}_id").val();
+          		if(currentVal !== ""){
+          			// Create marker
+          			var wkt = formatWkt(currentVal);
+           			if(wkt){
+          				// Creating marker using WKT
+              			var marker = omnivore.wkt.parse(wkt);
+          				var layers = marker._layers;
+          				for(i in layers){
+          					var layer = layers[i];
+          					// Adding marker
+          					L.marker([layer.getLatLng().lat, layer.getLatLng().lng]).addTo(drawnItems);
+          					// Creating map with view on center
+          					map = L.map('${id}_map_control').setView([layer.getLatLng().lat, layer.getLatLng().lng], ${zoom});
+          				}
+           			}
+          		}else{
+          			map = L.map('${id}_map_control').setView(${center}, ${zoom});  
+          		}
+      			
+          		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png?bar', {
+          		    maxZoom: ${maxZoom}
+          		}).addTo(map);
+          		
+          		map.addLayer(drawnItems);
+          		
+          		var drawControl = new L.Control.Draw({
+        			position: 'topright',
+        			draw: {
+        				rectangle: false,
+        				polyline: false,
+        				polygon: false,
+        				circle: false,
+        				marker: true
+        			},
+        			edit: {
+        				featureGroup: drawnItems,
+        				remove: true
+        			}
+        		});
+        		map.addControl(drawControl);
+        		
+        		map.on('draw:created', function (e) {
+        			var currentLayers = drawnItems.getLayers();
+        			if(currentLayers.length > 0){
+        				drawnItems.removeLayer(currentLayers[0]);
+        			}
+        			var type = e.layerType,
+        				layer = e.layer;
+        			drawnItems.addLayer(layer);
+        			
+        			// Adding to hidden input
+        			var point = "POINT( " + e.layer.getLatLng().lng + " " + e.layer.getLatLng().lat + " )";
+        			jQuery("#_${sec_field}_id").val(point);
+        		});
+        		
+        		map.on('draw:edited', function (e) {
+        			// Getting point layer
+        			var layers = e.layers.getLayers();
+        			if(layers.length > 0){
+        				var layer = layers[0];
+        				// Adding to hidden input
+            			var point = "POINT( " + layer.getLatLng().lng + " " + layer.getLatLng().lat + " )";
+            			jQuery("#_${sec_field}_id").val(point);
+        			}
+        				
+        		});
+        		
+        		map.on('draw:deleted', function (e) {
+        			var layers = drawnItems._layers;
+        			for(i in layers){
+        				drawnItems.removeLayer(layers[i]);
+        			}
+        			
+        			// Cleaning hidden input
+        			jQuery("#_${sec_field}_id").val("");
+        		})
+        		
+        		// Adding click event
+        		map.on("click", function(e){
+        			var currentLayers = drawnItems.getLayers();
+        			if(currentLayers.length > 0){
+        				drawnItems.removeLayer(currentLayers[0]);
+        			}
+        			var latlng = e.latlng;
+        			var marker = L.marker([latlng.lat, latlng.lng]).addTo(drawnItems);
+        			
+        			// Adding to hidden input
+        			var point = "POINT( " + latlng.lng + " " + latlng.lat + " )";
+        			jQuery("#_${sec_field}_id").val(point);
+        		});
+
+          		
+          		setTimeout(function(){
+          			jQuery(".leaflet-top").css("margin-top", "-42px");
+          			jQuery(".leaflet-bottom").hide();
+          			jQuery(".leaflet-left").css("margin-left", "20px");
+          			jQuery(".leaflet-right").css("margin-right", "20px");
+          			
+          			map._onResize();
+          			
+          		},100);
+      		});
+      	</script>
+      
+      </div>
+
+    </div>
+    <br />
+  </c:if>
+</jsp:root>

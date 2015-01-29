@@ -1,0 +1,112 @@
+.mapviewer_control{
+	min-height:100%;
+	max-height: 100%;
+}
+
+.mapviewer_wrap .btn{
+	padding: 10px;
+}
+.mapviewer_layers_container{
+	height: 500px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+.mapviewer_layers_header{
+	height: 50px;
+ 	padding: 0;
+ 	border-radius: 5px 5px 0 0;
+	background-color:rgb(96,130,36);
+}
+
+.mapviewer_layers_container h3{
+	padding: 15px;
+	margin: 0;
+	font-size: 14px;
+	color: white;
+}
+
+.mapviewer_layers .mapviewer_layers_layer{
+	padding: 10px 0;
+	border-bottom: 1px solid #DDDDDD;
+}
+
+.mapviewer_layers_layer span{
+	padding:10px;
+	cursor: pointer;
+}
+
+.mapviewer_layers{
+	margin-top: -2px;
+	padding: 10px;
+	overflow-y: auto;
+}
+
+.mapviewer_tools_bar{
+	font-size:10px;
+	background-color:#F9F9F9;
+	min-height:50px;
+	border:1px solid #DDDDDD;
+	border-radius:5px 5px 0 0;
+}
+
+.mapviewer_tools_bar i{
+	margin-top:5px;
+	margin-left:1px;
+	font-size:18px;
+	padding: 5px 0 5px 5px;
+	cursor: pointer;
+	width:30px;
+	text-align:center;
+}
+	.mapviewer_tools_bar i#default_tool{float: left;}/*out div*/
+
+.mapviewer_tools_bar i:hover{
+	border: 1px solid #AAAAAA;
+	border-radius:5px;
+	background-color: #CCCCCC;
+}
+
+.mapviewer_tool_selected{
+	background-color: #CCCCCC!important;
+}
+
+.cursor_hand_icon{
+	background: url("../../../resources/images/cursor_hand.png") no-repeat;
+	background-position: center;
+	background-size: 16px;
+}
+
+.measure_icon{
+	background: url("../../../resources/images/measure_icon.png") no-repeat;
+	background-position: center;
+	background-size: 16px;
+}
+
+.layer_legend_marker{
+	margin-top:5px;
+	margin-left:1px;
+	font-size:12px;
+	padding: 3px 0 3px 3px;
+	width:21px;
+	text-align:center;
+	border-radius:5px;
+	float: right;
+}
+
+.layer_legend_span{
+	relative;
+	margin-top:-5px;
+}
+
+.layer_legend{
+	height:3px;
+	margin-top:10px;
+	padding-left: 25px;
+	float:right;
+}
+
+.toolbar_button{
+	width: 25px;
+	height: 25px;
+}
