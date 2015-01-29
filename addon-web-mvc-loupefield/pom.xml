@@ -34,13 +34,18 @@
     <relativePath>../gvnix-osgi-bundles</relativePath>
   </parent>
   <artifactId>org.gvnix.addon.loupefield</artifactId>
-  <packaging>bundle</packaging>
-  <name>gvNIX - Spring Roo - Addon - Loupe Fields</name>
+  <packaging>pom</packaging>
+  <name>gvNIX - Parent - Loupe Fields</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>
   <description>Loupe Fields support for gvNIX Projects</description>
   <url>http://www.gvnix.org</url>
+  
+  <modules>
+  	<module>addon</module>
+  	<module>annotations</module>
+  </modules>
 
   <dependencies>
 
@@ -172,5 +177,6 @@
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
+    <target.jar.directory>${basedir}/../target/all</target.jar.directory>
   </properties>
 </project>

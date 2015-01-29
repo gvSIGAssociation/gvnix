@@ -11,7 +11,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>org.gvnix</groupId>
-				<artifactId>org.gvnix.addon.loupefield</artifactId>
+				<artifactId>org.gvnix.addon.loupefield.annotations</artifactId>
 				<version>${gvnix.version}</version>
 				<type>jar</type>
 			</dependency>
