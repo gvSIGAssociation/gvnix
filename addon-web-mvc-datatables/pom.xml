@@ -94,7 +94,7 @@
     </dependency>
     <dependency>
       <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.addon.geo</artifactId>
+      <artifactId>org.gvnix.addon.geo.addon</artifactId>
       <version>${gvnix.version}</version>
     </dependency>
   </dependencies>
