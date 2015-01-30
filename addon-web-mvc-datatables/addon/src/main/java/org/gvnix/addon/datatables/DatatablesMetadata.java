@@ -4171,7 +4171,8 @@ public class DatatablesMetadata extends
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(CRITERIA_PARAM_NAME);
-        parameterNames.add(new JavaSymbolName(entityName));
+        parameterNames.add(new JavaSymbolName(StringUtils
+                .uncapitalize(entityName)));
         parameterNames.add(REQUEST_PARAM_NAME);
         parameterNames.add(RESPONSE_PARAM_NAME);
 
