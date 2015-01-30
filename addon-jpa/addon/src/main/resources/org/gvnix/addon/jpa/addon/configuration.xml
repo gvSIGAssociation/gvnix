@@ -14,7 +14,7 @@
 	    <dependencies>
     		<dependency>
         		<groupId>org.gvnix</groupId>
-				<artifactId>org.gvnix.addon.jpa.annotations</artifactId>
+				<artifactId>org.gvnix.addon.jpa</artifactId>
 		       	<version>${gvnix.version}</version>
 		       	<type>jar</type>
 		       	<scope>provided</scope>

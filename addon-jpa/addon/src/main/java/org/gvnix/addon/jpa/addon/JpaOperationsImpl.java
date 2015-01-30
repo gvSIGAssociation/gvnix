@@ -126,8 +126,7 @@ public class JpaOperationsImpl implements JpaOperations {
 
         // Look for gvnix jpa dependency
         for (final Dependency dependency : pom.getDependencies()) {
-            if ("org.gvnix.addon.jpa.annotations".equals(dependency
-                    .getArtifactId())) {
+            if ("org.gvnix.addon.jpa".equals(dependency.getArtifactId())) {
                 return true;
             }
         }
