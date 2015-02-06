@@ -15,7 +15,7 @@ lang: es
 # Seminario de gvNIX en la ETSINF
 
 La Escuela Técnica Superior de Informática (ETSINF) en colaboración con la
-empresa tecnológica DISID te ofrece la posibilidad de conocer el manejo de gvNIX,
+empresa tecnológica DISID te ofrecen la posibilidad de conocer gvNIX,
 el entorno de código abierto para el desarrollo de aplicaciones Java
 que se ha convertido en el estándar oficial de la Generalitat Valenciana.
 
