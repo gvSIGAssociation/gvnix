@@ -12,7 +12,7 @@ category:
 lang: en
 ---
 
-# Seminario de gvNIX en la ETSINF
+# gvNIX seminar hosted by the ETSINF
 
 The School of Computing (ETSINF) in collaboration with 
 DiSiD, a technology company, offer you the chance to meet gvNIX,
