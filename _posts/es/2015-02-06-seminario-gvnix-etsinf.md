@@ -19,8 +19,7 @@ empresa tecnológica DISID te ofrecen la posibilidad de conocer gvNIX,
 el entorno de código abierto para el desarrollo de aplicaciones Java
 que se ha convertido en el estándar oficial de la Generalitat Valenciana.
 
-El seminario constará de una duración de 12 horas con carácter de introducción
-a la herramienta.
+El seminario consta de 12 horas y permite conocer cómo gvNIX puede ayudarle a desarrollar aplicaciones empresariales Java.
 
 Se desarrollará los días 23, 24, 25 y 26 de Febrero de 2015 de
 16h a 19h en un laboratorio de la ETSINF.
