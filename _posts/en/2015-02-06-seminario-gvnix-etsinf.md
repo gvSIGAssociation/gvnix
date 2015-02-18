@@ -1,9 +1,8 @@
 ---
 layout: post
 title: Free gvNIX seminar
-description: Register is now open!
+description: Develop Java applications
 tags: [training, ETSINF]
-featured: true
 training: true
 comments: true
 share: true
