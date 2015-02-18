@@ -1,9 +1,8 @@
 ---
 layout: post
 title: Seminario gratuito de gvNIX
-description: Inscripción abierta
+description: Desarrollo de aplicaciones Java
 tags: [formación, ETSINF]
-featured: true
 training: true
 comments: true
 share: true
