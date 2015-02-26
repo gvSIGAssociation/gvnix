@@ -2,7 +2,7 @@ title:            gvNIX
 logo:             logo-negativo-300.png
 disqus_shortname: gvNIX
 mail-to:          mailto:gvnixscm@gmail.com
-download:         http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download
+download:         http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.1.RELEASE.zip/download
 quickstart:       https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
 demo-geo:         http://geo-gvnix.rhcloud.com/login?lang=en
 
