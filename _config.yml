@@ -17,8 +17,8 @@ readtime:         true
 # Change url to your domain. Leave localhost server or blank when working locally.
 # or use the hint from http://jekyllrb.com/docs/github-pages/ to keep this the same
 # whether working locally or remotely. Start Jekyll with: jekyll serve --baseurl ''
-url: http://www.gvnix.org
-#url: http://localhost:4000
+#url: http://www.gvnix.org
+url: http://localhost:4000
 
 # Context path in the remote website (usually /<project>), will be prepended to absolute URLs for static resources
 #baseurl: /gvnix
