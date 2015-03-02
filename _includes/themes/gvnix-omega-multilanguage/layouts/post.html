@@ -36,12 +36,11 @@
                             <time datetime="{{ page.date | date_to_xmlschema }}" class="post-time" itemprop="datePublished">{{ page.date | date: "%d %b %Y" }}</time>
                             <span>
                               {% if page.modified %}{% if modifiedtime != posttime %}
-                              and
-                              <code>last modified on <span class="entry-date date updated">
+                              -
+                              {{ site.t[page.lang].modified }} <span class="entry-date date updated">
                                 <time datetime="{{ page.modified | date: "%Y-%m-%d" }}" itemprop="dateModified">
                                   {{ page.modified | date: "%d %b %Y" }}
                                   </time>
-                              </code>
                             </span>
                             {% endif %}
                             {% endif %}

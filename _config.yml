@@ -232,6 +232,7 @@ t:
     read: minutes read
     see-more: Read more...
     changelog: Changelog
+    modified: last modified on
 
   es:
     description: Herramienta de desarrollo rápido de aplicaciones web
@@ -271,6 +272,7 @@ t:
     read: minutos hace que fue leído
     see-more: Leer más...
     changelog: Control de cambios
+    modified: última modificación en
 
 
 ##{{ site.t[page.lang].grid-title }}
