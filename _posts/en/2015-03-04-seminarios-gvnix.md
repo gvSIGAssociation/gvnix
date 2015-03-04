@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Free gvNIX seminar for students
+title: Free seminar on gvNIX for students
 description: Generalitat Valenciana, GVSIG Association and DISID relied upon future valencian engineers
 tags: [training, gvNIX, gallery]
 type: photo
@@ -33,7 +33,7 @@ to encourage technological and scientific vocation
 so as to ensure quality jobs for our youth,
 while it helps to develop a vital sector to the growth of Comunidad Valenciana.
 
-This free training will be given by professionals of DISID,
+This free seminar will be given by professionals of DISID,
 experts in developing applications with gvNIX and consist of two classroom courses:
 2 to March 5 and 9 through March 12.
 
