@@ -56,14 +56,10 @@ The centers are confirmed for this initiative
 * Centre Privat FP Solvam (Quart de Poblet)
 * IES San Vicent Ferrer (Algemesi)
 
-
 This strategic project DGTI, whose management the gvSIG Association,
 commitment to knowledge and use of free software and/or open source
 involved in all areas of society, with emphasis in Public Administration,
 businesses, the technology sector and the Valencian society.
-
-Sin duda, una iniciativa que demuestra una gran visión de futuro,
-gran responsabilidad social y un compromiso por la educación admirable.
 
 Certainly, an initiative that shows great vision, great social responsibility
 and an admirable commitment by the education.
