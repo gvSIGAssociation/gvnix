@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Free seminar on gvNIX for students
-description: Generalitat Valenciana, GVSIG Association and DISID relied upon future valencian engineers
+description: Generalitat Valenciana, GVSIG Association and DISID put their faith in future valencian engineers
 tags: [training, gvNIX, gallery]
 type: photo
 imagefeature: /post/gvnix-seminarios-training.png
