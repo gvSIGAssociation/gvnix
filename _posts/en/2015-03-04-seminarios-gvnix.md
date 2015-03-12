@@ -4,10 +4,11 @@ title: Free seminar on gvNIX for students
 description: Generalitat Valenciana, GVSIG Association and DISID put their faith in future valencian engineers
 tags: [training, gvNIX, gallery]
 type: photo
-imagefeature: /post/gvnix-seminarios-training.png
+imagefeature: /post/institutos-semana-1/7.png
 comments: true
 training: true
 share: true
+modified: 12-03-2015
 category:
     - en
 lang: en
@@ -34,10 +35,10 @@ so as to ensure quality jobs for our youth,
 while it helps to develop a vital sector to the growth of Comunidad Valenciana.
 
 This free seminar will be given by professionals of DISID,
-experts in developing applications with gvNIX and consist of two classroom courses:
+experts in developing applications with gvNIX and consist of two seminars:
 2 to March 5 and 9 through March 12.
 
-The venue of the seminars for educational centres is
+The venue of the seminars for educational centers is
 [IDESE](http://www.idese.es/){:target="_blank"}  in C / del Marqués de Zenete,
 nº18 (46007) Valencia from 16 to 19h Monday to Thursday.
 
@@ -64,10 +65,59 @@ businesses, the technology sector and the Valencian society.
 Certainly, an initiative that shows great vision, great social responsibility
 and an admirable commitment by the education.
 
-<!--
-The opening of the seminar was attended by Jorge Elena, Administration Director in DISID,
-Eduardo Vendrell, Director of ETSINF and César Ferri Relations Assistant Professional Environment of ETSINF.
+The opening of the seminar was attended by Jorge Elena, Administration Director in DISID, and
+[Juan Carlos García del Canto](https://twitter.com/juanCaFx), software Engineer
+at DISID working on gvNIX project.
+
+<figure class="third">
+  <a href="{{ site.url }}/images/post/institutos-semana-1/1.png"><img src="{{ site.url }}/images/post/institutos-semana-1/1.png"></a>
+  <a href="{{ site.url }}/images/post/institutos-semana-1/2.png"><img src="{{ site.url }}/images/post/institutos-semana-1/2.png"></a>
+  <a href="{{ site.url }}/images/post/institutos-semana-1/3.png"><img src="{{ site.url }}/images/post/institutos-semana-1/3.png"></a>
+</figure>
+<figure class="half">
+  <a href="{{ site.url }}/images/post/institutos-semana-1/12.png"><img src="{{ site.url }}/images/post/institutos-semana-1/12.png"></a>
+  <a href="{{ site.url }}/images/post/institutos-semana-1/11.png"><img src="{{ site.url }}/images/post/institutos-semana-1/11.png"></a>
+</figure>
+<figure>
+<figure class="third">
+    <a href="{{ site.url }}/images/post/institutos-semana-1/5.png"><img src="{{ site.url }}/images/post/institutos-semana-1/5.png"></a>
+    <a href="{{ site.url }}/images/post/institutos-semana-1/7.png"><img src="{{ site.url }}/images/post/institutos-semana-1/7.png"></a>
+    <a href="{{ site.url }}/images/post/institutos-semana-1/8.png"><img src="{{ site.url }}/images/post/institutos-semana-1/8.png"></a>
+</figure>
+<figure class="third">
+    <a href="{{ site.url }}/images/post/institutos-semana-1/9.png"><img src="{{ site.url }}/images/post/institutos-semana-1/9.png"></a>
+    <a href="{{ site.url }}/images/post/institutos-semana-1/10.png"><img src="{{ site.url }}/images/post/institutos-semana-1/10.png"></a>
+    <a href="{{ site.url }}/images/post/institutos-semana-1/13.png"><img src="{{ site.url }}/images/post/institutos-semana-1/13.png"></a>
+    <figcaption>Photo gallery of the first seminar with students of educational centers from
+    Centre Privat FP Estudio, IES L´Estació, IES Abastos, Centre Privat FP Campus Centre D´estudios,
+    CIPFP Ausias March, Centre Privat FP Florida and IES Camp de Morvedre.</figcaption>
+</figure>
+<br>
+<figure class="third">
+  <a href="{{ site.url }}/images/post/institutos-semana-2/1.png"><img src="{{ site.url }}/images/post/institutos-semana-2/1.png"></a>
+  <a href="{{ site.url }}/images/post/institutos-semana-2/2.png"><img src="{{ site.url }}/images/post/institutos-semana-2/2.png"></a>
+  <a href="{{ site.url }}/images/post/institutos-semana-2/3.png"><img src="{{ site.url }}/images/post/institutos-semana-2/3.png"></a>
+</figure>
+<figure class="half">
+  <a href="{{ site.url }}/images/post/institutos-semana-2/4.png"><img src="{{ site.url }}/images/post/institutos-semana-2/4.png"></a>
+  <a href="{{ site.url }}/images/post/institutos-semana-2/5.png"><img src="{{ site.url }}/images/post/institutos-semana-2/5.png"></a>
+</figure>
+<figure>
+<figure class="third">
+    <a href="{{ site.url }}/images/post/institutos-semana-2/6.png"><img src="{{ site.url }}/images/post/institutos-semana-2/6.png"></a>
+    <a href="{{ site.url }}/images/post/institutos-semana-2/7.png"><img src="{{ site.url }}/images/post/institutos-semana-2/7.png"></a>
+    <a href="{{ site.url }}/images/post/institutos-semana-2/8.png"><img src="{{ site.url }}/images/post/institutos-semana-2/8.png"></a>
+</figure>
+<figure class="half">
+    <a href="{{ site.url }}/images/post/institutos-semana-2/9.png"><img src="{{ site.url }}/images/post/institutos-semana-2/9.png"></a>
+    <a href="{{ site.url }}/images/post/institutos-semana-2/10.png"><img src="{{ site.url }}/images/post/institutos-semana-2/10.png"></a>
+    <figcaption>
+    Photo gallery of the first seminar with students of educational centers from IES Doctor Lluís Simarro Lacabra, IES Jaume II El Just,
+    Centre Privat FP Florida, Centre Privat FP Solvam and IES Fuente San Luis.
+        <br>Photos taken by DISID
+    </figcaption>
+</figure>
 
 <br>
 Many thanks for all taking part.
--->
+
