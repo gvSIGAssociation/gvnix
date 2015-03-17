@@ -23,7 +23,7 @@ From within your gvNIX project's git checkout directory:
 
 ### Add the gh-pages-upstream remote
 
-    git remote add gh-pages-upstream https://github.com/disid/gvnix/gh-pages.git
+    git remote add gh-pages-upstream https://github.com/gvSIGAssociation/gvnix/gh-pages.git
 
 ### Pull in the common site infrastructure
 
