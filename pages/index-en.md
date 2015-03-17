@@ -10,6 +10,8 @@ badges:
   # Customize the documentation links. Delete any entries that do not apply.
 
   releases:
+    - name: 1.4.1
+      guide: gvnix-1.4.1-reference-docs.pdf
     - name: 1.4.0
       guide: gvnix-1.4.0-reference-docs.pdf
     - name: 1.3.1
@@ -52,7 +54,7 @@ badges:
 
   links:
     - name: Executable code
-      url:  http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download
+      url:  http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.1.RELEASE.zip/download
       icon: arrow-circle-down
 
     - name: Source code
