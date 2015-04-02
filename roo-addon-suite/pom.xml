@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.gvnix</groupId>
+        <artifactId>org.gvnix.osgi.bundles</artifactId>
+        <version>2.0.0.BUILD-SNAPSHOT</version>
+        <relativePath>../gvnix-osgi-bundles</relativePath>
+    </parent>
+    <artifactId>org.gvnix.roo.addon.suite</artifactId>
+    <packaging>esa</packaging>
+    <name>gvNIX - ROO Addon Suite</name>
+    <description>Generates gvNIX ROO Addon Suite</description>
+
+	<!-- gvNIX Subsystem Dependencies -->
+
+	<dependencies>
+		<!-- gvNIX Support -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.support</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Monitoring -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.monitoring</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Typical Security Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.web.typicalsecurity.roo.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web Dialog Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.web.exception.handler.roo.addon.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web Dialog Annotations -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.web.exception.handler.roo.addon.annotations</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon web i18n -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.web.i18n.roo.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon web mvc binding Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.web.mvc.binding.roo.addon.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon web mvc binding Annotations -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.web.mvc.binding.roo.addon.annotations</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Dynamic Configuration -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.dynamic.configuration.roo.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon OCC Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.occ.roo.addon.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon OCC Annotations -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.occ.roo.addon.annotations</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Service Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.service.roo.addon.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Service Annotations -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.service.roo.addon.annotations</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web Report Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.web.report.roo.addon.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web Report Annotations -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.web.report.roo.addon.annotations</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web Menu -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.web.menu.roo.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Datatables Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.datatables.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Datatables Annotations -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.datatables.annotations</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon JPA Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.jpa.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon JPA Annotations -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.jpa.annotations</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web MVC Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.web.mvc.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web MVC Annotations -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.web.mvc.annotations</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web MVC Loupe Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.loupefield.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web MVC Loupe Annotations -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.loupefield.annotations</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web MVC GEO Addon -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.geo.addon</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web MVC GEO Annotations -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.geo.annotations</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+		<!-- Addon Web MVC Bootstrap -->
+		<dependency>
+			<groupId>org.gvnix</groupId>
+			<artifactId>org.gvnix.addon.bootstrap</artifactId>
+			<version>${gvnix.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+	    <plugins>
+	      <plugin>
+	        <groupId>org.apache.aries</groupId>
+	        <artifactId>esa-maven-plugin</artifactId>
+	        <version>1.0.0</version>
+	        <extensions>true</extensions>
+	        <configuration>
+			  <archiveContent>none</archiveContent>
+	          <generateManifest>true</generateManifest>
+			  <instructions>
+			    <Subsystem-SymbolicName>${project.artifactId}</Subsystem-SymbolicName>
+			    <startOrder>dependencies</startOrder>
+			    <Subsystem-Type>osgi.subsystem.feature</Subsystem-Type>
+			  </instructions>
+	        </configuration>
+	      </plugin>
+	    </plugins>
+	  </build>
+	  
+  <properties>
+    <gvnix.version>${project.parent.version}</gvnix.version>
+    <devel.resources.path>../devel-resources</devel.resources.path>
+  </properties>
+
+</project>
+

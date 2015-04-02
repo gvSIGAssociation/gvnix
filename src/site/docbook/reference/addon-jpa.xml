@@ -329,6 +329,9 @@ public class Pet {
       formulario</emphasis>. Si no se incluyen estos campos en las peticiones puede
       perderse sus valores en el proceso de <emphasis>binding</emphasis>
       de los objetos recibidos</note>
+      <note>Es muy importante <emphasis>no utilizar</emphasis> actualizaciones/eliminaciones 
+      del estilo <emphasis>em.createQuery("UPDATE Country SET population = 0, area = 0");</emphasis>
+       ya que los cambios aplicados no serán registrados por la auditoría.</note>
 
       <para xml:lang="es">
       Para mantener esta información acutalizada se genera un clase, anotada

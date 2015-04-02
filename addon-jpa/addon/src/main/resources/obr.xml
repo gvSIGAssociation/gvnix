@@ -1,0 +1,17 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-jpa-audit-setup' v='jpa audit setup'/>
+      <p n='command-jpa-audit-add' v='jpa audit add'/>
+      <p n='command-jpa-audit-all' v='jpa audit all'/>
+      <p n='command-jpa-audit-revisionlog' v='jpa audit revisionLog'/>
+      <p n='command-jpa-batch-add' v='jpa batch add'/>
+      <p n='command-jpa-batch-all' v='jpa batch all'/>
+      <p n='command-jpa-geo-setup' v='jpa geo setup'/>
+      <p n='command-field-geo' v='field geo'/>
+      <p n='command-finder-geo-all' v='finder geo all'/>
+      <p n='command-finder-geo-add' v='finder geo add'/>
+      <p n='command-jpa-gvnix-setup' v='jpa gvnix setup'/>
+    </capability>
+  </resource>
+</repository>

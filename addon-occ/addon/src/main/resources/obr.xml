@@ -1,0 +1,8 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-set' v='occ checksum set'/>
+      <p n='command-all' v='occ checksum all'/>
+    </capability>
+  </resource>
+</repository>

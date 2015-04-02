@@ -1,0 +1,13 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-web-mvc-batch-setup' v='web mvc batch setup'/>
+      <p n='command-web-mvc-batch-add' v='web mvc batch add'/>
+      <p n='command-web-mvc-batch-all' v='web mvc batch all'/>
+      <p n='command-web-mvc-jquery-setup' v='web mvc jquery setup'/>
+      <p n='command-web-mvc-jquery-all' v='web mvc jquery all'/>
+      <p n='command-web-mvc-jquery-add' v='web mvc jquery add'/>
+      <p n='command-web-mvc-jquery-update-tags' v='web mvc jquery update tags'/>
+    </capability>
+  </resource>
+</repository>

@@ -18,7 +18,7 @@
 
       This program is distributed in the hope that it will be useful,
       but WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
       GNU General Public License for more details.
 
       You should have received a copy of the GNU General Public License
@@ -44,34 +44,33 @@
   <url>http://www.gvnix.org</url>
 
   <modules>
-    <!-- TODO: Modules order is important for googlecode repository upload (validate it) -->
     <module>gvnix-osgi-bundles</module>
     <module>support</module>
-    <module>taglib-datatables</module>
-    <module>util-datatables</module>
-    <module>util-web-mvc-jackson-binder</module>
-    <module>addon-jpa</module>
-    <module>addon-web-mvc</module>
     <module>addon-web-mvc-bootstrap</module>
     <module>addon-web-mvc-geo</module>
     <module>addon-web-mvc-loupefield</module>
+    <module>addon-web-mvc</module>
+    <module>addon-jpa</module>
     <module>addon-web-mvc-datatables</module>
-    <module>addon-dynamic-configuration</module>
-    <module>addon-web-i18n</module>
     <module>addon-web-menu</module>
     <module>addon-web-report</module>
-    <module>addon-web-theme</module>
     <module>addon-service</module>
     <module>addon-occ</module>
-    <module>addon-gva-security</module>
-    <module>addon-web-pattern</module>
+    <module>addon-dynamic-configuration</module>
     <module>addon-web-mvc-binding</module>
+    <module>addon-web-i18n</module>
     <module>addon-web-dialog</module>
     <module>addon-web-mvc-typicalsecurity</module>
     <module>addon-monitoring</module>
-    <module>addon-flex</module>
-    <!-- Deprecated -->
-    <!-- <module>addon-cit-security</module>-->
+
+    <!-- Libraries not included on Roo Addon Suite -->
+    <module>taglib-datatables</module>
+    <module>util-datatables</module>
+    <module>util-web-mvc-jackson-binder</module>
+
+    <!-- This modules will generate the subsysem .esa file and repository index.xml-->
+    <module>roo-addon-suite</module>
+    <module>repository</module>
   </modules>
 
   <!-- Note when doing releases: tagBase is set in release plugin configuration
@@ -183,18 +182,6 @@
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-mockito</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
     </dependency>
   </dependencies>
 
@@ -631,7 +618,12 @@
       </dependency>
       <dependency>
         <groupId>org.springframework.roo</groupId>
-        <artifactId>org.springframework.roo.addon.jpa</artifactId>
+        <artifactId>org.springframework.roo.addon.jpa.addon</artifactId>
+        <version>${roo.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.roo</groupId>
+        <artifactId>org.springframework.roo.addon.jpa.annotations</artifactId>
         <version>${roo.version}</version>
       </dependency>
       <dependency>
@@ -671,7 +663,12 @@
       </dependency>
       <dependency>
         <groupId>org.springframework.roo</groupId>
-        <artifactId>org.springframework.roo.addon.security</artifactId>
+        <artifactId>org.springframework.roo.addon.security.addon</artifactId>
+        <version>${roo.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.roo</groupId>
+        <artifactId>org.springframework.roo.addon.security.annotations</artifactId>
         <version>${roo.version}</version>
       </dependency>
       <dependency>
@@ -706,7 +703,7 @@
       </dependency>
       <dependency>
         <groupId>org.springframework.roo</groupId>
-        <artifactId>org.springframework.roo.addon.web.mvc.controller</artifactId>
+        <artifactId>org.springframework.roo.addon.web.mvc.controller.addon</artifactId>
         <version>${roo.version}</version>
       </dependency>
       <dependency>
@@ -903,6 +900,17 @@
                <parseJavaDoc>false</parseJavaDoc>
            </configuration>
        </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.5.3</version>
+        <configuration>
+          <finalName>${project.name}-${project.version}</finalName>
+          <descriptors>
+            <descriptor>src/main/assembly/repo-assembly.xml</descriptor>
+          </descriptors>
+        </configuration>
+      </plugin>
   	</plugins>
   </pluginManagement>
     <extensions>
@@ -967,13 +975,34 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.3.6</version>
+        <version>2.5.3</version>
         <extensions>true</extensions>
+        <executions>
+        	<execution>
+        		<id>install-bundle</id>
+	          <phase>install</phase>
+	          <goals>
+	            <goal>install</goal>
+	          </goals>
+        	</execution>
+        	<execution>
+            <id>deploy-bundle</id>
+	          <phase>install</phase>
+	          <goals>
+	            <goal>deploy</goal>
+	          </goals>
+        	</execution>
+        </executions>
         <configuration>
+	     <supportedProjectTypes>
+	     	 <supportedProjectTypes>bundle</supportedProjectTypes>
+	         <supportedProjectTypes>jar</supportedProjectTypes>
+	         <supportedProjectTypes>esa</supportedProjectTypes>
+	     </supportedProjectTypes>
+          <prefixUrl></prefixUrl>
+          <remoteOBR>index.xml</remoteOBR>
+          <obrDeploymentRepository>local::default::file://${target.osgi-repository.directory}</obrDeploymentRepository>
           <instructions>
-<!-- DiSiD: Remove because error with Git new versions
-            <_include>${project.build.directory}/build-number.mf</_include>
--->
             <Export-Package>${project.artifactId}.*;version=${project.version}</Export-Package>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
@@ -981,71 +1010,7 @@
               All Rights Reserved.</Bundle-Copyright>
             <Bundle-DocURL>${project.url}</Bundle-DocURL>
           </instructions>
-
-          <!-- DiSiD gvNIX google code publishing -->
-          <remoteOBR>true</remoteOBR>
-          <bundleUrl>httppgp://${google.code.project.name}.googlecode.com/svn/repo/org/gvnix/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar</bundleUrl>
-
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.4</version>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <outputDirectory>${project.build.directory}/../../target/all</outputDirectory>
-          <silent>true</silent>
-          <includeScope>compile</includeScope>
-          <excludeArtifactIds>org.apache.felix.scr.annotations</excludeArtifactIds>
-          <excludeGroupIds>org.osgi</excludeGroupIds>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.7</version>
-        <dependencies>
-            <dependency>
-                <groupId>ant-contrib</groupId>
-                <artifactId>ant-contrib</artifactId>
-                <version>20020829</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.ant</groupId>
-                <artifactId>ant-apache-regexp</artifactId>
-                <version>1.7.1</version>
-            </dependency>
-        </dependencies>
-        <executions>
-          <execution>
-			<!-- copies the JARs we have built locally (eg bootstrap JAR) that noone else depends on into the target/all -->
-            <id>copy-jars-for-roo-dev-or-assembly</id>
-            <phase>package</phase>
-            <configuration>
-              <target>
-                <copy todir="${target.jar.directory}" preservelastmodified="true">
-                  <fileset dir="${project.build.directory}">
-                    <include name="*.jar" />
-                    <exclude name="*-tests.jar" />
-                    <exclude name="*-sources.jar" />
-                  </fileset>
-                </copy>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1333,17 +1298,6 @@
       <!-- Other -->
       <!-- DiSiD: Keep from old Roo versions -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <finalName>${project.name}-${project.version}</finalName>
-          <descriptors>
-            <descriptor>src/main/assembly/assembly.xml</descriptor>
-          </descriptors>
-        </configuration>
-      </plugin>
-      <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
           <version>1.2</version>
@@ -1431,74 +1385,8 @@
               </dependency>
           </dependencies>
       </plugin>
-
-      <!-- DiSiD: Allow tag and branch creation on CIT repository from mvn release:* commands -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <autoVersionSubmodules>true</autoVersionSubmodules>
-          <!-- this declaration is optional because we're using standart svn layout -->
-          <tagBase>
-            http://scmcit.gva.es/svn/gvnix/tags
-          </tagBase>
-          <!-- this declaration is optional because we're using standart svn layout -->
-          <branchBase>
-            http://scmcit.gva.es/svn/gvnix/branches
-          </branchBase>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
-
-  <!-- DiSiD: From Roo old versions and disabled by incompatibility with site reports -->
-  <!--reporting>
-    <excludeDefaults>true</excludeDefaults>
-    <plugins>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
-        <reportSets>
-          <reportSet>
-            <id>html</id>
-            <reports>
-              <report>javadoc</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-        <configuration>
-          <breakiterator>true</breakiterator>
-          <links>
-            <link>http://java.sun.com/javase/6/docs/api/</link>
-            <link>http://junit.sourceforge.net/javadoc/</link>
-            <link>http://static.springsource.org/spring/docs/3.0.0.RELEASE/api/</link>
-            <link>http://jline.sourceforge.net/javadoc/</link>
-            <link>http://jansi.fusesource.org/maven/1.1/apidocs/</link>
-          </links>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jdepend-maven-plugin</artifactId>
-        <version>2.0-beta-2</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.3</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.6</version>
-        <reportSets>
-          <reportSet>
-          </reportSet>
-        </reportSets>
-      </plugin>
-    </plugins>
-  </reporting-->
   <properties>
     <powermock.version>1.4.12</powermock.version>
     <spring.version>3.1.3.RELEASE</spring.version>
@@ -1506,10 +1394,11 @@
     <osgi.version>5.0.0</osgi.version>
     <scr.plugin.version>1.20.0</scr.plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <target.osgi-repository.directory>${project.build.directory}/../../target/osgi-repository-bin</target.osgi-repository.directory>
     <!-- DiSiD: Add google code project name -->
     <dandelion-datatables.version>0.9.3-GVNIX</dandelion-datatables.version>
     <google.code.project.name>gvnix</google.code.project.name>
-    <target.jar.directory>${project.build.directory}/all</target.jar.directory>
     <devel.resources.path>../devel-resources</devel.resources.path>
+    <public.repository.url>scp://repository.gvnix.org:1025</public.repository.url>
   </properties>
 </project>

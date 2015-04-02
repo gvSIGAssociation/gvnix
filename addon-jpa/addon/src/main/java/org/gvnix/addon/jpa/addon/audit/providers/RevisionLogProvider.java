@@ -19,10 +19,10 @@ package org.gvnix.addon.jpa.addon.audit.providers;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.addon.jpa.addon.audit.GvNIXJpaAudit;
 import org.gvnix.addon.jpa.addon.audit.JpaAuditMetadata;
 import org.gvnix.addon.jpa.addon.audit.JpaAuditOperationsSPI;
 import org.gvnix.addon.jpa.addon.audit.JpaAuditRevisionEntityAnnotationValues;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAudit;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 
 /**

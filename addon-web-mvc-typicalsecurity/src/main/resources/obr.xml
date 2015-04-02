@@ -1,0 +1,7 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-setup' v='typicalsecurity setup'/>
+    </capability>
+  </resource>
+</repository>

@@ -1,0 +1,11 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-datatables-add' v='web mvc datatables add'/>
+      <p n='command-datatables-detail-add' v='web mvc datatables detail add'/>
+      <p n='command-datatables-all' v='web mvc datatables all'/>
+      <p n='command-datatables-setup' v='web mvc datatables setup'/>
+      <p n='command-datatables-update-tags' v='web mvc datatables update tags'/>
+    </capability>
+  </resource>
+</repository>

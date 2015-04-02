@@ -17,9 +17,7 @@
  */
 package org.gvnix.support;
 
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.TypeLocationService;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 
@@ -29,7 +27,7 @@ import org.springframework.roo.project.LogicalPath;
  * @author gvNIX Team
  * @since 1.1.0
  */
-public class PhysicalTypeUtils {
+public interface PhysicalTypeUtils {
 
     /**
      * Returns the {@link LogicalPath} of the given {@link JavaType}.
@@ -41,15 +39,6 @@ public class PhysicalTypeUtils {
      * @param typeLocationService Type locator service
      * @return
      */
-    public static LogicalPath getPath(JavaType javaType,
-            TypeLocationService typeLocationService) {
-        final ClassOrInterfaceTypeDetails typeDetails = typeLocationService
-                .getTypeDetails(javaType);
-        if (typeDetails == null) {
-            return null;
-        }
-        final LogicalPath path = PhysicalTypeIdentifier.getPath(typeDetails
-                .getDeclaredByMetadataId());
-        return path;
-    }
+    public LogicalPath getPath(JavaType javaType,
+            TypeLocationService typeLocationService);
 }

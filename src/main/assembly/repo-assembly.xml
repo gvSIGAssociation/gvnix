@@ -1,0 +1,88 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+  <id>bin</id>
+  <formats>
+    <format>dir</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <moduleSets>
+    <moduleSet>
+    
+      <!-- Enable access to all projects in the current multimodule build! -->
+      <useAllReactorProjects>true</useAllReactorProjects>
+      
+      <!-- Now, select which projects to include in this module-set. -->
+      <includes>
+        <!-- Addon Dynamic Configuration -->
+        <include>org.gvnix:org.gvnix.dynamic.configuration.roo.addon</include>
+        <!-- Addon JPA Addon -->
+        <include>org.gvnix:org.gvnix.addon.jpa.addon</include>
+        <!-- Addon JPA Annotations -->
+        <include>org.gvnix:org.gvnix.addon.jpa.annotations</include>
+        <!-- Addon Monitoring -->
+        <include>org.gvnix:org.gvnix.addon.monitoring</include>
+        <!-- Addon OCC Addon -->
+        <include>org.gvnix:org.gvnix.occ.roo.addon.addon</include>
+        <!-- Addon OCC Annotations -->
+        <include>org.gvnix:org.gvnix.occ.roo.addon.annotations</include>
+        <!-- Addon Service Addon -->
+        <include>org.gvnix:org.gvnix.service.roo.addon.addon</include>
+        <!-- Addon Service Annotations -->
+        <include>org.gvnix:org.gvnix.service.roo.addon.annotations</include>
+        <!-- Addon Web Dialog Addon -->
+        <include>org.gvnix:org.gvnix.web.exception.handler.roo.addon.addon</include>
+        <!-- Addon Web Dialog Annotations -->
+        <include>org.gvnix:org.gvnix.web.exception.handler.roo.addon.annotations</include>
+        <!-- Addon web i18n -->
+        <include>org.gvnix:org.gvnix.web.i18n.roo.addon</include>
+        <!-- Addon Web Menu -->
+        <include>org.gvnix:org.gvnix.web.menu.roo.addon</include>
+        <!-- Addon Web MVC Addon -->
+        <include>org.gvnix:org.gvnix.addon.web.mvc.addon</include>
+        <!-- Addon Web MVC Annotations -->
+        <include>org.gvnix:org.gvnix.addon.web.mvc.annotations</include>
+        <!-- Addon web mvc binding Addon -->
+        <include>org.gvnix:org.gvnix.web.mvc.binding.roo.addon.addon</include>
+        <!-- Addon web mvc binding Annotations -->
+        <include>org.gvnix:org.gvnix.web.mvc.binding.roo.addon.annotations</include>
+        <!-- Addon Web MVC Bootstrap -->
+        <include>org.gvnix:org.gvnix.addon.bootstrap</include>
+        <!-- Addon Datatables Addon -->
+        <include>org.gvnix:org.gvnix.addon.datatables.addon</include>
+        <!-- Addon Datatables Annotations -->
+        <include>org.gvnix:org.gvnix.addon.datatables.annotations</include>
+        <!-- Addon Web MVC GEO Addon -->
+        <include>org.gvnix:org.gvnix.addon.geo.addon</include>
+        <!-- Addon Web MVC GEO Annotations -->
+        <include>org.gvnix:org.gvnix.addon.geo.annotations</include>
+        <!-- Addon Web MVC Loupe Addon -->
+        <include>org.gvnix:org.gvnix.addon.loupefield.addon</include>
+        <!-- Addon Web MVC Loupe Annotations -->
+        <include>org.gvnix:org.gvnix.addon.loupefield.annotations</include>
+        <!-- Typical Security Addon -->
+        <include>org.gvnix:org.gvnix.web.typicalsecurity.roo.addon</include>
+        <!-- Addon Web Report Addon -->
+        <include>org.gvnix:org.gvnix.web.report.roo.addon.addon</include>
+        <!-- Addon Web Report Annotations -->
+        <include>org.gvnix:org.gvnix.web.report.roo.addon.annotations</include>
+        <!-- gvNIX Roo Addon Suite Subsystem -->
+        <include>org.gvnix:org.gvnix.roo.addon.suite</include>
+        <!-- gvNIX Support -->
+        <include>org.gvnix:org.gvnix.support</include>
+      </includes>
+
+      <!-- Customizing Dependency Output Location 
+           http://books.sonatype.com/mvnref-book/reference/assemblies-sect-controlling-contents.html
+      -->
+
+      <binaries>
+        <outputDirectory>org/gvnix/${module.artifactId}/${module.version}</outputDirectory>
+        <includeDependencies>false</includeDependencies>
+        <unpack>false</unpack>
+      </binaries>
+    </moduleSet>
+  </moduleSets>
+</assembly>
+
+

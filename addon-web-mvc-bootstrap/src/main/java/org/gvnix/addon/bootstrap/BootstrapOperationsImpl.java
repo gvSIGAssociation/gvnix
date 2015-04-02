@@ -11,7 +11,6 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.bootstrap.listener.BootstrapDependencyListener;
 import org.gvnix.support.WebProjectUtils;
-import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -48,6 +47,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     private MetadataService metadataService;
 
     private ProjectOperations projectOperations;
+
+    private WebProjectUtils webProjectUtils;
 
     /**
      * Uses to ensure that dependencyListener will be loaded
@@ -106,7 +107,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         // Updating all views to use jQuery
         BootstrapUtils.updateJSPViewsToUseJQuery(getPathResolver(),
-                getWebappPath(), getProjectOperations(), getFileManager());
+                getWebappPath(), getProjectOperations(), getFileManager(),
+                getWebProjectUtils());
 
     }
 
@@ -135,7 +137,8 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
         // Updating all views to use jQuery
         BootstrapUtils.updateJSPViewsToUseJQuery(getPathResolver(),
-                getWebappPath(), getProjectOperations(), getFileManager());
+                getWebappPath(), getProjectOperations(), getFileManager(),
+                getWebProjectUtils());
     }
 
     /**
@@ -448,7 +451,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
      * @return
      */
     public LogicalPath getWebappPath() {
-        return WebProjectUtils.getWebappPath(getProjectOperations());
+        return getWebProjectUtils().getWebappPath(getProjectOperations());
     }
 
     // Feature methods -----
@@ -571,5 +574,33 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
         else {
             return projectOperations;
         }
+    }
+
+    public WebProjectUtils getWebProjectUtils() {
+        if (webProjectUtils == null) {
+            // Get all Services implement WebProjectUtils interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebProjectUtils.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    webProjectUtils = (WebProjectUtils) this.context
+                            .getService(ref);
+                    return webProjectUtils;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebProjectUtils on BootstrapOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return webProjectUtils;
+        }
+
     }
 }

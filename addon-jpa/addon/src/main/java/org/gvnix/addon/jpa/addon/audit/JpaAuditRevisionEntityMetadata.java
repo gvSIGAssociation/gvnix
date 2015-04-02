@@ -21,6 +21,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.addon.jpa.addon.audit.providers.RevisionLogRevisionEntityMetadataBuilder;
 import org.gvnix.addon.jpa.addon.audit.providers.RevisionLogRevisionEntityMetadataBuilder.Context;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAuditRevisionEntity;
 import org.gvnix.support.ItdBuilderHelper;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;

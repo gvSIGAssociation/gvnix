@@ -29,16 +29,17 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.web.mvc.addon.MvcOperations;
+import org.gvnix.addon.web.mvc.annotations.jquery.GvNIXWebJQuery;
 import org.gvnix.support.OperationUtils;
 import org.gvnix.support.WebProjectUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
-import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
-import org.springframework.roo.addon.web.mvc.controller.finder.WebFinderMetadata;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.addon.web.mvc.controller.addon.details.FinderMetadataDetails;
+import org.springframework.roo.addon.web.mvc.controller.addon.details.WebMetadataService;
+import org.springframework.roo.addon.web.mvc.controller.addon.finder.WebFinderMetadata;
+import org.springframework.roo.addon.web.mvc.controller.addon.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.addon.web.mvc.controller.annotations.scaffold.RooWebScaffold;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -112,6 +113,10 @@ public class JQueryOperationsImpl extends AbstractOperations implements
     private TypeManagementService typeManagementService;
 
     private WebMetadataService webMetadataService;
+
+    private WebProjectUtils webProjectUtils;
+
+    private OperationUtils operationUtils;
 
     /**
      * {@inheritDoc}
@@ -218,7 +223,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
 
         // do the update
         for (String jspxName : pageList) {
-            WebProjectUtils.updateTagxUriInJspx(
+            getWebProjectUtils().updateTagxUriInJspx(
                     "WEB-INF/views/".concat(jspxName).concat(".jspx"),
                     rooUriMap, uriMap, getProjectOperations(), fileManager);
         }
@@ -272,7 +277,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
 
         // do the update
         for (String jspxName : pageList) {
-            WebProjectUtils.updateTagxUriInJspx(controllerPath, jspxName,
+            getWebProjectUtils().updateTagxUriInJspx(controllerPath, jspxName,
                     rooUriMap, uriMap, getProjectOperations(), fileManager);
         }
     }
@@ -338,7 +343,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         for (final FinderMetadataDetails finderDetails : finderMethodsDetails) {
             final String finderName = finderDetails.getFinderMethodMetadata()
                     .getMethodName().getSymbolName();
-            WebProjectUtils.updateTagxUriInJspx(
+            getWebProjectUtils().updateTagxUriInJspx(
                     "WEB-INF/views/".concat(controllerPath).concat("/")
                             .concat(finderName).concat(".jspx"), rooUriMap,
                     uriMap, getProjectOperations(), fileManager);
@@ -413,75 +418,79 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         boolean modified = false;
 
         // Add jquery-ui.css
-        modified = WebProjectUtils.addCssToTag(docTagx, root,
+        modified = getWebProjectUtils().addCssToTag(docTagx, root,
                 "jquery_ui_css_url", "/resources/styles/jquery/jquery-ui.css")
                 || modified;
 
         // Add jquery.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root, "jquery_js_url",
-                "/resources/scripts/jquery/jquery-min.js") || modified;
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
+                "jquery_js_url", "/resources/scripts/jquery/jquery-min.js")
+                || modified;
 
         // Add jquery-ui.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root,
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
                 "jquery_ui_js_url",
                 "/resources/scripts/jquery/jquery-ui.min.js")
                 || modified;
 
         // Add jquery.base64.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root,
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
                 "jquery_b64_js_url",
                 "/resources/scripts/jquery/jquery.base64.js")
                 || modified;
 
         // Add tinymce.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root, "tinymce_js_url",
-                "/resources/scripts/jquery/tinymce.min.js") || modified;
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
+                "tinymce_js_url", "/resources/scripts/jquery/tinymce.min.js")
+                || modified;
 
         // Add jQuery tinymce.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root,
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
                 "jquery_tinymce_js_url",
                 "/resources/scripts/jquery/jquery.tinymce.min.js")
                 || modified;
 
         // Add jQuery validate.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root,
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
                 "jquery_validate_js_url",
                 "/resources/scripts/jquery/jquery.validate-min.js")
                 || modified;
 
         // Add jQuery application JS init
-        modified = WebProjectUtils.addJSToTag(docTagx, root, "app_js_url",
-                "/resources/scripts/jquery/application.js") || modified;
+        modified = getWebProjectUtils().addJSToTag(docTagx, root, "app_js_url",
+                "/resources/scripts/jquery/application.js")
+                || modified;
 
         // Add jQuery cookie.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root,
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
                 "jquery_cookie_js_url",
                 "/resources/scripts/jquery/jquery.cookie.js")
                 || modified;
 
         // Add i18n customization var
-        modified = WebProjectUtils.addLocaleVarToTag(docTagx, root,
-                "jqueryLocale") || modified;
+        modified = getWebProjectUtils().addLocaleVarToTag(docTagx, root,
+                "jqueryLocale")
+                || modified;
 
         // Add jQuery UI datepicker i18n
-        modified = WebProjectUtils
+        modified = getWebProjectUtils()
                 .addJSToTag(docTagx, root, "jquery_ui_i18n_js_url",
                         "/resources/scripts/jquery/i18n/jquery.ui.datepicker-${jqueryLocale}.js")
                 || modified;
 
         // Add jQuery validate i18n
-        modified = WebProjectUtils
+        modified = getWebProjectUtils()
                 .addJSToTag(docTagx, root, "jquery_validate_i18n_js_url",
                         "/resources/scripts/jquery/i18n/jquery.validate-${jqueryLocale}.js")
                 || modified;
 
         // Add jQuery hastable.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root,
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
                 "hashtable_js_url", "/resources/scripts/jquery/hashtable.js")
                 || modified;
 
         // Add jQuery numberformatter.js
-        modified = WebProjectUtils.addJSToTag(docTagx, root,
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
                 "jquery_numberformatter_js_url",
                 "/resources/scripts/jquery/jquery.numberformatter.min.js")
                 || modified;
@@ -528,7 +537,7 @@ public class JQueryOperationsImpl extends AbstractOperations implements
      * @return
      */
     private LogicalPath getWebappPath() {
-        return WebProjectUtils.getWebappPath(getProjectOperations());
+        return getWebProjectUtils().getWebappPath(getProjectOperations());
     }
 
     /**
@@ -565,22 +574,23 @@ public class JQueryOperationsImpl extends AbstractOperations implements
                         "/scripts/jquery/skins/lightgray"), true);
         copyDirectoryContents("scripts/jquery/README.txt",
                 pathResolver.getIdentifier(webappPath, "/scripts/jquery"), true);
-        OperationUtils.updateDirectoryContents(
-                "scripts/jquery/skins/lightgray/fonts/*.*", pathResolver
-                        .getIdentifier(webappPath,
-                                "/scripts/jquery/skins/lightgray/fonts"),
-                fileManager, cContext, getClass());
-        OperationUtils.updateDirectoryContents(
-                "scripts/jquery/skins/lightgray/img/*.*", pathResolver
-                        .getIdentifier(webappPath,
-                                "/scripts/jquery/skins/lightgray/img"),
-                fileManager, cContext, getClass());
+        getOperationUtils().updateDirectoryContents(
+                "scripts/jquery/skins/lightgray/fonts/*.*",
+                pathResolver.getIdentifier(webappPath,
+                        "/scripts/jquery/skins/lightgray/fonts"), fileManager,
+                cContext, getClass());
+        getOperationUtils().updateDirectoryContents(
+                "scripts/jquery/skins/lightgray/img/*.*",
+                pathResolver.getIdentifier(webappPath,
+                        "/scripts/jquery/skins/lightgray/img"), fileManager,
+                cContext, getClass());
 
         // Copy CSS files and related resources
         copyDirectoryContents("styles/jquery/*.css",
                 pathResolver.getIdentifier(webappPath, "/styles/jquery"), true);
-        OperationUtils
-                .updateDirectoryContents("styles/jquery/images/*.*",
+        getOperationUtils()
+                .updateDirectoryContents(
+                        "styles/jquery/images/*.*",
                         pathResolver.getIdentifier(webappPath,
                                 "/styles/jquery/images"), fileManager,
                         cContext, getClass());
@@ -720,5 +730,61 @@ public class JQueryOperationsImpl extends AbstractOperations implements
         else {
             return webMetadataService;
         }
+    }
+
+    public WebProjectUtils getWebProjectUtils() {
+        if (webProjectUtils == null) {
+            // Get all Services implement WebProjectUtils interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebProjectUtils.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    webProjectUtils = (WebProjectUtils) this.context
+                            .getService(ref);
+                    return webProjectUtils;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebProjectUtils on JQueryOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return webProjectUtils;
+        }
+
+    }
+
+    public OperationUtils getOperationUtils() {
+        if (operationUtils == null) {
+            // Get all Services implement OperationUtils interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                OperationUtils.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    operationUtils = (OperationUtils) this.context
+                            .getService(ref);
+                    return operationUtils;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load OperationUtils on JQueryOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return operationUtils;
+        }
+
     }
 }

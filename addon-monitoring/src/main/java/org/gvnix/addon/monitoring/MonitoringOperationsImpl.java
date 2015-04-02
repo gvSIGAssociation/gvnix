@@ -1,29 +1,47 @@
 package org.gvnix.addon.monitoring;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.felix.scr.annotations.*;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.WebProjectUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
-import org.springframework.roo.classpath.details.*;
-import org.springframework.roo.classpath.details.annotations.*;
-import org.springframework.roo.model.*;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
+import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.MethodMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.model.JavaPackage;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.*;
+import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.*;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.springframework.roo.support.logging.HandlerUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Implementation of operations this add-on offers.
@@ -75,6 +93,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
     private TypeLocationService typeLocationService;
 
     private TypeManagementService typeManagementService;
+
+    private WebProjectUtils webProjectUtils;
 
     /** {@inheritDoc} */
     public boolean isCommandAvailable() {
@@ -141,8 +161,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                 "META-INF/spring/applicationContext.xml");
 
         if (getFileManager().exists(appContextPath)) {
-            Document docXml = WebProjectUtils.loadXmlDocument(appContextPath,
-                    getFileManager());
+            Document docXml = getWebProjectUtils().loadXmlDocument(
+                    appContextPath, getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -187,8 +207,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                 Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml");
 
         if (getFileManager().exists(persistencePath)) {
-            Document docXml = WebProjectUtils.loadXmlDocument(persistencePath,
-                    getFileManager());
+            Document docXml = getWebProjectUtils().loadXmlDocument(
+                    persistencePath, getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -266,7 +286,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                 Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml");
 
         if (getFileManager().exists(webPath)) {
-            Document docXml = WebProjectUtils.loadXmlDocument(webPath,
+            Document docXml = getWebProjectUtils().loadXmlDocument(webPath,
                     getFileManager());
 
             // Getting root element
@@ -401,7 +421,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      * @return
      */
     public LogicalPath getWebappPath() {
-        return WebProjectUtils.getWebappPath(getProjectOperations());
+        return getWebProjectUtils().getWebappPath(getProjectOperations());
     }
 
     /**
@@ -537,8 +557,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      */
     public void createMonitoringAdvisor(String appContextPath) {
         if (getFileManager().exists(appContextPath)) {
-            Document docXml = WebProjectUtils.loadXmlDocument(appContextPath,
-                    getFileManager());
+            Document docXml = getWebProjectUtils().loadXmlDocument(
+                    appContextPath, getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -662,8 +682,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      */
     public void createMonitoringAutoProxy(String appContextPath) {
         if (getFileManager().exists(appContextPath)) {
-            Document docXml = WebProjectUtils.loadXmlDocument(appContextPath,
-                    getFileManager());
+            Document docXml = getWebProjectUtils().loadXmlDocument(
+                    appContextPath, getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -818,8 +838,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
                 Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml");
 
         if (getFileManager().exists(persistencePath)) {
-            Document docXml = WebProjectUtils.loadXmlDocument(persistencePath,
-                    getFileManager());
+            Document docXml = getWebProjectUtils().loadXmlDocument(
+                    persistencePath, getFileManager());
 
             // Getting root element
             Element docRoot = docXml.getDocumentElement();
@@ -1020,6 +1040,34 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
         }
         else {
             return typeManagementService;
+        }
+
+    }
+
+    public WebProjectUtils getWebProjectUtils() {
+        if (webProjectUtils == null) {
+            // Get all Services implement WebProjectUtils interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebProjectUtils.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    webProjectUtils = (WebProjectUtils) this.context
+                            .getService(ref);
+                    return webProjectUtils;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebProjectUtils on MonitoringOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return webProjectUtils;
         }
 
     }

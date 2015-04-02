@@ -17,7 +17,8 @@
  */
 package org.gvnix.addon.web.mvc.addon.jquery;
 
-import org.springframework.roo.addon.web.mvc.controller.finder.WebFinderMetadata;
+import org.gvnix.addon.web.mvc.annotations.jquery.GvNIXWebJQuery;
+import org.springframework.roo.addon.web.mvc.controller.addon.finder.WebFinderMetadata;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Feature;
 

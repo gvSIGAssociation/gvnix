@@ -33,20 +33,12 @@
   </parent>
   <artifactId>org.gvnix.web.datatables</artifactId>
   <packaging>jar</packaging>
-  <name>gvNIX - Dandelion-Datatables Utils</name>
+  <name>gvNIX - Library - Dandelion-Datatables Utils</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>
   <description>Dandelion-DataTables utilities for Spring MVC based projects.</description>
   <url>http://www.gvnix.org</url>
-
-  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
-  <properties>
-    <google.code.project.name>gvnix</google.code.project.name>
-    <gvnix.version>${project.parent.version}</gvnix.version>
-    <querydsl.version>3.4.3</querydsl.version>
-    <spring.version>3.2.0.RELEASE</spring.version>
-  </properties>
 
   <repositories>
     <repository>
@@ -61,6 +53,10 @@
   </repositories>
 
   <dependencies>
+	  <dependency>
+	    <groupId>org.apache.commons</groupId>
+	    <artifactId>commons-lang3</artifactId>
+	</dependency>
 <!--
     <dependency>
         <groupId>org.slf4j</groupId>
@@ -183,5 +179,14 @@
     </resources>
 
   </build>
+
+  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
+  <properties>
+    <google.code.project.name>gvnix</google.code.project.name>
+    <gvnix.version>${project.parent.version}</gvnix.version>
+    <querydsl.version>3.4.3</querydsl.version>
+    <spring.version>3.2.0.RELEASE</spring.version>
+    <target.osgi-repository.directory>${basedir}/../target/osgi-repository-bin</target.osgi-repository.directory>
+  </properties>
 
 </project>

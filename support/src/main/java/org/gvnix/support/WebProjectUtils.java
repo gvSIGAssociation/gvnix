@@ -17,29 +17,17 @@
  */
 package org.gvnix.support;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.annotations.scaffold.RooWebScaffold;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.LogicalPath;
-import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.DomUtils;
-import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -48,13 +36,7 @@ import org.w3c.dom.Element;
  * 
  * @author gvNIX Team
  */
-public class WebProjectUtils {
-
-    private static final String WEB_INF_VIEWS = "WEB-INF/views/";
-
-    private static final String JSPX_EXT = ".jspx";
-
-    private static final String VALUE = "value";
+public interface WebProjectUtils {
 
     /**
      * Check if current project is a Spring MVC one
@@ -66,17 +48,8 @@ public class WebProjectUtils {
      * @param projectOperations Project operations component
      * @return Is a Spring MVC project ?
      */
-    public static boolean isSpringMvcProject(MetadataService metadataService,
-            FileManager fileManager, ProjectOperations projectOperations) {
-
-        PathResolver pathResolver = OperationUtils.getPathResolver(
-                metadataService, projectOperations);
-        String webXmlPath = pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/spring/webmvc-config.xml");
-
-        return fileManager.exists(webXmlPath);
-    }
+    public boolean isSpringMvcProject(MetadataService metadataService,
+            FileManager fileManager, ProjectOperations projectOperations);
 
     /**
      * Check if current project is a web project
@@ -88,17 +61,8 @@ public class WebProjectUtils {
      * @param projectOperations Project operations component
      * @return Is a web project ?
      */
-    public static boolean isWebProject(MetadataService metadataService,
-            FileManager fileManager, ProjectOperations projectOperations) {
-
-        PathResolver pathResolver = OperationUtils.getPathResolver(
-                metadataService, projectOperations);
-        String webXmlPath = pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
-                "WEB-INF/web.xml");
-
-        return fileManager.exists(webXmlPath);
-    }
+    public boolean isWebProject(MetadataService metadataService,
+            FileManager fileManager, ProjectOperations projectOperations);
 
     /**
      * Installs the Dialog Java class
@@ -108,18 +72,8 @@ public class WebProjectUtils {
      * @param pathResolver
      * @param fileManager
      */
-    public static void installWebDialogClass(String packageFullName,
-            PathResolver pathResolver, FileManager fileManager) {
-
-        String classFullName = pathResolver.getIdentifier(
-                LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
-                packageFullName.concat(".Dialog").replace(".", File.separator)
-                        .concat(".java"));
-
-        OperationUtils.installJavaClassFromTemplate(packageFullName,
-                classFullName, "Dialog.java-template", pathResolver,
-                fileManager);
-    }
+    public void installWebDialogClass(String packageFullName,
+            PathResolver pathResolver, FileManager fileManager);
 
     /**
      * Create all namespaces occurrences in given {@relativePath} file with
@@ -133,21 +87,9 @@ public class WebProjectUtils {
      * @param fileManager
      * @param metadataService
      */
-    public static void addTagxUriInJspx(JavaType controller, String jspxName,
+    public void addTagxUriInJspx(JavaType controller, String jspxName,
             Map<String, String> uriMap, ProjectOperations projectOperations,
-            FileManager fileManager, MetadataService metadataService) {
-
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
-                .get(WebScaffoldMetadata.createIdentifier(controller,
-                        getJavaPath(projectOperations)));
-
-        Validate.notNull(webScaffoldMetadata,
-                "Can't get RooWebScaffold metada for type: %s",
-                controller.getFullyQualifiedTypeName());
-
-        addTagxUriInJspx(webScaffoldMetadata.getAnnotationValues().getPath(),
-                jspxName, uriMap, projectOperations, fileManager);
-    }
+            FileManager fileManager, MetadataService metadataService);
 
     /**
      * Create all namespaces occurrences in given {@relativePath} file with
@@ -161,13 +103,9 @@ public class WebProjectUtils {
      * @param projectOperations
      * @param fileManager
      */
-    public static void addTagxUriInJspx(String controllerPath, String jspxName,
+    public void addTagxUriInJspx(String controllerPath, String jspxName,
             Map<String, String> newUriMap, ProjectOperations projectOperations,
-            FileManager fileManager) {
-        addTagxUriInJspx(WEB_INF_VIEWS.concat(controllerPath).concat("/")
-                .concat(jspxName).concat(JSPX_EXT), (Map<String, String>) null,
-                newUriMap, projectOperations, fileManager);
-    }
+            FileManager fileManager);
 
     /**
      * Create all namespaces occurrences in given {@relativePath} file with
@@ -185,13 +123,9 @@ public class WebProjectUtils {
      * @param projectOperations
      * @param fileManager
      */
-    public static void addTagxUriInJspx(String controllerPath, String jspxName,
+    public void addTagxUriInJspx(String controllerPath, String jspxName,
             Map<String, String> oldUriMap, Map<String, String> newUriMap,
-            ProjectOperations projectOperations, FileManager fileManager) {
-        addTagxUriInJspx(WEB_INF_VIEWS.concat(controllerPath).concat("/")
-                .concat(jspxName).concat(JSPX_EXT), oldUriMap, newUriMap,
-                projectOperations, fileManager);
-    }
+            ProjectOperations projectOperations, FileManager fileManager);
 
     /**
      * Create namespaces in given {@relativePath} file with namespaces
@@ -210,43 +144,9 @@ public class WebProjectUtils {
      * @param projectOperations
      * @param fileManager
      */
-    public static void addTagxUriInJspx(String relativePath,
+    public void addTagxUriInJspx(String relativePath,
             Map<String, String> oldUriMap, Map<String, String> newUriMap,
-            ProjectOperations projectOperations, FileManager fileManager) {
-
-        // Get jspx file path
-        PathResolver pathResolver = projectOperations.getPathResolver();
-        String docJspx = pathResolver.getIdentifier(
-                getWebappPath(projectOperations), relativePath);
-
-        // Parse XML document
-        Document docJspXml = loadXmlDocument(docJspx, fileManager);
-        if (docJspXml == null) {
-            // file not found: do nothing
-            return;
-        }
-
-        // Get main div
-        Element docRoot = docJspXml.getDocumentElement();
-        Element divMain = XmlUtils.findFirstElement("/div", docRoot);
-        boolean modified = false;
-
-        // Create namespace URIs
-        for (Entry<String, String> newUriEntry : newUriMap.entrySet()) {
-            String nsName = newUriEntry.getKey();
-            String nsUri = newUriEntry.getValue();
-
-            divMain.setAttribute(nsName, nsUri);
-            modified = true;
-        }
-
-        // If modified, update the jspx file
-        if (modified) {
-            DomUtils.removeTextNodes(docJspXml);
-            fileManager.createOrUpdateTextFileIfRequired(docJspx,
-                    XmlUtils.nodeToString(docJspXml), true);
-        }
-    }
+            ProjectOperations projectOperations, FileManager fileManager);
 
     /**
      * Replaces all namespaces occurrences in given {@relativePath} file with
@@ -266,23 +166,9 @@ public class WebProjectUtils {
      * @param fileManager
      * @param metadataService
      */
-    public static void updateTagxUriInJspx(JavaType controller,
-            String jspxName, Map<String, String> uriMap,
-            ProjectOperations projectOperations, FileManager fileManager,
-            MetadataService metadataService) {
-
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
-                .get(WebScaffoldMetadata.createIdentifier(controller,
-                        getJavaPath(projectOperations)));
-
-        Validate.notNull(webScaffoldMetadata,
-                "Can't get RooWebScaffold metada for type: %s",
-                controller.getFullyQualifiedTypeName());
-
-        updateTagxUriInJspx(
-                webScaffoldMetadata.getAnnotationValues().getPath(), jspxName,
-                uriMap, projectOperations, fileManager);
-    }
+    public void updateTagxUriInJspx(JavaType controller, String jspxName,
+            Map<String, String> uriMap, ProjectOperations projectOperations,
+            FileManager fileManager, MetadataService metadataService);
 
     /**
      * Replaces all namespaces occurrences in given {@relativePath} file with
@@ -302,13 +188,9 @@ public class WebProjectUtils {
      * @param projectOperations
      * @param fileManager
      */
-    public static void updateTagxUriInJspx(String controllerPath,
-            String jspxName, Map<String, String> newUriMap,
-            ProjectOperations projectOperations, FileManager fileManager) {
-        updateTagxUriInJspx(WEB_INF_VIEWS.concat(controllerPath).concat("/")
-                .concat(jspxName).concat(JSPX_EXT), (Map<String, String>) null,
-                newUriMap, projectOperations, fileManager);
-    }
+    public void updateTagxUriInJspx(String controllerPath, String jspxName,
+            Map<String, String> newUriMap, ProjectOperations projectOperations,
+            FileManager fileManager);
 
     /**
      * Replaces all namespaces occurrences in given {@relativePath} file with
@@ -332,14 +214,9 @@ public class WebProjectUtils {
      * @param projectOperations
      * @param fileManager
      */
-    public static void updateTagxUriInJspx(String controllerPath,
-            String jspxName, Map<String, String> oldUriMap,
-            Map<String, String> newUriMap, ProjectOperations projectOperations,
-            FileManager fileManager) {
-        updateTagxUriInJspx(WEB_INF_VIEWS.concat(controllerPath).concat("/")
-                .concat(jspxName).concat(JSPX_EXT), oldUriMap, newUriMap,
-                projectOperations, fileManager);
-    }
+    public void updateTagxUriInJspx(String controllerPath, String jspxName,
+            Map<String, String> oldUriMap, Map<String, String> newUriMap,
+            ProjectOperations projectOperations, FileManager fileManager);
 
     /**
      * Replaces all namespaces occurrences contained in {@code oldUriMap} in
@@ -369,74 +246,9 @@ public class WebProjectUtils {
      * @param projectOperations
      * @param fileManager
      */
-    public static void updateTagxUriInJspx(String relativePath,
+    public void updateTagxUriInJspx(String relativePath,
             Map<String, String> oldUriMap, Map<String, String> newUriMap,
-            ProjectOperations projectOperations, FileManager fileManager) {
-
-        // If null, create default oldUriMap causing jspx will be updated with
-        // all URIs in newUriMap
-        if (oldUriMap == null) {
-            oldUriMap = new HashMap<String, String>();
-        }
-
-        // Get jspx file path
-        PathResolver pathResolver = projectOperations.getPathResolver();
-        String docJspx = pathResolver.getIdentifier(
-                getWebappPath(projectOperations), relativePath);
-
-        // Parse XML document
-        Document docJspXml = loadXmlDocument(docJspx, fileManager);
-        if (docJspXml == null) {
-            // file not found: do nothing
-            return;
-        }
-
-        // Get main div
-        Element docRoot = docJspXml.getDocumentElement();
-        Element divMain = XmlUtils.findFirstElement("/div", docRoot);
-        boolean modified = false;
-
-        // Update namespace URIs
-        for (Entry<String, String> newUriEntry : newUriMap.entrySet()) {
-            String nsName = newUriEntry.getKey();
-            String nsUri = newUriEntry.getValue();
-
-            // Namespace name is in oldUriMap, as is in and as is in given file
-            // and old namespace (value in oldUriMap) match with namespace in
-            // jspx
-            if (oldUriMap.containsKey(nsName) && divMain.hasAttribute(nsName)) {
-                String oldNsUri = oldUriMap.get(nsName);
-                String currentUri = divMain.getAttribute(nsName);
-
-                if (StringUtils.isEmpty(oldNsUri)
-                        || oldNsUri.equalsIgnoreCase(currentUri)) {
-                    // Compares new value with current before change
-                    if (!StringUtils.equalsIgnoreCase(currentUri, nsUri)) {
-                        divMain.setAttribute(nsName, nsUri);
-                        modified = true;
-                    }
-                }
-            }
-
-            // Namespace name is not in oldUriMap and namespace name is in
-            // given file
-            if (!oldUriMap.containsKey(nsName) && divMain.hasAttribute(nsName)) {
-                // Compares new value with current before change
-                if (!StringUtils.equalsIgnoreCase(divMain.getAttribute(nsName),
-                        nsUri)) {
-                    divMain.setAttribute(nsName, nsUri);
-                    modified = true;
-                }
-            }
-        }
-
-        // If modified, update the jspx file
-        if (modified) {
-            DomUtils.removeTextNodes(docJspXml);
-            fileManager.createOrUpdateTextFileIfRequired(docJspx,
-                    XmlUtils.nodeToString(docJspXml), true);
-        }
-    }
+            ProjectOperations projectOperations, FileManager fileManager);
 
     /**
      * Load a XML {@link Document} from its file identifier
@@ -444,34 +256,8 @@ public class WebProjectUtils {
      * @param docFileIdentifier
      * @return document or null if file not found
      */
-    public static Document loadXmlDocument(String docFileIdentifier,
-            FileManager fileManager) {
-
-        Validate.notNull(fileManager, "FileManager cannot be null");
-        if (!fileManager.exists(docFileIdentifier)) {
-            // document doesn't exist, so nothing to do
-            return null;
-        }
-
-        // Parse document
-        Document docXml;
-        InputStream docIs = null;
-        try {
-            docIs = fileManager.getInputStream(docFileIdentifier);
-
-            try {
-                docXml = XmlUtils.getDocumentBuilder().parse(docIs);
-            }
-            catch (Exception ex) {
-                throw new IllegalStateException(
-                        "Could not open ".concat(docFileIdentifier), ex);
-            }
-        }
-        finally {
-            IOUtils.closeQuietly(docIs);
-        }
-        return docXml;
-    }
+    public Document loadXmlDocument(String docFileIdentifier,
+            FileManager fileManager);
 
     /**
      * Gets the {@code src/main/webapp} logicalPath
@@ -479,10 +265,7 @@ public class WebProjectUtils {
      * @param projectOperations
      * @return
      */
-    public static LogicalPath getWebappPath(ProjectOperations projectOperations) {
-        return LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP,
-                projectOperations.getFocusedModuleName());
-    }
+    public LogicalPath getWebappPath(ProjectOperations projectOperations);
 
     /**
      * Gets the src/main/java logicalPath
@@ -490,10 +273,7 @@ public class WebProjectUtils {
      * @param projectOperations
      * @return
      */
-    public static LogicalPath getJavaPath(ProjectOperations projectOperations) {
-        return LogicalPath.getInstance(Path.SRC_MAIN_JAVA,
-                projectOperations.getFocusedModuleName());
-    }
+    public LogicalPath getJavaPath(ProjectOperations projectOperations);
 
     /**
      * Append a css definition in loadScript.tagx
@@ -507,27 +287,8 @@ public class WebProjectUtils {
      * @param location css location
      * @return document has changed
      */
-    public static boolean addCssToTag(Document docTagx, Element root,
-            String varName, String location) {
-        boolean modified = false;
-
-        // add url resolution
-        modified = addUrlToTag(docTagx, root, varName, location);
-
-        // Add link
-        Element cssElement = XmlUtils.findFirstElement(
-                String.format("link[@href='${%s}']", varName), root);
-        if (cssElement == null) {
-            cssElement = docTagx.createElement("link");
-            cssElement.setAttribute("rel", "stylesheet");
-            cssElement.setAttribute("type", "text/css");
-            cssElement.setAttribute("media", "screen");
-            cssElement.setAttribute("href", "${".concat(varName).concat("}"));
-            root.appendChild(cssElement);
-            modified = true;
-        }
-        return modified;
-    }
+    public boolean addCssToTag(Document docTagx, Element root, String varName,
+            String location);
 
     /**
      * Append a css definition in loadScript.tagx
@@ -541,27 +302,8 @@ public class WebProjectUtils {
      * @param location css location
      * @return document has changed
      */
-    public static boolean updateCssToTag(Document docTagx, Element root,
-            String varName, String location) {
-        boolean modified = false;
-
-        // add url resolution
-        modified = updateUrlToTag(docTagx, root, varName, location);
-
-        // Add link
-        Element cssElement = XmlUtils.findFirstElement(
-                String.format("link[@href='${%s}']", varName), root);
-        if (cssElement == null) {
-            cssElement = docTagx.createElement("link");
-            cssElement.setAttribute("rel", "stylesheet");
-            cssElement.setAttribute("type", "text/css");
-            cssElement.setAttribute("media", "screen");
-            cssElement.setAttribute("href", "${".concat(varName).concat("}"));
-            root.appendChild(cssElement);
-            modified = true;
-        }
-        return modified;
-    }
+    public boolean updateCssToTag(Document docTagx, Element root,
+            String varName, String location);
 
     /**
      * Append a '<spring:url var="varName" value='location'/>' tag inside root
@@ -577,19 +319,8 @@ public class WebProjectUtils {
      * @param location URL
      * @return if document has changed
      */
-    public static boolean addUrlToTag(Document docTagx, Element root,
-            String varName, String location) {
-        Element urlElement = XmlUtils.findFirstElement(
-                "url[@var='".concat(varName) + "']", root);
-        if (urlElement == null) {
-            urlElement = docTagx.createElement("spring:url");
-            urlElement.setAttribute("var", varName);
-            urlElement.setAttribute(VALUE, location);
-            root.appendChild(urlElement);
-            return true;
-        }
-        return false;
-    }
+    public boolean addUrlToTag(Document docTagx, Element root, String varName,
+            String location);
 
     /**
      * Append a '<spring:url var="varName" value='location'/>' tag inside root
@@ -605,17 +336,8 @@ public class WebProjectUtils {
      * @param location URL
      * @return if document has changed
      */
-    public static boolean updateUrlToTag(Document docTagx, Element root,
-            String varName, String location) {
-        Element urlElement = XmlUtils.findFirstElement(
-                "url[@var='".concat(varName) + "']", root);
-        if (urlElement != null) {
-            urlElement.setAttribute("var", varName);
-            urlElement.setAttribute(VALUE, location);
-            return true;
-        }
-        return false;
-    }
+    public boolean updateUrlToTag(Document docTagx, Element root,
+            String varName, String location);
 
     /**
      * Append a js definition in loadScript.tagx
@@ -629,27 +351,8 @@ public class WebProjectUtils {
      * @param location js location
      * @return document has changed
      */
-    public static boolean addJSToTag(Document docTagx, Element root,
-            String varName, String location) {
-        boolean modified = false;
-
-        // add url resolution
-        modified = addUrlToTag(docTagx, root, varName, location);
-
-        // Add script
-        Element scriptElement = XmlUtils.findFirstElement(
-                String.format("script[@src='${%s}']", varName), root);
-        if (scriptElement == null) {
-            scriptElement = docTagx.createElement("script");
-            scriptElement.setAttribute("src", "${".concat(varName).concat("}"));
-            scriptElement.setAttribute("type", "text/javascript");
-            scriptElement.appendChild(docTagx
-                    .createComment("required for FF3 and Opera"));
-            root.appendChild(scriptElement);
-            modified = true;
-        }
-        return modified;
-    }
+    public boolean addJSToTag(Document docTagx, Element root, String varName,
+            String location);
 
     /**
      * Append a js definition in loadScript.tagx
@@ -663,27 +366,8 @@ public class WebProjectUtils {
      * @param location js location
      * @return document has changed
      */
-    public static boolean updateJSToTag(Document docTagx, Element root,
-            String varName, String location) {
-        boolean modified = false;
-
-        // add url resolution
-        modified = updateUrlToTag(docTagx, root, varName, location);
-
-        // Add script
-        Element scriptElement = XmlUtils.findFirstElement(
-                String.format("script[@src='${%s}']", varName), root);
-        if (scriptElement == null) {
-            scriptElement = docTagx.createElement("script");
-            scriptElement.setAttribute("src", "${".concat(varName).concat("}"));
-            scriptElement.setAttribute("type", "text/javascript");
-            scriptElement.appendChild(docTagx
-                    .createComment("required for FF3 and Opera"));
-            root.appendChild(scriptElement);
-            modified = true;
-        }
-        return modified;
-    }
+    public boolean updateJSToTag(Document docTagx, Element root,
+            String varName, String location);
 
     /**
      * Add css and javaScript definition to load-scripts.tagx (if not found)
@@ -693,50 +377,9 @@ public class WebProjectUtils {
      * @param projectOperations
      * @param fileManager
      */
-    public static void addJsAndCssToLoadScriptsTag(
-            List<Pair<String, String>> cssList,
+    public void addJsAndCssToLoadScriptsTag(List<Pair<String, String>> cssList,
             List<Pair<String, String>> jsList,
-            ProjectOperations projectOperations, FileManager fileManager) {
-
-        // Parse load-script.tagx
-        PathResolver pathResolver = projectOperations.getPathResolver();
-        String docTagxPath = pathResolver.getIdentifier(
-                getWebappPath(projectOperations),
-                "WEB-INF/tags/util/load-scripts.tagx");
-        Validate.isTrue(fileManager.exists(docTagxPath),
-                "load-script.tagx not found: ".concat(docTagxPath));
-
-        MutableFile docTagxMutableFile = null;
-        Document docTagx;
-
-        try {
-            docTagxMutableFile = fileManager.updateFile(docTagxPath);
-            docTagx = XmlUtils.getDocumentBuilder().parse(
-                    docTagxMutableFile.getInputStream());
-        }
-        catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        Element root = docTagx.getDocumentElement();
-
-        boolean modified = false;
-
-        // Add css
-        for (Pair<String, String> css : cssList) {
-            modified = addCssToTag(docTagx, root, css.getLeft(), css.getRight())
-                    || modified;
-        }
-
-        // Add js
-        for (Pair<String, String> js : jsList) {
-            modified = addJSToTag(docTagx, root, js.getLeft(), js.getRight())
-                    || modified;
-        }
-
-        if (modified) {
-            XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
-        }
-    }
+            ProjectOperations projectOperations, FileManager fileManager);
 
     /**
      * Add variable to contain request Locale in string format.
@@ -766,55 +409,6 @@ public class WebProjectUtils {
      * @param varName name of variable to create, see {@code VAR_NAME} in
      *        example above
      */
-    public static boolean addLocaleVarToTag(Document docTagx, Element root,
-            String varName) {
-
-        // Add locale var
-        Element varElement = XmlUtils.findFirstElement(
-                String.format("c:set[@var='${%s}']", varName), root);
-        if (varElement == null) {
-            varElement = docTagx.createElement("c:set");
-            varElement.setAttribute("var", varName);
-            varElement
-                    .appendChild(docTagx
-                            .createComment(" Get the user local from the page context (it was set by Spring MVC's locale resolver) "));
-
-            Element pElement = docTagx.createElement("c:set");
-            pElement.setAttribute("var", "jqlocale");
-            pElement.appendChild(docTagx
-                    .createTextNode("${pageContext.response.locale}"));
-            varElement.appendChild(pElement);
-
-            Element ifElement = docTagx.createElement("c:if");
-            ifElement.setAttribute("test", "${fn:length(jqlocale) eq 2}");
-
-            Element outElement = docTagx.createElement("c:out");
-            outElement.setAttribute(VALUE, "${jqlocale}");
-            ifElement.appendChild(outElement);
-            varElement.appendChild(ifElement);
-
-            ifElement = docTagx.createElement("c:if");
-            ifElement.setAttribute("test", "${fn:length(jqlocale) gt 2}");
-
-            outElement = docTagx.createElement("c:out");
-            outElement.setAttribute(VALUE,
-                    "${fn:substringBefore(jqlocale, '_')}");
-            outElement.setAttribute("default", "en");
-            ifElement.appendChild(outElement);
-            varElement.appendChild(ifElement);
-
-            ifElement = docTagx.createElement("c:if");
-            ifElement.setAttribute("test", "${fn:length(jqlocale) lt 2}");
-
-            outElement = docTagx.createElement("c:out");
-            outElement.setAttribute(VALUE, "en");
-            ifElement.appendChild(outElement);
-            varElement.appendChild(ifElement);
-
-            root.appendChild(varElement);
-
-            return true;
-        }
-        return false;
-    }
+    public boolean addLocaleVarToTag(Document docTagx, Element root,
+            String varName);
 }

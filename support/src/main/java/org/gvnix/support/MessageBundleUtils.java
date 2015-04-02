@@ -17,21 +17,9 @@
  */
 package org.gvnix.support;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.Validate;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
 
 /**
@@ -40,9 +28,7 @@ import org.springframework.roo.project.ProjectOperations;
  * @author gvNIX Team
  * @since 0.8.0
  */
-public class MessageBundleUtils {
-    private static final Logger logger = Logger
-            .getLogger(MessageBundleUtils.class.getName());
+public interface MessageBundleUtils {
 
     /**
      * Creates if it doesn't exist the messages_xx.properties file for the given
@@ -53,50 +39,8 @@ public class MessageBundleUtils {
      * 
      * @param i18n
      */
-    public static void installI18nMessages(I18n i18n,
-            ProjectOperations projectOperations, FileManager fileManager) {
-        Validate.notNull(i18n, "Language choice required");
-
-        if (i18n.getLocale() == null) {
-            logger.warning("could not parse language choice");
-            return;
-        }
-        LogicalPath webappPath = WebProjectUtils
-                .getWebappPath(projectOperations);
-        String targetDirectory = projectOperations.getPathResolver()
-                .getIdentifier(webappPath, "");
-
-        // Install message bundle
-        String messageBundle = targetDirectory.concat("WEB-INF/i18n/messages_")
-                .concat(i18n.getLocale().getLanguage()).concat(".properties");
-
-        // Special case for English locale (default)
-        if (i18n.getLocale().equals(Locale.ENGLISH)) {
-            messageBundle = targetDirectory
-                    .concat("WEB-INF/i18n/messages.properties");
-        }
-        if (!fileManager.exists(messageBundle)) {
-            OutputStream outputStream = null;
-            try {
-
-                outputStream = fileManager.createFile(messageBundle)
-                        .getOutputStream();
-                IOUtils.copy(i18n.getMessageBundle(), outputStream);
-
-            }
-            catch (IOException e) {
-
-                throw new IllegalStateException(
-                        "Error during copying of message bundle MVC JSP addon",
-                        e);
-            }
-            finally {
-
-                IOUtils.closeQuietly(outputStream);
-            }
-        }
-        return;
-    }
+    public void installI18nMessages(I18n i18n,
+            ProjectOperations projectOperations, FileManager fileManager);
 
     /**
      * Copy properties associated with the given class to the message bundle of
@@ -116,54 +60,8 @@ public class MessageBundleUtils {
      * @param fileManager
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static void addPropertiesToMessageBundle(String language,
+    public void addPropertiesToMessageBundle(String language,
             Class invokingClass, PropFileOperations propFileOperations,
-            ProjectOperations projectOperations, FileManager fileManager) {
-        Properties properties = new Properties();
-        LogicalPath webappPath = WebProjectUtils
-                .getWebappPath(projectOperations);
-
-        String sourcePropertyFile = "/".concat(
-                invokingClass.getPackage().getName()).replace('.', '/');
-
-        // Take "en" as default language
-        String targetFilePath = "/WEB-INF/i18n/messages.properties";
-        String targetFile = projectOperations.getPathResolver().getIdentifier(
-                webappPath, targetFilePath);
-
-        try {
-            if (language.equals("en")) {
-                sourcePropertyFile = sourcePropertyFile
-                        .concat("/messages.properties");
-                properties.load(invokingClass
-                        .getResourceAsStream(sourcePropertyFile));
-            }
-            else {
-                targetFilePath = "/WEB-INF/i18n/messages_".concat(language)
-                        .concat(".properties");
-                targetFile = projectOperations.getPathResolver().getIdentifier(
-                        webappPath, targetFilePath);
-
-                sourcePropertyFile = sourcePropertyFile.concat("/messages_"
-                        .concat(language).concat(".properties"));
-                properties.load(invokingClass
-                        .getResourceAsStream(sourcePropertyFile));
-            }
-
-            if (fileManager.exists(targetFile)) {
-                propFileOperations.addProperties(webappPath, targetFilePath,
-                        new HashMap<String, String>((Map) properties), true,
-                        true);
-            }
-            else {
-                logger.warning(targetFile
-                        .concat(" file doesn't exist in project."));
-            }
-        }
-        catch (IOException e) {
-            logger.log(Level.SEVERE, "Message properties for language \""
-                    .concat(language).concat("\" can't be loaded"));
-        }
-    }
+            ProjectOperations projectOperations, FileManager fileManager);
 
 }

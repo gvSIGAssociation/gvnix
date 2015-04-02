@@ -1,11 +1,14 @@
 package org.gvnix.addon.monitoring;
 
-import org.springframework.roo.model.*;
+import org.springframework.roo.model.JavaPackage;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Feature;
 
 /**
  * Interface of operations this add-on offers.
  * 
+ * @author gvNIX Team
  * @since 1.4.0
  */
 public interface MonitoringOperations extends Feature {

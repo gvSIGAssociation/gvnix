@@ -17,6 +17,8 @@
  */
 package org.gvnix.addon.jpa.addon.audit;
 
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAudit;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAuditRevisionEntity;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;

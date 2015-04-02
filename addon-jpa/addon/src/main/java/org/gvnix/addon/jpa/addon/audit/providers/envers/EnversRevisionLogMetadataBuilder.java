@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gvnix.addon.jpa.addon.audit.GvNIXJpaAudit;
 import org.gvnix.addon.jpa.addon.audit.JpaAuditMetadata;
 import org.gvnix.addon.jpa.addon.audit.JpaAuditRevisionEntityMetadata;
 import org.gvnix.addon.jpa.addon.audit.providers.RevisionLogMetadataBuilder;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAudit;
 import org.gvnix.support.ItdBuilderHelper;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;

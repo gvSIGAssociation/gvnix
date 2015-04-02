@@ -22,6 +22,7 @@ import static org.springframework.roo.classpath.customdata.CustomDataKeys.PERSIS
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAuditUserService;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;

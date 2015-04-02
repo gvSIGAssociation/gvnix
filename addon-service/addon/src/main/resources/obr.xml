@@ -1,0 +1,15 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-remote-service-class' v='remote service class'/>
+      <p n='command-remote-service-operation' v='remote service operation'/>
+      <p n='command-remote-service-define-ws' v='remote service define ws'/>
+      <p n='command-remote-service-export-operation' v='remote service export operation'/>
+      <p n='command-remote-service-list-operation' v='remote service list operation'/>
+      <p n='command-remote-service-import-ws' v='remote service import ws'/>
+      <p n='command-remote-service-export-ws' v='remote service export ws'/>
+      <p n='command-remote-service-security-ws' v='remote service security ws'/>
+      <p n='command-remote-service-ws-list' v='remote service ws list'/>
+    </capability>
+  </resource>
+</repository>

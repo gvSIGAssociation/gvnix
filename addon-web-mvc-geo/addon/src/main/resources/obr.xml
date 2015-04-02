@@ -1,0 +1,15 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-web-mvc-geo-setup' v='web mvc geo setup'/>
+      <p n='command-web-mvc-geo-controller' v='web mvc geo controller'/>
+      <p n='command-web-mvc-geo-entity-all' v='web mvc geo entity all'/>
+      <p n='command-web-mvc-geo-entity-add' v='web mvc geo entity add'/>
+      <p n='command-web-mvc-geo-field' v='web mvc geo field'/>
+      <p n='command-web-mvc-geo-tilelayer' v='web mvc geo tilelayer'/>
+      <p n='command-web-mvc-geo-wmslayer' v='web mvc geo wmslayer'/>
+      <p n='command-web-mvc-geo-tool-measure' v='web mvc geo tool measure'/>
+      <p n='command-web-mvc-geo-tool-custom' v='web mvc geo tool custom'/>
+    </capability>
+  </resource>
+</repository>

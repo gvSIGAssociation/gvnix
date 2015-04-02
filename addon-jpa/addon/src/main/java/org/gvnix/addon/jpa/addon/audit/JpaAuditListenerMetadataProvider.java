@@ -26,6 +26,8 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.jpa.addon.entitylistener.JpaOrmEntityListenerRegistry;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAudit;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAuditListener;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;

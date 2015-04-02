@@ -17,7 +17,7 @@
  */
 package org.gvnix.addon.web.mvc.addon.batch;
 
-import org.gvnix.addon.jpa.addon.batch.GvNIXJpaBatch;
+import org.gvnix.addon.jpa.annotations.batch.GvNIXJpaBatch;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Feature;
 

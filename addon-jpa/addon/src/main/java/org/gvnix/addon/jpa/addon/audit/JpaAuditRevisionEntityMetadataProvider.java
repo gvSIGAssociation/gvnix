@@ -23,6 +23,8 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.jpa.addon.audit.providers.RevisionLogProvider;
 import org.gvnix.addon.jpa.addon.audit.providers.RevisionLogRevisionEntityMetadataBuilder;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAudit;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAuditRevisionEntity;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;

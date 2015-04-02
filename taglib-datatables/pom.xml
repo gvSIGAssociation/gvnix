@@ -32,7 +32,7 @@
     <version>2.0.0.BUILD-SNAPSHOT</version>
   </parent>
   <artifactId>org.gvnix.datatables.tags</artifactId>
-  <name>gvNIX - Datatables JSP Tag library</name>
+  <name>gvNIX - Library - Datatables JSP Tag library</name>
   <organization>
     <name>Generalitat Valenciana</name>
   </organization>
@@ -52,6 +52,10 @@
   </repositories>
 
   <dependencies>
+  		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
+		</dependency>
         <dependency>
             <groupId>javax.servlet.jsp.jstl</groupId>
             <artifactId>jstl-api</artifactId>
@@ -131,9 +135,6 @@
             <version>2.1</version>
         </dependency>
   </dependencies>
-  <properties>
-        <jackson.version>1.9.12</jackson.version>
-  </properties>
   <build>
 
   	<!-- DiSiD: Add build resources filtering -->
@@ -190,5 +191,10 @@
   		</plugins>
   	</pluginManagement>
   </build>
+
+  <properties>
+    <jackson.version>1.9.12</jackson.version>
+    <target.osgi-repository.directory>${basedir}/../target/osgi-repository-bin</target.osgi-repository.directory>
+  </properties>
 </project>
 

@@ -1,0 +1,7 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-stringtrimmer' v='web mvc binding stringTrimmer'/>
+    </capability>
+  </resource>
+</repository>

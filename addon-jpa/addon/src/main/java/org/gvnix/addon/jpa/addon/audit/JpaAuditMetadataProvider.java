@@ -23,13 +23,14 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.addon.jpa.addon.audit.GvNIXJpaAudit.StoreRevisionLog;
 import org.gvnix.addon.jpa.addon.audit.providers.RevisionLogMetadataBuilder;
 import org.gvnix.addon.jpa.addon.audit.providers.RevisionLogProvider;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAudit;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAudit.StoreRevisionLog;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
+import org.springframework.roo.addon.jpa.addon.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;

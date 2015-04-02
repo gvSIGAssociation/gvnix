@@ -20,6 +20,7 @@ package org.gvnix.addon.web.mvc.addon.batch;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.web.mvc.annotations.batch.GvNIXWebJpaBatch;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;

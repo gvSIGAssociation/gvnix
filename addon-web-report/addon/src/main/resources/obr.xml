@@ -1,0 +1,8 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-setup' v='web report setup'/>
+      <p n='command-add' v='web report add'/>
+    </capability>
+  </resource>
+</repository>

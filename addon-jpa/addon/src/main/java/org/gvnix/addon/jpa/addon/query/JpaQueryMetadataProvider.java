@@ -19,6 +19,7 @@ package org.gvnix.addon.jpa.addon.query;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.jpa.annotations.query.GvNIXJpaQuery;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;

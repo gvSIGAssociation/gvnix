@@ -45,7 +45,6 @@
 
   
   <properties>
-	<target.jar.directory>${basedir}/../../target/all</target.jar.directory>  
 	<devel.resources.path>../../devel-resources</devel.resources.path>
   </properties>
 </project>

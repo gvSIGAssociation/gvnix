@@ -30,6 +30,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.addon.jpa.addon.audit.providers.RevisionLogMetadataBuilder;
 import org.gvnix.addon.jpa.addon.audit.providers.RevisionLogMetadataBuilder.Context;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAudit;
 import org.gvnix.support.ItdBuilderHelper;
 import org.gvnix.support.ItdBuilderHelper.GET_FIELD_EXISTS_ACTION;
 import org.springframework.roo.classpath.PhysicalTypeCategory;

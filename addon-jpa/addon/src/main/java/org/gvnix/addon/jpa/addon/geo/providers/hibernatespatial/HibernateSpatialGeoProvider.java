@@ -52,7 +52,7 @@ import org.w3c.dom.NodeList;
 public class HibernateSpatialGeoProvider implements GeoProvider {
 
     private static final JavaType JPA_ACTIVE_RECORD_ANNOTATION = new JavaType(
-            "org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord");
+            "org.springframework.roo.addon.jpa.annotations.activerecord.RooJpaActiveRecord");
 
     // ------------ OSGi component attributes ----------------
     private BundleContext context;
@@ -82,7 +82,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
             "org.hibernate.annotations.Type");
 
     private static final JavaType GVNIX_ENTITY_MAP_LAYER_ANNOTATION = new JavaType(
-            "org.gvnix.addon.jpa.geo.providers.hibernatespatial.GvNIXEntityMapLayer");
+            "org.gvnix.addon.jpa.annotations.geo.providers.hibernatespatial.GvNIXEntityMapLayer");
 
     protected void activate(ComponentContext cContext) {
         context = cContext.getBundleContext();

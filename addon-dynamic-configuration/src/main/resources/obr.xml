@@ -1,0 +1,12 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-create' v='configuration create'/>
+      <p n='command-property-add' v='configuration property add'/>
+      <p n='command-property-value' v='configuration property value'/>
+      <p n='command-property-undefined' v='configuration property undefined'/>
+      <p n='command-list' v='configuration list'/>
+      <p n='command-export' v='configuration export'/>
+    </capability>
+  </resource>
+</repository>

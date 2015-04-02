@@ -1,0 +1,8 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-setup' v='web mvc bootstrap setup'/>
+      <p n='command-update' v='web mvc bootstrap update'/>
+    </capability>
+  </resource>
+</repository>

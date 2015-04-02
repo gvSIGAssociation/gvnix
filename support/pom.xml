@@ -35,6 +35,7 @@
     <relativePath>../gvnix-osgi-bundles</relativePath>
   </parent>
   <artifactId>org.gvnix.support</artifactId>
+  <packaging>bundle</packaging>
   <name>gvNIX - Support Module</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
@@ -43,13 +44,36 @@
   <url>http://www.gvnix.org</url>
 
   <dependencies>
-
-    <!-- Roo -->
+  	<!-- Roo dependencies -->
+	<dependency>
+		<groupId>org.springframework.roo</groupId>
+		<artifactId>org.springframework.roo.addon.web.mvc.controller.addon</artifactId>
+	</dependency>    
+	<dependency>
+		<groupId>org.springframework.roo</groupId>
+		<artifactId>org.springframework.roo.addon.web.mvc.jsp</artifactId>
+	</dependency>    
+	
+	 <!-- OSGi -->
     <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.web.mvc.jsp</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <!-- Apache Felix -->
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
+    </dependency>
   </dependencies>
-
+  
+  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
+  <properties>
+    <gvnix.version>${project.parent.version}</gvnix.version>
+    <google.code.project.name>gvnix</google.code.project.name>
+  </properties>
+  
 </project>

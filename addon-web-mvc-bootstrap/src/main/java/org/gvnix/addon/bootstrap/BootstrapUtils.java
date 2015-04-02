@@ -134,7 +134,7 @@ public class BootstrapUtils {
      */
     public static void updateJSPViewsToUseJQuery(PathResolver pathResolver,
             LogicalPath webappPath, ProjectOperations projectOperations,
-            FileManager fileManager) {
+            FileManager fileManager, WebProjectUtils webProjectUtils) {
 
         String path = "";
         // Getting all views of the application
@@ -197,7 +197,7 @@ public class BootstrapUtils {
                 for (String jspxName : pageList) {
                     String tagxFile = "WEB-INF/views/".concat(path).concat(
                             jspxName);
-                    WebProjectUtils.updateTagxUriInJspx(tagxFile, rooUriMap,
+                    webProjectUtils.updateTagxUriInJspx(tagxFile, rooUriMap,
                             uriMap, projectOperations, fileManager);
                 }
             }

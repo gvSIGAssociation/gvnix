@@ -1,0 +1,12 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='command-exception-list' v='web mvc dialog exception list'/>
+      <p n='command-exception-add' v='web mvc dialog exception add'/>
+      <p n='command-exception-remove' v='web mvc dialog exception remove'/>
+      <p n='command-exception-set-language' v='web mvc dialog exception set language'/>
+      <p n='command-setup' v='web mvc dialog setup'/>
+      <p n='command-add' v='web mvc dialog add'/>
+    </capability>
+  </resource>
+</repository>

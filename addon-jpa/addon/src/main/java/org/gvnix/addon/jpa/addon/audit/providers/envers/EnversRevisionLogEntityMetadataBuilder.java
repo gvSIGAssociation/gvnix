@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.gvnix.addon.jpa.addon.audit.GvNIXJpaAuditRevisionEntity;
 import org.gvnix.addon.jpa.addon.audit.JpaAuditUserServiceMetadata;
 import org.gvnix.addon.jpa.addon.audit.providers.RevisionLogRevisionEntityMetadataBuilder;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAuditRevisionEntity;
 import org.gvnix.support.ItdBuilderHelper;
 import org.gvnix.support.ItdBuilderHelper.GET_FIELD_EXISTS_ACTION;
 import org.springframework.roo.classpath.PhysicalTypeCategory;

@@ -18,8 +18,9 @@
 package org.gvnix.addon.web.mvc.addon.jquery;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.gvnix.addon.web.mvc.annotations.jquery.GvNIXWebJQuery;
+import org.springframework.roo.addon.web.mvc.controller.addon.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.addon.web.mvc.controller.annotations.scaffold.RooWebScaffold;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetails;

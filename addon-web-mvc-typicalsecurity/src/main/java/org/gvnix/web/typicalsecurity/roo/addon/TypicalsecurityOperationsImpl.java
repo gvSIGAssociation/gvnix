@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,10 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.WebProjectUtils;
 import org.gvnix.web.typicalsecurity.roo.addon.listeners.TypicalSecurityDependencyListener;
 import org.gvnix.web.typicalsecurity.roo.addon.utils.TokenReplacementFileCopyUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
@@ -39,6 +44,7 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.shell.Shell;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
@@ -54,6 +60,10 @@ import org.w3c.dom.Element;
 @Component
 @Service
 public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations {
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(TypicalsecurityOperationsImpl.class);
+
     private static final String VIEWS = "views/";
     private static final String SIGNUP = "signup";
     private static final String INTERCEPT_URL = "intercept-url";
@@ -67,11 +77,20 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
     @Reference
     private Shell shell;
 
+    private WebProjectUtils webProjectUtils;
+
     /**
      * Uses to ensure that dependencyListener will be loaded
      */
     @Reference
     private TypicalSecurityDependencyListener dependencyListener;
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
 
     /*
      * Not available since Roo 1.1.2 (See ROO-2066)
@@ -803,7 +822,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
      * @return
      */
     public LogicalPath getWebappPath() {
-        return WebProjectUtils.getWebappPath(projectOperations);
+        return getWebPojectUtils().getWebappPath(projectOperations);
     }
 
     /**
@@ -840,6 +859,34 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
         finally {
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
+        }
+
+    }
+
+    public WebProjectUtils getWebPojectUtils() {
+        if (webProjectUtils == null) {
+            // Get all Services implement WebProjectUtils interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebProjectUtils.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    webProjectUtils = (WebProjectUtils) this.context
+                            .getService(ref);
+                    return webProjectUtils;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebProjectUtils on TypicalSecurityOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return webProjectUtils;
         }
 
     }

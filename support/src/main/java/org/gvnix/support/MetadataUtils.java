@@ -27,7 +27,7 @@ import org.springframework.roo.model.JavaType;
  * @author gvNIX Team
  * @since 0.8.0
  */
-public class MetadataUtils {
+public interface MetadataUtils {
 
     /**
      * Returns an instance of {@link MutableClassOrInterfaceTypeDetails} of the
@@ -42,9 +42,7 @@ public class MetadataUtils {
      * @return
      * @deprecated Use typeLocationService.getTypeDetails(type) instead
      */
-    public static ClassOrInterfaceTypeDetails getPhysicalTypeDetails(
-            JavaType type, TypeLocationService typeLocationService) {
-        return typeLocationService.getTypeDetails(type);
-    }
+    public ClassOrInterfaceTypeDetails getPhysicalTypeDetails(JavaType type,
+            TypeLocationService typeLocationService);
 
 }

@@ -1,0 +1,10 @@
+<repository>
+  <resource>
+    <capability name='commands'>
+      <p n='commandsetup' v='monitoring setup'/>
+      <p n='commandall' v='monitoring all'/>
+      <p n='commandaddpackage' v='monitoring add package'/>
+      <p n='commandaddmethod' v='monitoring add method'/>
+    </capability>
+  </resource>
+</repository>

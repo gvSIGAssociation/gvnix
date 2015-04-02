@@ -25,7 +25,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.web.mvc.controller.finder.WebFinderMetadata;
+import org.springframework.roo.addon.web.mvc.controller.addon.finder.WebFinderMetadata;
 import org.springframework.roo.metadata.DefaultMetadataService;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;

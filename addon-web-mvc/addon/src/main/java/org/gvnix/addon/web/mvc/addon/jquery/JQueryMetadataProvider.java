@@ -21,9 +21,10 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.web.mvc.annotations.jquery.GvNIXWebJQuery;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.addon.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.addon.web.mvc.controller.addon.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;

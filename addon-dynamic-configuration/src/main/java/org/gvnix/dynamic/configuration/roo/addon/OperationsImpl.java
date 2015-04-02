@@ -19,6 +19,7 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -28,9 +29,14 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.support.OperationUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -58,9 +64,21 @@ public class OperationsImpl implements Operations {
     @Reference
     private PomManager pomManager;
 
+    private OperationUtils operationUtils;
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(OperationsImpl.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
+    protected void activate(ComponentContext cContext) {
+        context = cContext.getBundleContext();
+    }
+
     public boolean isProjectAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService,
+        return getOperationUtils().isProjectAvailable(metadataService,
                 projectOperations);
     }
 
@@ -230,6 +248,34 @@ public class OperationsImpl implements Operations {
         }
 
         return dynConfs;
+    }
+
+    public OperationUtils getOperationUtils() {
+        if (operationUtils == null) {
+            // Get all Services implement OperationUtils interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                OperationUtils.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    operationUtils = (OperationUtils) this.context
+                            .getService(ref);
+                    return operationUtils;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load OperationUtils on Dynamic Configuration OperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return operationUtils;
+        }
+
     }
 
 }

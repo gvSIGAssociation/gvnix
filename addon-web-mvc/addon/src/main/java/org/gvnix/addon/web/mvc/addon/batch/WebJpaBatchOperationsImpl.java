@@ -28,16 +28,17 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.addon.jpa.addon.JpaOperations;
-import org.gvnix.addon.jpa.addon.batch.GvNIXJpaBatch;
 import org.gvnix.addon.jpa.addon.batch.JpaBatchAnnotationValues;
+import org.gvnix.addon.jpa.annotations.batch.GvNIXJpaBatch;
 import org.gvnix.addon.web.mvc.addon.MvcOperations;
+import org.gvnix.addon.web.mvc.annotations.batch.GvNIXWebJpaBatch;
 import org.gvnix.support.WebProjectUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.addon.web.mvc.controller.addon.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.addon.web.mvc.controller.annotations.scaffold.RooWebScaffold;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -97,6 +98,8 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
     private TypeManagementService typeManagementService;
 
     private MetadataService metadataService;
+
+    private WebProjectUtils webProjectUtils;
 
     protected void activate(ComponentContext cContext) {
         context = cContext.getBundleContext();
@@ -177,8 +180,8 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
      * @param targetPackage
      */
     private void updateWebMvcConfig() {
-        LogicalPath webappPath = WebProjectUtils
-                .getWebappPath(getProjectOperations());
+        LogicalPath webappPath = getWebProjectUtils().getWebappPath(
+                getProjectOperations());
         String webMvcXmlPath = getProjectOperations().getPathResolver()
                 .getIdentifier(webappPath, "WEB-INF/spring/webmvc-config.xml");
         Validate.isTrue(fileManager.exists(webMvcXmlPath),
@@ -516,5 +519,33 @@ public class WebJpaBatchOperationsImpl extends AbstractOperations implements
         else {
             return metadataService;
         }
+    }
+
+    public WebProjectUtils getWebProjectUtils() {
+        if (webProjectUtils == null) {
+            // Get all Services implement WebProjectUtils interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebProjectUtils.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    webProjectUtils = (WebProjectUtils) this.context
+                            .getService(ref);
+                    return webProjectUtils;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebProjectUtils on WebJpaBatchOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return webProjectUtils;
+        }
+
     }
 }

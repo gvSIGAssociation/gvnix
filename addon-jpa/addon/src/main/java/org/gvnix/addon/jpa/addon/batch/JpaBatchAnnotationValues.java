@@ -17,6 +17,7 @@
  */
 package org.gvnix.addon.jpa.addon.batch;
 
+import org.gvnix.addon.jpa.annotations.batch.GvNIXJpaBatch;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;

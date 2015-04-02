@@ -18,6 +18,7 @@
 package org.gvnix.addon.jpa.addon.audit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAuditUserService;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;

@@ -17,7 +17,8 @@
  */
 package org.gvnix.addon.jpa.addon.audit;
 
-import org.gvnix.addon.jpa.addon.audit.GvNIXJpaAudit.StoreRevisionLog;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAudit;
+import org.gvnix.addon.jpa.annotations.audit.GvNIXJpaAudit.StoreRevisionLog;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
