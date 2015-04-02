@@ -7,9 +7,12 @@
       <distribution>repo</distribution>
       <comments>
       <![CDATA[
-      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
-      i Transport - Generalitat Valenciana
-      Copyright (C) 2010 CIT - Generalitat Valenciana
+      gvNIX is sponsored by the General Directorate for Information 
+      Technologies (DGTI) of the Regional Ministry of Finance and Public 
+      Administration of the Generalitat Valenciana (Valencian Community, 
+      Spain), managed by gvSIG Association and led by DISID.
+
+      Copyright (C) 2010 DGTI - Generalitat Valenciana
 
       This program is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by
@@ -18,11 +21,11 @@
 
       This program is distributed in the hope that it will be useful,
       but WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
       GNU General Public License for more details.
 
       You should have received a copy of the GNU General Public License
-      along with this program.  If not, see <http://www.gnu.org/licenses />.
+      along with this program. If not, see <http://www.gnu.org/licenses />.
       ]]>
       </comments>
     </license>
@@ -34,12 +37,25 @@
   <packaging>pom</packaging>
   <version>2.0.0.BUILD-SNAPSHOT</version>
   <name>gvNIX</name>
-  <description>Spring Roo based RAD tool for Conselleria d'Infraestructures i Transport - Generalitat Valenciana</description>
+
+  <description>
+  gvNIX is an open source tool for rapid application development (RAD) with 
+  which you can create Java web applications in minutes.
+
+  It is a distribution of Spring Roo that provides the set of Spring Roo tools 
+  plus a suite of features that increase development productivity and improve 
+  the user experience.
+  </description>
 
   <organization>
-    <name>Conselleria d'Infraestrures i Transport, Generalitat Valenciana</name>
-    <url>http://www.cit.gva.es/</url>
+    <name>
+    General Directorate for Information Technologies (DGTI) of
+    the Regional Ministry of Finance and Public Administration of the 
+    Generalitat Valenciana.
+    </name>
+    <url>http://www.dgti.gva.es/</url>
   </organization>
+
   <inceptionYear>2010</inceptionYear>
   <url>http://www.gvnix.org</url>
 
