@@ -222,7 +222,7 @@
       <executions>
         <execution>
           <id>upload-repository</id>
-          <phase>install</phase>
+          <phase>deploy</phase>
           <goals>
             <goal>upload</goal>
           </goals>
