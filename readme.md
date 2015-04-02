@@ -30,33 +30,13 @@ To start to develop gvNIX and extend its features you need:
 
 * Last Spring Roo distribution (http://spring.io/projects/spring-roo)
 * JDK 7 or above ( http://www.oracle.com/technetwork/es/java/javase/downloads/index.html)
-* Maven 3.0.5 or above ( http://maven.apache.org/download.html )
-* Apache 2 HTTP Server ( http://httpd.apache.org/download.cgi) 
+* Maven 3.0.5 or above ( http://maven.apache.org/download.html ) 
 * Internet access so that Maven can download required dependencies
 
 Run gvNIX Roo Addon Suite
 ===========================
 
-1. Build gvNIX Roo Addon Suite
-
-    bash:~/gvnix$ mvn clean install
-
-2. Create/Update your own repository
-
-    bash:~/gvnix$ mkdir /var/www/html/gvnix-repo
-    bash:~/gvnix$ cp -r target/osgi-repository-bin/* /var/www/html/gvnix-repo/
-
-3. Execute Spring Roo shell
-
-    bash:~/project$ roo.sh
-
-4. Add your gvNIX repo to Spring Roo
-
-    roo> addon repository add --url http://localhost/gvnix-repo/index.xml
-
-5. Install your gvNIX Roo Addon Suite
-
-    roo> addon suite install name --symbolicName org.gvnix.roo.addon.suite
+TBC
 
 Developing within STS
 ==========================
@@ -91,11 +71,11 @@ Need more info ?
 
 For more information generate and read the *gvNIX Developer Guide* (Spanish).
 
-Run the following command from the root checkout location::
+Run the following command from the root checkout location:
 
    bash:~/gvnix$ mvn site
 
-This will create the guide in the "target/site/developer" directory (in several formats)::
+This will create the guide in the "target/site/developer" directory (in several formats):
 
     target
     |-- docbkx
@@ -137,17 +117,16 @@ Do you want to contribute to gvNIX Project? :D
 
 Create an issue
 -----------------
-
 Create a new issue on gitHub using the following link https://github.com/gvSIGAssociation/gvnix/issues/new
 
 Send your Pull Requests
 ------------------------
 
-1. Fork gvNIX project and implement your own features or bug fixes
+Fork gvNIX project and implement your own features or bug fixes
 
-2. Send your Pull Requests with your applied changes
+Send your Pull Requests with your applied changes
 
-3. gvNIX team will validate your changes and merge your Pull Request
+gvNIX team will validate your changes and merge your Pull Request
 
 
 Contact us ?
