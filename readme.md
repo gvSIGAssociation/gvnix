@@ -37,24 +37,24 @@ To start to develop gvNIX and extend its features you need:
 Run gvNIX Roo Addon Suite
 ===========================
 
-#. Build gvNIX Roo Addon Suite::
+1. Build gvNIX Roo Addon Suite
 
     bash:~/gvnix$ mvn clean install
 
-#. Create/Update your own repository using Apache HTTP Server::
+2. Create/Update your own repository
 
     bash:~/gvnix$ mkdir /var/www/html/gvnix-repo
     bash:~/gvnix$ cp -r target/osgi-repository-bin/* /var/www/html/gvnix-repo/
 
-#. Execute Spring Roo shell in your java project::
+3. Execute Spring Roo shell
 
     bash:~/project$ roo.sh
 
-#. Add your gvNIX local repository to Spring Roo::
+4. Add your gvNIX repo to Spring Roo
 
     roo> addon repository add --url http://localhost/gvnix-repo/index.xml
 
-#. Install your gvNIX Roo Addon Suite
+5. Install your gvNIX Roo Addon Suite
 
     roo> addon suite install name --symbolicName org.gvnix.roo.addon.suite
 
@@ -91,11 +91,11 @@ Need more info ?
 
 For more information generate and read the *gvNIX Developer Guide* (Spanish).
 
-# Run the following command from the root checkout location::
+Run the following command from the root checkout location::
 
    bash:~/gvnix$ mvn site
 
-# This will create the guide in the "target/site/developer" directory (in several formats)::
+This will create the guide in the "target/site/developer" directory (in several formats)::
 
     target
     |-- docbkx
@@ -118,7 +118,7 @@ For more information generate and read the *gvNIX Developer Guide* (Spanish).
 
 The *gvNIX Reference Guide* (Spanish) is the documentation for developing projects with the framework.
 
-# And will create a site with the project summary (target/site/index.html).
+And will create a site with the project summary (target/site/index.html).
 
 
 Write doc
@@ -138,16 +138,16 @@ Do you want to contribute to gvNIX Project? :D
 Create an issue
 -----------------
 
-#. Create a new issue on gitHub using the following link https://github.com/gvSIGAssociation/gvnix/issues/new
+Create a new issue on gitHub using the following link https://github.com/gvSIGAssociation/gvnix/issues/new
 
 Send your Pull Requests
 ------------------------
 
-#. Fork gvNIX project and implement your own features or bug fixes
+1. Fork gvNIX project and implement your own features or bug fixes
 
-#. Send your Pull Requests with your applied changes
+2. Send your Pull Requests with your applied changes
 
-#. gvNIX team will validate your changes and merge your Pull Request
+3. gvNIX team will validate your changes and merge your Pull Request
 
 
 Contact us ?
