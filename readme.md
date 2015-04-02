@@ -1,9 +1,9 @@
-gvNIX - RAD tool for Java developers
+gvNIX - Spring Roo Addon Suite
 ======================================
 
-Welcome to gvNIX, Spring Roo based RAD tool for Java developers.
+Welcome to gvNIX, an Spring Roo Addon Suite.
 
-gvNIX is an Spring Roo distribution that focuses both enterprise knowledge and enterprise standards to build Java applications.
+gvNIX is an Spring Roo Addon Suite that focuses both enterprise knowledge and enterprise standards to build Java applications.
 
 gvNIX is sponsored by the <a href="http://www.dgti.gva.es/" target="_blank">General Directorate for Information Technologies</a> (DGTI) at Regional Ministry of Finance and Public Administration of the Generalitat Valenciana (Valencian Community, Spain), and led by <a href="http://www.disid.com" target="_blank">DISID</a>.
 
@@ -15,10 +15,7 @@ that these instructions are for developers looking to develop gvNIX itself.
 
 If you like to try a release that has already been built, tested and
 distributed by the core development team, we recommend that you visit gvNIX
-download page http://www.gvnix.org in Spanish or http://gvnix.googlecode.com
-in English and read the documentation.
-
-This document is written using the reStructuredText markup and UTF-8 charset encoding.
+download page http://www.gvnix.org and read the documentation.
 
 Copyright (C) 2010 Conselleria d'Infraestructures i Transport - Generalitat Valenciana
 
@@ -29,161 +26,44 @@ http://creativecommons.org/licenses/by-sa/3.0/
 Pre-requisites
 ==============
 
-To start with gvNIX you need:
+To start to develop gvNIX and extend its features you need:
 
-* A nix machine (Windows users should be OK if they write a .bat)
-* JDK 6.0 or above ( http://java.sun.com/javase/downloads/index.jsp )
-* Maven 3.0.1 or above ( http://maven.apache.org/download.html )
+* Last Spring Roo distribution (http://spring.io/projects/spring-roo)
+* JDK 7 or above ( http://www.oracle.com/technetwork/es/java/javase/downloads/index.html)
+* Maven 3.0.5 or above ( http://maven.apache.org/download.html )
+* Apache 2 HTTP Server ( http://httpd.apache.org/download.cgi) 
 * Internet access so that Maven can download required dependencies
 
-Setup instructions
-==================
+Run gvNIX Roo Addon Suite
+===========================
 
-Roo
----
+#. Build gvNIX Roo Addon Suite::
 
-gvNIX provides its own distribution of the Spring Roo source code. This is needed because gvNIX has some patches still not included in a Roo published distribution, and the process to generate a distribution of gvNIX needs all the sources.
+    bash:~/gvnix$ mvn clean install
 
-Then, first of all you must configure and compile the roo projects, by following the steps provided in the document::
+#. Create/Update your own repository using Apache HTTP Server::
 
- roo/readme.txt
+    bash:~/gvnix$ mkdir /var/www/html/gvnix-repo
+    bash:~/gvnix$ cp -r target/osgi-repository-bin/* /var/www/html/gvnix-repo/
 
-It provides more information of projects requirements and setup, like MAVEN, GIT, GPG or ECLIPSE.
+#. Execute Spring Roo shell in your java project::
 
-If you don't want to perform the GPG configuration needed to sign build outputs, just add the following parameter each time you call mvn to build the project::
+    bash:~/project$ roo.sh
 
-  -Dgpg.skip=true
+#. Add your gvNIX local repository to Spring Roo::
 
-Git
----
+    roo> addon repository add --url http://localhost/gvnix-repo/index.xml
 
-Git is used for download Roo source code, but Roo is stored into gvNIX SVN too.
-To compile the gvNIX project source code you don't need Git installed, it is only required to upgrade the gvNIX based Roo source code.
+#. Install your gvNIX Roo Addon Suite
 
-First, you need a GitHub account:
+    roo> addon suite install name --symbolicName org.gvnix.roo.addon.suite
 
- http://forum.springsource.org/showthread.php?114239-Spring-Roo-sources-move-to-GitHub!
-
-And your SSH public key from your account settings (http://help.github.com/linux-set-up-git/).
-
-Roo source code is commited on gvNIX project in the ``roo`` folder.
-However, Roo source code can be updated to a new tag with the following commands:
-
-* Ask which branch is current:	git status
-* Revert working copy changes:  git checkout .
-* Add a file/resolve conflict:  git add
-* Revert index (adedd) changes: git reset
-* Update git info:				git pull
-* Update master git info:		git pull git@github.com:SpringSource/spring-roo.git master
-* List available tags:			git tag -l
-* Store our Roo modifications:	git stash
-* Change to new tag:			git checkout {version}
-* Apply our Roo modifications:	git stash pop
-* Merge changes:				git mergetool
-* Remove all stashed states:	git stash clear
-* Save in SVN:					svn commit
-
-Update gvNIX parent pom roo.version property to the new value.
-Be careful, git deleted files could be not deleted from SVN !
-
-Update ROO version on build.sh 
-
-Other userful Git commands:
-
-* Change to master branch:		git checkout master
-
-Run gvNIX dev
-=============
-
-#. Build Roo::
-
-    bash:~/gvnix/trunk/code/roo$ mvn clean install
-
-   Roo is only necessary to be installed the first time.
-   Only reinstall it if Roo there are changes in the source code.
-
-#. Build gvNIX::
-
-    bash:~/gvnix/trunk/code$ mvn clean install
-
-   From now on, you will need to reinstall only each modified module instead of reinstalling all the gvNIX projects again::
-
-    bash:~/gvnix/trunk/code/module$ mvn clean install
-
-#. Add gvNIX ``bin`` directory to PATH::
-
-    bash:~/gvnix/trunk/code$ PATH=$PWD/bin:$PATH
-
-   It is recommended that you add this information to your .bashrc script.
-
-#. Execute gvNIX shell in your java project::
-
-    bash:~/project$ gvnix-dev
-
-   Or execute gvNIX shell on debug mode in your java project::
-
-    bash:~/project$ gvnix-dev-debug
-
-Developing within Eclipse
+Developing within STS
 ==========================
 
-Eclipse can be used to develop gvNIX. Use ``mvn clean eclipse:clean eclipse:eclipse`` to produce Eclipse project files that can be imported via *File > Import > Existing Projects into Workspace*.
+STS can be used to develop gvNIX Roo Addon Suite. 
 
-It is recommended that you create an Eclipse project for each add-on, in spite of creating a project to contain the entire project.
-
-Package gvNIX
-=============
-
-* Modify and commit gvNIX version at Roo shell start:
-
-   roo/shell/src/main/java/org/springframework/roo/shell/AbstractShell.java
-
-* Modify and commit gvNIX version from pom.xml on every addons. Modify version and SNAPSHOT to RELEASE
-
-* Update if necessary the Roo source code version (tag or head) into 'roo' folder with git
-
-* Update Roo version reference into gvNIX parent pom.xml (roo.version)
-
-* Modify and commit the appropriate Roo and gvNIX versions (GVNIX_VERSION and ROO_VERSION) at build.sh file.
-
-* Modify and commit the appropriate gvNIX version in docbook documentacion (releaseinfo property) at src/site/docbook/reference/index.xml and at src/site/docbook/developer/index.xml
-
-* Create the tag for the gvNIX version we want to build using STS
-
-* Config your maven file conf/settings.xml to deploy to maven central following this documentation:
-
-http://central.sonatype.org/pages/apache-maven.html
-
-  
-* Copy your conf/settings.xml to .m2/ folder 
-
-* To package gvNIX use the following commands:
-
-   bash: ./build.sh -d
-
-  The ``-d`` option deploy to google code, can be used only by commiters.
-
-  Check if all add-ons are published correctly at http://gvnix.googlecode.com/svn/repo/repository.xml for RooBoot.
-  This will create the ZIP file ``target/gvnix-dist/gvNIX-{version}.zip``.
-
-* Deploy wrappings to google code.
-
-* Test uncompress ZIP file, start it, execute some script and check in STS.
-
-* Publish into http://sourceforge.net/projects/gvnix (Get password from redmine project wiki)
-
-* Add release notes to https://code.google.com/p/gvnix/
-
-* Update http://gvnix.org 
-
-* Notify to the communication department the new version and attach the new version reference documentation.
-
-Branch
-------
-
-* Optional, create a branch for a new development version::
-
-   bash:~/gvnix/trunk/code$ mvn release:branch -DbranchName={version}
+Every addon can be imported via *File > Import > Maven > Existing Maven Project*.
 
 Documentation
 =============
@@ -206,17 +86,6 @@ Documentation index
   * reference: Working guide about projects development with gvNIX.
   * developer: Working guide about gvNIX project development.
 
-* gvNIX project methodology documentation can be found at ../doc in gvMetrica format and Spanish.
-
-Contact us ?
-------------
-
-* http://www.gvnix.org
-* https://gvnix.googlecode.com
-* http://listserv.gva.es/cgi-bin/mailman/listinfo/gvNIX_soporte
-* http://www.gvpontis.gva.es/cast/gvnix
-* If you use Twitter, you are encouraged to follow @gvnix and we appreciate your mentions.
-
 Need more info ?
 ----------------
 
@@ -224,7 +93,7 @@ For more information generate and read the *gvNIX Developer Guide* (Spanish).
 
 # Run the following command from the root checkout location::
 
-   bash:~/gvnix/trunk/code$ mvn site
+   bash:~/gvnix$ mvn site
 
 # This will create the guide in the "target/site/developer" directory (in several formats)::
 
@@ -251,6 +120,7 @@ The *gvNIX Reference Guide* (Spanish) is the documentation for developing projec
 
 # And will create a site with the project summary (target/site/index.html).
 
+
 Write doc
 ---------
 
@@ -258,5 +128,35 @@ Write doc
 * Use the previous editor to open ``src/site/docbook/developer/index.xml`` and contribute with your knowledge.
 
 gvNIX documentation is moving to AsciiDoc. These docs have the suffix .ad, .adoc or .asciidoc. To learn more about how to convert AsciiDoc to PDF, HTML5, etc go to http://asciidoc.org/ or http://asciidoctor.org/
+
+
+Contribute to gvNIX Project
+==============================
+
+Do you want to contribute to gvNIX Project? :D
+
+Create an issue
+-----------------
+
+#. Create a new issue on gitHub using the following link https://github.com/gvSIGAssociation/gvnix/issues/new
+
+Send your Pull Requests
+------------------------
+
+#. Fork gvNIX project and implement your own features or bug fixes
+
+#. Send your Pull Requests with your applied changes
+
+#. gvNIX team will validate your changes and merge your Pull Request
+
+
+Contact us ?
+------------
+
+* http://www.gvnix.org
+* http://www.disid.com
+* https://github.com/gvSIGAssociation/gvnix
+* If you use Twitter, you are encouraged to follow @gvNIX and we appreciate your mentions.
+
 
 
