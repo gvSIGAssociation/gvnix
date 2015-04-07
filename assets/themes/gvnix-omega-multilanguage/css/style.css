@@ -2944,6 +2944,7 @@ a.active {
 ::-moz-selection {
     text-shadow: none;
     background: #4b731d;
+    color:#fff;
 }
 
 ::selection {
