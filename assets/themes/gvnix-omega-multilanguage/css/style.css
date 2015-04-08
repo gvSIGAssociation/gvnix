@@ -770,6 +770,7 @@ html {
 }
 .social-icons i {
   vertical-align: middle;
+  line-height: 72px;
 }
 .social-mini {
   margin: 0;

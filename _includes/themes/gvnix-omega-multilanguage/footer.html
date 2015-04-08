@@ -55,12 +55,16 @@
         </ul>
             <div>
                 <p class="rss-subscribe text-center">
-                subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}" target="_blank">via RSS</a> |
+                 Subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}" target="_blank">via RSS</a> |
                  <a href="{{ site.url }}/{{ page.lang }}/legal-notice/">{{ site.t[page.lang].legal-notice }}</a> |
                  <a href="{{ site.url }}/{{ page.lang }}/contact/">{{ site.linksextra[page.lang].contact.title }}</a>
                 </p>
                 <p class="rss-subscribe text-center">
-                  {{ site.owner.name }} &copy; {{ site.time | date: '%Y' }} 
+                 {{ site.t[page.lang].license-notice }}<a href="{{ site.t[page.lang].license-link }}" target="_blank">{{ site.t[page.lang].license-version }}</a>
+
+                </p>
+                <p class="rss-subscribe text-center">
+                  {{ site.owner.name }} &copy; {{ site.time | date: '%Y' }}
                 </p>
                 <p class="rss-subscribe text-center">
                 <a href="{{ site.linksextra[page.lang].disid.url }}" target="_blank" data-toggle="tooltip" title="{{ site.linksextra[page.lang].disid.tooltip }}">{{ site.linksextra[page.lang].disid.title }}</a> |

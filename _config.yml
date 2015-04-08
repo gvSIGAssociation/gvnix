@@ -219,6 +219,9 @@ t:
     latest-news: "Latest news"
     all-news: "All news"
     legal-notice: "Legal notice"
+    license-notice: "gvNIX and all its components are released under the "
+    license-version: "GNU General Public License (GPL), Version 3.0"
+    license-link: "http://www.gnu.org/licenses/gpl-3.0.html"
     back-to-blog: "Back"
     doc-samples: Sample Projects
     doc-guides: Getting Started Guides
@@ -259,6 +262,9 @@ t:
     latest-news: "Últimas noticias"
     all-news: "Todas las noticias"
     legal-notice: "Aviso legal"
+    license-notice: "gvNIX y todos sus componentes están liberados bajo la "
+    license-version: "Licencia Pública General de GNU (GPL), Versión 3.0"
+    license-link: "http://www.gnu.org/licenses/gpl-3.0.html"
     back-to-blog: "Volver atrás"
     doc-samples: Proyectos demo
     doc-guides: Guías de inicio
