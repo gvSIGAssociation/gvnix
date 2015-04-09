@@ -50,7 +50,6 @@
   </organization>
   <description>Service Layer for Spring Roo. Includes management for: Local services management, import remote services to local services and export local services via WS.</description>
   <inceptionYear>2010</inceptionYear>
-  <inceptionYear>2010</inceptionYear>
   <url>http://www.gvnix.org</url>
 
   <modules>

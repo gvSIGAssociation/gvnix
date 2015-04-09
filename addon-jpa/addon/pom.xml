@@ -50,7 +50,6 @@
   </organization>
   <description>GvNIX functionalities for JPA layer</description>
   <inceptionYear>2010</inceptionYear>
-  <inceptionYear>2010</inceptionYear>
   <url>http://www.gvnix.org</url>
 
     <dependencies>

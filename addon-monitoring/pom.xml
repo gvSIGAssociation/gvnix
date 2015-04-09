@@ -50,7 +50,6 @@
   </organization>
   <description>Add monitoring support on your gvNIX application using JavaMelody.</description>
   <inceptionYear>2010</inceptionYear>
-  <inceptionYear>2010</inceptionYear>
   <url>http://www.gvnix.org</url>
 
   <dependencies>

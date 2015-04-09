@@ -8,9 +8,9 @@
       <distribution>repo</distribution>
       <comments>
       <![CDATA[
-      gvNIX is sponsored by the General Directorate for Information 
-      Technologies (DGTI) of the Regional Ministry of Finance and Public 
-      Administration of the Generalitat Valenciana (Valencian Community, 
+      gvNIX is sponsored by the General Directorate for Information
+      Technologies (DGTI) of the Regional Ministry of Finance and Public
+      Administration of the Generalitat Valenciana (Valencian Community,
       Spain), managed by gvSIG Association and led by DISID.
 
       Copyright (C) 2010 DGTI - Generalitat Valenciana
@@ -43,7 +43,7 @@
   <organization>
     <name>
     General Directorate for Information Technologies (DGTI) of
-    the Regional Ministry of Finance and Public Administration of the 
+    the Regional Ministry of Finance and Public Administration of the
     Generalitat Valenciana.
     </name>
     <url>http://www.dgti.gva.es/</url>
@@ -51,7 +51,7 @@
   <description>Loupe Fields support for gvNIX Projects</description>
   <inceptionYear>2010</inceptionYear>
   <url>http://www.gvnix.org</url>
-  
+
   <modules>
   	<module>addon</module>
   	<module>annotations</module>
@@ -68,7 +68,7 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
-    
+
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
@@ -108,7 +108,7 @@
       <version>${gvnix.version}</version>
     </dependency>
   </dependencies>
-  
+
   <!-- DiSiD: Add google code distribution management -->
   <distributionManagement>
     <repository>
