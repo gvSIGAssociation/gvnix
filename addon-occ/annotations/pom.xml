@@ -50,7 +50,6 @@
   </organization>
   <description>JPA Optimistic Control for Spring Roo. For those applications that starts with an unmodifiable schema and the tables don't have the column 'version' for concurrency control.</description>
   <inceptionYear>2010</inceptionYear>
-  <inceptionYear>2010</inceptionYear>
   <url>http://www.gvnix.org</url>
 
    <properties>
