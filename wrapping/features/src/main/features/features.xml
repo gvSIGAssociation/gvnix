@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures,
-      Territori i Medi Ambient - Generalitat Valenciana
-      Copyright (C) 2011 CIT - Generalitat Valenciana
+      gvNIX is sponsored by the General Directorate for Information
+      Technologies (DGTI) of the Regional Ministry of Finance and Public
+      Administration of the Generalitat Valenciana (Valencian Community,
+      Spain), managed by gvSIG Association and led by DISID.
+
+      Copyright (C) 2010 DGTI - Generalitat Valenciana
 
       This program is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by
@@ -20,9 +23,9 @@
 <!--
   Karaf features allow you to load a collection of bundles using a single name.
 
-  A feature consists of one or more OSGi bundles grouped to collectively 
-  provide a specific feature or functionality. When a feature is loaded, the 
-  container loads any required bundles that are not already present into the 
+  A feature consists of one or more OSGi bundles grouped to collectively
+  provide a specific feature or functionality. When a feature is loaded, the
+  container loads any required bundles that are not already present into the
   container and activates them.
 -->
 <features name="gvnix-features-repository">
@@ -44,7 +47,7 @@
         <bundle dependency="true">mvn:org.apache.commons/com.springsource.org.apache.commons.collections/3.2.1</bundle>
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-pool/1.5.4_1</bundle>
         <bundle dependency="true">mvn:org.apache.commons/com.springsource.org.apache.commons.dbcp/1.2.2.osgi</bundle>
-        <bundle dependency="true">mvn:org.slf4j/com.springsource.slf4j.log4j/1.6.1</bundle> 
+        <bundle dependency="true">mvn:org.slf4j/com.springsource.slf4j.log4j/1.6.1</bundle>
         <bundle dependency="true">mvn:org.slf4j/com.springsource.slf4j.api/1.6.1</bundle>
         <bundle dependency="true">mvn:org.apache.log4j/com.springsource.org.apache.log4j/1.2.16</bundle>
         <bundle dependency="true">mvn:javassist/org.gvnix.javassist/3.12.1.GA</bundle>
@@ -58,15 +61,15 @@
         <!-- Specs -->
         <!-- IMPORTANT: Some Java EE specifications don't work well in OSGi
 
-        The mean reason is that the implementation is discovered using 
-        different mechanisms by the API. The most commonly used one is to find 
-        a file on the classpath in the 'META-INF/services' directory and find 
+        The mean reason is that the implementation is discovered using
+        different mechanisms by the API. The most commonly used one is to find
+        a file on the classpath in the 'META-INF/services' directory and find
         the main entry point class of the implementation (SPI mechanism).
 
         ServiceMix and Geronimo groups have done a good work on this area
         and it's recommendable/needed to use their bundles for JEE specs
         because these bundles include an OSGi specific discovery mechanism
-        that let these spec bundles to be able to locate dynamically the 
+        that let these spec bundles to be able to locate dynamically the
         implementation to use.
 
         Ref: http://gnodet.blogspot.com/2008/05/jee-specs-in-osgi.html

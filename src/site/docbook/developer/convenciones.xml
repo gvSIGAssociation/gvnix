@@ -295,8 +295,11 @@ web binding setup // Comando de gvNIX</programlisting>
     <para>Licencia a integrar en las cabeceras de las clases java:</para>
 
     <programlisting>/*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
- * Copyright (C) 2013 Generalitat Valenciana
+ * gvNIX is sponsored by the General Directorate for Information 
+ * Technologies (DGTI) of the Regional Ministry of Finance and Public 
+ * Administration of the Generalitat Valenciana (Valencian Community, 
+ * Spain), managed by gvSIG Association and led by DISID.
+ * Copyright (C) 2010 DGTI - Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -309,7 +312,7 @@ web binding setup // Comando de gvNIX</programlisting>
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
+ * along with this program.  If not, see &lt;http://www.gnu.org/licenses/gpl-3.0.html&gt;.
  */</programlisting>
 
     <para>Este es un ejemplo de como debería quedar el fichero
@@ -321,12 +324,15 @@ web binding setup // Comando de gvNIX</programlisting>
   &lt;licenses&gt;
     &lt;license&gt;
       &lt;name&gt;&amp;gt;GNU General Public License (GPL), Version 3.0&lt;/name&gt;
-      &lt;url&gt;http://www.gnu.org/copyleft/gpl.html&lt;/url&gt;
+      &lt;url&gt;http://www.gnu.org/licenses/gpl-3.0.html&lt;/url&gt;
       &lt;comments&gt;
       &lt;![CDATA[
-      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
-      i Transport - Generalitat Valenciana
-      Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
+      gvNIX is sponsored by the General Directorate for Information
+      Technologies (DGTI) of the Regional Ministry of Finance and Public
+      Administration of the Generalitat Valenciana (Valencian Community,
+      Spain), managed by gvSIG Association and led by DISID.
+
+      Copyright (C) 2010 DGTI - Generalitat Valenciana
 
       This program is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by

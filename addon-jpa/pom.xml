@@ -3,13 +3,17 @@
   <modelVersion>4.0.0</modelVersion>
   <licenses>
     <license>
-      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
-      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <name>GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
       <distribution>repo</distribution>
       <comments>
       <![CDATA[
-      gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
-      Copyright (C) 2013 - Generalitat Valenciana
+      gvNIX is sponsored by the General Directorate for Information
+      Technologies (DGTI) of the Regional Ministry of Finance and Public
+      Administration of the Generalitat Valenciana (Valencian Community,
+      Spain), managed by gvSIG Association and led by DISID.
+
+      Copyright (C) 2010 DGTI - Generalitat Valenciana
 
       This program is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by
@@ -37,11 +41,18 @@
   <packaging>pom</packaging>
   <name>gvNIX - Parent - JPA layer services</name>
   <organization>
-    <name>Generalitat Valenciana</name>
+    <name>
+    General Directorate for Information Technologies (DGTI) of
+    the Regional Ministry of Finance and Public Administration of the
+    Generalitat Valenciana.
+    </name>
+    <url>http://www.dgti.gva.es/</url>
   </organization>
   <description>GvNIX functionalities for JPA layer</description>
+  <inceptionYear>2010</inceptionYear>
+  <inceptionYear>2010</inceptionYear>
   <url>http://www.gvnix.org</url>
-  
+
   <modules>
   	<module>addon</module>
   	<module>annotations</module>
@@ -58,7 +69,7 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
-    
+
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
@@ -78,7 +89,7 @@
       <version>${gvnix.version}</version>
     </dependency>
   </dependencies>
-  
+
   <!-- DiSiD: Add google code distribution management -->
   <distributionManagement>
     <repository>
@@ -114,5 +125,5 @@
     <google.code.project.name>gvnix</google.code.project.name>
     <target.osgi-repository.directory>${basedir}/../../target/osgi-repository-bin</target.osgi-repository.directory>
   </properties>
-  
+
 </project>

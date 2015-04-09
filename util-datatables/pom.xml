@@ -3,25 +3,30 @@
   <modelVersion>4.0.0</modelVersion>
   <licenses>
     <license>
-      <name>Apache 2</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <name>GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
       <distribution>repo</distribution>
       <comments>
       <![CDATA[
-      gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
-      Copyright (C) 2013 - Generalitat Valenciana
+      gvNIX is sponsored by the General Directorate for Information
+      Technologies (DGTI) of the Regional Ministry of Finance and Public
+      Administration of the Generalitat Valenciana (Valencian Community,
+      Spain), managed by gvSIG Association and led by DISID.
 
-      Licensed under the Apache License, Version 2.0 (the "License");
-      you may not use this file except in compliance with the License.
-      You may obtain a copy of the License at
+      Copyright (C) 2010 DGTI - Generalitat Valenciana
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
 
-      Unless required by applicable law or agreed to in writing, software
-      distributed under the License is distributed on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-      See the License for the specific language governing permissions and
-      limitations under the License.
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program. If not, see <http://www.gnu.org/licenses />.
       ]]>
       </comments>
     </license>
@@ -35,9 +40,15 @@
   <packaging>jar</packaging>
   <name>gvNIX - Library - Dandelion-Datatables Utils</name>
   <organization>
-    <name>Generalitat Valenciana</name>
+    <name>
+    General Directorate for Information Technologies (DGTI) of
+    the Regional Ministry of Finance and Public Administration of the
+    Generalitat Valenciana.
+    </name>
+    <url>http://www.dgti.gva.es/</url>
   </organization>
   <description>Dandelion-DataTables utilities for Spring MVC based projects.</description>
+  <inceptionYear>2010</inceptionYear>
   <url>http://www.gvnix.org</url>
 
   <repositories>
@@ -100,12 +111,12 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
 	  <groupId>com.mysema.querydsl</groupId>
 	  <artifactId>querydsl-spatial</artifactId>
 	  <version>${querydsl.version}</version>
-	</dependency>    
+	</dependency>
 
     <!-- Dandelion - DataTables -->
     <dependency>
@@ -120,13 +131,13 @@
       <artifactId>spring-beans</artifactId>
       <version>${spring.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
       <version>${spring.version}</version>
     </dependency>
-    
+
     <!-- General dependencies for standard applications -->
     <dependency>
         <groupId>javax.servlet</groupId>

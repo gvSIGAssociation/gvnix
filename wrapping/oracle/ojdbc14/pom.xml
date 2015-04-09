@@ -3,14 +3,17 @@
   <modelVersion>4.0.0</modelVersion>
   <licenses>
     <license>
-      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
-      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <name>GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
       <distribution>repo</distribution>
       <comments>
       <![CDATA[
-      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
-      i Transport - Generalitat Valenciana
-      Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
+      gvNIX is sponsored by the General Directorate for Information 
+      Technologies (DGTI) of the Regional Ministry of Finance and Public 
+      Administration of the Generalitat Valenciana (Valencian Community, 
+      Spain), managed by gvSIG Association and led by DISID.
+
+      Copyright (C) 2010 DGTI - Generalitat Valenciana
 
       This program is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by
@@ -43,7 +46,12 @@
   <description>Oracle 10.2 JDBC driver classes for use with JDK1.4 and JDK1.5, driverclass:oracle.jdbc.OracleDriver. This bundle wraps the standard Maven artifact: ${pkgArtifactId}-${pkgVersion}.</description>
 
   <organization>
-    <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
+    <name>
+    General Directorate for Information Technologies (DGTI) of
+    the Regional Ministry of Finance and Public Administration of the 
+    Generalitat Valenciana.
+    </name>
+    <url>http://www.dgti.gva.es/</url>
   </organization>
 
   <properties>

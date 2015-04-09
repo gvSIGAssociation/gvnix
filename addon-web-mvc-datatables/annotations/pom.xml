@@ -3,13 +3,17 @@
   <modelVersion>4.0.0</modelVersion>
   <licenses>
     <license>
-      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
-      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <name>GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
       <distribution>repo</distribution>
       <comments>
       <![CDATA[
-      gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
-      Copyright (C) 2013 - Generalitat Valenciana
+      gvNIX is sponsored by the General Directorate for Information 
+      Technologies (DGTI) of the Regional Ministry of Finance and Public 
+      Administration of the Generalitat Valenciana (Valencian Community, 
+      Spain), managed by gvSIG Association and led by DISID.
+
+      Copyright (C) 2010 DGTI - Generalitat Valenciana
 
       This program is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by
@@ -37,9 +41,15 @@
   <packaging>bundle</packaging>
   <name>gvNIX - Annotations - Web Datatables Addon</name>
   <organization>
-    <name>Generalitat Valenciana</name>
+    <name>
+    General Directorate for Information Technologies (DGTI) of
+    the Regional Ministry of Finance and Public Administration of the 
+    Generalitat Valenciana.
+    </name>
+    <url>http://www.dgti.gva.es/</url>
   </organization>
   <description>Datatables support for Spring MVC based projects. Allows replace the standart roo list view to use JQuery Datatables component based on Dandelion datatables (http://dandelion.github.com/datatables) taglib</description>
+  <inceptionYear>2010</inceptionYear>
   <url>http://www.gvnix.org</url>
   
   <properties>

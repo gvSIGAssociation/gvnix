@@ -631,10 +631,13 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures 
-    i Transport - Generalitat Valenciana
-    Copyright (C) 2010 CIT - Generalitat Valenciana
- 
+    gvNIX is sponsored by the General Directorate for Information
+    Technologies (DGTI) of the Regional Ministry of Finance and Public
+    Administration of the Generalitat Valenciana (Valencian Community,
+    Spain), managed by gvSIG Association and led by DISID.
+
+    Copyright (C) 2010 DGTI - Generalitat Valenciana
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -653,8 +656,11 @@ Also add information on how to contact you by electronic and paper mail.
   If the program does terminal interaction, make it output a short
 notice like this when it starts in an interactive mode:
 
-    gvNIX. Spring Roo based RAD tool 
-    Copyright (C) 2010 CIT - Generalitat Valenciana
+    gvNIX is an open source tool for rapid application development (RAD)
+    with which you can create Java web applications in minutes.
+
+    Copyright (C) 2010 DGTI - Generalitat Valenciana
+
     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
     under certain conditions; type `show c' for details.
