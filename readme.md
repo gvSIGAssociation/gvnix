@@ -17,7 +17,7 @@ If you like to try a release that has already been built, tested and
 distributed by the core development team, we recommend that you visit gvNIX
 download page http://www.gvnix.org and read the documentation.
 
-Copyright (C) 2010 Conselleria d'Infraestructures i Transport - Generalitat Valenciana
+Copyright (C) 2010 DGTI - Generalitat Valenciana
 
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
 Unported License. To view a copy of this license, visit
@@ -30,7 +30,7 @@ To start to develop gvNIX and extend its features you need:
 
 * Last Spring Roo distribution (http://spring.io/projects/spring-roo)
 * JDK 7 or above ( http://www.oracle.com/technetwork/es/java/javase/downloads/index.html)
-* Maven 3.0.5 or above ( http://maven.apache.org/download.html ) 
+* Maven 3.0.5 or above ( http://maven.apache.org/download.html )
 * Internet access so that Maven can download required dependencies
 
 Run gvNIX Roo Addon Suite
@@ -41,7 +41,7 @@ TBC
 Developing within STS
 ==========================
 
-STS can be used to develop gvNIX Roo Addon Suite. 
+STS can be used to develop gvNIX Roo Addon Suite.
 
 Every addon can be imported via *File > Import > Maven > Existing Maven Project*.
 

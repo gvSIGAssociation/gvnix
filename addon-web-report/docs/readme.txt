@@ -3,8 +3,8 @@
 ==================================
 
 :Project:   gvNIX. Spring Roo based RAD tool
-:Copyright: Conselleria d'Infraestructures i Transport - Generalitat Valenciana
-:Author:    DiSiD Technologies, S.L.
+:Copyright: DGTI - Generalitat Valenciana
+:Author:    DISID Corporation, S.L.
 :Revision:  $Rev: 1535 $
 :Date:      $Date: 2012-09-01 10:55:06 +0200 (sáb, 01 sep 2012) $
 
