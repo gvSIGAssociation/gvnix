@@ -39,7 +39,13 @@
     <artifactId>org.gvnix.roo.addon.repository</artifactId>
     <packaging>pom</packaging>
     <name>gvNIX - Addon Repository Generator</name>
-    <description>Generates gvNIX Addon Repository</description>
+    <description>
+    Generates the gvNIX Addon Repository.
+    This module will copy all addon artifacts to the local repository at
+    ${project.parent.basedir}/target/osgi-repository-bin
+    Finally this module will deploy the gvNIX OSGi repository to production 
+    server.
+    </description>
     <organization>
     <name>
     General Directorate for Information Technologies (DGTI) of
@@ -219,7 +225,7 @@
 	</dependencies>
 
 	<build>
-	<extensions>
+    <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
@@ -227,7 +233,7 @@
       </extension>
     </extensions>
     
-   	 <plugins>
+    <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
@@ -254,27 +260,80 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>wagon-maven-plugin</artifactId>
-      <version>1.0</version>
-      <executions>
-        <execution>
-          <id>upload-repository</id>
-          <phase>deploy</phase>
-          <goals>
-            <goal>upload</goal>
-          </goals>
-          <configuration>
-            <serverId>gvnix-public-repository</serverId>
-          	<url>${public.repository.url}</url>
-            <fromDir>../target/osgi-repository-bin</fromDir>
-            <toDir>home/disid/gvnix-repository</toDir>
-          </configuration>
+        <!--
+        Update the repository index to set the repository name and the XSL 
+        that lets the web browsers to render a user-friendly index.
+        Finally copy the HTML resources to apply the gvNIX look to the
+        user-friendly index.
+        -->
+        <artifactId>maven-antrun-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>com.oopsconsultancy</groupId>
+            <artifactId>xmltask</artifactId>
+            <version>1.14</version>
+          </dependency>
+          <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.2</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>userfriendly-index</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks> 
+              <taskdef name="xmltask"
+                classname="com.oopsconsultancy.xmltask.ant.XmlTask"
+                classpathref="maven.plugin.classpath"/>
+              <xmltask 
+                source="${project.parent.build.directory}/osgi-repository-bin/index.xml" 
+                dest="${project.parent.build.directory}/osgi-repository-bin/index.xml" 
+                preserveType="false">
+                <insert path="/repository" position="before"> 
+                <![CDATA[ 
+                <?xml-stylesheet type="text/xsl" href="obr2html.xsl"?>
+                ]]> 
+                </insert> 
+                <attr path="repository" attr="name" value="gvNIX Suite Repository"/>
+              </xmltask>
+              <copy file="${basedir}/src/main/resources/gvnix.css" 
+                todir="${project.parent.build.directory}/osgi-repository-bin" />
+              <copy file="${basedir}/src/main/resources/obr2html.xsl" 
+                todir="${project.parent.build.directory}/osgi-repository-bin" />
+              </tasks>
+            </configuration>
           </execution>
         </executions>
-        </plugin>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>wagon-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>upload-repository</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>upload</goal>
+            </goals>
+            <configuration>
+              <serverId>gvnix-public-repository</serverId>
+            	<url>${public.repository.url}</url>
+              <fromDir>../target/osgi-repository-bin</fromDir>
+              <toDir>home/disid/gvnix-repository</toDir>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       
     </plugins>
   </build>
