@@ -152,7 +152,7 @@
 										</c:otherwise>
 								</c:choose>
 								<c:choose>
-										<c:when test="${!disableFormBinding}">
+										<c:when test="${disableFormBinding}">
 												<input type="hidden" id="${sec_field}_loupe_hidden_bind"
 														name="${sec_field}" />
 										</c:when>
