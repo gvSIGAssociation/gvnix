@@ -2575,6 +2575,13 @@ public class DatatablesMetadata extends
         // but not included yet
         boolean isConditionApplied = false;
 
+        // Flag set if condition value is "Between"
+        boolean isBetweenCondition = false;
+
+        // Checks if there is any operator "And" or "Or" and holds it
+        boolean isOperatorApplied = false;
+        String op = "";
+
         // Helper which can generated the expression
         // required for generate the predicate
         FinderToDslHelper fHelper = new FinderToDslHelper(finderMethod,
@@ -2582,6 +2589,9 @@ public class DatatablesMetadata extends
 
         // Holds current expression
         StringBuilder expBuilder = null;
+
+        // Holds condition if exists
+        StringBuilder condition = null;
         for (final Token token : queryHolder.getTokens()) {
             if (token instanceof ReservedToken) {
                 // Current token isn't a field
@@ -2626,89 +2636,137 @@ public class DatatablesMetadata extends
 
                         // mark as condition is no included
                         isConditionApplied = false;
+                        isOperatorApplied = false;
                     }
-                    if (reservedToken.equalsIgnoreCase("And")) {
-                        if (!isConditionApplied) {
-                            // use .eq() operator if condition not applied
-                            expBuilder.append(fHelper
-                                    .getEqualExpression(fieldName));
+
+                    if (reservedToken.equalsIgnoreCase("And")
+                            || reservedToken.equalsIgnoreCase("Or")) {
+                        if (!isBetweenCondition) {
+                            if (reservedToken.equalsIgnoreCase("And")) {
+                                if (!isConditionApplied) {
+                                    // use .eq() operator if condition not
+                                    // applied
+                                    expBuilder.append(fHelper
+                                            .getEqualExpression(fieldName));
+                                    // Creating Basesearch expression
+                                    createBaseSearchExpressionWithNullCheck(
+                                            bodyBuilder, fHelper,
+                                            lastFieldToken, expBuilder, "and");
+                                }
+                                else {
+                                    createBaseSearchExpressionWithNullCheck(
+                                            bodyBuilder, fHelper,
+                                            lastFieldToken, condition, "and");
+                                }
+                            }
+
+                            if (reservedToken.equalsIgnoreCase("Or")) {
+                                if (!isConditionApplied) {
+                                    // use .eq() operator if condition not
+                                    // applied
+                                    expBuilder.append(fHelper
+                                            .getEqualExpression(fieldName));
+                                    // Creating Basesearch expression
+                                    createBaseSearchExpressionWithNullCheck(
+                                            bodyBuilder, fHelper,
+                                            lastFieldToken, expBuilder, "or");
+                                }
+                                else {
+                                    createBaseSearchExpressionWithNullCheck(
+                                            bodyBuilder, fHelper,
+                                            lastFieldToken, condition, "or");
+                                }
+                            }
                         }
-                        // Creating Basesearch expression
-                        createBaseSearchExpressionWithNullCheck(bodyBuilder,
-                                fHelper, lastFieldToken, expBuilder, "and");
-                        expBuilder = null;
-                        isConditionApplied = true;
-                    }
-                    else if (reservedToken.equalsIgnoreCase("Or")) {
-                        if (!isConditionApplied) {
-                            // use .eq() operator if condition not applied
-                            expBuilder.append(fHelper
-                                    .getEqualExpression(fieldName));
-                        }
-                        // Creating Basesearch expression
-                        createBaseSearchExpressionWithNullCheck(bodyBuilder,
-                                fHelper, lastFieldToken, expBuilder, "or");
-                        expBuilder = null;
-                        isConditionApplied = true;
-                    }
-                    else if (reservedToken.equalsIgnoreCase("Between")) {
-                        // use .between(minField,maxField) expression
-                        createBaseSearchExpressionWithNullCheck(bodyBuilder,
-                                fHelper, lastFieldToken, expBuilder, "between");
-                        expBuilder = null;
-                        isConditionApplied = true;
+                        op = reservedToken.toLowerCase();
+                        condition = null;
+                        isOperatorApplied = true;
+                        isConditionApplied = false;
+                        isBetweenCondition = false;
 
                     }
-                    else if (reservedToken.equalsIgnoreCase("Like")) {
-                        // use .like() expression
-                        expBuilder.append(fHelper.getLikeExpression(fieldName));
+                    else {
+
+                        if (reservedToken.equalsIgnoreCase("Between")) {
+                            // use .between(minField,maxField) expression
+                            createBaseSearchExpressionWithNullCheck(
+                                    bodyBuilder, fHelper, lastFieldToken,
+                                    expBuilder, "between");
+                            isBetweenCondition = true;
+                            isOperatorApplied = true;
+                        }
+                        else if (reservedToken.equalsIgnoreCase("Like")) {
+                            // use .like() expression
+                            expBuilder.append(fHelper
+                                    .getLikeExpression(fieldName));
+                        }
+                        else if (reservedToken.equalsIgnoreCase("IsNotNull")) {
+                            // builder.append(" IS NOT NULL ");
+                            // use isNotNull() expression
+                            expBuilder.append(".isNotNull()");
+                        }
+                        else if (reservedToken.equalsIgnoreCase("IsNull")) {
+                            // builder.append(" IS NULL ");
+                            // use isNull() expression
+                            expBuilder.append(".isNull()");
+                        }
+                        else if (reservedToken.equalsIgnoreCase("Not")) {
+                            // builder.append(" IS NOT ");
+                            // use not() expression
+                            expBuilder.append(".not()");
+                        }
+                        else if (reservedToken.equalsIgnoreCase("NotEquals")) {
+                            // builder.append(" != ");
+                            expBuilder.append(fHelper
+                                    .getNotEqualExpression(fieldName));
+                        }
+                        else if (reservedToken.equalsIgnoreCase("LessThan")) {
+                            // builder.append(" < ");
+                            expBuilder.append(fHelper
+                                    .getLessThanExpression(fieldName));
+                        }
+                        else if (reservedToken
+                                .equalsIgnoreCase("LessThanEquals")) {
+                            // builder.append(" <= ");
+                            expBuilder.append(fHelper
+                                    .getLessThanEqualsExpression(fieldName));
+                        }
+                        else if (reservedToken.equalsIgnoreCase("GreaterThan")) {
+                            // builder.append(" > ");
+                            expBuilder.append(fHelper
+                                    .getGreaterThanExpression(fieldName));
+                        }
+                        else if (reservedToken
+                                .equalsIgnoreCase("GreaterThanEquals")) {
+                            // builder.append(" >= ");
+                            expBuilder
+                                    .append(fHelper
+                                            .getGreaterThanEqualseExpression(fieldName));
+                        }
+                        else if (reservedToken.equalsIgnoreCase("Equals")) {
+                            // builder.append(" = ");
+                            expBuilder.append(fHelper
+                                    .getEqualExpression(fieldName));
+                        }
+                        if (expBuilder != null) {
+                            condition = expBuilder;
+                        }
+                        isConditionApplied = true;
+                        isNewField = false;
                     }
-                    else if (reservedToken.equalsIgnoreCase("IsNotNull")) {
-                        // builder.append(" IS NOT NULL ");
-                        // use isNotNull() expression
-                        expBuilder.append(".isNotNull()");
-                    }
-                    else if (reservedToken.equalsIgnoreCase("IsNull")) {
-                        // builder.append(" IS NULL ");
-                        // use isNull() expression
-                        expBuilder.append(".isNull()");
-                    }
-                    else if (reservedToken.equalsIgnoreCase("Not")) {
-                        // builder.append(" IS NOT ");
-                        // use not() expression
-                        expBuilder.append(".not()");
-                    }
-                    else if (reservedToken.equalsIgnoreCase("NotEquals")) {
-                        // builder.append(" != ");
-                        expBuilder.append(fHelper
-                                .getNotEqualExpression(fieldName));
-                    }
-                    else if (reservedToken.equalsIgnoreCase("LessThan")) {
-                        // builder.append(" < ");
-                        expBuilder.append(fHelper
-                                .getLessThanExpression(fieldName));
-                    }
-                    else if (reservedToken.equalsIgnoreCase("LessThanEquals")) {
-                        // builder.append(" <= ");
-                        expBuilder.append(fHelper
-                                .getLessThanEqualsExpression(fieldName));
-                    }
-                    else if (reservedToken.equalsIgnoreCase("GreaterThan")) {
-                        // builder.append(" > ");
-                        expBuilder.append(fHelper
-                                .getGreaterThanExpression(fieldName));
-                    }
-                    else if (reservedToken
-                            .equalsIgnoreCase("GreaterThanEquals")) {
-                        // builder.append(" >= ");
-                        expBuilder.append(fHelper
-                                .getGreaterThanEqualseExpression(fieldName));
-                    }
-                    else if (reservedToken.equalsIgnoreCase("Equals")) {
-                        // builder.append(" = ");
-                        expBuilder
-                                .append(fHelper.getEqualExpression(fieldName));
-                    }
+                }
+                else {
+                    // Create the expression if lastToken is Collection type
+                    String colType = lastFieldToken.getField().getFieldType()
+                            .getSimpleTypeName().toString();
+                    op = reservedToken.toLowerCase();
+                    expBuilder.append(String.format(
+                            ".getCollection(\"%s\", %s.class).contains(%s)",
+                            fieldName, colType, fieldName));
+                    createBaseSearchExpressionWithNullCheck(bodyBuilder,
+                            fHelper, lastFieldToken, expBuilder, op);
+                    isOperatorApplied = true;
+                    isNewField = false;
                 }
             }
             else {
@@ -2722,22 +2780,38 @@ public class DatatablesMetadata extends
             // has found. generate an expression using
             // equals operator
             expBuilder = new StringBuilder("entity");
+            String fieldName = lastFieldToken.getField().getFieldName()
+                    .getSymbolName();
+            JavaType fieldType = fHelper.getFieldTypeOfFinder(fieldName);
+
             if (lastFieldToken != null
                     && !lastFieldToken.getField().getFieldType()
                             .isCommonCollectionType()) {
-                String fieldName = lastFieldToken.getField().getFieldName()
-                        .getSymbolName();
-                JavaType fieldType = fHelper.getFieldTypeOfFinder(fieldName);
                 expBuilder
                         .append(fHelper.getDslGetterFor(fieldName, fieldType));
                 expBuilder.append(fHelper.getEqualExpression(fieldName));
-
             }
-            isConditionApplied = false;
+            else if (lastFieldToken.getField().getFieldType()
+                    .isCommonCollectionType()) {
+                String colType = lastFieldToken.getField().getFieldType()
+                        .getSimpleTypeName().toString();
+                expBuilder.append(String.format(
+                        ".getCollection(\"%s\", %s.class).contains(%s)",
+                        fieldName, colType, fieldName));
+            }
+            isConditionApplied = true;
         }
-        if (!isConditionApplied) {
-            createBaseSearchExpressionWithNullCheck(bodyBuilder, fHelper,
-                    lastFieldToken, expBuilder, "and");
+
+        if (!isBetweenCondition) {
+            if (!isOperatorApplied) {
+                createBaseSearchExpressionWithNullCheck(bodyBuilder, fHelper,
+                        lastFieldToken, expBuilder, "and");
+            }
+
+            else {
+                createBaseSearchExpressionWithNullCheck(bodyBuilder, fHelper,
+                        lastFieldToken, expBuilder, op);
+            }
         }
     }
 
@@ -2791,6 +2865,16 @@ public class DatatablesMetadata extends
                 dslOperationNull = fHelper.getDslAnd(nullExpression);
                 nullValidation = String.format("if(%s != null && %s != null){",
                         min, max);
+            }
+
+            if (fieldType.isCommonCollectionType()) {
+                String colType = fieldType.getSimpleTypeName().toString();
+                nullExpression = String.format(
+                        "entity.getCollection(\"%s\", %s.class).isEmpty()",
+                        fieldName, colType);
+                dslOperation = fHelper.getDslAnd(expBuilder.toString());
+                dslOperationNull = fHelper.getDslAnd(nullExpression);
+                nullValidation = String.format("if(%s != null){", fieldName);
             }
 
             // There is an expression not included in predicate yet.
