@@ -1,17 +1,28 @@
 package org.gvnix.addon.monitoring;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.SpringJavaType;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
 import org.springframework.roo.shell.CommandMarker;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * @author gvNIX Team
@@ -21,8 +32,24 @@ import org.springframework.roo.shell.CommandMarker;
 @Service
 public class MonitoringCommands implements CommandMarker {
 
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(MonitoringCommands.class);
+
     @Reference
     private MonitoringOperations operations;
+
+    private TypeLocationService typeLocationService;
+
+    private BundleContext context;
+
+    /**
+     * Update dependencies if is needed
+     * 
+     * @param context the component context
+     */
+    protected void activate(ComponentContext componentContext) {
+        context = componentContext.getBundleContext();
+    }
 
     /**
      * This method checks if this command is available
@@ -80,7 +107,25 @@ public class MonitoringCommands implements CommandMarker {
     @CliCommand(value = "monitoring add class", help = "Add a class to be monitored as a Spring service")
     public void addClass(
             @CliOption(key = "name", mandatory = true, help = "Set the class name to be monitored") final JavaType name) {
-        operations.addClass(name);
+
+        // Getting class details
+        ClassOrInterfaceTypeDetails typeDetails = getTypeLocationService()
+                .getTypeDetails(name);
+
+        // Getting class @Controller annotations
+        AnnotationMetadata annotations = typeDetails
+                .getAnnotation(SpringJavaType.CONTROLLER);
+
+        // If class doesn't have @Controller annotations means that is not a
+        // valid controller
+        if (annotations != null) {
+            operations.addClass(name);
+        }
+        else {
+            LOGGER.log(Level.WARNING,
+                    "Error. You must to specify a valid class annotated with @Controller ");
+        }
+
     }
 
     /**
