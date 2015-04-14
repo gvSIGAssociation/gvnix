@@ -213,6 +213,65 @@
     echo "======================================================"
     echo .
 
+
+##
+## gvNIX Web MVC Addon
+## 
+
+	## batch
+	echo "======================================================"
+   	 echo "------------------------------------------------------"
+	echo batch start
+	mkdir batch
+	cd batch
+	$1/gvnix.sh script --file $2/code/addon-web-mvc/addon/src/test/batch.roo --lineNumbers true
+	mkdir target
+	mvn test tomcat:run & 
+	wget --retry-connrefused -O target/main.html http://localhost:8080/petclinic
+	cd ..
+	echo batch end
+   	 echo "------------------------------------------------------"
+    	echo "======================================================"
+    	echo .
+
+	
+
+	## jquery
+	echo "======================================================"
+   	 echo "------------------------------------------------------"
+	echo jquery start
+	mkdir jquery
+	cd jquery
+	$1/gvnix.sh script --file $2/code/addon-web-mvc/addon/src/test/jquery.roo --lineNumbers true
+	mkdir target
+	mvn test tomcat:run &
+	wget --retry-connrefused -O target/owners.html http://localhost:8080/petclinic/owners
+	cd ..
+	echo jquery end
+   	 echo "------------------------------------------------------"
+    	echo "======================================================"
+    	echo .
+
+##
+## gvNIX bootstrap add-on
+##
+	echo "======================================================"
+   	 echo "------------------------------------------------------"
+	echo bootstrap start
+	mkdir bootstrap
+	cd bootstrap
+	$1/gvnix.sh script --file $2/code/addon-web-mvc-bootstrap/src/test/resources/bootstrap.roo--lineNumbers true
+	mkdir target
+	mvn test tomcat:run &
+	wget --retry-connrefused -O target/main.html http://localhost:8080/petclinic 
+	cd ..
+	echo bootstrap end
+   	 echo "------------------------------------------------------"
+    	echo "======================================================"
+    	echo .
+
+
+
 ##
 ## gvNIX datatables add-on
 ##
@@ -537,6 +596,63 @@
     echo "------------------------------------------------------"
     echo "======================================================"
     echo .
+
+	## jpa-audit-multimodule
+echo "======================================================"
+    echo "------------------------------------------------------"
+	echo jpa-audit-multimodule start
+	mkdir jpa-audit-muldimodule
+	cd jpa-audit-multimodule
+	$1/gvnix.sh script --file $2/code/addon-jpa/addon/src/test/resources/jpa-audit-multimodule.roo --lineNumbers true
+	# Create new pet
+	mkdir target
+	mvn test tomcat:run &
+	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/mvn/pets --post-data 'name=a&weight=1&type=Dog' & 
+	cd ..
+	echo jpa-audit-multimodule end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
+	## jpa-audit-pkc 
+echo "======================================================"
+    echo "------------------------------------------------------"
+	echo jpa-audit-pkc start
+	mkdir jpa-audit-pkc
+	cd jpa-audit-pkc
+	$1/gvnix.sh script --file $2/code/addon-jpa/src/test/resources/jpa-audit-pkc.roo --lineNumbers true
+	# Create new pet
+	mvn test tomcat:run &
+	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/displayRelationTable --post-data 'name=a&weight=1&type=Dog' &
+	cd ..
+	echo jpa-audit-pkc end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
+##
+## gvNIX loupe add-on
+##
+	
+	## loupefield
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo loupefield start
+	mkdir loupefield
+	cd loupefield
+	$1/gvnix.sh script --file $2/code/addon-web-mvc-loupefield/src/main/resources/loupe.roo --lineNumbers true
+	mkdir target
+    # Get page with loupe fields
+	#wget --retry-connrefused -O target/visits.html http://localhost:8080/petclinic/visits?form
+	cd ..
+	echo loupefield end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
 
 ##
 ## gvNIX pattern add-on
