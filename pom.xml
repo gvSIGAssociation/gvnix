@@ -68,20 +68,18 @@
     <module>addon-web-mvc</module>
     <module>addon-jpa</module>
     <module>addon-web-mvc-datatables</module>
-    <module>addon-web-menu</module>
-    <module>addon-web-report</module>
+    <module>addon-web-mvc-menu</module>
+    <module>addon-web-mvc-report</module>
     <module>addon-service</module>
     <module>addon-occ</module>
     <module>addon-dynamic-configuration</module>
     <module>addon-web-mvc-binding</module>
-    <module>addon-web-i18n</module>
-    <module>addon-web-dialog</module>
+    <module>addon-web-mvc-i18n</module>
+    <module>addon-web-mvc-dialog</module>
     <module>addon-web-mvc-typicalsecurity</module>
     <module>addon-monitoring</module>
 
     <!-- Libraries not included on Roo Addon Suite -->
-    <module>taglib-datatables</module>
-    <module>util-datatables</module>
     <module>util-web-mvc-jackson-binder</module>
 
     <!-- Generate the subsystem .esa file -->

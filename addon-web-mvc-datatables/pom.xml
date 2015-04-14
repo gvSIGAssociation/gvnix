@@ -55,6 +55,9 @@
   <modules>
   	<module>addon</module>
   	<module>annotations</module>
+  	<!-- Libraries -->
+  	<module>taglib-datatables</module>
+  	<module>util-datatables</module>
   </modules>
 
   <dependencies>

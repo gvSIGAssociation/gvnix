@@ -197,7 +197,8 @@
     <gvnix.version>${project.parent.version}</gvnix.version>
     <querydsl.version>3.4.3</querydsl.version>
     <spring.version>3.2.0.RELEASE</spring.version>
-    <target.osgi-repository.directory>${basedir}/../target/osgi-repository-bin</target.osgi-repository.directory>
+    <target.osgi-repository.directory>${basedir}/../../target/osgi-repository-bin</target.osgi-repository.directory>
+  	<devel.resources.path>../../devel-resources</devel.resources.path>
   </properties>
 
 </project>

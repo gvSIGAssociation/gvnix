@@ -205,7 +205,8 @@
 
   <properties>
     <jackson.version>1.9.12</jackson.version>
-    <target.osgi-repository.directory>${basedir}/../target/osgi-repository-bin</target.osgi-repository.directory>
+    <target.osgi-repository.directory>${basedir}/../../target/osgi-repository-bin</target.osgi-repository.directory>
+	<devel.resources.path>../../devel-resources</devel.resources.path>
   </properties>
 </project>
 
