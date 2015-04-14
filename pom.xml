@@ -79,9 +79,6 @@
     <module>addon-web-mvc-typicalsecurity</module>
     <module>addon-monitoring</module>
 
-    <!-- Libraries not included on Roo Addon Suite -->
-    <module>util-web-mvc-jackson-binder</module>
-
     <!-- Generate the subsystem .esa file -->
     <module>roo-addon-suite</module>
 
