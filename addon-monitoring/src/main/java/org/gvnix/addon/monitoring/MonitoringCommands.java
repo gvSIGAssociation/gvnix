@@ -138,4 +138,29 @@ public class MonitoringCommands implements CommandMarker {
             @CliOption(key = "class", mandatory = true, help = "Set the class name of the method to be monitored") final JavaType className) {
         operations.addMethod(methodName, className);
     }
+
+    public TypeLocationService getTypeLocationService() {
+        if (typeLocationService == null) {
+            // Get all Services implement TypeLocationService interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                TypeLocationService.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (TypeLocationService) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load TypeLocationService on MonitoringCommands.");
+                return null;
+            }
+        }
+        else {
+            return typeLocationService;
+        }
+    }
 }
