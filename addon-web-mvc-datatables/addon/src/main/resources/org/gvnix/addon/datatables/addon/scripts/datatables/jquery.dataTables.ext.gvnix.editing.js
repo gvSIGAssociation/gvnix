@@ -609,7 +609,7 @@ var GvNIX_Editing;
 
 								// Make a new unique ID for the input to avoid
 								// collisions with other elements with same ID
-								jQuery($inputCtrl[k]).attr('id', '_' + $updateForm.attr('id') + jQuery($inputCtrl[k]).attr('id') + '_edit_' + rowId);
+								jQuery($inputCtrl[k]).attr('id', '_' + jQuery($inputCtrl[k]).attr('id') + '_edit_' + rowId);
 
 								var value = fnVal( jQuery($inputCtrl[k]) );
 
@@ -646,12 +646,16 @@ var GvNIX_Editing;
 					// the request to send to server (by example: version, other required fields, etc...)
 					jQuery.each($updateForm.find("form").find(":input"), function (index, input) {
 						var $input = jQuery(input);
-						var name = $input.attr('name');
-						if (name !== undefined && name) {
-							oEditRow.oAllItemData[name] = fnVal($input);
+					// Check if is a loupe input field
+						if($input.attr("id") == undefined || $input.attr("id").indexOf("loupe") == -1 || $input.attr("type") != "hidden"){
+							var name = $input.attr('name');
+							if (name !== undefined && name) {
+								oEditRow.oAllItemData[name] = fnVal($input);
+							}
 						}
 					});
 				}
+				
 
 				// Redraw the table
 				this.fnRedrawVisibleRows();
