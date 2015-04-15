@@ -39,7 +39,7 @@ Run gvNIX Roo Addon Suite
 To be able to test gvNIX quickly without deploy all components you should following the next steps:
 
 * Add _$ROO_HOME_ variable to your $PATH 
-* Compile gvNIX project using 'mvn clean install'
+* Compile gvNIX project using 'mvn clean install' on your project folder
 * Execute ./gvnix-dev
 
 Developing within STS
