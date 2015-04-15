@@ -481,6 +481,27 @@
     echo "======================================================"
     echo .
 
+
+
+##
+## gvNIX geo add-on
+##
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo geo quickstart start
+	mkdir geo
+	cd geo
+	$1/gvnix.sh script --file $2/code/addon-web-mvc-geo/addon/src/test/resources/geo.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo geo quickstart end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+	
+
+
+
 ##
 ## gvNIX i18n add-on
 ##
