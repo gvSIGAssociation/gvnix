@@ -51,7 +51,8 @@ public class WebModalDialogCommands implements CommandMarker {
                 && exceptionOperations.isExceptionMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc dialog setup", help = "Setup support for Modal Dialogs in current project.")
+    @CliCommand(value = "web mvc dialog setup",
+            help = "Setup support for Modal Dialogs in current project.")
     public void setupGvNIXModalDialog() {
         modalDialogOperations.setupModalDialogsSupport();
     }
@@ -62,10 +63,15 @@ public class WebModalDialogCommands implements CommandMarker {
                 && modalDialogOperations.isMessageBoxOfTypeModal();
     }
 
-    @CliCommand(value = "web mvc dialog add", help = "Defines gvNIX customizable Dialog.")
+    @CliCommand(value = "web mvc dialog add",
+            help = "Defines gvNIX customizable Dialog.")
     public void addGvNIXModalDialog(
-            @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
-            @CliOption(key = "name", mandatory = true, help = "Identificication to use for this modal dialog") JavaSymbolName name) {
+            @CliOption(key = "class",
+                    mandatory = true,
+                    help = "The controller to apply the pattern to") JavaType controllerClass,
+            @CliOption(key = "name",
+                    mandatory = true,
+                    help = "Identificication to use for this modal dialog") JavaSymbolName name) {
         modalDialogOperations.addModalDialogAnnotation(controllerClass, name);
     }
 }

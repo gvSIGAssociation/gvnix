@@ -20,11 +20,15 @@
 this_file=`readlink -f $0`
 this_dir=`dirname $this_file`
 
-echo "Executing gvnix-dev..............."
+echo ""
+echo "Executing gvNIX-dev!"
 
-if [ "${GVNIX_HOME}x" == "x" ]; then
-	export GVNIX_HOME=`dirname $this_dir`
-fi
+# Defining vars
+export GVNIX_HOME="$this_dir"
+export GVNIX_TARGET="$GVNIX_HOME/target"
+export GVNIX_CACHE="$GVNIX_TARGET/roo/cache"
+export GVNIX_BUNDLES="$GVNIX_TARGET/roo/bundle"
+
 
 # Checking if ROO_HOME was specified
 if [ "${ROO_HOME}x" == "x" ]; then
@@ -32,25 +36,33 @@ if [ "${ROO_HOME}x" == "x" ]; then
   exit
 fi
 
-echo "ROO_HOME............: $ROO_HOME"
-echo "GVNIX_HOME..........: $GVNIX_HOME"
-echo "gvNIX target dir....: $GVNIX_HOME/target"
-
-
 # Checking if mvn clean install was executed before execute gvnix-dev
-if [ ! -d "$GVNIX_HOME/target" ]; then
-  echo "### ERROR: You must execute mvn clean install before execute gvnix-dev"
+if [ ! -d "$GVNIX_TARGET" ]; then
+  echo "### ERROR: You must execute 'mvn clean install' in $GVNIX_HOME before execute gvnix-dev"
   exit
 fi
 
-# ROO: Remove OSGi cache
-rm -r "$ROO_HOME"/cache
+# Showing variables
+echo ""
+echo "ROO Home..................: $ROO_HOME"
+echo "gvNIX Home................: $GVNIX_HOME"
+echo "gvNIX target dir..........: $GVNIX_TARGET"
+echo "ROO cache dir.............: $GVNIX_CACHE"
+echo "ROO bundle dir............: $GVNIX_BUNDLES"
+echo ""
 
-# gvNIX: remove gvNIX add-ons on start
-rm -r "$ROO_HOME"/bundle/org.gvnix.*
+# gvNIX: Remove OSGi cache and bundles
+rm -r "$GVNIX_TARGET/roo"
 
-# gvNIX: copy add-ons to roo bundles
-cp `find $GVNIX_HOME/target/osgi-repository-bin/org/gvnix/ -iname org.gvnix.*.jar` $ROO_HOME/bundle
+# gvNIX: Creating Bundle and Cache folders
+mkdir -p "$GVNIX_CACHE"
+mkdir -p "$GVNIX_BUNDLES"
+
+# gvNIX: copy add-ons to gvNIX ROO bundles
+cp `find $GVNIX_TARGET/osgi-repository-bin/org/gvnix/ -iname org.gvnix.*.jar` "$GVNIX_BUNDLES"
+
+# ROO: copy ROO add-ons to gvNIX ROO Bundles
+cp -r "$ROO_HOME/bundle/." "$GVNIX_BUNDLES"
 
 # Store file locations in variables to facilitate Cygwin conversion if needed
 
@@ -58,10 +70,10 @@ cp `find $GVNIX_HOME/target/osgi-repository-bin/org/gvnix/ -iname org.gvnix.*.ja
 ROO_CP=`echo "$ROO_HOME"/bin/*.jar | sed 's/ \//:\//g'`
 # echo ROO_CP: $ROO_CP
 
-ROO_OSGI_FRAMEWORK_STORAGE="$ROO_HOME/cache"
+ROO_OSGI_FRAMEWORK_STORAGE="$GVNIX_CACHE"
 # echo "ROO_OSGI_FRAMEWORK_STORAGE: $ROO_OSGI_FRAMEWORK_STORAGE"
 
-ROO_AUTO_DEPLOY_DIRECTORY="$ROO_HOME/bundle"
+ROO_AUTO_DEPLOY_DIRECTORY="$GVNIX_BUNDLES"
 # echo "ROO_AUTO_DEPLOY_DIRECTORY: $ROO_AUTO_DEPLOY_DIRECTORY"
 
 ROO_CONFIG_FILE_PROPERTIES="$ROO_HOME/conf/config.properties"

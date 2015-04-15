@@ -31,7 +31,11 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 @Component
 @Service
-@Reference(name = "provider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = GeoProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
+@Reference(name = "provider",
+        strategy = ReferenceStrategy.EVENT,
+        policy = ReferencePolicy.DYNAMIC,
+        referenceInterface = GeoProvider.class,
+        cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class JpaGeoOperationsImpl implements JpaGeoOperations {
 
     protected final static Logger LOGGER = HandlerUtils

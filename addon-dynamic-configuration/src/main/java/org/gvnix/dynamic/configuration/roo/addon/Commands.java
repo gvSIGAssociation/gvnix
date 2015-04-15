@@ -58,9 +58,11 @@ public class Commands implements CommandMarker {
         return operations.isProjectAvailable();
     }
 
-    @CliCommand(value = "configuration create", help = "Define a new configuration with a name")
-    public void create(
-            @CliOption(key = "name", mandatory = true, help = "Name for defined configuration") JavaSymbolName name) {
+    @CliCommand(value = "configuration create",
+            help = "Define a new configuration with a name")
+    public void create(@CliOption(key = "name",
+            mandatory = true,
+            help = "Name for defined configuration") JavaSymbolName name) {
 
         // There is no previous dynamic configurations created ?
         DynConfigurationList dynConfs = operations.findConfigurations();
@@ -92,9 +94,12 @@ public class Commands implements CommandMarker {
                 && !operations.findConfigurations().isEmpty();
     }
 
-    @CliCommand(value = "configuration property add", help = "Make a property available for all configurations")
-    public void propertyAdd(
-            @CliOption(key = "name", mandatory = true, help = "Name of property to add", optionContext = DynPropertyConverter.SOURCE_FILES) DynProperty name) {
+    @CliCommand(value = "configuration property add",
+            help = "Make a property available for all configurations")
+    public void propertyAdd(@CliOption(key = "name",
+            mandatory = true,
+            help = "Name of property to add",
+            optionContext = DynPropertyConverter.SOURCE_FILES) DynProperty name) {
 
         // Add the property and show a message
         Boolean added = operations.addProperty(name.getKey());
@@ -129,11 +134,19 @@ public class Commands implements CommandMarker {
                 && !operations.findConfigurations().isEmpty();
     }
 
-    @CliCommand(value = "configuration property value", help = "Set new value into a configuration property")
+    @CliCommand(value = "configuration property value",
+            help = "Set new value into a configuration property")
     public void propertyValue(
-            @CliOption(key = "configuration", mandatory = true, help = "Name of configuration to update") DynConfiguration configuration,
-            @CliOption(key = "property", mandatory = true, help = "Name of property to update", optionContext = DynPropertyConverter.CONFIGURATION_FILE) DynProperty property,
-            @CliOption(key = "value", mandatory = true, help = "New value to set") String value) {
+            @CliOption(key = "configuration",
+                    mandatory = true,
+                    help = "Name of configuration to update") DynConfiguration configuration,
+            @CliOption(key = "property",
+                    mandatory = true,
+                    help = "Name of property to update",
+                    optionContext = DynPropertyConverter.CONFIGURATION_FILE) DynProperty property,
+            @CliOption(key = "value",
+                    mandatory = true,
+                    help = "New value to set") String value) {
 
         // Update the configuration
         DynProperty dynProperty = operations.updateProperty(
@@ -162,10 +175,16 @@ public class Commands implements CommandMarker {
                 && !operations.findConfigurations().isEmpty();
     }
 
-    @CliCommand(value = "configuration property undefined", help = "Set no value into a configuration property")
+    @CliCommand(value = "configuration property undefined",
+            help = "Set no value into a configuration property")
     public void propertyUndefined(
-            @CliOption(key = "configuration", mandatory = true, help = "Name of configuration to update") DynConfiguration configuration,
-            @CliOption(key = "property", mandatory = true, help = "Name of property to update", optionContext = DynPropertyConverter.CONFIGURATION_FILE) DynProperty property) {
+            @CliOption(key = "configuration",
+                    mandatory = true,
+                    help = "Name of configuration to update") DynConfiguration configuration,
+            @CliOption(key = "property",
+                    mandatory = true,
+                    help = "Name of property to update",
+                    optionContext = DynPropertyConverter.CONFIGURATION_FILE) DynProperty property) {
 
         // Update the configuration
         DynProperty dynProperty = operations.updateProperty(
@@ -196,7 +215,8 @@ public class Commands implements CommandMarker {
                 && !operations.findConfigurations().isEmpty();
     }
 
-    @CliCommand(value = "configuration list", help = "List all created configurations and their properties")
+    @CliCommand(value = "configuration list",
+            help = "List all created configurations and their properties")
     public void list() {
 
         // If name specified get this configuration, else base configuration
@@ -215,7 +235,8 @@ public class Commands implements CommandMarker {
                 && !operations.findConfigurations().isEmpty();
     }
 
-    @CliCommand(value = "configuration export", help = "Write current configurations into project")
+    @CliCommand(value = "configuration export",
+            help = "Write current configurations into project")
     public void export() {
 
         // Write all dynamic configurations into the build tool

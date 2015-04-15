@@ -63,7 +63,8 @@ public class JpaCommands implements CommandMarker { // All command types must
      * 
      * @param type
      */
-    @CliCommand(value = "jpa gvnix setup", help = "Setup the project dependencies that gvNIX JPA utilities need")
+    @CliCommand(value = "jpa gvnix setup",
+            help = "Setup the project dependencies that gvNIX JPA utilities need")
     public void setup() {
         operations.setup();
     }

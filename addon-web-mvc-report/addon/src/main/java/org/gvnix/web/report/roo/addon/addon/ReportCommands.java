@@ -99,11 +99,20 @@ public class ReportCommands implements CommandMarker { // All command types must
      * 
      * @param type
      */
-    @CliCommand(value = "web report add", help = "Add a new report handled by the given controller")
+    @CliCommand(value = "web report add",
+            help = "Add a new report handled by the given controller")
     public void add(
-            @CliOption(key = "controller", mandatory = true, help = "The name of the controller object which handle the report request") JavaType controller,
-            @CliOption(key = "reportName", mandatory = true, help = "The name of the new report.") String reportName,
-            @CliOption(key = "format", mandatory = false, unspecifiedDefaultValue = "pdf", specifiedDefaultValue = "pdf", help = "The available format for the new report with comma separated list format. By example: pdf,xls,html,csv") String format) {
+            @CliOption(key = "controller",
+                    mandatory = true,
+                    help = "The name of the controller object which handle the report request") JavaType controller,
+            @CliOption(key = "reportName",
+                    mandatory = true,
+                    help = "The name of the new report.") String reportName,
+            @CliOption(key = "format",
+                    mandatory = false,
+                    unspecifiedDefaultValue = "pdf",
+                    specifiedDefaultValue = "pdf",
+                    help = "The available format for the new report with comma separated list format. By example: pdf,xls,html,csv") String format) {
 
         if (!reportConfigService.isJasperViewsProject()) {
             reportConfigService.setup();
@@ -116,7 +125,8 @@ public class ReportCommands implements CommandMarker { // All command types must
      * This method registers a command with the Roo shell. It has no command
      * attribute.
      */
-    @CliCommand(value = "web report setup", help = "Setup JasperReport support in the project. Adds maven dependencies to pom.xlm. Adds JasperReportViewResolver in webmvc-config.xml. Installs jasper-views.xml as config file for JasperReportViewResolver. Installs jasperreports_extension.properties and the FreeSans font family TTF fonts in the webapp classpath.")
+    @CliCommand(value = "web report setup",
+            help = "Setup JasperReport support in the project. Adds maven dependencies to pom.xlm. Adds JasperReportViewResolver in webmvc-config.xml. Installs jasper-views.xml as config file for JasperReportViewResolver. Installs jasperreports_extension.properties and the FreeSans font family TTF fonts in the webapp classpath.")
     public void setup() {
         reportConfigService.setup();
     }

@@ -101,22 +101,42 @@ public class ServiceCommands implements CommandMarker {
                 projectOperations);
     }
 
-    @CliCommand(value = "remote service class", help = "Creates a new Service class in SRC_MAIN_JAVA.")
-    public String createServiceClass(
-            @CliOption(key = "class", mandatory = true, help = "Name of the service class to create") JavaType serviceClass) {
+    @CliCommand(value = "remote service class",
+            help = "Creates a new Service class in SRC_MAIN_JAVA.")
+    public String createServiceClass(@CliOption(key = "class",
+            mandatory = true,
+            help = "Name of the service class to create") JavaType serviceClass) {
 
         serviceOperations.createServiceClass(serviceClass);
         return "New class can be used adding a property of this type with @Autowired annotation in the class that use it.";
     }
 
-    @CliCommand(value = "remote service operation", help = "Adds a new method to existing Service")
+    @CliCommand(value = "remote service operation",
+            help = "Adds a new method to existing Service")
     public void addServiceOperation(
-            @CliOption(key = { "", "name" }, mandatory = true, help = "The name of the operation to add") JavaSymbolName operationName,
-            @CliOption(key = "service", mandatory = true, optionContext = "update,project", help = "The name of the service to receive this field") JavaType className,
-            @CliOption(key = "return", mandatory = false, unspecifiedDefaultValue = "__NULL__", optionContext = "java-all,project", help = "The Java type this operation returns") JavaType returnType,
-            @CliOption(key = "paramNames", mandatory = false, help = "The parameters of the operation. They must be introduced separated by commas without blank spaces.") String paramNames,
-            @CliOption(key = "paramTypes", mandatory = false, optionContext = "java", help = "The Java types of the given parameters. They must be introduced separated by commas without blank spaces.") JavaTypeList paramTypesList,
-            @CliOption(key = "exceptions", mandatory = false, optionContext = "exceptions", help = "The Exceptions defined for the operation. They must be introduced separated by commas without blank spaces.") JavaTypeList exceptionTypes) {
+            @CliOption(key = { "", "name" },
+                    mandatory = true,
+                    help = "The name of the operation to add") JavaSymbolName operationName,
+            @CliOption(key = "service",
+                    mandatory = true,
+                    optionContext = "update,project",
+                    help = "The name of the service to receive this field") JavaType className,
+            @CliOption(key = "return",
+                    mandatory = false,
+                    unspecifiedDefaultValue = "__NULL__",
+                    optionContext = "java-all,project",
+                    help = "The Java type this operation returns") JavaType returnType,
+            @CliOption(key = "paramNames",
+                    mandatory = false,
+                    help = "The parameters of the operation. They must be introduced separated by commas without blank spaces.") String paramNames,
+            @CliOption(key = "paramTypes",
+                    mandatory = false,
+                    optionContext = "java",
+                    help = "The Java types of the given parameters. They must be introduced separated by commas without blank spaces.") JavaTypeList paramTypesList,
+            @CliOption(key = "exceptions",
+                    mandatory = false,
+                    optionContext = "exceptions",
+                    help = "The Exceptions defined for the operation. They must be introduced separated by commas without blank spaces.") JavaTypeList exceptionTypes) {
 
         String[] paramNameArray;
         List<String> paramNameList = new ArrayList<String>();
@@ -172,13 +192,24 @@ public class ServiceCommands implements CommandMarker {
                         fileManager, projectOperations);
     }
 
-    @CliCommand(value = "remote service define ws", help = "Defines a service endpoint interface (SEI) that will be mapped to a PortType in service contract. If target class doesn't exist the add-on will create it.")
+    @CliCommand(value = "remote service define ws",
+            help = "Defines a service endpoint interface (SEI) that will be mapped to a PortType in service contract. If target class doesn't exist the add-on will create it.")
     public String serviceExport(
-            @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass,
-            @CliOption(key = "serviceName", mandatory = false, help = "Name to publish the Web Service.") String serviceName,
-            @CliOption(key = "portTypeName", mandatory = false, help = "Name to define the portType.") String portTypeName,
-            @CliOption(key = "addressName", mandatory = false, help = "Address to publish the Web Service in server. Default class name value.") String addressName,
-            @CliOption(key = "targetNamespace", mandatory = false, help = "Namespace name for the service. \ni.e.: 'http://services.project.service.test.gvnix.org/'. It must have URI format.") String targetNamespace) {
+            @CliOption(key = "class",
+                    mandatory = true,
+                    help = "Name of the service class to export or create") JavaType serviceClass,
+            @CliOption(key = "serviceName",
+                    mandatory = false,
+                    help = "Name to publish the Web Service.") String serviceName,
+            @CliOption(key = "portTypeName",
+                    mandatory = false,
+                    help = "Name to define the portType.") String portTypeName,
+            @CliOption(key = "addressName",
+                    mandatory = false,
+                    help = "Address to publish the Web Service in server. Default class name value.") String addressName,
+            @CliOption(key = "targetNamespace",
+                    mandatory = false,
+                    help = "Namespace name for the service. \ni.e.: 'http://services.project.service.test.gvnix.org/'. It must have URI format.") String targetNamespace) {
 
         wSExportOperations.exportService(serviceClass, serviceName,
                 portTypeName, targetNamespace, addressName);
@@ -227,17 +258,36 @@ public class ServiceCommands implements CommandMarker {
      * Object.</li>
      * </ul>
      */
-    @CliCommand(value = "remote service export operation", help = "Publish a class method as web service operation in a PortType.")
+    @CliCommand(value = "remote service export operation",
+            help = "Publish a class method as web service operation in a PortType.")
     public void serviceExportOperation(
-            @CliOption(key = "class", mandatory = true, help = "Name of the service class to export a method.") JavaType serviceClass,
-            @CliOption(key = "method", mandatory = true, help = "Method to export as Web Service Operation.") JavaSymbolName methodName,
-            @CliOption(key = "operationName", mandatory = false, help = "Name of the method to be showed as a Web Service operation.") String operationName,
-            @CliOption(key = "resultName", mandatory = false, help = "Method result name.") String resultName,
-            @CliOption(key = "resultNamespace", mandatory = false, help = "NNamespace of the result type. \ni.e.: 'http://services.project.service.test.gvnix.org/'. It must have URI format.") String resultNamespace,
-            @CliOption(key = "responseWrapperName", mandatory = false, help = "Name to define the Response Wrapper Object.") String responseWrapperName,
-            @CliOption(key = "responseWrapperNamespace", mandatory = false, help = "Namespace of the Response Wrapper Object. \ni.e.: 'http://services.project.service.test.gvnix.org/'. It must have URI format.") String responseWrapperNamespace,
-            @CliOption(key = "requestWrapperName", mandatory = false, help = "Name to define the Request Wrapper Object.") String requestWrapperName,
-            @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.service.test.gvnix.org/'. It must have URI format.") String requestWrapperNamespace) {
+            @CliOption(key = "class",
+                    mandatory = true,
+                    help = "Name of the service class to export a method.") JavaType serviceClass,
+            @CliOption(key = "method",
+                    mandatory = true,
+                    help = "Method to export as Web Service Operation.") JavaSymbolName methodName,
+            @CliOption(key = "operationName",
+                    mandatory = false,
+                    help = "Name of the method to be showed as a Web Service operation.") String operationName,
+            @CliOption(key = "resultName",
+                    mandatory = false,
+                    help = "Method result name.") String resultName,
+            @CliOption(key = "resultNamespace",
+                    mandatory = false,
+                    help = "NNamespace of the result type. \ni.e.: 'http://services.project.service.test.gvnix.org/'. It must have URI format.") String resultNamespace,
+            @CliOption(key = "responseWrapperName",
+                    mandatory = false,
+                    help = "Name to define the Response Wrapper Object.") String responseWrapperName,
+            @CliOption(key = "responseWrapperNamespace",
+                    mandatory = false,
+                    help = "Namespace of the Response Wrapper Object. \ni.e.: 'http://services.project.service.test.gvnix.org/'. It must have URI format.") String responseWrapperNamespace,
+            @CliOption(key = "requestWrapperName",
+                    mandatory = false,
+                    help = "Name to define the Request Wrapper Object.") String requestWrapperName,
+            @CliOption(key = "requestWrapperNamespace",
+                    mandatory = false,
+                    help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.service.test.gvnix.org/'. It must have URI format.") String requestWrapperNamespace) {
 
         if (StringUtils.isNotBlank(resultNamespace)) {
             Validate.isTrue(StringUtils.startsWithIgnoreCase(resultNamespace,
@@ -265,9 +315,12 @@ public class ServiceCommands implements CommandMarker {
                 requestWrapperName, requestWrapperNamespace);
     }
 
-    @CliCommand(value = "remote service list operation", help = "Shows available methods to export as web service operation in selected class.")
+    @CliCommand(value = "remote service list operation",
+            help = "Shows available methods to export as web service operation in selected class.")
     public String serviceExportOperationList(
-            @CliOption(key = "class", mandatory = true, help = "Name of the service class to list methods available to export as web service operations.") JavaType serviceClass) {
+            @CliOption(key = "class",
+                    mandatory = true,
+                    help = "Name of the service class to list methods available to export as web service operations.") JavaType serviceClass) {
 
         return wSExportOperations
                 .getAvailableServiceOperationsToExport(serviceClass);
@@ -280,10 +333,15 @@ public class ServiceCommands implements CommandMarker {
                 projectOperations);
     }
 
-    @CliCommand(value = "remote service import ws", help = "Imports a Web Service to Service class. If the class doesn't exists the Addon will create it.")
+    @CliCommand(value = "remote service import ws",
+            help = "Imports a Web Service to Service class. If the class doesn't exists the Addon will create it.")
     public String serviceImport(
-            @CliOption(key = "class", mandatory = true, help = "Name of the service class to import or create") JavaType serviceClass,
-            @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
+            @CliOption(key = "class",
+                    mandatory = true,
+                    help = "Name of the service class to import or create") JavaType serviceClass,
+            @CliOption(key = "wsdl",
+                    mandatory = true,
+                    help = "Local or remote location (URL) of the web service contract") String url) {
 
         wSImportOperations.addImportAnnotation(serviceClass, url);
 
@@ -303,9 +361,12 @@ public class ServiceCommands implements CommandMarker {
                         fileManager, projectOperations);
     }
 
-    @CliCommand(value = "remote service export ws", help = "Exports a Web Service from WSDL to java code with gvNIX annotations to generate this Web Service in project with dummy methods.")
+    @CliCommand(value = "remote service export ws",
+            help = "Exports a Web Service from WSDL to java code with gvNIX annotations to generate this Web Service in project with dummy methods.")
     public String serviceExportWsdl(
-            @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
+            @CliOption(key = "wsdl",
+                    mandatory = true,
+                    help = "Local or remote location (URL) of the web service contract") String url) {
 
         List<JavaType> serviceClasses = wSExportWsdlOperations.exportWsdl(url);
         StringBuilder sb = new StringBuilder();
@@ -345,12 +406,21 @@ public class ServiceCommands implements CommandMarker {
                 projectOperations);
     }
 
-    @CliCommand(value = "remote service security ws", help = "Adds Signature to a imported Web Service request")
+    @CliCommand(value = "remote service security ws",
+            help = "Adds Signature to a imported Web Service request")
     public void serviceSecurityWs(
-            @CliOption(key = "class", mandatory = true, help = "Name of the imported service class") JavaType importedServiceClass,
-            @CliOption(key = "certificate", mandatory = true, help = "pkcs12 file to use for sing the request") File certificate,
-            @CliOption(key = "password", mandatory = true, help = "pkcs12 file password to use for sing the request") String password,
-            @CliOption(key = "alias", mandatory = true, help = "alias of pkcs12 file to use for sing the request") String alias) {
+            @CliOption(key = "class",
+                    mandatory = true,
+                    help = "Name of the imported service class") JavaType importedServiceClass,
+            @CliOption(key = "certificate",
+                    mandatory = true,
+                    help = "pkcs12 file to use for sing the request") File certificate,
+            @CliOption(key = "password",
+                    mandatory = true,
+                    help = "pkcs12 file password to use for sing the request") String password,
+            @CliOption(key = "alias",
+                    mandatory = true,
+                    help = "alias of pkcs12 file to use for sing the request") String alias) {
         // TODO use converters to auto-complete imported service class parameter
         // (converter can use WSImportOperation.getServiceList() for
         // auto-complete)
@@ -358,7 +428,8 @@ public class ServiceCommands implements CommandMarker {
                 certificate, password, alias);
     }
 
-    @CliCommand(value = "remote service ws list", help = "Shows a class list with imported and/or exported services")
+    @CliCommand(value = "remote service ws list",
+            help = "Shows a class list with imported and/or exported services")
     public String serviceWsList() {
 
         // Gets imported services

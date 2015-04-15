@@ -101,18 +101,30 @@ public class MenuEntryCommands implements CommandMarker { // all command types
                 && operations.isGvNixMenuAvailable();
     }
 
-    @CliCommand(value = "menu setup", help = "Install gvNIX web menu: multilevel menu, advanced roo-shell menu commands and context menu support.")
+    @CliCommand(value = "menu setup",
+            help = "Install gvNIX web menu: multilevel menu, advanced roo-shell menu commands and context menu support.")
     public void setup() {
         operations.setup();
     }
 
-    @CliCommand(value = "menu entry add", help = "Add new menu item to menu. This command won't add neither Controller nor JSPs for the new entry, if you need them use 'controller class' instead.")
+    @CliCommand(value = "menu entry add",
+            help = "Add new menu item to menu. This command won't add neither Controller nor JSPs for the new entry, if you need them use 'controller class' instead.")
     public String addEntry(
-            @CliOption(key = "label", mandatory = true, help = "Text to show in menu if no messageCode set, otherwise label is used as message argument.") String label,
-            @CliOption(key = "category", mandatory = false, help = "Add entry into this menu entry (category). Default add to 'Page' category. Note you don't need a command to manage categories, just change default category ID ('menu entry update') when you need, new default category will be created automatically.") MenuEntry parentEntryId,
-            @CliOption(key = "messageCode", mandatory = false, help = "The global message code to get I18N label text (works in conjunction with label). If empty, it will be generated using entry name.") String messageCode,
-            @CliOption(key = "url", mandatory = false, help = "The link URL to access to this page.") String url,
-            @CliOption(key = "roles", mandatory = false, help = "User that has any of this granted roles (comma separated) will see this menu entry. If empty, the menu entry is shown for every one.") String roles) {
+            @CliOption(key = "label",
+                    mandatory = true,
+                    help = "Text to show in menu if no messageCode set, otherwise label is used as message argument.") String label,
+            @CliOption(key = "category",
+                    mandatory = false,
+                    help = "Add entry into this menu entry (category). Default add to 'Page' category. Note you don't need a command to manage categories, just change default category ID ('menu entry update') when you need, new default category will be created automatically.") MenuEntry parentEntryId,
+            @CliOption(key = "messageCode",
+                    mandatory = false,
+                    help = "The global message code to get I18N label text (works in conjunction with label). If empty, it will be generated using entry name.") String messageCode,
+            @CliOption(key = "url",
+                    mandatory = false,
+                    help = "The link URL to access to this page.") String url,
+            @CliOption(key = "roles",
+                    mandatory = false,
+                    help = "User that has any of this granted roles (comma separated) will see this menu entry. If empty, the menu entry is shown for every one.") String roles) {
 
         // Default category is the same default category that Roo uses
         JavaSymbolName categoryName = null;
@@ -131,26 +143,42 @@ public class MenuEntryCommands implements CommandMarker { // all command types
         return "New page '".concat(pageId).concat("' added.");
     }
 
-    @CliCommand(value = "menu entry visibility", help = "Show/Hide a menu entry. This only affects menu entry neither related artefacts nor page accessibility.")
+    @CliCommand(value = "menu entry visibility",
+            help = "Show/Hide a menu entry. This only affects menu entry neither related artefacts nor page accessibility.")
     public void hideEntry(
-            @CliOption(key = "id", mandatory = true, help = "Menu entry id to show/hide. Use 'menu tree' to get all pages ids.") MenuEntry menuEntryId,
-            @CliOption(key = "hidden", mandatory = true, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Show/Hide menu entry. Default, show menu entry.") boolean hidden) {
+            @CliOption(key = "id",
+                    mandatory = true,
+                    help = "Menu entry id to show/hide. Use 'menu tree' to get all pages ids.") MenuEntry menuEntryId,
+            @CliOption(key = "hidden",
+                    mandatory = true,
+                    unspecifiedDefaultValue = "false",
+                    specifiedDefaultValue = "true",
+                    help = "Show/Hide menu entry. Default, show menu entry.") boolean hidden) {
         operations.updateEntry(menuEntryId.getJavaSymbolName(), null, null,
                 null, null, null, hidden, false);
     }
 
-    @CliCommand(value = "menu entry roles", help = "Set the user roles that will grant entry to be shown depending on user roles and target URL permissions.")
+    @CliCommand(value = "menu entry roles",
+            help = "Set the user roles that will grant entry to be shown depending on user roles and target URL permissions.")
     public void secureEntry(
-            @CliOption(key = "id", mandatory = true, help = "Menu entry ID to update.") MenuEntry menuEntryId,
-            @CliOption(key = "roles", mandatory = true, help = "User role list (comma separated) that can access this page. If empty, the page is available for every one.") String roles) {
+            @CliOption(key = "id",
+                    mandatory = true,
+                    help = "Menu entry ID to update.") MenuEntry menuEntryId,
+            @CliOption(key = "roles",
+                    mandatory = true,
+                    help = "User role list (comma separated) that can access this page. If empty, the page is available for every one.") String roles) {
         operations.updateEntry(menuEntryId.getJavaSymbolName(), null, null,
                 null, null, roles, null, false);
     }
 
-    @CliCommand(value = "menu entry move", help = "Move a menu entry and its children to another tree node.")
+    @CliCommand(value = "menu entry move",
+            help = "Move a menu entry and its children to another tree node.")
     public void moveEntry(
             @CliOption(key = "id", mandatory = true, help = "Item to move") MenuEntry menuEntryId,
-            @CliOption(key = "into", mandatory = false, optionContext = MenuEntryOperations.CATEGORY_MENU_ITEM_PREFIX, help = "Insert the menu entry into this.") MenuEntry intoEntryId,
+            @CliOption(key = "into",
+                    mandatory = false,
+                    optionContext = MenuEntryOperations.CATEGORY_MENU_ITEM_PREFIX,
+                    help = "Insert the menu entry into this.") MenuEntry intoEntryId,
             @CliOption(key = "before", mandatory = false, help = "   .") MenuEntry beforeEntryId) {
         Validate.notNull(menuEntryId, "A page is required");
         if (intoEntryId == null && beforeEntryId == null) {
@@ -185,28 +213,51 @@ public class MenuEntryCommands implements CommandMarker { // all command types
 
     @CliCommand(value = "menu entry update", help = "Change menu entry data.")
     public void updateEntry(
-            @CliOption(key = "id", mandatory = true, help = "Menu entry id to update. Use 'menu tree' to get all pages ids.") MenuEntry menuEntryId,
-            @CliOption(key = "nid", mandatory = false, help = "New ID for selected page. Use new ID to change page type: use 'c_' prefix for category pages or 'i_' prefix for item pages.") JavaSymbolName pageName,
-            @CliOption(key = "label", mandatory = false, help = "The label text used for related menu item. Note that related labelCode will remain the same.") String label,
-            @CliOption(key = "messageCode", mandatory = false, help = "The global message code to get I18N label text (works in conjunction with label). If empty, it will be generated using page name.") String messageCode,
-            @CliOption(key = "url", mandatory = false, help = "The link URL to access to this page.") String url,
-            @CliOption(key = "roles", mandatory = false, help = "User role list (comma separated) granted to access to target URL. If empty, the page is available for every one.") String roles,
-            @CliOption(key = "hidden", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Menu entry visibility.") boolean hidden) {
+            @CliOption(key = "id",
+                    mandatory = true,
+                    help = "Menu entry id to update. Use 'menu tree' to get all pages ids.") MenuEntry menuEntryId,
+            @CliOption(key = "nid",
+                    mandatory = false,
+                    help = "New ID for selected page. Use new ID to change page type: use 'c_' prefix for category pages or 'i_' prefix for item pages.") JavaSymbolName pageName,
+            @CliOption(key = "label",
+                    mandatory = false,
+                    help = "The label text used for related menu item. Note that related labelCode will remain the same.") String label,
+            @CliOption(key = "messageCode",
+                    mandatory = false,
+                    help = "The global message code to get I18N label text (works in conjunction with label). If empty, it will be generated using page name.") String messageCode,
+            @CliOption(key = "url",
+                    mandatory = false,
+                    help = "The link URL to access to this page.") String url,
+            @CliOption(key = "roles",
+                    mandatory = false,
+                    help = "User role list (comma separated) granted to access to target URL. If empty, the page is available for every one.") String roles,
+            @CliOption(key = "hidden",
+                    mandatory = false,
+                    unspecifiedDefaultValue = "false",
+                    specifiedDefaultValue = "true",
+                    help = "Menu entry visibility.") boolean hidden) {
         operations.updateEntry(menuEntryId.getJavaSymbolName(), pageName,
                 label, messageCode, url, roles, hidden, true);
     }
 
     @CliCommand(value = "menu tree", help = "List current menu tree structure.")
     public String list(
-            @CliOption(key = "id", mandatory = false, help = "Menu entry id to show its tree structure. Default show all entries.") MenuEntry menuEntryId) {
+            @CliOption(key = "id",
+                    mandatory = false,
+                    help = "Menu entry id to show its tree structure. Default show all entries.") MenuEntry menuEntryId) {
         return operations.getCompactInfo(menuEntryId != null ? menuEntryId
                 .getJavaSymbolName() : null);
     }
 
-    @CliCommand(value = "menu entry info", help = "Shows all information about a menu entry.")
+    @CliCommand(value = "menu entry info",
+            help = "Shows all information about a menu entry.")
     public String entryInfo(
-            @CliOption(key = "id", mandatory = true, help = "Menu entry identifier to show info.") MenuEntry menuEntryId,
-            @CliOption(key = "lang", mandatory = false, help = "Show messages in this language.") I18n lang) {
+            @CliOption(key = "id",
+                    mandatory = true,
+                    help = "Menu entry identifier to show info.") MenuEntry menuEntryId,
+            @CliOption(key = "lang",
+                    mandatory = false,
+                    help = "Show messages in this language.") I18n lang) {
         return operations
                 .getFormatedInfo(menuEntryId.getJavaSymbolName(), lang);
     }

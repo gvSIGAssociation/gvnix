@@ -90,10 +90,15 @@ public class JpaAuditCommands implements CommandMarker {
      * @param userType (optional) to store as user information. If not set uses
      *        {@link String}
      */
-    @CliCommand(value = "jpa audit setup", help = "Initializes jpa audit support in this project.")
+    @CliCommand(value = "jpa audit setup",
+            help = "Initializes jpa audit support in this project.")
     public void setup(
-            @CliOption(key = "service", mandatory = false, help = "Class which will provide the user information for audit purpose") JavaType service,
-            @CliOption(key = "userType", mandatory = false, help = "the java type of user information to store in aduit features. If not set, uses String") JavaType userType) {
+            @CliOption(key = "service",
+                    mandatory = false,
+                    help = "Class which will provide the user information for audit purpose") JavaType service,
+            @CliOption(key = "userType",
+                    mandatory = false,
+                    help = "the java type of user information to store in aduit features. If not set, uses String") JavaType userType) {
         operations.setup(service, userType);
     }
 
@@ -106,10 +111,15 @@ public class JpaAuditCommands implements CommandMarker {
      *        entity-listener-class will be create in the same package of
      *        managed entity and a name based on entity name
      */
-    @CliCommand(value = "jpa audit add", help = "Adds simple auditory information (creation/lastUpdate user an date) to a entity which is managed automatically.")
+    @CliCommand(value = "jpa audit add",
+            help = "Adds simple auditory information (creation/lastUpdate user an date) to a entity which is managed automatically.")
     public void create(
-            @CliOption(key = "entity", mandatory = true, help = "a JPA Active Record Entity") JavaType entity,
-            @CliOption(key = "type", mandatory = false, help = "the java type to be created as entity-listener. If not set, class will be create in the same package of managed entity and a name based on entity name") JavaType target) {
+            @CliOption(key = "entity",
+                    mandatory = true,
+                    help = "a JPA Active Record Entity") JavaType entity,
+            @CliOption(key = "type",
+                    mandatory = false,
+                    help = "the java type to be created as entity-listener. If not set, class will be create in the same package of managed entity and a name based on entity name") JavaType target) {
         operations.create(entity, target);
     }
 
@@ -120,9 +130,12 @@ public class JpaAuditCommands implements CommandMarker {
      * @param targetPackage package for created classes. If not set, classes
      *        will be create in the same package of managed entity
      */
-    @CliCommand(value = "jpa audit all", help = "Adds simple auditory information (creation/lastUpdate user an date) to each project entity which is managed automatically.")
+    @CliCommand(value = "jpa audit all",
+            help = "Adds simple auditory information (creation/lastUpdate user an date) to each project entity which is managed automatically.")
     public void all(
-            @CliOption(key = "package", mandatory = false, help = "package for created classes. If not set, classes will be create in the same package of managed entity") JavaPackage targetPackage) {
+            @CliOption(key = "package",
+                    mandatory = false,
+                    help = "package for created classes. If not set, classes will be create in the same package of managed entity") JavaPackage targetPackage) {
         operations.createAll(targetPackage);
     }
 
@@ -132,9 +145,12 @@ public class JpaAuditCommands implements CommandMarker {
      * 
      * @param provider to use to handle revision log information
      */
-    @CliCommand(value = "jpa audit revisionLog", help = "Enable the revision log provider for audit entity changes.")
+    @CliCommand(value = "jpa audit revisionLog",
+            help = "Enable the revision log provider for audit entity changes.")
     public void revisionLog(
-            @CliOption(key = "provider", mandatory = true, help = "Provider to use to handle revision log information") RevisionLogProviderId provider) {
+            @CliOption(key = "provider",
+                    mandatory = true,
+                    help = "Provider to use to handle revision log information") RevisionLogProviderId provider) {
         operations.activeRevisionLog(provider);
     }
 }

@@ -89,9 +89,11 @@ public class JpaGeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "jpa geo setup", help = "Setup GEO persistence in your project.")
-    public void setup(
-            @CliOption(key = "provider", mandatory = true, help = "Provider's Name") GeoProviderId provider) {
+    @CliCommand(value = "jpa geo setup",
+            help = "Setup GEO persistence in your project.")
+    public void setup(@CliOption(key = "provider",
+            mandatory = true,
+            help = "Provider's Name") GeoProviderId provider) {
         operations.installProvider(provider);
     }
 
@@ -103,9 +105,17 @@ public class JpaGeoCommands implements CommandMarker {
      */
     @CliCommand(value = "field geo", help = "Add GEO field on specified Entity")
     public void addField(
-            @CliOption(key = { "", "fieldName" }, mandatory = true, help = "The name of the field to add") final JavaSymbolName fieldName,
-            @CliOption(key = "type", mandatory = true, help = "The Java type of the entity") FieldGeoTypes fieldGeoType,
-            @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the class to receive this field") final JavaType entity) {
+            @CliOption(key = { "", "fieldName" },
+                    mandatory = true,
+                    help = "The name of the field to add") final JavaSymbolName fieldName,
+            @CliOption(key = "type",
+                    mandatory = true,
+                    help = "The Java type of the entity") FieldGeoTypes fieldGeoType,
+            @CliOption(key = "class",
+                    mandatory = true,
+                    unspecifiedDefaultValue = "*",
+                    optionContext = UPDATE_PROJECT,
+                    help = "The name of the class to receive this field") final JavaType entity) {
 
         final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
                 .getTypeDetails(entity);
@@ -121,7 +131,8 @@ public class JpaGeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "finder geo all", help = "Add finders to all Geo Entities")
+    @CliCommand(value = "finder geo all",
+            help = "Add finders to all Geo Entities")
     public void addFinderGeoAll() {
         operations.addFinderGeoAllByProvider();
     }
@@ -132,9 +143,13 @@ public class JpaGeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "finder geo add", help = "Add finders to selected Geo Entity")
+    @CliCommand(value = "finder geo add",
+            help = "Add finders to selected Geo Entity")
     public void addFinderGeoAdd(
-            @CliOption(key = "class", mandatory = true, optionContext = UPDATE_PROJECT, help = "Entity where you want to generate geo finders") final JavaType entity) {
+            @CliOption(key = "class",
+                    mandatory = true,
+                    optionContext = UPDATE_PROJECT,
+                    help = "Entity where you want to generate geo finders") final JavaType entity) {
 
         final ClassOrInterfaceTypeDetails javaTypeDetails = typeLocationService
                 .getTypeDetails(entity);

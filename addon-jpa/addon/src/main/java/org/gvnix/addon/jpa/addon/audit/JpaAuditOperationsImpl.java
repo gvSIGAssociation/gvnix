@@ -76,7 +76,11 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 @Component
 @Service
-@Reference(name = "provider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = RevisionLogProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
+@Reference(name = "provider",
+        strategy = ReferenceStrategy.EVENT,
+        policy = ReferencePolicy.DYNAMIC,
+        referenceInterface = RevisionLogProvider.class,
+        cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class JpaAuditOperationsImpl implements JpaAuditOperations,
         JpaAuditOperationsMetadata, JpaAuditOperationsSPI {
 

@@ -64,10 +64,17 @@ public class WebBinderCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc binding stringTrimmer", help = "Declares StringTrimmerEditor on all Web MVC Controller classes")
+    @CliCommand(value = "web mvc binding stringTrimmer",
+            help = "Declares StringTrimmerEditor on all Web MVC Controller classes")
     public void webBindingStringTrimmer(
-            @CliOption(key = { "class", "" }, mandatory = false, help = "The path and name of the controller on which declare de StringTrimmerEditor") JavaType controller,
-            @CliOption(key = "emptyAsNull", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "true", help = "Editor that sets Empty String to Null") boolean emptyAsNull) {
+            @CliOption(key = { "class", "" },
+                    mandatory = false,
+                    help = "The path and name of the controller on which declare de StringTrimmerEditor") JavaType controller,
+            @CliOption(key = "emptyAsNull",
+                    mandatory = false,
+                    specifiedDefaultValue = "true",
+                    unspecifiedDefaultValue = "true",
+                    help = "Editor that sets Empty String to Null") boolean emptyAsNull) {
         if (controller == null) {
             webBinderOperations.bindStringTrimmerAll(emptyAsNull);
         }

@@ -54,7 +54,11 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 @Component
 @Service
-@Reference(name = "components", strategy = ReferenceStrategy.LOOKUP, policy = ReferencePolicy.DYNAMIC, referenceInterface = DefaultDynamicConfiguration.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
+@Reference(name = "components",
+        strategy = ReferenceStrategy.LOOKUP,
+        policy = ReferencePolicy.DYNAMIC,
+        referenceInterface = DefaultDynamicConfiguration.class,
+        cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class ServicesImpl implements Services {
 
     private static final Logger logger = HandlerUtils

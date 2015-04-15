@@ -55,7 +55,8 @@ public class BootstrapCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc bootstrap setup", help = "Setup Bootstrap 3 in your project.")
+    @CliCommand(value = "web mvc bootstrap setup",
+            help = "Setup Bootstrap 3 in your project.")
     public void setup() {
         operations.setup();
     }
@@ -66,7 +67,8 @@ public class BootstrapCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc bootstrap update", help = "Update Bootstrap 3 tags in your project. Use this if you installed menu, datatables or security after bootstrap setup.")
+    @CliCommand(value = "web mvc bootstrap update",
+            help = "Update Bootstrap 3 tags in your project. Use this if you installed menu, datatables or security after bootstrap setup.")
     public void update() {
         operations.updateTags();
     }

@@ -47,7 +47,8 @@ public class WebExceptionHandlerCommands implements CommandMarker {
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc dialog exception list", help = "Obtains the list of the Exceptions that handles the application.")
+    @CliCommand(value = "web mvc dialog exception list",
+            help = "Obtains the list of the Exceptions that handles the application.")
     public String listExceptionHandler() {
         return exceptionOperations.getHandledExceptionList();
     }
@@ -58,12 +59,21 @@ public class WebExceptionHandlerCommands implements CommandMarker {
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc dialog exception add", help = "Adds a handler for an Uncaught Exception and creates a view with a specific message.")
+    @CliCommand(value = "web mvc dialog exception add",
+            help = "Adds a handler for an Uncaught Exception and creates a view with a specific message.")
     public void addNewHandledException(
-            @CliOption(key = "exception", mandatory = true, help = "The name of the Exception you want to handle with the whole package path. e.g. java.lang.Exception") String exceptionName,
-            @CliOption(key = "title", mandatory = true, help = "The title of the Exception you want to handle.\nEnter the title between commas if it is composed of more than one word.") String exceptionTitle,
-            @CliOption(key = "description", mandatory = true, help = "The description of the Exception you want to handle.\nEnter the description between commas if it is composed of more than one word.") String exceptionDescription,
-            @CliOption(key = "language", mandatory = true, help = "The language to create the message fo the exception.\n[es, de, it, nl, sv, en]") String exceptionLanguage) {
+            @CliOption(key = "exception",
+                    mandatory = true,
+                    help = "The name of the Exception you want to handle with the whole package path. e.g. java.lang.Exception") String exceptionName,
+            @CliOption(key = "title",
+                    mandatory = true,
+                    help = "The title of the Exception you want to handle.\nEnter the title between commas if it is composed of more than one word.") String exceptionTitle,
+            @CliOption(key = "description",
+                    mandatory = true,
+                    help = "The description of the Exception you want to handle.\nEnter the description between commas if it is composed of more than one word.") String exceptionDescription,
+            @CliOption(key = "language",
+                    mandatory = true,
+                    help = "The language to create the message fo the exception.\n[es, de, it, nl, sv, en]") String exceptionLanguage) {
 
         exceptionOperations.addNewHandledException(exceptionName,
                 exceptionTitle, exceptionDescription, exceptionLanguage);
@@ -76,9 +86,11 @@ public class WebExceptionHandlerCommands implements CommandMarker {
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc dialog exception remove", help = "Removes the Exception handler select and her view.")
-    public void removeExceptionHandled(
-            @CliOption(key = "exception", mandatory = true, help = "The Exception you want to remove.") String exceptionName) {
+    @CliCommand(value = "web mvc dialog exception remove",
+            help = "Removes the Exception handler select and her view.")
+    public void removeExceptionHandled(@CliOption(key = "exception",
+            mandatory = true,
+            help = "The Exception you want to remove.") String exceptionName) {
         exceptionOperations.removeExceptionHandled(exceptionName);
     }
 
@@ -89,12 +101,21 @@ public class WebExceptionHandlerCommands implements CommandMarker {
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc dialog exception set language", help = "Set the title and description of the exception selected to the choosed language file.")
+    @CliCommand(value = "web mvc dialog exception set language",
+            help = "Set the title and description of the exception selected to the choosed language file.")
     public void languageExceptionHandled(
-            @CliOption(key = "exception", mandatory = true, help = "The name of the Exception you want to set the message with the whole package path. e.g. java.lang.Exception") String exceptionName,
-            @CliOption(key = "title", mandatory = true, help = "The title of the Exception you want to handle.\nEnter the title between commas if it is composed of more than one word.") String exceptionTitle,
-            @CliOption(key = "description", mandatory = true, help = "The description of the Exception you want to handle.\nEnter the description between commas if it is composed of more than one word.") String exceptionDescription,
-            @CliOption(key = "language", mandatory = true, help = "The language to create the message fo the exception.\n[es, de, it, nl, sv, en]") String exceptionLanguage) {
+            @CliOption(key = "exception",
+                    mandatory = true,
+                    help = "The name of the Exception you want to set the message with the whole package path. e.g. java.lang.Exception") String exceptionName,
+            @CliOption(key = "title",
+                    mandatory = true,
+                    help = "The title of the Exception you want to handle.\nEnter the title between commas if it is composed of more than one word.") String exceptionTitle,
+            @CliOption(key = "description",
+                    mandatory = true,
+                    help = "The description of the Exception you want to handle.\nEnter the description between commas if it is composed of more than one word.") String exceptionDescription,
+            @CliOption(key = "language",
+                    mandatory = true,
+                    help = "The language to create the message fo the exception.\n[es, de, it, nl, sv, en]") String exceptionLanguage) {
 
         exceptionOperations.languageExceptionHandled(exceptionName,
                 exceptionTitle, exceptionDescription, exceptionLanguage);

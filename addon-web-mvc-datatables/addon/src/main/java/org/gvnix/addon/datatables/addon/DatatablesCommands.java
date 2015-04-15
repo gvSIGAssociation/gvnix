@@ -86,13 +86,28 @@ public class DatatablesCommands implements CommandMarker {
      * 
      * @param type target controller
      */
-    @CliCommand(value = "web mvc datatables add", help = "Add Dandelion Datatables requests support to given Controller and change the tables in the JSP pages of the related weblayer to Dandelion Datatables")
+    @CliCommand(value = "web mvc datatables add",
+            help = "Add Dandelion Datatables requests support to given Controller and change the tables in the JSP pages of the related weblayer to Dandelion Datatables")
     public void add(
-            @CliOption(key = "type", mandatory = true, help = "The controller to apply this component to") JavaType target,
-            @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "true (default) to load data using AJAX, otherwise the data are loaded on page render time") boolean ajax,
-            @CliOption(key = "inline", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false", help = "Allow user to modify data in-line, that is, enable in-line editing") boolean inline,
-            @CliOption(key = "mode", mandatory = false, unspecifiedDefaultValue = GvNIXDatatables.TABLE, help = "Visualization mode: if empty (default) renders a table, otherwise create one-row-per-page + one-cell-per-row datatable will be created. On each cell the content of given mode will be rendered, that is, by setting mode == show, each cell will have the show.jspx containing the data of the current entity") String mode,
-            @CliOption(key = "baseFilter", mandatory = false, help = "Add a default base filter to this datatable.  Using the following format: nameEQjohnAndageGT26") JavaSymbolName baseFilter) {
+            @CliOption(key = "type",
+                    mandatory = true,
+                    help = "The controller to apply this component to") JavaType target,
+            @CliOption(key = "ajax",
+                    mandatory = false,
+                    unspecifiedDefaultValue = "true",
+                    help = "true (default) to load data using AJAX, otherwise the data are loaded on page render time") boolean ajax,
+            @CliOption(key = "inline",
+                    mandatory = false,
+                    specifiedDefaultValue = "true",
+                    unspecifiedDefaultValue = "false",
+                    help = "Allow user to modify data in-line, that is, enable in-line editing") boolean inline,
+            @CliOption(key = "mode",
+                    mandatory = false,
+                    unspecifiedDefaultValue = GvNIXDatatables.TABLE,
+                    help = "Visualization mode: if empty (default) renders a table, otherwise create one-row-per-page + one-cell-per-row datatable will be created. On each cell the content of given mode will be rendered, that is, by setting mode == show, each cell will have the show.jspx containing the data of the current entity") String mode,
+            @CliOption(key = "baseFilter",
+                    mandatory = false,
+                    help = "Add a default base filter to this datatable.  Using the following format: nameEQjohnAndageGT26") JavaSymbolName baseFilter) {
         if (baseFilter != null
                 && !baseFilter.toString().matches(
                         "((And)?[a-zA-Z0-9]+[A-Z][B-Z]+[a-zA-Z0-9]*)+")) {
@@ -116,10 +131,15 @@ public class DatatablesCommands implements CommandMarker {
      * @param target controller of master datatables
      * @param property of controller entity for detail
      */
-    @CliCommand(value = "web mvc datatables detail add", help = "Use detail datatable component for a controller list view")
+    @CliCommand(value = "web mvc datatables detail add",
+            help = "Use detail datatable component for a controller list view")
     public void add(
-            @CliOption(key = "type", mandatory = true, help = "The controller to apply this component to") JavaType target,
-            @CliOption(key = "property", mandatory = true, help = "The controller entity property to show as detail") String property) {
+            @CliOption(key = "type",
+                    mandatory = true,
+                    help = "The controller to apply this component to") JavaType target,
+            @CliOption(key = "property",
+                    mandatory = true,
+                    help = "The controller entity property to show as detail") String property) {
 
         // TODO Validate property exists and/or auto completed parameter
 
@@ -130,9 +150,13 @@ public class DatatablesCommands implements CommandMarker {
      * This method registers a command with the Roo shell. It has no command
      * attribute.
      */
-    @CliCommand(value = "web mvc datatables all", help = "Use datatable component for all list view in this application")
+    @CliCommand(value = "web mvc datatables all",
+            help = "Use datatable component for all list view in this application")
     public void all(
-            @CliOption(key = "ajax", mandatory = false, unspecifiedDefaultValue = "true", help = "Datatables will use AJAX request to get data data or not") boolean ajax) {
+            @CliOption(key = "ajax",
+                    mandatory = false,
+                    unspecifiedDefaultValue = "true",
+                    help = "Datatables will use AJAX request to get data data or not") boolean ajax) {
         operations.annotateAll(ajax);
     }
 
@@ -142,16 +166,20 @@ public class DatatablesCommands implements CommandMarker {
      * @param webPackage (optional) controller package. Required if no
      *        conversionService declared on project
      */
-    @CliCommand(value = "web mvc datatables setup", help = "Install the project dependencies, tags and artifacts that Dandelion Datatables needs")
+    @CliCommand(value = "web mvc datatables setup",
+            help = "Install the project dependencies, tags and artifacts that Dandelion Datatables needs")
     public void setup(
-            @CliOption(key = "package", mandatory = false, help = "controllers base package. Required if no conversionService registered jet.") JavaPackage webPackage) {
+            @CliOption(key = "package",
+                    mandatory = false,
+                    help = "controllers base package. Required if no conversionService registered jet.") JavaPackage webPackage) {
         operations.setup(webPackage);
     }
 
     /**
      * Update related datatables artifacts (tags, js, images...)
      */
-    @CliCommand(value = "web mvc datatables update tags", help = "Update datatables artificats (tags, images, js)")
+    @CliCommand(value = "web mvc datatables update tags",
+            help = "Update datatables artificats (tags, images, js)")
     public void updateTags() {
         operations.updateTags();
     }

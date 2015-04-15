@@ -70,7 +70,8 @@ public class LoupefieldCommands implements CommandMarker { // All command types
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc loupe setup", help = "Setup necessary files to use Loupe Field")
+    @CliCommand(value = "web mvc loupe setup",
+            help = "Setup necessary files to use Loupe Field")
     public void setup() {
         operations.setup();
     }
@@ -90,9 +91,12 @@ public class LoupefieldCommands implements CommandMarker { // All command types
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc loupe set", help = "Add functionalities to a Controller to use Loupe Element")
+    @CliCommand(value = "web mvc loupe set",
+            help = "Add functionalities to a Controller to use Loupe Element")
     public void set(
-            @CliOption(key = { "controller", "" }, mandatory = true, help = "The path and name of the controller object to annotate") final JavaType controller) {
+            @CliOption(key = { "controller", "" },
+                    mandatory = true,
+                    help = "The path and name of the controller object to annotate") final JavaType controller) {
         operations.setLoupeController(controller);
     }
 
@@ -101,15 +105,30 @@ public class LoupefieldCommands implements CommandMarker { // All command types
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc loupe field", help = "Convert field into Loupefield in jspx view to use loupe element.")
+    @CliCommand(value = "web mvc loupe field",
+            help = "Convert field into Loupefield in jspx view to use loupe element.")
     public void field(
-            @CliOption(key = { "controller", "" }, mandatory = true, help = "The path and name of the controller annotated") final JavaType controller,
-            @CliOption(key = { "field", "" }, mandatory = true, help = "The field to convert into loupe element") final JavaSymbolName field,
-            @CliOption(key = { "additionalFields", "" }, mandatory = false, help = "Additional controller fields to use in loupe search (Separated by commas)") final String additionalFields,
-            @CliOption(key = { "caption", "" }, mandatory = false, help = "Caption to show when select an item. If not set uses ConversionService") final String caption,
-            @CliOption(key = { "baseFilter", "" }, mandatory = false, help = "Base Filter to default loupe filtering") final String baseFilter,
-            @CliOption(key = { "listPath", "" }, mandatory = false, help = "View to use in Selector Dialog. By default uses controllerpath/list.jspx") final String listPath,
-            @CliOption(key = { "max", "" }, mandatory = false, help = "Max results to show in DropDown List when search. By Default 3 elements displayed") final String max) {
+            @CliOption(key = { "controller", "" },
+                    mandatory = true,
+                    help = "The path and name of the controller annotated") final JavaType controller,
+            @CliOption(key = { "field", "" },
+                    mandatory = true,
+                    help = "The field to convert into loupe element") final JavaSymbolName field,
+            @CliOption(key = { "additionalFields", "" },
+                    mandatory = false,
+                    help = "Additional controller fields to use in loupe search (Separated by commas)") final String additionalFields,
+            @CliOption(key = { "caption", "" },
+                    mandatory = false,
+                    help = "Caption to show when select an item. If not set uses ConversionService") final String caption,
+            @CliOption(key = { "baseFilter", "" },
+                    mandatory = false,
+                    help = "Base Filter to default loupe filtering") final String baseFilter,
+            @CliOption(key = { "listPath", "" },
+                    mandatory = false,
+                    help = "View to use in Selector Dialog. By default uses controllerpath/list.jspx") final String listPath,
+            @CliOption(key = { "max", "" },
+                    mandatory = false,
+                    help = "Max results to show in DropDown List when search. By Default 3 elements displayed") final String max) {
         operations.setLoupeField(controller, field, additionalFields, caption,
                 baseFilter, listPath, max);
     }

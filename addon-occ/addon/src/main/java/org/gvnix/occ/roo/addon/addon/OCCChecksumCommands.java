@@ -57,20 +57,34 @@ public class OCCChecksumCommands implements CommandMarker {
         return operations.isOCCChecksumAvailable();
     }
 
-    @CliCommand(value = "occ checksum set", help = "Add the gvNIX Optimistic Concurrecy Control Checksum based behaivor to a Entity")
+    @CliCommand(value = "occ checksum set",
+            help = "Add the gvNIX Optimistic Concurrecy Control Checksum based behaivor to a Entity")
     public void addOCCChecksumToEntity(
-            @CliOption(key = "entity", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the entity object to add OCC") JavaType entity,
-            @CliOption(key = "fieldName", mandatory = false, help = "The name of the field to use to store de checksum value") String fieldName,
-            @CliOption(key = "digestMethod", mandatory = false, help = "The name of the type of digest method to compute the checksum") String digestMethod
+            @CliOption(key = "entity",
+                    mandatory = false,
+                    unspecifiedDefaultValue = "*",
+                    optionContext = "update,project",
+                    help = "The name of the entity object to add OCC") JavaType entity,
+            @CliOption(key = "fieldName",
+                    mandatory = false,
+                    help = "The name of the field to use to store de checksum value") String fieldName,
+            @CliOption(key = "digestMethod",
+                    mandatory = false,
+                    help = "The name of the type of digest method to compute the checksum") String digestMethod
 
     ) {
         operations.addOccToEntity(entity, fieldName, digestMethod);
     }
 
-    @CliCommand(value = "occ checksum all", help = "Add the gvNIX Optimistic Concurrecy Control Checksum based behaivor to all entities in project")
+    @CliCommand(value = "occ checksum all",
+            help = "Add the gvNIX Optimistic Concurrecy Control Checksum based behaivor to all entities in project")
     public void addOCCChecksumAll(
-            @CliOption(key = "fieldName", mandatory = false, help = "The name of the field to use to store de checksum value") String fieldName,
-            @CliOption(key = "digestMethod", mandatory = false, help = "The name of the type of digest method to compute the checksum") String digestMethod) {
+            @CliOption(key = "fieldName",
+                    mandatory = false,
+                    help = "The name of the field to use to store de checksum value") String fieldName,
+            @CliOption(key = "digestMethod",
+                    mandatory = false,
+                    help = "The name of the type of digest method to compute the checksum") String digestMethod) {
         operations.addOccAll(fieldName, digestMethod);
     }
 

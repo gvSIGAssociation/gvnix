@@ -64,10 +64,15 @@ public class JpaBatchCommands implements CommandMarker {
      *        will be create in the same package of managed entity and a name
      *        based on entity name
      */
-    @CliCommand(value = "jpa batch add", help = "Adds batch support for given entity by creating a Spring @Service class with batch operation methods")
+    @CliCommand(value = "jpa batch add",
+            help = "Adds batch support for given entity by creating a Spring @Service class with batch operation methods")
     public void create(
-            @CliOption(key = "entity", mandatory = true, help = "a JPA Active Record Entity") JavaType entity,
-            @CliOption(key = "type", mandatory = false, help = "the java type to be created. If not set, class will be create in the same package of managed entity and a name based on entity name") JavaType target) {
+            @CliOption(key = "entity",
+                    mandatory = true,
+                    help = "a JPA Active Record Entity") JavaType entity,
+            @CliOption(key = "type",
+                    mandatory = false,
+                    help = "the java type to be created. If not set, class will be create in the same package of managed entity and a name based on entity name") JavaType target) {
         operations.create(entity, target);
     }
 
@@ -78,9 +83,12 @@ public class JpaBatchCommands implements CommandMarker {
      * @param targetPackage package for created classes. If not set, classes
      *        will be create in the same package of managed entity
      */
-    @CliCommand(value = "jpa batch all", help = "Adds batch support for all entities by creating a Spring @Service class with batch operation methods for each JPA Active Record entity")
+    @CliCommand(value = "jpa batch all",
+            help = "Adds batch support for all entities by creating a Spring @Service class with batch operation methods for each JPA Active Record entity")
     public void all(
-            @CliOption(key = "package", mandatory = false, help = "package for created classes. If not set, classes will be create in the same package of managed entity") JavaPackage targetPackage) {
+            @CliOption(key = "package",
+                    mandatory = false,
+                    help = "package for created classes. If not set, classes will be create in the same package of managed entity") JavaPackage targetPackage) {
         operations.createAll(targetPackage);
     }
 }

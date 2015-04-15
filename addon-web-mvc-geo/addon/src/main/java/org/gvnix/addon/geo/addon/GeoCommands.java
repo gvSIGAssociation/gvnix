@@ -120,7 +120,8 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo setup", help = "Setup GEO components in your project.")
+    @CliCommand(value = "web mvc geo setup",
+            help = "Setup GEO components in your project.")
     public void setup() {
         operations.setup();
     }
@@ -131,11 +132,21 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo controller", help = "Add new Map view to your project")
+    @CliCommand(value = "web mvc geo controller",
+            help = "Add new Map view to your project")
     public void addMap(
-            @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = UPDATE_PROJECT, help = "The name of the new Map Controller") final JavaType controller,
-            @CliOption(key = "preferredMapping", mandatory = true, optionContext = UPDATE_PROJECT, help = "Indicates a specific request mapping path for this map (eg /foo); no default value") final JavaSymbolName path,
-            @CliOption(key = "projection", mandatory = false, help = "Indicates which CRS you want to use on current wms layer.  Don't change this if you're not sure what it means. If you change it, you must to specify URL param. DEFAULT: EPSG3857. ") final ProjectionCRSTypes crs) {
+            @CliOption(key = "class",
+                    mandatory = true,
+                    unspecifiedDefaultValue = "*",
+                    optionContext = UPDATE_PROJECT,
+                    help = "The name of the new Map Controller") final JavaType controller,
+            @CliOption(key = "preferredMapping",
+                    mandatory = true,
+                    optionContext = UPDATE_PROJECT,
+                    help = "Indicates a specific request mapping path for this map (eg /foo); no default value") final JavaSymbolName path,
+            @CliOption(key = "projection",
+                    mandatory = false,
+                    help = "Indicates which CRS you want to use on current wms layer.  Don't change this if you're not sure what it means. If you change it, you must to specify URL param. DEFAULT: EPSG3857. ") final ProjectionCRSTypes crs) {
         operations.addMap(controller, path, crs);
     }
 
@@ -145,9 +156,12 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo entity all", help = "Run this method to include all GEO entities on specific map or on all available maps")
+    @CliCommand(value = "web mvc geo entity all",
+            help = "Run this method to include all GEO entities on specific map or on all available maps")
     public void all(
-            @CliOption(key = "map", mandatory = false, help = "Map where you want to add all entities. If blank, adds all GEO entities to all available maps") MapsProperty path) {
+            @CliOption(key = "map",
+                    mandatory = false,
+                    help = "Map where you want to add all entities. If blank, adds all GEO entities to all available maps") MapsProperty path) {
         // Checking if path was selected
         if (path != null) {
 
@@ -174,10 +188,15 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo entity add", help = "Run this method to include specific GEO entity on all maps or specific map")
+    @CliCommand(value = "web mvc geo entity add",
+            help = "Run this method to include specific GEO entity on all maps or specific map")
     public void add(
-            @CliOption(key = "controller", mandatory = true, help = "Indicates which entity controller you want to add to map") final JavaType controller,
-            @CliOption(key = "map", mandatory = false, help = "Map where you want to add current entities. If blank, adds current GEO entity to all available maps") final MapsProperty path) {
+            @CliOption(key = "controller",
+                    mandatory = true,
+                    help = "Indicates which entity controller you want to add to map") final JavaType controller,
+            @CliOption(key = "map",
+                    mandatory = false,
+                    help = "Map where you want to add current entities. If blank, adds current GEO entity to all available maps") final MapsProperty path) {
         // Checking if path was selected
         if (path != null) {
             operations.add(controller, new JavaSymbolName(path.getKey()));
@@ -193,15 +212,30 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo field", help = "Run this method to transform input to map control on entity CRU views.")
+    @CliCommand(value = "web mvc geo field",
+            help = "Run this method to transform input to map control on entity CRU views.")
     public void field(
-            @CliOption(key = "controller", mandatory = true, help = "Indicates which entity controller has field") final JavaType controller,
-            @CliOption(key = "field", mandatory = true, help = "Indicates which field you want to implements as map control") final JavaSymbolName fieldName,
-            @CliOption(key = "color", mandatory = false, help = "Indicates which color you want to use to draw element") final String color,
-            @CliOption(key = "weight", mandatory = false, help = "Indicates which weight you want to use to draw element") final String weight,
-            @CliOption(key = "center", mandatory = false, help = "Indicates map center to use as default. FORMAT: 'lat , lng'") final String center,
-            @CliOption(key = "zoom", mandatory = false, help = "Indicates which zoom you want to use on map") final String zoom,
-            @CliOption(key = "maxZoom", mandatory = false, help = "Indicates which maxZoom you want to use to on map") final String maxZoom) {
+            @CliOption(key = "controller",
+                    mandatory = true,
+                    help = "Indicates which entity controller has field") final JavaType controller,
+            @CliOption(key = "field",
+                    mandatory = true,
+                    help = "Indicates which field you want to implements as map control") final JavaSymbolName fieldName,
+            @CliOption(key = "color",
+                    mandatory = false,
+                    help = "Indicates which color you want to use to draw element") final String color,
+            @CliOption(key = "weight",
+                    mandatory = false,
+                    help = "Indicates which weight you want to use to draw element") final String weight,
+            @CliOption(key = "center",
+                    mandatory = false,
+                    help = "Indicates map center to use as default. FORMAT: 'lat , lng'") final String center,
+            @CliOption(key = "zoom",
+                    mandatory = false,
+                    help = "Indicates which zoom you want to use on map") final String zoom,
+            @CliOption(key = "maxZoom",
+                    mandatory = false,
+                    help = "Indicates which maxZoom you want to use to on map") final String maxZoom) {
 
         operations.field(controller, fieldName, color, weight, center, zoom,
                 maxZoom);
@@ -213,13 +247,24 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo tilelayer", help = "Run this method to add new base tile layers on your map.")
+    @CliCommand(value = "web mvc geo tilelayer",
+            help = "Run this method to add new base tile layers on your map.")
     public void tileLayer(
-            @CliOption(key = "name", mandatory = true, help = "Indicates which name has current base tile layer") final String name,
-            @CliOption(key = "url", mandatory = true, help = "Indicates base tile layer URL") final String url,
-            @CliOption(key = "map", mandatory = false, help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
-            @CliOption(key = "index", mandatory = false, help = "Indicates in which position must be layer displayed. Default: Poisiton of the layer on map view") final String index,
-            @CliOption(key = "opacity", mandatory = false, help = "Indicates which opacity has base layer. Number between 0 and 1. DEFAULT: 1") final String opacity) {
+            @CliOption(key = "name",
+                    mandatory = true,
+                    help = "Indicates which name has current base tile layer") final String name,
+            @CliOption(key = "url",
+                    mandatory = true,
+                    help = "Indicates base tile layer URL") final String url,
+            @CliOption(key = "map",
+                    mandatory = false,
+                    help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
+            @CliOption(key = "index",
+                    mandatory = false,
+                    help = "Indicates in which position must be layer displayed. Default: Poisiton of the layer on map view") final String index,
+            @CliOption(key = "opacity",
+                    mandatory = false,
+                    help = "Indicates which opacity has base layer. Number between 0 and 1. DEFAULT: 1") final String opacity) {
 
         // Checking if path was selected
         if (path != null) {
@@ -237,19 +282,43 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo wmslayer", help = "Run this method to add new base wms layers on your map.")
+    @CliCommand(value = "web mvc geo wmslayer",
+            help = "Run this method to add new base wms layers on your map.")
     public void wmsLayer(
-            @CliOption(key = "name", mandatory = true, help = "Indicates which name has current base wms layer") final String name,
-            @CliOption(key = "url", mandatory = true, help = "Indicates base wms layer URL") final String url,
-            @CliOption(key = "map", mandatory = false, help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
-            @CliOption(key = "index", mandatory = false, help = "Indicates in which position must be layer displayed. Default: Poisiton of the layer on map view") final String index,
-            @CliOption(key = "opacity", mandatory = false, help = "Indicates which opacity has base layer. Number between 0 and 1. DEFAULT: 0.5") final String opacity,
-            @CliOption(key = "layers", mandatory = false, help = "Indicates which layers you want to load on this wms layer") final String layers,
-            @CliOption(key = "format", mandatory = false, help = "Indicates which image format you want to load on this wms layer. EX: image/png") final String format,
-            @CliOption(key = "transparent", mandatory = false, help = "Indicates if current layer is transparent or not", unspecifiedDefaultValue = "false") final boolean transparent,
-            @CliOption(key = "styles", mandatory = false, help = "Indicates which styles you want to use on current wms layer") final String styles,
-            @CliOption(key = "version", mandatory = false, help = "Indicates which wms version you want to use on current wms layer") final String version,
-            @CliOption(key = "crs", mandatory = false, help = "Indicates which CRS projection you want to use on current wms layer. DEFAULT: EPSG3857") final ProjectionCRSTypes crs) {
+            @CliOption(key = "name",
+                    mandatory = true,
+                    help = "Indicates which name has current base wms layer") final String name,
+            @CliOption(key = "url",
+                    mandatory = true,
+                    help = "Indicates base wms layer URL") final String url,
+            @CliOption(key = "map",
+                    mandatory = false,
+                    help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
+            @CliOption(key = "index",
+                    mandatory = false,
+                    help = "Indicates in which position must be layer displayed. Default: Poisiton of the layer on map view") final String index,
+            @CliOption(key = "opacity",
+                    mandatory = false,
+                    help = "Indicates which opacity has base layer. Number between 0 and 1. DEFAULT: 0.5") final String opacity,
+            @CliOption(key = "layers",
+                    mandatory = false,
+                    help = "Indicates which layers you want to load on this wms layer") final String layers,
+            @CliOption(key = "format",
+                    mandatory = false,
+                    help = "Indicates which image format you want to load on this wms layer. EX: image/png") final String format,
+            @CliOption(key = "transparent",
+                    mandatory = false,
+                    help = "Indicates if current layer is transparent or not",
+                    unspecifiedDefaultValue = "false") final boolean transparent,
+            @CliOption(key = "styles",
+                    mandatory = false,
+                    help = "Indicates which styles you want to use on current wms layer") final String styles,
+            @CliOption(key = "version",
+                    mandatory = false,
+                    help = "Indicates which wms version you want to use on current wms layer") final String version,
+            @CliOption(key = "crs",
+                    mandatory = false,
+                    help = "Indicates which CRS projection you want to use on current wms layer. DEFAULT: EPSG3857") final ProjectionCRSTypes crs) {
 
         // Checking if path was selected
         if (path != null) {
@@ -269,11 +338,18 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo tool measure", help = "Run this method to add new measure tool on your map.")
+    @CliCommand(value = "web mvc geo tool measure",
+            help = "Run this method to add new measure tool on your map.")
     public void measureTool(
-            @CliOption(key = "name", mandatory = true, help = "Indicates which name has current tool") final String name,
-            @CliOption(key = "map", mandatory = false, help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
-            @CliOption(key = "preventExitMessageCode", mandatory = false, help = "Indicates which MessageCode you want to use to prevent exit. If blank, not prevent exit. DEFAULT: blank.") final String preventExitMessageCode) {
+            @CliOption(key = "name",
+                    mandatory = true,
+                    help = "Indicates which name has current tool") final String name,
+            @CliOption(key = "map",
+                    mandatory = false,
+                    help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
+            @CliOption(key = "preventExitMessageCode",
+                    mandatory = false,
+                    help = "Indicates which MessageCode you want to use to prevent exit. If blank, not prevent exit. DEFAULT: blank.") final String preventExitMessageCode) {
 
         // Checking if path was selected
         if (path != null) {
@@ -291,17 +367,37 @@ public class GeoCommands implements CommandMarker {
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc geo tool custom", help = "Run this method to add new custom tool on your map.")
+    @CliCommand(value = "web mvc geo tool custom",
+            help = "Run this method to add new custom tool on your map.")
     public void customTool(
-            @CliOption(key = "name", mandatory = true, help = "Indicates which name has current tool") final String name,
-            @CliOption(key = "icon", mandatory = true, help = "Icon to show on ToolBar to identiy the tool element. Fontawesome icons or glyphicon icons") final String icon,
-            @CliOption(key = "activateFunction", mandatory = true, help = "Function to invoke when the user press on tool button") final String activateFunction,
-            @CliOption(key = "deactivateFunction", mandatory = true, help = "Function to invoke when the user press a different tool button") final String deactivateFunction,
-            @CliOption(key = "map", mandatory = false, help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
-            @CliOption(key = "iconLibrary", mandatory = false, help = "DESC: Select de icon library.| DEFAULT: 'glyphicon' | POSSIBLE VALUES: 'fa' for font-awesome or 'glyphicon' for bootstrap 3") final String iconLibrary,
-            @CliOption(key = "actionTool", mandatory = false, help = "Indicates if this tool is a selectable tool (false) or and action tool (true)", unspecifiedDefaultValue = "false") final boolean actionTool,
-            @CliOption(key = "cursorIcon", mandatory = false, help = "Icon to show as cursor when enter on map element") final String cursorIcon,
-            @CliOption(key = "preventExitMessageCode", mandatory = false, help = "Indicates which MessageCode you want to use to prevent exit. If blank, not prevent exit. DEFAULT: blank.") final String preventExitMessageCode) {
+            @CliOption(key = "name",
+                    mandatory = true,
+                    help = "Indicates which name has current tool") final String name,
+            @CliOption(key = "icon",
+                    mandatory = true,
+                    help = "Icon to show on ToolBar to identiy the tool element. Fontawesome icons or glyphicon icons") final String icon,
+            @CliOption(key = "activateFunction",
+                    mandatory = true,
+                    help = "Function to invoke when the user press on tool button") final String activateFunction,
+            @CliOption(key = "deactivateFunction",
+                    mandatory = true,
+                    help = "Function to invoke when the user press a different tool button") final String deactivateFunction,
+            @CliOption(key = "map",
+                    mandatory = false,
+                    help = "Map where you want to add current layer. If blank, adds current layer to all available maps") final MapsProperty path,
+            @CliOption(key = "iconLibrary",
+                    mandatory = false,
+                    help = "DESC: Select de icon library.| DEFAULT: 'glyphicon' | POSSIBLE VALUES: 'fa' for font-awesome or 'glyphicon' for bootstrap 3") final String iconLibrary,
+            @CliOption(key = "actionTool",
+                    mandatory = false,
+                    help = "Indicates if this tool is a selectable tool (false) or and action tool (true)",
+                    unspecifiedDefaultValue = "false") final boolean actionTool,
+            @CliOption(key = "cursorIcon",
+                    mandatory = false,
+                    help = "Icon to show as cursor when enter on map element") final String cursorIcon,
+            @CliOption(key = "preventExitMessageCode",
+                    mandatory = false,
+                    help = "Indicates which MessageCode you want to use to prevent exit. If blank, not prevent exit. DEFAULT: blank.") final String preventExitMessageCode) {
 
         // Checking if path was selected
         if (path != null) {
