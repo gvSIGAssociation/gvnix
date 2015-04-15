@@ -36,7 +36,11 @@ To start to develop gvNIX and extend its features you need:
 Run gvNIX Roo Addon Suite
 ===========================
 
-TBC
+To be able to test gvNIX quickly without deploy all components you should following the next steps:
+
+* Add _$ROO_HOME_ variable to your $PATH 
+* Compile gvNIX project using 'mvn clean install'
+* Execute ./gvnix-dev
 
 Developing within STS
 ==========================
