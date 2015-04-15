@@ -35,11 +35,11 @@
 			<div class="container">
 				<h1> <xsl:value-of select="@name"/></h1>
 				<p class="text-right"><em>Last modified 	
-				<xsl:value-of select="@lastmodified"/></em>.</p>
+				<xsl:value-of select="@lastmodified"/></em></p>
 
 				<table class="table table-striped table-hover table-condensed">
 					<thead>
-						<tr class="info"><th>Link</th><th>Version</th><th>doc/src</th><th>Description</th><th>Bytes</th></tr>
+						<tr class="info"><th>Link</th><th>Version</th><th>Description</th></tr>
 					</thead>
 					<tbody>
 						<xsl:apply-templates select="resource">
@@ -66,21 +66,10 @@
 				<a href="{normalize-space(@uri)}"><xsl:value-of select="@presentationname"/></a>
 				
 			</td>
-			<td><xsl:value-of select="@version"/></td>
-			<td>
-					<xsl:if test="documentation">
-						<a href="{normalize-space(documentation)}">D</a>
-					</xsl:if>
-					<xsl:if test="source">
-						<a href="{normalize-space(source)}">S</a>
-					</xsl:if>
-			</td>
+			<td><xsl:value-of select="@version"/></td>			
 			<td>
 				<xsl:value-of select="description"/>
-			</td>
-			<td>
-					<xsl:value-of select="size"/>
-			</td>
+			</td>			
 		</tr>
 		
 	</xsl:template>
