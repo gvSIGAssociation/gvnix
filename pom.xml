@@ -89,12 +89,6 @@
   <!-- Note when doing releases: tagBase is set in release plugin configuration
     below -->
 
-  <!-- CIT repository for tag and branch from mvn release:* commands and googlecode repository for upload from mvn deploy command -->
-  <scm>
-    <connection>scm:svn:http://scmcit.gva.es/svn/gvnix/trunk/code</connection>
-    <developerConnection>scm:svn:http://scmcit.gva.es/svn/gvnix/trunk/code</developerConnection>
-    <url>http://code.google.com/p/gvnix/source/browse</url>
-  </scm>
   <distributionManagement>
     <snapshotRepository>
         <id>ossrh</id>
