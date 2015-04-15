@@ -12,7 +12,7 @@
 ##
 	
 	## Start graphic environment emulator to start firefox for selenium integration tests
-	startx -- `which Xvfb` :1 -screen 0 1024x768x24 2>&1 >/dev/null &
+	## startx -- `which Xvfb` :1 -screen 0 1024x768x24 2>&1 >/dev/null &
 	export DISPLAY=:1
 	
 	## Remove old potential temporal folder of previous test, create new one and go into
