@@ -464,7 +464,7 @@ echo "======================================================"
     echo "------------------------------------------------------"
 	echo jpa-audit-multimodule start
 	rm -r jpa-audit-multimodule 
-	mkdir jpa-audit-muldimodule
+	mkdir jpa-audit-multimodule
 	cd jpa-audit-multimodule
 	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-multimodule.roo --lineNumbers true
 	# Create new pet
@@ -527,7 +527,7 @@ echo "======================================================"
     echo "======================================================"
     echo "------------------------------------------------------"
 	echo test-script-pkc start
-	rm -r test-scropt-pkc
+	rm -r test-script-pkc
 	mkdir test-script-pkc
 	cd test-script-pkc
 	$1/gvnix.sh script --file $2/addon-web-pattern/src/test/resources/test-script-pkc.roo --lineNumbers true
