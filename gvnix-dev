@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+# i Transport - Generalitat Valenciana
+# Copyright (C) 2010 DGTI - Dirección General de Tecnologias de la Información
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses />.
+
+this_file=`readlink -f $0`
+this_dir=`dirname $this_file`
+
+echo "Executing gvnix-dev..............."
+
+if [ "${GVNIX_HOME}x" == "x" ]; then
+	export GVNIX_HOME=`dirname $this_dir`
+fi
+
+# Checking if ROO_HOME was specified
+if [ "${ROO_HOME}x" == "x" ]; then
+  echo "### ERROR: You must define ROO_HOME variable to execute gvnix-dev" 
+  exit
+fi
+
+echo "ROO_HOME............: $ROO_HOME"
+echo "GVNIX_HOME..........: $GVNIX_HOME"
+echo "gvNIX target dir....: $GVNIX_HOME/target"
+
+
+# Checking if mvn clean install was executed before execute gvnix-dev
+if [ ! -d "$GVNIX_HOME/target" ]; then
+  echo "### ERROR: You must execute mvn clean install before execute gvnix-dev"
+  exit
+fi
+
+# ROO: Remove OSGi cache
+rm -r "$ROO_HOME"/cache
+
+# gvNIX: remove gvNIX add-ons on start
+rm -r "$ROO_HOME"/bundle/org.gvnix.*
+
+# gvNIX: copy add-ons to roo bundles
+cp `find $GVNIX_HOME/target/osgi-repository-bin/org/gvnix/ -iname org.gvnix.*.jar` $ROO_HOME/bundle
+
+# Store file locations in variables to facilitate Cygwin conversion if needed
+
+# Build a classpath containing our two magical startup JARs (we look for " /" as per ROO-905)
+ROO_CP=`echo "$ROO_HOME"/bin/*.jar | sed 's/ \//:\//g'`
+# echo ROO_CP: $ROO_CP
+
+ROO_OSGI_FRAMEWORK_STORAGE="$ROO_HOME/cache"
+# echo "ROO_OSGI_FRAMEWORK_STORAGE: $ROO_OSGI_FRAMEWORK_STORAGE"
+
+ROO_AUTO_DEPLOY_DIRECTORY="$ROO_HOME/bundle"
+# echo "ROO_AUTO_DEPLOY_DIRECTORY: $ROO_AUTO_DEPLOY_DIRECTORY"
+
+ROO_CONFIG_FILE_PROPERTIES="$ROO_HOME/conf/config.properties"
+# echo "ROO_CONFIG_FILE_PROPERTIES: $ROO_CONFIG_FILE_PROPERTIES"
+
+cygwin=false;
+case "`uname`" in
+    CYGWIN*)
+        cygwin=true
+        ;;
+esac
+
+if [ "$cygwin" = "true" ]; then
+	export ROO_HOME=`cygpath -wp "$ROO_HOME"`
+	export ROO_CP=`cygpath -wp "$ROO_CP"`
+	export ROO_OSGI_FRAMEWORK_STORAGE=`cygpath -wp "$ROO_OSGI_FRAMEWORK_STORAGE"`
+	export ROO_AUTO_DEPLOY_DIRECTORY=`cygpath -wp "$ROO_AUTO_DEPLOY_DIRECTORY"`
+	export ROO_CONFIG_FILE_PROPERTIES=`cygpath -wp "$ROO_CONFIG_FILE_PROPERTIES"`
+fi
+
+# make sure to disable the flash message feature for the default OSX terminal, we recommend to use a ANSI compliant terminal such as iTerm if flash message support is desired
+APPLE_TERMINAL=false;
+if [ "$TERM_PROGRAM" = "Apple_Terminal" ]; then
+	APPLE_TERMINAL=true
+fi
+
+# Hop, hop, hop...
+DEBUG=
+#DEBUG="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
+PAUSE=
+#PAUSE="-Droo.pause=true"
+METADATA_TRACE=
+#METADATA_TRACE="-Droo.metadata.trace=true"
+ANSI="-Droo.console.ansi=true"
+java $PAUSE $DEBUG $METADATA_TRACE $ANSI -Dis.apple.terminal=$APPLE_TERMINAL $ROO_OPTS -Dorg.osgi.framework.bootdelegation=org.netbeans.lib.profiler,org.netbeans.lib.profiler.\* -Droo.args="$*" -DdevelopmentMode=true -Dorg.osgi.framework.storage="$ROO_OSGI_FRAMEWORK_STORAGE" -Dfelix.auto.deploy.dir="$ROO_AUTO_DEPLOY_DIRECTORY" -Dfelix.config.properties="file:$ROO_CONFIG_FILE_PROPERTIES" -cp "$ROO_CP" org.springframework.roo.bootstrap.Main
+EXITED=$?
+echo Roo exited with code $EXITED
