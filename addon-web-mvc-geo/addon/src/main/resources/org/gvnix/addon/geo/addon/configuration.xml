@@ -5,7 +5,7 @@
 			<repository>
 				<id>gvNIX Add-on repository</id>
 				<name>gvNIX Add-on repository</name>
-				<url>https://gvnix.googlecode.com/svn/repo</url>
+				<url>http://repository.gvnix.org</url>
 			</repository>
 		</repositories>
 		<properties>

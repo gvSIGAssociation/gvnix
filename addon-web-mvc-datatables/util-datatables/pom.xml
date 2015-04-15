@@ -55,7 +55,7 @@
     <repository>
       <id>gvnix-add-on-repository</id>
       <name>gvNIX repository</name>
-      <url>https://gvnix.googlecode.com/svn/repo</url>
+      <url>http://repository.gvnix.org</url>
       <snapshots>
         <updatePolicy>never</updatePolicy>
         <enabled>true</enabled>
