@@ -663,7 +663,7 @@ echo "======================================================"
 	rm -r report
 	mkdir report
 	cd report
-	$1/gvnix.sh script --file $2/addon-web-mvc-report/src/main/resources/report.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-report/addon/src/main/resources/report.roo --lineNumbers true
 	# Start tomcat, wait to start and execute selenium tests to insert data
 	mvn test tomcat:run &
 	sleep 30
@@ -683,7 +683,7 @@ echo "======================================================"
 	rm -r gvnix-test-report
 	mkdir gvnix-test-report
 	cd gvnix-test-report
-	$1/gvnix.sh script --file $2/addon-web-mvc-report/src/test/resources/gvnix-test-report.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-report/addon/src/test/resources/gvnix-test-report.roo --lineNumbers true
 	mkdir target
 	mvn clean compile
 	cd ..
