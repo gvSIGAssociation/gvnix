@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration>
 	<gvnix>
-		<repositories>
-			<repository>
-				<id>gvNIX Add-on repository</id>
-				<name>gvNIX Add-on repository</name>
-				<url>http://repository.gvnix.org</url>
-			</repository>
-		</repositories>
 		<dependencies>
 			<dependency>
 				<groupId>org.gvnix</groupId>
