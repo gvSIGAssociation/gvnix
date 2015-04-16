@@ -169,6 +169,7 @@
 	mkdir target
 	mvn test tomcat:run & 
 	wget --retry-connrefused -O target/main.html http://localhost:8080/petclinic
+   	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`	
 	kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo batch end
@@ -189,6 +190,7 @@
 	mkdir target
 	mvn test tomcat:run &
 	wget --retry-connrefused -O target/owners.html http://localhost:8080/petclinic/owners
+   	 MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`	
 	kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo jquery end
@@ -209,6 +211,7 @@
 	mkdir target
 	mvn test tomcat:run &
 	wget --retry-connrefused -O target/main.html http://localhost:8080/petclinic 
+   	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`	
 	kill -9 $MVN_TOMCAT_PID	
 	cd ..
 	echo bootstrap end
@@ -471,6 +474,7 @@ echo "======================================================"
 	mkdir target
 	mvn test tomcat:run &
 	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/mvn/pets --post-data 'name=a&weight=1&type=Dog' & 
+  	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`			
 	kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo jpa-audit-multimodule end
@@ -490,6 +494,7 @@ echo "======================================================"
 	# Create new pet
 	mvn test tomcat:run &
 	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/displayRelationTable --post-data 'name=a&weight=1&type=Dog' &
+   	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
 	kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo jpa-audit-pkc end
@@ -511,13 +516,13 @@ echo "======================================================"
 	rm -r report
 	mkdir report
 	cd report
-	$1/gvnix.sh script --file $2/addon-web-report/src/main/resources/report.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-report/src/main/resources/report.roo --lineNumbers true
 	# Start tomcat, wait to start and execute selenium tests to insert data
 	mvn test tomcat:run &
 	sleep 30
 	mkdir target
-    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
-    kill -9 $MVN_TOMCAT_PID
+    	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+   	 kill -9 $MVN_TOMCAT_PID
 	cd ..
 	echo report end
     echo "------------------------------------------------------"
@@ -531,7 +536,7 @@ echo "======================================================"
 	rm -r gvnix-test-report
 	mkdir gvnix-test-report
 	cd gvnix-test-report
-	$1/gvnix.sh script --file $2/addon-web-report/src/test/resources/gvnix-test-report.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-report/src/test/resources/gvnix-test-report.roo --lineNumbers true
 	mkdir target
 	mvn clean compile
 	cd ..
