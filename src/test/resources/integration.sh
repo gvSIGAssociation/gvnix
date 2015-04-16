@@ -206,12 +206,12 @@
 	rm -r bootstrap
 	mkdir bootstrap
 	cd bootstrap
-	$1/gvnix.sh script --file $2/addon-web-mvc-bootstrap/src/test/resources/bootstrap.roo--lineNumbers true
+##	$1/gvnix.sh script --file $2/addon-web-mvc-bootstrap/src/test/resources/bootstrap.roo--lineNumbers true
 	mkdir target
-	mvn test tomcat:run &
-	wget --retry-connrefused -O target/main.html http://localhost:8080/petclinic 
-   	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`	
-	kill -9 $MVN_TOMCAT_PID	
+##	mvn test tomcat:run &
+##	wget --retry-connrefused -O target/main.html http://localhost:8080/petclinic 
+##   	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`	
+##	kill -9 $MVN_TOMCAT_PID	
 	cd ..
 	echo bootstrap end
    	 echo "------------------------------------------------------"
@@ -501,6 +501,424 @@ echo "======================================================"
 
 
 	
+
+##
+## gvNIX i18n add-on
+##
+	
+	## es-i18n
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo es-i18n start
+	rm -r es-i18n
+	mkdir es-i18n
+	cd es-i18n
+	$1/gvnix.sh script --file $2/addon-web-i18n/src/main/resources/es-i18n.roo --lineNumbers true
+	mkdir target
+	mvn clean compile
+	cd ..
+	echo es-i18n end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+##
+## gvNIX menu add-on
+##
+	
+	## menu
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo menu start
+	rm -r menu
+	mkdir menu
+	cd menu
+	$1/gvnix.sh script --file $2/addon-web-menu/src/main/resources/menu.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo menu end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+	
+	## base
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo base start
+	rm -r base
+	mkdir base
+	cd base
+	$1/gvnix.sh script --file $2/addon-web-menu/src/test/resources/base.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo base end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+##
+## gvNIX occ add-on
+##
+	
+	## occ
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo occ start
+	rm -r occ
+	mkdir occ
+	cd occ
+	$1/gvnix.sh script --file $2/addon-occ/src/main/resources/occ.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo occ end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+##
+## gvNIX jpa add-on
+##
+	
+	## jpa-audit-test
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo jpa-audit-test start
+	rm -r jpa-audit
+	mkdir jpa-audit
+	cd jpa-audit
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-test.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo jpa-audit-test end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+	## jpa-audit-envers
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo jpa-audit-envers start
+	rm -r jpa-audit-envers
+	mkdir jpa-audit-envers
+	cd jpa-audit-envers
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-envers.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo jpa-audit-envers end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+	## jpa-audit-multimodule
+echo "======================================================"
+    echo "------------------------------------------------------"
+	echo jpa-audit-multimodule start
+	rm -r jpa-audit-multimodule 
+	mkdir jpa-audit-multimodule
+	cd jpa-audit-multimodule
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-multimodule.roo --lineNumbers true
+	# Create new pet
+	mkdir target
+	mvn test tomcat:run &
+	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/mvn/pets --post-data 'name=a&weight=1&type=Dog' & 
+  	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`			
+	kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo jpa-audit-multimodule end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
+	## jpa-audit-pkc 
+echo "======================================================"
+    echo "------------------------------------------------------"
+	echo jpa-audit-pkc start
+	rm -r jpa-audit-pkc
+	mkdir jpa-audit-pkc
+	cd jpa-audit-pkc
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-pkc.roo --lineNumbers true
+	# Create new pet
+	mvn test tomcat:run &
+	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/displayRelationTable --post-data 'name=a&weight=1&type=Dog' &
+   	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+	kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo jpa-audit-pkc end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
+
+
+##
+## gvNIX report add-on
+##
+	
+	## report
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo report start
+	rm -r report
+	mkdir report
+	cd report
+	$1/gvnix.sh script --file $2/addon-web-mvc-report/src/main/resources/report.roo --lineNumbers true
+	# Start tomcat, wait to start and execute selenium tests to insert data
+	mvn test tomcat:run &
+	sleep 30
+	mkdir target
+    	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+   	 kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo report end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+	
+	## gvnix-test-report
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo gvnix-test-report start
+	rm -r gvnix-test-report
+	mkdir gvnix-test-report
+	cd gvnix-test-report
+	$1/gvnix.sh script --file $2/addon-web-mvc-report/src/test/resources/gvnix-test-report.roo --lineNumbers true
+	mkdir target
+	mvn clean compile
+	cd ..
+	echo gvnix-test-report end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+##
+## gvNIX service add-on
+##
+	
+	## bing
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo bing start
+	rm -r bing
+	mkdir bing
+	cd bing
+	$1/gvnix.sh script --file $2/addon-service/addon/src/main/resources/bing.roo --lineNumbers true
+	mvn test tomcat:run -Dmaven.tomcat.fork=true 
+	cd ..
+	echo bing end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+	## service
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo service start
+	rm -r service
+	mkdir service
+	cd service
+	$1/gvnix.sh script --file $2/addon-service/addon/src/main/resources/service.roo --lineNumbers true
+	mvn clean compile 
+	cd ..
+	echo service end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
+	## gvnix-test-no-jpa-no-web
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo gvnix-test-no-jpa-no-web start
+	rm -r gvnix-test-no-jpa-no-web
+	mkdir gvnix-test-no-jpa-no-web
+	cd gvnix-test-no-jpa-no-web
+	$1/gvnix.sh script --file $2/addon-service/addon/src/test/resources/gvnix-test-no-jpa-no-web.roo --lineNumbers true
+	mvn test package
+	cd ..
+	echo gvnix-test-no-jpa-no-web end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+	## gvnix-test-no-jpa
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo gvnix-test-no-jpa start
+	rm -r gvnix-test-no-jpa
+	mkdir gvnix-test-no-jpa
+	cd gvnix-test-no-jpa
+	$1/gvnix.sh script --file $2/addon-service/addon/src/test/resources/gvnix-test-no-jpa.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo gvnix-test-no-jpa end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+	## gvnix-test-no-web
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo gvnix-test-no-web start
+	rm -r gvnix-test-no-web
+	mkdir gvnix-test-no-web
+	cd gvnix-test-no-web
+	$1/gvnix.sh script --file $2/addon-service/addon/src/test/resources/gvnix-test-no-web.roo --lineNumbers true
+	mvn test package
+	cd ..
+	echo gvnix-test-no-web end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+	
+	## gvnix-test
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo gvnix-test start
+	rm -r gvnix-test
+	mkdir gvnix-test
+	cd gvnix-test
+	$1/gvnix.sh script --file $2/addon-service/addon/src/test/resources/gvnix-test.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo gvnix-test end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
+	## gvnix-test-entity
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo gvnix-test-entity start
+	rm -r gvnix-test-entity
+	mkdir gvnix-test-entity
+	cd gvnix-test-entity
+	$1/gvnix.sh script --file $2/addon-service/addon/src/test/resources/gvnix-test-entity.roo --lineNumbers true
+	mkdir target
+	mvn clean compile
+	cd ..
+	echo gvnix-test-entity end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+##
+## gvNIX typicalsecurity add-on
+##
+	
+	## typicalsecurity
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo typicalsecurity start
+	rm -r typicalsecurity 
+	mkdir typicalsecurity
+	cd typicalsecurity
+	$1/gvnix.sh script --file $2/addon-web-mvc-typicalsecurity/src/main/resources/typicalsecurity.roo --lineNumbers true
+	mvn test tomcat:run &
+	mkdir target
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo typicalsecurity end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+##
+## gvNIX monitoring add-on
+##
+	
+	## monitoring
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo monitoring start
+	rm -r monitoring
+	mkdir monitoring
+	cd monitoring
+	$1/gvnix.sh script --file $2/addon-monitoring/src/main/resources/monitoring.roo --lineNumbers true
+	mvn test tomcat:run &
+	mkdir target
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo monitoring end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
+##
+## gvNIX add-ons
+##
+	
+	## gvnix-sample
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo gvnix-sample start
+	rm -r gvnix-sample
+	mkdir gvnix-sample
+	cd gvnix-sample
+	$1/gvnix.sh script --file $2/src/main/resources/gvnix-sample.roo --lineNumbers true
+	mvn clean compile		
+	cd ..
+	echo gvnix-sample end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+	## script
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo script start
+	rm -r script
+	mkdir script
+	cd script
+	$1/gvnix.sh script --file $2/src/main/resources/script.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo script end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+	
+	
+	## tiendavirtual
+   echo "======================================================"
+    echo "------------------------------------------------------"
+	echo tiendavirtual start
+	rm -r tiendavirtual
+	mkdir tiendavirtual
+	cd tiendavirtual
+	$1/gvnix.sh script --file $2/src/main/resources/tiendavirtual.roo --lineNumbers true
+##  Reopen shell to generate pending pattern resources
+	$1/gvnix.sh hint
+	mvn clean compile
+	cd ..
+	echo tiendavirtual end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
+	## safe 
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo safe start
+	rm -r safe 
+	mkdir safe
+	cd safe
+	$1/gvnix.sh script --file $2/src/test/resources/security-safe.roo --lineNumbers true
+	mvn test tomcat:run &
+	mkdir target
+    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo safe end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
 
 
 
