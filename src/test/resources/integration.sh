@@ -247,7 +247,7 @@
 	rm -r datatables-multimodule
 	mkdir datatables-multimodule
 	cd datatables-multimodule
-	$1/gvnix.sh script --file $2/addon-web-mvc-datatables/src/test/resources/datatables-multimodule.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-datatables/addon/src/test/resources/datatables-multimodule.roo --lineNumbers true
 	mvn test tomcat:run &
 	mkdir target
       MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
@@ -265,7 +265,7 @@
 	rm -r datatables-test
 	mkdir datatables-test
 	cd datatables-test
-	$1/gvnix.sh script --file $2/addon-web-mvc-datatables/src/test/resources/datatables-test.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-datatables/addon/src/test/resources/datatables-test.roo --lineNumbers true
 	mkdir target
 	mvn clean compile
    	cd ..
@@ -281,7 +281,7 @@
 	rm -r datatables-pkc
 	mkdir datatables-pkc
 	cd datatables-pkc
-	$1/gvnix.sh script --file $2/addon-web-mvc-datatables/src/test/resources/datatables-pkc.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-datatables/addon/src/test/resources/datatables-pkc.roo --lineNumbers true
 	mvn test tomcat:run &
 	mkdir target
     MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
@@ -343,13 +343,163 @@
 	rm -r geo
 	mkdir geo
 	cd geo
-	$1/gvnix.sh script --file $2/addon-web-mvc-geo/addon/src/test/resources/geo.roo --lineNumbers true
-	mvn clean compile
+##	$1/gvnix.sh script --file $2/addon-web-mvc-geo/addon/src/test/resources/geo.roo --lineNumbers true
+##	mvn clean compile
 	cd ..
 	echo geo quickstart end
     echo "------------------------------------------------------"
     echo "======================================================"
     echo .
+
+
+##
+## gvNIX i18n add-on
+##
+	
+	## es-i18n
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo es-i18n start
+	rm -r es-i18n
+	mkdir es-i18n
+	cd es-i18n
+	$1/gvnix.sh script --file $2/addon-web-i18n/src/main/resources/es-i18n.roo --lineNumbers true
+	mkdir target
+	mvn clean compile
+	cd ..
+	echo es-i18n end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+##
+## gvNIX menu add-on
+##
+	
+	## menu
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo menu start
+	rm -r menu
+	mkdir menu
+	cd menu
+	$1/gvnix.sh script --file $2/addon-web-menu/src/main/resources/menu.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo menu end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+	
+	## base
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo base start
+	rm -r base
+	mkdir base
+	cd base
+	$1/gvnix.sh script --file $2/addon-web-menu/src/test/resources/base.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo base end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+##
+## gvNIX occ add-on
+##
+	
+	## occ
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo occ start
+	rm -r occ
+	mkdir occ
+	cd occ
+	$1/gvnix.sh script --file $2/addon-occ/src/main/resources/occ.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo occ end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+##
+## gvNIX jpa add-on
+##
+	
+	## jpa-audit-test
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo jpa-audit-test start
+	rm -r jpa-audit
+	mkdir jpa-audit
+	cd jpa-audit
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-test.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo jpa-audit-test end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+	## jpa-audit-envers
+    echo "======================================================"
+    echo "------------------------------------------------------"
+	echo jpa-audit-envers start
+	rm -r jpa-audit-envers
+	mkdir jpa-audit-envers
+	cd jpa-audit-envers
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-envers.roo --lineNumbers true
+	mvn clean compile
+	cd ..
+	echo jpa-audit-envers end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+	## jpa-audit-multimodule
+echo "======================================================"
+    echo "------------------------------------------------------"
+	echo jpa-audit-multimodule start
+	rm -r jpa-audit-multimodule 
+	mkdir jpa-audit-multimodule
+	cd jpa-audit-multimodule
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-multimodule.roo --lineNumbers true
+	# Create new pet
+	mkdir target
+	mvn test tomcat:run &
+	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/mvn/pets --post-data 'name=a&weight=1&type=Dog' & 
+  	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`			
+	kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo jpa-audit-multimodule end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
+	## jpa-audit-pkc 
+echo "======================================================"
+    echo "------------------------------------------------------"
+	echo jpa-audit-pkc start
+	rm -r jpa-audit-pkc
+	mkdir jpa-audit-pkc
+	cd jpa-audit-pkc
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-pkc.roo --lineNumbers true
+	# Create new pet
+	mvn test tomcat:run &
+	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/displayRelationTable --post-data 'name=a&weight=1&type=Dog' &
+   	MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+	kill -9 $MVN_TOMCAT_PID
+	cd ..
+	echo jpa-audit-pkc end
+    echo "------------------------------------------------------"
+    echo "======================================================"
+    echo .
+
+
 	
 
 
