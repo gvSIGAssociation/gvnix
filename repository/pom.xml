@@ -327,9 +327,9 @@
             </goals>
             <configuration>
               <serverId>gvnix-public-repository</serverId>
-            	<url>${public.repository.url}</url>
+              <url>${public.repository.url}</url>
               <fromDir>../target/osgi-repository-bin</fromDir>
-              <toDir>home/disid/gvnix-repository</toDir>
+              <toDir>${osgi.repository.dir}</toDir>
             </configuration>
           </execution>
         </executions>
@@ -341,5 +341,25 @@
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
   </properties>
-
+  
+  <profiles>
+  	<!-- -SNAPSHOT Profile -->
+  	<profile>
+  		<id>snapshots</id>
+  		<activation>
+  			<activeByDefault>true</activeByDefault>
+  		</activation>
+  		<properties>
+  			<osgi.repository.dir>home/disid/gvnix-repository/snapshots</osgi.repository.dir>
+  		</properties>
+  	</profile>
+  	<!-- -RELEASE Profile -->
+  	<profile>
+  		<id>release</id>
+  		<properties>
+  			<osgi.repository.dir>home/disid/gvnix-repository</osgi.repository.dir>
+  		</properties>
+  	</profile>
+  </profiles>
+  
 </project>
