@@ -51,8 +51,10 @@ echo "ROO cache dir.............: $GVNIX_CACHE"
 echo "ROO bundle dir............: $GVNIX_BUNDLES"
 echo ""
 
-# gvNIX: Remove OSGi cache and bundles
-rm -r "$GVNIX_TARGET/roo"
+# gvNIX: Remove OSGi cache and bundles if roo directory exists
+if [ -d "$GVNIX_TARGET/roo" ]; then
+  rm -r "$GVNIX_TARGET/roo"
+fi
 
 # gvNIX: Creating Bundle and Cache folders
 mkdir -p "$GVNIX_CACHE"
