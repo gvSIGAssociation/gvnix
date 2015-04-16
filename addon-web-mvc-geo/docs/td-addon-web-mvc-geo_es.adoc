@@ -1,0 +1,322 @@
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//   $ asciidoc -b html5 td-addon-web-mvc-geo_es.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 td-addon-web-mvc-geo_es.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf td-addon-web-mvc-geo_es.adoc
+//
+= {title}
+:title:			gvNIX 1.3.1 - Requisitos Soporte Geo
+:author: 		DISID Corporation S.L. - Pivotal Software, Inc
+:authorsite: 		www.disid.com
+:copyright: 		CC BY-NC-SA 3.0
+:doctype: 		article
+:toc:
+:toc-placement:		left
+:toc-title:		Índice
+:toclevels: 		4
+:numbered:
+:sectnumlevels:		4
+ifdef::backend-pdf[]
+:pdf-style:		asciidoctor
+:pagenums:
+//:pygments-style: 	bw
+//:source-highlighter: 	pygments
+endif::[]
+
+[[descripcion-doc]]
+== Descripción del documento
+
+Documento de análisis y diseño técnico de una nueva funcionalidad de gvNIX que permita soportar componentes de tipo geográfico en las aplicaciones web generadas con la herramienta de desarrollo gvNIX.
+
+[[diseño]]
+== Diseño técnico
+
+Esta nueva funcionalidad se implementará dentro de varios add-ons del proyecto gvNIX. Los componentes relacionados con la capa de persistencia del componente GEO se implementará en el addon *addon-jpa de gvNIX*. Por otra parte, los componentes relacionados con la capa de visualización del componente GEO se implementará en un nuevo add-on llamado *addon-web-mvc-geo*.
+
+En los siguientes apartados se desarrolla el diseño técnico de estos add-ons en lo que se refiere al soporte de componentes de tipo Geográfico.
+
+[[analisis-solucion]]
+=== Análisis de la solución
+
+El soporte para componentes de tipo GEO consiste en que las aplicaciones desarrolladas utilizando la herramienta de desarrollo gvNIX, sean capaces de:
+
+- Almacenar datos de tipo geográfico como puntos, lineas, polígonos, etc...
+- Mantener (de forma visual) los datos de tipo geográfico.
+- Representar los datos de tipo geográfico en componentes de tipo mapa.
+- Obtener únicamente los datos que se visualizarán en el componente mapa utilizando el Bounding Box y la escala del mismo.
+- Interactuar con los datos (filtrado y selección) representados en el mapa utilizando el componente Datatables. 
+
+Para añadir este soporte, será necesario aplicar los siguientes cambios en la estructura del proyecto generado:
+
+- Incluir *nuevos ficheros* javascript, tags, estilos, imágenes etc.. en el proyecto generado para poder utilizar componentes de tipo GEO de forma correcta.
+- Incluir *dependencias* al proyecto para que pueda gestionar campos de tipo GEO.
+- Generar *conversores* que sean capaces de transformar la información geográfica en información válida para los componentes visuales.
+- Incluir nuevos *controladores y métodos* que se encarguen de gestionar las peticiones de los componentes geográficos.
+- Generar *vistas* de tipo mapa donde representar los datos de tipo GEO.
+- Incluir entradas en el *menú* de la aplicación que permitan acceder al Geoportal.
+
+[[analisis-funcional]]
+=== Análisis funcional
+
+Implementar la solución indicada en el punto anterior requiere desarrollar los siguientes comandos gvNIX y los siguientes componentes:
+
+*Comandos:*
+
+- *jpa geo setup*: Se encargará de instalar el soporte de persistencia geoespacial en el proyecto gvNIX. Para ello incluye todas las dependencias necesarias en el proyecto generado. Parámetros:
+* provider (obligatorio): Indicará qué proveedor de persistencia geoespacial se utilizará. Para esta primera versión solo estará disponible el proveedor HIBERNATE_SPATIAL.
+
+- *field geo*: Se encargará de añadir campos de tipo geoespacial (lineas, puntos, polígonos) en las entidades seleccionadas. Parámetros:
+* fieldName (obligatorio): Indicará el nombre del campo en la entidad.
+* type (obligatorio): Indicará de qué tipo es el campo geoespacial. Se soportarán los siguientes tipos:
+** POINT
+** LINESTRING
+** MULTILINESTRING
+** POLYGON
+** GEOMETRY
+* class (obligatorio): Indicará sobre qué entidad se añadirá el nuevo campo de tipo GEO.
+
+- *finder geo all*: Se encargará de implementar un buscador específico para campos de tipo GEO únicamente en aquellas entidades que dispongan de campos de tipo GEO.
+
+- *finder geo add*: Se encargará de implementar un buscador específico para campos de tipo GEO en la entidad seleccionada. Únicamente se podrá aplicar este comando en entidades que disponen de campos de tipo GEO. Parámetros:
+* class (obligatorio): Entidad sobre la cual se generará el buscador especifico de campos GEO.
+
+- *web mvc geo setup*: Se encarga de instalar los componentes necesarios (javascript, css, imágenes, tags, etc...) para el correcto funcionamiento de los componentes visuales del soporte geográfico.
+
+- *web mvc geo field*: Por defecto los campos GEO se generan como campos inputs de tipo text en las vistas de creación, actualización y visualización de la entidad. Este comando se encargará de transformar estos campos de tipo texto a componentes de tipo mapa. Parámetros:
+* controller (obligatorio): Se indicará el controlador asociado a la vista en la que se quiere añadir el componente de tipo mapa para un campo de la entidad asociada.
+* field (obligatorio): indica qué campo de las vistas de creación, actualización y visualización debe ser transformado a componente mapa.
+
+- *web mvc geo controller*: Se encargará de generar el GeoPortal donde se representarán los datos de tipo GEO. Parámetros:
+* class (obligatorio): Nombre del controlador a crear para la gestión del Geoportal.
+* preferredMapping (obligatorio): Indica la ruta de acceso (path) que utilizará el controlador.
+* projection (opcional): Indicará la proyección con la que trabaja el mapa. Por defecto trabajará con la proyección *EPSG4326*.
+
+- *web mvc geo entity add*: Se encargará de añadir una entidad con campos de tipo GEO al Geoportal o Geoportales generados. Para ejecutar este comando es necesario que se haya creado al menos un Geoportal en el proyecto utilizando el comando anterior. Parámetros:
+* controller (obligatorio): Controlador asociado a la entidad que se quiere añadir en el Geoportal.
+* map (opcional): Path del Geoportal al que se quiere añadir la nueva capa de entidad. Si no se especifica ningún Geoportal, la entidad se añadirá a todos los Geoportales generados.
+
+- *web mvc geo entity all*: Se encargará de añadir todas las entidades con campos de tipo GEO al Geoportal o Geoportales generados. Parámetros:
+* map (opcional): Path del Geoportal al que se quiere añadir todas las entidades que dispongan de campos GEO. Si no se especifica ningún Geoportal, todas las entidades se añadirán a todos los Geoportales generados.
+
+- *web mvc geo tilelayer*: Se encargará de añadir una nueva capa de tipo TILE al Geoportal o Geoportales generados.
+* name (obligatorio): Nombre que identificará a la capa generada.
+* url (obligatorio): Url del servidor de mapas que proveerá la cartografía a representar.
+* map (opcional): Path del Geoportal al que se quiere añadir la nueva capa base. Si no se especifica ningún Geoportal, esta nueva capa base se añadirá a todos los Geoportales generados.
+
+- *web mvc geo wmslayer*: Se encargará de añadir una nueva capa de tipo WMS al Geoportal o Geoportales generados.
+* name (obligatorio): Nombre que identificará a la capa generada.
+* url (obligatorio): Url del servidor de mapas que proveerá la cartografía a representar.
+* map (opcional): Path del Geoportal al que se quiere añadir la nueva capa base. Si no se especifica ningún Geoportal, esta nueva capa base se añadirá a todos los Geoportales generados.
+
+
+- *web mvc geo tool measure*: Se encargará de añadir una nueva herramienta de medición al Geoportal o Geoportales indicados.
+* map (opcional): Path del Geoportal al que se quiere añadir la nueva herramienta de medición. Si no se especifica ningún Geoportal, esta nueva herramienta de medición se añadirá a todos los Geoportales generados.
+
+- *web mvc geo tool custom*: Se encargará de añadir una nueva herramienta personalizable al Geoportal o Geoportales indicados.
+* map (opcional): Path del Geoportal al que se quiere añadir la nueva herramienta personalizable. Si no se especifica ningún Geoportal, esta nueva herramienta personalizable se añadirá a todos los Geoportales generados.
+
+*Componentes:*
+
+- *leaflet.gvnix.ext.gvnix.map.js*: Este fichero contiene las funciones javascript necesarias para:
+* Generar las vistas de mapas del GeoPortal
+* Incluir TOC en la vista del Geoportal.
+* Incluir panel de herramientas en la vista del Geoportal.
+* Realizar llamadas AJAX para obtener los datos a representar.
+
+- *map.tagx*: Este tag se añade a la vista JSP y genera la estructura de componentes necesaria para visualizar el componente mapa.
+
+- *toc.tagx*: Este tag se añade a la vista JSP y genera la estructura de componentes necesaria que almacenará las capas de entidad y capas base que se incluyan.
+
+- *toolbar.tagx*: Este tag se añade a la vista JSP y genera la estructura de componentes necesaria que almacenará las herramientas que se incluyan.
+
+- *entity.tagx*: Este tag se añade como hijo del tag *toc.tagx*  en la vista JSP y se encarga de generar la estructura de componentes necesaria para incluir una nueva capa de entidad en el TOC.
+
+- *tile.tagx*: Este tag se añade como hijo del tag *toc.tagx* en la vista JSP y se encarga de generar la estructura de componentes necesaria para incluir una nueva capa base de tipo TILE en el TOC.
+
+- *wms.tagx*: Este tag se añade como hijo del tag *toc.tagx* en la vista JSP y se encarga de generar la estructura de componentes necesaria para incluir una nueva capa base de tipo WMS en el TOC.
+
+- *measure.tagx*: Este tag se añade como hijo del tag *toolbar.tagx* en la vista JSP y se encarga de generar la estructura de componentes necesaria para incluir una nueva herramienta de medición en la barra de herramientas.
+
+- *custom.tagx*: Este tag se añade como hijo del tag *toolbar.tagx* en la vista JSP y se encarga de generar la estructura de componentes necesaria para incluir una nueva herramienta personalizable en la barra de herramientas.
+
+- *map-fied.tagx*: Este tag se añadirá en las vistas de creación , actualización y visualización y será el encargado de gestionar los campos de tipo GEO de las entidades en los formularios, permitiendo introducir, modificar y eliminar datos GEO.
+
+[[diseño-tecnico]]
+=== Diseño técnico
+
+[[requisitos]]
+==== Requisitos
+
+1. Para que los componentes y comandos del soporte GEO estén disponibles, es necesario se haya integrado el componente jQuery en el proyecto generado. Para ello es necesario haber ejecutado el comando *web mvc jquery setup*.
+
+2. Para que los comandos relacionados con la capa de persistencia GEO estén disponibles es necesario que se haya instalado un proveedor de persistencia válido. Para ello basta con ejecutar el comando *jpa setup*.
+
+3. Para que los comandos relacionados con la capa web del componente GEO estén disponibles, es necesario se haya instalado el proveedor de persistencia GEO y que se haya instalado previamente la capa web del proyecto. Para instalar el proveedor de persistencia basta con ejecutar el comando *jpa geo setup*. Para instalar la capa web del proyecto habrá que ejecutar el comando *web mvc setup*.
+
+[[jpa-geo-setup]]
+==== jpa geo setup
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+`jpa geo setup --provider HIBERNATE_SPATIAL`
+
+Aplicará los siguientes cambios:
+
+1. Actualizará el fichero *persistence.xml* modificando el dialecto utilizado por uno equivalente a la base de datos instalada pero con soporte geoespacial.
+
+[[field-geo]]
+==== field geo
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+`field geo --fieldName location --type POINT --class ~.domain.Owner`
+
+Aplicará los siguientes cambios:
+
+1. Creará la clase *package-info.java* en el paquete de la entidad donde se añada el nuevo campo para poder _mapear_ los campos de tipo GEO de forma correcta.
+2. Se añadirá el *nuevo campo* _location_ de tipo _Point_ a la entidad _Owner_.
+3. Se generarán los *getters* y *setters* necesarios.
+
+[[finder-geo-all-add]]
+==== finder geo all y finder geo add
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+`finder geo add --class ~.domain.Owner`
+
+Aplicará los siguientes cambios:
+
+1. Se anotará la entidad Owner con la anotación _@GvNIXEntityMapLayer_ en caso de disponer de campos de tipo GEO.
+2. Se generarán los ITDs necesarios que contendrán los métodos de búsqueda por campos de tipo GEO.
+
+En el caso del comando _finder geo all_ el procedimiento será el mismo que el anterior pero incluyendo TODAS las entidades del proyecto que contengan campos de tipo GEO.
+
+[[web-mvc-geo-setup]]
+==== web mvc geo setup
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+`web mvc geo setup`
+
+Aplicará los siguientes cambios:
+
+1. Se anotará el fichero *ApplicationConversionServiceFactoryBean.java* con la anotación _@GvNIXGeoConversionService_.
+2. Se generará el ITD relacionado con la anotación anterior que incluirá los conversores de tipos GEO.
+3. Se Incluirán en el proyecto los ficheros desarrollados para este componente. link:#analisis-funcional[(punto 2.2)]
+4. Estos ficheros incluirán la implementación para integrar el componente *Datatables* con el componente *Geo*.
+5. Se añadirán los anteriores componentes en el fichero *load-scripts.tagx*
+6. Añadirá dependencias al *pom.xml* relacionadas con el componente GEO.
+
+[[web-mvc-geo-field]]
+==== web mvc geo field
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+`web mvc geo field --controller ~.web.OwnerController --field area`
+
+Aplicará los siguientes cambios:
+
+1. Añadirá el siguiente *namespace* en las vistas JSP de creación, actualización y visualización asociadas al controlador _OwnerController_:
+* xmlns:geofield="urn:jsptagdir:/WEB-INF/tags/geo/form/fields"
+2. Sustituirá el campo _area_ de tipo _field:input_ por un campo de tipo *geofield:map-field* con los atributos por defecto.
+
+[[web-mvc-geo-controller]]
+==== web mvc geo controller
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+`web mvc geo controller --class ~.web.MapViewerController --preferredMapping mapview`
+
+Aplicará los siguientes cambios:
+
+1. Generará un nuevo controlador llamado *MapViewerController* anotado con _@RequestMapping(“/mapview”)_.
+2. Se anotará el controlador generado con _@GvNIXMapViewer_
+3. Se generará el *ITD* relacionado con la anotación _@GvNIXMapViewer_ el cual incluirá los métodos necesarios para gestionar la vista del Geoportal.
+4. Se generarán las *vistas JSP* necesarias para la correcta visualización del geoportal.
+5. Se actualizará el fichero *menu.xml* incluyendo una nueva entrada de menú en la aplicación generada.
+6. Actualizará los ficheros de propiedades i18n para una correcta traducción del geoportal.
+
+[[web-mvc-entity-add-all]]
+==== web mvc geo entity add y web mvc geo entity all
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+`web mvc geo entity add --controller ~.domain.OwnerController`
+
+Aplicará los siguientes cambios:
+
+1. Se anotará el controlador *OwnerController* con la anotación _@GvNIXWebEntityMapLayer_.
+2. Se generará el ITD relacionado con la anotación anterior. 
+3. El ITD generado tendrá los métodos necesarios para representar los datos de la entidad _Owner_ en el Geoportal utilizando el *BoundingBox* y la *escala* del mapa visualizado.
+4. Se añadirá la nueva entidad a la anotación _@GvNIXMapViewer_ del siguiente modo: (Gracias a esto, el mapa sabrá que entidades debe añadir como capas)
+* _@GvNIXMapViewer(entityLayers = OwnerController.class })_
+5. Se actualizará la vista JSP del mapa añadiendo el tag *entity.tagx* como hijo del tag *toc.tagx* con la configuración de la entidad _Owner_.
+El funcionamiento con el comando _web mvc geo entity all_ será similar al descrito anteriormente aplicándose a TODAS las entidades del proyecto al mismo tiempo.
+
+[[web-mvc-geo-titlelayer]]
+==== web mvc geo tilelayer
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+----
+web mvc geo tilelayer --name satellit --url "http://maptile.maps.svc.ovi.com/maptiler/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8"
+----
+
+Aplicará los siguientes cambios:
+
+1. Añadira el tag *tilelayer.tagx* como hijo del tag *toc.tagx* a la vista JSP del mapa con la configuración especificada en el comando.
+2. Actualizará el fichero de propiedades i18n con las etiquetas _necesarias_ para una correcta implementación multi-idioma.
+
+[[web-mvc-geo-wmslayer]]
+==== web mvc geo wmslayer
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+----
+web mvc geo wmslayer --name "geological map of valencia" --url "http://mapas.igme.es/gis/services/Cartografia_Geologica/IGME_GeologicoCValenciana_400/MapServer/WMSServer" --format "image/png" --transparent true --version "1.1.1" --crs EPSG4326 --layers "0,1,2,3"
+----
+
+Aplicará los siguientes cambios:
+
+1. Añadirá el tag *wmslayer.tagx* como hijo del tag *toc.tagx* a la vista JSP del mapa con la configuración especificada en el comando.
+2. Actualizará el fichero de propiedades i18n con las etiquetas _necesarias_ para una correcta implementación multi-idioma.
+
+[[web-mvc-geo-tool-measure]]
+==== web mvc geo tool measure
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+`web mvc geo tool measure --name measure`
+
+Aplicará los siguientes cambios:
+
+1. Añadirá el tag *measure.tagx* como hijo del tag *toolbar.tagx* a la vista JSP del mapa con el nombre _measure_.
+2. Actualizará el fichero de propiedades i18n con las etiquetas _necesarias_ para una correcta implementación multi-idioma.
+
+[[web-mvc-geo-tool-custom]]
+==== web mvc geo tool custom
+
+Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
+
+----
+web mvc geo tool custom --name latlng --icon fa-location-arrow --activateFunction activateLatLngTool --deactivateFunction deactivateLatLngTool --iconLibrary fa
+----
+
+Aplicará los siguientes cambios:
+
+1. Añadirá el tag *custom.tagx* como hijo del tag *toolbar.tagx* a la vista JSP del mapa con el nombre _latlng_ y la configuración introducida en el comando.
+2. Actualizará el fichero de propiedades i18n con las etiquetas _necesarias_ para una correcta implementación multi-idioma.
