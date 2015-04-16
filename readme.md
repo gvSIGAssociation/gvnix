@@ -49,6 +49,29 @@ STS can be used to develop gvNIX Roo Addon Suite.
 
 Every addon can be imported via *File > Import > Maven > Existing Maven Project*.
 
+Deploy gvNIX artifacts
+=======================
+
+All gvNIX artifacts will be deployed on Maven central.
+
+* **RELEASE artifacts**: https://oss.sonatype.org/service/local/staging/deploy/maven2/org/gvnix
+* **SNAPSHOT artifacts**: https://oss.sonatype.org/content/repositories/snapshots/org/gvnix
+
+In addition, gvNIX Addon Suite will be deployed in our own gvNIX repository:
+
+* **RELEASE gvNIX Addon Suite**: http://repository.gvnix.org/
+* **SNAPSHOT gvNIX Addon Suite**: http://repository.gvnix.org/snapshots
+
+To deploy **RELEASE** artifacts and generate gvNIX Addon Suite you must execute the following command:
+
+	mvn clean deploy -P release
+	
+To deploy **SNAPSHOT** artifacts and generate gvNIX Addon Suite you must execute the following command:
+
+	mvn clean deploy
+
+**NOTE**: _You must have the necessary permissions to deploy gvNIX artifacts_
+
 Documentation
 =============
 
