@@ -35,7 +35,7 @@
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.web.report.roo.addon</artifactId>
     <version>2.0.0.BUILD-SNAPSHOT</version>
-    <relativePath>../../addon-web-report</relativePath>
+    <relativePath>../../addon-web-mvc-report</relativePath>
   </parent>
   <artifactId>org.gvnix.web.report.roo.addon.addon</artifactId>
   <packaging>bundle</packaging>
