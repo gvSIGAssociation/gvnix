@@ -1,5 +1,5 @@
 // Executing clinic.roo and creating project
-script --file clinic.roo
+script clinic.roo
 
 // Adding jQuery to project
 web mvc jquery setup

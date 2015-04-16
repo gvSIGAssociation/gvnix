@@ -229,7 +229,7 @@
 	rm -r datatables
 	mkdir datatables
 	cd datatables
-	$1/gvnix.sh script --file $2/addon-web-mvc-datatables/src/main/resources/datatables.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-datatables/addon/src/main/resources/datatables.roo --lineNumbers true
 	mkdir target
 	mvn clean compile
     	cd ..
@@ -436,7 +436,7 @@
 	rm -r jpa-audit
 	mkdir jpa-audit
 	cd jpa-audit
-	$1/gvnix.sh script --file $2/addon-jpa/src/test/resources/jpa-audit-test.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-test.roo --lineNumbers true
 	mvn clean compile
 	cd ..
 	echo jpa-audit-test end
@@ -451,7 +451,7 @@
 	rm -r jpa-audit-envers
 	mkdir jpa-audit-envers
 	cd jpa-audit-envers
-	$1/gvnix.sh script --file $2/addon-jpa/src/test/resources/jpa-audit-envers.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-envers.roo --lineNumbers true
 	mvn clean compile
 	cd ..
 	echo jpa-audit-envers end
@@ -486,7 +486,7 @@ echo "======================================================"
 	rm -r jpa-audit-pkc
 	mkdir jpa-audit-pkc
 	cd jpa-audit-pkc
-	$1/gvnix.sh script --file $2/addon-jpa/src/test/resources/jpa-audit-pkc.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-jpa/addon/src/test/resources/jpa-audit-pkc.roo --lineNumbers true
 	# Create new pet
 	mvn test tomcat:run &
 	wget --retry-connrefused -O target/petcreate.html http://localhost:8080/displayRelationTable --post-data 'name=a&weight=1&type=Dog' &
@@ -499,109 +499,6 @@ echo "======================================================"
 
 
 
-##
-## gvNIX pattern add-on
-##
-	
-	## pattern
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo pattern start
-	rm -r pattern
-	mkdir pattern
-	cd pattern
-	$1/gvnix.sh script --file $2/addon-web-pattern/src/main/resources/pattern.roo --lineNumbers true
-##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh hint
-	mvn test tomcat:run & 
-	sleep 30
-    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
-    kill -9 $MVN_TOMCAT_PID
-	cd ..
-	echo pattern end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
-	
-	## test-script-pkc
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo test-script-pkc start
-	rm -r test-script-pkc
-	mkdir test-script-pkc
-	cd test-script-pkc
-	$1/gvnix.sh script --file $2/addon-web-pattern/src/test/resources/test-script-pkc.roo --lineNumbers true
-##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh hint
-	mvn test tomcat:run &
-	sleep 30
-    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
-    kill -9 $MVN_TOMCAT_PID
-	cd ..
-	echo test-script-pkc end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
-	
-	## test-script-pkc2
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo test-script-pkc2 start
-	rm -r test-script-pkc2
-	mkdir test-script-pkc2
-	cd test-script-pkc2
-	$1/gvnix.sh script --file $2/addon-web-pattern/src/test/resources/test-script-pkc2.roo --lineNumbers true
-	##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh hint
-	mvn test tomcat:run &
-	sleep 30
-    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
-    kill -9 $MVN_TOMCAT_PID
-	cd ..
-	echo test-script-pkc2 end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
-
-	## test-script-pkc3
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo test-script-pkc3 start
-	rm -r test-script-pkc3
-	mkdir test-script-pkc3
-	cd test-script-pkc3
-	$1/gvnix.sh script --file $2/addon-web-pattern/src/test/resources/test-script-pkc3.roo --lineNumbers true
-##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh hint
-	mvn test tomcat:run &
-	sleep 30
-    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
-    kill -9 $MVN_TOMCAT_PID
-	cd ..
-	echo test-script-pkc3 end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
-
-	## test-script-manytomany
-    echo "======================================================"
-    echo "------------------------------------------------------"
-	echo test-script-manytomany start
-	rm -r test-script-manytomany
-	mkdir test-script-manytomany
-	cd test-script-manytomany
-	$1/gvnix.sh script --file $2/addon-web-pattern/src/test/resources/test-script-manytomany.roo --lineNumbers true
-##  Reopen shell to generate pending pattern resources
-	$1/gvnix.sh hint
-	mvn test tomcat:run &
-	sleep 30
-    MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
-    kill -9 $MVN_TOMCAT_PID
-	cd ..
-	echo test-script-manytomany end
-    echo "------------------------------------------------------"
-    echo "======================================================"
-    echo .
 
 ##
 ## gvNIX report add-on
@@ -654,7 +551,7 @@ echo "======================================================"
 	rm -r bing
 	mkdir bing
 	cd bing
-	$1/gvnix.sh script --file $2/addon-service/src/main/resources/bing.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-service/addon/src/main/resources/bing.roo --lineNumbers true
 	mvn test tomcat:run -Dmaven.tomcat.fork=true 
 	cd ..
 	echo bing end
@@ -669,7 +566,7 @@ echo "======================================================"
 	rm -r service
 	mkdir service
 	cd service
-	$1/gvnix.sh script --file $2/addon-service/src/main/resources/service.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-service/addon/src/main/resources/service.roo --lineNumbers true
 	mvn clean compile 
 	cd ..
 	echo service end
@@ -685,7 +582,7 @@ echo "======================================================"
 	rm -r gvnix-test-no-jpa-no-web
 	mkdir gvnix-test-no-jpa-no-web
 	cd gvnix-test-no-jpa-no-web
-	$1/gvnix.sh script --file $2/addon-service/src/test/resources/gvnix-test-no-jpa-no-web.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-service/addon/src/test/resources/gvnix-test-no-jpa-no-web.roo --lineNumbers true
 	mvn test package
 	cd ..
 	echo gvnix-test-no-jpa-no-web end
@@ -700,7 +597,7 @@ echo "======================================================"
 	rm -r gvnix-test-no-jpa
 	mkdir gvnix-test-no-jpa
 	cd gvnix-test-no-jpa
-	$1/gvnix.sh script --file $2/addon-service/src/test/resources/gvnix-test-no-jpa.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-service/addon/src/test/resources/gvnix-test-no-jpa.roo --lineNumbers true
 	mvn clean compile
 	cd ..
 	echo gvnix-test-no-jpa end
@@ -715,7 +612,7 @@ echo "======================================================"
 	rm -r gvnix-test-no-web
 	mkdir gvnix-test-no-web
 	cd gvnix-test-no-web
-	$1/gvnix.sh script --file $2/addon-service/src/test/resources/gvnix-test-no-web.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-service/addon/src/test/resources/gvnix-test-no-web.roo --lineNumbers true
 	mvn test package
 	cd ..
 	echo gvnix-test-no-web end
@@ -730,7 +627,7 @@ echo "======================================================"
 	rm -r gvnix-test
 	mkdir gvnix-test
 	cd gvnix-test
-	$1/gvnix.sh script --file $2/addon-service/src/test/resources/gvnix-test.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-service/addon/src/test/resources/gvnix-test.roo --lineNumbers true
 	mvn clean compile
 	cd ..
 	echo gvnix-test end
@@ -746,7 +643,7 @@ echo "======================================================"
 	rm -r gvnix-test-entity
 	mkdir gvnix-test-entity
 	cd gvnix-test-entity
-	$1/gvnix.sh script --file $2/addon-service/src/test/resources/gvnix-test-entity.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-service/addon/src/test/resources/gvnix-test-entity.roo --lineNumbers true
 	mkdir target
 	mvn clean compile
 	cd ..
