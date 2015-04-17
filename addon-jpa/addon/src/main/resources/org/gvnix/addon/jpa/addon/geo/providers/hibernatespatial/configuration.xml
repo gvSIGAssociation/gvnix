@@ -10,9 +10,9 @@
 			<url>http://www.hibernatespatial.org/repository</url>
 		</repository>
 		<repository>
-            <id>gvNIX Add-on repository</id>
+            <id>gvNIX External Libraries repo</id>
             <url>http://repository.gvnix.org</url>
-            <name>gvNIX Add-on repository</name>
+            <name>gvNIX External Libraries repo</name>
         </repository>
 	</repositories>
 	<dependencies>

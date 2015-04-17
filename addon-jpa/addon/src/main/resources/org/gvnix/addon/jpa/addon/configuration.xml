@@ -3,10 +3,10 @@
 	<gvnix>
 		<repositories>
 			<repository>
-				<id>gvNIX Add-on repository</id>
-				<name>gvNIX Add-on repository</name>
-				<url>http://repository.gvnix.org</url>
-			</repository>
+	            <id>gvNIX External Libraries repo</id>
+	            <url>http://repository.gvnix.org</url>
+	            <name>gvNIX External Libraries repo</name>
+	        </repository>
 		</repositories>
 		<properties>
 			<gvnix.version>2.0.0.BUILD-SNAPSHOT</gvnix.version>

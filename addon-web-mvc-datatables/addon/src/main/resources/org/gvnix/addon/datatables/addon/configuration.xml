@@ -11,10 +11,10 @@
 				<url>http://www.hibernatespatial.org/repository</url>
 			</repository>
 			<repository>
-				<id>gvNIX Add-on repository</id>
-				<name>gvNIX Add-on repository</name>
-				<url>http://repository.gvnix.org</url>
-			</repository>
+	            <id>gvNIX External Libraries repo</id>
+	            <url>http://repository.gvnix.org</url>
+	            <name>gvNIX External Libraries repo</name>
+	        </repository>
 		</repositories>
 		<properties>
 			<querydsl.version>3.4.3</querydsl.version>

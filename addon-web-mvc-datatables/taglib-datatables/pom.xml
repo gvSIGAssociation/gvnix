@@ -52,15 +52,11 @@
   <url>http://www.gvnix.org</url>
 
   <repositories>
-    <repository>
-      <id>gvnix-add-on-repository</id>
-      <name>gvNIX repository</name>
-      <url>http://repository.gvnix.org</url>
-      <snapshots>
-        <updatePolicy>never</updatePolicy>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
+	<repository>
+    	<id>gvNIX External Libraries repo</id>
+        <url>http://repository.gvnix.org</url>
+        <name>gvNIX External Libraries repo</name>
+     </repository>
   </repositories>
 
   <dependencies>
