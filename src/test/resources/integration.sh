@@ -323,7 +323,7 @@
 	rm -r dialog
 	mkdir dialog
 	cd dialog
-	$1/gvnix.sh script --file $2/addon-web-dialog/src/main/resources/dialog.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-dialog/src/main/resources/dialog.roo --lineNumbers true
 	mkdir target
 	mvn clean compile    
 	cd ..
@@ -363,7 +363,7 @@
 	rm -r es-i18n
 	mkdir es-i18n
 	cd es-i18n
-	$1/gvnix.sh script --file $2/addon-web-i18n/src/main/resources/es-i18n.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-i18n/src/main/resources/es-i18n.roo --lineNumbers true
 	mkdir target
 	mvn clean compile
 	cd ..
@@ -383,7 +383,7 @@
 	rm -r menu
 	mkdir menu
 	cd menu
-	$1/gvnix.sh script --file $2/addon-web-menu/src/main/resources/menu.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-menu/src/main/resources/menu.roo --lineNumbers true
 	mvn clean compile
 	cd ..
 	echo menu end
@@ -398,7 +398,7 @@
 	rm -r base
 	mkdir base
 	cd base
-	$1/gvnix.sh script --file $2/addon-web-menu/src/test/resources/base.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-menu/src/test/resources/base.roo --lineNumbers true
 	mvn clean compile
 	cd ..
 	echo base end
@@ -513,7 +513,7 @@ echo "======================================================"
 	rm -r es-i18n
 	mkdir es-i18n
 	cd es-i18n
-	$1/gvnix.sh script --file $2/addon-web-i18n/src/main/resources/es-i18n.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-i18n/src/main/resources/es-i18n.roo --lineNumbers true
 	mkdir target
 	mvn clean compile
 	cd ..
@@ -533,7 +533,7 @@ echo "======================================================"
 	rm -r menu
 	mkdir menu
 	cd menu
-	$1/gvnix.sh script --file $2/addon-web-menu/src/main/resources/menu.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-menu/src/main/resources/menu.roo --lineNumbers true
 	mvn clean compile
 	cd ..
 	echo menu end
@@ -548,7 +548,7 @@ echo "======================================================"
 	rm -r base
 	mkdir base
 	cd base
-	$1/gvnix.sh script --file $2/addon-web-menu/src/test/resources/base.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-menu/src/test/resources/base.roo --lineNumbers true
 	mvn clean compile
 	cd ..
 	echo base end
