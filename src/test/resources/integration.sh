@@ -323,7 +323,7 @@
 	rm -r dialog
 	mkdir dialog
 	cd dialog
-	$1/gvnix.sh script --file $2/addon-web-mvc-dialog/src/main/resources/dialog.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-dialog/addon/src/main/resources/dialog.roo --lineNumbers true
 	mkdir target
 	mvn clean compile    
 	cd ..
@@ -685,6 +685,7 @@ echo "======================================================"
 	cd gvnix-test-report
 	$1/gvnix.sh script --file $2/addon-web-mvc-report/addon/src/test/resources/gvnix-test-report.roo --lineNumbers true
 	mkdir target
+ii
 	mvn clean compile
 	cd ..
 	echo gvnix-test-report end
