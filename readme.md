@@ -72,6 +72,13 @@ To deploy **SNAPSHOT** artifacts and generate gvNIX Addon Suite you must execute
 
 **NOTE**: _You must have the necessary permissions to deploy gvNIX artifacts_
 
+**About gvNIX version number**:
+
+gvNIX versions are series of individual numbers, separated by periods, with a progression such as 1.7.0, 1.8.0, 1.8.1, 1.9.0, 1.10.0, 1.11.0, 1.11.1, 1.11.2, and so on.
+
+The early stages are identified with "ALPHA", "BETA" or "BUILD-SNAPSHOT" 
+qualifiers.
+
 Documentation
 =============
 
