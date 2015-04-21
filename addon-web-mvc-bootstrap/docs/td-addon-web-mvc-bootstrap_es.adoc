@@ -60,7 +60,7 @@ Para añadir este soporte, será necesario aplicar los siguientes cambios en la 
 
 * Incluir *nuevos ficheros* javascript, tags, estilos, imágenes, librerías Bootstrap, etc.. en el proyecto generado.
 * Añadir estos nuevos ficheros y componentes al *cargar* la capa de la vista para que estén disponibles.
-* *Modificar estructura* de componentes de la capa de la vista (tags, jspx, layouts, etc..) para que sigan la estructura de Bootstrap. 
+* *Modificar estructura* de componentes de la capa de la vista (tags, jspx, layouts, etc..) para que sigan la estructura de Bootstrap.
 
 [[analisis-funcional]]
 === Análisis funcional
@@ -73,7 +73,7 @@ Implementar la solución indicada en el punto anterior requiere desarrollar los 
 
 [[diseño-tecnico]]
 === Diseño técnico
- 
+
 [[requisitos]]
 ==== Requisitos
 
@@ -88,9 +88,9 @@ Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo 
 
 Aplicará los siguientes cambios:
 
-1. Se añaden los ficheros *javascript*, estilos *CSS*, librerías *Bootstrap*, *imágenes*, *fuentes*, etc... necesarios para el correcto funcionamiento del soporte adaptativo. 
+1. Se añaden los ficheros *javascript*, estilos *CSS*, librerías *Bootstrap*, *imágenes*, *fuentes*, etc... necesarios para el correcto funcionamiento del soporte adaptativo.
 2. Actualizará el fichero existente *standard.css* para que aplique los nuevos estilos.
-3. Modificará las *clases y estructura HTML de los tagx* existentes en el proyecto para que utilicen la estructura Bootstrap. 
+3. Modificará las *clases y estructura HTML de los tagx* existentes en el proyecto para que utilicen la estructura Bootstrap.
 4. Actualizará los *layouts* para seguir la estructura HTML de Bootstrap.
 5. Actualizará las *vistas JSP comunes* (index.jspx, footer.jspx, header.jspx, etc..) para que utilicen la estructura Bootstrap.
 6. Actualizará *TODAS las vistas jsp* de la aplicación para que utilicen los tags de *JQuery* (create, update, show, list, finders).
@@ -99,7 +99,7 @@ Aplicará los siguientes cambios:
 
 [[web-mvc-bootstrap-update]]
 ==== web mvc bootstrap update
-	
+
 Este comando solo estará disponible una vez ejecutado el comando de instalación de Bootstrap. (web mvc bootstrap setup).
 
 Solo será necesario ejecutar este comando en caso de instalar un nuevo componente que no cumpla con la estructura de Bootstrap. Para esta versión, solo será necesario ejecutarlo si se instala el componente Datatables o se aplica seguridad al proyecto.
@@ -113,3 +113,29 @@ Aplicará los siguientes cambios:
 1. Actualizará la estructura de los componentes instalados para que utilicen la estructura de Bootstrap.
 2. En caso del componente *Datatables* se incluirán ficheros CSS con los nuevos estilos del componente para apariencia Bootstrap.
 3. En caso de añadir una *nueva entidad y aplicar scaffold* para generar la capa web al ejecutar este comando también se actualizarán los jspx para que utilice los tags de *jquery.*
+
+
+Addon Bootstrap
+---------------------
+
+* Para poder utilizar el comando "web mvc bootstrap setup" es necesario que se ejecute previamente el comando "web mvc jquery setup".
+
+* Una vez instalado jquery ejecutamos el comando de instalación de bootstrap que hará las siguientes operaciones:
+
+    - Importará los scripts básicos, imágenes y estilos básicos de bootstrap al proyecto gvNIX
+    - Reemplazará el fichero standard.css para que aplique los nuevos estilos
+    - Añade los tagx necesarios para bootstrap y modifica los tagx necesarios.
+    - Actualiza los layouts para seguir la estructura HTML de bootstrap3
+    - Actualiza los ficheros JSP comunes (index.jspx, footer.jspx, header.jspx, etc..)
+    - Actualiza TODAS las vistas jsp de la aplicación para que utilicen los tags de JQuery (create, update, show, list, finders)
+    - Comprueba si está instalado el addon de datatables. Si está instalado genera los recursos necesarios, si no, no los instala.
+    - Comprueba si está instalada la seguridad (security setup). Si está instalado modifica el fichero login.jspx
+
+* Una vez ejecutado este comando ya está aplicado bootstrap en el proyecto.
+
+*En caso de añadir datatables, o aplicar seguridad al proyecto gvNIX, será necesario aplicar el comando web mvc bootstrap update para actualizar/importar los recursos necesarios para que toda la aplicación aplique bootstrap.
+
+*En caso de añadir una nueva entidad y aplicar scaffold para generar la capa web, ejecutando el comando web mvc bootstrap update también se actualizarán los jspx para que utilice los tags de jquery.
+Quickstart
+
+*Creado el fichero bootstrap.roo y añadido al addon. Al arrancar la consola se puede ejecutar script --file bootstrap.roo y creará un proyecto de ejemplo aplicando bootstrap.

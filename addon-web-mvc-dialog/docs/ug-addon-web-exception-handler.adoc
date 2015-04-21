@@ -1,0 +1,51 @@
+gvNIX Uncaught Exception Handler Add-on
+=======================================
+:author: [ … ]
+:date: $Date$
+
+This work is licensed under the Creative Commons Attribution-Share Alike
+3.0 Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco,
+California, 94105, USA.
+
+[[introduction]]
+Introduction
+------------
+
+This project generates the addon to catch unhandled exceptions in
+controllers and show an intelligible message to the browser.
+
+[[features]]
+Features
+--------
+
+This are features contained:
+
+_________________________________________________________________________
+* Creates an Exception to handle and the depending view of the
+exception.
+* Removes a selected Exception from the application.
+* Lists all the handled Exception of the application.
+* Adds a new translation in a determinate language for an Exception.
+_________________________________________________________________________
+
+[[how-to-install]]
+How to install
+--------------
+
+1.  Download and setup
+http://www.springsource.com/download/community?project=Spring%20Roo[Spring
+Roo] .
+2.  Change to cxf addon directory
+3.  Run the Roo console
+4.  Execute the command `perform assembly` to build the addon
+5.  Execute the command
+`addon install --url file:{absolute_path_to_zip_generated_from_assembly}`
+to install the addon
+
+That’s all.
+
+To remove the addon execute
+`addon uninstall --pattern {name_of_addon_zip_file_without_path}` in any
+Roo console
