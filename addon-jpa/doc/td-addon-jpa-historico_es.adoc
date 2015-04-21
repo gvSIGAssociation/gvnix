@@ -54,7 +54,7 @@ El histórico de base de datos consiste en guardar en tablas adicionales todos l
 
 Para llevar a cabo este proceso, será necesario que gvNIX modifique automáticamente la estructura de la aplicación del siguiente modo:
 
-- Debe crear un sistema de proveedores de histórico que permitirá instalar distintas implementaciones para esta funcionalidad. Estos proveedores podrán ser dependientes de la implementación de JPA. Para esta versión, el proveedor de histórico que se implementará utilizará la librería _Hibernate Envers_. 
+- Debe crear un sistema de proveedores de histórico que permitirá instalar distintas implementaciones para esta funcionalidad. Estos proveedores podrán ser dependientes de la implementación de JPA. Para esta versión, el proveedor de histórico que se implementará utilizará la librería _Hibernate Envers_.
 - Se creará una clase servicio para recuperar el objeto que representa al usuario que realiza el cambio. El desarrollador personalizará esta clase para obtener los datos del usuario de la fuente adecuada (base de datos, petición, etc.). Los datos que proporcione esta clase se almacenarán como valor de usuario al actualizar las entidades.
 * En el caso de utilizar Spring Security el add-on podrá generar una implementación por defecto basada en el uso de la interfaz _UserDetails_ de Spring Security.
 
