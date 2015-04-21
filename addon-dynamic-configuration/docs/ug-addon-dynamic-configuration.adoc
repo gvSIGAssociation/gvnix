@@ -1,7 +1,40 @@
-Dynamic Configuration Addon User Guide
-======================================
-:author: DISID Corporation, S.L.
-:date: $Date$
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 ug-addon-dynamic-configuration.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 ug-addon-dynamic-configuration.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf ug-addon-dynamic-configuration.adoc
+
+
+= Dynamic Configuration Addon User Guide
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+//:description: Steps to install gvNIX
+:corpsite: www.disid.com
+:doctype: book
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit
@@ -31,35 +64,18 @@ Addon commands
 --------------
 
 * configuration create - Define a new configuration with a name
-
-______________________________________
-* name: Name for defined configuration
-______________________________________
-
-* configuration property add - Make a property available for all
-configurations
-
-_______________________________
-* name: Name of property to add
-_______________________________
-
+** name: Name for defined configuration
+* configuration property add - Make a property available for all configurations
+** name: Name of property to add
 * configuration property value - Set new values into a configuration
 property
-
-________________________________________________
-* configuration: Name of configuration to update
-* property: Name of configuration to update
-* value: New value to set
-________________________________________________
-
+** configuration: Name of configuration to update
+** property: Name of configuration to update
+** value: New value to set
 * configuration property undefined - Set no value into a configuration
 property
-
-________________________________________________
-* configuration: Name of configuration to update
-* property: ame of property to update
-________________________________________________
-
+** configuration: Name of configuration to update
+** property: name of property to update
 * configuration list - List all created configurations and their
 properties
 * configuration export - Write current configurations into project

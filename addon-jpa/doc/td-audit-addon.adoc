@@ -1,7 +1,45 @@
-gvNIX. Add-on Auditoría
-=======================
-:author: DISID TECHNOLOGIES, S.L.
-:date: $Date$
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 td-audit-addon.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 td-audit-addon.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf td-audit-addon.adoc
+
+
+= gvNIX. Add-on Auditoría
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: book
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
 
 [[introducción]]
 Introducción
@@ -38,13 +76,14 @@ http://scmcit.gva.es/svn/gvnix-proof/tags/petclinic-revision-log/v1.2_
 Uso del addon
 ~~~~~~~~~~~~~
 
-[[inicializar-auditoría]]
+[[inicializar-auditoria]]
 Inicializar auditoría
 ^^^^^^^^^^^^^^^^^^^^^
 
 En un proyecto con la persistencia configurada se ejecutará el siguiente
 comando:
 
+[source, java]
 -------------------------------------------------------------------------------------------
 gvNIX> jpa audit setup --service ~.servicies.AuditUserService --userType ~.domain.UserLogin
 -------------------------------------------------------------------------------------------
@@ -60,12 +99,13 @@ no implementa la interfaz de _String Security_ `UserDetails` se mostrará
 un aviso al usuario que debe ajustar el método `getUser()` de la clase
 _~.servicies.AuditUserService_.
 
-[[establecer-auditoría]]
+[[establecer-auditoria]]
 Establecer auditoría
 ^^^^^^^^^^^^^^^^^^^^
 
 Para estabecer la auditoría a una entidad se ejecutará el comando:
 
+[source, java]
 ------------------------------------------
 gvNIX> jpa audit add --name ~.domain.Visit
 ------------------------------------------
@@ -96,6 +136,7 @@ actual y el valor devuelto por la clase anotada
 _persistence.xml_) para registrar el listener `Visit_auditListener` a la
 entidad `Visit`:
 +
+[source, xml]
 ---------------------------------------------------------------------------------------------------------------------------
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
@@ -112,7 +153,7 @@ entidad `Visit`:
 En el proof indicado se ha implementado un test que comprueba el
 funcionamiento en `VisitIntegrationTest.VisitIntegrationTest`.
 
-[[añadir-registro-de-histórico]]
+[[anadir-registro-de-historico]]
 Añadir registro de histórico
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -120,6 +161,7 @@ El registro de histórico será opcional. Para seleccionar el proveedor
 (cuyo bundle debe estar instalado en el framework) se usará una
 instrucción como esta):
 
+[source, java]
 ---------------------------------------------------------
 gvNIX> jpa audit revisionLog --provider NombreDeProveedor
 ---------------------------------------------------------
@@ -240,27 +282,21 @@ La implementación del add tendrá los siguientes componentes:
 ** `jpa audit setup`: Configura la auditoría de historico creando la
 clase que proveera del nombre de usuario que realiza el cambio. Sólo se
 puede ejecutar una vez. Parámetros:
-+
-_____________________________________________________________________________________________________________
 *** `service` (obligatorio): Nombre de la clase a crear para hacer de
 proveedor del objeto usuario.
 *** `userType` (opcional): Clase a usar como usuario. Por defecto
 `String`.
-+
-_____________________________________________________________________________________________________________
 **** Lanzará un warning informando que tiene que ajustar la
 implementación de la clase en dos circunstancias:
 ***** Si no está configurado Spring Security
 ***** Si la clase `userType` no es String y no implementa `UserDetails`.
-_____________________________________________________________________________________________________________
-_____________________________________________________________________________________________________________
+
 ** `jpa audit revisionLog`: Configura un proveedor de revisiones de
 histórico. Solo disponible si hay alguno disponible. Parámetros:
-+
-________________________________________________________________________________
+
 *** `provider` (obligatorio): Proveedor a usar. Será autocompletado
 (converter).
-________________________________________________________________________________
+
 ** `jpa audit add`: preparará la audición para una entidad. Parámetros:
 *** `entity` (obligatorio): Clase de la entidad sobre la que actuará el
 comando
@@ -280,8 +316,6 @@ entidades. Por defecto es `null` y este valor depende del proveedor de
 registro configurado (puede no haber).
 * RevisionLogProvider: Interfaz que deben cumplir los proveedores de
 gestión de registro
-+
-________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
 ** Las clases que implementen este interfaz deben estar anotadas con
 `@Component` y `@Service` de OSGi para que puedan ser registradas en el
 add-on.
@@ -308,7 +342,7 @@ información de la revisión.
 *** void fillAddtionalArtifact(????): Método que termina de construir el
 metadato, incluyendo métodos y propiedades de utilidad necesarias para
 el funcionamiento de la implemenetación.
-________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
 * Operations:
 ** Soporte para las operaciones de los commands
 ** Tendrá una lista de instancias de RevisionLogProvider inyectada vía
@@ -338,7 +372,7 @@ atenderán a la anotación `GvNIXAuditListener`
 ** En su activación deberá registrar la dependencia en
 `JpaOrmEntityListenerRegistry`
 
-[[registro-de-histórico-con-hibernate-envers]]
+[[registro-de-historico-con-hibernate-envers]]
 Registro de Histórico con Hibernate Envers
 ------------------------------------------
 

@@ -24,7 +24,6 @@
 :Project:   gvNIX. Spring Roo based RAD tool
 :Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
 :Author:    DISID Corporation, S.L.
-//:description: Steps to install gvNIX
 :corpsite: www.disid.com
 :doctype: book
 :keywords: gvNIX, Documentation
