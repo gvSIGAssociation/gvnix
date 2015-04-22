@@ -1,6 +1,45 @@
-gvNIX OCC Add-on User Guide
-===========================
-:date: $Date: 2010-01-19 09:08:12 +0100 (mar 19 de ene de 2010) $
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 ug-occ-addon.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 ug-occ-addon.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf ug-occ-addon.adoc
+
+
+= gvNIX OCC Add-on User Guide
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: book
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
 
 [[introduction]]
 Introduction
@@ -13,12 +52,10 @@ the old and new entity state without the need to alter legacy databases.
 Requirements
 ~~~~~~~~~~~~
 
-____________________________________________________________
 * JDK 1.6+
 * Maven 2+
 * gvNIX - Spring Roo - Addon - Optimistic Concurreny Control
 * Eclipse Helios 3.6.0 (optional)
-____________________________________________________________
 
 [[install-addon-services-management]]
 Install Addon Services Management
@@ -26,23 +63,22 @@ Install Addon Services Management
 
 Options:
 
-__________________________________________________________________________________________________________________________________________________________________
 * To install gvNIX 0.6.0 that contains the add-on installed.
 
 * OR, to install in Spring Roo 1.1.2::
-  * Trust on PGP KEY ID used to sign the add-on. Note that gvNIX project
+** Trust on PGP KEY ID used to sign the add-on. Note that gvNIX project
   members have their PGP KEYs IDs published at
   https://code.google.com/p/gvnix/people/list:
-  +
++
 ----------------------------
 pgp trust --keyId 0xC5FC814B
 ----------------------------
-  * Run the command below:
-  +
+
+** Run the command below:
++
 -----------------------------------------------------------------
 addon install bundle --bundleSymbolicName org.gvnix.occ.roo.addon
 -----------------------------------------------------------------
-__________________________________________________________________________________________________________________________________________________________________
 
 [[use-case-occ-support-in-pet-clinic]]
 Use case: OCC support in Pet clinic
@@ -50,6 +86,7 @@ Use case: OCC support in Pet clinic
 
 Create a new directory for the project:
 
+[source, java]
 --------------
 Bash shell:
 
@@ -59,11 +96,12 @@ Bash shell:
 
 Start gvNIX:
 
+[source,java]
 ------------------------------------------------------------------------------
 clinic$ gvnix.sh
-    ____  ____  ____  
-   / __ \/ __ \/ __ \ 
-  / /_/ / / / / / / / 
+    ____  ____  ____
+   / __ \/ __ \/ __ \
+  / /_/ / / / / / / /
  / _, _/ /_/ / /_/ /   1.1.2.RELEASE [rev fbc33bb]
 /_/ |_|\____/\____/   gvNIX distribution 0.6.0
 
@@ -74,12 +112,14 @@ roo>
 
 Create the project:
 
+[source, java]
 ----------------------
 roo> script clinic.roo
 ----------------------
 
 Set concurrency control on _Pet_ entity:
 
+[source, java]
 ----------------------------------------------------------------------------------------------------------------------------------
 roo> occ checksum set --entity ~.domain.Pet
 
@@ -112,17 +152,20 @@ Two new commands will be available:
 Checksum based behaivor to a Entity.
 +
 Options:
+
 * _entity_: The name of the entity object to add OCC
 * _fieldName_ (optional): The name of the field to use to store de
 checksum value
 * _digestMethod_ (optional): The name of the type of digest method to
 compute the checksum
+
 2.  `occi checksum all`: Apply this occ implementation to all existing
 `@RooJpaActiveRecord`. Add the gvNIX Optimistic Concurrency Control
 Checksum based behaivor to all entities in project. If any of them has
 already been configure no changes will be applied to this entity.
 +
 Options:
+
 * _fieldName_ (optional): The name of the field to use to store de
 checksum value
 * _digestMethod_ (optional): The name of the type of digest method to

@@ -1,7 +1,45 @@
-gvNIX OCC Add-on Technical Design
-=================================
-:author: DISID Corporation, S.L.
-:date: $Date: 2010-04-15 09:37:50 +0200 (jue 15 de abr de 2010) $
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 td-occ-addon.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 td-occ-addon.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf td-occ-addon.adoc
+
+
+= gvNIX OCC Add-on Technical Design
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: book
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
 
 [[introduction]]
 Introduction
@@ -50,8 +88,7 @@ Proof of Concept
 * http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-occ
 * https://svn.disid.com/svn/disid/proof/gvnix/concurrency
 * https://svn.disid.com/svn/disid/proof/gvnix/occ-checksum-app
-*
-https://svn.disid.com/svn/disid/proof/spring_roo/gvnix_concurrency_test
+* https://svn.disid.com/svn/disid/proof/spring_roo/gvnix_concurrency_test
 
 [[todo-list]]
 TODO List
@@ -64,14 +101,14 @@ AspectJ precedence vs. around
 There is a way to replace Itd definitions of other add-on (like build-in
 add-on) AspetJ `declare precedence`:
 
-_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+________________________________________________________________________________
 Given a potential conflict between inter-type member declarations in
 different aspects, if one aspect has precedence over the other its
 declaration will take effect without any conflict notice from compiler.
 This is true both when the precedence is declared explicitly with
 declare precedence as well as when when sub-aspects implicitly have
 precedence over their super-aspect.
-_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+________________________________________________________________________________
 
 We can use this declaration to override `Roo_Jpa_ActiveRecord` merge and
 remove methods instead to use `around`. We have to study what is the
@@ -79,10 +116,8 @@ better way to do this.
 
 Related links:
 
-*
-http://www.eclipse.org/aspectj/doc/next/progguide/semantics-declare.html
-*
-http://www.eclipse.org/aspectj/doc/next/adk15notebook/annotations-decp.html
+* http://www.eclipse.org/aspectj/doc/next/progguide/semantics-declare.html
+* http://www.eclipse.org/aspectj/doc/next/adk15notebook/annotations-decp.html
 * http://jira.springframework.org/browse/ROO-795
 
 [[set-type-fields-occ]]
