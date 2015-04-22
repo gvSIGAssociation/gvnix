@@ -71,7 +71,6 @@
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
     </dependency>-->
-
 	<!-- Hibernate jpa api -->
 	<dependency>
 		<groupId>org.hibernate.javax.persistence</groupId>
