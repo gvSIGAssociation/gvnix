@@ -102,7 +102,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
             .getLogger(LoupefieldOperationsImpl.class);
 
     private static final JavaType ANNOTATION_LOUPE_CONTROLLER = new JavaType(
-            "org.gvnix.addon.loupefield.GvNIXLoupeController");
+            "org.gvnix.addon.loupefield.annotations.GvNIXLoupeController");
 
     protected void activate(final ComponentContext cContext) {
         context = cContext.getBundleContext();
