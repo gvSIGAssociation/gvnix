@@ -1,11 +1,45 @@
-===================================================================
-gvNIX Service Layer Add-on
-===================================================================
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 readme.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 readme.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf readme.adoc
 
-:Project: gvNIX. Spring Roo based RAD tool :Copyright: Conselleria
-d’Infraestructures i Transport - Generalitat Valenciana :Author: DiSiD
-TECHNOLOGIES, S.L. :Revision: latexmath:[$Rev: 1507 $] :Date:
-latexmath:[$Date: 2012-08-21 09:27:47 +0200 (mar, 21 ago 2012) $]
+
+= gvNIX Service Layer Add-on
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: book
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit
@@ -13,9 +47,6 @@ http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
 Creative Commons, 171 Second Street, Suite 300, San Francisco,
 California, 94105, USA.
 
-.. contents:: :depth: 2 :backlinks: none
-
-.. |date| date::
 
 [[introduction]]
 Introduction
@@ -68,8 +99,7 @@ Important:
 
 You must update *JavaParserMethodMetadata* class in
 `gvnix/trunk/code/roo/classpath-javaparser` ROO Add-on with patch
-*issue_3879_JavaParserMethodMetadata.patch* in::
-
+*issue_3879_JavaParserMethodMetadata.patch* in:
 http://projects.disid.com/issues/3879
 
 And then, run `mvn clean install` in roo sources directory to use this

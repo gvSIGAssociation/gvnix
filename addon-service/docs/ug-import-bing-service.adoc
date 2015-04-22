@@ -1,7 +1,44 @@
-gvNIX Service Layer Add-on - Import Use Case
-============================================
-:author: DISID Corporation, S.L.
-:date: $Date: 2010-11-23 10:33:14 +0100 (mar, 23 nov 2010) $
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 ug-import-bing-service.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 ug-import-bing-service.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf ug-import-bing-service.adoc
+
+
+= gvNIX Service Layer Add-on - Import Use Case
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: book
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit
@@ -20,12 +57,11 @@ API.
 Requirements
 ~~~~~~~~~~~~
 
-____________________________________________________
 * JDK 1.6+
 * Maven 2+
 * _gvNIX - Spring Roo - Addon - Services Management_
 * Eclipse Helios 3.6.0 (optional)
-____________________________________________________
+
 
 [[install-addon-services-management]]
 Install Addon Services Management
@@ -33,23 +69,22 @@ Install Addon Services Management
 
 Options:
 
-__________________________________________________________________________________________________________________________________________________________________
 * To install gvNIX 0.6.0 that contains the add-on installed.
 
-* OR, to install in Spring Roo 1.1.2::
-  * Trust on PGP KEY ID used to sign the add-on. Note that gvNIX project
+* OR, to install in Spring Roo 1.1.2:
+** Trust on PGP KEY ID used to sign the add-on. Note that gvNIX project
   members have their PGP KEYs IDs published at
   https://code.google.com/p/gvnix/people/list:
-  +
++
 ----------------------------
 pgp trust --keyId 0xC5FC814B
 ----------------------------
-  * Run the command below:
-  +
+** Run the command below:
++
 ---------------------------------------------------------------------
 addon install bundle --bundleSymbolicName org.gvnix.service.roo.addon
 ---------------------------------------------------------------------
-__________________________________________________________________________________________________________________________________________________________________
+
 
 [[bing-api]]
 Bing API
@@ -59,11 +94,11 @@ To connect to Bing API you have to register at _Bing Developer Center_
 and get the Bing _AppID_ and _Version_, both parameters are required to
 invoke Bing Web Services.
 
-____________________________________________________________
-*DiSiD tests*
 
+*DiSiD tests*
+----
 AppID: 8DC4F8381BF17A5FE9BF28F7B5AF12F5EA08462F Version: 2.2
-____________________________________________________________
+----
 
 Go to http://www.bing.com/developers/createapp.aspx for registering.
 
@@ -77,6 +112,7 @@ Create your application
 
 Create a new directory for the project:
 
+[source,sh]
 -----------------------
 Bash shell:
 
@@ -86,11 +122,12 @@ Bash shell:
 
 Start gvNIX:
 
+[source,sh]
 ------------------------------------------------------------------------------
 bing-search-app$ gvnix.sh
-    ____  ____  ____  
-   / __ \/ __ \/ __ \ 
-  / /_/ / / / / / / / 
+    ____  ____  ____
+   / __ \/ __ \/ __ \
+  / /_/ / / / / / / /
  / _, _/ /_/ / /_/ /   1.1.2.RELEASE [rev fbc33bb]
 /_/ |_|\____/\____/   gvNIX distribution 0.6.0
 
@@ -101,6 +138,7 @@ roo>
 
 Create the project:
 
+[source,sh]
 -----------------------------------------------------------------------------
 roo> project --topLevelPackage org.gvnix.search --projectName bing-search-app
 
@@ -114,13 +152,14 @@ Created SRC_MAIN_RESOURCES/META-INF/spring
 Created SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
 Created SRC_MAIN_RESOURCES/log4j.properties
 
-org.gvnix.search roo> 
+org.gvnix.search roo>
 -----------------------------------------------------------------------------
 
 Create local service from Bing WSDL that defines the service contract.
 This local service will act as ``service proxy'' and will route our
 local invocations to the remote service:
 
+[source,sh]
 ---------------------------------------------------------------------------------------------------------------------
 org.gvnix.search roo> remote service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
 
@@ -150,6 +189,7 @@ worry, it will be compiled to _target/classes_.
 Now, generate a new web page in which we will include the search form
 for our application:
 
+[source,sh]
 ---------------------------------------------------------------------
 org.gvnix.search roo> controller class --class ~.web.SearchController
 
@@ -167,6 +207,7 @@ org.gvnix.search roo>
 
 Create Eclipse specific workspace configuration artifacts:
 
+[source,sh]
 --------------------------------------------------------------------------
 org.gvnix.search roo> perform eclipse
 
@@ -186,12 +227,14 @@ Existing Projects into Workspace_
 
 Add the local service reference to our Controller class:
 
+[source,sh]
 -----------------------------------------------
 @Autowired private SearchService searchService;
 -----------------------------------------------
 
 Add the handler method that will receive the query string:
 
+[source,sh]
 -------------------------------------------------------------------------------------------
 @RequestMapping(params = { "find=ByQuery" }, method = RequestMethod.GET, value = "{query}")
 public String get(@RequestParam("query") String query,
@@ -237,14 +280,15 @@ Service only.
 Now open `src/main/webapp/WEB-INF/views/search/index.jspx` to add the
 search form to your application:
 
+[source,jsp]
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <form:find finderName="ByQuery" id="ff_bing_search" path="/search/list" z="user-managed">
-      <field:input label="Bing" disableFormBinding="true" field="query" 
-          id="f_com_microsoft_schemas_livesearch_u2008_u03_search_SearchRequest2_query" 
+      <field:input label="Bing" disableFormBinding="true" field="query"
+          id="f_com_microsoft_schemas_livesearch_u2008_u03_search_SearchRequest2_query"
           required="true" />
     </form:find>
 </div>
@@ -253,6 +297,8 @@ search form to your application:
 Create a web page to show the search results, for example
 `src/main/webapp/WEB-INF/views/search/list.jspx`:
 
+[source,jsp]
+--------------------------------------------------------------------------------
 <?xml version=``1.0'' encoding=``UTF-8'' standalone=``no''?> <div
 xmlns:c=``http://java.sun.com/jsp/jstl/core''
 xmlns:jsp=``http://java.sun.com/JSP/Page''
@@ -268,10 +314,11 @@ value=``$\{result.title}'' /></a> <br/> <c:out
 value=``$\{result.description}'' /> <br/> <span style=``color:
 green;''><c:out value=``$\{result.url}'' /></span> <br/> <br/>
 </c:forEach> </page:list> </div>
+--------------------------------------------------------------------------------
 
-Register the new view at
-`src/main/webapp/WEB-INF/views/search/views.xml`:
+Register the new view at `src/main/webapp/WEB-INF/views/search/views.xml`:
 
+[source,xml]
 ----------------------------------------------------------------------
 <definition extends="default" name="search/list">
   <put-attribute name="body" value="/WEB-INF/views/search/list.jspx"/>
@@ -280,6 +327,7 @@ Register the new view at
 
 Update labels at `src/main/webapp/WEB-INF/i18n/application.properties`:
 
+[source,properties]
 ---------------------------------------------------------
 application_name=Bing Search Demo
 label_search_index=Search at Bing

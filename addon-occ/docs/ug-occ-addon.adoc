@@ -86,7 +86,7 @@ Use case: OCC support in Pet clinic
 
 Create a new directory for the project:
 
-[source, java]
+[source, sh]
 --------------
 Bash shell:
 
@@ -112,14 +112,14 @@ roo>
 
 Create the project:
 
-[source, java]
+[source, sh]
 ----------------------
 roo> script clinic.roo
 ----------------------
 
 Set concurrency control on _Pet_ entity:
 
-[source, java]
+[source, sh]
 ----------------------------------------------------------------------------------------------------------------------------------
 roo> occ checksum set --entity ~.domain.Pet
 

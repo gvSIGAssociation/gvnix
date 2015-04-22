@@ -83,7 +83,7 @@ Inicializar auditoría
 En un proyecto con la persistencia configurada se ejecutará el siguiente
 comando:
 
-[source, java]
+[source, sh]
 -------------------------------------------------------------------------------------------
 gvNIX> jpa audit setup --service ~.servicies.AuditUserService --userType ~.domain.UserLogin
 -------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ Establecer auditoría
 
 Para estabecer la auditoría a una entidad se ejecutará el comando:
 
-[source, java]
+[source, sh]
 ------------------------------------------
 gvNIX> jpa audit add --name ~.domain.Visit
 ------------------------------------------
@@ -161,7 +161,7 @@ El registro de histórico será opcional. Para seleccionar el proveedor
 (cuyo bundle debe estar instalado en el framework) se usará una
 instrucción como esta):
 
-[source, java]
+[source, sh]
 ---------------------------------------------------------
 gvNIX> jpa audit revisionLog --provider NombreDeProveedor
 ---------------------------------------------------------
