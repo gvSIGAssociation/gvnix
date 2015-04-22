@@ -1,6 +1,16 @@
 //
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
 // HTML5:
-//   $ asciidoc -b td-addon-web-mvc-batch_es.adoc
+//
+//   $ asciidoc -b html5 td-addon-web-mvc-batch_es.adoc
 //
 // HTML5 Asciidoctor:
 //   # Embed images in XHTML
@@ -8,39 +18,41 @@
 //
 // PDF Asciidoctor:
 //   $ asciidoctor-pdf td-addon-web-mvc-batch_es.adoc
-//
-= {title}
-:title:			gvNIX 1.3.1 - Análisis soporte tablas dinámicas
-:author: 		DISID Corporation S.L. - Pivotal Software, Inc
-:authorsite: 		www.disid.com
-:copyright: 		CC BY-NC-SA 3.0
-:doctype: 		article
+
+
+= gvNIX 1.3.1 - Análisis soporte tablas dinámicas
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: article
+:keywords: gvNIX, Documentation
 :toc:
-:toc-placement:		left
-:toc-title:		Índice
-:toclevels: 		4
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
 :numbered:
-:sectnumlevels:		4
-:icons:			font
+:sectnumlevels: 4
+:source-highlighter:  pygments
 ifdef::backend-pdf[]
-:pdf-style:		asciidoctor
+:pdf-style: asciidoctor
 :pagenums:
-//:pygments-style: 	bw
-//:source-highlighter: 	pygments
+:pygments-style:  bw
 endif::[]
+
 
 [[descripcion-doc]]
 == Descripción del documento
 
 Documento de análisis y diseño técnico de una nueva funcionalidad de gvNIX que permita utilizar tablas dinámicas en los proyectos generados utilizando la herramienta de desarrollo gvNIX.
 
-[[diseño]]
+[[diseno]]
 == Diseño técnico
 
 Esta nueva funcionalidad se implementará en varios addons del proyecto:
 
 - Se creará el add-on *addon-web-mvc-datatables* en el proyecto gvNIX que será el encargado de la generación de la capa web utilizando tablas dinámicas para la gestión de los datos.
-- En el addon *addon-jpa* de gvNIX se crearán los comandos necesarios para poder generar los métodos que permitan utilizar operaciones en bloque (creación, actualización y eliminación de varios registros al mismo tiempo) en la capa de entidades. 
+- En el addon *addon-jpa* de gvNIX se crearán los comandos necesarios para poder generar los métodos que permitan utilizar operaciones en bloque (creación, actualización y eliminación de varios registros al mismo tiempo) en la capa de entidades.
 - En el addon *addon-web-mvc* del proyecto gvNIX se crearán los comandos necesarios para poder publicar las operaciones en bloque de la capa de entidades en la capa web y que así puedan ser utilizadas por las tablas dinámicas.
 
 En los siguientes apartados se desarrolla el diseño técnico de estos add-ons en lo que se refiere al soporte para tablas dinámicas en una aplicación generada utilizando la herramienta de desarrollo gvNIX.
@@ -51,7 +63,7 @@ El soporte para tablas dinámicas consiste en que las aplicaciones desarrolladas
 
 - Gestionar datos introducidos en la aplicación de forma dinámica.
 - Cargar datos en modo asíncrono utilizando AJAX
-- Ordenar datos por uno o más campos. 
+- Ordenar datos por uno o más campos.
 - Filtrado general y filtros por columna.
 - Paginación de registros.
 - Selección de registros.
@@ -89,13 +101,13 @@ Implementar la solución indicada en el punto anterior requiere desarrollar los 
 - *web mvc batch all*: Se encargará de publicar las operaciones en bloque de TODAS las entidades en la capa web del proyecto.
 
 - *web mvc datatables setup*: Se encargará de incluir todos los componentes , dependencias y librerías necesarias para que la aplicación generada utilice tablas dinámicas para la gestión de los datos.
-- *web mvc datatables update tags*: Se encargará de actualizar los ficheros tags JSP del componente tablas dinámicas a la versión más actual. 
+- *web mvc datatables update tags*: Se encargará de actualizar los ficheros tags JSP del componente tablas dinámicas a la versión más actual.
 - *web mvc datatables add*: Se encargará de añadir los métodos necesarios a una clase controladora asociada a una entidad para generar la capa web utilizando  tablas dinámicas para la gestión de los datos de dicha entidad.  Parámetros:
 * type (Requerido): Clase controladora sobre la que se implementarán los métodos de generación de las tablas dinámicas.
 * ajax (Opcional): Establecerá el modo de datos, por defecto tomará valor verdadero (AJAX), en caso de ser falso el modo de datos será DOM.
 * mode (Opcional): Establecerá el modo de visualización de los datos de la tabla. En caso de tomar el valor 'show' se mostrarán los registros de manera individual utilizando la paginación para navegar entre ellos. En caso de tomar el valor 'list' se mostrará una lista paginada de los registros.
 * inline (Opcional): Habilitará la edición y creación en linea, permitiendo crear y editar registros sin abandonar la vista.
-- *web mvc datatables all*: Se encargará de añadir los métodos necesarios a TODAS las clases controladoras asociadas a las entidades del proyecto para generar la capa web utilizando tablas dinámicas para la gestión de los datos de dicha entidad.  
+- *web mvc datatables all*: Se encargará de añadir los métodos necesarios a TODAS las clases controladoras asociadas a las entidades del proyecto para generar la capa web utilizando tablas dinámicas para la gestión de los datos de dicha entidad.
 - *web mvc datatables details add*: Se encargará de añadir una tabla dinámica detalle a una tabla dinámica maestro en base a una propiedad 1 a N de la entidad relacionada. Este comando permitirá representar modelos relacionales utilizando patrones de pantalla “Maestro-Detalle”. Se permite representar relaciones multinivel. Parámetros:
 * type (Requerido): Clase controladora de la tabla dinámica maestra sobre la que se añadirá el nuevo detalle. Será necesario que se haya aplicado el comando web _mvc datatables add_ sobre dicho controlador.
 * property (Requerido): Nombre de la propiedad 1:N del modelo relacional en la entidad asociada a la clase controladora seleccionada. Es necesario que se haya aplicado el comando web _mvc datatables add_ sobre el controlador de la entidad asociada que contiene la propiedad relacionada.
@@ -109,15 +121,15 @@ Implementar la solución indicada en el punto anterior requiere desarrollar los 
 - *jquery.dataTables.ext.gvnix.rowclick.js*: Este fichero contendrá las funciones javascript necesarias para poder seleccionar filas haciendo doble click sobre ellas.
 - *jquery.dataTables.ext.gvnix.rowontop.js*: Este fichero contendrá las funciones javascript necesarias para que los registros recién creados se muestren en la primera fila, permitiendo al usuario localiazrlos de forma rápida.
 - *jquery.dataTables.ext.gvnix.selection.js*: Este fichero contiene las funciones javascript necesarias para permitir al usuario seleccionar los registros mostrados. Esta funcionalidad permitirá ejecutar las operaciones en bloque en caso de que hayan sido generadas, ya que se podrán seleccionar múltiples registros para su edición o eliminación.
-- *action-column.tagx*: Este tag JSP se encargará de generar la estructura de componentes necesaria para visualizar una columna de acción en el listado. Estas columnas de acción invocarán las funciones javascript necesarias para interactuar con los registros. Por defecto, se añadirán funciones de edición, borrado y visualización de registros. 
+- *action-column.tagx*: Este tag JSP se encargará de generar la estructura de componentes necesaria para visualizar una columna de acción en el listado. Estas columnas de acción invocarán las funciones javascript necesarias para interactuar con los registros. Por defecto, se añadirán funciones de edición, borrado y visualización de registros.
 - *callback.tagx*: Este tag JSP se encargará de generar callbakcs de funciones javascript al ejecutarse distintos eventos del componente tablas dinámicas.
 - *column.tagx*: Este tag JSP se encargará de generar la estructura de componentes necesaria para visualizar columnas en el componente tabla dinámica.
 - *extraConf.tagx*: Este tag JSP se encargará de añadir propiedades extra de configuración del componente tablas dinámicas. Gracias a este componente el desarrollador podrá facilitar configuraciones personalizadas al componente tablas dinámicas.
 - *list.tagx*: Este tag JSP se encargará de generar la estructura de componentes necesaria para visualizar de forma correcta el componente tabla dinámica.
 - *redirect.tagx*: Este tag JSP se encargará de generar las funciones y estructura HTML necesarias para guardar los parámetros de la URL al abandonar la página de listado para efectuar alguna operación (creación, actualización, etc..) y así poder volver a ella al finalizar la operación.
 - *set-input-values-from-request.tagx*: Este tag JSP se encargará de generar la estructura de componentes necesaria para enviar a los formularios de creación en linea los valores que establecen la relación y así poder crear detalles relacionados  sin seleccionar de forma manual el campo relacionado.
- 
-[[diseño-tecnico]]
+
+[[diseno-tecnico]]
 === Diseño técnico
 
 Para integrar funcionalidades de tablas dinámicas en un proyecto generado utilizando la herramienta de desarrollo gvNIX, se utilizará el componente jQuery Datatables en su versión 1.9:
@@ -240,7 +252,7 @@ Efectuará los mismos cambios que el comando anterior pero para TODOS los contro
 ==== web mvc datatables details add
 
 Para una mejor comprensión del comando, nos apoyaremos en el siguiente ejemplo para explicar qué acciones realizará en la aplicación:
-	
+
 `web mvc datatables detail add --type ~.web.OwnerController --property pets`
 
 Aplicará los siguientes cambios:
