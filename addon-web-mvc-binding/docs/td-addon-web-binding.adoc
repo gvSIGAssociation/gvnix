@@ -1,7 +1,45 @@
-gvNIX Web Binding add-on
-========================
-:author: DISID Corporation, S.L.
-:date: $Date: 2011-09-20 11:06:13 +0200 (mar, 20 sep 2011) $
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 td-addon-web-binding.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 td-addon-web-binding.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf td-addon-web-binding.adoc
+
+
+= gvNIX Web Binding add-on
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: article
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit
@@ -19,8 +57,8 @@ This document contents relative to this add-on.
 Requirements
 ------------
 
-This add-on has been reimplemented due to an issue appeared in Spring
-3.0.1GA (https://jira.springsource.org/browse/SPR-7077). Looks like old
+This add-on has been reimplemented due to an https://jira.springsource.org/browse/SPR-7077[issue appeared in Spring
+3.0.1GA]. Looks like old
 way to register property editors globally doesn’t work. Right now the
 solution is to use methods annotated with @InitBinder in order to
 register custom editors.
@@ -38,8 +76,10 @@ with @InitBinder. This method registers StringTrimmerEditor
 Operations
 ----------
 
-web mvc binding stringTrimmer [–class path_to_controller] [–emptyAsNull
-true|false] —–
+[source, sh]
+----
+web mvc binding stringTrimmer [--class path_to_controller] [--emptyAsNull true|false]
+----
 
 Performs the needed operations for match the requirements described
 above.

@@ -1,7 +1,45 @@
-gvNIX Web Binding add-on
-========================
-:author: DISID Corporation, S.L.
-:date: $Date: 2011-09-20 11:06:13 +0200 (mar, 20 sep 2011) $
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 ug-addon-web-binding.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 ug-addon-web-binding.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf ug-addon-web-binding.adoc
+
+
+= gvNIX Web Binding add-on
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: article
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit
@@ -41,6 +79,7 @@ pgp trust --keyId 0xC5FC814B
 ----------------------------
 ** Run the command below:
 +
+[source, sh]
 -------------------------------------------------------------------------
 addon install bundle --bundleSymbolicName org.gvnix.web.binding.roo.addon
 -------------------------------------------------------------------------
@@ -51,6 +90,7 @@ Use case: PropertyEditors Binding in Pet clinic
 
 Create a new directory for the project:
 
+[source, sh]
 --------------
 Bash shell:
 
@@ -60,6 +100,7 @@ Bash shell:
 
 Start gvNIX:
 
+[source, sh]
 ------------------------------------------------------------------------------
 clinic$ gvnix.sh
     ____  ____  ____
@@ -75,12 +116,14 @@ roo-gvNIX>
 
 Create the project:
 
+[source, sh]
 ----------------------------
 roo-gvNIX> script clinic.roo
 ----------------------------
 
 Add a new report:
 
+[source, sh]
 ------------------------------------
 roo-gvNIX> web binding stringTrimmer
 ------------------------------------
