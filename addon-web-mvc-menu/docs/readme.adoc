@@ -1,0 +1,42 @@
+gvNIX web menu add-on
+=====================
+:author: DISID Corporation, S.L.
+:date: $Date$
+
+This work is licensed under the Creative Commons Attribution-Share Alike
+3.0 Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco,
+California, 94105, USA.
+
+[[introduction]]
+Introduction
+------------
+
+Add-on to install and manage extended web menu.
+
+[[project-contents]]
+Project contents
+----------------
+
+This folder contains add-on sources and documents folder `docs` with
+documentation of this project.
+
+[[features]]
+Features
+--------
+
+This add-ons have this features:
+
+1.  Roo shell commands to manage web site map
+* Move pages inside, before, after other pages or categories
+* Hide/Show pages
+* Change URL, label and message
+2.  Role based page authorization management
+3.  Quick and centralized access to page data: URL, label, message, etc
+
+[[how-to-install]]
+How to install
+--------------
+
+TBC

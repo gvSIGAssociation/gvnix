@@ -9,6 +9,7 @@
 // ===================
 //
 // HTML5:
+//
 //   $ asciidoc -b html5 td-addon-jpa-historico_es.adoc
 //
 // HTML5 Asciidoctor:
@@ -17,24 +18,26 @@
 //
 // PDF Asciidoctor:
 //   $ asciidoctor-pdf td-addon-jpa-historico_es.adoc
-//
+
 = {title}
 :title:			gvNIX 1.3.1 - Análisis y Prueba de Concepto histórico BBDD
-:author: 		DISID Corporation S.L. - Pivotal Software, Inc
-:authorsite: 		www.disid.com
-:copyright: 		CC BY-NC-SA 3.0
-:doctype: 		article
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: book
+:keywords: gvNIX, Documentation
 :toc:
-:toc-placement:		left
-:toc-title:		Índice
-:toclevels: 		4
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
 :numbered:
-:sectnumlevels:		4
+:sectnumlevels: 4
+:source-highlighter:  pygments
 ifdef::backend-pdf[]
-:pdf-style:		asciidoctor
+:pdf-style: asciidoctor
 :pagenums:
-//:pygments-style: 	bw
-//:source-highlighter: 	pygments
+:pygments-style:  bw
 endif::[]
 
 [[descripcion-doc]]
@@ -42,7 +45,7 @@ endif::[]
 
 Documento de análisis y diseño técnico de una nueva funcionalidad de gvNIX que proporcione e integre el soporte de histórico de cambios en base de datos.
 
-[[diseño]]
+[[diseno]]
 == Diseño técnico
 
 Esta nueva funcionalidad se implementará dentro del add-on *addon-jpa* de gvNIX y se complementará con el desarrollo de auditoría de BBDD realizado anteriormente. En los siguientes apartados se desarrolla el diseño técnico de este add-on en lo que se refiere al sistema de histórico de cambios en BBDD.
@@ -54,7 +57,7 @@ El histórico de base de datos consiste en guardar en tablas adicionales todos l
 
 Para llevar a cabo este proceso, será necesario que gvNIX modifique automáticamente la estructura de la aplicación del siguiente modo:
 
-- Debe crear un sistema de proveedores de histórico que permitirá instalar distintas implementaciones para esta funcionalidad. Estos proveedores podrán ser dependientes de la implementación de JPA. Para esta versión, el proveedor de histórico que se implementará utilizará la librería _Hibernate Envers_. 
+- Debe crear un sistema de proveedores de histórico que permitirá instalar distintas implementaciones para esta funcionalidad. Estos proveedores podrán ser dependientes de la implementación de JPA. Para esta versión, el proveedor de histórico que se implementará utilizará la librería _Hibernate Envers_.
 - Se creará una clase servicio para recuperar el objeto que representa al usuario que realiza el cambio. El desarrollador personalizará esta clase para obtener los datos del usuario de la fuente adecuada (base de datos, petición, etc.). Los datos que proporcione esta clase se almacenarán como valor de usuario al actualizar las entidades.
 * En el caso de utilizar Spring Security el add-on podrá generar una implementación por defecto basada en el uso de la interfaz _UserDetails_ de Spring Security.
 
@@ -76,7 +79,7 @@ Implementar la solución indicada en el punto anterior requiere actualizar/añad
 * package (opcional): Paquete java donde se generarán las clases de los listeners. Por defecto el mismo que las entidades.
 * revisionLog (opcional): Registrar lista de revisiones para todas las entidades. Por defecto es null y este valor depende del proveedor de registro configurado (puede no haber).
 
-[[diseño-tecnico]]
+[[diseno-tecnico]]
 === Diseño técnico
 
 [[requisitos]]
@@ -149,6 +152,6 @@ Debe incluir los siguientes métodos:
 
 - *String getDescription()*: Descripción del proveedor
 
-- *boolean getDefaultValueOfRevisionLogAttribute()*: Devuelve un booleano que indica que valor que se debe asumir para el ``revisionLog`` de las anotaciones cuyo valor sea ``null``.
+- *boolean getDefaultValueOfRevisionLogAttribute()*: Devuelve un booleano que indica que valor que se debe asumir para el `revisionLog` de las anotaciones cuyo valor sea `null`.
 
 - *void setup()*: Realizar las operaciones necesaria para instalarse en el proyecto actual

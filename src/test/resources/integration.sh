@@ -323,7 +323,7 @@
 	rm -r dialog
 	mkdir dialog
 	cd dialog
-	$1/gvnix.sh script --file $2/addon-web-mvc-dialog/src/main/resources/dialog.roo --lineNumbers true
+	$1/gvnix.sh script --file $2/addon-web-mvc-dialog/addon/src/main/resources/dialog.roo --lineNumbers true
 	mkdir target
 	mvn clean compile    
 	cd ..
