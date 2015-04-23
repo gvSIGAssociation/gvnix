@@ -30,6 +30,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
@@ -56,6 +57,7 @@ public class DependencyListenerImpl implements MenuDependencyListener {
      * Use PageOperations to execute operations
      */
     private MenuEntryOperations operations;
+    private ProjectOperations projectOperations;
 
     private Boolean hasSpringSecurity = null;
 
@@ -75,6 +77,7 @@ public class DependencyListenerImpl implements MenuDependencyListener {
     public void notify(String upstreamDependency, String downstreamDependency) {
         // Check if is project metadata
         if (ProjectMetadata.isValid(upstreamDependency)) {
+            // Check if gvNIX menu is installed
             if (getMenuEntryOperations().isGvNixMenuAvailable()) {
                 // if dependency changes or its first call
                 if (!ObjectUtils.equals(getMenuEntryOperations()
@@ -85,6 +88,17 @@ public class DependencyListenerImpl implements MenuDependencyListener {
                             .isSpringSecurityInstalled();
                     getMenuEntryOperations().createWebArtefacts("~.web.menu");
                 }
+
+                // If Bootstrap is installed and gvNIX Bootstrap menu is not
+                // installed
+                // is neccessary to install it.
+                if (getProjectOperations().isFeatureInstalledInFocusedModule(
+                        "gvnix-bootstrap")
+                        && !getMenuEntryOperations()
+                                .isGvNixMenuBootstrapAvailable()) {
+                    getMenuEntryOperations().setupBootstrapMenu();
+                }
+
             }
         }
     }
@@ -140,6 +154,33 @@ public class DependencyListenerImpl implements MenuDependencyListener {
         }
         else {
             return operations;
+        }
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference[] references = context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference ref : references) {
+                    projectOperations = (ProjectOperations) context
+                            .getService(ref);
+                    return projectOperations;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on DependencyListenerImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
         }
     }
 }

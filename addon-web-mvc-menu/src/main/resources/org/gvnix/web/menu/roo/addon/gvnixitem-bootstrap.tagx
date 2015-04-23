@@ -1,0 +1,121 @@
+<jsp:root xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu"
+  xmlns:c="http://java.sun.com/jsp/jstl/core"
+  xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+  xmlns:jsp="http://java.sun.com/JSP/Page"
+  xmlns:spring="http://www.springframework.org/tags" version="2.0">
+
+  <!-- gvNIX menu item renderer -->
+
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" 
+    description="The menu item identifier" />
+  <jsp:directive.attribute name="url" type="java.lang.String" required="false"
+    description="Destination of the item (usually a url)" />
+  <jsp:directive.attribute name="labelCode" type="java.lang.String" required="false"
+    description="The label code to get text from I18N properties that will be used as message arguments." />
+  <jsp:directive.attribute name="messageCode" type="java.lang.String" required="false"
+    description="The message code for the label of this item" />
+  <jsp:directive.attribute name="roles" type="java.lang.String" required="false"
+    description="Roles allowed to see this item (empty allows all)" />
+  <jsp:directive.attribute name="children" type="java.util.Collection" required="false" description="Item's Children" />
+  <jsp:directive.attribute name="hidden" type="java.lang.Boolean" required="false"
+    description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
+  <jsp:directive.attribute name="ignoreHidden" type="java.lang.Boolean" required="false"
+    description="Ignore hidden menu item value (show all)" />
+
+  <!-- Execute expression evaluator to resolve in-line expressions -->
+  <c:if test="${not empty url}">
+    <!-- Try to identify an EL expression and evaluate it -->
+    <jsp:useBean id="url" type="java.lang.String" />
+    <jsp:scriptlet><![CDATA[
+      if (url.matches(".*[$][{].*[}].*")) {
+          try {
+            Object destinationEvaluated = jspContext.getExpressionEvaluator()
+                .evaluate(url, java.lang.String.class,
+                    jspContext.getVariableResolver(), null);
+            jspContext.setAttribute("url", destinationEvaluated);
+          }
+          catch (Exception ex) {
+            //Don't set attribute
+          }
+      }
+    //]]></jsp:scriptlet>
+
+    <spring:url value="${url}" var="targetUrl" />
+  </c:if>
+
+  <!-- Load the label -->
+  <c:if test="${not empty labelCode}">
+    <spring:message code="${labelCode}" var="label" htmlEscape="false" />
+  </c:if>
+
+  <!-- draw if not hidden -->
+  <c:choose>
+    <c:when test="${hidden}">
+      <c:choose>
+        <c:when test="${empty ignoreHidden or not ignoreHidden}">
+          <c:set var="showItem" value="false" />
+        </c:when>
+        <c:otherwise>
+          <c:set var="showItem" value="true" />
+        </c:otherwise>
+      </c:choose>
+    </c:when>
+    <c:otherwise>
+      <c:set var="showItem" value="true" />
+    </c:otherwise>
+  </c:choose>
+
+  <!-- draw if not hidden -->
+  <c:if test="${showItem}">
+    <c:choose>
+      <!-- single item -->
+      <c:when test="${empty children}">
+        <menu:item url="${url}" id="${id}" label="${label}"
+          messageCode="${messageCode}" />
+      </c:when>
+      <c:otherwise>
+        <!--  item with children -->
+        <c:if test="${not empty messageCode}">
+          <spring:message code="${messageCode}" arguments="${label}"
+            var="label" htmlEscape="false" />
+        </c:if>
+        <!-- menu:category doesn't support url attribute. We need to add  url="${targetUrl} -->
+        <menu:category id="${id}" label="${label}">
+          <c:if test="${menuItem.hidden}">
+            <c:choose>
+              <c:when test="${empty ignoreHidden or not ignoreHidden}">
+                <c:set var="itemHidden" value="true" />
+              </c:when>
+              <c:otherwise>
+                <c:set var="itemHidden" value="false" />
+              </c:otherwise>
+            </c:choose>
+          </c:if>
+
+          <!-- iterate over all children -->
+          <c:forEach items="${children}" var="menuItem">
+             <c:choose>
+             <c:when test="${empty menuItem.children}">
+                  <menu:gvnixitem id="${menuItem.id}" url="${menuItem.url}"
+                  labelCode="${menuItem.labelCode}"
+                  messageCode="${menuItem.messageCode}"
+                  hidden="${menuItem.hidden}" ignoreHidden="${itemHidden}"
+                  roles="${menuItem.roles}" children="${menuItem.children}" />
+             </c:when>
+             <c:otherwise>
+                  <menu:gvnixsubcategory id="${menuItem.id}" url="${menuItem.url}"
+                  labelCode="${menuItem.labelCode}"
+                  messageCode="${menuItem.messageCode}"
+                  hidden="${menuItem.hidden}" ignoreHidden="${itemHidden}"
+                  roles="${menuItem.roles}" children="${menuItem.children}" />
+             </c:otherwise>
+            </c:choose>
+          </c:forEach>
+        </menu:category>
+      </c:otherwise>
+    </c:choose>
+
+  </c:if>
+</jsp:root>

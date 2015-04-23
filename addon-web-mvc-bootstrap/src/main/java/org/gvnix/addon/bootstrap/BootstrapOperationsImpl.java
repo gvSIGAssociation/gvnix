@@ -320,7 +320,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /**
      * This method updates HTML structure in default gvNIX layouts to use
-     * bootsrap
+     * bootstrap
      */
     public void updateGvNIXLayouts() {
 

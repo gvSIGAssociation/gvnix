@@ -64,6 +64,14 @@ public interface MenuEntryOperations {
     boolean isGvNixMenuAvailable();
 
     /**
+     * Indicate project has a gvNIX Bootstrap menu.
+     * 
+     * @return true if the user installed the gvNIX Bootstrap menu, otherwise
+     *         returns false.
+     */
+    boolean isGvNixMenuBootstrapAvailable();
+
+    /**
      * Checks if Spring Security 3.0.5.RELEASE is installed.
      * 
      * @return true if Spring Security 3.0.5 is installed. Otherwise returns
@@ -75,6 +83,11 @@ public interface MenuEntryOperations {
      * Setup all add-on artifacts (dependencies in this case)
      */
     void setup();
+
+    /**
+     * Setup all add-on artifacts with Bootstrap (dependencies in this case)
+     */
+    void setupBootstrapMenu();
 
     /**
      * Create or update menu web layer artefacts.

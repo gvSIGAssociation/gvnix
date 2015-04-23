@@ -53,6 +53,13 @@
   <url>http://www.gvnix.org</url>
 
   <dependencies>
+  
+    <!-- gvNIX -->
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.support</artifactId>
+      <version>${gvnix.version}</version>
+    </dependency>
 
     <!-- OSGi -->
     <dependency>

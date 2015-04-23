@@ -37,11 +37,18 @@ import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.WebProjectUtils;
 import org.gvnix.web.menu.roo.addon.listeners.MenuDependencyListener;
 import org.gvnix.web.menu.roo.addon.util.FilenameUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
@@ -111,7 +118,6 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
-    @Reference
     private ProjectOperations projectOperations;
 
     /**
@@ -129,8 +135,14 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     /** menu.jspx file path */
     private String menuFile;
 
+    /** gvnixsubcategory */
+
+    private String menuBootstrapFile;
+
     /** menu.xml file path */
     private String menuConfigFile;
+
+    private WebProjectUtils webProjectUtils;
 
     /**
      * Is OSGI Roo menu component already disabled ? In other words, is OSGI
@@ -143,6 +155,16 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      */
     @Reference
     private MenuDependencyListener dependencyListener;
+
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(MenuEntryOperationsImpl.class);
+
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
+
+    protected void activate(final ComponentContext context) {
+        this.context = context.getBundleContext();
+    }
 
     // Public operations -----
 
@@ -170,8 +192,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      */
     public boolean isProjectAvailable() {
         // Check if a project has been created
-        return projectOperations.isProjectAvailable(projectOperations
-                .getFocusedModuleName());
+        return getProjectOperations().isProjectAvailable(
+                getProjectOperations().getFocusedModuleName());
     }
 
     /**
@@ -190,6 +212,12 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         return fileManager.exists(getMenuConfigFile());
     }
 
+    // Check if bootstrap is installed
+    @Override
+    public boolean isGvNixMenuBootstrapAvailable() {
+        return fileManager.exists(getMenuBootstrapConfigFile());
+    }
+
     /** {@inheritDoc} */
     public boolean isSpringSecurityInstalled() {
 
@@ -203,8 +231,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 "spring-security-core", "3.0.5.RELEASE");
 
         // locate Spring Security dependency
-        Set<Dependency> dependencies = projectOperations.getFocusedModule()
-                .getDependenciesExcludingVersion(dep);
+        Set<Dependency> dependencies = getProjectOperations()
+                .getFocusedModule().getDependenciesExcludingVersion(dep);
 
         // if didn't find, Spring Security is not installed
         if (dependencies.isEmpty()) {
@@ -237,6 +265,36 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // create web layer artefacts
         createWebArtefacts("~.web.menu");
+    }
+
+    @Override
+    public void setupBootstrapMenu() {
+        if (isSpringSecurityInstalled()) {
+            installResourceIfNeeded("/WEB-INF/tags/menu/gvnixitem.tagx",
+                    "gvnixitem-bootstrap-sec.tagx", null,
+                    new String[] { "<menu:gvnixitem", " xmlns:spring=",
+                            " xmlns:sec=" });
+        }
+        else {
+            installResourceIfNeeded("/WEB-INF/tags/menu/gvnixitem.tagx",
+                    "gvnixitem-bootstrap.tagx", null,
+                    new String[] { "<menu:gvnixitem" });
+        }
+
+        // Adding gvnixsubcategory
+        installResourceIfNeeded("/WEB-INF/tags/menu/gvnixsubcategory.tagx",
+                "gvnixsubcategory.tagx", null, null);
+
+        // Adding subcategory.tagx
+        installResourceIfNeeded("/WEB-INF/tags/menu/subcategory.tagx",
+                "subcategory.tagx", null, null);
+
+        // Adding gvNIX Menu styles with Bootstrap
+        installResourceIfNeeded("/styles/menu/dropdown-submenu.css",
+                "dropdown-submenu.css", null, null);
+
+        // Adding new css to load scripts
+        addStylesToLoadScriptBootstrap();
     }
 
     /** {@inheritDoc} */
@@ -807,6 +865,18 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         return menuConfigFile;
     }
 
+    /** {@inheritDoc} */
+    public String getMenuBootstrapConfigFile() {
+
+        // resolve path for gvnixsubcategory.tagx if it hasn't been resolved yet
+        if (menuBootstrapFile == null) {
+            menuBootstrapFile = getPathResolver().getIdentifier(
+                    LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                    "/WEB-INF/tags/menu/gvnixsubcategory.tagx");
+        }
+        return menuBootstrapFile;
+    }
+
     /**
      * Get and initialize the absolute path for the {@code menu.jspx}.
      * 
@@ -835,7 +905,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // Use PathResolver to resolve between {@link File}, {@link Path} and
         // canonical path {@link String}s.
         // See {@link MavenPathResolver} to know location values
-        PathResolver pathResolver = projectOperations.getPathResolver();
+        PathResolver pathResolver = getProjectOperations().getPathResolver();
 
         return pathResolver;
     }
@@ -867,24 +937,40 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         String javaPackage = getFullyQualifiedPackageName(classesPackage);
 
         // Put variable values in parameters Map
-        params.put("__TOP_LEVEL_PACKAGE__", projectOperations
-                .getTopLevelPackage(projectOperations.getFocusedModuleName())
-                .getFullyQualifiedPackageName());
+        params.put(
+                "__TOP_LEVEL_PACKAGE__",
+                getProjectOperations().getTopLevelPackage(
+                        getProjectOperations().getFocusedModuleName())
+                        .getFullyQualifiedPackageName());
         params.put("__MENU_MODEL_CLASS__", javaPackage.concat(".Menu"));
 
         // install tags
         installResourceIfNeeded("/WEB-INF/tags/menu/gvnixmenu.tagx",
                 "gvnixmenu.tagx", params, new String[] { "<menu:gvnixitem" });
 
-        if (isSpringSecurityInstalled()) {
-            installResourceIfNeeded("/WEB-INF/tags/menu/gvnixitem.tagx",
-                    "gvnixitem-sec.tagx", null,
-                    new String[] { "<menu:gvnixitem", " xmlns:spring=",
-                            " xmlns:sec=" });
+        // Check if bootstrap is installed
+        if (getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-bootstrap")) {
+
+            if (!isGvNixMenuBootstrapAvailable()) {
+                // Installing gvnixitem and gvnixitem-sec with Bootstrap
+                setupBootstrapMenu();
+            }
         }
         else {
-            installResourceIfNeeded("/WEB-INF/tags/menu/gvnixitem.tagx",
-                    "gvnixitem.tagx", null, new String[] { "<menu:gvnixitem" });
+
+            // Installing gvnixitem and gvnixitem-sec without Bootstrap
+            if (isSpringSecurityInstalled()) {
+                installResourceIfNeeded("/WEB-INF/tags/menu/gvnixitem.tagx",
+                        "gvnixitem-sec.tagx", null, new String[] {
+                                "<menu:gvnixitem", " xmlns:spring=",
+                                " xmlns:sec=" });
+            }
+            else {
+                installResourceIfNeeded("/WEB-INF/tags/menu/gvnixitem.tagx",
+                        "gvnixitem.tagx", null,
+                        new String[] { "<menu:gvnixitem" });
+            }
         }
 
         // change menu.jspx to use gvnix menu tag that will render menu.xml
@@ -922,8 +1008,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 // replace template variables
                 input = input.replace(
                         "__TOP_LEVEL_PACKAGE__",
-                        projectOperations.getTopLevelPackage(
-                                projectOperations.getFocusedModuleName())
+                        getProjectOperations().getTopLevelPackage(
+                                getProjectOperations().getFocusedModuleName())
                                 .getFullyQualifiedPackageName());
 
                 // Output the file for the user
@@ -1088,7 +1174,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // default package
         String packagePath = fullyQualifPackage.replace('.', '/');
 
-        return projectOperations.getPathResolver().getIdentifier(
+        return getProjectOperations().getPathResolver().getIdentifier(
                 LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                 packagePath.concat("/").concat(fileName));
     }
@@ -1112,8 +1198,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // resolve "~" as denoting the user's top-level package
         if (packageName.startsWith("~")) {
             String topLevelPath = "";
-            topLevelPath = projectOperations.getTopLevelPackage(
-                    projectOperations.getFocusedModuleName())
+            topLevelPath = getProjectOperations().getTopLevelPackage(
+                    getProjectOperations().getFocusedModuleName())
                     .getFullyQualifiedPackageName();
             // analyze char after ~, if it is . do nothing, else concat .
             // between
@@ -1390,8 +1476,9 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         List<Element> addonProperties = XmlUtils.findElements(
                 "/configuration/gvnix/menu/properties/*", configuration);
         for (Element property : addonProperties) {
-            projectOperations.addProperty(projectOperations
-                    .getFocusedModuleName(), new Property(property));
+            getProjectOperations().addProperty(
+                    getProjectOperations().getFocusedModuleName(),
+                    new Property(property));
         }
     }
 
@@ -1408,8 +1495,8 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         for (Element dependencyElement : securityDependencies) {
             dependencies.add(new Dependency(dependencyElement));
         }
-        projectOperations.addDependencies(
-                projectOperations.getFocusedModuleName(), dependencies);
+        getProjectOperations().addDependencies(
+                getProjectOperations().getFocusedModuleName(), dependencies);
     }
 
     /**
@@ -1458,4 +1545,76 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "/WEB-INF/layouts/layouts.xml");
     }
+
+    /**
+     * Method to add menu styles to load-scripts-bootstrap.tagx
+     */
+    private void addStylesToLoadScriptBootstrap() {
+
+        List<Pair<String, String>> cssList = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> jsList = new ArrayList<Pair<String, String>>();
+
+        // Add jquery.datatables.css url resolution
+        cssList.add(new ImmutablePair<String, String>("css_bootstrap_menu_url",
+                "/resources/styles/menu/dropdown-submenu.css"));
+
+        getWebProjectUtils().addJsAndCssToLoadScriptsTag(cssList, jsList,
+                getProjectOperations(), fileManager);
+
+    }
+
+    public ProjectOperations getProjectOperations() {
+        if (projectOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference[] references = this.context
+                        .getAllServiceReferences(
+                                ProjectOperations.class.getName(), null);
+
+                for (ServiceReference ref : references) {
+                    projectOperations = (ProjectOperations) this.context
+                            .getService(ref);
+                    return projectOperations;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load ProjectOperations on MenuEntryOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return projectOperations;
+        }
+    }
+
+    public WebProjectUtils getWebProjectUtils() {
+        if (webProjectUtils == null) {
+            // Get all Services implement WebProjectUtils interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                WebProjectUtils.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    webProjectUtils = (WebProjectUtils) this.context
+                            .getService(ref);
+                    return webProjectUtils;
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load WebProjectUtils on MenuEntryOperationsImpl.");
+                return null;
+            }
+        }
+        else {
+            return webProjectUtils;
+        }
+    }
+
 }
