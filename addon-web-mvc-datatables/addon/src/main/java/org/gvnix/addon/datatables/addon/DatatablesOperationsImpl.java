@@ -228,8 +228,9 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         final boolean isActiveRecord = MemberFindingUtils.getAnnotationOfType(
                 entity.getAnnotations(), JPA_ACTIVE_RECORD_ANNOTATION) != null;
 
-        Validate.isTrue(isActiveRecord,
-                "This command only supports JPA active record controller");
+        if (!isActiveRecord) {
+            LOGGER.warning("No JPA active record controller found, probably you'll need to customize 'entityManagerProvider' bean in 'webmvc-config.xml' to provide entity manager resolution.");
+        }
 
         // TODO support JPA repositories
 
@@ -520,11 +521,50 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
         // Update web.xml
         updateWebXmlFile();
 
+        // Install EntityManagerProvider
+        installEntityManagerProvider();
+
         // Installing bootstrap components if necessary
         if (getProjectOperations().isFeatureInstalledInFocusedModule(
                 "gvnix-bootstrap")) {
             updateDatatablesAddonToBootstrap();
         }
+    }
+
+    /**
+     * Add a bean in webmvc-config.xml with EMP implementation file
+     */
+    private void installEntityManagerProvider() {
+
+        // Load webmvc-config.xml
+        LogicalPath webappPath = getWebProjectUtils().getWebappPath(
+                getProjectOperations());
+        String webMvcXmlPath = getProjectOperations().getPathResolver()
+                .getIdentifier(webappPath, "WEB-INF/spring/webmvc-config.xml");
+        Validate.isTrue(fileManager.exists(webMvcXmlPath),
+                "webmvc-config.xml not found");
+
+        InputStream inputStream = fileManager.getInputStream(webMvcXmlPath);
+
+        Document docXml = XmlUtils.readXml(inputStream);
+
+        // Getting root element
+        Element document = docXml.getDocumentElement();
+
+        // If our bean doesn't exist then create it
+        Element beanElement = XmlUtils.findFirstElement(
+                "bean[@id='entityManagerProvider']", document);
+        if (beanElement == null) {
+            beanElement = docXml.createElement("bean");
+            beanElement.setAttribute("id", "entityManagerProvider");
+            beanElement.setAttribute("class",
+                    "org.gvnix.web.datatables.util.EntityManagerProviderImpl");
+            document.appendChild(beanElement);
+
+            XmlUtils.writeXml(fileManager.updateFile(webMvcXmlPath)
+                    .getOutputStream(), docXml);
+        }
+
     }
 
     /**

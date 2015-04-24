@@ -48,6 +48,7 @@ import org.springframework.roo.addon.finder.ReservedToken;
 import org.springframework.roo.addon.finder.ReservedTokenHolder;
 import org.springframework.roo.addon.finder.Token;
 import org.springframework.roo.addon.jpa.addon.activerecord.JpaActiveRecordMetadata;
+import org.springframework.roo.addon.plural.addon.PluralMetadata;
 import org.springframework.roo.addon.web.mvc.controller.addon.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.addon.details.FinderMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.addon.details.WebMetadataService;
@@ -58,6 +59,7 @@ import org.springframework.roo.addon.web.mvc.controller.addon.scaffold.WebScaffo
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
@@ -155,19 +157,6 @@ public final class DatatablesMetadataProvider extends
         LogicalPath entityPath = getPhysicalTypeUtils().getPath(entity,
                 getTypeLocationService());
 
-        String jpaMetadataId = JpaActiveRecordMetadata.createIdentifier(entity,
-                entityPath);
-        JpaActiveRecordMetadata jpaMetadata = (JpaActiveRecordMetadata) getMetadataService()
-                .get(jpaMetadataId);
-        if (jpaMetadata == null) {
-            // Unsupported type (by now)
-            return null;
-        }
-
-        // register dependency to JPA Active record
-        getMetadataDependencyRegistry().registerDependency(jpaMetadataId,
-                metadataIdentificationString);
-
         // Get batch service (if any)
         String webJpaBatchMetadataId = WebJpaBatchMetadata.createIdentifier(
                 javaType, path);
@@ -195,10 +184,18 @@ public final class DatatablesMetadataProvider extends
             return null;
         }
 
-        String plural = jpaMetadata.getPlural();
+        // Get Plural
+        final ClassOrInterfaceTypeDetails classDetails = getTypeLocationService()
+                .getTypeDetails(entity);
 
-        JavaSymbolName entityManagerMethodName = jpaMetadata
-                .getEntityManagerMethod().getMethodName();
+        final LogicalPath pathEntity = PhysicalTypeIdentifier
+                .getPath(classDetails.getDeclaredByMetadataId());
+        final String pluralId = PluralMetadata.createIdentifier(entity,
+                pathEntity);
+        final PluralMetadata pluralMetadata = (PluralMetadata) getMetadataService()
+                .get(pluralId);
+
+        String plural = pluralMetadata.getPlural();
 
         // check if has metadata types
         final MemberDetails entityMemberDetails = getMemberDetails(entity);
@@ -221,15 +218,14 @@ public final class DatatablesMetadataProvider extends
 
             // Locate finders details
             findersRegistered = getFindersRegisterd(entity, path,
-                    entityMemberDetails, plural, jpaMetadata.getEntityName());
+                    entityMemberDetails, plural, entity.getSimpleTypeName());
 
         }
 
         return new DatatablesMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, entity,
-                entityMemberDetails, identifiers, plural,
-                entityManagerMethodName, datePatterns, webScaffoldAspectName,
-                webJpaBatchMetadata, jpaQueryMetadata,
+                entityMemberDetails, identifiers, plural, datePatterns,
+                webScaffoldAspectName, webJpaBatchMetadata, jpaQueryMetadata,
                 webScaffoldAnnotationValues, findersRegistered,
                 getWebMetadataService(), getProjectOperations());
     }

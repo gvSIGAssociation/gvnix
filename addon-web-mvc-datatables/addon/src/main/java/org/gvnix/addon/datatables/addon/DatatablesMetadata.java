@@ -164,6 +164,7 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 public class DatatablesMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
+    private static final String DATATABLES_MANAGER_PROVIDER = "org.gvnix.web.datatables.util.EntityManagerProvider";
     private static final String ENDING = "\");";
     private static final String ELSE = "} else {";
     private static final String JSON_APPEND = "json.append(\",\");";
@@ -199,6 +200,9 @@ public class DatatablesMetadata extends
 
     private static final JavaSymbolName RETRIEVE_DATA_METHOD_NAME = new JavaSymbolName(
             "retrieveData");
+
+    private static final JavaSymbolName DATATABLES_MANAGER_PROVIDER_NAME = new JavaSymbolName(
+            "entityManagerProvider");
 
     private static final Logger LOGGER = HandlerUtils
             .getLogger(DatatablesMetadata.class);
@@ -269,11 +273,6 @@ public class DatatablesMetadata extends
      * If related entity has date properties
      */
     private final Map<JavaSymbolName, DateTimeFormatDetails> entityDatePatterns;
-
-    /**
-     * Method name to get entity manager from entity class
-     */
-    private final JavaSymbolName entityEntityManagerMethod;
 
     /**
      * Batch services metadata
@@ -350,7 +349,6 @@ public class DatatablesMetadata extends
             DatatablesAnnotationValues annotationValues, JavaType entity,
             MemberDetails entityMemberDetails,
             List<FieldMetadata> identifierProperties, String entityPlural,
-            JavaSymbolName entityManagerMethodName,
             Map<JavaSymbolName, DateTimeFormatDetails> datePatterns,
             JavaType webScaffoldAspectName,
             WebJpaBatchMetadata webJpaBatchMetadata,
@@ -376,7 +374,6 @@ public class DatatablesMetadata extends
         this.entityMemberDetails = entityMemberDetails;
         this.entityName = entity.getSimpleTypeName();
         this.entityPlural = entityPlural;
-        this.entityEntityManagerMethod = entityManagerMethodName;
         this.entityDatePatterns = datePatterns;
         this.webJpaBatchMetadata = webJpaBatchMetadata;
         this.jpaQueryMetadata = jpaQueryMetadata;
@@ -426,6 +423,7 @@ public class DatatablesMetadata extends
         builder.addField(getConversionServiceField());
         builder.addField(getMessageSourceField());
         builder.addField(getBeanWrapperField());
+        builder.addField(getEntityManagerProvider());
 
         // Adding methods
         builder.addMethod(getListDatatablesRequestMethod());
@@ -508,6 +506,20 @@ public class DatatablesMetadata extends
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
+    }
+
+    private FieldMetadata getEntityManagerProvider() {
+        JavaType backingType = new JavaType(DATATABLES_MANAGER_PROVIDER);
+
+        // AutoWired
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(new AnnotationMetadataBuilder(AUTOWIRED));
+
+        final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                getId(), Modifier.PRIVATE, annotations,
+                DATATABLES_MANAGER_PROVIDER_NAME, backingType);
+
+        return fieldBuilder.build();
     }
 
     /**
@@ -656,11 +668,13 @@ public class DatatablesMetadata extends
         // // Create a query with filter
         bodyBuilder.appendFormalLine("// Create a query with filter");
 
-        // JPAQuery query = new JPAQuery(Vet.entityManager());
+        // JPAQuery query = new
+        // JPAQuery(entityManagerProvider.getEntityManager(Vet.class));
         bodyBuilder.appendFormalLine(String.format(
-                "%s query = new %s(%s.entityManager());",
+                "%s query = new %s(%s.getEntityManager(%s.class));",
                 helper.getFinalTypeName(QDSL_JPA_QUERY),
                 helper.getFinalTypeName(QDSL_JPA_QUERY),
+                DATATABLES_MANAGER_PROVIDER_NAME,
                 helper.getFinalTypeName(entity)));
 
         // query = query.from(entity);
@@ -1328,10 +1342,13 @@ public class DatatablesMetadata extends
         // // Create a query with filter
         bodyBuilder.appendFormalLine("// Create a query with filter");
         // JPAQuery query = new JPAQuery(Visit.entityManager());
+        // JPAQuery query = new
+        // JPAQuery(entityManagerProvider.getEntityManager(Vet.class));
         bodyBuilder.appendFormalLine(String.format(
-                "%s query = new %s(%s.entityManager());",
+                "%s query = new %s(%s.getEntityManager(%s.class));",
                 helper.getFinalTypeName(QDSL_JPA_QUERY),
                 helper.getFinalTypeName(QDSL_JPA_QUERY),
+                DATATABLES_MANAGER_PROVIDER_NAME,
                 helper.getFinalTypeName(entity)));
         // query = query.from(entity);
         bodyBuilder.appendFormalLine("query = query.from(entity);");
@@ -4350,13 +4367,12 @@ public class DatatablesMetadata extends
             if (baseSearch) {
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s searchResult = %s.findByCriteria(entity, %s.%s(), %s, baseSearch);",
+                                .format("%s searchResult = %s.findByCriteria(entity, %s.getEntityManager(%s.class), %s, baseSearch);",
                                         helper.getFinalTypeName(searchResult),
                                         helper.getFinalTypeName(DATATABLES_UTILS),
-                                        entityTypeName,
-                                        entityEntityManagerMethod
-                                                .getSymbolName(),
-                                        CRITERIA_PARAM_NAME.getSymbolName()));
+                                        DATATABLES_MANAGER_PROVIDER_NAME,
+                                        entityTypeName, CRITERIA_PARAM_NAME
+                                                .getSymbolName()));
 
             }
             else {
@@ -4377,14 +4393,14 @@ public class DatatablesMetadata extends
 
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.%s(), %s, baseSearchValuesMap, conversionService_dtt, messageSource_dtt);",
+                                .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.getEntityManager(%s.class), %s, baseSearchValuesMap, conversionService_dtt, messageSource_dtt);",
                                         helper.getFinalTypeName(searchResult),
                                         helper.getFinalTypeName(DATATABLES_UTILS),
                                         entityTypeName, filterByInfo,
-                                        orderByInfo, entityTypeName,
-                                        entityEntityManagerMethod
-                                                .getSymbolName(),
-                                        CRITERIA_PARAM_NAME.getSymbolName()));
+                                        orderByInfo,
+                                        DATATABLES_MANAGER_PROVIDER_NAME,
+                                        entityTypeName, CRITERIA_PARAM_NAME
+                                                .getSymbolName()));
             }
         }
         else {
@@ -4392,17 +4408,16 @@ public class DatatablesMetadata extends
             // SearchResults<Pet> searchResult =
             // DatatablesUtils.findByCriteria(Pet.class,
             // Pet.getFilterByAssociations(), Pet.getOrderByAssociations(),
-            // Pet.entityManager(), criterias);
+            // entityManagerProvider.getEntityManager(Pet.class), criterias);
             if (baseSearch) {
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s searchResult = %s.findByCriteria(entity, %s.%s(), %s, baseSearch);",
+                                .format("%s searchResult = %s.findByCriteria(entity, %s.getEntityManager(%s.class), %s, baseSearch);",
                                         helper.getFinalTypeName(searchResult),
                                         helper.getFinalTypeName(DATATABLES_UTILS),
-                                        entityTypeName,
-                                        entityEntityManagerMethod
-                                                .getSymbolName(),
-                                        CRITERIA_PARAM_NAME.getSymbolName()));
+                                        DATATABLES_MANAGER_PROVIDER_NAME,
+                                        entityTypeName, CRITERIA_PARAM_NAME
+                                                .getSymbolName()));
             }
             else {
 
@@ -4421,13 +4436,13 @@ public class DatatablesMetadata extends
 
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s searchResult = %s.findByCriteria(%s.class, %s.%s(), %s, baseSearchValuesMap, conversionService_dtt, messageSource_dtt);",
+                                .format("%s searchResult = %s.findByCriteria(%s.class, %s.getEntityManager(%s.class), %s, baseSearchValuesMap, conversionService_dtt, messageSource_dtt);",
                                         helper.getFinalTypeName(searchResult),
                                         helper.getFinalTypeName(DATATABLES_UTILS),
-                                        entityTypeName, entityTypeName,
-                                        entityEntityManagerMethod
-                                                .getSymbolName(),
-                                        CRITERIA_PARAM_NAME.getSymbolName()));
+                                        entityTypeName,
+                                        DATATABLES_MANAGER_PROVIDER_NAME,
+                                        entityTypeName, CRITERIA_PARAM_NAME
+                                                .getSymbolName()));
             }
 
         }
@@ -5040,17 +5055,17 @@ public class DatatablesMetadata extends
 
         /*
          * SearchResults<Visit> searchResult = DatatablesUtils.findByCriteria(
-         * Visit.class, Visit.entityManager(), noPaginationCriteria,
+         * Visit.class, entityManagerProvider.getEntityManager(Visit.class), noPaginationCriteria,
          * baseSearchValuesMap); org.springframework.ui.Model uiModel = new
          * org.springframework.ui.ExtendedModelMap();
          */
-        format = "%s searchResult = %s.findByCriteria(%s.class, %s.entityManager(), noPaginationCriteria, baseSearchValuesMap);";
+        format = "%s searchResult = %s.findByCriteria(%s.class, %s.getEntityManager(%s.class), noPaginationCriteria, baseSearchValuesMap);";
         String entityTypeName = helper.getFinalTypeName(entity);
         bodyBuilder.appendFormalLine(String.format(format, new JavaType(
                 SEARCH_RESULTS.getFullyQualifiedTypeName(), 0, DataType.TYPE,
                 null, Arrays.asList(entity)), helper
                 .getFinalTypeName(DATATABLES_UTILS), entityTypeName,
-                entityTypeName));
+                DATATABLES_MANAGER_PROVIDER_NAME, entityTypeName));
 
         String dateFormatVarName = getCodeToAddDateTimeFormatPatterns(bodyBuilder);
 
