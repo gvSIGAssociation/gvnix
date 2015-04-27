@@ -17,7 +17,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses />.
 
-this_file=`readlink -f $0`
+PRG="$0"
+
+cd `dirname "$PRG"`
+TARGET_FILE=`basename $PRG`
+
+while [ -L "$TARGET_FILE" ]
+do
+    TARGET_FILE=`readlink $TARGET_FILE`
+    cd `dirname $TARGET_FILE`
+    TARGET_FILE=`basename $TARGET_FILE`
+done
+
+PHYS_DIR=`pwd -P`
+this_file=$PHYS_DIR/$TARGET_FILE
 this_dir=`dirname $this_file`
 
 echo ""
