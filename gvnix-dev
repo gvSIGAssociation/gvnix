@@ -17,20 +17,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses />.
 
-PRG="$0"
 
-cd `dirname "$PRG"`
-TARGET_FILE=`basename $PRG`
 
-while [ -L "$TARGET_FILE" ]
-do
-    TARGET_FILE=`readlink $TARGET_FILE`
-    cd `dirname $TARGET_FILE`
-    TARGET_FILE=`basename $TARGET_FILE`
-done
+# Uncomment the following commented lines to execute this script on Mac OSx
+#
+#PRG="$0"
+#
+#cd `dirname "$PRG"`
+#TARGET_FILE=`basename $PRG`
 
-PHYS_DIR=`pwd -P`
-this_file=$PHYS_DIR/$TARGET_FILE
+#while [ -L "$TARGET_FILE" ]
+#do
+#    TARGET_FILE=`readlink $TARGET_FILE`
+#    cd `dirname $TARGET_FILE`
+#    TARGET_FILE=`basename $TARGET_FILE`
+#done
+#
+#PHYS_DIR=`pwd -P`
+#this_file=$PHYS_DIR/$TARGET_FILE
+
+this_file=`readlink -f $0`
 this_dir=`dirname $this_file`
 
 echo ""
