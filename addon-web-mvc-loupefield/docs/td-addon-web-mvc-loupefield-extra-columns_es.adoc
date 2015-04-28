@@ -9,6 +9,7 @@
 // ===================
 //
 // HTML5:
+//
 //   $ asciidoc -b html5 td-addon-web-mvc-loupefield-extra-columns_es.adoc
 //
 // HTML5 Asciidoctor:
@@ -17,32 +18,35 @@
 //
 // PDF Asciidoctor:
 //   $ asciidoctor-pdf td-addon-web-mvc-loupefield-extra-columns_es.adoc
-//
-= {title}
-:title:			gvNIX 1.3.1 - N:1 Columnas adicionales
-:author: 		DISID Corporation S.L. - Pivotal Software, Inc
-:authorsite: 		www.disid.com
-:copyright: 		CC BY-NC-SA 3.0
-:doctype: 		article
+
+
+= gvNIX 1.3.1 - N:1 Columnas adicionales
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: article
+:keywords: gvNIX, Documentation
 :toc:
-:toc-placement:		left
-:toc-title:		Índice
-:toclevels: 		4
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
 :numbered:
-:sectnumlevels:		4
+:sectnumlevels: 4
+:source-highlighter:  pygments
 ifdef::backend-pdf[]
-:pdf-style:		asciidoctor
+:pdf-style: asciidoctor
 :pagenums:
-//:pygments-style: 	bw
-//:source-highlighter: 	pygments
+:pygments-style:  bw
 endif::[]
+
 
 [[descripcion-doc]]
 == Descripción del documento
 
 Documento de análisis y diseño técnico de una nueva funcionalidad de gvNIX que permita al desarrollador, utilizando el componente lupa en atributos de relaciones N:1, obtener varias columnas del elemento relacionado y así poder autocompletar otros componente del formulario con los valores de las mismas.
 
-[[diseño]]
+[[diseno]]
 == Diseño técnico
 
 Esta nueva funcionalidad se implementará dentro del add-on *addon-web-mvc-loupefield* de gvNIX. En los siguientes apartados se desarrolla el diseño técnico de este add-on en lo que se refiere al sistema de obtención de columnas adicionales del componente lupa.
@@ -72,11 +76,11 @@ Esta implementación a medida se incluirá en el proyecto generado al ejecutar l
 
 * Se copiarán todos los recursos necesarios para el correcto funcionamiento del componente lupa, entre ellos el fichero *jquery.loupeField.ext.gvnix* y el fichero *loupe.tagx* que incluirán las funcionalidades para obtener las columnas adicionales e invocar la función javascript al seleccionar un registro.
 
-- *web mvc loupe field* 
+- *web mvc loupe field*
 
 * Especificando el parámetro opcional *--additionalFields* se añadirá la propiedad additionalFields al tag del componente lupa que se incluirá en la vista JSP obteniendo así columnas adicionales.
 
-[[diseño-tecnico]]
+[[diseno-tecnico]]
 === Diseño técnico
 
 [[requisitos]]
@@ -93,12 +97,12 @@ Además, también se añadirá la propiedad *onSet* al tag del componente lupa, 
 
 Un ejemplo de cómo quedaría especificado este tag en la vista JSP de creación sería el siguiente:
 
-[subs="verbatim,macros"]
+[source,jsp]
 ----
 <loupefield:loupe pass:quotes[*additionalFields="codigoPostal,provincia"*] controllerPath="ciudades" field="ciudad" id="c_com_springsource_petclinic_domain_Ciudad_ciudad" itemValue="id" items="${ciudadeses}" listPath="ciudades/list" pass:quotes[*onSet="onSetCiudad"*] path="/ciudades" pkField="id" z="user-managed"/>
 ----
 
-El componente lupa anterior, buscar las ciudades y devuelve la información del _id_, _codigoPostal_ y la provincia asociada a la ciudad seleccionada. Al seleccionar un registro, se invocará a la función _onSetCiudad_.  
+El componente lupa anterior, buscar las ciudades y devuelve la información del _id_, _codigoPostal_ y la provincia asociada a la ciudad seleccionada. Al seleccionar un registro, se invocará a la función _onSetCiudad_.
 
 [[fichero-javascript]]
 ==== Fichero Javascript: jquery.loupeField.ext.gvnix.js
@@ -108,15 +112,16 @@ Se actualizará la función encargada de obtener los registros para que devuelva
 
 Se añadirá un evento *onClick* en la lista desplegable de los registros encontrados. Esta función onClick invocará a la función definida en el atributo *onSet* especificado en el tagx.
 
-[[actualizacion-elementos]] 
+[[actualizacion-elementos]]
 ==== Actualización de elementos del formulario
 
 Un ejemplo de la implementación de la función *onSet* que debe realizar el desarrollador para cambiar el valor de otro elemento del formulario sería el siguiente:
 
+[source,js]
 ----
 function onSetCiudad(id, instancia, data){
 	var codigoPostal = jQuery('#codigo_postal_input');
-	codigoPostal.val(data.ciudad.codigoPostal)    
+	codigoPostal.val(data.ciudad.codigoPostal)
 }
 ----
 
