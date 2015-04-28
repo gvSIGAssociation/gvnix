@@ -1,7 +1,45 @@
-gvNIX Uncaught Exception Handler Add-on
-=======================================
-:author: [ … ]
-:date: $Date$
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 ug-addon-web-exception-handler.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 ug-addon-web-exception-handler.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf ug-addon-web-exception-handler.adoc
+
+
+= gvNIX Uncaught Exception Handler Add-on
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: article
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit
@@ -22,27 +60,22 @@ Features
 
 This are features contained:
 
-_________________________________________________________________________
 * Creates an Exception to handle and the depending view of the
 exception.
 * Removes a selected Exception from the application.
 * Lists all the handled Exception of the application.
 * Adds a new translation in a determinate language for an Exception.
-_________________________________________________________________________
 
 [[how-to-install]]
 How to install
 --------------
 
-1.  Download and setup
-http://www.springsource.com/download/community?project=Spring%20Roo[Spring
-Roo] .
+1.  Download and setup http://spring.io/projects/spring-roo[Spring Roo].
 2.  Change to cxf addon directory
 3.  Run the Roo console
 4.  Execute the command `perform assembly` to build the addon
 5.  Execute the command
-`addon install --url file:{absolute_path_to_zip_generated_from_assembly}`
-to install the addon
+`addon install --url file:{absolute_path_to_zip_generated_from_assembly}`to install the addon
 
 That’s all.
 
