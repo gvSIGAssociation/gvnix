@@ -1,12 +1,58 @@
-This is a Spring Roo Addon which helps developer quick setup Typical
-Security setup for their Spring Roo Project. This Addon will help
-developer 1. Get User, Role and UserRole entities for Security 2. Change
-Authentication Provider to a Database Authentication Provider 3. Add
-Change Password Controller 4. Add Forgot Password Controller 5. Add User
-Registration Controller which uses recaptcha and also sends Activation
-email 6. Add User Activation Controller which activates a User Account
-7. Add User Profile Controller 8. Add Entities to track User activities
-and Lock User functionality 9. Add facility to allow user to login using
-gmail, yahoo, facebook, twitter logins. Also allow login using OpenId
-10. Allow OAuth, Basic and Token based authentication using the User
-name and password for third party Authentication
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 readme.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 readme.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf readme.adoc
+
+
+= Addon Typical Security
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: article
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
+This is a Spring Roo Addon which helps developer quick setup Typical Security
+setup for their Spring Roo Project.
+
+This Addon will help developer
+
+. Get User, Role and UserRole entities for Security
+. Change Authentication Provider to a Database Authentication Provider
+. Add Change Password Controller
+. Add Forgot Password Controller
+. Add User Registration Controller which uses recaptcha and also sends Activation email
+. Add User Activation Controller which activates a User Account
+. Add User Profile Controller
+. Add Entities to track User activities and Lock User functionality
+. Add facility to allow user to login using gmail, yahoo, facebook, twitter logins. Also allow login using OpenId
+. Allow OAuth, Basic and Token based authentication using the User name and password for third party Authentication
+

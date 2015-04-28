@@ -1,7 +1,45 @@
-gvNIX Web report add-on
-=======================
-:author: DISID Corporation, S.L.
-:date: $Date$
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 ug-addon-web-report.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 ug-addon-web-report.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf ug-addon-web-report.adoc
+
+
+= gvNIX Web report add-on
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: article
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit
@@ -32,15 +70,17 @@ Options:
 
 * To install gvNIX 0.6.0 that contains the add-on installed.
 * OR, to install in Spring Roo 1.1.2
+
 ** Trust on PGP KEY ID used to sign the add-on. Note that gvNIX project
-members have their PGP KEYs IDs published at
-https://code.google.com/p/gvnix/people/list:
+members have their PGP KEYs IDs published at https://code.google.com/p/gvnix/people/list
 +
 ----------------------------
 pgp trust --keyId 0xC5FC814B
 ----------------------------
+
 ** Run the command below:
 +
+[source,sh]
 ------------------------------------------------------------------------
 addon install bundle --bundleSymbolicName org.gvnix.web.report.roo.addon
 ------------------------------------------------------------------------
@@ -51,6 +91,7 @@ Use case: Reports support in Pet clinic
 
 Create a new directory for the project:
 
+[source,sh]
 --------------
 Bash shell:
 
@@ -60,11 +101,12 @@ Bash shell:
 
 Start gvNIX:
 
+[source,sh]
 ------------------------------------------------------------------------------
 clinic$ gvnix.sh
-    ____  ____  ____  
-   / __ \/ __ \/ __ \ 
-  / /_/ / / / / / / / 
+    ____  ____  ____
+   / __ \/ __ \/ __ \
+  / /_/ / / / / / / /
  / _, _/ /_/ / /_/ /   1.1.2.RELEASE [rev fbc33bb]
 /_/ |_|\____/\____/   gvNIX distribution 0.6.0
 
@@ -75,17 +117,19 @@ roo>
 
 Create the project:
 
+[source,sh]
 ----------------------
 roo> script clinic.roo
 ----------------------
 
 Add a new report:
 
+[source,sh]
 --------------------------------------------------------------------------------------------
 roo> web report add --controller ~.web.PetController --reportName PetReport --format pdf,xls
 --------------------------------------------------------------------------------------------
 
-Run mvn tomcat:run in the root of your project and the report should be
+Run `mvn tomcat:run` in the root of your project and the report should be
 available under the URL
 http://localhost:8080/petclinic/pets/reports/petreport?form
 
@@ -95,8 +139,7 @@ About the command
 
 The command performs the following operations:
 
-* Adds the add-on and JasperReports dependencies to the project
-_pom.xml_
+* Adds the add-on and JasperReports dependencies to the project _pom.xml_
 * Adds JasperReporViewsResolver in _webmv-config.xml_
 * Installs _jasper-views.xml_ as config file for
 `CustomJasperReportsMultiFormatView.java`.
@@ -107,7 +150,7 @@ The command accepts the parameters below:
 
 * _controller_: Is an existing class in your project handling web
 requests. This controller must be annotated with
-* *@RooWebScaffold* and its attribute _formBackingObject_ must be
+* _@RooWebScaffold_ and its attribute _formBackingObject_ must be
 informed. The add-on takes this annotation and its attribute value for
 code generation. The value of _formBackingObject_ informs which is the
 Entity exposed by the controller. The parameter is mandatory and has not
@@ -131,7 +174,7 @@ of the generated output file. Its name is
 once, the following invocations checks it the Java file exists.
 
 Over this class a new bean is defined in *jasper-views.xml* file. This
-new bean will have _<formBackingObject_name>_<reportname>_ as id and the
+new bean will have _<formBackingObject_name><reportname>_ as id and the
 class will be our CustomJasperReportsMultiFormatView. The bean defines a
 JasperReport view resolver.
 
@@ -139,7 +182,7 @@ The command creates a sample report in JasperReport XML format (jrxml)
 using three fields of the entity informed by _formBackingObject_
 attribute in annotation @RooWebScaffold as detail of the report. The
 sample report is in the file
-_src/main/webapp/WEB-INF/reports/<formBackingObject_name>_<reportname>.jrxml_.
+_src/main/webapp/WEB-INF/reports/<formBackingObject_name><reportname>.jrxml_.
 As the report renders the title in bold, it needs to have available a
 bold TTF font. So, it installs some fonts under
 _src/main/webapp/WEB-INF/classes/jasperfonts/_.
@@ -167,6 +210,7 @@ Modifying source code
 
 Annotate the Controller with:
 
+[source,java]
 ------------------------------------------------------------------------
 @GvNIXReports({ "<reportName>|<formats>"[, "<reportName2>|<formats>"] })
 ------------------------------------------------------------------------
@@ -176,12 +220,14 @@ save file changes and let gvNIX/Roo do its magic.
 The value of the *@GvNIXReports* annotation is case insensitive, so,
 something like:
 
+[source,java]
 ---------------------------------------------------------------
 @GvNIXReports({ "myfirstreport|pdf", "myFirstREPORT|xls,csv" })
 ---------------------------------------------------------------
 
 is equivalent to:
 
+[source,java]
 ----------------------------------------------
 @GvNIXReports({ "myfirstreport|pdf,xls,csv" })
 ----------------------------------------------
