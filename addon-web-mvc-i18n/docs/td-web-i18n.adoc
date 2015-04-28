@@ -1,3 +1,46 @@
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 td-web-i18n.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 td-web-i18n.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf td-web-i18n.adoc
+
+
+= Addon web i18n
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: article
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
+
 [[proof-of-concept]]
 Proof of Concept
 ----------------
@@ -11,13 +54,13 @@ TODO
 En el ejemplo petclinic, con el tema de la CIT instalado, no me aparece
 la bandera del cambio de idioma a Valenciano, sin embargo sí que me
 funciona accediendo directamente a la URL
-``http://localhost:8080/petclinic/?lang=ca''.
+_http://localhost:8080/petclinic/?lang=ca_.
 
-___________________________________
+----
 * web mvc install language –code ca
 * theme install –id cit
 * theme set –id cit
-___________________________________
+----
 
 Se debe a que ejecuto la instalación del idioma antes de instalar y
 establecer el tema.
