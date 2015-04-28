@@ -1,7 +1,46 @@
-gvNIX - Spring Roo - Addon - Web MVC Menu
-=========================================
-:author: DISID Corporation, S.L.
-:date: $Date: 2011-04-19 11:03:43 +0200 (mar, 19 abr 2011) $
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 ug-addon-web-menu.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 ug-addon-web-menu.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf ug-addon-web-menu.adoc
+
+
+= gvNIX - Spring Roo - Addon - Web MVC Menu
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: article
+:keywords: gvNIX, Documentation
+//:date: $Date: 2011-04-19 11:03:43 +0200 (mar, 19 abr 2011) $
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit
@@ -22,6 +61,7 @@ Menu management in Pet clinic
 
 Create a new directory for the project:
 
+[source,sh]
 --------------
 Bash shell:
 
@@ -31,11 +71,12 @@ Bash shell:
 
 Start gvNIX:
 
+[source,sh]
 ------------------------------------------------------------------------------
 clinic$ gvnix.sh
-    ____  ____  ____  
-   / __ \/ __ \/ __ \ 
-  / /_/ / / / / / / / 
+    ____  ____  ____
+   / __ \/ __ \/ __ \
+  / /_/ / / / / / / /
  / _, _/ /_/ / /_/ /   1.1.2.RELEASE [rev fbc33bb]
 /_/ |_|\____/\____/   gvNIX distribution 0.6.0
 
@@ -46,6 +87,7 @@ roo>
 
 Create the project:
 
+[source,sh]
 ----------------------
 roo> script clinic.roo
 ----------------------
@@ -53,12 +95,14 @@ roo> script clinic.roo
 Setup menu management: install dependencies, create menu model and load
 initial menu data structure from _menu.jspx_:
 
+[source,sh]
 ---------------
 roo> menu setup
 ---------------
 
 Create a new menu category to contain all finders:
 
+[source,sh]
 --------------------------------------------------------------------------------
 roo> // Create a category to contain application finders
 roo> menu entry add --label Finders
@@ -76,7 +120,7 @@ roo> menu entry move --id fi_visit_descriptionlike --into c_finders
 roo> menu entry move --id fi_visit_visitdatebetween --into c_finders
 --------------------------------------------------------------------------------
 
-Run mvn tomcat:run in the root of your project and the new application
+Run `mvn tomcat:run` in the root of your project and the new application
 structure should be available under the URL
 _http://localhost:8080/petclinic/_
 
@@ -100,7 +144,7 @@ No parameters needed.
 This method add new menu entry related to one page.
 
 This command won’t add neither Controller nor JSPs for the new entry, if
-you need them use `controller class' instead.
+you need them use `controller class` instead.
 
 For application pages you can’t create two pages to the same destination
 with the same parameters (parameters values are ignored).
@@ -110,8 +154,8 @@ Parameters:
 * `--label`, text to show in menu if no messageCode set, otherwise label
 is used as message argument.
 * `--category`, add entry into this menu entry (category). Default add
-to `Page' category. Note you don’t need a command to manage categories,
-just change default category ID (`menu entry update') when you need, new
+to `Page` category. Note you don’t need a command to manage categories,
+just change default category ID (`menu entry update`) when you need, new
 default category will be created automatically.
 * `--messageCode`, the global message code to get I18N label text (works
 in conjunction with label). If empty, it will be generated using entry
@@ -184,10 +228,10 @@ Update menu entry info.
 
 Parameters:
 
-* `--id`, page id to update its menu entry. Use `menu tree' to get all
+* `--id`, page id to update its menu entry. Use `menu tree` to get all
 pages ids.
 * `--nid`, new ID for selected page. Use new ID to change page type: use
-`c_' prefix for category pages or `i_' prefix for item pages.
+`c_` prefix for category pages or `i_` prefix for item pages.
 * `--label`, the label text used for related menu item. Note that
 related labelCode will remain the same.
 * `--messageCode`, the global message code to get I18N label text (works
@@ -208,7 +252,7 @@ List current menu tree structure. Example: clinic.roo:
 [c_owner]
 URL          : No
 Hidden       : false
-Children     : 
+Children     :
     [i_owner_new]
     URL          : /owners?form
     Hidden       : false
@@ -251,10 +295,10 @@ If we use all this parameters the output will show something like this:
 URL          : No
 Label Code   : menu_category_owner_label
 Label        : Owner
-Message Code : 
-Message      : 
+Message Code :
+Message      :
 Hidden       : false
-Children     : 
+Children     :
     [i_owner_new]
     URL          : /owners?form
     Label Code   : menu_item_owner_new_label
@@ -280,25 +324,25 @@ Label Code   : menu_category_pet_label
 `menu entry info`
 ~~~~~~~~~~~~~~~~~
 
-Shows all information about a page. Example for Locale `es':
+Shows all information about a page. Example for Locale `es`:
 
 --------------------------------------------------------------------------
 [c_vet]
 URL          : No
 Label Code   : menu_category_vet_label
 Label        : Vet
-Message Code : 
-Message      : 
-Roles        : 
+Message Code :
+Message      :
+Roles        :
 Hidden       : false
-Children     : 
+Children     :
     [i_vet_new]
     URL          : /vets?form
     Label Code   : menu_item_vet_new_label
     Label        : Vet
     Message Code : global_menu_new
     Message      : Crear nuevo {0}
-    Roles        : 
+    Roles        :
     Hidden       : false
 
     [i_vet_list]
@@ -307,6 +351,6 @@ Children     :
     Label        : Vets
     Message Code : global_menu_list
     Message      : Listar {0}
-    Roles        : 
+    Roles        :
     Hidden       : false
 --------------------------------------------------------------------------

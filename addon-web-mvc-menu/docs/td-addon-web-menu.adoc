@@ -1,7 +1,46 @@
-gvNIX - Spring Roo - Addon - Web MVC Menu
-=========================================
-:author: DISID Corporation, S.L.
-:date: $Date: 2011-06-30 15:40:23 +0200 (jue, 30 jun 2011) $
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 td-addon-web-menu.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 td-addon-web-menu.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf td-addon-web-menu.adoc
+
+
+= gvNIX - Spring Roo - Addon - Web MVC Menu
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: article
+:keywords: gvNIX, Documentation
+//:date: $Date: 2011-06-30 15:40:23 +0200 (jue, 30 jun 2011) $
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
 
 This work is licensed under the Creative Commons Attribution-Share Alike
 3.0 Unported License. To view a copy of this license, visit
@@ -52,11 +91,9 @@ templates needed to generate them in `~.web.menu`
 
 Runtime model is composed by:
 
-* MenuLoader.java_: Loads application structure into Menu instance and
-put it in application _ServletContext_.
-* Menu.java_ : Represents the application structure and information.
-* MenuItem.java_ : Represents an application page or an application
-pages group/category.
+* `MenuLoader.java` : Loads application structure into Menu instance and put it in application *ServletContext*.
+* `Menu.java`       : Represents the application structure and information.
+* `MenuItem.java`   : Represents an application page or an application pages group/category.
 
 [[context-menu]]
 Context menu
@@ -86,7 +123,7 @@ as Spring beans `@Component` and `@Configurable`.
 Web artifacts
 ~~~~~~~~~~~~~
 
-* _gvnixmenu.tagx_ to render menu from Application structure model_.
+* _gvnixmenu.tagx_ to render menu from `Application structure model`.
 This tag renders the menu iterating all menu entries and taking in
 account the context menu strategy.
 * _gvnixitem.tagx_ renders a menu entry. Checks if Spring Security is
@@ -116,12 +153,8 @@ Spring Security integration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Automatic sync with _applicationContext-security.xml_:
-
-_______________________________________________________________________
-* If Spring Security is set, load default roles settings to *menu.xml".
-* If Spring Security is updated, update roles in *menu.xml"
-_______________________________________________________________________
-
+** If Spring Security is set, load default roles settings to _menu.xml_.
+** If Spring Security is updated, update roles in _menu.xml_
 * Detection of _Controller_ and _Controller Method_ Spring Security
 configuration and set menu entries visibility based on that info.
 
@@ -149,20 +182,15 @@ Proof of Concept
 * http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-menu
 * https://svn.disid.com/svn/disid/proof/gvnix/page-menu-app
 * https://svn.disid.com/svn/disid/proof/gvnix/web-menu
-*
-https://svn.disid.com/svn/disid/proof/spring_roo/struts-menu-integration
+* https://svn.disid.com/svn/disid/proof/spring_roo/struts-menu-integration
 * https://svn.disid.com/svn/disid/proof/spring_roo/gvnix_web_menu
 
 [[todo]]
 TODO
 ----
 
-* Check to disable menu Roo service
-(http://projects.disid.com/issues/3919):
-
-______________________________________________________
-* http://jira.springframework.org/browse/ROO-918
-* http://jira.springframework.org/browse/ROO-904
-* http://forum.springsource.org/showthread.php?t=89522
-* http://jira.springframework.org/browse/ROO-950
-______________________________________________________
+* Check to disable menu Roo service http://projects.disid.com/issues/3919
+** http://jira.springframework.org/browse/ROO-918
+** http://jira.springframework.org/browse/ROO-904
+** http://forum.springsource.org/showthread.php?t=89522
+** http://jira.springframework.org/browse/ROO-950
