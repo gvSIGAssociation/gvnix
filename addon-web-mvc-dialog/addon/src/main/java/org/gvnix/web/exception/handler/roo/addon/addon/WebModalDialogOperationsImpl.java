@@ -77,6 +77,7 @@ import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.osgi.OSGiUtils;
@@ -330,6 +331,14 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         for (Element depen : depens) {
             projectOperations.addDependency(projectOperations
                     .getFocusedModuleName(), new Dependency(depen));
+        }
+
+        // Install properties
+        List<Element> properties = XmlUtils.findElements(
+                "/configuration/gvnix/properties/*", configuration);
+        for (Element property : properties) {
+            projectOperations.addProperty(projectOperations
+                    .getFocusedModuleName(), new Property(property));
         }
     }
 
@@ -765,7 +774,14 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
         // Check if dialog:message-box is of type modal
         String dialogNS = lsHtml.getAttribute("xmlns:dialog");
-        if (dialogNS.equals("urn:jsptagdir:/WEB-INF/tags/dialog/modal")) {
+        String defaultUrn = "urn:jsptagdir:/WEB-INF/tags/dialog/modal";
+
+        // Check if Bootstrap is installed
+        if (projectOperations.isFeatureInstalled("gvnix-bootstrap")) {
+            defaultUrn = "urn:jsptagdir:/WEB-INF/tags/bootstrap/dialog/modal";
+        }
+
+        if (dialogNS.equals(defaultUrn)) {
             return true;
         }
 

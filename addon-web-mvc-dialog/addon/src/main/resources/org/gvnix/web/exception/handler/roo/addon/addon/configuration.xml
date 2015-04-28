@@ -10,6 +10,9 @@
             <scope>provided</scope>
           </dependency>
       </dependencies>
+      <properties>
+			<gvnix.version>2.0.0.BUILD-SNAPSHOT</gvnix.version>
+		</properties>
   </gvnix>
   <dependencies>
     <dependency>
