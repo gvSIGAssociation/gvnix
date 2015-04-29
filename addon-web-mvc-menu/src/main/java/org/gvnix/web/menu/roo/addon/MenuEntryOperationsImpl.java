@@ -347,9 +347,23 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // name
         String categoryName = menuCategoryName.getSymbolName();
         StringBuilder categoryId = new StringBuilder();
+        Element category = null;
 
+        // check for existence of menu category by looking for the
+        // identifier
+        // provided
+
+        // build category name and Id:
+        // - menuCategoryName is a name if it doesn't start with c_: create
+        // the
+        // id
+        // - menuCategoryName is an identifier if it starts with c_: create
+        // the name
+        // don't create any categoryId if there is already an id prefix
         if (!categoryName
-                .startsWith(MenuEntryOperations.CATEGORY_MENU_ITEM_PREFIX)) {
+                .startsWith(MenuEntryOperations.CATEGORY_MENU_ITEM_PREFIX)
+                && !categoryName.startsWith(idPrefix)) {
+
             // create categoryId using the category name
             categoryId.append(MenuEntryOperations.CATEGORY_MENU_ITEM_PREFIX)
                     .append(categoryName.toLowerCase());
@@ -360,13 +374,12 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             categoryName = StringUtils.capitalize(categoryName.substring(2));
         }
 
-        // check for existence of menu category by looking for the identifier
-        // provided
-        Element category = XmlUtils.findFirstElement(
+        List<Element> givenCategory = XmlUtils.findElements(
                 ID_EXP.concat(categoryId.toString()).concat("']"), rootElement);
 
-        // if not exists, create new one
-        if (category == null) {
+        // if given category not exists, create new one
+        if (givenCategory.isEmpty()) {
+
             String categoryLabelCode = "menu_category_".concat(
                     categoryName.toLowerCase()).concat("_label");
 
@@ -378,6 +391,9 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
             properties.put(categoryLabelCode,
                     menuCategoryName.getReadableSymbolName());
+        }
+        else {
+            category = givenCategory.get(0);
         }
 
         // build menu item Id:
@@ -391,6 +407,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             itemId.delete(0, idPrefix.length());
         }
         else {
+            itemId.append(idPrefix);
             itemId.append(categoryName.toLowerCase()).append("_")
                     .append(menuItemId.getSymbolName().toLowerCase());
         }
@@ -402,15 +419,15 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // at application.properties, so we have to add idPrefix_ to look for
         // the given menu item but we have to add without idPrefix_ to
         // application.properties
-        Element menuItem = XmlUtils.findFirstElement(ID_EXP.concat(idPrefix)
-                .concat(itemId.toString()).concat("']"), rootElement);
+        List<Element> menuList = XmlUtils.findElements(
+                ID_EXP.concat(itemId.toString()).concat("']"), rootElement);
 
         String itemLabelCode = "menu_item_".concat(itemId.toString()).concat(
                 "_label");
 
-        if (menuItem == null) {
-            menuItem = new XmlElementBuilder(MENU_ITEM, document)
-                    .addAttribute("id", idPrefix.concat(itemId.toString()))
+        if (menuList.isEmpty()) {
+            Element menuItem = new XmlElementBuilder(MENU_ITEM, document)
+                    .addAttribute("id", itemId.toString())
                     .addAttribute(LABEL_CODE, itemLabelCode)
                     .addAttribute(
                             MESSAGE_CODE,
