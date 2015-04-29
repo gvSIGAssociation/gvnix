@@ -407,7 +407,6 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             itemId.delete(0, idPrefix.length());
         }
         else {
-            itemId.append(idPrefix);
             itemId.append(categoryName.toLowerCase()).append("_")
                     .append(menuItemId.getSymbolName().toLowerCase());
         }
@@ -419,15 +418,15 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // at application.properties, so we have to add idPrefix_ to look for
         // the given menu item but we have to add without idPrefix_ to
         // application.properties
-        List<Element> menuList = XmlUtils.findElements(
-                ID_EXP.concat(itemId.toString()).concat("']"), rootElement);
+        List<Element> menuList = XmlUtils.findElements(ID_EXP.concat(idPrefix)
+                .concat(itemId.toString()).concat("']"), rootElement);
 
         String itemLabelCode = "menu_item_".concat(itemId.toString()).concat(
                 "_label");
 
         if (menuList.isEmpty()) {
             Element menuItem = new XmlElementBuilder(MENU_ITEM, document)
-                    .addAttribute("id", itemId.toString())
+                    .addAttribute("id", idPrefix.concat(itemId.toString()))
                     .addAttribute(LABEL_CODE, itemLabelCode)
                     .addAttribute(
                             MESSAGE_CODE,
