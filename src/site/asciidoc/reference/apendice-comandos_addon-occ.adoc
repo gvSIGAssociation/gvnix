@@ -1,6 +1,10 @@
 Comandos del add-on OCC
 -----------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Para una descripción detallada de las características del add-on
 consultar la documentación del link:#addon-persistence[add-on OCC
 (Optimistic Concurrency Control)].
@@ -82,3 +86,6 @@ Sus parámetros son:
   http://docs.oracle.com/javase/1.5.0/docs/api/java/security/MessageDigest.html[MessageDigest.getInstance(String
   algorithm)]. Por defecto, se utilizará el algoritmo _md5_, pero pueden
   utilizarse otros como por ejemplo _sha_.
+
+  //Return level title
+  :leveloffset: 0

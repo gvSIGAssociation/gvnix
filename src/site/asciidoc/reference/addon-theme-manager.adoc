@@ -1,6 +1,10 @@
 Add-on Theme Manager
 --------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Add-on para la gestión de distintos temas visuales.
 
 Descripción
@@ -80,3 +84,6 @@ Exportación de temas::
   la aplicación.
 Descarga de temas::
   Soporte de descarga de temas desde servidores.
+
+  //Return level title
+  :leveloffset: 0

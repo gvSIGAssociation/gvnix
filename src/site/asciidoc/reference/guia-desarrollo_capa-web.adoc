@@ -1,6 +1,10 @@
 Gestión de la capa web
 ----------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 La capa web de la aplicación contiene la infraestructura necesaria para
 gestionar las peticiones HTTP y visualizar cierta información al usuario
 como respuesta. Actualmente esta capa puede desarrollarse con
@@ -110,8 +114,8 @@ Los parámetros para este comando son:
 Un ejemplo:
 
 -----------
-roo-gvNIX> 
-roo-gvNIX> 
+roo-gvNIX>
+roo-gvNIX>
 -----------
 
 web mvc controller
@@ -133,8 +137,8 @@ Los parámetros para este comando son:
 Un ejemplo:
 
 -----------
-roo-gvNIX> 
-roo-gvNIX> 
+roo-gvNIX>
+roo-gvNIX>
 -----------
 
 Genera una clase como esta:
@@ -190,8 +194,8 @@ Continuando con el proyecto del tutorial, la capa web de la aplicación
 de venta de pizzas se creará con la siguiente secuencia de comandos:
 
 -------------------------------
-~.domain.PizzaOrder roo-gvNIX> 
-~.domain.PizzaOrder roo-gvNIX> 
+~.domain.PizzaOrder roo-gvNIX>
+~.domain.PizzaOrder roo-gvNIX>
 -------------------------------
 
 Crear la capa web con un IDE
@@ -367,18 +371,18 @@ _default.jspx_:
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-    
 
-    
+
+
     <title><spring:message code="welcome_h3" arguments="${app_name}" /></title>
   </head>
 
   <body class="tundra spring">
     <div id="wrapper">
-      
+
       <tiles:insertAttribute name="menu" ignore="true" />
       <div id="main">
-        
+
         <tiles:insertAttribute name="footer" ignore="true"/>
       </div>
     </div>
@@ -537,7 +541,7 @@ el proyecto PizzaShop de ejemplo, tomando la definición de la página
 jspx de listado de como la entidad PizzaOrder:
 
 ----------------------------------------------------------------------------
-<field:display 
+<field:display
         id="s_com_disid_roo_pizzashop_domain__pizzas" object="${pizzaorder}"
         z="WSxjsiiEWhA5vo8ecxRoox5EjKA="/>
 ----------------------------------------------------------------------------
@@ -573,3 +577,6 @@ Se pueden implementar algunas mejoras de rendimiento definidas en la
 sección
 link:#guia-desarrollo_mejoras-rendimiento-evitar-carga-listas-innecesarias[Evitar
 la carga de listas de valores innecesarias].
+
+//Return level title
+:leveloffset: 0

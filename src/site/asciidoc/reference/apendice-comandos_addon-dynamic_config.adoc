@@ -1,6 +1,10 @@
 Comandos del add-on Dynamic Configuration
 -----------------------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Para una descripción detallada de las características del add-on
 consultar la documentación del link:#addon-dynamic_config[add-on Dynamic
 Configuration].
@@ -130,3 +134,6 @@ comando, las configuraciones no serán aplicadas en el proyecto y por lo
 tanto no podrán ser utilizadas.
 
 Este comando no tiene ningún parámetro obligatorio ni opcional.
+
+//Return level title
+:leveloffset: 0

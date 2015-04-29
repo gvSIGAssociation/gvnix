@@ -1,6 +1,10 @@
 Add-on Web Report
 -----------------
 
+//Push down level title
+:leveloffset: 2
+
+
 El add-on añade soporte para la generación de informes con _Jasper
 Reports_ y genera informes totalmente funcionales para una entidad que
 posteriormente pueden ser personalizados. Los informes son accesibles
@@ -48,7 +52,7 @@ Estas operaciones de configuración las realiza el comando del add-on
 link:#apendice-comandos_addon-web-report_setup[web report setup]:
 
 -------------------------------------------------------------------------------------------
-    roo-gvNIX> 
+    roo-gvNIX>
     Updated SRC_MAIN_WEBAPP/WEB-INF/spring/webmvc-config.xml
     Created SRC_MAIN_WEBAPP/WEB-INF/spring/jasper-views.xml
     Created SRC_MAIN_WEBAPP/WEB-INF/classes/jasperfonts
@@ -57,7 +61,7 @@ link:#apendice-comandos_addon-web-report_setup[web report setup]:
     Created SRC_MAIN_WEBAPP/WEB-INF/classes/jasperfonts/FreeSansBoldOblique.ttf
     Created SRC_MAIN_WEBAPP/WEB-INF/classes/jasperfonts/FreeSansOblique.ttf
     Created SRC_MAIN_WEBAPP/WEB-INF/classes/jasperfonts/gvnix_reportfonts.xml
-    Updated ROOT/pom.xml [added dependency org.gvnix:org.gvnix.web.report.roo.addon:X.Y.Z; 
+    Updated ROOT/pom.xml [added dependency org.gvnix:org.gvnix.web.report.roo.addon:X.Y.Z;
             added property 'jasperreports.version' = '4.0.1';
             added property 'jasperreportsfonts.version' = '4.0.0';
             added property 'apachepoi.version' = '3.7';
@@ -65,7 +69,7 @@ link:#apendice-comandos_addon-web-report_setup[web report setup]:
             org.apache.poi:poi:${apachepoi.version},
             net.sf.jasperreports:jasperreports-fonts:${jasperreportsfonts.version}]
     Created SRC_MAIN_WEBAPP/WEB-INF/classes/jasperreports_extension.properties
-    
+
 -------------------------------------------------------------------------------------------
 
 El comando configura los siguientes archivos:
@@ -154,7 +158,7 @@ formatos de fichero en los que se puede generar el informe son:
 : Hyper Text Markup Language.
 
 --------------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
     Updated SRC_MAIN_JAVA/org/gvnix/test/web/EntityController.java
     Created SRC_MAIN_WEBAPP/WEB-INF/reports
     Created SRC_MAIN_WEBAPP/WEB-INF/reports/entity_informe.jrxml
@@ -202,7 +206,7 @@ _formBackingObject_ de _@RooWebScaffold_ tiene como valor _Entity_ y el
 nombre definido para el informe es _informe_:
 +
 ----------------------------------------------------------------------------------------
-<bean id="entity_informe" 
+<bean id="entity_informe"
 class="org.gvnix.test.web.servlet.view.jasperreports.CustomJasperReportsMultiFormatView"
 p:url="/WEB-INF/reports/entity_informe.jrxml"
 p:subReportUrls-ref="subReportUrls"
@@ -313,3 +317,6 @@ visualización de las relaciones que pueda tener la entidad sobre la que
 se declara el informe. En la sección de recetas se muestra una forma de
 mostrar las relaciones de una entidad en el informe mediante el
 link:#recetas-reports-subinforme[uso de subinformes].
+
+//Return level title
+:leveloffset: 0

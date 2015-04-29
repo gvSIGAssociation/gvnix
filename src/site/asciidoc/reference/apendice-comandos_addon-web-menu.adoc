@@ -1,6 +1,10 @@
 Comandos del add-on Web Menu
 ----------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Para una descripción detallada de las características del add-on
 consultar la documentación del link:#addon-web-menu[add-on Web Menu].
 
@@ -249,18 +253,18 @@ El comando mostrará un resultado similar al siguiente:
 URL          : No
 Label Code   : menu_category_person_label
 Label        : Person
-Message Code : 
-Message      : 
-Roles        : 
+Message Code :
+Message      :
+Roles        :
 Hidden       : false
-Children     : 
+Children     :
                [i_person_new]
                URL          : /people?form
                Label Code   : menu_item_person_new_label
                Label        : Person
                Message Code : global_menu_new
                Message      : Create new {0}
-               Roles        : 
+               Roles        :
                Hidden       : false
 
                [i_person_list]
@@ -269,7 +273,7 @@ Children     :
                Label        : People
                Message Code : global_menu_list
                Message      : List all {0}
-               Roles        : 
+               Roles        :
                Hidden       : false
 ---------------------------------------------------------------------------------------
 
@@ -291,7 +295,7 @@ Sus parámetros son:
 El comando mostrará un resultado similar al siguiente:
 
 ----------------------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 [c_pet, visible, no-URL]
           /pets?form  [i_pet_new, visible]
           /pets?page=1&size=${empty param.size ? 10 : param.size}  [i_pet_list, visible]
@@ -322,3 +326,6 @@ roo-gvNIX>
 [c_seleniumtests, visible, no-URL]
           /resources/selenium/test-suite.xhtml  [si_seleniumtests_test, visible]
 ----------------------------------------------------------------------------------------
+
+//Return level title
+:leveloffset: 0

@@ -1,6 +1,10 @@
 Comandos del add-on WEB MVC Lupa
 --------------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Para una descripción detallada de las características del add-on
 consultar la documentación dellink:#addon-web-mvc-loupe[add-on Lupa].
 
@@ -100,3 +104,6 @@ web mvc loupe update
 
 Este comando mantiene actualizados todos los componentes que se importan
 al proyecto gvNIX al realizar la instalación del add-on.
+
+//Return level title
+:leveloffset: 0

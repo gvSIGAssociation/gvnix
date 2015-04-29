@@ -1,6 +1,9 @@
 Crear una nueva aplicación
 --------------------------
 
+//Push down level title
+:leveloffset: 2
+
 El proyecto de ejemplo que se utilizará en esta parte de la
 documentación consiste en una aplicación web para la venta de pizzas,
 *Pizza Shop*.
@@ -49,7 +52,7 @@ asistente que cambiará durante el proceso de desarrollo en función del
 estado en el que se encuentre el proyecto:
 
 ------------
-roo-gvNIX>  
+roo-gvNIX>
 ------------
 
 Muestra las instrucciones para continuar y crear un proyecto. El
@@ -63,7 +66,7 @@ el número 6 corresponde a la versión del JDK utilizado, en este caso JDK
 1.6, si no se especifica Roo por defecto utiliza el JDK 1.6
 
 -----------
-roo-gvNIX> 
+roo-gvNIX>
 -----------
 
 Una vez creado el proyecto observar que el foco de la consola ha
@@ -78,3 +81,6 @@ Por otro lado, la estructura de directorios creada esta basada en las
 recomendaciones de Maven.
 
 image:images/projectfolders.png[Estructura de carpetas]
+
+//Return level titles
+:leveloffset: 0

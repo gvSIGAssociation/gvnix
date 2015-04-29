@@ -1,6 +1,10 @@
 Buscadores en la capa web
 -------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 En la sección de recetas se puede encontrar información adicional para
 link:#recetas-finders-multitud-campos[desarrollar buscadores con gran
 cantidad de campos] y también para hacer los
@@ -23,7 +27,7 @@ encargado de gestionar dicha entidad, se generará el buscador en la capa
 de vista.
 
 -----------------------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Upd SRC_MAIN_JAVA/com/springsource/petclinic/web/OwnerController.java
 Upd SRC_MAIN_WEBAPP/WEB-INF/views/owners/views.xml
 Upd SRC_MAIN_WEBAPP/WEB-INF/i18n/application.properties
@@ -77,3 +81,6 @@ privileged aspect OwnerController_Roo_Controller_Finder {
 
 Se generará también la página jspx correspondiente y los recursos
 adicionales necesarios para su visualización.
+
+//Return level title
+:leveloffset: 0

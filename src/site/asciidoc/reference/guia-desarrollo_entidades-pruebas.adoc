@@ -1,6 +1,10 @@
 Pruebas de integración
 ----------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Creación de pruebas de integración
 ----------------------------------
 
@@ -17,7 +21,10 @@ Para ejecutar los test utilizar el comando `perform
         tests`:
 
 --------------------------------------
-~.domain.PizzaOrder roo-gvNIX> 
-        
+~.domain.PizzaOrder roo-gvNIX>
+
         ~.domain.PizzaOrder roo-gvNIX>
 --------------------------------------
+
+//Return level title
+:leveloffset: 0

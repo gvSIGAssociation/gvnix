@@ -1,6 +1,10 @@
 Add-on Web MVC Datatables
 -------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Uso del componente http://datatables.net/[dataTables] en las vistas
 _list_ de los controladores.
 
@@ -444,3 +448,6 @@ registro.
 
 Gracias a esto tendremos siempre posicionado en pantalla el registro que
 se ha seleccionado.
+
+//Return level title
+:leveloffset: 0

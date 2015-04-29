@@ -1,6 +1,10 @@
 Add-on Web Screen Patterns
 --------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Add-on para aplicar patrones de visualización sobre entidades y sus
 relaciones.
 
@@ -61,7 +65,7 @@ La ejecución del comando realizará las siguientes modificaciones en el
 proyecto.
 
 ----------------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
     Created SRC_MAIN_WEBAPP/images/pattern
     Created SRC_MAIN_WEBAPP/images/pattern/enEdicion.gif
     Created SRC_MAIN_WEBAPP/images/pattern/pedi_off.gif
@@ -172,7 +176,7 @@ _Controlador2_.
     public class Controlador2 {
       ...
     }
-    
+
 ----------------------------------------------------------
 
 Creación de un patrón maestro
@@ -456,3 +460,6 @@ borrado y refresco de los registros del patrón. Este atributo solo es
 útil si se encuentra aplicada la seguridad, por ejemplo mediante el
 link:#addon-cit-security[add-on CIT Security] o el add-on Typical
 security.
+
+//Return level title
+:leveloffset: 0

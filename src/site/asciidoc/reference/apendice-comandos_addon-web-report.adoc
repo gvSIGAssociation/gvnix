@@ -1,6 +1,10 @@
 Comandos del add-on Web Report
 ------------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Para una descripción detallada de las características del add-on
 consultar la documentación del link:#addon-web-report[add-on Web
 Report].
@@ -79,3 +83,6 @@ Sus parámetros son:
   hubiesen podido definir se añadirán al informe existente. Los formatos
   siempre serán convertidos a minúsculas. Si este parámetro no se
   especifica, tomará por defecto el valor _pdf_.
+
+  //Return level title
+  :leveloffset: 0

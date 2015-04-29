@@ -1,6 +1,10 @@
 Comandos del add-on JPA
 -----------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Para una descripción detallada de las características del add-on
 consultar la documentación del link:#addon-jpa[add-on JPA].
 
@@ -231,3 +235,6 @@ Sus parámetros son:
   _[Requerido] [Autocompletado]_
   +
   Entidad sobre la que se quieren generar los métodos de búsqueda.
+
+  //Return level title
+  :leveloffset: 0

@@ -1,6 +1,10 @@
 Mejoras de rendimiento
 ----------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 #
 
 Descripción
@@ -31,7 +35,7 @@ entorno:
 -----------------------------------------------------------------------------------------------------
         Entornos de desarrollo e integración: %d{dd/MM/yyyy HH:mm:ss.SSS} [%t] %p %c{1}.%M(%L) | %m%n
         Entornos de preproducción y producción: %d{dd/MM/yyyy HH:mm:ss.SSS} [%t] %p %c{1} | %m%n
-        
+
 -----------------------------------------------------------------------------------------------------
 
 Los distintos valores en función del entorno se pueden establecer de
@@ -52,8 +56,8 @@ las relaciones con otras entidades y que se representan en página como
 campos desplegables.
 
 ----------------------------------------------------
-        ... field="propertyname" render="false" ... 
-        
+        ... field="propertyname" render="false" ...
+
 ----------------------------------------------------
 
 En dicho caso es recomendable evitar que se carguen las listas de datos
@@ -68,5 +72,8 @@ con el campo que se ha ocultado.
         uiModel.addAttribute("propertyname", OtherEntity.findAllOtherEntities());
         ...
         }
-        
+
 ---------------------------------------------------------------------------------
+
+//Return level titles
+:leveloffset: 0

@@ -1,6 +1,10 @@
 Add-on Web MVC GEO
 ------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Uso del componente http://leafletjs.com/[Mapa] para representar y
 posicionar entidades que dispongan de campos de tipo GEO.
 
@@ -179,3 +183,6 @@ a utilizar.
 Para mas información sobre los comandos ver el
 link:#apendice-comandos_addon-web-mvc-geo[apéndice de comandos de este
 add-on].
+
+//Return level title
+:leveloffset: 0

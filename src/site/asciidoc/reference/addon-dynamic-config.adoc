@@ -1,6 +1,10 @@
 Add-on Dynamic Configuration
 ----------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Descripción
 -----------
 
@@ -73,14 +77,14 @@ create] que tiene un único parámetro obligatorio (_name_) que define el
 nombre para la nueva configuración.
 
 --------------------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 ...
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Configuration created with currently available properties
 First created configuration set as default
 (use 'configuration property add' to make a property available for all configurations)
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Configuration created with currently available properties
 (use 'configuration property add' to make a property available for all configurations)
@@ -96,22 +100,22 @@ property add]. Las propiedades inicialmente tomarán el valor que tengan
 definido en el proyecto.
 
 -----------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
@@ -124,19 +128,19 @@ link:#apendice-comandos_addon-dynamic_config-config_prop_update[configuration
 property value].
 
 ----------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
@@ -151,7 +155,7 @@ empaquetar la aplicación con Maven como un parámetro mediante el
 modificador _-D nombre=valor_.
 
 -------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value undefined
 (use '-D propname=propvalue' on maven commands to set the property value)
@@ -165,7 +169,7 @@ link:#apendice-comandos_addon-dynamic_config-config_list[configuration
 list].
 
 ---------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
       (Active)      dev
 ----------------------------------------
  * Database Connection Properties
@@ -196,7 +200,7 @@ destino y por lo tanto hasta ese momento no se podrán utilizar las
 configuraciones.
 
 --------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Updated ROOT/pom.xml
 Updated ROOT/pom.xml
 Updated SRC_MAIN_RESOURCES/META-INF/spring/database.properties
@@ -220,9 +224,9 @@ opcionalmente el valor de los parámetros que se crearon como indefinidos
 en la configuración.
 
 ---------------------------------------------------------------------------
-shell> 
+shell>
 ... (Empaquetando la aplicación con la configuración llamada dev) ...
-shell> 
+shell>
 ... (Empaquetando la aplicación con la configuración llamada pro) ...
 ... (Se utilizará como clave de acceso a la base de datos "mypassword") ...
 ---------------------------------------------------------------------------
@@ -253,3 +257,6 @@ como, por ejemplo, distintas dependencias.
 valores estándar que se consideren adecuados para una determinada
 configuración. Por ejemplo, establecer el formato de los logs en
 producción para reducir el consumo de recursos.
+
+//Return level title
+:leveloffset: 0

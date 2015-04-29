@@ -1,6 +1,10 @@
 Add-on JPA
 ----------
 
+//Push down level title
+:leveloffset: 2
+
+
 Add-on de utilidades enfocadas a la persistencia y consulta de las
 entidades.
 
@@ -37,7 +41,7 @@ import org.springframework.stereotype.Service;
 @GvNIXJpaBatch(entity = Owner.class)
 public class OwnerBatchService {
 }
-    
+
 -----------------------------------------------
 
 En el correspondiente fichero `OwnerBatchService_Roo_GvNIXJpaBatch.aj`
@@ -81,7 +85,7 @@ class MyClass {
 
     @Autowire
     private OwnerBatchService ownerBatch;
-    
+
 -----------------------------------------
 
 Todas las operaciones generadas (excepto _findByValues_) son
@@ -128,7 +132,7 @@ public class Pet {
     @ManyToOne
     private Owner owner;
 
-    
+
 ---------------------------------------------------------------------------------------
 
 Auditoría y resgistro de cambios de entidades
@@ -464,3 +468,6 @@ comandos:
 ``::
   Genera los buscadores de todos los campos de tipo GEO para la entidad
   seleccionada.
+
+  //Return level title
+  :leveloffset: 0

@@ -1,6 +1,9 @@
 Gestión del acceso a datos
 --------------------------
 
+//Push down level title
+:leveloffset: 2
+
 Persistencia de objetos
 -----------------------
 
@@ -40,7 +43,7 @@ y configurar el sistema de persistencia. Teclear `hint` que sugerirá los
 siguientes pasos a dar:
 
 ---------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Roo requires the installation of a persistence configuration,
 for example, JPA or MongoDB.
 
@@ -64,7 +67,7 @@ instalado como Hypersonic e Hibernate como implementación del sistema de
 persistencia:
 
 --------------------------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Created SPRING_CONFIG_ROOT/database.properties
 Updated SPRING_CONFIG_ROOT/applicationContext.xml
 Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
@@ -232,7 +235,7 @@ Los pasos a seguir para la configuración son:
           setup` con los parámetros que disponemos:
 +
 ---------------------------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Created SPRING_CONFIG_ROOT/database.properties
 Please update your database details in
  src/main/resources/META-INF/spring/database.properties.
@@ -246,19 +249,19 @@ Updated ROOT/pom.xml [added dependencies postgresql:postgresql:9.1-901-1.jdbc4,
  javax.transaction:jta:1.1, org.springframework:spring-jdbc:${spring.version},
  org.springframework:spring-orm:${spring.version}, commons-pool:commons-pool:1.5.6,
  commons-dbcp:commons-dbcp:1.4]
-roo-gvNIX> 
+roo-gvNIX>
 ---------------------------------------------------------------------------------------------
 2.  Comprobar como ha quedado la configuración de la conexión. Para ello
 usar el comando `database properties
           list`:
 +
 ----------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 database.driverClassName = org.postgresql.Driver
 database.password = 1234
 database.url = jdbc:postgresql://dbserver:5432/my_db
 database.username = user1
-roo-gvNIX> 
+roo-gvNIX>
 ----------------------------------------------------
 +
 Observar que lo único que falta es configurar el puerto de la base de
@@ -271,20 +274,20 @@ comando `database properties
           set`:
 +
 ----------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Updated SPRING_CONFIG_ROOT/database.properties
-roo-gvNIX> 
+roo-gvNIX>
 ----------------------------------------------
 4.  Volver a comprobar el estado de los parámetros con el comando
 `database properties list`:
 +
 ----------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 database.driverClassName = org.postgresql.Driver
 database.password = 1234
 database.url = jdbc:postgresql://dbserver:5438/my_db
 database.username = user1
-roo-gvNIX> 
+roo-gvNIX>
 ----------------------------------------------------
 
 Una vez hecho, la siguiente vez que se arranque la aplicación usará la
@@ -349,7 +352,7 @@ adecuados para la nueva conexión de base de datos:
                     <property name="hibernate.connection.charSet" value="..."/>
                 </properties>
             </persistence-unit>
-          
+
 ----------------------------------------------------------------------------------------
 * En _src/main/resources/META-INF/spring/applicationContext.xml_ incluir
 la siguiente configuración reemplazando los puntos suspensivos por los
@@ -380,7 +383,7 @@ valores adecuados para la nueva conexión de base de datos:
                 <property name="persistenceUnitName" value="persistenceUnit2" />
                 <property name="dataSource" ref="dataSource2"/>
             </bean>
-          
+
 --------------------------------------------------------------------------------------------
 * En la clase Java de la entidad, por ejemplo,
 _src/main/java/.../domain/Entidad.java_ añadir en la anotación
@@ -390,8 +393,12 @@ haciendo referencia a la nueva conexión configurada:
 ---------------------------------------------------------------------
             @RooJpaActiveRecord(persistenceUnit = "persistenceUnit2")
             class Entity
-          
+
 ---------------------------------------------------------------------
 +
 De esta forma, para cada entidad de datos se puede asociar la conexión
 de base de datos que se desee.
+
+//Return level titles
+:leveloffset: 0
+

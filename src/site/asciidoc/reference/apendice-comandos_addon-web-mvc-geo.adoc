@@ -1,6 +1,10 @@
 Comandos del add-on Web MVC GEO
 -------------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Para una descripción detallada de las características del add-on
 consultar la documentación del link:#addon-web-mvc-geo[add-on Web MVC
 GEO].
@@ -307,3 +311,6 @@ Sus parámetros son:
   Código del mensaje multi-idioma que aparecerá al cambiar de
   herramienta para evitar que se pierdan los cambios aplicados sobre el
   mapa.
+
+  //Return level title
+  :leveloffset: 0
