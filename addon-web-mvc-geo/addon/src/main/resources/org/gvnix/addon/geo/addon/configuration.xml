@@ -17,6 +17,7 @@
 				<artifactId>org.gvnix.addon.geo.annotations</artifactId>
 				<version>${gvnix.version}</version>
 				<type>jar</type>
+				<scope>provided</scope>	
 			</dependency>
 			<dependency>
 				<groupId>org.gvnix</groupId>

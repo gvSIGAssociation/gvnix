@@ -17,6 +17,7 @@
         		<groupId>org.gvnix</groupId>
 				<artifactId>org.gvnix.addon.jpa.annotations</artifactId>
 		       	<version>${gvnix.version}</version>
+			<scope>provided</scope>
       		</dependency>
       		
       		<!--  QueryDSL library -->
