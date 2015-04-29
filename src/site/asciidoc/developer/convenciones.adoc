@@ -1,0 +1,312 @@
+Convenciones
+------------
+
+Nombres de los comandos
+-----------------------
+
+_TBC_
+
+(de roo-addon-desarrollo.rst)
+
+* Para los comandos genéricos que aportará gvNIX usaremos una
+nomenclatura basada en su funcionalidad. Por ejemplo:
++
+---------
+cxf setup
+---------
++
+Cuando la funcionalidad sea una extensión a la funcionalidad de Roo
+utilizaremos una nomenclatura similar a la de Roo, de forma que al
+pulsar el tabulador para autocompletar obtengamos tanto los comandos de
+Roo como los propios de gvNIX. Ejemplos:
++
+-------------------------------------
+web flow          // Comando de Roo
+
+web binding setup // Comando de gvNIX
+-------------------------------------
++
+Notar que en ambos casos al escribir la primera parte del comando `web`
+y al pulsar el tabulador nos aconsejará `flow` y `binding`.
+* Para los comandos propios de la CIT parece más adecuado y cómodo que
+los comandos estén agrupados por un prefijo común. Ejemplo:
++
+------------------
+cit security setup
+------------------
+
+Nombres de paquetes
+-------------------
+
+Paquete raíz de gvNIX: org.gvnix
+
+Paquete raíz para probar funcionalidades genéricas:
+org.gvnix.test.funcionalidad
+
+Paquete raíz para probar funcionalidades específicas CIT:
+org.gvnix.test.cit.funcionalidad
+
+Add-ons
+~~~~~~~
+
+* Para add-ons genéricos que aportará gvNIX añadir al paquete raíz la
+funcionalidad y finalizar con `roo.addon` (esto último es requerimiento
+de Roo). El patrón a seguir sería org.gvnix.FUNCIONALIDAD.roo.addon.
+Ejemplo:
++
+------------------------
+ org.gvnix.cxf.roo.addon
+------------------------
+* Para add-ons específicos para un entorno, por ejemplo la CIT, seguir
+el siguiente patrón org.gvnix.ID_ENTORNO.FUNCIONALIDAD.roo.addon.
+Ejemplo:
++
+--------------------------------
+org.gvnix.cit.security.roo.addon
+--------------------------------
+
+Código generado
+~~~~~~~~~~~~~~~
+
+El código generado *DEBE* ubicarse dentro del paquete raíz del proyecto.
+Los add-ons deberán utilizar las utilidades de Roo para que las clases
+generadas se creen dentro de la estructura de paquetes del proyecto.
+
+Por ejemplo, si el proyecto se creó con el comando Roo
+`project --topLevelPackage es.gv.cit.pizzashop`, las clases generadas se
+encontrarán dentro de ese paquete raíz.
+
+Se recomienda que a partir del paquete raíz del proyecto se siga una
+estructura similar a la de la funcionalidad implementada.
+
+Por ejemplo, si implementamos un sistema de autenticación para un
+entorno específico con Spring Security, entonces seguir una estructura
+similar a la planteada por Spring Security. Ejemplo:
+
+-------------------------------------------------
+es.gv.cit.pizzashop.security.authentication.wscit
+-------------------------------------------------
+
+Del mismo modo que se debe seguir un convenio para el código Java
+generado, debemos también tenerolo para los distintos *artefactos que se
+generan*.
+
+El motivo para adoptar este convenio es principalmente la mantenibilidad
+del proyecto generado. No sabemos quién mantendrá el proyecto en un
+futuro y posiblemente no conozca gvNIX, o es más, podría ser que se
+hubiese dejado de usar gvNIX en ese proyecto. Lo que si podemos saber es
+que el desarrollador encargado del mantenimiento conocerá los estándares
+de las distintas tecnologías usadas y sabrá que cuando se usa Spring,
+sus ficheros de configuración suelen estar en
+_src/main/resources/spring_ (que al empaquetarlo acaban en
+_/WEB-INF/classes/META-INF/spring_).
+
+La principal regla a seguir es seguir los estándars de facto de la
+librería que del artefacto generado. Un ejemplo muy claro de esto lo
+tenemos con las distintas JSP que generamos cuando usamos Spring MVC
+para la capa web del proyecto. Como aquí se usa Tiles como librería del
+motor de plantillas, las JSP se generan en el directorio
+_/WEB-INF/views_ puesto que es el estándar seguido en todos los
+proyectos que usan Tiles.
+
+Algunos ejemplos más para intentar ilustrar este convenio:
+
+* Artefactos estáticos relacionados con la capa web: dentro de
+_src/main/webapp/_ (_src/main/webapp/images, src/main/webapp/styles,
+src/main/webapp/scripts_).
+* Artefactos de las vistas en la capa web: dentro de _WEB-INF_
+(_WEB-INF/layouts, WEB-INF/views, WEB-INF/reports_).
+
+Comentarios en el Código fuente
+-------------------------------
+
+El idioma de desarrollo será el inglés, tanto para el código fuente
+generado como para el código fuente de los add-ons: métodos,
+propiedades, variables y javadoc.
+
+Cabecera Javadoc para la clase java
+-----------------------------------
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ /**
+   * Provides strategies management shell commands.
+   *
+   * @author DEVELOPER_NAME (DEVELOPER_USERNAME at CIT_PROVIDER dot com) at <a href="http://www.CIT_PROVIDER.com">CIT_PROVIDER</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+   */
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+O simplemente:
+
+---------------------------------------------------
+ /**
+   * Provides strategies management shell commands.
+   *
+   * @author gvNIX Team
+   */
+---------------------------------------------------
+
+Documentación del proyecto
+--------------------------
+
+Ya está accesible y actualizado a media noche el javadoc de todos los
+módulos de gvNIX:
+
+http://projects.disid.com/projects/fwjava/wiki/Javadoc
+En el proyecto gvNIX ha llegado un momento que la documentación de cada
+módulo en su directorio "doc" se queda anticuada rápidamente debido a
+que es fácil olvidarse de actualizarla al hacer algún cambio en el
+código, a parte de ser un "coñazo" cambiar código en un sitio y
+documentación en otro.
+
+Es por ello, que hemos llegado a la conclusión de mantener toda la
+documentación en javadoc.
+
+Para cada módulo, a parte de la documentación javadoc que se incluye en
+cada clase java, existen ficheros especiales del proyecto que se
+incluyen en el javadoc:
+
+package.html: se puede añadir en cada paquete java y se incluirá como
+documentación adicional en la página javadoc de cada paquete
+
+overview.html: se puede añadir en src/main/javadoc y se incluirá como
+documentación adicional en la página principal del javadoc
+
+Con esto, creo que podemos dejar de mantener la documentación por
+separado (javadoc y rst en docs). Además, tenemos la posibilidad de
+consultar la última versión de la documentación de todos los módulos vía
+web.
+
+Poco a poco, iremos migrando la documentación de docs a javadoc y
+mejorando el javadoc que existe actualmente.
+
+La doc estará en inglés. Hay que definir una guía para el documentador
+que evite que cada uno documente como mejor le parezca, es decir, qué
+doc se pone en la clase, qué doc en el package, qué doc se pone en cada
+tipo de clase (por ejemplo la lista de comandos debe estar en la doc de
+la clase Command), etc. Lo que comentas aplica a documentación muy
+dinámica, habrá documentación que no cambia a lo largo del tiempo y que
+quizás no vale la pena llevar a Javadoc. Habrá que ver cada caso.
+
+El javadoc de Springframework está lleno de ejemplos de buena doc:
+
+http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/web/servlet/mvc/AbstractController.html
+(workflow y propiedades en cabecera de clase)
+
+http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/orm/hibernate3/HibernateInterceptor.html
+(ejemplo de código)
+
+Nombre de add-ons
+-----------------
+
+Dentro del fichero pom.xml habría que añadir la etiqueta `description`
+dentro de `project` con una breve descripción del add-on.
+
+Ejemplo:
+
+-------------------------------------------------------------------------------------------
+  <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+  <project ...>
+        ....
+        ....
+        <name>gvNIX - Spring Roo - Addon - Web MVC Menu</name>
+        <description>Site structure management for Spring MVC based web layer</description>
+        ....
+        ....
+-------------------------------------------------------------------------------------------
+
+El nombre debe contener:
+
+gvNIX::
+  Identificador del conjunto de add-ons
+Spring Roo - Addon::
+  Identificador de add-on de Roo
+_Nombre del add-on_::
+  Nombre descriptivo del add-on
+
+Esta información sirve para localizar rápidamente los add-ons de gvNIX
+en el entorno OSGi, por ejemplo al ejecutar el comando _osgi ps_.
+
+Es importante que la descripción sea descriptiva del objetivo del add-on
+(por ejemplo, _Site structure management_) y debe incluir información
+sobre la tecnología en la que debe aplicarse (por ejemplo, _for Spring
+MVC based web layer_). Este último punto ayudará a los desarrolladores a
+saber si pueden utilizarlo en determinados add-ons, siguiendo el
+ejemplo, el add-on de menu no podría utilizarse con una capa web basada
+en GWT.
+
+Licencia de add-ons
+-------------------
+
+Se utilizará GPLv3.
+
+Copiar al directorio `legal` del addon el archivo
+`gvnix/trunk/code/LICENSE.TXT.`
+
+El texto original de la licencia se encuentra en
+http://www.gnu.org/licenses/gpl-3.0.txt. Guía de referencia:
+http://www.gnu.org/licenses/quick-guide-gplv3.html.
+
+Licencia a integrar en las cabeceras de las clases java:
+
+------------------------------------------------------------------------------------
+/*
+ * gvNIX is sponsored by the General Directorate for Information 
+ * Technologies (DGTI) of the Regional Ministry of Finance and Public 
+ * Administration of the Generalitat Valenciana (Valencian Community, 
+ * Spain), managed by gvSIG Association and led by DISID.
+ * Copyright (C) 2010 DGTI - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
+ */
+------------------------------------------------------------------------------------
+
+Este es un ejemplo de como debería quedar el fichero `pom.xml` del
+proyecto:
+
+----------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project ...>
+...
+  <licenses>
+    <license>
+      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+      <comments>
+      <![CDATA[
+      gvNIX is sponsored by the General Directorate for Information
+      Technologies (DGTI) of the Regional Ministry of Finance and Public
+      Administration of the Generalitat Valenciana (Valencian Community,
+      Spain), managed by gvSIG Association and led by DISID.
+
+      Copyright (C) 2010 DGTI - Generalitat Valenciana
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses />.
+      ]]>
+      </comments>
+    </license>
+  </licenses>
+...
+</project>
+----------------------------------------------------------------------------

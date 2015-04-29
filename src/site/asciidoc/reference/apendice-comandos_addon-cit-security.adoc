@@ -1,0 +1,46 @@
+Comandos del add-on CIT Security
+--------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-cit-security[add-on CIT
+Security].
+
+.Comandos de Add-on CIT Security
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-cit-security_cit-security-setup[cit
+security setup [DEPRECATED]] |Instala y configura el sistema de
+autenticación y autorización de la CITMA.
+|=======================================================================
+
+cit security setup
+~~~~~~~~~~~~~~~~~~
+
+Instala y configura el sistema de autenticación y autorización de la
+Consejería de Infraestructuras, Transporte y Medio Ambiente (CITMA) del
+Gobierno de Valencia.
+
+Sus parámetros son:
+
+--url::
+  _[Requerido] [Cadena]_
+  +
+  Dirección URL que referencia al punto de entrada o _end-point_ del
+  servidor de servicio web de autenticación y autorización de la CITMA.
+--login::
+  _[Requerido] [Cadena]_
+  +
+  Nombre de usuario válido para conectar con el servicio web de
+  autenticación y autorización de la CITMA.
+--password::
+  _[Requerido] [Cadena]_
+  +
+  Clave válida para conectar con el servicio web de autenticación y
+  autorización de la CITMA.
+--appName::
+  _[Requerido] [Cadena]_
+  +
+  Código de la aplicación para la que se solicita la información de
+  autenticación y autorización al servicio web de autenticación y
+  autorización de la CITMA.

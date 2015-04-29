@@ -1,0 +1,81 @@
+Comandos del add-on Web Report
+------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-web-report[add-on Web
+Report].
+
+.Comandos del add-on Web Report
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-web-report_setup[web report setup]
+|Configura en el proyecto el soporte para la generación de informes en
+formato PDF, XLS, CSV y HTML
+
+|link:#apendice-comandos_addon-web-report_add[web report add] |Crea un
+nuevo informe y permite su acceso desde el controlador de una entidad
+que se le proporciona como parámetro
+|=======================================================================
+
+web report setup
+~~~~~~~~~~~~~~~~
+
+Configura en el proyecto el soporte para la generación de informes en
+formato PDF, XLS, CSV y HTML mediante _Jasper Reports_ y su descarga
+desde la aplicación web.
+
+El comando sólo estará disponible si el proyecto utiliza Spring MVC en
+la capa web y link:#guia-desarrollo_web_tiles[Tiles] como motor de
+vistas web.
+
+Este comando no tiene ningún parámetro obligatorio ni opcional.
+
+Para una descripción detallada de las configuraciones que realiza este
+comando en el proyecto, consultar la sección de
+link:#addon-web-report_instalacion[instalación] del add-on Web Report.
+
+web report add
+~~~~~~~~~~~~~~
+
+Crea un nuevo informe y permite su acceso desde el controlador de una
+entidad que se le proporciona como parámetro al comando. El controlador
+debe obligatoriamente estar gestionando una entidad del proyecto. El
+informe, por defecto, mostrará los 10 primeros registros de la entidad.
+
+Si el comando se ejecuta varias veces sobre el mismo controlador y con
+el mismo nombre de informe, se añadirán al informe existente los nuevos
+formatos de generación que se hayan podido especificar. Para mas
+información consultar la sección de
+link:#addon-web-report_generacion[generación de un informe] del add-on
+Web Report.
+
+El comando sólo estará disponible si el proyecto utiliza Spring MVC en
+la capa web y link:#guia-desarrollo_web_tiles[Tiles] como motor de
+vistas web.
+
+Sus parámetros son:
+
+--controller::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Clase controladora que gestiona una entidad en la que se desea añadir
+  el informe. Este controlador ha de contener la anotación
+  _@RooWebScaffold_ y su atributo _formBackingObject_ indicará la
+  entidad para la que se generará el informe.
+--reportName::
+  _[Requerido] [Cadena]_
+  +
+  Nombre que se le quiere dar al informe y que servirá de identificador
+  único. No admite espacios y el valor proporcionado será convertido a
+  minúsculas.
+--format::
+  _[Opcional] [Cadena]_
+  +
+  Lista de formatos en los que se permitirá generar el informe. Los
+  formatos de la lista deberán estar separados por comas y sin espacios.
+  Los formatos soportados son: _pdf, xls, csv y html_. Si el nombre del
+  informe ya existe en un controlador, los formatos nuevos que se
+  hubiesen podido definir se añadirán al informe existente. Los formatos
+  siempre serán convertidos a minúsculas. Si este parámetro no se
+  especifica, tomará por defecto el valor _pdf_.

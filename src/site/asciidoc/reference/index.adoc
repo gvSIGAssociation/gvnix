@@ -1,0 +1,118 @@
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 index.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 index.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf index.adoc
+
+
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: docbook
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
+
+gvNIX - Documentación de referencia
+===================================
+
+== Primeros pasos con gvNIX
+
+Esta parte de la documentación contiene la información necesaria para
+entender qué es gvNIX y cómo empezar a utilizarlo.
+
+
+// Push titles down one level.
+:leveloffset: 1
+include::intro_introduccion.adoc[]
+
+
+== Desarrollo de aplicaciones con gvNIX
+
+En esta sección se verá paso a paso cómo desarrollar una aplicación web
+desde cero demostrando cómo utilizar gvNIX en cualquier proyecto web.
+Algunas de las características de gvNIX que se verán son:
+
+* Creación de un nuevo proyecto.
+* Configuración del acceso a datos.
+* Código genereado automáticamente.
+* Gestión del modelo de entidades.
+* Gestión de la capa web.
+
+== Desarrollo avanzado con gvNIX
+
+En esta parte se va a ver cómo ampliar una aplicación web básica creada con el
+framework para cumplir con los requerimientos de cualquier proyecto
+real.
+
+Se revisará las características distintivas que ofrece gvNIX y que van
+enfocadas al desarrollo de funcionalidades de alto nivel para facilitar
+el desarrollo y proporcionar una mejor experiencia de uso al usuario:
+
+* Gestión de distintos temas visuales.
+* Organización de la estructura de páginas en el menú.
+* Gestión de patrones de visualización de entidades y sus relaciones.
+* Control de concurrencia a nivel de aplicación sin campos en base de
+datos.
+* Gestión de la visualización de excepciones y gestión de mensajes de
+usuario en ventana modal.
+* Control de acceso (autenticación y autorización) y seguridad.
+* Generación de documentos (reportes).
+* Gestión de servicios locales y servicios web (importación y
+exposición).
+* Soporte de idiomas oficiales para el estado Español (inicialmente
+incluido el Valenciano).
+* Gestión de configuraciones por entorno.
+* Gestión de transformación de cadenas vacías a valores nulos.
+
+Cada uno de estos elementos son añadidos (add-ons) que gvNIX incluye de
+forma adicional a todas las funcionalidades que ya proporciona su núcleo
+Spring Roo. Cada uno de estos addons pueden ser también utilizados en
+cualquier distribución de Spring Roo estándar.
+
+Estos add-ons han sido inicialmente diseñados para ser aplicados en un
+modelo de dominio del tipo registro activo y una capa visual del tipo
+spring MVC. Sin embargo, pueden funcionar también con otros modelos de
+dominio y visuales y en futuras versiones se irá incrementando dicha
+compatibilidad.
+
+== Recetas de desarrollo
+
+En esta parte se verán distintas guías para realizar ciertas
+modificaciones sobre el código generado para adaptarlo a distintas
+necesidades.
+
+== Apéndices
+
+Listado de comandos adicionales incluidos en gvNIX detallando cada uno
+de sus parámetros.
+
+== Recursos
+

@@ -1,0 +1,158 @@
+Comandos del add-on Web Screen Patterns
+---------------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-web-screen-patterns[add-on
+Web Screen Patterns].
+
+.Comandos del add-on Web Screen Patterns
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-web_mvc_pattern_setup[web mvc pattern
+setup] |Crea en el proyecto los ficheros que utilizarán los patrones de
+visualización
+
+|link:#apendice-comandos_addon-web_mvc_pattern_update_tags[web mvc
+pattern update tags] |Actualiza en el proyecto los ficheros que
+utilizarán los patrones de visualización
+
+|link:#apendice-comandos_addon-web_mvc_pattern_master[web mvc pattern
+master] |Crea un patrón de visualización maestro en el controlador que
+gestiona una entidad del proyecto
+
+|link:#apendice-comandos_addon-web_mvc_relation_pattern_detail[web mvc
+pattern detail] |Crea un patrón de visualización detalle en el
+controlador que gestiona una entidad del proyecto dada una de las
+relaciones de la entidad
+|=======================================================================
+
+web mvc pattern setup
+~~~~~~~~~~~~~~~~~~~~~
+
+Crea en el proyecto los ficheros que utilizarán los patrones de
+visualización. El comando no tiene ningún parámetro obligatorio ni
+opcional.
+
+Para una descripción detallada de los ficheros que instala este comando
+en el proyecto consultar la sección de
+link:#addon-web-screen-patterns[instalación] del add-on Web Screen
+Patterns.
+
+web mvc pattern update tags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Actualiza en el proyecto los ficheros que utilizarán los patrones de
+visualización. El comando no tiene ningún parámetro obligatorio ni
+opcional.
+
+Para una descripción detallada de los ficheros que instala este comando
+en el proyecto consultar la sección de
+link:#addon-web-screen-patterns[instalación] del add-on Web Screen
+Patterns.
+
+web mvc pattern master
+~~~~~~~~~~~~~~~~~~~~~~
+
+Crea un patrón de visualización maestro en el controlador que gestiona
+una entidad del proyecto. El patrón maestro mostrará los registros de la
+entidad gestionada por este controlador.
+
+_Advertencia:_ Actualmente, este comando solo soporta controladores cuya
+entidad sea un _Active record_ (que son aquellas que tengan declarada la
+notación `@RooJpaActiveRecord`).
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Controlador en el cual generar el patrón de visualización maestro.
+--name::
+  _[Requerido] [Cadena]_
+  +
+  Nombre que identificará de forma única al patrón. No permite espacios.
+  El nombre elegido sólo se podrá utilizar una vez en todo el proyecto
+  para evitar colisiones con otros patrones.
+--type::
+  _[Requerido] [Tipo de patrón] [Autocompletado]_
+  +
+  Tipo de patrón de visualización a aplicar.
+--testAutomatically::
+  _[Opcional] [Booleano] [Autocompletado]_
+  +
+  Crear los tests funcionales de Selenium para este patrón. Por defecto
+  los tests no se generan.
+--testName::
+  _[Opcional] [Cadena]_
+  +
+  Nombre con el que crear el test funcional de Selenium. Por defecto, si
+  no se especifica, el test tomará el mismo nombre que el proporcionado
+  para el patrón.
+--testServerUrl::
+  _[Opcional] [Cadena]_
+  +
+  Dirección donde responde la aplicación donde se ejecutan los tests;
+  incluyendo protocolo, servidor, puerto y ruta a la aplicación. Por
+  defecto, toma el valor _http://localhost:8080/_.
+
+web mvc pattern detail
+~~~~~~~~~~~~~~~~~~~~~~
+
+Crea un patrón de visualización detalle en el controlador que gestiona
+una entidad del proyecto dada una de las relaciones de la entidad. El
+patrón detalle mostrará los registros de la entidad relacionada que
+estén asociados con los registros de la entidad maestra. La entidad
+maestra en la entidad gestionada por este controlador.
+
+_Advertencia:_ Actualmente, este comando solo soporta controladores cuya
+entidad sea un _Active record_ (que son aquellas que tengan declarada la
+notación `@RooJpaActiveRecord`).
+
+Para aplicar un patrón detalle sobre un controlador, es necesario
+definir previamente un patrón maestro sobre el mismo controlador.
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Controlador en el cual generar el patrón de visualización detalle. Es
+  necesario que previamente se haya definido un patrón maestro sobre
+  este mismo controlador.
+--name::
+  _[Requerido] [Cadena]_
+  +
+  Nombre de un patrón maestro, previamente definido en el controlador,
+  sobre el que se desea aplicar el patrón detalle. El patrón maestro se
+  debe haber definido previamente mediante el comando _web mvc pattern
+  master_.
+--field::
+  _[Requerido] [Cadena]_
+  +
+  Nombre del campo de la entidad maestra de la que obtener los registros
+  a mostrar en el patrón detalle. Es decir, el nombre de una propiedad
+  de la clase Java de la entidad gestionada por el controlador. El campo
+  debe definir una relación a muchos, es decir, debe estar anotado con
+  _@OneToMany_ o _@ManyToMany_.
+--type::
+  _[Requerido] [Tipo de patrón] [Autocompletado]_
+  +
+  Tipo de patrón de visualización a aplicar en el detalle.
+--testAutomatically::
+  _[Opcional] [Booleano] [Autocompletado]_
+  +
+  Crear los tests funcionales de Selenium para este patrón. Por defecto
+  los tests no se generan.
+--testName::
+  _[Opcional] [Cadena]_
+  +
+  Nombre con el que crear el test funcional de Selenium. Por defecto, si
+  no se especifica, el test tomará el mismo nombre que el proporcionado
+  para el patrón.
+--testServerUrl::
+  _[Opcional] [Cadena]_
+  +
+  Dirección donde responde la aplicación donde se ejecutan los tests;
+  incluyendo protocolo, servidor, puerto y ruta a la aplicación. Por
+  defecto, toma el valor _http://localhost:8080/_.

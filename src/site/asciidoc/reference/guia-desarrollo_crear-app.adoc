@@ -1,0 +1,80 @@
+Crear una nueva aplicación
+--------------------------
+
+El proyecto de ejemplo que se utilizará en esta parte de la
+documentación consiste en una aplicación web para la venta de pizzas,
+*Pizza Shop*.
+
+Requerimientos:
+
+* Los clientes pueden hacer pedidos por la web.
+* Los empleados crean pedidos recibidos por teléfono.
+* Las pizzas son un conjunto de ingredientes sobre una base.
+
+gvNIX es especialmente potente si usamos los principios del _diseño
+dirigido por el dominio_ (DDD). Básicamente son un conjunto de patrones
+para construir aplicaciones a partir del modelo del dominio. En el
+ámbito de gvNIX destacan las siguientes dos características:
+
+* *Diseño dirigido por el modelo*. Representar fielmente los conceptos
+seleccionados del dominio del problema, por ejemplo utilizando UML
+(diagramas de clases).
+* *Arquitectura por capas*. Separar la lógica de negocio de la lógica de
+aplicación (transacciones, seguridad, etc), de la lógica de presentación
+y de la lógica de infraestructura (acceso a datos, acceso a servicios
+externos, etc).
++
+La arquitectura por capas es un patrón que gvNIX se encarga de aplicar
+por nosotros, sin embargo, debemos conocer las capas generadas por gvNIX
+porque este conocimiento será de utilidad a la hora de hacer nuestros
+desarrollos.
+
+Por tanto, lo primero que se debe hacer es definir el modelo del
+dominio:
+
+image:images/pizza.png[Pizza Shop Domain Model]
+
+Crear un nuevo proyecto
+-----------------------
+
+La creación de un nuevo proyecto se puede realizar de dos formas, en
+función de si se hace desde la consola del sistema operativo o desde el
+IDE. Para ello, leer las secciones
+link:#guia-desarrollo_eclipse-usar[Crear proyecto gvNIX en Eclipse IDE]
+para la creación desde el IDE o link:#instalacion_instalacion[Descarga e
+instalación gvNIX] para la creación desde la consola del sistema.
+
+Acceder a la consola y teclear `hint` para mostrar la información del
+asistente que cambiará durante el proceso de desarrollo en función del
+estado en el que se encuentre el proyecto:
+
+------------
+roo-gvNIX>  
+------------
+
+Muestra las instrucciones para continuar y crear un proyecto. El
+proyecto ya estará creado si se hizo desde la consola del IDE y se podrá
+pasar a la siguiente sección, en caso contrario teclear `project`.
+Pulsar la tecla TAB (tabulador) para que se muestre el parámetro
+`--topLevelPackage` y definir el paquete principal del proyecto, en este
+caso com.springsource.roo.pizzashop. También se puede indicar el JDK con
+el que se va a trabajar en el proyecto añadiendo el atributo `--java 6`,
+el número 6 corresponde a la versión del JDK utilizado, en este caso JDK
+1.6, si no se especifica Roo por defecto utiliza el JDK 1.6
+
+-----------
+roo-gvNIX> 
+-----------
+
+Una vez creado el proyecto observar que el foco de la consola ha
+cambiado, ahora se encuentra apuntando al paquete base del proyecto que
+se ha indicado al crearlo:
+
+-----------------------------------------
+com.springsource.roo.pizzashop roo-gvNIX>
+-----------------------------------------
+
+Por otro lado, la estructura de directorios creada esta basada en las
+recomendaciones de Maven.
+
+image:images/projectfolders.png[Estructura de carpetas]

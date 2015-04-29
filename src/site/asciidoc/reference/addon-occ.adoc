@@ -1,0 +1,198 @@
+Add-on OCC (Optimistic Concurrency Control)
+-------------------------------------------
+
+Add-on de utilidades enfocadas a la persistencia de las entidades.
+
+Este add-on proporciona un sistema que facilita la detección de
+modificaciones concurrentes en la persistencia de entidades del modelo
+de datos.
+
+El sistema consiste en un control de _concurrencia optimista_ basada en
+un _checkSum o suma de control_ de los valores de una entidad dada.
+
+Introducción
+------------
+
+Esta utilidad añade a las entidades un sistema de _control de
+concurrencia_ basado en una operación de _checksum o suma de control_
+sobre todos los campos persistentes que contiene la entidad.
+
+El _control de concurrencia optimista_ ya es ofrecido por defecto por el
+núcleo de Spring Roo. Sin embargo, el sistema que proporciona se basa en
+la existencia de un campo en cada una de las tabla de base de datos que
+se desea controlar. Este campo se suele definir como _version_ (numérico
+que identifica la versión del objeto) o _lastupdate_ (fecha de la última
+actualización). Esto es un problema para aquellas bases de datos ya
+existentes y en las que no se puede o no se quiere alterar su
+estructura.
+
+Esta funcionalidad nace de la necesidad de controlar la concurrencia
+sobre modelos de datos heredados en los que no es posible alterar el
+modelo relacional de base de datos para añadir los campos de control en
+los que se basa el mecanismo de _control de concurrencia_ del núcleo de
+Spring Roo que sigue la especificación
+http://jcp.org/aboutJava/communityprocess/final/jsr220/index.html[JPA].
+
+El checksum consiste en una operación matemática de los distintos
+valores que contiene un registro (instancia) de una entidad. El cálculo
+tiene en cuenta todas las propiedad de tipo simple de la entidad, es
+decir, no se incluye en el cálculo propiedad que represente una relación
+con otro u otros objetos. El cálculo se realiza en el momento de la
+carga del registro de la entidad desde la base de datos y es almacenado
+en una propiedad no persistente de la misma entidad.
+
+En el momento de _actualizar o eliminar_ un registro de dicha entidad se
+carga el elemento que está persistido en la base de datos y _se compara
+el valor de checksum_ actual con el que se calculó en el momento de la
+carga del elemento a actualizar o eliminar. _Si no coincide se lanza una
+Excepción_(http://docs.oracle.com/javaee/6/docs/api/javax/persistence/OptimisticLockException.html[javax.persistence.OptimisticLockException])
+y la operación no se realizará.
+
+Esta operación supone un coste adicional en las tareas de persistencia,
+pero no es apreciable en condiciones del uso cuotidiano de la aplicación
+excepto en procesos de actualizaciones masivas de registros.
+
+Para mostrar un mensaje amigable al usuario se puede utilizar el
+link:#addon-web-exception-handler_descripcion[Add-on Web Dialog] que, en
+el link:#addon-web-exception-handler_excptiones-de-gvnix[conjunto de
+excepciones gestionadas por defecto] se incluye esta. Una vez
+inicializada la gestión de excepciones es posible personalizar el
+mensaje usando el comando
+link:#apendice-comandos_addon-web-exception-handler_exception-handler-set-language[web
+mvc dialog exception set language]
+
+Añadir el control en las entidades
+----------------------------------
+
+Para activar esta característica sobre una entidad se pueden utilizar
+los siguientes comandos:
+
+link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-set[occ
+checksum set]::
+  Aplica el control de concurrencia a una entidad.
+link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-all[occ
+checksum all]::
+  Aplica el control de concurrencia a todas las entidades de la
+  aplicación.
+
+Estos comandos añaden a uno o a todos los ficheros `.java` de las
+entidades una anotación @GvNIXEntityOCCChecksum y un campo no
+persistente para almacenar el checksum. En base a esta anotación se
+generará un _aspecto java_ (fichero `*_gvNIX_occChecksum.aj`) con toda
+la lógica necesaria para calcular el checksum en base a las propiedades
+de un registro de la entidad y para controlar antes de una actualización
+o borrado si el registro ha cambiado desde que se cargo inicialmente.
+Toda esta lógica sera manejada automáticamente por el add-on.
+
+Si se aplica el control de concurrencia sobre una entidad que extiende
+de otra y en la clase padre existe un campo anotado como campo de
+control de persistencia con @javax.persistence.Version, el add-on
+detectará esta circunstancia y aplicará el control de concurrencia sobre
+la clase padre.
+
+Para ver todos los comandos y sus opciones ver el
+link:#apendice-comandos_addon-persistence[apéndice de comandos].
+
+_______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Note*
+
+Se ha detectado que al aplicar este control de concurrencia sobre
+entidades que tienen generados, o sobre los que se van a generar, tests
+de integración (mediante el comando _test integration_ o mediante la
+opción _--testAutomatically_ del comando _entity jpa_) los tests de
+integración presentarán un error de compilación. Se debe a que el add-on
+que genera los tests de integración no considera el caso en el que el
+campo que hace de control de concurrencia sea del tipo cadena. Hay
+varias opciones para evitar estos errores de compilación:
+
+1.  No es recomendable, pero se pueden desactivar los tests de los
+métodos _flush()_ y _merge()_ (métodos _testFlush()_ y _testMerge()_).
+Para ello hay que editar los archivos
+_src/test/java/**/*IntegrationTest.java_ y añadir a la anotación
+_@RooIntegrationTest_ los atributos _flush = false_ y _merge = false_,
+de esta manera estos dos tests no se generan en sus aspecto Java
+correspondiente quedando la batería de pruebas incompleta pero
+compilando correctamente:
++
+---------------------------------------------
+@RooIntegrationTest(entity = MiClase.class, )
+---------------------------------------------
+2.  La más recomendable es corregir los dos test mencionados en el punto
+anterior. Para ello se debe realizar un _pushin_ de estos dos métodos
+que se encuentran declarados en
+_src/test/java/**/*IntegrationTest_Roo_IntegrationTest.aj_ y también el
+campo <nombre_entidad>DataOnDemand dod, anotado con @Autowired,
+llevandolos a la clase Java del test de integración. Una vez los test
+están en la clase Java, se pueden corregir los errores de compilación
+reemplazando el operador _">"_ por el método _equals_. A continuación se
+muestra un ejemplo extraido del proyecto de ejemplo petclinic que se
+distribuye junto a gvNIX/Roo en el que se han corregido las líneas
+marcadas en negrita para los métodos _testFlush()_ y _testMerge()_.
++
+----------------------------------------------------------------------------------
+package com.springsource.petclinic.domain;
+
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.roo.addon.test.RooIntegrationTest;
+
+@RooIntegrationTest(entity = Owner.class)
+public class OwnerIntegrationTest {
+    @Autowired
+    private OwnerDataOnDemand dod;
+
+    @Test
+    public void testMarkerMethod() {
+
+    }
+
+    @Test
+    public void testFlush() {
+        com.springsource.petclinic.domain.Owner obj = dod.getRandomOwner();
+        org.junit.Assert.assertNotNull(
+                "Data on demand for 'Owner' failed to initialize correctly", obj);
+        java.lang.Long id = obj.getId();
+        org.junit.Assert.assertNotNull(
+                "Data on demand for 'Owner' failed to provide an identifier", id);
+        obj = com.springsource.petclinic.domain.Owner.findOwner(id);
+        org.junit.Assert.assertNotNull(
+                "Find method for 'Owner' illegally returned null for id '"
+                + id + "'", obj);
+        boolean modified =  dod.modifyOwner(obj);
+        java.lang.String currentVersion = obj.getOccChekcsum();
+        obj.flush();
+        org.junit.Assert.assertTrue(
+                "OccCheckSum for 'Owner' failed to modify on flush directive", 
+                (currentVersion != null &&
+                ) ||
+                !modified);
+    }
+
+    @Test
+    public void testMerge() {
+        com.springsource.petclinic.domain.Owner obj = dod.getRandomOwner();
+        org.junit.Assert.assertNotNull(
+                "Data on demand for 'Owner' failed to initialize correctly", obj);
+        java.lang.Long id = obj.getId();
+        org.junit.Assert.assertNotNull(
+                "Data on demand for 'Owner' failed to provide an identifier", id);
+        obj = com.springsource.petclinic.domain.Owner.findOwner(id);
+        boolean modified =  dod.modifyOwner(obj);
+        java.lang.String currentVersion = obj.getOccChekcsum();
+        com.springsource.petclinic.domain.Owner merged = (
+                com.springsource.petclinic.domain.Owner) obj.merge();
+        obj.flush();
+        org.junit.Assert.assertEquals(
+                "Identifier of merged object not the same as identifier of " + 
+                        "original object",
+                merged.getId(), id);
+        org.junit.Assert.assertTrue(
+                "OccCheckSum for 'Owner' failed to modify on merge and flush " + 
+                        "directive", 
+                (currentVersion != null &&
+                )
+                || !modified);
+    }
+}
+----------------------------------------------------------------------------------
+_______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________

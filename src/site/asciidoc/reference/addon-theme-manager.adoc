@@ -1,0 +1,82 @@
+Add-on Theme Manager
+--------------------
+
+Add-on para la gestión de distintos temas visuales.
+
+Descripción
+-----------
+
+Este add-on permite gestionar temas visuales en la aplicación.
+
+Un tema visual está compuesto por ficheros (css, tagx, layouts,
+imágenes) que, usando los comandos de esta utilidad, se pueden instalar
+en la aplicación sobre la que se trabaja. Tiene también un fichero XML
+de descripción con el identificador del tema.
+
+Cada uno de los temas que ofrece gvNIX puede estar en alguno de los
+siguientes estados:
+
+Establecido::
+  Último tema que se ha aplicado en la aplicación y por lo tanto el tema
+  que se estará visualizando.
+Instalado::
+  Temas que se encuentran almacenados dentro de la aplicación y
+  preparados para establecer.
+Disponible::
+  Temas que se pueden instalar en la aplicación y que están incluidos en
+  la instalación de gvNIX.
+
+Un Tema, para poder ser _establecido_ en la aplicación en desarrollo,
+debe de estar _Instalado_. La instalación de un Tema puede hacerse
+mediante el comando
+link:#apendice-comandos_addon-theme-manager_theme-install[`theme
+    install`] o copiando el tema en el directorio `themes` de la
+aplicación con la que se está trabajando. gvNIX detectará la instalación
+manual de un tema y por lo tanto se podrá establecer en la aplicación.
+
+Para establecer un tema se utiliza el comando
+link:#apendice-comandos_addon-theme-manager_theme-set[`theme
+    set`]. Este comando copiará el contenido del tema al directorio de
+la aplicación, sobreescribiendo los fichero ya existentes. Este comando
+*sobreescribe los ficheros y no implementa ningún mecanismo para
+revertir los cambios*.
+
+Si se desea actualizar un tema (estilos, recursos gráficos, ...) a una
+versión más actual que tenga disponible una nueva versión de gvNIX es
+suficiente con instalar la nueva versión (comando _theme install_) y
+establecerla (_theme set_). Es decir, los comandos de este add-on
+permiten la actualización del tema.
+
+Por otro lado, con el comando _theme set_ se instala en el directorio
+_styles_ del proyecto un archivo (_application.css_) que permitirá
+personalizar los estilos de la aplicación sin necesidad de modificar
+directamente las CSS de los temas o de otros addons. Esta hoja de
+estilos no se reemplaza al reinstalar un tema.
+
+Para ver todos los comandos y sus opciones ver el
+link:#apendice-comandos_addon-theme-manager[apéndice de comandos].
+
+Temas disponibles por defecto.
+------------------------------
+
+La distribución de gvNIX viene con dos temas _disponibles_:
+
+cit-theme::
+  Tema visual utilizado en las aplicaciones de la CITMA (Consejería de
+  Infraestructuras, Transporte y Medio Ambiente del Govierno de
+  Valencia).
+gvNIX-theme::
+  Tema de ejemplo con una personalización del tema estándar de Spring
+  Roo.
+
+Futuras versiones
+-----------------
+
+Para las futuras versiones de esta herramienta se preve (aunque no están
+planificadas) añadir la siguientes funcionalidades:
+
+Exportación de temas::
+  Generar un Tema basado en los elementos de visualización actuales de
+  la aplicación.
+Descarga de temas::
+  Soporte de descarga de temas desde servidores.

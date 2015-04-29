@@ -1,0 +1,70 @@
+Arranque y pruebas de la aplicación web
+---------------------------------------
+
+Pruebas funcionales
+-------------------
+
+Una vez creada la capa web es posible generar automáticamente un
+conjunto de pruebas funcionales que permitirán realizar pruebas de
+aceptación de la aplicación.
+
+La creación de las pruebas funcionales se realizan a través del comando
+`selenium test`
+
+En el siguiente ejemplo se está generando las pruebas funcionales para
+el controlador de la entidad _Pizza_:
+
+------------------------------------------------
+selenium test --controller ~.web.PizzaController
+------------------------------------------------
+
+Los test generados estarán en _src/main/webapp/selenium_. La opción
+_--controller_ especifica la clase controladora para la que se desea
+generar el test. Existen dos parámetros opcionales, uno es _--serverUrl_
+que permite indicar la dirección base de la aplicación sobre la que
+deben ejecutarse los tests y el otro es _--name_ que permite dar un
+nombre específico al test. Habitualmente, no será necesario especificar
+estos parámetros opcionales.
+
+Arrancar la aplicación web
+--------------------------
+
+Desde que se creó la capa web, ya era posible poner en marcha la
+aplicación y visualizarla en un navegador web. La puesta en marcha de la
+aplicación se puede realizar de dos formas distintas.
+
+Si la consola del framework se está ejecutando desde un Eclipse o un
+STS, consultar la sección de la documentación
+link:#guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse[Arrancar
+la aplicación con Eclipse] en la que se explica tanto la instalación de
+un servidor en el IDE como el modo de arrancar la aplicación.
+
+Si la consola del framework se está ejecutando desde la consola del
+sistema, salir de la consola del framework con el comando `quit` y
+ejecutar la orden `mvn tomcat:run`. Observar que en la consola del
+sistema debe estar configurado y por lo tanto disponible la herramienta
+Maven.
+
+Para poder ver en funcionamiento la aplicación se debe acceder a la
+dirección: http://localhost:8080/pizzashop con un navegador web.
+
+Ejecutar los tests funcionales
+------------------------------
+
+Para lanzar las pruebas, la aplicación debe estar en marcha y entonces
+pueden ejecutarse utilizando el plugin M2Eclipse de STS o Eclipse. Para
+ello, seleccionar la opción `Run As > Maven build ...` del menú
+contextual del proyecto o del menú superior e introducir como `Goals` el
+valor `selenium:selenese`. Darle un nombre a esta configuración y a
+partir de entonces utilizar esta configuración guardada para ejecutar
+los test funcionales mediante el botón `Run As...`.
+
+También es posible lanzar las pruebas funcionales con la orden
+`mvn selenium:selenese` desde la consola del sistema.
+
+De este modo se ejecutará el conjunto de tests sobre una nueva instancia
+del navegador FireFox (obviamente, es necesario tener instalado dicho
+navegador en la máquina).
+
+Los resultados de los tests se guardarán en _target/selenium.html_ en
+formato HTML.

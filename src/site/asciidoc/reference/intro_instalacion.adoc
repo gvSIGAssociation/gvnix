@@ -1,0 +1,276 @@
+Instalación de gvNIX
+--------------------
+
+Requisitos previos
+------------------
+
+gvNIX es en si mismo una aplicación Java por lo que requiere tener una
+máquina virtual Java instalada en el sistema.
+
+La lista de requisitos es la siguiente:
+
+* Versión más actual de Java JDK 6 instalado en el sistema
+(http://www.oracle.com/technetwork/java/javase/downloads/index.html[Más
+información]).
+* Maven 3.0.x o superior (http://maven.apache.org/).
+* Conexión a Internet para la descarga de las dependencias de los
+proyectos.
+
+Configuración del entorno
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+La configuración del entorno solo será necesario si se va a utilizar
+gvNIX desde la consola del sistema. Por lo tanto, no será necesario
+realizar todos los pasos indicados en este punto si se va a utilizar
+gvNIX desde Eclipse o STS tal y como se detallará posteriomente.
+
+Una vez descargado el archivo de instalación de Java JDK y Maven veamos
+como configurar el entorno de trabajo para usar estas herramientas.
+
+_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Note*
+
+Las siguientes notas sobre configuración son una recomendación de buenas
+prácticas. La variable _$HOME_ hace referencia al path del directorio de
+raíz de usuario (por ejemplo: _/home/usuario_). Se supondrñá instalado
+Java JDK y Maven en:
+
+1.  Java JDK 1.6 instalada en: _/home/usuario/software/jdk1.6.0_35_
+2.  Maven 3 instalado en: _/home/usuario/software/apache-maven-3.0.4_
+_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+* *Variables de entorno*.
++
+En entornos Unix, se puede utilizar _$HOME/.bashrc_ para definir las
+variables de entorno y automáticamente se cargarán al abrir una nueva
+consola. Es una buena práctica definirlas en nuestro propio archivo y
+cargarlo desde el _$HOME/.bashrc_, en este caso dicho archivo se llamará
+_$HOME/.bash_devel_.
++
+En sistemas Windows, establecer en las propiedades de "Mi PC" únicamente
+las variables de entorno que se definen a continuación en el segundo
+punto.
+** *Modificar _$HOME/.bashrc_ para que cargue el archivo
+_$HOME/.bash_devel_*:
++
+Añadir al final del archivo .bashrc las siguientes líneas:
++
+-----------------------------
+# Development settings
+if [ -f ~/.bash_devel ]; then
+   . ~/.bash_devel
+fi
+-----------------------------
+** *Crear/Modificar _$HOME/.bash_devel_ para añadir las variables de
+entorno*:
++
+-------------------------------------------------
+export JAVA_HOME=$HOME/software/jdk1.6.0_35
+
+export M2_HOME=$HOME/software/apache-maven-3.0.4
+
+export M2=$M2_HOME/bin
+
+export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512"
+
+export PATH=$JAVA_HOME/bin:$M2:$PATH
+-------------------------------------------------
++
+Con estos cambios cada vez que se abra una consola del sistema estarán
+cargadas las variables de entorno. También se puede cargar los cambios
+realizados en estos ficheros ejecutando el comando _source_ en la
+consola de entornos Unix:
++
+----------------------
+bash:~$ source .bashrc
+----------------------
++
+Una vez realizados estos cambios se puede comprobar su funcionamiento:
+(Ejecutando los comandos siguientes veremos salidas similares a las que
+se muestran)
++
+----------------------------------------------------------------------------
+bash:~$ 
+java version "1.6.0_35"
+Java(TM) SE Runtime Environment (build 1.6.0_35-b04)
+Java HotSpot(TM) 64-Bit Server VM (build 20.8-b03, mixed mode)
+bash:~$ 
+Apache Maven 3.0.4 (r1056850; 2012-01-09 17:58:10+0100)
+Java version: 1.6.0_35, vendor: Sun Microsystems Inc.
+Java home: /home/usuario/software/jdk1.6.0_35/jre
+Default locale: es_ES, platform encoding: UTF-8
+OS name: "linux", version: "3.2.0-30-generic", arch: "amd64", family: "unix"
+----------------------------------------------------------------------------
+
+Acceso a través de un proxy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Si la conexión a Internet se realiza a través de un proxy, habrá que
+configurar tanto Java como Maven para que puedan acceder al exterior
+correctamente.
+
+* *Java a través de proxy*:
++
+Es posible que la red en la que se esté trabajando requiera de la
+configuración de un Proxy para el acesso a internet.
++
+gvNIX/Roo dispone de un comando que indica si la instalación de Java
+está, o no, configurada para conectar a Internet a través de un proxy.
++
+------------------------------------------------------------------------------------
+roo-gvNIX> 
+                     *** Your system has no proxy setup ***
+http://download.oracle.com/javase/6/docs/technotes/guides/net/proxies.html offers
+useful information.
+For most people, simply edit /etc/java-6-openjdk/net.properties (or equivalent) and
+set the java.net.useSystemProxies=true property to use your operating system-defined
+proxy settings.
+------------------------------------------------------------------------------------
++
+En el ejemplo anterior indica que no hay ningún proxy configurado. Si es
+necesario hacerlo se debe seguir la guía tal y como indica la salida del
+comando.
++
+Si se han seguido las recomendaciones para instalar Java, ir a
+/home/usuario/software/jdk1.6.0_35/jre/lib. Aquí estará el archivo
+net.properties que se debe editar y configurarlo según las necesidades.
++
+La opción más sencilla es establecer la propiedad
+_java.net.useSystemProxies=true_. Esto le indica a Java que debe
+utilizar la configuración del proxy que previamente se haya definido en
+el sistema operativo. Sin embargo puede no funcionar en todos los
+sistemas.
++
+En caso de no funcionar lo anterior, definir la configuración específica
+del proxy buscando las propiedades descritas a continuación y
+añadiéndolas si no existen:
++
+------------------------------------------------------------
+java.net.useSystemProxies=false
+
+http.proxyHost=host.proxy.de.red (ejemplo: proxy.mired.com)
+http.proxyPort=puerto (ejemplo: 8080)
+http.nonProxyHosts=hosts.a.ignorar.1|host.a.ignorar.2
+ (ejemplo: localhost|127.0.0.1|192.168.1.*|*.mired.com)
+
+https.proxyHost=host.proxy.de.red (ejemplo: proxy.mired.com)
+https.proxyPort=puerto (ejemplo: 8080)
+https.nonProxyHosts=hosts.a.ignorar.1|host.a.ignorar.2
+ (ejemplo: localhost|127.0.0.1|192.168.1.*|*.mired.com)
+------------------------------------------------------------
++
+Si se configura alguna de estas propiedades el comando _proxy
+configuration_ informará de los valores configurados.
+* *Maven a través de proxy:*
++
+Algunos comandos de gvNIX/Roo utilizan la herramienta Maven y dicha
+herramienta en algunos casos necesita conexión con Internet para, por
+ejemplo, descargar las dependencias de los proyectos generados.
++
+Es por ello que si se accede a Internet a través de un proxy se deberá
+configurar en el fichero $M2_HOME/conf/settings.xml las siguientes
+secciones en el lugar adecuado del fichero. Revisar las secciones
+comentadas porque existirá ya una sección de este tipo como ejemplo:
++
+-----------------------------------------------------------------
+<proxy>
+        <id>Proxyhttp</id>
+        <active>true</active>
+        <protocol>http</protocol>
+        <host>host.proxy.de.red (ejemplo: proxy.mired.com)</host>
+        <port>puerto (ejemplo: 8080)</port>
+</proxy>
+<proxy>
+        <id>Proxyhttps</id>
+        <active>true</active>
+        <protocol>https</protocol>
+        <host>host.proxy.de.red (ejemplo: proxy.mired.com)</host>
+        <port>puerto (ejemplo: 8080)</port>
+</proxy>
+-----------------------------------------------------------------
+
+Descarga e instalación de gvNIX
+-------------------------------
+
+1.  Descargar (https://code.google.com/p/gvnix/downloads/list) y
+descomprimir el fichero ZIP de la versión de gvNIX más actual, por
+ejemplo gvNIX-X.Y.Z.RELEASE.zip
+* Ejemplo para sistemas Unix y Apple:
++
+-------------------------------------
+bash:~$ unzip gvNIX-X.Y.Z.RELEASE.zip
+-------------------------------------
+2.  Al descomprimir el fichero ZIP se creará un nuevo directorio
+_gvNIX-X.Y.Z.RELEASE_. En el resto del documento se hará referencia a
+este directorio como _GVNIX_HOME_
+3.  Incluir el directorio _bin_ de gvNIX en la variable de entorno
+_PATH._
++
+_Solo será necesaria si se utiliza gvNIX desde la consola del sistema.
+Por lo tanto, no será necesario realizar todos los pasos indicados en
+este punto si se utiliza gvNIX desde Eclipse o STS tal y como se
+detallará posteriomente._
+* Ejemplo para sistemas Unix y Apple:
++
+------------------------------------------------------
+bash:~$ cd gvNIX-X.Y.Z.RELEASE
+bash:~/gvNIX-X.Y.Z.RELEASE$ export PATH=$PWD/bin:$PATH
+------------------------------------------------------
++
+Se puede definir la variable _GVNIX_HOME_ y su inclusión en el PATH del
+sistema mediante el archivo _.bash_devel_ y así tenerla disponible de
+manera permanente.
++
+Recordar que en sistemas Windows, se pueden establecer en las
+propiedades de "Mi PC" las variables de entorno que se definen a
+continuación.
++
+Para ello modificamos el archivo para que quede como sigue:
++
+----------------------------------------------------
+...
+export GVNIX_HOME=$HOME/software/gvNIX-X.Y.Z.RELEASE
+
+export PATH=$JAVA_HOME/bin:$M2:$GVNIX_HOME/bin:$PATH
+----------------------------------------------------
++
+Notar que la última línea es la modificación de la definición de la
+variable _PATH_. Recordar recargar el fichero _.bash_devel_ mediante el
+comando _source_ de la consola de entornos Unix.
+
+Una vez hecho esto, ya se puede trabajar con el entorno gvNIX desde la
+línea de comandos. Sin embargo, se recomienda utilizar un IDE de
+desarrollo que permita integrar el entorno gvNIX como, por ejemplo STS o
+Eclipse tal y como se verá en la sección posterior. Aún así, si se desea
+abrir el intérprete de comandos desde la línea de comandos se puede
+hacer de la siguiente forma:
+
+* Cambiar al directorio donde se encuentre el proyecto Java existente o
+a un directorio vacío en el caso de tratarse de un proyecto nuevo:
++
+------------------------------
+bash:~$ cd ~/project-directory
+------------------------------
+* Ejecutar el intérprete de comando de gvNIX para interactuar con el
+proyecto Java:
++
+-----------------------------------------------------------
+bash:~/project-directory$ gvnix.sh
+
+(En sistemas windows el intérprete se abrirá con gvnix.bat)
+-----------------------------------------------------------
+* Con esto se abrirá la consola de gvNIX y se mostrará algo similar a lo
+siguiente:
++
+------------------------------------------------------------------------------------------
+    ____  ____  ____
+               / __ \/ __ \/ __ \
+              / /_/ / / / / / / /
+             / _, _/ /_/ / /_/ /   gvNIX x.x.x distribution
+            /_/ |_|\____/\____/    x.x.x-RELEASE [rev xxxxxxx]
+
+
+            Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
+            roo-gvNIX>
+        
+------------------------------------------------------------------------------------------

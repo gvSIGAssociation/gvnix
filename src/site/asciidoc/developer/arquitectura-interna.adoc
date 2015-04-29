@@ -1,0 +1,122 @@
+Arquitectura interna
+--------------------
+
+Esquema general de componentes
+------------------------------
+
+En el esquema siguiente podemos ver los principales componentes del
+framework.
+
+image:images/roo-esquema-general-componentes.png[Esquema General de
+componentes del framework]
+
+Una breve descripción de los componentes sería:
+
+Support::
+  Este componente engloba utilería genérica común en el framework.
+Classpath::
+  Componente básico. Contiene las clases e interfaces básicos para el
+  framework.
+Shell::
+  El interprete de comando interactivo que recibe los comando que
+  solicita el usuario. Soporta autocompletado (`TAB`) y ayuda en línea.
+Process Manager::
+  Coordina la ejecución de los procesos ya venga de comandos del shell o
+  de eventos que sucedan en el proyecto.
+Model::
+  Clases que se encarga de representar Tipos o clases Java.
+Metadata::
+  Servicio de manejo de la información disponible del proyecto,
+  tipos/clases, declaraciones de alto nivel (Entidades, controladores,
+  etc...).
+Project::
+  Gestiona el proyecto en general y sus dependencias.
+File Undo::
+  Pila de registro de comandos que permiten el deshacer los cambios
+  realizados en los ficheros en caso de fallo.
+File Monitor::
+  Componente que se encarga de registrar y monitorizar ficheros y
+  directorios de nuestro proyecto.
+
+El sistemas se arranca en un framework OSGi, por lo que casi todos estos
+componentes se acceden como servicios referencias de servicios OSGi.
+
+Aquí se detalla un poco más alguno de ellos.
+
+File Monitor
+------------
+
+El framework, mientras se está ejecutando la consola, esta monitorizando
+los cambios en los ficheros y directorios del proyecto apara poder
+ajustar los elementos generados por él mismo a los cambios que sufran
+los artefactos que gestiona.
+
+Los elementos que gestiona este componente debe de ser registrados.
+También contiene la lista de subscriptores, identificados por su
+interface como servicios OSGi, que desean ser notificados de los cambios
+en los componentes que gestiona.
+
+Por defecto, en el framework existen algunos ya implementados, como por
+ejemplo el que detecta los cambios en los `.java` y publica sus
+metadatos.
+
+Model
+-----
+
+En este componente contiene clases necesarias para representar la
+estructura de una clase java del proyecto.
+
+Metadata
+--------
+
+Es el conjunto de información que tenemos sobre el proyecto (nombre,
+dependencias, etc..), tipos Java (métodos, campos, constructores...) y
+conceptos de alto nivel (Entidades, controladores, reglas de
+validación,...). Todos estos datos deben ser recopilados automáticamente
+desde el propio proyecto.
+
+Sus características son:
+
+* Son objetos inmutables.
+* Cada uno tiene un identificador de tipo cadena único cuya generación
+es totalmente predecible. El primer requisito es que comience por los
+caracteres `MID:`.
+* Se construyen bajo demanda, no se almacenan en el proyecto.
+* Un metadato puede depender de otro. Si el metadato varia sus
+_dependientes_ recibirán una notificación.
+* Es posible monitorizar las notificaciones de los metadatos
+implementando un interface.
+
+Para que el manejo de metadatos sea mas óptimo existe un servicio que
+cachea los metadatos.
+
+Shell
+-----
+
+Componente que implementa una consola interactiva que soporta
+autocompletado y ayuda en linea. A través de este componente el
+framework interactúa con el usuario.
+
+Process Manager
+---------------
+
+Gestiona y coordina la ejecución de los comando del Shell, la ejecución
+de los distintos monitores y la ejecución de las operaciones provocadas
+por los eventos de estos últimos.
+
+Una característica importante es que se encarga de registrar las
+acciones sobre los ficheros de los procesos, dentro del File Undo, para
+poder _deshacerlas_ en caso de fallo en la ejecución.
+
+En el desarrollo de un Add-on se ha de utilizar el componente
+FileManager para la gestión de los ficheros (creación, actualización y
+eliminación) quedando así registrada cada acción sobre un fichero en
+determinado proceso para poder deshacer en caso de error.
+
+Framework OSGi
+--------------
+
+_TBC_.
+
+[Características. Descripción de los servicios y componentes.
+Referencias.] (Nuevo)

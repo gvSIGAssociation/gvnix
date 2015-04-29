@@ -1,0 +1,127 @@
+Comandos del add-on Web MVC Datatables
+--------------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-web-mvc-datatables[add-on Web
+MVC Datatables].
+
+.Comandos del add-on Web MVC Datatables
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-setup[web
+mvc datatables setup] |Instala los artefactos y dependencias requeridas
+para el funcionamiento del add-on.
+
+|link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-update-tags[web
+mvc datatables update tags] |Actualiza los artefactos, ya instalados en
+el add-on, por los actuales.
+
+|link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add[web
+mvc datatables add] |Añade el uso de datatables al controlador
+especificado.
+
+|link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-all[web
+mvc datatables all] |Añade el uso de Datatables a todos los
+controladores de la aplicación.
+
+|link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-details-add[web
+web mvc datatables details add] |Añade un detalle a la vistas list de un
+controlador.
+|=======================================================================
+
+web mvc datatables setup
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Instala todos los artefactos necesario para que el add-on funcione.
+
+Los cambios en el proyecto son:
+
+webapp/styles/datatables::
+  Css usadas por el widget.
+webapp/images/datatables/::
+  Imágenes usadas por el widget.
+webapp/scripts/datatables::
+  JavaScript usado por el widget.
+webapp/WEB-INF/tags/datatables::
+  Tagx que adaptan los parámetros de los tags estándar a los de
+  Dandelion-DataTables.
+src/main/resources/datatables*.properties::
+  Fichero con opciones de configuración de Dandelion-DataTables y
+  cadenas de internacionalización.
+webapp/WEB-INF/tags/util/load-scripts.tagx::
+  Añade la carga de ficheros js y css a la páginas.
+webapp/WEB-INF/web.xml::
+  Registra configuración necesaria para el uso de Dandelion-DataTables.
+webapp/WEB-INF/spring/webmvc-config.xml::
+  Registra configuración necesaria para el uso de Dandelion-DataTables.
+
+web mvc datatables update tags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Actualiza todos los artefactos necesario para que el add-on funcione.
+Este comando es útil cuando se actualiza la versión del add-on y se
+desea utilizar los cambios en los tagx u otros artefactos de la nueva
+versión.
+
+_Advertencia:_Al ejecutar este comando, _los artefactos del proyecto
+serán reescritos_. Cualquier cambio sobre los originales se perderá. Por
+lo tanto, es conveniente disponer de una _copia de seguridad o un
+sistema de control de versiones_ para revisar las diferencias entre los
+artefactos anteriores y la actualización.
+
+web mvc datatables add
+~~~~~~~~~~~~~~~~~~~~~~
+
+Añade el uso de Datatables al controlador especificado.
+
+Sus parámetros son:
+
+--type::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Nombre de la clase Java controladora a la que se aplicará los cambios.
+--ajax::
+  _[Opcional] [Booleano] [Autocompletado]_
+  +
+  Establece el modo de datos a AJAX (por defecto) o a DOM (cuando es
+  _false_).
+--mode::
+  _[Opcional] [Cadena]_
+  +
+  Establece el modo de visualización a
+  link:#addon-web-mvc-datatables_register-modeaddon-web-mvc-datatables_register-mode[modo
+  registro].
+--inline::
+  _[Opcional] [Boolean] [Autocompletado]_
+  +
+  Habilita la funcionalidad
+  link:#addon-web-mvc-datatables_inline-editing[edición en línea].
+
+web mvc datatables all
+~~~~~~~~~~~~~~~~~~~~~~
+
+Añade el uso de Datatables a todos los controladores de la aplicación,
+usando los valores por defecto del comando
+link:#apendice-comandos_addon-web-mvc_jquery_web-mvc-jquery-add[web mvc
+jquery add].
+
+web mvc datatables details add
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Un detalle a la vista list para en base a una propiedad _1 a N_ de la
+entidad relacionada (ver descripción en
+link:#addon-web-mvc-datatables_add-details[Visualización de detalles]).
+
+Sus parámetros son:
+
+--type::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Nombre de la clase Java controladora a la que se aplicará los cambios.
+  Este controlador ya debe estar usando la funcionalidad _dataTables_
+--property::
+  _[Requerido] [Nombre de propiedad]_
+  +
+  Nombre de la propiedad _1 a N_ de la entidad relación con el
+  controlador a usar para el detalle.

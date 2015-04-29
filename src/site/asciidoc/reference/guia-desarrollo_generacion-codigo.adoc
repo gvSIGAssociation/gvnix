@@ -1,0 +1,34 @@
+Código generado por gvNIX/Roo
+-----------------------------
+
+Clases Java y ficheros AJ
+-------------------------
+
+Archivos Java
+~~~~~~~~~~~~~
+
+Por lo general, la norma que se sigue es mantener la clase Java, el
+archivo .java, lo más sencillo posible y por ello, muchas veces, se
+puede observar que el archivo .java está prácticamente vacio. Contiene
+poco más que la declaración de la clase y anotaciones asociadas a la
+misma. El resto del código, campos y métodos se declaran en sus aspectos
+java de los que se hablará a continuación.
+
+Archivos AJ
+~~~~~~~~~~~
+
+Estos son los ficheros que genera automáticamente el framework y que
+contienen las operaciones básicas, los campos definidos con sus getter y
+setter, el identificador, etc. En general contine el código que un
+programador haria de manera rutinaria. Estos ficheros tienen nombres
+como *_Roo_*.aj y *_gvNIX_*aj. Se trata de aspectos java que no son más
+que porciones de código que al compilar el proyecto, se asocian como
+código de la propia clase Java a la que están vinculadas. Si se desea
+personalizar alguna de las operaciones básicas, un getter determinado o
+añadir nuevas funcionalidades, estas deberán realizarse en los ficheros
+.java. En los ficheros aj no se debe de hacer ningún cambio. El motivo
+de esto es, que teniendo la consola funcionando, o al arrancarla, se
+volvería a generar el código automáticamente perdiendo las
+modificaciones que se hubiesen realizado. Y al contrario si en el
+fichero .java se ha creado el getter personalizandolo, automáticamente
+lo borrara del fichero .aj.

@@ -1,0 +1,245 @@
+Introducción
+------------
+
+// Push titles down one level.
+:leveloffset: 2
+
+
+¿Qué es gvNIX?
+--------------
+
+gvNIX es un entorno de trabajo Java de código abierto para el desarrollo
+rápido de aplicaciones web altamente productivo, flexible y que no
+compromete la calidad de los proyectos.
+
+Está compuesto de un conjunto de herramientas de código abierto entre
+las que destaca su núcleo, http://www.springsource.org/spring-roo[Spring
+Roo]. Esto le proporciona un amplio apoyo por parte de importantes
+organizaciones como Spring Source y VMWare. Añade funcionalidades de
+alto nivel a las prestaciones que ya se obtienen con
+http://www.springsource.org/spring-roo[Spring Roo] para mejorar la
+productividad.
+
+gvNIX es un proyecto subvencionado y liderado por la Consejería de
+Infraestructuras, Transporte y Medio Ambiente (CITMA) de la Generalidad
+Valenciana.
+
+gvNIX está disponible dentro del proyecto de Migración a Software de
+fuentes abiertas http://www.gvpontis.gva.es[gvPONTIS].
+
+* http://www.gvnix.org[Comunidad online de gvNIX]
+* http://gvnix.googlecode.com[Proyecto gvNIX en Google Code]
+* http://www.gvpontis.gva.es/cast/gvnix/[Página de gvNIX dentro del
+proyecto gvPONTIS]
+* http://projects.spring.io/spring-roo/[Página oficial de Spring Roo]
+
+¿Qué es Spring Roo?
+-------------------
+
+Según su creador, Ben Alex: "Roo es un pequeño genio que observa desde
+un segundo plano y gestiona todo aquello de lo que no me quiero
+preocupar".
+
+Spring Roo es un entorno de trabajo Java que permite el desarrollo de
+aplicaciones web de forma rápida y cómoda para el desarrollador. Sus
+principales características son:
+
+* Generación de código en Java (lenguaje estático).
+* Eliminar el trabajo tedioso centrando el desarrollo en la lógica de
+negocio.
+* Convención sobre configuración.
+* Desarrollo dirigido por el dominio (Domain-Driven Development):
+** Diseño dirigido por el modelo de entidades.
+** Lógica en las entidades (Real Object Oriented), eliminando capas
+redundantes.
+** Otras capas opcionales (servicios, DAOs, ...).
+* Crea un proyecto en segundos.
+* Realimentación: añade valor durante todo el ciclo de vida.
+* No incorpora elementos adicionales al entorno de ejecución, por lo que
+no penaliza la velocidad ni la memoria de la aplicación.
+* No requiere ningún IDE.
+* Recibe instrucciones a través de una consola interactiva con
+autocompletado y ayuda en línea.
+* Extensible usando _bundles OSGi_.
+* Aprovecha el conocimiento: no necesita más conocimiento que el
+necesario para el desarrollo de aplicaciones JEE.
+
+¿Qué ofrece gvNIX?
+------------------
+
+gvNIX aprovecha las características de Spring Roo y aporta su propia
+filosofía, ofrecer al desarrollador componentes de alto valor funcional
+para aplicaciones corporativas:
+
+* Control de concurrencia a nivel de aplicación sin campos en base de
+datos.
+* Utilidades de generación de consultas.
+* Utilidades de modificaciones múltiples de entidades.
+* Gestión de temas visuales.
+* Gestión de la visualización de excepciones.
+* Gestión de mensajes de usuario en ventana modal.
+* Gestión de la estructura de páginas en el menú.
+* Gestión de patrones de visualización de entidades y sus relaciones.
+* Gestión de transformación de cadenas vacías a valores nulos.
+* Gestión de servicios locales y servicios web (importación y
+exposición).
+* Control de acceso (autenticación y autorización).
+* Gestión de configuraciones por entorno.
+* Generación de documentos (reportes).
+
+Arquitectura
+------------
+
+gvNIX se centra en el desarrollo de aplicaciones Java para entornos
+corporativos.
+
+La arquitectura de Roo y gvNIX se subdivide en 2 grandes bloques: el
+entorno de desarrollo y el entorno de ejecución
+
+* El entorno de desarrollo incorpora distintas herramientas enfocadas al
+desarrollo rápido de aplicaciones Java. La característica más importante
+del entorno de desarrollo es que no introduce ningún tipo de librería
+propia, de tal forma que en tiempo de ejecución no añade sobre coste
+alguno al rendimiento a las aplicaciones.
+* El entorno de ejecución es un entorno típico de aplicaciones basadas
+en Spring 3:
+** Acceso a bases de datos relacionales usando el API Java Persistence
+(JPA).
+** Inyección de dependencias.
+** Gestión de transacciones propia de Spring.
+** Pruebas unitarias con JUnit.
+** Configuración Maven para la construcción de las aplicaciones.
+** Vistas JSP usando Spring MVC. Además, se pueden utilizar otras
+tecnologías de visualización tales como Flex, GWT, JSF y Vaadin.
++
+Las aplicaciones basadas en Spring son probablemente las aplicaciones
+Java más populares seguidas de JSF, Struts y GWT según el
+http://twitpic.com/9mgnd5[Developer Productivity Report 2012].
+
+Es importante destacar que Roo y gvNIX no imponen ninguna restricción
+sobre el tipo de aplicaciones que se pueden generar con este entorno.
+Algunos ejemplos de las funcionalidades que se pueden cubrir fácilmente
+con la versión actual son (notar que no están limitadas únicamente a
+estas):
+
+* Intercambio de mensajes por JMS o envío por SMTP.
+* Capa de servicios opcional con posibilidad de acceso remoto para
+clientes RIA.
+* Ejecución de acciones predefinidas contra la base de datos.
+
+Una de las mayores diferencias entre Roo/gvNIX y las aplicaciones
+tradicionales generadas a mano es que, por defecto, no añade capas de
+abstracción innecesarias. Las aplicaciones Java más tradicionales tienen
+una capa DAO, capas de servicios, capa de dominio y una capa de control.
+En una aplicación generada con Roo/gvNIX inicialmente solo se usa una
+link:#guia-desarrollo_gestion-entidades[capa de Entidad] (que es similar
+a la capa de dominio) y una link:#guia-desarrollo_capa-web[capa Web]. Se
+podrá generar también una capa de Servicios y/o DAO si fuese necesario.
+
+A continuación se puede ver un diagrama de los componentes de la
+arquitectura, capas y tecnologías relacionadas en Roo/gvNIX:
+
+image:images/gvnix-arquitectura-v1.0.png[Diagrama Arquitectura]
+
+El intérprete de comandos
+-------------------------
+
+Para que el entorno empiece a funcionar, hay que arrancar un intérprete
+de comandos (_Roo shell_) mediante el que se interactuará con el entorno
+de desarrollo. Este intérprete de comandos o consola tiene dos funciones
+básicas:
+
+* Ejecutar las órdenes indicadas por el desarrollador.
+
+* Monitorizar cualquier cambio en el proyecto para reajustar el código
+generado.
+
+La consola tiene el siguiente aspecto:
+
+------------------------------------------------------------------------------
+    ____  ____  ____
+   / __ \/ __ \/ __ \
+  / /_/ / / / / / / /
+ / _, _/ /_/ / /_/ /   gvNIX x.x.x distribution
+/_/ |_|\____/\____/    x.x.x-RELEASE [rev xxxxxxx]
+
+Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
+roo-gvNIX>
+------------------------------------------------------------------------------
+
+La usabilidad es un factor clave en el entorno de trabajo. Entre las
+principales características de usabilidad que proporciona la consola se
+encuentran:
+
+* Comandos _hint_ y _help_: Guían al usuario sobre la forma de proceder
+* _TAB_ para completar prácticamente cualquier comando.
++
+Pulsando _TAB_ Roo sugiere que hacer a continuación, que comando se
+puede utilizar a continuación, incluso pulsando algún caracter qué
+comandos que empiezan por ese caracter se pueden utilizar.
+* Si se produce algún error en alguna operación, Roo deshará todos los
+cambios generados dejando la aplicación como se encontraba inicialmente.
+* Ejecución de _scripts_: Se puede guardar una secuencia de comandos en
+un archivo de texto y ejecutarlos en bloque cuantas veces se necesite.
+Por ejemplo, se puede hacer un guión para crear una aplicación completa
+y ejecutarlo en el intérprete de Roo.
+* Funcionamiento predictivo y conservador: Al ejecutarse en segundo
+plano debe ser un entorno conservador en el sentido que si no cambia
+nada en el proyecto no debe tocar nada, el desarrollador no debe perder
+nunca el control del proyecto.
+
+¿Cómo funciona?
+---------------
+
+Este diagrama muestra a alto nivel el modelo funcional de Roo y gvNIX:
+
+image:images/modelo-roo.png[Diagrama de modelo funcional de Roo y gvNIX]
+
+* Proyecto Java
++
+Es el contenido de nuestra aplicación formada por todos los archivos
+necesarios.
+* ** Add-ons
++
+Componentes que automáticamente monitorizan y realizan cambios en
+nuestro proyecto.
++
+También ofrecen un conjunto de comandos para que los desarrolladores
+puedan realizar operaciones a través del intérprete de comandos.
+** Intérprete de comandos (Shell)
++
+Componente que permite la recepción y ejecución de órdenes del
+desarrollador
+** STS: SpringSource Tool Suite
++
+Plugin/Aplicación Eclipse de SpringSource para trabajar con proyectos
+Spring. Entre otras, dispone de herramientas para trabajar con
+Roo/gvNIX.
+
+Generación de código
+--------------------
+
+_Roo y gvNIX es un generador de código híbrido, puesto que intenta
+combinar lo mejor de los modelos de generación pasiva y activa._
+
+* Generación pasiva:
++
+El desarrollador indica a la herramienta qué es lo que debe generar, y
+una vez generado finaliza el trabajo de la herramienta. No se asume un
+mantenimiento a largo plazo del código generado. El desarrollador
+interactúa mediante el intérprete de comandos, desde ahí se realiza y
+termina el proceso de generación de código, que genera archivos xml y
+java.
+* Generación activa:
++
+Es una realimentación automática que genera un modelo detallado de
+metadatos con la ayuda de las anotaciones @Roo y @GvNIX e
+incrementalmente actualiza archivos aj y jsp. Permite mantener
+automáticamente elementos del proyecto en respuesta a cambios, este tipo
+de generación nunca modifica archivos java, estos solo se modifican por
+indicación expresa del desarrollador y solo a través del intérprete de
+comandos.
+
+// Return to normal title levels.
+:leveloffset: 0
+

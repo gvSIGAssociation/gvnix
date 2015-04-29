@@ -1,0 +1,83 @@
+Add-on GVA Security
+-------------------
+
+Descripción
+-----------
+
+El add-on permite instalar clientes de autenticación y autorización y lo
+integra con el sistema de seguridad Spring Security. Por defecto están
+configurados los proveedores SAFE (acceso mediante usuario y contraseña
+y acceso mediante certificado digital) y APLUSU (antiguo CIT security
+addon) pero se pueden añadir nuevos proveedores implementando la
+interfaz SecurityProvider
+
+Para instalarlo, hay que utilizar el comando
+link:#apendice-comandos_addon-gva-security_security-provider-add[security
+provider add] con los parámetro adecuados (nombre del proveedor y
+paquete en el que se instalará). El add-on instalará las clases
+necesarias para hacer la llamada al servicio, el modelo de datos de
+usuario cumpliendo con los interfaces de Spring Security y el proveedor
+de autentificación que sirve de pasarela entre los dos elementos.
+
+Al instalar el Proveedor de seguridad _SAFE_ se permitirá al
+desarrollador configurar mediante dynamic configuration los siguientes
+parámetros:
+
+security.SAFE.appId::
+  _[Requerido]_
+  +
+  ID que identifica la aplicación en el servicio SAFE
+security.SAFE.environment::
+  _[Requerido]_
+  +
+  Entorno para el que se está configurando SAFE
+security.SAFE.keystore.alias::
+  _[Requerido]_
+  +
+  Alias del certificado utilizado para firmar la petición SAFE
+security.SAFE.keystore.file::
+  _[Requerido]_
+  +
+  Directorio del certificado utilizado para firmar la petición SAFE
+security.SAFE.keystore.password::
+  _[Requerido]_
+  +
+  Password del certificado utilizado para firmar la petición SAFE
+security.SAFE.keystore.type.keystore::
+  _[Requerido]_
+  +
+  Tipo del certificado utilizado para firmar la petición SAFE (Defecto:
+  JKS)
+security.SAFE.mapRoles::
+  _[Requerido]_
+  +
+  Indicamos si la petición devuelve los roles de usuario finales o
+  debemos asociarlos a los indicados por el desarrollador (Defecto:
+  true)
+security.SAFE.active::
+  _[Requerido]_
+  +
+  Parámetro para activar el proveedor de seguridad SAFE por entorno
+  (Defecto: true)
+security.SAFE.autorizacion.poraplicacion::
+  _[Requerido]_
+  +
+  Indicamos si la petición devuelve los roles de usuario según el id de
+  aplicación indicado anteriormente (Default: true)
+security.SAFE.applet.location::
+  _[Requerido]_
+  +
+  URL donde está almacenado el applet de SAFE para acceso por
+  certificado
+wsdl.SAFE.location::
+  _[Requerido]_
+  +
+  URL del servicio de Autenticación
+wsdl.SAFEAutorizacion.location::
+  _[Requerido]_
+  +
+  URL del servicio de Autorización
+
+Para ver con mas detalle el comando que proporciona el add-on consultar
+la sección de link:#apendice-comandos_gva-security[comandos del add-on
+GVA Security].

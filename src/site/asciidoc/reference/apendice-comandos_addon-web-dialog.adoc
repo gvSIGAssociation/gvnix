@@ -1,0 +1,188 @@
+Comandos del add-on Web Dialog
+------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-web-dialog[add-on Web
+Dialog].
+
+.Comandos del add-on Web Dialog
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix[web
+mvc dialog setup] |Instala el soporte para diálogos modales y realiza la
+gestión de ciertas excepciones para que sean visualizadas de forma
+amigable y en múltiples idiomas
+
+|link:#apendice-comandos_addon-web-exception-handler_exception-handler-list[web
+mvc dialog exception list] |Muestra por la consola la lista de
+excepciones que están siendo actualmente gestionadas
+
+|link:#apendice-comandos_addon-web-exception-handler_exception-handler-add[web
+mvc dialog exception add] |Incluye una nueva excepción dentro de la
+gestión de excepciones y permite definir el mensaje amigable asociado a
+la excepción en un determinado idioma
+
+|link:#apendice-comandos_addon-web-exception-handler_exception-handler-set-language[web
+mvc dialog exception set language] |Añade o actualiza un mensaje
+amigable asociado a una excepción en un determinado idioma para lo que
+la excepción debe haber sido incluida previamente en el sistema de
+gestión de excepciones con el comando anterior
+
+|link:#apendice-comandos_addon-web-exception-handler_exception-handler-remove[web
+mvc dialog exception remove] |Quita una excepción de la gestión y por lo
+tanto no se mostrará un mensaje amigable y en múltiples idiomas en el
+caso de producirse y no ser controlada desde el proyecto
+
+|link:#apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix[web
+mvc dialog add] |Añade dos métodos en el código fuente de un controlador
+que permiten abrir un diálogo modal en una página de la aplicación sin
+realizar ninguna implementación en la capa web
+|=======================================================================
+
+web mvc dialog setup
+~~~~~~~~~~~~~~~~~~~~
+
+Instala en el proyecto el soporte para diálogos de error y de usuario en
+ventana modal (pop-up). A partir de ese momento los mensajes de error de
+la aplicación se mostrarán con ese formato. También configura un sistema
+para visualizar de forma amigable y con soporte multi idioma ciertas
+excepciones que se pueden producir en esta clase de aplicaciones. Ver
+link:#addon-web-dialog[Add-on Web Dialog] para una información más
+detallada.
+
+web mvc dialog exception list
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Muestra por consola la lista de excepciones que actualmente están siendo
+gestionadas. Es decir, las excepciones que si no son controladas desde
+la aplicación y se producen, aparecerán al usuario en una ventana modal
+con un mensaje amigable y en multiples idiomas. El resultado mostrado
+por la consola será algo similar a lo siguiente:
+
+----------------------------------------------------
+Handled Exceptions:
+.DataAccessException
+.NoSuchRequestHandlingMethodException
+.TypeMismatchException
+.MissingServletRequestParameterException
+java.sql.SQLException
+java.io.IOException
+org.springframework.transaction.TransactionException
+java.lang.UnsupportedOperationException
+javax.persistence.OptimisticLockException
+org.hibernate.NonUniqueObjectException
+org.hibernate.exception.ConstraintViolationException
+org.hibernate.id.IdentifierGenerationException
+----------------------------------------------------
+
+web mvc dialog exception add
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Incluye una nueva excepción a la gestión de excepciones. De esta forma,
+si se produce dicha excepción en la aplicación se visualizará de forma
+amigable mediante un mensaje modal y en múltiples idiomas. Este comando
+permite también definir el mensaje amigable asociado a la excepción en
+un determinado idioma. El mensaje amigable se compone de título y
+descripción.
+
+Sus parámetros son:
+
+--exception::
+  _[Requerido] [Cadena]_
+  +
+  Nombre de la excepción a incluir en la gestión de excepciones. Si se
+  desea que la definición sea única, se ha de especificar el paquete
+  java completo del que proviene, por ejemplo
+  _java.lang.NullPointerException_, ya que si se especifica únicamente
+  el nombre, por ejemplo _NullPointerException_, aplicaría a todas las
+  excepciones con dicho nombre sea cual sea el paquete en el que se
+  encuentre.
+--title::
+  _[Requerido] [Cadena]_
+  +
+  Título de la ventana modal que se mostrará en pantalla cuando se
+  produzca la excepción.
+--description::
+  _[Requerido] [Cadena]_
+  +
+  Texto con el contenido de la ventana modal que se mostrará en pantalla
+  cuando se produzca la excepción.
+--language::
+  _[Requerido] [Cadena]_
+  +
+  Idioma del título y de la descripción en su formato ISO: _es, de, it,
+  nl, sv, en, etc_.
+
+web mvc dialog exception set language
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Añade o actualiza el mensaje amigable asociado a una excepción en un
+determinado idioma. La excepción debe haber sido incluida anteriormente
+en el sistema de gestión de excepciones con el comando _web mvc dialog
+exception add_. El mensaje amigable se compone de título y descripción.
+
+Sus parámetros son:
+
+--exception::
+  _[Requerido] [Cadena]_
+  +
+  Nombre de la excepción ya incluida en la gestión de excepciones para
+  la que se desea añadir o modificar sus mensajes amigables en un idioma
+  determinado. Se puede obtener el nombre exacto de la excepción
+  mediante el comando _web mvc dialog exception list_.
+--title::
+  _[Requerido] [Cadena]_
+  +
+  Título de la ventana modal que se mostrará en pantalla cuando se
+  produzca la excepción.
+--description::
+  _[Requerido] [Cadena]_
+  +
+  Texto con el contenido de la ventana modal que se mostrará en pantalla
+  cuando se produzca la excepción.
+--language::
+  _[Requerido] [Cadena]_
+  +
+  Idioma del título y de la descripción en su formato ISO: _es, de, it,
+  nl, sv, en, etc_.
+
+web mvc dialog exception remove
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Quita una excepción del sistema de gestión de excepciones y por lo tanto
+no se mostrará un mensaje amigable y en múltiples idiomas en el caso de
+producirse cuando no es controlada desde el código fuente de la
+aplicación.
+
+Sus parámetros son:
+
+--exception::
+  _[Requerido] [Cadena]_
+  +
+  Nombre de la excepción ya incluida en la gestión de excepciones que se
+  desea eliminar. Se puede obtener el nombre exacto de la excepción
+  mediante el comando _web mvc dialog exception list_.
+
+web mvc dialog add
+~~~~~~~~~~~~~~~~~~
+
+Añade dos métodos en el código fuente de un controlador que permiten
+abrir un diálogo modal en una página de la aplicación sin realizar
+ninguna implementación en la capa web. Ver la sección de inclusión de
+link:#addon-web-exception-handler_nuevos-dialogos[nuevos diálogos
+modales] para una información más detallada.
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Controlador para el cual generar los métodos de creación de un diálogo
+  modal.
+--name::
+  _[Requerido] [Cadena]_
+  +
+  Nombre que se dará a uno de los métodos en el controlador. Este método
+  y el método por defecto con nombre _modalDialog_ permitirán mostrar un
+  diálogo modal cada uno con distintas características.

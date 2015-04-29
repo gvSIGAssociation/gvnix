@@ -1,0 +1,22 @@
+Implementación de Comandos
+--------------------------
+
+TBC
+
+[Descripción general de que son los comandos instalación (xxx setup).
+Recomendaciones para la accesibilidad y activación]
+
+Comandos instalación
+--------------------
+
+TBC [Comandos de tipo 'xxx setup'
+
+Comandos de información
+-----------------------
+
+TBC [Comandos de tipo 'paga list'
+
+Comandos de acción
+------------------
+
+TBC [Comandos de tipo 'occchecksum set'

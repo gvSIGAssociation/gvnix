@@ -1,0 +1,23 @@
+Pruebas de integración
+----------------------
+
+Creación de pruebas de integración
+----------------------------------
+
+En la creación de entidades, al especificar el parámetro
+`--testAutomatically` se generan automáticamente las pruebas de
+integración que permitirán validar el buen funcionamiento del código de
+persistencia de la entidad.
+
+Si no se solicitó la generación de las pruebas de integración en el
+momento de la creación de una entidad, se pueden generar posteriormente
+con el comando _test integration_.
+
+Para ejecutar los test utilizar el comando `perform
+        tests`:
+
+--------------------------------------
+~.domain.PizzaOrder roo-gvNIX> 
+        
+        ~.domain.PizzaOrder roo-gvNIX>
+--------------------------------------

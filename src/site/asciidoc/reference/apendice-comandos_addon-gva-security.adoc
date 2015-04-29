@@ -1,0 +1,34 @@
+Comandos del add-on GVA Security
+--------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-gva-security[add-on GVA
+Security].
+
+.Comandos de Add-on GVA Security
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-gva-security_gva-security-setup[security
+provider add] |Instala y configura el sistema de autenticación y
+autorización según el proveedor seleccionado
+|=======================================================================
+
+security provider add
+~~~~~~~~~~~~~~~~~~~~~
+
+Instala y configura el sistema de autenticación y autorización según el
+proveedor seleccionado. Por defecto es posible instalar el proveedor
+SAFE y el proveedor APLUSU.
+
+Sus parámetros son:
+
+--name::
+  _[Requerido] [Cadena]_
+  +
+  Nombre del proveedor de seguridad que se quiere instalar.
+--package::
+  _[Requerido] [Cadena]_
+  +
+  Paquete en el que se instalarán todas las clases necesarias para el
+  correcto funcionamiento del proveedor de seguridad

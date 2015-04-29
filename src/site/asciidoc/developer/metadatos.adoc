@@ -1,0 +1,231 @@
+Metadatos
+---------
+
+Como hemos dicho en la descripción del componente
+link:#arquitectura-interna_metadata[Metadata] los metadatos es la
+información sobre el proyecto. Estos pueden obtenerse en cualquier
+momento, siempre que se conozca el tipo, usando el servicio
+_MetadataService_.
+
+Al desarrollar un add-on podemos tener que realizar operaciones sobre
+artefactos o dependientes de ellos pero esto puede requerir _marcar_ o
+_añadir información_ al artefacto. Esto comúnmente se consigue usando
+_anotaciones_ en los artefacto afectados que, a su vez, terminan siendo
+_metadatos_ del artefacto.
+
+El requisito de un metadato es implementar el interface MetadataItem.
+Luego, cada metadato ofrece su información con su implementación
+específica. Además de él, es necesario implementar un MetadataProvider
+que gestione el registro, comportamiento y creación de ese tipo de
+metadato.
+
+El manejo de los metadatos se realiza a través del servicio
+MetadataService que expone los metadatos a través del método `get`.
+
+Dentro del framework ahora existen varios tipos de _metadatos_ entre
+ellos:
+
+Metadato de Tipo Físico (PhysicalTypeMetadata)::
+  Representa un _Interface_ o _Clase_, aunque potencialmente puede ser
+  una anotación
+Metadato de `ITD` (ItdTypeDetailsProvidingMetadataItem)::
+  Representa la información de _inter-type declarations (o ITD)_
+
+Metadatos de tipo físico
+------------------------
+
+Son la representación de las `clases` e `interfaces` del proyecto.
+Normalmente los prepara el propio framework usando un `parser` para
+ficheros `.java` en los eventos del
+link:#arquitectura-interna_file-monitor[File Monitor].
+
+Metadatos ITD
+-------------
+
+Son representaciones de tipos internos. Es lo que utiliza el framework,
+con ayuda de la librería AspectJ, para generar los ficheros `.aj`.
+
+Están asociado a una de las anotaciones @Roo* (o al menos en las
+declaradas actualmente). Por lo que, normalmente, junto a estos
+encontramos un conjunto de tres clases en total:
+
+1.  Una que implementa a ItdTypeDetailsProvidingMetadataItem: que es el
+`metadato` en si mismo.
+2.  Una que implementa a ItdMetadataProvider: maneja y registra
+información del metadato y el ITD.
+3.  La anotación correspondiente.
+
+Ejemplos de esto son:
+
+EntityMetadata::
+  Metadatos de la anotación de @RooEntity (junto con
+  EntityMetadataProvider).
+ToStringMetadata::
+  Metadatos de la anotación de @RooToString (junto con
+  ToStringMetadataProvider).
+
+Dependencias entre metadatos
+----------------------------
+
+Muchas veces, para manejar nuestros _metadatos_ dependerán de otros
+_metadatos_ registrados en la aplicación. Esto se puede gestionar de dos
+formas distintas:
+
+1.  Añadiendo un MetadataNotificationListener: En dónde recibiremos
+todas las notificaciones que generen de los metadatos y deberemos
+filtrar los que nos interesen.
+2.  Generando nuestros propio _metadato_ y registrando las dependencias
+que necesitemos en el MetadataDependencyManager.
+
+Añadir listener de metadatos general
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Con este sistema lo único que necesitamos es registrar una instancia de
+MetadataNotificationListener en el MetadataDependencyManager.
+
+Las notificaciones las recibiremos en el método notify con el parámetro
+`downstream` a `null`.
+
+Registrar un nuevo tipo de metadatos y sus dependencias
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Primero, se registra el tipo de metadato, por la instancias del
+MetadataProvider asociada al MetadataItem, en el MetadataItem. El
+registro de dependencias se realiza en el MetadataDependencyManager
+identifica el tipo de _metadato_ (cadena de ID) _superior o upstream_
+del que dependemos y el _inferior o downstream_ nuestro tipo.
+
+Con esto conseguiremos que, cuando el _metadato upstream_ envíe una
+_notificación_, nuestro MetadataProvider recibirá una petición. Esta
+petición puede ser de dos tipos:
+
+1.  Una llamada al método MetadataProvider.get. Además, posteriormente
+se enviará una _notificación_ a todos nuestros _downstreams_
+registrados.
+2.  Una llamada al métodos MetadataProviderListener.notify si
+implementamos dicho interface. En este caso se delega el control quedará
+totalmente en nuestro control, incluso generar la notificación a nuestro
+_downstreams_.
+
+Hay que recalcar que las _notificaciones no se lanzan de forma
+automática_ (excepto en el primer caso explicado en el párrafo
+anterior). Es decir, que la notificación, por ejemplo, de un _metadato_
+de una clase, es lanzado desde un FileListener, que registra el
+framework, cuando detecta algún evento en un fichero `.java`.
+
+Consideraciones sobre los metadatos que generan productos y su orden de
+ejecución
+---------------------------------------------------------------------------------
+
+En principio, por lo que se ha podido observar, *no existe ningún
+control sobre el orden de petición/notificación de metadatos, excepto
+los `Listener` genéricos que se ejecutan siempre al final de las
+dependencias... pero, entre ellos, tampoco es posible especificar un
+orden*. De hecho, las estructuras de datos que almacenan esta
+dependencias están basadas en HashSet y HashMap. Es más, se ha podido
+observar que a partir de una primera notificación de un `metadato`, se
+pueden producir varias notificaciones al mismos MetadataProvider en
+distintos puntos de las dependencias registradas.
+
+Debido a esto, la conclusión que podemos sacar es que, si nuestro add-on
+genera metadatos y esos metadatos producen algún tipo de producto,
+*siempre* nos tendremos que asegurar que nuestro producto sea el
+correcto *sin esperar ni pretender tener ningún tipos de control sobre
+el orden de ejecución*.
+
+Para ilustrar esto, podemos ver una _traza de notificación de metadatos_
+que se produce al añadir un campo sobre una _entidad_ existente en un
+proyecto. Sobre esta _entidad_ ya se había creado un _controlador_
+automático (_scaffold_):
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+roo> 0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.finder.FinderMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+Managed SRC_MAIN_JAVA/es/gva/cit/compsiteid/Entity1_Roo_JavaBean.aj
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.entity.EntityMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+0000004e  MID:org.springframework.roo.addon.entity.EntityMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.finder.FinderMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+0000004e  MID:org.springframework.roo.addon.entity.EntityMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000050   MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.finder.FinderMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000050   MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.tostring.ToStringMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+Managed SRC_MAIN_JAVA/es/gva/cit/compsiteid/Entity1_Roo_ToString.aj
+00000050   MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller
+00000053    MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller -> MID:org.springframework.roo.addon.mvc.jsp.JspMetadata [via class]
+Managed SRC_MAIN_WEBAPP/WEB-INF/views/entity1/list.jspx
+Managed SRC_MAIN_WEBAPP/WEB-INF/views/entity1/show.jspx
+Managed SRC_MAIN_WEBAPP/WEB-INF/views/entity1/create.jspx
+Managed SRC_MAIN_WEBAPP/WEB-INF/views/entity1/update.jspx
+0000004e  MID:org.springframework.roo.addon.entity.EntityMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller
+00000055   MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller -> MID:org.springframework.roo.addon.mvc.jsp.JspMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.javabean.JavaBeanMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000057  MID:org.springframework.roo.addon.javabean.JavaBeanMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000058   MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.finder.FinderMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000058   MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.tostring.ToStringMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000058   MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller
+0000005b    MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller -> MID:org.springframework.roo.addon.mvc.jsp.JspMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+0000005d  MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.finder.FinderMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+0000005d  MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.tostring.ToStringMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+0000005d  MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller
+00000060   MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller -> MID:org.springframework.roo.addon.mvc.jsp.JspMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.tostring.ToStringMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.plural.PluralMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000063  MID:org.springframework.roo.addon.plural.PluralMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.entity.EntityMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000064   MID:org.springframework.roo.addon.entity.EntityMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.finder.FinderMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000064   MID:org.springframework.roo.addon.entity.EntityMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000066    MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.finder.FinderMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000066    MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.tostring.ToStringMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+00000066    MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller
+00000069     MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller -> MID:org.springframework.roo.addon.mvc.jsp.JspMetadata [via class]
+00000064   MID:org.springframework.roo.addon.entity.EntityMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller
+0000006b    MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1Controller -> MID:org.springframework.roo.addon.mvc.jsp.JspMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.configurable.ConfigurableMetadata#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.tostring.ToStringMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.javabean.JavaBeanMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.plural.PluralMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.beaninfo.BeanInfoMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.configurable.ConfigurableMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.property.editor.EditorMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.test.IntegrationTestMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.dod.DataOnDemandMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.finder.FinderMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata [via class]
+0000004c MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#SRC_MAIN_JAVA?es.gva.cit.compsiteid.Entity1 -> MID:org.springframework.roo.addon.entity.EntityMetadata [via class]
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/java/es/gva/cit/compsiteid/Entity1.java
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/show.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/java/es/gva/cit/compsiteid/Entity1_Roo_JavaBean.aj
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/create.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/list.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/update.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/java/es/gva/cit/compsiteid/Entity1_Roo_ToString.aj
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/create.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/update.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/list.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/show.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/show.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/java/es/gva/cit/compsiteid/Entity1_Roo_JavaBean.aj
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/create.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/list.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/webapp/WEB-INF/views/entity1/update.jspx
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/java/es/gva/cit/compsiteid/Entity1_Roo_ToString.aj
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/java/es/gva/cit/compsiteid/Entity1_Roo_ToString.aj
+UPDATED:/home/jmvivo/projects/test-roo/compositeId/src/main/java/es/gva/cit/compsiteid/Entity1_Roo_JavaBean.aj
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Como podemos observar, las llamadas a los distintos metadatos se
+repinten varias veces a lo largo del recorrido de las dependencias,
+aunque realmente, sólo la primera llamada realiza alguna acción (si es
+que la necesita).
+
+Esquema de relación de componentes entre los add-ons y los servicios de
+metadatos
+---------------------------------------------------------------------------------
+
+image:images/roo-relacion-addon-metadatos.png[Esquema de relación entre
+add-ons y los servicios de metadatos]
+
+Este esquema sirve para ver como se relacionan los componentes de un
+_Add-on_ que maneja/genera metadatos y los servicios que ofrece el
+framework para manejarlos.
+
+En este esquema, también se pueden ver los puntos de entrada de la
+aplicación (en color azul oscuro) que describíamos en
+link:#puntos-entrada[Puntos de entrada al framework].

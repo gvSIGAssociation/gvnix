@@ -1,0 +1,233 @@
+Comandos del add-on JPA
+-----------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-jpa[add-on JPA].
+
+.Comandos de add-on jpa
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-jpa_jpa-gvnix-setup[jpa gvnix setup]
+|Instala el soporte para la funcionalidad
+
+|link:#apendice-comandos_addon-jpa_jpa-batch_jpa-batch-add[jpa batch
+add] |Genera el servicio de persistencia en bloque para una entidad.
+
+|link:#apendice-comandos_addon-jpa_jpa-batch_jpa-batch-all[jpa batch
+all] |Genera el servicio de persistencia en bloque para todas las
+entidades.
+
+|link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-setup[jpa audit
+setup] |Configura la auditoría de historico creando la clase que
+proveera del nombre de usuario que realiza el cambio. Sólo se puede
+ejecutar una vez.
+
+|link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-add[jpa audit
+add] |Añade el soporte de auditoría a una entidad.
+
+|link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-all[jpa audit
+all] |Añade el soporte de auditoría todas las entidades.
+
+|link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-revisionlog[jpa
+audit revisionLog] |Establece el proveedor de registro de cambios a
+usar.
+
+|link:#apendice-comandos_addon-jpa_jpa-geo_jpa-geo-setup[jpa geo setup]
+|Configura el proyecto para poder guardar entidades con campos de tipo
+geográficos.
+
+|link:#apendice-comandos_addon-jpa_jpa-geo_field-geo[field geo] |Añade
+un nuevo campo de tipo geográfico a la entidad seleccionada.
+
+|link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-all[finder geo
+all] |Genera los buscadores de todos los campos de tipo GEO de _todas_
+las entidades registradas en el proyecto.
+
+|link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-add[finder geo
+add] |Genera los buscadores de todos los campos de tipo GEO para la
+entidad seleccionada.
+|=======================================================================
+
+jpa gvnix setup
+~~~~~~~~~~~~~~~
+
+Instala las dependencias necesarias para las funcionalidades del add-on.
+
+jpa batch add
+~~~~~~~~~~~~~
+
+Crea el servicio de persistencia en bloque para una entidad.
+
+Sus parámetros son:
+
+--entity::
+  _[Requerido] [Clase entidad] [Autocompletado]_
+  +
+  Entidad destino de las operaciones de persistencia.
+--type::
+  _[Opcional] [Clase] [Autocompletado]_
+  +
+  Clase de servicio a generar. Si se omite se generará una clase, con
+  nombre basado en el nombre de la entidad, en el mismo paquete que la
+  entidad.
+
+jpa batch all
+~~~~~~~~~~~~~
+
+Crea el servicio de persistencia en bloque para todas las entidades de
+la aplicación.
+
+Sus parámetros son:
+
+--package::
+  _[Opcional] [Paquete] [Autocompletado]_
+  +
+  Paquete donde se generarán las clases de servicio a generar. Si se
+  omite se generarán en el mismo paquete que la entidad a la que afecta.
+  El nombre de la clase del servicio se genera a partir del nombre de la
+  entidad.
+
+jpa audit setup
+~~~~~~~~~~~~~~~
+
+Configura la auditoría de historico creando la clase que proveera del
+nombre de usuario que realiza el cambio. Sólo se puede ejecutar una vez.
+
+Sus parámetros son:
+
+--service::
+  _[Requerido] [Clase]_
+  +
+  Nombre de la clase a crear para hacer de proveedor del objeto usuario.
+--userType::
+  _[Opcional] [Clase] [Autocompletado]_
+  +
+  Clase a usar como usuario. Por defecto ``String``.
+
+________________________________________________________________________________________________________
+*Note*
+
+Lanzará un warning informando que tiene que ajustar la implementación de
+la clase en dos circunstancias:
+Si no está configurado Spring Security::
+Si la clase ``userType`` no es String y no implementa ``UserDetails``.::
+________________________________________________________________________________________________________
+
+jpa audit add
+~~~~~~~~~~~~~
+
+Añade el soporte de auditoría a una entidad.
+
+Sus parámetros son:
+
+--entity::
+  _[Requerido] [Clase entidad] [Autocompletado]_
+  +
+  Entidad a la que añadir la auditoría.
+--type::
+  _[Opcional] [Clase] [Autocompletado]_
+  +
+  Clase a crear como _EntityListener_ para establecer los datos de
+  auditoría. Si no se establece se genera una clase, basada en el nombre
+  de la entidad, en el mismo paquete que la entidad.
+
+jpa adudit all
+~~~~~~~~~~~~~~
+
+Añade el soporte de auditoría a todas las entidades de la aplicación.
+
+Sus parámetros son:
+
+--package::
+  _[Opcional] [Paquete] [Autocompletado]_
+  +
+  Paquete donde se generarán las clases _EntityListener_. Si se omite se
+  generarán en el mismo paquete que la entidad a la que afecta. El
+  nombre de la clase _EntityListener_ se genera a partir del nombre de
+  la entidad.
+
+jpa adudit revisionLog
+~~~~~~~~~~~~~~~~~~~~~~
+
+Selecciona el proveedor de gestión de revisiones de entidades a usar.
+
+Sus parámetros son:
+
+--provider::
+  _[Requerido] [Identificador de proveedor] [Autocompletado]_
+  +
+  Identificador del proveedor de revisiones a usar. Sólo estarán
+  visibles aquellos proveedor que puedan utilizarse en el proyecto
+  actual (esto se consulta al la propia instancia de proveedor). Los
+  proveedores se registran como add-ons en el framework (al estilo de
+  los proveedores de JDBC para la ingeniería inversa) y deben de
+  implementar un interfaz definido.
+
+jpa geo setup
+~~~~~~~~~~~~~
+
+Configura el proyecto para poder guardar entidades con campos de tipo
+geográficos.
+
+Sus parámetros son:
+
+--provider::
+  _[Requerido] [Identificador de proveedor] [Autocompletado]_
+  +
+  Identificador del proveedor de persistencia GEO a usar. Sólo estarán
+  visibles aquellos proveedor que puedan utilizarse en el proyecto
+  actual (esto se consulta al la propia instancia de proveedor). Los
+  proveedores se registran como add-ons en el framework (al estilo de
+  los proveedores de JDBC para la ingeniería inversa) y deben de
+  implementar un interfaz definido.
+
+field geo
+~~~~~~~~~
+
+Añade un nuevo campo de tipo geográfico a la entidad seleccionada.
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Autocompletado]_
+  +
+  Entidad sobre la que se quiere añadir el nuevo campo de tipo GEO
+--fieldName::
+  _[Requerido]_
+  +
+  Nombre del nuevo campo que se quiere añadir
+--type::
+  _[Requerido] [Autocompletado]_
+  +
+  Selecciona el tipo de dato GEO que representará el nuevo campo añadido
+  a la entidad. Puede tomar los siguientes valores:
+  +
+  * POINT (Se guarda un único punto en la base de datos)
+  * LINESTRING (Se guardan una serie de puntos que forman una linea
+  continua)
+  * MULTILINESTRING (Se guardan una serie de puntos que forman varias
+  lineas continuas)
+  * POLYGON (Se guardan una serie de puntos que forman un polígono.
+  Siempre empieza y acaba en el mismo punto.)
+  * GEOMETRY (Se guarda una serie de puntos que forman una geometría.
+  Acepta cualquiera de las geometrías anteriores.)
+
+finder geo all
+~~~~~~~~~~~~~~
+
+Genera los buscadores de todos los campos de tipo GEO de _todas_ las
+entidades registradas en el proyecto.
+
+finder geo add
+~~~~~~~~~~~~~~
+
+Genera los buscadores de todos los campos de tipo GEO para la entidad
+seleccionada.
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Autocompletado]_
+  +
+  Entidad sobre la que se quieren generar los métodos de búsqueda.

@@ -1,0 +1,40 @@
+Comandos del add-on WEB MVC Bootstrap
+-------------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-web-mvc-bootstrap[add-on
+Bootstrap].
+
+.Comandos de Addo-on Bootstrap
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-web-mvc-bootstrap_setup[web mvc bootstrap
+setup] |Este comando importará e instalará todos los recursos necesarios
+para utilizar bootstrap. Además, modificará la estructura de algunos
+tagx existentes para que funcionen correctamente con Bootstrap y
+modificará todas las vistas de la aplicación para que utilicen los tags
+de JQuery.
+
+|link:#apendice-comandos_addon-web-mvc-bootstrap_update[web mvc
+bootstrap update] |Este comando permite regenerar de forma correcta
+todos los componentes importados por Bootstrap. En caso de una
+modificación incorrecta de estos componentes, podremos regenerarlos para
+que vuelvan a su estado inicial.
+|=======================================================================
+
+web mvc bootstrap setup
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Este comando importará e instalará todos los recursos necesarios para
+utilizar bootstrap. Además, modificará la estructura de algunos tagx
+existentes para que funcionen correctamente con Bootstrap y modificará
+todas las vistas de la aplicación para que utilicen los tags de JQuery.
+
+web mvc bootstrap update
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Este comando permite regenerar de forma correcta todos los componentes
+importados por Bootstrap. En caso de una modificación incorrecta de
+estos componentes, podremos regenerarlos para que vuelvan a su estado
+inicial.

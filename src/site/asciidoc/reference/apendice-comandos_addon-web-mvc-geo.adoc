@@ -1,0 +1,309 @@
+Comandos del add-on Web MVC GEO
+-------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-web-mvc-geo[add-on Web MVC
+GEO].
+
+.Comandos del add-on Web MVC GEO
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-setup[web mvc geo
+setup] |Instala los artefactos y dependencias requeridas para el
+funcionamiento del add-on.
+
+|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-controller[web
+mvc geo controller] |Genera una nueva vista de Mapa en nuestro proyecto
+
+|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-field[web mvc geo
+field] |Transforma los campos de texto generados por defecto, a campos
+de tipo mapa para facilitar el guardado de campos geográficos.
+
+|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-entity-all[web
+mvc geo entity all] |Añade todas las entidades con campos de tipo GEO a
+la vista de mapa
+
+|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-entity-add[web
+mvc geo entity add] |Añade la entidad seleccionada a la vista de mapa.
+
+|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-tilelayer[web mvc
+geo tilelayer] |Añade una capa base de tipo Tile a la vista del mapa
+
+|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-wmslayer[web mvc
+geo wmslayer] |Añade una capa base de tipo WMS a la vista del mapa
+
+|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-tool-measure[web
+mvc geo tool measure] |Añade una nueva herramienta de medición a la
+vista del mapa
+
+|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-tool-custom[web
+mvc geo tool custom] |Añade una nueva herramienta personalizada a la
+vista del mapa
+|=======================================================================
+
+web mvc geo setup
+~~~~~~~~~~~~~~~~~
+
+Instala todos los artefactos necesario para que el add-on funcione.
+
+web mvc geo controller
+~~~~~~~~~~~~~~~~~~~~~~
+
+Genera una vista de mapa en nuestro proyecto. Es posible generar tantas
+vistas de mapa como se necesiten. Cada una de ellas será independiente y
+podrán personalizarse de manera individual
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Clase Java]_
+  +
+  Nombre de la clase Java controladora que se desea crear.
+--preferredMapping::
+  _[Requerido] [String]_
+  +
+  Path que se quiere utilizar en el controller
+--projection::
+  _[Opcional] [CRS] [Autocompletado]_
+  +
+  Proyección con la que trabajará el mapa generado
+
+web mvc geo field
+~~~~~~~~~~~~~~~~~
+
+Por defecto, a la hora de guardar campos de tipo geográfico se utilizará
+formato #http://es.wikipedia.org/wiki/Well_Known_Text[WKT] que tendrá
+que ser introducido de forma manual por el usuario.
+
+Sin embargo, este add-on permite transformar estos campos de texto a
+componentes de tipo Mapa, gracias a los cuales se facilita la
+introducción de datos de tipo GEO en una entidad.
+
+Sus parámetros son:
+
+--controller::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Controlador Java asociado a la entidad sobre la cual queremos
+  actualizar campo de tipo input a campo de tipo mapa.
+--field::
+  _[Requerido] [String]_
+  +
+  Campo que queremos modificar
+--center::
+  _[Opcional] [String]_
+  +
+  Configura el centro del mapa que se va a generar. Formato 'lat, lng'
+--color::
+  _[Opcional] [String]_
+  +
+  Color con el que se pintarán los datos en el mapa
+--maxZoom::
+  _[Opcional] [String]_
+  +
+  Nivel de Zoom máximo que se aplicará al mapa generado
+--weight::
+  _[Opcional] [String]_
+  +
+  Grosor de la linea que se utilizará para pintar sobre el mapa
+--zoom::
+  _[Opcional] [String]_
+  +
+  Nivel de Zoom inicial con el que aparecerá el mapa
+
+web mvc geo entity all
+~~~~~~~~~~~~~~~~~~~~~~
+
+Añade todas las entidades con campos de tipo GEO a la vista de mapa
+
+web mvc geo entity add
+~~~~~~~~~~~~~~~~~~~~~~
+
+Añade la entidad seleccionada a la vista de mapa.
+
+Sus parámetros son:
+
+--controller::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Selecciona el controlador asociado a la entidad que quieres añadir a
+  la vista de Mapa.
+--map::
+  _[Opcional] [Map]_
+  +
+  Indica el mapa en el cual quieres añadir la nueva entidad. Si no se
+  selecciona ningún mapa, se añade a todas las vistas de mapa generadas.
+
+web mvc geo tilelayer
+~~~~~~~~~~~~~~~~~~~~~
+
+Añade una capa base de tipo Tile a la vista del mapa
+
+Sus parámetros son:
+
+--name::
+  _[Requerido] [String]_
+  +
+  Indica el nombre de la nueva Capa Base. Este nombre debe ser único
+  para cada una de las capas añadidas.
+--url::
+  _[Requerido] [String]_
+  +
+  URL del servidor de mapas que devolverá la capa base
+--map::
+  _[Opcional] [Mapa]_
+  +
+  Indica sobre que mapa quieres añadir la nueva capa base. Si no
+  selecciona ningún mapa se añadirá a todas las vistas de mapas
+  existentes.
+--index::
+  _[Opcional] [String]_
+  +
+  Posición en la que aparecerá la capa base. Si no se introduce ningun
+  indice, se generará uno automáticamente para evitar erorres en la
+  visualización de capas.
+--opacity::
+  _[Opcional] [Number]_
+  +
+  Indica la opacidad que tendrá la capa. Podemos indicar valores entre
+  el 0 y el 1. 1 significa que no es transparente y 0 que es totalmente
+  transparente.
+
+web mvc geo wmslayer
+~~~~~~~~~~~~~~~~~~~~
+
+Añade una capa base de tipo WMS a la vista del mapa
+
+Sus parámetros son:
+
+--name::
+  _[Requerido] [String]_
+  +
+  Indica el nombre de la nueva Capa Base. Este nombre debe ser único
+  para cada una de las capas añadidas.
+--url::
+  _[Requerido] [String]_
+  +
+  URL del servidor de mapas que devolverá la capa base
+--map::
+  _[Opcional] [Mapa]_
+  +
+  Indica sobre que mapa quieres añadir la nueva capa base. Si no
+  selecciona ningún mapa se añadirá a todas las vistas de mapas
+  existentes.
+--index::
+  _[Opcional] [String]_
+  +
+  Posición en la que aparecerá la capa base. Si no se introduce ningun
+  indice, se generará uno automáticamente para evitar erorres en la
+  visualización de capas.
+--opacity::
+  _[Opcional] [Number]_
+  +
+  Indica la opacidad que tendrá la capa. Podemos indicar valores entre
+  el 0 y el 1. 1 significa que no es transparente y 0 que es totalmente
+  transparente.
+--layers::
+  _[Opcional] [String]_
+  +
+  Indica qué capas quieres obtener del servicio WMS
+--format::
+  _[Opcional] [String]_
+  +
+  Indica en qué formato se obtienen las imágenes del servicio WMS.
+  Formato 'image/png'
+--transparent::
+  _[Opcional] [Boolean]_
+  +
+  Indica si la imágen que devuelve tiene transparencia o no
+--styles::
+  _[Opcional] [String]_
+  +
+  Indica qué estilos quieres obtener para cada una de las capas
+--version::
+  _[Opcional] [String]_
+  +
+  Versión del servicio WMS
+--crs::
+  _[Opcional] [String]_
+  +
+  Indica en qué proyección se obtiene la capa WMS. Por defecto EPSG3857
+
+web mvc geo tool measure
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Añade una nueva herramienta de medición a la vista del mapa
+
+Sus parámetros son:
+
+--name::
+  _[Requerido] [String]_
+  +
+  Indica el nombre de la herramienta de medición. Este nombre es único y
+  cada una de las herramientas deben tener el suyo propio.
+--map::
+  _[Opcional] [Map]_
+  +
+  Indica el mapa sobre el que se desea añadir la nueva herramienta. Si
+  no se espeicifica ningún mapa, se añadirá a todas las vistas de mapa
+  registradas en el proyecto.
+--preventExitMessageCode::
+  _[Opcional] [String]_
+  +
+  Código del mensaje multi-idioma que aparecerá al cambiar de
+  herramienta para evitar que se pierdan los cambios aplicados sobre el
+  mapa.
+
+web mvc geo tool custom
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Añade una nueva herramienta personalizada a la vista del mapa
+
+Sus parámetros son:
+
+--name::
+  _[Requerido] [String]_
+  +
+  Indica el nombre de la herramienta de medición. Este nombre es único y
+  cada una de las herramientas deben tener el suyo propio.
+--icon::
+  _[Requerido] [String]_
+  +
+  Indica el icono que mostrará la herramienta personalizada
+--activateFunction::
+  _[Requerido] [String]_
+  +
+  Nombre de la función Javascript que se ejecutará al seleccionar la
+  herramienta personalizada.
+--deactivateFunction::
+  _[Requerido] [String]_
+  +
+  Nombre de la función Javascript que se ejecutará al cambiar de
+  herramienta si esta se encuentra seleccionada.
+--map::
+  _[Opcional] [Map]_
+  +
+  Indica el mapa sobre el que se desea añadir la nueva herramienta. Si
+  no se espeicifica ningún mapa, se añadirá a todas las vistas de mapa
+  registradas en el proyecto.
+--iconLibrary::
+  _[Opcional] [String]_
+  +
+  Indica qué librería se utilizará para representar el icono.
+--actionTool::
+  _[Opcional] [Boolean]_
+  +
+  Indica si la herramienta es únicamente clicable o si puede mantenerse
+  seleccionada
+--cursorIcon::
+  _[Opcional] [String]_
+  +
+  Indica el icono que tendrá el cursor sobre el mapa al activar esta
+  herramienta.
+--preventExitMessageCode::
+  _[Opcional] [String]_
+  +
+  Código del mensaje multi-idioma que aparecerá al cambiar de
+  herramienta para evitar que se pierdan los cambios aplicados sobre el
+  mapa.

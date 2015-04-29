@@ -1,0 +1,338 @@
+Comandos del add-on Service
+---------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-service[add-on Service].
+
+.Comandos del add-on Service
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-service_class[remote service class] |Crea
+una clase Java que actuará como servicio local dentro de la aplicación
+
+|link:#apendice-comandos_addon-service_operation[remote service
+operation] |Añade un nuevo método en una clase Java
+
+|link:#apendice-comandos_addon-service_define_ws[remote service define
+ws] |Hace que una clase Java pueda ser accedida desde el exterior a
+través de un servicio web
+
+|link:#apendice-comandos_addon-service_export_operation[remote service
+export operation] |Hace que un método de una clase Java pueda ser
+accedido desde el exterior a través de una operación del servicio web
+
+|link:#apendice-comandos_addon-service_list_operation[remote service
+list operation] |Muestra el listado de métodos de una clase Java que
+podrían ser ofrecidos al exterior como operaciones del servicio web
+
+|link:#apendice-comandos_addon-service_export_ws[remote service export
+ws] |Crea en el proyecto la infraestructura necesaria definida por un
+_WSDL_ para ofrecer ciertas operaciones mediante un servicio web
+
+|link:#apendice-comandos_addon-service_import_ws[remote service import
+ws] |Crea en el proyecto la infraestructura necesaria definida por un
+_WSDL_ para acceder a ciertas operaciones situadas en un servicio web
+
+|link:#apendice-comandos_addon-service_ws_list[remote service ws list]
+|Lista los servicios web que se encuentran definidos en la aplicación
+
+|link:#apendice-comandos_addon-service_security_ws[remote service
+security ws] |Añade o actualiza la configuración necesaria para firmar
+las peticiones que se hacen a un servicio web remoto
+|=======================================================================
+
+remote service class
+~~~~~~~~~~~~~~~~~~~~
+
+Crea una clase Java que actuará como servicio local dentro de la
+aplicación. El servicio se podrá utilizar desde cualquier otra clase
+Java definiendo una propiedad del tipo de la clase de servicio con la
+anotación _@Autowired_.
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Paquete y nombre donde crear la clase Java de servicio.
+
+remote service operation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Añade un nuevo método en una clase Java. La clase Java puede ser una
+entidad, controlador, servicio o cualquier otro tipo.
+
+Sus parámetros son:
+
+--name::
+  _[Requerido] [Cadena]_
+  +
+  Nombre del método a añadir en la clase Java.
+--service::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Paquete y nombre de la clase Java donde crear el nuevo método.
+--return::
+  _[Opcional] [Tipo Java] [Autocompletado]_
+  +
+  Tipo de dato Java que devolverá el método.
+--paramNames::
+  _[Opcional] [Cadena]_
+  +
+  Nombre de los parámetros de entrada del método, separados mediante
+  comas y sin espacios.
+--paramTypes::
+  _[Opcional] [Tipos Java] [Autocompletado]_
+  +
+  Tipos Java de los parámetros de entrada del método, separados mediante
+  comas y sin espacios.
+--exceptions::
+  _[Opcional] [Cadena]_
+  +
+  Tipos Java de las excepciones que puede lanzar el método, separados
+  mediante comas y sin espacios.
+
+remote service define ws
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Hace que una clase Java pueda ser accedida desde el exterior a través de
+un servicio web. Para ello, creará toda la infraestructura necesaria
+para que sistemas externos puedan comunicarse con ella mediante los
+protocolos y tecnologías propias de los servicios web. Si la clase
+indicada como parámetro no existe, será creada automáticamente.
+
+Se recomienda no especificar en este comando ningún parámetro opcional
+si no es estrictamente necesario y se conoce las implicaciones que
+tendrá desde el punto de vista de la interoperabilidad de servicios web.
+Si no se especifica, para cada parámetro se proporcionará un valor
+adecuado para facilitar la máxima interoperabilidad del servicio web con
+el exterior.
+
+Tras publicar una clase Java a través de un servicio web, sus métodos
+todavía no serán accesibles como operaciones del servicio web hasta que
+no se le indique para cada método.
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Paquete y nombre de la clase Java a hacer accesible desde el exterior
+  a través de un servicio web. Si la clase Java no existe, será creada y
+  además se le aplicará las características propias de un servicio
+  local. Por ejemplo, _org.gvnix.test.service.Service_.
+--serviceName::
+  _[Opcional] [Cadena]_
+  +
+  Nombre con el que se quiere publicar el servicio web. Por defecto,
+  tomará el mismo nombre que la clase Java. Por ejemplo, _Service_.
+--portTypeName::
+  _[Opcional] [Cadena]_
+  +
+  Nombre para el tipo de puerto o _PortType_ del servicio web. Por
+  defecto, tomará el mismo nombre que la clase Java seguido del sufijo
+  _PortType_. Por ejemplo, _ServicePortType_.
+--addressName::
+  _[Opcional] [Cadena]_
+  +
+  Dirección URL relativa a la raíz de la aplicación desde donde se podrá
+  acceder al servicio web. Por defecto, tomará el mismo nombre que la
+  clase Java. Por ejemplo, _Service_.
+--targetNamespace::
+  _[Opcional] [Cadena]_
+  +
+  Espacio de nombres o _Namespace_ del servicio web. Debe tener formato
+  de URL. Por defecto, tendrá el mismo valor que el paquete de la clase
+  Java en sentido inverso y con formato de URL. Por ejemplo,
+  _http://service.test.gvnix.org/_.
+
+remote service export operation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Hace que un método de una clase Java pueda ser accedido desde el
+exterior a través de una operación del servicio web. Para ello, creará
+toda la infraestructura necesaria para que sistemas externos puedan
+comunicarse con ella mediante los protocolos y tecnologías propias de
+los servicios web. Si la clase indicada como parámetro no está
+configurada todavía para ser accedida a través de un servicio web, se le
+aplicará esta configuración automáticamente.
+
+Se recomienda no especificar en este comando ningún parámetro opcional
+si no es estrictamente necesario y se conoce las implicaciones que
+tendrá desde el punto de vista de la interoperabilidad de servicios web.
+Si no se especifica, para cada parámetro se proporcionará un valor
+adecuado para facilitar la máxima interoperabilidad de la operación del
+servicio web con el exterior.
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Paquete y nombre de la clase Java que contiene el método que se desea
+  hacer accesible a través de una operación del servicio web. Por
+  ejemplo, _org.gvnix.test.service.Service_.
+--method::
+  _[Requerido] [Cadena]_
+  +
+  Nombre del método que se desea hacer accesible a través de una
+  operación del servicio web. Por ejemplo, _method_.
+--operationName::
+  _[Opcional] [Cadena]_
+  +
+  Nombre que tendrá la operación del servicio web y que dará acceso al
+  método de la clase Java. Por defecto, tomará el mismo nombre que el
+  método. Por ejemplo, _method_.
+--resultName::
+  _[Opcional] [Cadena]_
+  +
+  Nombre que tendrá el resultado de la operación del servicio web y que
+  será de un tipo de datos equivalente al resultado del método. Por
+  defecto, tomará el nombre _result_.
+--resultNamespace::
+  _[Opcional] [Cadena]_
+  +
+  Espacio de nombres o _Namespace_ del resultado de la operación del
+  servicio web. Debe tener formato de URL. Por defecto, tendrá el mismo
+  valor que el paquete de la clase Java en sentido inverso y con formato
+  de URL. Por ejemplo, _http://service.test.gvnix.org/_.
+--responseWrapperName::
+  _[Opcional] [Cadena]_
+  +
+  Nombre que tendrá el objeto que contendrá la respuesta de la operación
+  del servicio web. Por defecto, tomará el mismo nombre que el método
+  seguido del sufijo _Response_. Por ejemplo, _methodResponse_.
+--responseWrapperNamespace::
+  _[Opcional] [Cadena]_
+  +
+  Espacio de nombres o _Namespace_ del objeto que contendrá el resultado
+  de la operación del servicio web. Debe tener formato de URL. Por
+  defecto, tendrá el mismo valor que el paquete de la clase Java en
+  sentido inverso y con formato de URL. Por ejemplo,
+  _http://service.test.gvnix.org/_.
+--requestWrapperName::
+  _[Opcional] [Cadena]_
+  +
+  Nombre que deberá tener el objeto que contendrá la petición a la
+  operación del servicio web. Por defecto, tomará el mismo nombre que el
+  método. Por ejemplo, _method_.
+--requestWrapperNamespace::
+  _[Opcional] [Cadena]_
+  +
+  Espacio de nombres o _Namespace_ del objeto que contendrá el la
+  petición a la operación del servicio web. Debe tener formato de URL.
+  Por defecto, tendrá el mismo valor que el paquete de la clase Java en
+  sentido inverso y con formato de URL. Por ejemplo,
+  _http://service.test.gvnix.org/_.
+
+remote service list operation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Muestra el listado de métodos de una clase Java que podrían ser
+ofrecidos como operaciones del servicio web. La clase Java debe haber
+sido previamente definida como accesible a través de un servicio web.
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Paquete y nombre de la clase Java de la que obtener el listado de
+  métodos que podrían ser ofrecidos como operaciones del servicio web.
+  Por ejemplo, _org.gvnix.test.service.Service_.
+
+remote service export ws
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Crea en el proyecto toda la infraestructura necesaria para ofrecer
+ciertas operaciones mediante un servicio web. El servicio web y sus
+operaciones vendrán definidas mediante un contrato de servicio o _WSDL_.
+
+El comando creará una clase Java que representará en el proyecto al
+servicio web y creará dentro tantos métodos como operaciones hubiesen
+definidas en el contrato de servicio. Con esto, el servicio web y sus
+operaciones ya son accesibles desde el exterior. Será responsabilidad
+del desarrollador el implementar la lógica de negocio de cada método.
+
+Sus parámetros son:
+
+--wsdl::
+  _[Requerido] [Cadena]_
+  +
+  Ruta al archivo que define el contrato de servicio o _WSDL_ cuya
+  infraestructura Java se desea crear en el proyecto. La ruta puede ser
+  a un archivo local mediante _file://ruta_, a una dirección web
+  mediante _http://ruta_ o a una dirección web segura mediante
+  _https://ruta_.
+
+remote service import ws
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Crea en el proyecto toda la infraestructura necesaria para acceder a
+ciertas operaciones situadas en un servicio web. El servicio web y sus
+operaciones vendrán definidas mediante un contrato de servicio o _WSDL_.
+
+El comando creará una clase Java que representará en el proyecto al
+servicio web y creará dentro tantos métodos como operaciones hubiesen
+definidas en el contrato de servicio. Invocando a alguno de estos
+métodos se estará accediendo a la operación correspondiente del sistema
+externo.
+
+Sus parámetros son:
+
+--wsld::
+  _[Requerido] [Cadena]_
+  +
+  Ruta al archivo que define el contrato de servicio o _WSDL_ cuya
+  infraestructura Java se desea crear en el proyecto. La ruta puede ser
+  a un archivo local mediante _file://ruta_, a una dirección web
+  mediante _http://ruta_ o a una dirección web segura mediante
+  _https://ruta_.
+--class::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Paquete y nombre de la clase Java que permitirá acceder al servicio
+  web externo creando un método por cada una de las operaciones del
+  servicio web. Si la clase Java no existe, será creada y además se le
+  aplicará las características propias de un servicio local. Por
+  ejemplo, _org.gvnix.test.service.Service_.
+
+remote service ws list
+~~~~~~~~~~~~~~~~~~~~~~
+
+Lista los servicios web que se encuentran definidos en la aplicación,
+tanto los que ofrecen servicios web al exterior como los que acceden a
+servicios web externos.
+
+Este comando no tiene ningún parámetro obligatorio ni opcional.
+
+remote service security ws
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Añade o actualiza la configuración necesaria para firmar las peticiones
+que se hacen a un servicio web remoto.
+
+Sus parámetros son:
+
+--class::
+  _[Requerido] [Clase Java] [Autocompletado]_
+  +
+  Paquete y nombre de la clase Java que define realiza el acceso al
+  servicio web externo. Por ejemplo, _org.gvnix.test.service.Service_.
+--certificate::
+  _[Requerido] [Cadena]_
+  +
+  Ruta y nombre del fichero donde se encuentra el certificado a utilizar
+  para firmar la petición. El certificado debe de tener un formato
+  _pkcs12_ y una extensión _p12_. El certificado será copiado al
+  directorio de recursos del proyecto. Por ejemplo,
+  _/tmp/certificado.p12_.
+--password::
+  _[Requerido] [Cadena]_
+  +
+  Contraseña para acceder al certificado de firma.
+--alias::
+  _[Requerido] [Cadena]_
+  +
+  Alias a utilizar para la firma.

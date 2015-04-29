@@ -1,0 +1,68 @@
+Add-on Web MVC i18n
+-------------------
+
+Permite añadir soporte para nuevos idiomas en el proyecto.
+
+Descripción
+-----------
+
+Este add-on permite añadir en el proyecto soporte para nuevas lenguas
+utilizando para ello una infraestructura común para la inclusión de
+nuevos idiomas. Al incluir un nuevo idioma, se añaden en la aplicación
+de forma automática los textos traducidos a dicho idioma.
+
+Los idiomas soportados son: de (Alemán), en (Inglés), es (Español), it
+(Italiano), nl (Holandés), sv (Finlandés), *ca (Valenciano/Catalán)*.
+Este último es añadido por gvNIX utilizando la base del add-on de
+idiomas de su núcleo Spring Roo.
+
+Instalación de un idioma
+------------------------
+
+Para instalar uno de los idiomas soportados hay que ejecutar el comando
+web mvc install language y proporcionar como parámetro _code_ el código
+del idioma deseado.
+
+---------------------------------------------------------------
+roo-gvNIX> 
+    Created SRC_MAIN_WEBAPP/WEB-INF/i18n/messages_ca.properties
+    Created SRC_MAIN_WEBAPP/images/ca.png
+    Updated SRC_MAIN_WEBAPP/WEB-INF/views/footer.jspx
+---------------------------------------------------------------
+
+Este comando instala un fichero de propiedades en el proyecto con la
+traducción de las etiquetas necesarias para el idioma que se requiera.
+Por ejemplo, para el idioma valenciano/catalán se creará el fichero
+_src/main/webapp/WEB-INF/i18n/messages_ca.properties_.
+
+-----------------------------------
+#menu
+    global_menu_new=Crear nou {0}
+    global_menu_list=Llistar {0}
+    global_menu_find=Cercar per {0}
+    ...
+-----------------------------------
+
+También realiza las modificaciones necesarias para poder solicitar el
+cambio de idioma desde la interfaz visual, lo que implica la inclusión
+de una imagen con la bandera del idioma solicitado y la modificación del
+pie de página para mostrar el cambio a dicho idioma. Esto se realiza en
+el fichero _src/main/webapp/WEB-INF/views/footer.jspx_ mediante el tag
+_<util:language>_ que será el encargado de incluir la imagen y generar
+el enlace para el cambio de idioma.
+
+------------------------------------------------------
+<util:language label="Valencian_Catalan" locale="ca"/>
+------------------------------------------------------
+
+Para mas información sobre este comando ver el
+link:#apendice-comandos_addon-web_i18n[apéndice de comandos del add-on].
+
+Futuras versiones
+-----------------
+
+Mejoras a incluir en futuras versiones del add-on.
+
+* Incluir el soporte para el resto de lenguas cooficiales del estado
+español, es decir, Gallego y Euskera. Se deja abierta la posibilidad de
+añadir idiomas de otros estados que pudiesen ser de utilidad.

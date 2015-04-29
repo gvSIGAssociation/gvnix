@@ -1,0 +1,220 @@
+Compilación e instalación de add-ons
+------------------------------------
+
+TBC [Pequeña introducción hablando de OSGi e instalación/desinstalación
+en caliente]
+
+Compilación y empaquetado de un add-on.
+---------------------------------------
+
+Los add-ons se empaquetan en un archivo _jar_. Al generar el proyecto
+con la plantilla de add-ons Roo ya nos prepara el fichero `pom.xml` para
+que genere el fichero este _jar_ como `bundle` en el tag `<package>`.
+
+Para empaquetar ejecutar el comando `mvn clean
+    install` desde un shell del sistema, desde el directorio raíz del
+add-on.
+
+Esto genera un `.jar` en el directorio `target` y guarda una copia en el
+repositorio de maven local con el add-on listo para instalar en el
+entrono OSGi de framework.
+
+Instalación
+-----------
+
+Al finalizar el comando `mvn clean
+    install` del empaquetado la consola muestra algo parecido por
+pantalla:
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+...
+[INFO] Building jar: ../target/org.organization.roo.addon-0.1.0-SNAPSHOT-sources.jar
+[INFO] [install:install]
+[INFO] Installing ../target/org.organization.roo.addon-0.1.0-SNAPSHOT.jar to /home/user/.m2/repository/org/organization/roo/addon/org.organization.roo.addon/0.1.0-SNAPSHOT/org.organization.roo.addon-0.1.0-SNAPSHOT.jar
+[INFO] Installing ../target/org.organization.roo.addon-0.1.0-SNAPSHOT-tests.jar to /home/user/.m2/repository/org/organization/roo/addon/org.organization.roo.addon/0.1.0-SNAPSHOT/org.organization.roo.addon-0.1.0-SNAPSHOT-tests.jar
+[INFO] Installing ../target/org.organization.roo.addon-0.1.0-SNAPSHOT-sources.jar to /home/user/.m2/repository/org/organization/roo/addon/org.organization.roo.addon/0.1.0-SNAPSHOT/org.organization.roo.addon-0.1.0-SNAPSHOT-sources.jar
+[INFO] [bundle:install]
+[INFO] Parsing file: /home/user/.m2/repository/repository.xml
+[INFO] Installing ../org.organization.roo.addon-0.1.0-SNAPSHOT.jar
+[INFO] Writing OBR metadata
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 20 seconds
+[INFO] Finished at: Tue May 04 09:58:34 CEST 2010
+[INFO] Final Memory: 23M/43M
+[INFO] ------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+En estas lineas se puede ver el archivo _bundle_ que nos ha generado
+maven con el add-on. Para instalar en cualquier instalación del
+framework tenemos dos opciones:
+
+1.  Usando los comando de instalación de la consola del framework.
+2.  Copiando el fichero _jar_ del _bundle_ en el directorio bundle
+
+Instalar usando comando de consola
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+La consola del framework ofrece una serie de comando para instalar los
+_bundles_ _en caliente_. Las instrucciones son las siguientes:
+
+1.  Utilizando la ruta que nos muestra maven de la instalación del jar
+del bundle usamos el comando `osgi install` para instalarlo en el
+framework:
++
+-------------
+roo> 
+Bundle ID: 55
+roo>
+-------------
++
+_______________________________________________________________________________________________________________________________________________________________________
+*Warning*
+
+Hay que usar el _.jar que no tiene sufijo_. Si se usa el `*-sources.jar`
+o `*-test.jar` no se mostrará ningún mensaje de error, pero el add-on
+_no se habrá instalado_.
+_______________________________________________________________________________________________________________________________________________________________________
++
+Como salida el framework nos informa de `ID` del bundle instalado.
+2.  Usamos el comando `osgi list` para comprobar que el bundle está
+instalado:
++
+-----------------------------------------------------------------------
+roo> 
+[ 1] [...
+[55] [Installed   ] [    1] org.organization.roo.addon (0.1.0.SNAPSHOT)
+roo>
+-----------------------------------------------------------------------
+3.  Ahora activamos el bundle con el comando `felix shell
+          start` con el `ID` del bundle que acabamos de instalar.
++
+-------------------------
+roo> felix shell start 55
+roo> 
+-------------------------
+4.  Comprobamos que el bundle se ha activado.
++
+----------------------------------------------------------------------
+roo> 
+[ 1] [...
+[55] [Active     ] [    1] org.organization.roo.addon (0.1.0.SNAPSHOT)
+roo>
+----------------------------------------------------------------------
++
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Note*
+
+Si no aparece como `Active` puede que sea porque no están disponibles en
+el `classpath` de framework alguna de las dependencias del add-on. Ver
+la sección link:#compilacion_instalacion_dependencias[Instalar
+dependencias de terceros].
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Otro comando que nos puede ser útil es `osgi
+      update`. Permite reinstalar el jar usando la versión actual del
+parámetro `url` que se utilizó en su instalación:
+
+-----
+roo> 
+roo> 
+-----
+
+Para poder ver mensajes sobre las instalación y activación del los
+_bundles_ podemos usar el comando `osgi
+      log`.
+
+Desinstalar un add-on
+~~~~~~~~~~~~~~~~~~~~~
+
+Para desinstalar un add-on podemos usar el comando `osgi
+      uninstall`:
+
+-----
+roo> 
+roo> 
+-----
+
+Instalar copiando el bundle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Es posible instalar en bundle manualmente copiando su jar dentro del
+directorio `bundle` de la instalación del framework. El add-on debería
+estar disponible en el siguiente arranque del framework.
+
+Instalar dependencias de terceros
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Si nuestro add-on tiene dependencias de librerías de terceros, deberemos
+de hacerlas disponibles en el classpath del framework. Para ellos copiar
+los jar de estas librerías en el directorio `bin` de la instalación.
+Estas librerías serán incluidas automáticamente en la próxima arranque
+del framework.
+
+Instalar en desarrollo.
+~~~~~~~~~~~~~~~~~~~~~~~
+
+TBC [Hablar de dónde está el directorio bundle en desarrollo, hacer un
+mvn clean para limpiar...]
+
+Depuración de add-on
+~~~~~~~~~~~~~~~~~~~~
+
+En este momento la depuración de un add-on sólo es posible mediante el
+sistema de _depuración de java remota_. El entrono de desarrollo de
+gvNIX ofrece una versión de `gvnix-dev` llamada `gvnix-dev-debug` que ya
+tiene configurada los parámetros necesario para ello.
+
+La recomendación es depurar con eclipse. Para tener el proyecto y el
+eclipse preparado se deben seguir los siguientes pasos:
+
+Importar el proyecto de add-on en el eclipse.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Para importar un proyecto en el eclipse hay que seguir dos pasos:
+
+1.  Ejecutar el comando `mvn eclipse:eclipse` desde la consola del
+sistema, estando situados en el directorio del add-on.
+2.  Importar el proyecto en el eclipse usando la opción
+_Import../Existing Project into Workspace_
+
+Preparar el Debug en eclipse
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Hay que crear una nueva configuración de arranque de depuración en
+eclipse. Para ello seguir los siguientes pasos:
+
+1.  Acceder a la ventana de configuración de depuración en _Run/Debug
+configuration..._
+2.  Seleccionar el tipo `Remote Java
+            Application` y pulsar el botón `New`
+3.  Seleccionar el proyecto del add-on usando el botón `Browse...`
+4.  Añadimos en la pestaña `sources` los proyectos que queremos depurar
+(Add-ons, bootstrap de ROO...).
+5.  El campo `port` en la sección `Connection properties` establecemos
+el valor `4000`
+6.  La propiedad `host` debe de ser en este caso `localhost`.
+7.  Guardar la configuración con el botón `Apply`
+
+Arrancar el Debug
+^^^^^^^^^^^^^^^^^
+
+Antes de arrancar el Debug de eclipse es necesario que el framework esté
+arrancado con `gvnix-dev-debug`. Luego ya podremos arrancar la
+depuración con la configuración que se ha creado en el punto anterior.
+
+Recordar instalar el add-on en el entorno de desarrollo.
+
+Añadir en una instalación de gvNIX.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TBC [Describir como añadir en una instalación de binarios de gvnix:
+igual que en desarrollo o copiando al directorio 'plugins']
+
+Añadir un add-on al la distribución de gvNIX.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TBC [Describir añadir al pom.xml padre como modulo, limpiar pom.xml del
+addon, añadir artefactos extra a la distribución de binarios en el
+assembly.xml]

@@ -1,0 +1,762 @@
+Creación de proyecto de add-on
+------------------------------
+
+Estos son los a seguir para prepara un proyecto de add-on:
+
+1.  Crear el directorio que contendrá el proyecto del add-on.
+2.  Ejecutar la consola del framework desde el directorio que acabamos
+de crear.
+3.  Existen varios comando para creación de add-on dependiendo de los
+requisitos y tipo de add-on. En este apartado usaremos el
+`addon create simple`. Ejemplo:
++
+--------------------------------------------------------------
+roo> addon create simple --topLevelPackage org.gvnix.addon.cxf
+--------------------------------------------------------------
++
+El nombre del paquete base tiene las siguientes limitaciones:
+* El último elemento del paquete se utilizará como identificador del
+add-on y como nombre base de las clases generadas.
+4.  utilizar el formato de paquetes subsiguientes con la misma
+estructura que tengan las librerías que estamos extendiendo y/o
+utilizando como base. Ejemplos:
+* org.gvnix.addon.cxf
+* org.gvnix.addon.security
+
+Esto nos genera los elementos necesario con tres clase de ejemplo:
+
+1.  Una clase Commands: Clase que declara los _comandos_ que expone el
+add-on.
+2.  Una interfaz Operations: Interfaz de ejemplo con los métodos
+declarados para los _comandos_ registrados.
+3.  Una clase OperationsImpl: Clase de ejemplo que implementa la
+interfaz Operations para la implementación de los comandos registrados.
+4.  Una clase PropertyName: Clase de ejemplo de declaración/registro de
+propiedades de tipo enumerados disponibles para la línea de comando con
+autocompletados. Para mostrar las opciones inicializadas en la clase de
+un parámetro asociado al comando.
+
+Si vamos a trabajar con Eclipse podemos ejecutar:
+
+* Desde la consola del framework:
++
+---------------
+perform eclipse
+---------------
+* Desde el shell del sistema:
++
+-------------------
+mvn eclipse:eclipse
+-------------------
+
+Declaración y uso de componente-servicios OSGi
+----------------------------------------------
+
+El framework funciona sobre la implementación OSGi
+http://felix.apache.org/[Apache Felix]. Todos los servicios (excepto
+algunas utilidades que se acceden a través de métodos estáticos) están
+declarados como componente-servicio OSGi.
+
+Un componente-servicio OSGi se declara:
+
+1.  Definiendo un interface para el acceso a los métodos del servicio.
+2.  Clases que implementan ese interface que ofrecen ese servicio
+anotadas con @Component y @Service.
+3.  Las implementaciones de servicio no deben tener constructor
+declarado.
+4.  Si las implementaciones de servicio requieren algún tipo de
+inicialización deben implementar los métodos activate y deactivate que
+serán llamados por OSGi en la activación y desactivación del servicio
+respectivamente. La firma de estos métodos es la siguiente:
++
+-------------------------------------------------------
+  protected void activate(ComponentContext context) {
+
+  }
+
+  protected void deactivate(ComponentContext context) {
+
+  }
+-------------------------------------------------------
+
+El framework OSGi se encarga de construir las instancias de los servicio
+e inicializarlas correctamente. La implementación a usar por cada
+interface las decide el framework en base a la prioridades de cada
+servicio o su disponibilidad. Este es un ejemplo de un servicio OSGi:
+
+----------------------------
+// Service interface
+public interface MyService {
+  public String sayHello();
+}
+----------------------------
+
+-------------------------------------------------------
+// Service implementation
+@Component
+@Service
+public class MyServiceImpl implements MyService{
+  
+  private String helloPhrase;
+
+  protected void activate(ComponentContext context) {
+     helloPhrase = "Hello Man!";
+  }
+
+  protected void deactivate(ComponentContext context) {
+     helloPhrase = null;
+  }
+
+  public String sayHello(){
+     return helloPhrase;
+  }
+}
+-------------------------------------------------------
+
+Para usar un servicio OSGi:
+
+1.  La clase debe de ser un componente OSGi, para ello debe de estar
+anotada con @Component. En el caso que la clase se abstracta, deberemos
+usar la anotación @AbstractComponent. La clase puede o no ser a su vez
+un servicio (@Service).
+2.  Declararemos una propiedad privada del tipo del interface del
+servicio.
+3.  Anotaremos dicha propiedad con @Reference.
+
+El framework OSGi se encargará de inyectarnos la implementación
+correspondiente en esta propiedades.
+
+Un ejemplo de uso del ejemplo de servicio anterior:
+
+-------------------------------------------
+@Component
+public class MyServiceUser{
+
+  @Reference
+  private MyService service;
+
+  public void printSayHello(){
+    System.out.println(service.sayHello());
+  }
+}
+-------------------------------------------
+
+Cabe destacar una serie de comando útiles para identificar problemas con
+los componente OSGi que ofrece el framework:
+
+osgi log::
+  Muestra el log de framework OSGi. Permite ver excepciones producidas
+  en la inicialización y activación de servicios y componentes (puede
+  que estos mensaje se produzcan sin que se muestren en otro sitio).
+osgi ps::
+  Muestra los bundles (conjuntos de componentes OSGi) instalados y su
+  estado
+osgi scr list::
+  Muestra los componentes-servicio instalados y su estado.
+felix shell::
+  Permite ejecutar comandos directamente al framework OSGi.
+
+Para más información sobre los comandos relacionados disponibles usar
+`help osgi` y `felix shell help` desde la consola del framework.
+
+La clase Commands
+-----------------
+
+Clase de registro de operaciones. Esta clase no requiere registro, será
+localizada como servicio OSGi al implementar el interface CommandMarker.
+Los requisitos para que esta clase sea usada en el framework son los
+siguientes:
+
+1.  implementar el interface
+org.springframework.roo.shell.CommandMarker.
+2.  La clase debe ser un link:#creacion-addon_osgi[componente-servicio
+OSGi].
+3.  Contiene dos tipos de métodos:
+1.  Indicadores de
+_link:#creacion-addon_commands_accesibilidad[accesibilidad]_: Indician
+si un comando es accesible para el usuario en el contexto actual.
+2.  link:#creacion-addon_commands_command[Comandos]: Punto de entrada y
+registro de un comando.
+4.  Tendrá poca o ninguna implementación. La implementación de las
+acciones se realizará en las clases
+link:#creacion-addon_operationsimpl[OperationsImpl].
+
+Estas clases no requieren ser registradas ya que se localizan gracias al
+framework OSGi.
+
+Métodos de accesibilidad
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Estos métodos deben de hacer las comprobaciones necesarias para indicar
+si un comando o comandos deben estar accesible para el usuario. Su
+características principales son:
+
+* El método está anotado con la anotación @CliAvailabilityIndicator, con
+los parámetros la lista de comandos a los que afecta.
+* Devuelven `boolean`.
+
+Estos son ejemplos de estos métodos:
+
+----------------------------------------------------------------------------------
+    @CliAvailabilityIndicator("myaddon setup")
+    public boolean isSetupAvailable(){
+        return true; 
+    }
+
+    @CliAvailabilityIndicator({"myaddon add", "myaddon remove", "myaddon update"})
+    public boolean isActionsAvailable(){
+        return true;
+    }
+----------------------------------------------------------------------------------
+
+Métodos de comando
+~~~~~~~~~~~~~~~~~~
+
+Definición y punto de entrada de los comando que registra nuestro
+plugin. Sus características son:
+
+* El método debe estar anotado con @CliCommand. Los parámetros de esta
+anotación son:
++
+value::
+  Cadena del comando
+help::
+  Cadena de ayuda para este comando. Usado por el comando `help` y el
+  autocompletado del framework.
+* Cada parámetro debe estar anotado con @CliOption. Los parámetros de
+esta anotación son:
++
+key::
+  Nombre del parámetro para el shell. El usuario podrá usar el parámetro
+  usando el nombre que indiquemos aquí precedido de dos guiones (`--`).
+  Es posible añadir mas de un key. Si se añade una cadena vacía se
+  asumirá que es el parámetro por defecto (por ejemplo es equivalente el
+  comando `field string campoCadena` que
+  `entity jpa --fieldName campoCadena`).
+mandatory::
+  Indica si el parámetro es requerido o no. Booleano.
+specifiedDefaultValue::
+  Valor que recibe parámetro a usar si es añadido el parámetro en el
+  comando por el usuario sin especificar ningún valor. Muy útil para los
+  parámetro tipo booleanos.
+unspecifiedDefaultValue::
+  Valor que recibe este parámetro si es omitido en la línea de comando.
+  Admite el valor `"*"` que usara como valor el _foco_ actual del shell
+  (un ejemplo es la omisión del parámetro `--class` en el comando
+  `field` justo después de usar el comando `entity`).
+help::
+  Texto de ayuda, usado en el comando `help` y en el autocompletado.
+optionContext::
+  Opciones de contexto para el parámetro. Esta cadena es útil para
+  configurar los parámetro de un tipo asociado a un
+  link:#creacion-addon_converters[Converter].
+* Su valor de retorno debe ser void o String, dependiendo si es un
+comando que realiza alguna opción o es un comando que devuelve
+información a la consola (como el `help`, `hint` o el `properties
+          list`).
+
+Estos son ejemplos de estos métodos:
+
+-------------------------------------------------------------------------------------------------
+  @CliCommand(value="welcome write hello", help="Writes hello.txt in the project root directory")
+  public void writeHello() {
+     operations.writeTextFile("hello");
+  }
+  
+  @CliCommand(value="welcome property", help="Obtains a pre-defined system property")
+  public String property(
+          @CliOption(key="name", 
+              mandatory=false, 
+              specifiedDefaultValue="USERNAME", 
+              unspecifiedDefaultValue="USERNAME", 
+              help="The property name you'd like to display") PropertyName propertyName) {
+     return operations.getProperty(propertyName);
+  }
+-------------------------------------------------------------------------------------------------
+
+Converters del Shell
+--------------------
+
+Son clases del Shell del framework que permiten transformar las cadenas
+que introduce el usuario en la línea de comandos en las clases Java que
+usarán la clase Commands. Además, estas clases son las que permiten el
+autocompletado de los valores de los parámetros en el Shell.
+
+Sus características principales son:
+
+1.  Deben implementar el interface
+org.springframework.roo.shell.Converter.
+2.  Deben ser link:#creacion-addon_osgi[componente-servicio OSGi].
+
+Existen algunos ya registrados en el sistema que pueden ser útiles:
+
+* StaticFieldConverter: Nos permite registrar enumerados Java.
+
+Estas clases pueden ser muy útiles si nuestro add-on trabaja con tipos
+(por ejemplo un datos de un elementos de menú). En el add-on se ha
+definido una clase para el tipo en cuestión y crea un converter que
+permita la conversión de lo que introduzca el usuario en el Shell al
+tipo. Es recomendable que estos tipos se creen como _tipos inmutables_
+(al objeto de tipos se inicializa en el constructor y no permite
+modificar sus datos).
+
+TBC [Añadir la descripción de la clase]
+
+La interface Operations
+-----------------------
+
+Es la Interfaz dónde se definen los métodos necesarios para el
+funcionamiento del Add-on. Para ser invocados desde la clase Commands o
+desde otro Add-on que pueda utilizarlos.
+
+La clase OperationsImpl
+-----------------------
+
+Esta clase implementa la interfaz definida Operations. Contendrá la
+implementación de las operaciones disponibles en el add-on.
+
+Sus requisitos son:
+
+* Debe ser un link:#creacion-addon_osgi[componente-servicio OSGi].
+* Implementar el interface Operations que usará la clase Commands.
+* No tener método constructor.
+
+Si la clase necesita inicialización o registrar otros componentes
+debería utilizar los métodos activate y deactivate del los
+componentes-servicios OSGi.
+
+Para estas clases podemos dar la siguientes recomendaciones:
+
+* Intentar que los estados usado para tomar las decisiones de si está
+activado o no algún comando sean lo más simples posible o que estén
+_cacheados_ (aunque suponga implementar algún listener para identificar
+cambios de estado).
++
+Los métodos de habilitación de comandos son llamados _muy
+frecuentemente_ (por ejemplo con el uso de la tecla `TAB` del
+autocompletado del Shell). Una mala implementación de esto puede
+repercutir seriamente en la agilidad de uso del framework.
+* Intentar evitar las referencias cíclicas entre componentes-servicios
+OSGi.
++
+Podemos encontrarnos que intentamos usar un servicio que no está cargado
+porque, a su vez este servicio requiere de nuestro componente.
++
+Si aun así no encontramos con este problema, intentar usar mecanismos de
+_ejecución retardada_. Como por ejemplo, acumular en una lista las
+operaciones a realizar hasta que detectemos que todos los servicios
+necesarios están disponibles (un ProcessListener puede ayudar).
+
+La clase PropertyName
+---------------------
+
+Esta clase es un ejemplo de clase que se puede registrar en el
+StaticFieldConverter comentado en la sección de
+link:#creacion-addon_converters[Converter].
+
+Test unitarios
+--------------
+
+Para mantener y garantizar la calidad en los add-on generados es
+fundamental que estos tengan implementados una batería de pruebas
+unitarias para las operaciones principales de los add-on.
+
+Desarrollo dirigido por Test (RDA)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Desarrollo dirigido por Test o Test-driven development (TDD) es una
+práctica de programación que se basa en la repetición de un ciclo de
+desarrollo muy corto. En primer lugar se escribe una prueba (test) y se
+verifica que la prueba falle, luego se implementa el código que haga que
+la prueba pase satisfactoriamente y seguidamente se refactoriza el
+código escrito. La idea es que los requerimientos sean traducidos a
+pruebas, de este modo, cuando las pruebas pasen se garantizará que los
+requerimientos se hayan implementado correctamente.
+
+Test Unitarios
+~~~~~~~~~~~~~~
+
+Los Test unitarios son una forma de probar el correcto funcionamiento de
+un módulo de código, en este caso las operaciones de un add-on. Esto
+sirve para asegurar que cada una de las operaciones funciona
+correctamente por separado. Se contemplan los casos posibles de error
+para el desarrollo dirigido por test y así asegurar su correcto
+funcionamiento e implementación del código necesario.
+
+Objetos Mock
+~~~~~~~~~~~~
+
+Los tests unitarios se centran en módulos de código concretos. A veces
+un módulo necesita o utiliza un objeto externo para realizar una
+operación, por ejemplo una operación de un add-on necesita utilizar un
+servicio que pertenece a otro add-on, para poder desarrollar un test con
+todos los resultados posibles relacionados con el servicio que utiliza,
+debemos simular el comportamiento del servicio mediante un Mock para
+centrarnos en los tests del módulo concreto.
+
+Un Mock es un objeto creado para reemplazar el comportamiento del
+original, simular su comportamiento dentro del test que se está
+desarrollando. El Mock se instancia como parámetro de la clase sobre la
+que vamos a crear las pruebas e implementamos el comportamiento que va a
+tener dentro del test en cuestión. Nos permite simular la llamada a este
+objeto definiendo los parámetros de entrada y de salida.
+
+Un Mock puede simular el comportamiento de cualquier clase, no es
+imprescindible que sea un servicio.
+
+Para el desarrollo de los tests mediante Mocks utilizaremos la librería
+EasyMock:
+
+http://www.easymock.org/
+
+Ejemplo:
+
+1.  Crear el servicio que utiliza como un Mock e instanciarlo a la clase
+de test para sustituir el original:
++
+--------------------------------------------------------------------------------------------
+// Mock objects to emulate Roo OSGi Services
+private FileManager fileManager;
+...
+fileManager = createMock(FileManager.class);
+ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "fileManager", fileManager);
+--------------------------------------------------------------------------------------------
+2.  Simular la llamada al método (utilizando el método expect) con los
+parámetros que se utilizan en la operación para devolver con el método
+andReturn el resultado que esperamos:
++
+----------------------------------------------------------------
+expect(fileManager.exists("webmvc-config.xml")).andReturn(true);
+----------------------------------------------------------------
+3.  Antes de ejecutar la llamada al método de la clase sobre la que se
+desarrollan los tests, se ejecuta el método replay sobre los Mocks de
+los que se ha definido su comportamiento:
++
+------------------------------------------------------------
+replay(fileManager);
+webExceptionHandlerOperationsImpl.getHandledExceptionList();
+------------------------------------------------------------
+4.  Después de la ejecución del test se han de reiniciar los valores de
+los Mocks utilizados durante la llamada al método sobre el que se han
+ejecutado los tests con el comando reset:
++
+-------------------
+reset(fileManager);
+-------------------
+
+Ejemplo
+~~~~~~~
+
+Ejemplo simple de test unitario usando Mocks para simular los servicios
+osgi para una operación del add-on _addon-web-exception-handler_.
+
+1.  Añadir dependencias correspondientes al proyecto add-on.
++
+Para el desarrollo de tests en un add-on se necesita importar las
+librerías de test en el pom.xml del proyecto:
++
+------------------------------------------
+<!-- Unit Test dependencies -->
+<dependency>
+  <groupId>org.easymock</groupId>
+  <artifactId>easymock</artifactId>
+  <version>3.0</version>
+  <scope>test</scope>
+</dependency>
+<dependency>
+  <groupId>org.springframework</groupId>
+  <artifactId>spring-test</artifactId>
+  <version>${spring.version}</version>
+  <scope>test</scope>
+</dependency>
+<dependency>
+  <groupId>org.springframework</groupId>
+  <artifactId>spring-core</artifactId>
+  <version>${spring.version}</version>
+  <scope>test</scope>
+</dependency>
+<dependency>
+  <groupId>commons-logging</groupId>
+  <artifactId>commons-logging</artifactId>
+  <version>1.1.1</version>
+  <scope>test</scope>
+</dependency>
+------------------------------------------
+2.  Crear la clase de Test
++
+Este primer test está dirigido a la clase Operations del Addon
+WebExceptionHandlerOperationsImpl.
+1.  Crear una nueva clase utilizando el nombre de la clase que se quiere
+hacer el test añadiendo el sufijo Test:
+WebExceptionHandlerOperationsImplTest.
+2.  Declarar como atributo la clase sobre la que se quieren ejecutar los
+tests y los servicios que utiliza la clase operations del Addon:
++
+-------------------------------------------------------------------------
+//Class under test
+private WebExceptionHandlerOperationsImpl exceptionHandlerOperationsImpl;
+
+// Mock objects to emulate Roo OSGi Services
+private FileManager fileManager;
+private MetadataService metadataService;
+private PathResolver pathResolver;
+private PropFileOperations propFileOperations;
+
+// Mock to emulate file management.
+private MutableFile webXmlMutableFile;
+
+// Files to use placed in src/test/resorces
+static final String EXC_WEB_XML = "exceptions-webmvc-config.xml";
+static final String NO_EXC_WEB_XML = "no-exceptions-webmvc-config.xml";
+
+// Project web config file path
+static final String WEB_XML_PATH = "WEB-INF/spring/webmvc-config.xml";
+-------------------------------------------------------------------------
+3.  Utilizando las anotaciones de JUnit se ha de instanciar la clase de
+test y los servicios que utiliza para simular su comportamiento
+instanciándolos como Mocks:
++
+------------------------------------------------------------------------------------------------------------
+/**
+ * Setup operations instance and Mock objects
+ *
+ * @throws java.lang.Exception
+ */
+@Before
+public void setUp() throws Exception {
+
+  // Class under test
+  webExceptionHandlerOperationsImpl = new WebExceptionHandlerOperationsImpl();
+
+  // Setup Mock service objects
+  fileManager = createMock(FileManager.class);
+  metadataService = createMock(MetadataService.class);
+  pathResolver = createMock(PathResolver.class);
+  propFileOperations = createMock(PropFileOperations.class);
+
+  // Mock Objects
+  webXmlMutableFile = createMock(MutableFile.class);
+
+  // Inject mock objects in instance. This emulate OSGi environment
+  ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "fileManager", fileManager);
+  ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "metadataService", metadataService);
+  ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "pathResolver", pathResolver);
+  ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "propFileOperations", propFileOperations);
+}
+------------------------------------------------------------------------------------------------------------
++
+El método _setUp()_ se ejecuta antes de cada test de esta clase debido a
+la anotación _@Before_ para instanciar los elementos necesarios en cada
+método de la clase operations. Ahora se han de crear los métodos de test
+por cada uno de los métodos implementados en la clase de operaciones del
+add-on. Puede que para algunos métodos no sea necesario el test debido a
+la simplicidad que representan, pero es recomendable crearlos también.
+4.  Crear test para el método _getHandledExceptionList():_
++
+-------------------------------------------------------------------------------------------------------
+/**
+ * Checks method
+ * {@link WebExceptionHandlerOperationsImpl#getHandledExceptionList()}
+ * 
+ * @throws Exception
+ */
+@Test
+public void testGetHandledExceptionList() throws Exception {
+
+  String result;
+  String expected;
+
+  /*
+   * Test 1 - Encuentra excepciones instanciadas en el archivo de
+   * configuración EXC_WEB_XML
+   */
+  expect(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, WEB_XML_PATH)).andReturn(EXC_WEB_XML);
+
+  expect(fileManager.exists(EXC_WEB_XML)).andReturn(true);
+
+  expect(fileManager.updateFile(EXC_WEB_XML)).andReturn(webXmlMutableFile);
+
+  expect(webXmlMutableFile.getInputStream()).andReturn(getClass().getResourceAsStream(EXC_WEB_XML));
+
+  replay(pathResolver, fileManager, webXmlMutableFile);
+
+  result = webExceptionHandlerOperationsImpl.getHandledExceptionList();
+
+  assertTrue("There aren't exceptions defined in " + EXC_WEB_XML + " file", result != null);
+
+  reset(pathResolver, fileManager, webXmlMutableFile);
+
+  /*
+   * Test 2 - No encuentra excepciones instanciadas en el archivo de
+   * configuración NO_EXC_WEB_XML
+   */
+  expect(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, WEB_XML_PATH)).andReturn(NO_EXC_WEB_XML);
+
+  expect(fileManager.exists(NO_EXC_WEB_XML)).andReturn(true);
+
+  expect(fileManager.updateFile(NO_EXC_WEB_XML)).andReturn(webXmlMutableFile);
+
+  expect(webXmlMutableFile.getInputStream()).andReturn(getClass().getResourceAsStream(NO_EXC_WEB_XML));
+
+  replay(pathResolver, fileManager, webXmlMutableFile);
+
+  result = webExceptionHandlerOperationsImpl.getHandledExceptionList();
+
+  expected = "Handled Exceptions:\n";
+
+  assertEquals("There are exceptions defined in " + NO_EXC_WEB_XML
+    + " file", expected, result);
+
+  reset(pathResolver, fileManager, webXmlMutableFile);
+
+}
+-------------------------------------------------------------------------------------------------------
++
+Se añade la anotación _@Test_ de _JUnit_ para que el método sea
+reconocido y se ejecute al lanzar el comando test de maven.
+3.  Archivos _xml_ para obtener los resultados del test.
++
+Este test se basa en la comprobación de datos que se obtienen de un
+archivo xml de configuración de un proyecto. Los casos de uso del test
+están relacionados con el tratamiento de archivos por eso necesitamos
+crear los archivos para obtener las distintas soluciones.
++
+Crear los archivos xml que se utilizarán para la ejecución del test
+_exceptions-webmvc-config.xml_ y _no-exceptions-webmvc-config.xml_ en el
+mismo paquete java que se ha creado el test dentro de la carpeta
+_src/test/resources_.
++
+El primero de los archivos _contiene las excepciones instanciadas_ para
+que el test funcione correctamente según se ha implementado el _Test 1:_
++
+----------------------------------------------------------------------------------------------------------------------------
+<!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views. 
+     The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet container: 
+     this will happen - here with all other types of exceptions. -->
+<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver" p:defaultErrorView="uncaughtException">
+ <property name="exceptionMappings">
+  <props>
+   <prop key=".DataAccessException">dataAccessFailure</prop>
+   <prop key=".NoSuchRequestHandlingMethodException">resourceNotFound</prop>
+   <prop key=".TypeMismatchException">resourceNotFound</prop>
+   <prop key=".MissingServletRequestParameterException">resourceNotFound</prop>
+  </props>
+ </property>
+</bean>
+----------------------------------------------------------------------------------------------------------------------------
++
+Mientras que el segundo _no contiene excepciones instanciadas_, se
+utiliza en el _Test 2_ para comprobar que no existen excepciones en el
+archivo de configuración correspondiente:
++
+----------------------------------------------------------------------------------------------------------------------------
+<!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views. 
+     The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet container: 
+     this will happen - here with all other types of exceptions. -->
+<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver" p:defaultErrorView="uncaughtException">
+ <property name="exceptionMappings">
+  <props>
+  </props>
+ </property>
+</bean>
+----------------------------------------------------------------------------------------------------------------------------
+
+Recomendaciones sobre el desarrollo de los add-on
+-------------------------------------------------
+
+En este apartado se añaden una serie de recomendaciones y las
+conveciones sobre la creación/implementación de los add-ons.
+
+Una lectura interesante en este sentido es la presentación de Ben Alex
+sobre el desarrollo de roo disponible en
+http://www.slideshare.net/benalexau/spring-roo-100-technical-deep-dive[Spring
+Roo 1.0.0 Technical Deep Dive].
+
+Evitar lanzar un error si podemos dar la solución
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Una de las premisas que parece reinar el proyecto Roo es que si el
+add-on, ante la falta de algún paso, si es conocedor de como solucionar
+la falta, intentar solucionarlo el mismo en vez de _protestar y alguien
+los solucionara_.
+
+Si ya existe alguien que sabe resolverlo, que se encargue de ello
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Si nuestro add-on depende de que otro se ejecute, deberíamos intentar,
+en la medida de lo posible, que sea él el que resuelva el problema. Un
+ejemplo puede ser que si nuestro add-on registra un _Proveedor de
+autenticación_ y no se ha instalado las dependencias de las librería
+adecuadas, delegaremos en el add-on existente para que realice la tarea.
+
+Actualización de Add-ons
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Nuestro add-on debería identificar productos generados por otras
+versiones de si mismo y _actualizarlos_ de forma coherente.
+
+Anotaciones mejor que ficheros de configuración
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Para simplificar el mantenimiento y reducir el número de artefactos a
+gestionar en la aplicación, debemos de tender a usar anotaciones,
+siempre que sea adecuado y con sentido común, en vez de registro en el
+los ficheros de contexto Spring.
+
+Evitar en lo posible ficheros properties de configuración
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cuando usemos variables, es recomendable que los valores sean
+actualizados en los _ficheros de contexto de Spring_, siempre se sea
+posible, en vez de repartirlos por fichero `.properties`.
+
+Si estos valores son dependientes del entorno, como en el caso del uso
+de profiles de maven, es preferible tratar los fichero de Spring en la
+compilación que en un `.properties`.
+
+Agilidad en métodos de disponibilidad de comandos
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ya que los método de _disponibilidad de un comando_ pueden ser llamados
+desde la línea de comandos y de manera muy frecuente, tendríamos que
+cuidar de que fuesen _lo más sencillos y optimizados posible_.
+
+Por ejemplo, intentar ver si comprobando dependencias del proyecto y/o
+la existencia de algún/os ficheros tenemos suficiente (preparando los
+identificadores de fichero una única vez) o usar variables de estado
+_cacheadas_, coordinado con algún listener que las limpie cuando
+convenga.
+
+Los metadatos únicamente generan metadatos
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Evitar en lo posible que los _metadatos_ y sus _providers_ realicen
+otras operaciones que no sean la gerenación del propio artefacto.
+
+Por ejemplo, evitar que los _metadatos_ instalen cualquier elemento
+común (como Imágenes, css, etc.). Para este fin es recomendable crear un
+comando _setup_ o similar que el usuario debe ejecutar antes de tener
+disponible la funcionalidad.
+
+El manejo de mentadatos es un proceso constante durante la ejecución del
+framework. La instalación de artefactos, normalmente, requiere la
+solicitud al los servicios OSGi la búsqueda de los recursos en el
+bundle. Estas peticiones son muy costosas y, la ejecución repetida puede
+llevar a un decremento _inmenso_ del rendimiento.
+
+add-ons genéricos y específicos CIT
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Intentaremos implementar add-ons de consola Roo genéricos para que
+puedan ser utilizados en múltiples ámbitos y luego estos add-ons podrían
+ser personalizados para la CIT mediante scripts de consola Roo.
+
+Adicionalmente, puede ser interesante, en algunos casos, que algunos de
+nuestros add-ons necesiten ejecutar como paso previo otro add-on antes
+de realizar sus tareas. Por ejemplo, la instalación del sistema de
+seguridad de la CIT requiere que antes se haya ejecutado la instalación
+del sistema de seguridad de Spring, por lo que lo más recomendable es
+que nuestro add-on de seguridad CIT invoque como paso previo al add-on
+de seguridad Spring, si no hubiese sido ejecutado todavía. La finalidad
+que se busca es que no obligar a invocar a un comando manualmente antes
+de invocar a otro comando.

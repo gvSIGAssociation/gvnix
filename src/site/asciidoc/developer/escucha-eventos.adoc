@@ -1,0 +1,74 @@
+Escucha de eventos
+------------------
+
+En el framework, además de los comandos de la consola, también puede ser
+necesario gestionar eventos en los artefactos y/o ficheros que estamos
+manejando. Para ello, debemos suscribirnos a los eventos que nos ofrece
+el framework. Algunos de ellos son componente-servicio OSGi y no es
+necesario su registro (se localizan automáticamente en base a su
+interface).
+
+Disponemos de distintos tipos de _Listener_ que podemos registrar dentro
+de nuestro add-on:
+
+* Metadatos
+* Dependencias del proyecto
+* Ficheros y directorios
+* Estado de los procesos
+
+Eventos de ficheros y directorios
+---------------------------------
+
+Las notificaciones que podemos recibir son de los siguientes tipos:
+
+* Inicio Monitorización.
+* Fin Monitorización.
+* Creación.
+* Eliminación.
+* Actualización.
+* Renombrado.
+
+El servicio del framework encargado de la monitorización de los cambios
+en disco es el que implementa el interface FileMonitorService. Este
+servicio notificará de los cambios a todos los
+link:#creacion-addon_osgi[componente-servicio OSGi] que cumplan el
+interface FileEventListener en el método onFileEvent que recibe un
+FileEvent.
+
+Los recursos que monitoriza el FileMonitorService se registran como
+instancias de MonitoringRequest a través del método add.
+
+En el capítulo de link:#recetas[recetas] podemos encontrar un ejemplo de
+link:#recetas_crear-listener-filesystem[crear listeners del Filesystem]
+y otro para
+link:#recetas_monitorizacion-directorios-no-registrados[monitorización
+de directorios no registrados].
+
+Eventos de metadatos
+--------------------
+
+Algunos metadatos lanzan notificaciones en algunas circunstancias. Estas
+notificaciones son iniciadas de forma arbitraría, por lo que, si sabemos
+que el MetadataProvider en cuestión efectúa una notificación que podemos
+utilizar, podemos recibirla.
+
+Para ello, necesitamos crear una clase que implemente el interface
+MetadataNotificationListener y registrarlo en el
+MetadataDependencyRegistry.addNotificationListener. A partir de ese
+momento recibiremos todas las *notificaciones* generadas por todos los
+MetadataProvider en el método notify con los parámetros:
+
+upstream::
+  La identificación de metadato que notifica.
+downstream::
+  `null`
+
+En el capítulo de link:#recetas[recetas] podemos encontrar un ejemplo de
+link:#recetas_crear-listener-metadatos[crear listener de metadatos].
+
+Eventos de procesos
+-------------------
+
+TBC
+
+[Nuevo]

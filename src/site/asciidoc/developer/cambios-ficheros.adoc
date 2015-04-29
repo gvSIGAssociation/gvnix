@@ -1,0 +1,42 @@
+Creación y modificación de ficheros
+-----------------------------------
+
+TBC
+
+[explicar las recomendaciones con los fichero]
+
+Evitar cambios innecesarios
+---------------------------
+
+TBC
+
+[comparar fichero antes de grabar]
+
+Uso de la clase FileManager
+---------------------------
+
+TBC
+
+[Describir utilidad del fileManager para poder tener rollback]
+
+Uso de plantillas
+-----------------
+
+TBC
+
+[Describir utilerias para uso de plantillas]
+
+Problemas con enconding
+-----------------------
+
+TBC
+
+[Describir los problemas de enconding encontrados en el add-on del tema]
+
+Realizar cambios con posibilidad de deshacer
+--------------------------------------------
+
+TBC
+
+Ver ejemplo en el capítulo de recetas, sección _Realizar cambios en XML
+con posibilidad de deshacer_.

@@ -1,0 +1,397 @@
+Gestión del acceso a datos
+--------------------------
+
+Persistencia de objetos
+-----------------------
+
+Trabajar en un entorno orientado a objetos con acceso a fuentes de datos
+relacionales (lo habitual en tecnología Java) puede suponer un
+incremento de los tiempos de desarrollo porque se debe incluir la lógica
+necesaria para hacer corresponder el modelo relacional de la base de
+datos, que trata con relaciones y conjuntos, con el paradigma orientado
+a objetos de las entidades del proyecto, que trata con objetos,
+atributos y asociaciones de unos con otros. Esta problemática es la que
+se conoce como _desajuste objeto-relacional_ (object-relational
+impedance mismatch).
+
+La técnica y herramientas _ORM_ (Object-Relational Mapping) surgen para
+reducir el coste de desarrollo que supone el desajuste
+objeto-relacional. Las técnicas de ORM permiten automatizar procesos que
+trasladan objetos a formas almacenables en tablas y viceversa,
+preservando los atributos de los objetos. Para esto se basan en la
+utilización de metadatos de correspondencia que especifican la
+información necesaria para que se pueda efectuar de forma automática la
+conversión de datos entre el sistema relacional y el sistema orientado a
+objetos.
+
+Esta técnica supuso que empezaran a aparecer multitud de librerías y
+herramientas ORM para Java. Para estandarizar esta técnica en el mundo
+Java y hacer nuestras aplicaciones independientes de la herramienta
+surgió JPA (Java Persistence API), actualmente en su versión 2
+(http://jcp.org/en/jsr/detail?id=317[JSR 317]).
+
+gvNIX (herencia del núcleo Spring Roo) fundamenta su interacción con la
+base de datos en un sistema de persistencia _JPA 2_. Gracias a esto las
+aplicaciones desarrolladas con gvNIX se benefician de las mejoras de
+tiempos de desarrollo que aportan la técnica y herramientas ORM.
+
+Regresando a la creación del nuevo proyecto, el primer paso es instalar
+y configurar el sistema de persistencia. Teclear `hint` que sugerirá los
+siguientes pasos a dar:
+
+---------------------------------------------------------------------
+roo-gvNIX> 
+Roo requires the installation of a persistence configuration,
+for example, JPA or MongoDB.
+
+For JPA, type 'jpa setup' and then hit TAB three times.
+We suggest you type 'H' then TAB to complete "HIBERNATE".
+After the --provider, press TAB twice for database choices.
+For testing purposes, type (or TAB) HYPERSONIC_IN_MEMORY.
+If you press TAB again, you'll see there are no more options.
+As such, you're ready to press ENTER to execute the command.
+
+Once JPA is installed, type 'hint' and ENTER for the next suggestion.
+
+Similarly, for MongoDB persistence, type 'mongo setup' and ENTER.
+
+roo-gvNIX>
+---------------------------------------------------------------------
+
+En el ámbito de esta documentación es suficiente con conectar la
+aplicación con una base de datos que no necesita ningún servidor
+instalado como Hypersonic e Hibernate como implementación del sistema de
+persistencia:
+
+--------------------------------------------------------------------------------------------
+roo-gvNIX> 
+Created SPRING_CONFIG_ROOT/database.properties
+Updated SPRING_CONFIG_ROOT/applicationContext.xml
+Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
+Updated ROOT/pom.xml [added dependencies org.hsqldb:hsqldb:2.2.9,
+org.hibernate:hibernate-core:4.2.2.Final, org.hibernate:hibernate-entitymanager:4.2.2.Final,
+org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final,
+commons-collections:commons-collections:3.2.1,
+org.hibernate:hibernate-validator:4.3.1.Final,
+javax.validation:validation-api:1.0.0.GA,
+javax.transaction:jta:1.1, org.springframework:spring-jdbc:${spring.version},
+org.springframework:spring-orm:${spring.version},
+commons-pool:commons-pool:1.5.6, commons-dbcp:commons-dbcp:1.4]
+roo-gvNIX>
+--------------------------------------------------------------------------------------------
+
+_________________________________________________________________________________________________________________________________________________________
+*Warning*
+
+Este tipo de bases de datos no es la mejor opción para un entorno de
+producción, utilizarla sólo para entornos de desarrollo, demostraciones
+y formación.
+_________________________________________________________________________________________________________________________________________________________
+
+___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Warning*
+
+Con la ingeniería directa, es decir, la creación de entidades y campos
+mediante los comandos de la consola, se configura el sistema de
+persistencia para crear la base de datos cada vez que se arranca la
+aplicación. Por eso, los datos de la demo se perderán cada vez que se
+inicie la aplicación. Esto no es así cuando se utiliza la ingeniería
+inversa a partir de un esquema de base de datos ya existente.
+
+Este comportamiento se puede cambiar en la configuración del sistema de
+persistencia: `src/main/resources/META-INF/persistence.xml`. Consultar
+la sección
+link:#guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd[enlazar
+base de datos existente] para aprender cómo cambiar el comportamiento
+por defecto.
+___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Configurar la conexión con la base de datos
+-------------------------------------------
+
+En cualquier punto del ciclo de vida de una aplicación puede surgir la
+necesidad de cambiar de base de datos (distinta tecnología de bases de
+datos, cambio de la clave de acceso, cambio del equipo donde se
+encuentra la base de datos, etc), para estos casos gvNIX ofrece una
+serie de comandos que simplificarán la actualización de la configuración
+de acceso a la base de datos:
+
+* `jpa setup`
+* `database properties`
+
+jpa setup
+~~~~~~~~~
+
+Crea o actualiza la configuración del acceso a datos (base de datos y el
+proveedor de persistencia o ORM). Entre los parámetros requeridos están
+la herramienta ORM y la base de datos a utilizar.
+
+Los parámetros obligatorios que requiere este comando son:
+
+--provider::
+  Identificador de la herramienta ORM. Los valores posibles son:
+  +
+  DATANUCLEUS;;
+    http://www.datanucleus.org/[Data Nucleus]
+  ECLIPSELINK;;
+    http://www.eclipse.org/eclipselink/[EclipseLink]
+  HIBERNATE;;
+    http://www.hibernate.org/[Hibernate]
+  OPENJPA;;
+    http://openjpa.apache.org/[OpenJPA]
+--database::
+  Identificador de la base de datos. Los valores posibles son:
+  +
+  * ORACLE_. Debido a que los drivers JDBC no están disponibles en
+  ningún repositorio Maven, en caso de utilizar Oracle habrá que
+  instalar manualmente el driver JDBC._
+  * MSSQL.
+  * MYSQL.
+  * POSTGRES.
+  * SYBASE.
+  * DB2_. Debido a que los drivers JDBC no están disponibles en ningún
+  repositorio Maven, en caso de utilizar DB2 habrá que instalar
+  manualmente el driver JDBC._
+  * DERBY.
+  * GOOGLE_APP_ENGINE.
+  * H2_IN_MEMORY.
+  * HYPERSONIC_IN_MEMORY.
+  * HYPERSONIC_PERSISTENT.
+  * FIREBIRD.
+  * DATABASE_DOT_COM.
+
+--applicationId::
+  Identificación de aplicación en Google App Engine (sólo utilizado para
+  esta base de datos).
+--databaseName::
+  Nombre de la base de datos con la que conectar.
+--hostName::
+  El nombre DNS o la dirección IP del ordenador en el que se encuentra
+  la base de datos a utilizar.
+--jndiDataSource::
+  Fuente de datos JNDI a utilizar.
+--password::
+  Contraseña del usuario para la conexión con la base de datos.
+--persistenceUnit::
+  Nombre de la unidad de persistencia a utilizar en el fichero
+  persistence.xml.
+--transactionManager::
+  Nombre del gestor de transacciones a utilizar.
+--userName::
+  Nombre del usuario para la conexión con la base de datos.
+
+Dependiendo del tipo de base de datos pueden ser necesarios unos u otros
+parámetros. Se recomienda usar el completado de comandos con _TAB_ (en
+la consola del sistema) o _CTRL+SPACE_ (en el IDE) para que se indique
+lo que hace falta en función del contexto. Cuando el autocompletado no
+proporciona más opciones para un comando, se recomienda escribir los
+caracteres _--_ e ir auto completando para que aparezcan los parámetros
+opcionales.
+
+database properties
+~~~~~~~~~~~~~~~~~~~
+
+Permite la consulta, eliminación, actualización y creación de las
+propiedades de conexión con la base de datos (a diferencia del comando
+anterior que configura el sistema de persitencia en su totalidad). Estas
+propiedades se almacenan el fichero
+`src/main/resources/META-INF/spring/database.properties` de la
+aplicación.
+
+Se dispone del siguiente grupo de comandos:
+
+database properties list::
+  Lista las propiedades de conexión con la base de datos.
+database properties remove::
+  Elimina una propiedad de la configuración. Requiere un único parámetro
+  `--key` para especificar la clave a eliminar.
+database properties set::
+  Crea o actualiza una propiedad en la configuración. Requiere un
+  parámetro `--key` con el nombre de la propiedad y un `--value` con el
+  valor a establecer.
+
+Ejemplo: Conectar con PostgreSQL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+En este ejemplo se va a configurar la conexión a un servidor PostgreSQL
+situado en una máquina en de la red local. Los datos de conexión de
+ejemplo son:
+
+* Servidor de base de datos: `dbserver`
+* Puerto de conexión: `5438`
+* Nombre de la base de datos: `my_db`
+* Nombre de usuario de la base de datos: `user1`
+* Contraseña del usuario: `1234`
+
+Recordar que estos comando se pueden ejecutar en cualquier momento y
+tantas veces como se desee.
+
+Los pasos a seguir para la configuración son:
+
+1.  Usar el comando `persistence
+          setup` con los parámetros que disponemos:
++
+---------------------------------------------------------------------------------------------
+roo-gvNIX> 
+Created SPRING_CONFIG_ROOT/database.properties
+Please update your database details in
+ src/main/resources/META-INF/spring/database.properties.
+Updated SPRING_CONFIG_ROOT/applicationContext.xml
+Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
+Updated ROOT/pom.xml [added dependencies postgresql:postgresql:9.1-901-1.jdbc4,
+ org.hibernate:hibernate-core:4.2.2.Final, org.hibernate:hibernate-entitymanager:4.2.2.Final,
+ org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final,
+ commons-collections:commons-collections:3.2.1,
+ org.hibernate:hibernate-validator:4.3.1.Final, javax.validation:validation-api:1.0.0.GA,
+ javax.transaction:jta:1.1, org.springframework:spring-jdbc:${spring.version},
+ org.springframework:spring-orm:${spring.version}, commons-pool:commons-pool:1.5.6,
+ commons-dbcp:commons-dbcp:1.4]
+roo-gvNIX> 
+---------------------------------------------------------------------------------------------
+2.  Comprobar como ha quedado la configuración de la conexión. Para ello
+usar el comando `database properties
+          list`:
++
+----------------------------------------------------
+roo-gvNIX> 
+database.driverClassName = org.postgresql.Driver
+database.password = 1234
+database.url = jdbc:postgresql://dbserver:5432/my_db
+database.username = user1
+roo-gvNIX> 
+----------------------------------------------------
++
+Observar que lo único que falta es configurar el puerto de la base de
+datos en la propiedad `database.url`. Observar que el puerto configurado
+automáticamente es el puerto por defecto de la base de datos, sin
+embargo en este ejemplo el servidor de base de datos utiliza uno
+distinto.
+3.  Configurar la URL de conexión al servidor correctamente usando el
+comando `database properties
+          set`:
++
+----------------------------------------------
+roo-gvNIX> 
+Updated SPRING_CONFIG_ROOT/database.properties
+roo-gvNIX> 
+----------------------------------------------
+4.  Volver a comprobar el estado de los parámetros con el comando
+`database properties list`:
++
+----------------------------------------------------
+roo-gvNIX> 
+database.driverClassName = org.postgresql.Driver
+database.password = 1234
+database.url = jdbc:postgresql://dbserver:5438/my_db
+database.username = user1
+roo-gvNIX> 
+----------------------------------------------------
+
+Una vez hecho, la siguiente vez que se arranque la aplicación usará la
+nueva conexión de base de datos configurada.
+
+Actualización automática del esquema
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Al crear las entidades y los campos desde la consola mediante los
+comandos de ingeniería directa, en el arranque de la aplicación se crea
+automáticamente el esquema de base de datos que se corresponde con el
+modelo de entidades. Esto no es así cuando se realiza la ingeniería
+inversa a partir de un esquema de base de datos ya existente.
+
+_Si se desea cambiar este comportamiento para, por ejemplo, que los
+datos almacenados no desaparezca en cada arranque seguir los siguientes
+pasos_:
+
+* Editar el archivo `src/main/resources/META-INF/persistence.xml`
+* Cambiar el valor de la propiedad _hibernate.hbm2ddl.auto_:
++
+Existen cinco valores _validate, update, create, create-drop y none_.
+Estos valores deben utilizarse con precauciñón por el peligr" puede
+suponer para la integridad de la BBDD.
+** _validate_: valida que el modelo de objetos y el modelo relacional de
+base de datos son equivalentes. En caso de no ser iguales no se
+permitirá el arranque de la aplicación.
+** _update_: actualiza el esquema al arrancar la aplicación. Esto es,
+modificará los elementos del modelo relacional de base de datos que no
+se correspondan con el modelo de objetos.
+** _create_: crea el esquema en el arranque de la aplicación destruyendo
+la información existente.
+** _create-drop_: hace un _drop_ de las tablas al parar la aplicación y
+en el arranque las crea.
+** none: no hace absolutamente ninguna validación ni modificación del
+esquema.
+
+Múltiples fuentes de datos
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+La conexión con distintas bases de datos está soportada, aunque su
+configuración no se genera automáticamente. Distinguir de la conexión
+con distintos esquemas de la misma base de datos que está tanto
+soportado como contemplado por la generación automática que realiza la
+ingeniería inversa.
+
+A continuación se muestran los pasos a seguir para configurar la
+conexión con distintas bases de datos en una misma aplicación mediante
+el proveedor de persistencia Hibernate:
+
+* En _src/main/resources/META-INF/persistence.xml_ incluir la siguiente
+configuración reemplazando los puntos suspensivos por los valores
+adecuados para la nueva conexión de base de datos:
++
+----------------------------------------------------------------------------------------
+            <persistence-unit name="persistenceUnit2" transaction-type="RESOURCE_LOCAL">
+                <provider>org.hibernate.ejb.HibernatePersistence</provider>
+                <properties>
+                    <property name="hibernate.dialect" value="..."/>
+                    <property name="hibernate.hbm2ddl.auto" value="..."/>
+                    <property name="hibernate.ejb.naming_strategy" value="..."/>
+                    <property name="hibernate.connection.charSet" value="..."/>
+                </properties>
+            </persistence-unit>
+          
+----------------------------------------------------------------------------------------
+* En _src/main/resources/META-INF/spring/applicationContext.xml_ incluir
+la siguiente configuración reemplazando los puntos suspensivos por los
+valores adecuados para la nueva conexión de base de datos:
++
+--------------------------------------------------------------------------------------------
+            <bean class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+                    id="dataSource2">
+                <property name="driverClassName" value="..."/>
+                <property name="url" value="..."/>
+                <property name="username" value="..."/>
+                <property name="password" value="..."/>
+                <property name="testOnBorrow" value="..."/>
+                <property name="testOnReturn" value="..."/>
+                <property name="testWhileIdle" value="..."/>
+                <property name="timeBetweenEvictionRunsMillis" value="..."/>
+                <property name="numTestsPerEvictionRun" value="..."/>
+                <property name="minEvictableIdleTimeMillis" value="..."/>
+                <property name="validationQuery" value="..."/>
+            </bean>
+            <bean class="org.springframework.orm.jpa.JpaTransactionManager"
+                    id="transactionManager2">
+                <property name="entityManagerFactory" ref="entityManagerFactory2"/>
+            </bean>
+            <tx:annotation-driven mode="aspectj" transaction-manager="transactionManager2"/>
+            <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+                    id="entityManagerFactory2">
+                <property name="persistenceUnitName" value="persistenceUnit2" />
+                <property name="dataSource" ref="dataSource2"/>
+            </bean>
+          
+--------------------------------------------------------------------------------------------
+* En la clase Java de la entidad, por ejemplo,
+_src/main/java/.../domain/Entidad.java_ añadir en la anotación
+_@RooJpaActiveRecord_ el atributo _persistenceUnit = "persistenceUnit2"_
+haciendo referencia a la nueva conexión configurada:
++
+---------------------------------------------------------------------
+            @RooJpaActiveRecord(persistenceUnit = "persistenceUnit2")
+            class Entity
+          
+---------------------------------------------------------------------
++
+De esta forma, para cada entidad de datos se puede asociar la conexión
+de base de datos que se desee.

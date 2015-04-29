@@ -1,0 +1,29 @@
+Comandos del add-on Web MVC i18n
+--------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-web-i18n[add-on Web MVC
+i18n].
+
+.Comandos de add-on Web MVC i18n
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-web_i18n_install_language[web mvc install
+language] |Instala el soporte para un nuevo idioma en el proyecto
+|=======================================================================
+
+web mvc install language
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Crea un fichero de propiedades con las traducciones de las etiquetas
+multi idioma del proyecto en el lenguage solicitado y configura en la
+capa web un acceso para cambiar a dicho idioma.
+
+Sus parámetros son:
+
+--code::
+  _[Requerido] [Idioma] [Autocompletado]_
+  +
+  Código del idioma a instalar. Los idiomas disponibles son _de, en, es,
+  it, nl y sv._

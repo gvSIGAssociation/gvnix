@@ -1,0 +1,102 @@
+Comandos del add-on WEB MVC Lupa
+--------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación dellink:#addon-web-mvc-loupe[add-on Lupa].
+
+.Comandos de Addo-on Componentes Lupa
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-web-mvc-loupe_setup[web mvc loupe setup]
+|Este comando importará a nuestro proyecto todos los recursos necesarios
+para utilizar componentes lupa.
+
+|link:#apendice-comandos_addon-web-mvc-loupe_set[web mvc loupe set]
+|Este comando nos permite generar los métodos necesarios para la
+búsqueda y visualización de registros del componente lupa en el
+controlador seleccionado.
+
+|link:#apendice-comandos_addon-web-mvc-loupe_field[web mvc loupe field]
+|Este comando nos permite transformar a componente lupa cualquier campo
+válido de la entidad a la que está asociado el Controlador en el que se
+han generado los métodos de lupa.
+
+|link:#apendice-comandos_addon-web-mvc-loupe_update[web mvc loupe
+update] |Este comando nos permite mantener actualizados todos los
+componentes importados mediante el comando de instalación.
+|=======================================================================
+
+web mvc loupe setup
+~~~~~~~~~~~~~~~~~~~
+
+Este comando importará a nuestro proyecto todos los recursos necesarios
+para utilizar componentes lupa.
+
+web mvc loupe set
+~~~~~~~~~~~~~~~~~
+
+Este comando nos permite generar los métodos necesarios para la búsqueda
+y visualización de registros del componente lupa en el controlador
+seleccionado.
+
+Sus parámetros son:
+
+--controller::
+  _[Requerido] [Cadena]_
+  +
+  Nombre y ruta del Controlador sobre el cual queremos generar los nuevo
+  métodos de búsqueda para el componente lupa.
+
+web mvc loupe field
+~~~~~~~~~~~~~~~~~~~
+
+Este comando nos permite transformar a componente lupa cualquier campo
+válido de la entidad a la que está asociado el Controlador en el que se
+han generado los métodos de lupa.
+
+Sus parámetros son:
+
+--controller::
+  _[Requerido] [Cadena]_
+  +
+  Nombre y ruta del Controlador que ya dispone de los métodos generados.
+--field::
+  _[Requerido] [Cadena]_
+  +
+  Nombre del campo que queremos transformar a componente lupa en la
+  vista de creación y actualización de la capa web.
+--additionalFields::
+  _[Cadena]_
+  +
+  Campos adicionales de la entidad sobre los que se realizará la
+  búsqueda cuando el usuario escriba en el componente lupa. Si no se
+  especifica ningún valor solo será posible buscar por id.
+--baseFilter::
+  _[Cadena]_
+  +
+  Filtro base que se aplica a todas las búsquedas realizadas en el
+  componente lupa.
+--caption::
+  _[Cadena]_
+  +
+  Campo de la entidad relacionada que se mostrará en el desplegable del
+  componente lupa cuando se encuentré un resultado.
+--listPath::
+  _[Cadena]_
+  +
+  Opcionalmente, añadiendo la ruta del fichero a este comando, se puede
+  mostrar un listado distinto al generado por defecto para cada
+  controlador.
+--max::
+  _[Cadena]_
+  +
+  Se especifica el número máximo de resultados que se quiere mostrar en
+  el desplegable del componente lupa. Por defecto se muestran los 3
+  primeros resultados obtenidos.
+
+web mvc loupe update
+~~~~~~~~~~~~~~~~~~~~
+
+Este comando mantiene actualizados todos los componentes que se importan
+al proyecto gvNIX al realizar la instalación del add-on.

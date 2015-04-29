@@ -1,0 +1,171 @@
+Add-on Web MVC
+--------------
+
+Add-on de utilidades para la capa Web de tipo Spring MVC.
+
+Este add-on incluye dos funcionalidades:
+
+* Interfaz Web para operaciones de persistencia de entidades en bloque.
+* Visualización de vistas usando jQuery como librería de JavaScript.
+
+Interfaz para operaciones de persistencia en bloque
+---------------------------------------------------
+
+Esta funcionalidad añade el interfaz web a un controlador para poder
+recibir peticiones de creación, actualización y eliminación de registros
+de una entidad en bloque.
+
+Actualmente se utiliza para dar soporte a las operaciones de
+modificación múltiple que el link:#addon-web-mvc-datatables[add-on web
+mvc datatables].
+
+Los método añadidos por esta funcionalidad se apoyan en las operaciones
+de persistencia en bloque generadas por el `` proporciona. Por ello,
+sólo se podrá añadir sobre controladores cuya entidad relacionada tenga
+generado este servicio.
+
+Para generar estos métodos se pueden utilizar los siguientes comandos:
+
+``::
+  Instala las dependencias y ajusta la configuración.
+``::
+  Genera los métodos en un controlador.
+``::
+  Genera los métodos para todos los controladores.
+
+Métodos de creación y actualización
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Los métodos de actualización y creación reciben una _Array_ de elementos
+en formato http://es.wikipedia.org/wiki/JSON[JSON].
+
+Como resultado generan un objeto _JsonResponse_ (también en formato
+JSON) con el resultado de la operación.
+
+El _JsonResponse_ se compone de las siguientes propiedades:
+
+status::
+  Resultado de la operación: _SUCCESS_ o _ERROR_
+exceptionMessage::
+  Mensaje de error (si lo hay) encontrado al ejecutar la operación.
+bindingResult::
+  Errores encontrados en la carga y/o validación de los datos recibidos.
+  +
+  El formato de este objeto en JSON es como el siguiente:
+  +
+----------------------------------------------------------------------------------------
+ {
+    OBJECT_INDEX : { FIELD1_NAME : FIELD_ERROR_MSG, FIELD2_NAME : FIELD_ERROR_MSG, ...},
+    OBJECT_INDEX2 : { FIELD1_NAME : FIELD_ERROR_MSG,
+      FIELD_OBJECT_NAME : { SUBOBJECT_FIELD: FIELD_ERROR_MSG, ... }
+      FIELD_LIST_NAME: {
+         OBJECT_FIELD_ITEM_INDEX : {ITEM_LIST_FIELD: FIELD_ERROR_MSG, ... },
+         OBJECT_FIELD_ITEM_INDEX2 : {ITEM_LIST_FIELD: FIELD_ERROR_MSG, ... },
+      },
+      ...
+    },
+    ...
+ }
+               
+----------------------------------------------------------------------------------------
+value::
+  Objetos persistidos o recibidos.
+
+Método de eliminación
+~~~~~~~~~~~~~~~~~~~~~
+
+El método de eliminación recibe los siguientes parámetros:
+
+\{entidad}::
+  Valores de las propiedades usado como _filtro base_ de la operación de
+  borrado completo.
+all::
+  Si recibe un _true_ elimina todos los elementos que cumplan el _filtro
+  base_. Si no se ha recibido _filtro base borrará todos los elementos._
+  Los parámetros relativos a borrado por identificadores serán
+  ignorados.
+idList[]::
+  Lista de identificadores de elementos a tener en cuenta para el
+  borrado.
+deleteIn::
+  Si recibe un _true_ cuyo identificador se encuentra en _idList[]_. De
+  lo contrario elimina los elementos cuyo identificado _no se encuentra
+  en idList[]_.
+
+Como resultado, el método devuelve: el número de elementos eliminados
+
+Si se produce un error en la eliminación el método devuelve un estado
+_INTERNAL_SERVER_ERROR(500)_ y el mensaje de error.
+
+Carga de datos en formato JSON
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Debido a que las operaciones de creación y actualización reciben los
+datos en formato http://es.wikipedia.org/wiki/JSON[JSON] y Spring no
+tiene soporte todavía para cargar objetos en este formato usando el
+_conversionService_ (ver
+https://jira.springsource.org/browse/SPR-6731[tarea en el JIRA de
+Spring]). Mientras tanto, esta funcionalidad incluye una librería propia
+que añade un _MappingHandlerAdapter_ que es capaz de hacerlo. Además,
+este objeto realizar la validación y rellenar un _BindingResult_ con los
+resultados de la carga.
+
+El _Jackson2RequestMappingHandlerAdapter_ se configura en el fichero
+`webmvc-config.xml` y se encarga de gestionar todas las peticiones cuyo
+@RequestMapping esté configurado con
+
+-----------------------------
+consumes = "application/json"
+-----------------------------
+
+.
+
+Visualización con jQuery
+------------------------
+
+Esta funcionalidad permite modificar la visualización de las vista para
+que utilice la librería _jQuery_ en vez de la estándar _jQuery_.
+
+Las opciones de este add-on _no son compatibles con el
+link:#addon-web-screen-patterns[add-on Web Screen Patterns]_.
+
+Para poder utilizar el _list_ generado por el
+link:#addon-web-mvc-datatables[add-on web mvc datatables] es necesario
+que la vista esté convertida a jQuery (ya que el componente _dataTables_
+que se utiliza está creado en base a esta librería).
+
+Los artefactos que se instalan son:
+
+* Ficheros `.js` de la librería _jQuery_ y _jQueryUI_ además de otros
+plugins, como _jQuery.validate_, necesarios para reemplazar todas las
+funcionalidades disponibles de base en las vistas.
+* Ficheros `.tagx` con la nueva implementación de pintado de los
+componentes.
+* Ficheros de estilos e imágenes.
+
+Para utilizar esta funcionalidad dispone de los siguientes comandos:
+
+``::
+  Instala los artefactos necesarios.
+``::
+  Convierte las vista de un controlador a jQuery.
+``::
+  Convierte todas las vistas a jQuery.
+``::
+  Actualiza los artefactos requeridos por jQuery. Util para actualizar
+  un proyecto a una nueva versión de gvNIX.
+
+Conversión de las vistas a jQuery
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+En el proceso de conversión consta de la correspondiente anotación en el
+controlador @GvNIXWebJQuery y la actualización de las rutas a los
+`.tagx` en sus ficheros `.jspx`.
+
+Los `.tagx` se han creado para que sean compatibles con los originales,
+por lo que, en principio, no será necesario modificar las páginas
+`.jspx` generadas de forma estándar por los comandos de ROO.
+
+Si se han añadido nuevos `.tagx` personalizados al proyecto basados en
+_DOJO_, es posible que tengan que ser replicados usando la nueva
+librería.

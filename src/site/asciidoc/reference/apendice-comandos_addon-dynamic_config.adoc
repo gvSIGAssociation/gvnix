@@ -1,0 +1,132 @@
+Comandos del add-on Dynamic Configuration
+-----------------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-dynamic_config[add-on Dynamic
+Configuration].
+
+.Comandos del add-on Dynamic Configuration
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-dynamic_config-config_save[configuration
+create] |Crea una nueva configuración con un determinado nombre
+
+|link:#apendice-comandos_addon-dynamic_config-config_prop_add[configuration
+property add] |Añade una propiedad a la gestión de configuraciones
+
+|link:#apendice-comandos_addon-dynamic_config-config_prop_update[configuration
+property value] |Cambia el valor que tiene una propiedad en una
+determinada configuración
+
+|link:#apendice-comandos_addon-dynamic_config-config_prop_undefined[configuration
+property undefined] |Deja sin valor una propiedad en una determinada
+configuración
+
+|link:#apendice-comandos_addon-dynamic_config-config_list[configuration
+list] |Lista todas las configuraciones definidas
+
+|link:#apendice-comandos_addon-dynamic_config-config_export[configuration
+export] |Escribe en el proyecto los cambios definidos hasta el momento
+en las configuraciones
+|=======================================================================
+
+configuration create
+~~~~~~~~~~~~~~~~~~~~
+
+Crea una nueva configuración con un determinado nombre.
+
+La primera configuración creada quedará marcada como la configuración
+por defecto de modo que en el caso de empaquetar la aplicación sin
+elegir ninguna configuración, será esta la que se aplique.
+
+Sus parámetros son:
+
+--name::
+  _[Requerido] [Cadena]_
+  +
+  Nombre para la nueva configuración que la referenciará de forma
+  unívoca.
+
+configuration property add
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Añade una propiedad a la gestión de configuraciones de modo que dicha
+propiedad podrá tener distinto valor para cada configuración.
+
+Al añadir una nueva propiedad, quedará almacenado internamente el valor
+que tubiese en dicho momento. En todas las configuraciones existentes en
+ese momento y en aquellas que se creen en un futuro la propiedad tendrá
+por defecto dicho valor.
+
+Sus parámetros son:
+
+--name::
+  _[Requerido] [Propiedad] [Autocompletado]_
+  +
+  Nombre de la propiedad cuyo valor puede tomar distinto valor en cada
+  configuración.
+
+configuration property value
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cambia el valor que tiene una propiedad en una determinada
+configuración.
+
+Sus parámetros son:
+
+--configuration::
+  _[Requerido] [Configuración] [Autocompletado]_
+  +
+  Nombre de la configuración cuyo valor para una propiedad se quiere
+  modificar.
+--property::
+  _[Requerido] [Propiedad] [Autocompletado]_
+  +
+  Nombre de la propiedad cuyo valor se desea modificar.
+--value::
+  _[Requerido] [Cadena]_
+  +
+  Nuevo valor para la propiedad en la configuración.
+
+configuration property undefined
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Deja sin valor una propiedad en una determinada configuración.
+
+Esto es útil para evitar que quede almacenado en el código fuente del
+proyecto algunos valores críticos como puede ser la clave de conexión
+con la base de datos de producción. El valor se tendrá que proporcionar
+al empaquetar la aplicación con Maven como un parámetro mediante el
+modificador _-Dnombre.propiedad=valor_.
+
+Sus parámetros son:
+
+--configuration::
+  _[Requerido] [Configuración] [Autocompletado]_
+  +
+  Nombre de la configuración cuyo valor para una propiedad se desea
+  dejar sin valor.
+--property::
+  _[Requerido] [Propiedad] [Autocompletado]_
+  +
+  Nombre de la propiedad cuyo valor se desea dejar sin valor.
+
+configuration list
+~~~~~~~~~~~~~~~~~~
+
+Lista todas las configuraciones definidas junto con las propiedades
+incluidas y los valores definidos para cada una de ellas.
+
+Este comando no tiene ningún parámetro obligatorio ni opcional.
+
+configuration export
+~~~~~~~~~~~~~~~~~~~~
+
+Escribe en el proyecto los cambios definidos hasta el momento en las
+configuraciones mediante todos los comandos anteriores utilizando para
+ello el sistema de perfiles de Maven. Mientras no se ejecute este
+comando, las configuraciones no serán aplicadas en el proyecto y por lo
+tanto no podrán ser utilizadas.
+
+Este comando no tiene ningún parámetro obligatorio ni opcional.

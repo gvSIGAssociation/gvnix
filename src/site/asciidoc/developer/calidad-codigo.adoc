@@ -1,0 +1,279 @@
+Calidad del código
+------------------
+
+Recomendaciones a seguir en el código
+-------------------------------------
+
+En esta sección se incluyen una serie de recomendaciones para mantener
+la calidad del código del framework. Estas recomendaciones están basadas
+en reglas de buenas prácticas medidas por ciertas herramientas pensadas
+para este fin.
+
+* _No dejar bloque de código vacíos_
++
+Ya sean excepciones ignoradas o condiciones no utilizadas, es
+recomendable no dejar estos bloques sin realizar ninguna operación (los
+comentarios no cuentan como operación). Ejemplos:
+** En el caso de ignorar una excepción podemos lanzar una traza de
+depuración:
++
+------------------------------------------
+ } catch (Exception toIgnore) {
+    LOGGER.finest("Problem do something");
+  }
+            
+------------------------------------------
+** Para condiciones de if que no se utilizan es recomendable eliminarlas
+* _Lanzar las excepciones_
++
+Suele pasar a veces que en bloques `catch` ser crean las excepciones
+_pero se lanzan_ con la sentencia `throw`
+* _Implementar el método_ `hashCode` _a la vez que el_ `equals`
++
+Para el correcto funcionamiento del método `equals` en una clase con
+dicho método personalizado, en fundamental personalizar también el
+método `hashCode` utilizando los mismos campos en ambos.
++
+Eclipse, en la opción `source` ofrece una herramienta que permite
+generar ambos métodos de manera automática a partir de los campos de la
+clase que estimemos oportunos.
+* _Añadir JavaDoc en todos los métodos públicos._
+* _Añadir comentarios en los métodos para explicar bloques de código_
+* _Uso de_ `try/finally` _para el cierre de recursos_
++
+Siempre que se utilicen recursos, como _Streams_, _objetos de BBDD
+(Conexiones, cursores, Statement)_ utilizaremos un bloque `try/finally`
+para asegurarnos que los recursos son liberados. Ejemplo:
++
+-----------------------------------------------------------------
+            InputStream ins = null;
+            OutputStream outs = null;
+            try {
+                if (fileManager.exists(path)){
+                    mutableFile = fileManager.updateFile(path);
+                } else {
+                    mutableFile = fileManager.createFile(path);
+                }
+
+                ins = FileUtils.getInputStream(getClass(), file);
+                outs = mutableFile.getOutputStream();
+                TokenReplacementFileCopyUtils.replaceAndCopy(
+                        ins, outs, properties);
+                
+                insertI18nMessages();
+            } catch (IOException ioe) {
+                throw new IllegalStateException(ioe);
+            } finally {
+                IOUtils.closeQuietly(ins);
+                IOUtils.closeQuietly(outs);
+            }
+-----------------------------------------------------------------
++
+Para cerrar los objetos de tipo`*Stream` es recomendable usar el método
+`IOUtils.closeQuietly`
+* _Evitar el uso de operador_ `+`
++
+Es recomendable usar otras opciones como:
+** `String.concat`
+** `StringBuilder`. Preferentemente antes que `StringBuffer`, a no ser
+que se requiera que las instancia se _Thread-safe_
+** `String.format`. Para cadenas complejas o con varios argumentos.
+Ejemplo:
++
+-----------------------------------------------------------------------------------------------
+ String.format("Esta concatenación de '%s' es mas compleja ya que %s.%s usar varias cadenas.", 
+                var1, var2, var3)
+-----------------------------------------------------------------------------------------------
+* _Evitar identificadores de variables o campos de menos de 3
+caracteres._
+* _Nombres de constantes en mayúsculas._
++
+Incluye el `LOGGER`.
+* _No modificar un campo estático desde un método no-estático_
+* _Añadir el modificador_`final` en las propiedades que se establecen en
+el constructor y no se van a ser modificadas
+* _Eliminar código muerto._
++
+El código muerto son métodos privados que nunca se invocan, campos de
+clase no usados, variables asignadas que nunca se utilizan en el método,
+etc...
+* _Iterar sobre_ `Map.entrySet` _en vez de_ `Map.keySet`
++
+El coste de iteración es el mismo y se obtiene la clave y el valor a la
+vez.
+* Precauciones a tener en cuenta en el código fuente del framework para
+mejorar la puntuación de SONAR:
+** Ver si es posible evitar el uso de Set de URL en addon de temas
+(puede ser un grave problema de rendimiento)
+** Evitar catch vacios: Ver la posibilidad de log o usar apache commons
+para cerrar conexiones.
+** Arreglar algunos new XXXException(... sin el throw
+** Algunas comprobaciones de is null.
+** Limpiar algunas variable no usadas.
+* Precauciones a tener en cuenta en el código fuente de los proyectos
+generados para mejorar la puntuación de SONAR:
+** Algunos if que no usan llaves
+** Añadir la generación de los test para las entidades
+** Parece que en algún sitio del los aj (creo que en el equals) hay
+alguna comprobación de null que se podría mejorar.
+
+Lanzar proceso de comprobación
+------------------------------
+
+Para el proyecto gvNIX se ha utilizado la herramienta
+http://www.sonarsource.org/[Sonar] ( http://www.sonarsource.org/). Esta
+herramienta se compone de un lanzador de proceso (en gvNIX se utiliza el
+plugin de maven) que analiza el código y una aplicación servidor que
+permite visualizar y gestionar los resultados.
+
+En este apartado se describe como preparar el entrono para lanzar el
+proceso de análisis y como ejecutarlo sobre un proyecto generado por
+gvNIX o sobre el propio framework. No se describen la instalación del
+servido y su gestión.
+
+Configuración del entorno para lanzar el análisis de Sonar
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Para que el plugin de maven sea capaz de conectarse al servidor de Sonar
+es necesario configura especificar los parámetros de conexión a la base
+de datos de Sonar. Para ello hay que añadir un _profile_ en el fichero
+_$\{HOME}/.m2/settings.xml_ . Este es un ejemplo de la declaración
+
+----------------------------------------------------------------------------------------
+....
+<settings>
+  ....
+  ....
+  ....
+  <profiles>
+    ....
+    ....
+    ....
+    <profile>
+        <id>sonar</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <properties>
+         <sonar.jdbc.url>
+            jdbc:postgresql://localhost/sonar
+          </sonar.jdbc.url>
+          <sonar.jdbc.driverClassName>org.postgresql.Driver</sonar.jdbc.driverClassName>
+          <sonar.jdbc.username>sonar</sonar.jdbc.username>
+          <sonar.jdbc.password>sonar</sonar.jdbc.password>
+            <!-- optional URL to server. -->
+            <sonar.host.url>
+              http://localhost:9000
+            </sonar.host.url>
+        </properties>
+    </profile>
+  </profiles>
+</settings>
+----------------------------------------------------------------------------------------
+
+En el ejemplo se pueden ver los siguientes parámetros:
+
+* `sonar.jdbc.url`:Url JDBC para conexión con el servidor de BBDD.
+* `sonar.jdbc.driverClassName`:Nombre de la clase _Driver_ JDBC a usar.
+* `sonar.jdbc.username` y `sonar.jdbc.username`: Datos de usuario para
+conectar al servidor de BBDD
+* `sonar.host.url`:Url de conexión al servido (aplicación) Sonar.
+
+También es posible especificar estos parámetros desde la línea de
+comandos en la ejecución usando el formato `-Dsonar.jdbc.username=sonar`
+
+Para más información sobre la configuración del plugin de maven ver la
+http://docs.codehaus.org/display/SONAR/Installing+and+Configuring+Maven[documentación
+de sonar] al respecto
+
+Lanzar el análisis de Sonar
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Para lanzar el análisis de sonar sobre un proyecto maven hay que usar el
+comando:
+
+--------------------------------------------------------------
+mvn clean install sonar:sonar -Dmaven.test.failure.ignore=true
+--------------------------------------------------------------
+
+Si ya se ha lanzado el install puede usarse el siguiente comando para no
+volver a lanzarlo:
+
+----------------------------------
+mvn dependency:resolve sonar:sonar
+----------------------------------
+
+Una vez terminado el proceso de análisis es posible consultar el
+resultado desde la aplicación servidor sonar.
+
+Para más información sobre la configuración del plugin de maven ver la
+http://docs.codehaus.org/display/SONAR/Analyzing+with+Maven[documentación
+de sonar] al respecto
+
+Visualizar evidencias de Sonar en proyectos de eclipse
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Existe un plugin para eclipse que permite visualizar las evidencias
+detectadas por un análisis de sonar desde el proyecto de un workspace de
+eclipse. La información para instalar, configurar y usar este plugin se
+encuentra en
+http://docs.codehaus.org/display/SONAR/Using+Sonar+in+Eclipse[documentación
+de sonar] al respecto
+
+Establecer el perfil para la aplicación
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Una vez analizado un proyecto por primera vez es posible establecer el
+perfil de reglas que se deben aplicar al proyecto. Para ello es
+necesario seguir los siguiente pasos:
+
+* Entrar en http://hq02.disid.com:9000
++
+Logarse como Administrador
++
+Seleccionar el proyecto desde el menú Proyectos
++
+Seleccionar en el menú Configuración del proyecto (debajo del input
+buscar, en la parte derecha) y seleccionar Perfiles de calidad
++
+Seleccionar el perfil a usar para Java
+
+Exportar/importar perfiles de calidad
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Es posible exportar e importar los perfiles de calidad.
+
+Exportar:
+
+* Entrar en http://hq02.disid.com:9000
++
+Entrar en el menú Configuración de sonar (en la parte derecha de la
+barra superior, a la izquierda del input buscar).
++
+Seleccionar Perfiles de calidad
++
+Seleccionar el perfil a exportar
++
+Pulsar sobre pestaña Enlaces permanentes
++
+Descargar el fichero del link Todas las reglas
+
+Importar:
+
+* Entrar en http://hq02.disid.com:9000
++
+Logarse como Administrador
++
+Entrar en el menú Configuración de sonar (en la parte derecha de la
+barra superior, a la izquierda del input buscar).
++
+Seleccionar Perfiles de calidad
++
+Pulsar sobre Restaurar perfil (en la parte derecha arriba)
++
+Seleccionar el archivo de la exportación.
++
+Pulsar Restaurar
+
+El fichero de reglas utilizado en eXcentia se puede encontrar en
+http://scmcit.gva.es/svn/gvnix/trunk/doc/general/sonar/export-excentia-sonar.xml

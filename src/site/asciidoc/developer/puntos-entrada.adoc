@@ -1,0 +1,61 @@
+Puntos de entrada al framework
+------------------------------
+
+En el Framework los add-ons pueden tener acciones de dos tipos:
+
+Pasivas::
+  Acción se inicia en base a una petición del usuario en el Shell o por
+  otro add-on. Principalmente se identifican por los Commands.
+Activas::
+  Son aquellas que se basan en los cambios que se produzcan en el
+  proyecto.
+
+Normalmente, si el add-on va a manejar/generar algún producto que
+depende o se genera a partir de un artefacto de la aplicación,
+necesitará registrar algún comando para la primera generación y un
+elemento de escucha para mantener su producto actualizado según los
+cambios que pueda sufrir dicho artefacto.
+
+Commands
+--------
+
+Son clases que, mediante el uso de anotaciones, identifican operaciones
+accesibles al usuario desde la consola de Roo. Estas anotaciones
+contienen información suficiente para que la consola sea capaz de
+mostrar ayuda en línea, el autocompletado, parámetros disponibles y de
+su disponibilidad.
+
+Estas clases suelen ser declarativas o con poca lógica (adaptar
+parámetros y opciones por defecto, etc...), delegando la ejecución de
+los comando a servicios OSGi definidos por un interface (normalmente con
+nombre terminado en el sufijo `Operations`). Normalmente, la clase
+`Commands`, el Interface `Operations` y la implementación de esta última
+(`OperationsImpl`) se encuentran en el mismo paquete.
+
+Listeners
+---------
+
+Como ya hemos comentado, los comandos permiten realizar operaciones pero
+los productos de las acciones normalmente están vinculados a un
+artefacto de la aplicación (entidad, controlador, servicio). La
+filosofía de Roo es que los cambios en los artefactos deben propagarse a
+todos los productos relacionados de forma automática (siempre, claro
+está, que esté en marcha la consola).
+
+Para poder conseguir esto, además de un control de las acciones de los
+usuarios, los add-ons deben implementar Listeners que monitoricen los
+artefacto sobre los que actúan para que sean notificados con los
+cambios. Algunos de los tipos de listeners disponibles son:
+
+MetadataNotificationListener::
+  Recibe notificaciones de los *metadatos* de los artefactos.
+DependencyListener::
+  Recibe los cambios en las dependencias del proyecto.
+FileEventListener::
+  Recibe los cambios en fichero y directorios.
+ProcessManagerStatusListener::
+  Recibe los cambios en el estado de
+  link:#arquitectura-interna_process-manager[Process Manager].
+
+En muchas ocasiones, nuestros add-ons necesitarán notificaciones del
+listeners de metadatos.

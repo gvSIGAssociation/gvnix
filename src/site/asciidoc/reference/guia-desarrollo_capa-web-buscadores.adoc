@@ -1,0 +1,79 @@
+Buscadores en la capa web
+-------------------------
+
+En la sección de recetas se puede encontrar información adicional para
+link:#recetas-finders-multitud-campos[desarrollar buscadores con gran
+cantidad de campos] y también para hacer los
+link:#recetas-finders-modificar[campos opcionales en los buscadores] .
+
+Descripción
+-----------
+
+Si está definida la capa web con Spring MVC, se podrá generar el código
+necesario en el controlador y la página jspx con el formulario que
+invocará a uno de los buscadores que se encuentren definidos en la capa
+de entidades.
+
+Creación de buscadores
+----------------------
+
+Al ejecutar el comando _web mvc finder add_ indicando la entidad que
+contiene algún buscador definido a nivel de entidad y el controlador
+encargado de gestionar dicha entidad, se generará el buscador en la capa
+de vista.
+
+-----------------------------------------------------------------------------------------
+roo-gvNIX> 
+Upd SRC_MAIN_JAVA/com/springsource/petclinic/web/OwnerController.java
+Upd SRC_MAIN_WEBAPP/WEB-INF/views/owners/views.xml
+Upd SRC_MAIN_WEBAPP/WEB-INF/i18n/application.properties
+Cre SRC_MAIN_JAVA/com/springsource/petclinic/web/OwnerController_Roo_Controller_Finder.aj
+Cre SRC_MAIN_WEBAPP/WEB-INF/views/owners/findOwnersByLastNameLikeAndCityLike.jspx
+Upd SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
+-----------------------------------------------------------------------------------------
+
+Consultar la documentación del comando
+http://docs.spring.io/spring-roo/reference/html/command-index.html#command-index-web-mvc-finder-add[web
+mvc finder add] para más información.
+
+Código generado
+---------------
+
+La ejecución del comando _web mvc finder add_ desencadenará la inclusión
+de una anotación en la clase Java del controlador especificado.
+
+--------------------------------------
+...
+        @RooWebFinder
+        public class OwnerController {
+        }
+--------------------------------------
+
+La aparición de la anotación _RooWebFinder_ en el controlador provocará
+la generación del aspecto Java correspondiente que implementará la parte
+web de los buscadores definidos en su entidad relacionada.
+
+---------------------------------------------------------------------------------------------------
+privileged aspect OwnerController_Roo_Controller_Finder {
+
+            @RequestMapping(params = { "find=ByLastNameLikeAndCityLike", "form" },
+                    method = RequestMethod.GET)
+            public String OwnerController.findOwnersByLastNameLikeAndCityLikeForm(
+                    Model uiModel) {
+                return "owners/findOwnersByLastNameLikeAndCityLike";
+            }
+
+            @RequestMapping(params = "find=ByLastNameLikeAndCityLike",
+                    method = RequestMethod.GET)
+            public String OwnerController.findOwnersByLastNameLikeAndCityLike(
+                    @RequestParam("lastName") String lastName,
+                    @RequestParam("city") String city, Model uiModel) {
+                uiModel.addAttribute("owners",
+                        Owner.findOwnersByLastNameLikeAndCityLike(lastName, city).getResultList());
+                return "owners/list";
+            }
+        }
+---------------------------------------------------------------------------------------------------
+
+Se generará también la página jspx correspondiente y los recursos
+adicionales necesarios para su visualización.

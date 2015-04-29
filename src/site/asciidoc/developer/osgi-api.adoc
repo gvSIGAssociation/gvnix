@@ -1,0 +1,435 @@
+Interacción con el contenedor OSGi
+----------------------------------
+
+Los add-ons, como cualquier componente OSGi, disponen de un API para
+interactuar con el contenedor OSGi. Permitiendo a nuestro código recibir
+eventos OSGi, reemplazar componentes OSGi, etc.
+
+Reemplazar componentes-servicios de Roo
+---------------------------------------
+
+En algunos casos podemos necesitar cambiar los componentes-servicios que
+por defecto instala Roo por otros específicos de gvNIX, por ejemplo, el
+componente de gestión del menú de la aplicación MVC.
+
+Inicialmente se utilizaba el API de OSGi para poder desactivar el
+servicio. Esto suponía algunos problemas ya que, dependiendo del orden
+de carga, nuestro servicio no estaban activos antes de que algún
+componente requiriese el componente original.
+
+El nuevo enfoque es mantener los dos servicios activos y crear un
+componente que haga de _proxy_ y que sepa decidir si debe usar el
+componente original o el nuestro. Además, este servicio _no tendrá
+referencias_ inicialmente a ninguno de los servicios para que esté
+disponible lo antes posible. Esto se combina con registrar un servicio
+que implementa _FindHook_ (servicios que permiten gestionar evento en el
+framework) para filtrar los resultado de la búsqueda del servicio a
+sustituir por el servicio de _proxy_.
+
+Pasos para reemplazar servicios OSGi:
+
+1.  Crear nuestro componente-servicio que reemplazará al de Roo. Esta
+operación se realiza automáticamente si anotamos la clase con
+_@Component_ y _@Service_
++
+Es importante destacar que nuestro componente _DEBE_ implementar la
+misma interfaz del componente al que queremos substituir.
++
+Añadiremos, además una propiedad, usando la anotación _@Property_, al
+servicio que nos permitirá identificar el servicio de forma fácil
++
+Este sería un ejemplo de parte de la declaración de la clase:
++
+--------------------------------------------------------------------------
+....
+....
+....
+
+@Component
+@Service
+public class MenuOperationsImpl implements MenuOperations { 
+
+  private static Logger logger = HandlerUtils
+            .getLogger(MenuOperationsImpl.class);
+  
+  /**
+   * Property to identify this service in {@link FilterMenuOperationsHook}
+   * and {@link MenuOperationsProxy}
+   */
+  @Property(boolValue=true)
+  public static final String GVNIX_COMPONENT = "gvNIXComponent";
+  
+  
+  /**
+   * Use AddonOperations delegate to operations this add-on offers
+   */
+  @Reference private MenuEntryOperations operations;
+  @Reference private XmlRoundTripFileManager xmlFileManager;
+
+  // TODO: Implementación de los métodos de MenuOperations
+....
+....
+....
+                    
+--------------------------------------------------------------------------
+2.  Crear el componente-servicio _proxy_. Esta componente se debe estar
+anotado con _@Component(immediate=true)_ y _@Service_
++
+Este componte, además de implementar la misma interfaz del componente al
+que queremos substituir, _NO DEBE TENER NINGUNA_ referencia a otro
+servicio (que utilice la anotación _@Reference_). Esto es muy
+importante, ya que este servicio de de cargarse de forma instantánea.
++
+Este servicio también tendrá una propiedad, usando la anotación
+_@Property_, que nos permitirá identificar el servicio de forma fácil
++
+------------------------------------------------------------------------------------------------------------------
+....
+....
+....
+import static org.gvnix.web.menu.roo.addon.FilterMenuOperationsHook.isGvNIXOperations;
+import static org.gvnix.web.menu.roo.addon.FilterMenuOperationsHook.isRooOperations;
+....
+....
+....
+
+@Component(immediate=true)
+@Service
+public class MenuOperationsProxy implements MenuOperations {
+
+    private static Logger logger = HandlerUtils
+            .getLogger(MenuOperationsProxy.class);
+    
+    private static final String MENU_OPERATION_NAME = MenuOperations.class.getName();
+    
+    /*
+     * ===========================================================
+     * VERY IMPORTANT: This class **MUST HAS NONE** @Reference   
+     * property to assure this component is really loaded 
+     * immediately
+     * ===========================================================
+     */
+
+    /**
+     * Property to identify this service in {@link FilterMenuOperationsHook}
+     * and {@link MenuOperationsProxy}
+     */
+    @Property(boolValue=true)
+    public static final String GVNIX_PROXY_COMPONENT = "gvNIXProxyComponent";
+    
+    /**
+     * gvNIX {@link MenuOperations} implementation
+     */
+    private MenuOperationsImpl gvNIXOperations = null;
+    
+    /**
+     * {@link ServiceReference} to gvNIX {@link MenuOperations}
+     * implementation (to perform unget on component deactivate)
+     */
+    private ServiceReference gvNIXOperationsService = null;
+    
+    
+    /**
+     * Original {@link MenuOperations}
+     */
+    private MenuOperations rooOperations = null;
+    
+    /**
+     * {@link ServiceReference} to original {@link MenuOperations}
+     * implementation (to perform unget on component deactivate)
+     */
+    private ServiceReference rooOperationsService = null;
+    
+    /**
+     * BunleContext
+     */
+    private BundleContext context;
+
+    /** {@inheritDoc} */
+    protected void activate(ComponentContext context) {
+        logger.finer("MenuOperation proxy activated");
+        this.context = context.getBundleContext();
+    }
+    
+    /** {@inheritDoc} */
+    protected void deactivate(ComponentContext context) {
+        // unget from gvNIX menu operation
+        gvNIXOperations = null;
+        context.getBundleContext().ungetService(gvNIXOperationsService);
+        gvNIXOperationsService = null;
+        
+        // unget from original menu operation
+        rooOperations = null;
+        context.getBundleContext().ungetService(rooOperationsService);
+        rooOperationsService = null;
+    }
+    
+    /**
+     * Wait until {@link #gvNIXOperations} and {@link #rooOperations}
+     * are resolved.
+     */
+    private void waitToOperations(){
+        if (!(gvNIXOperations == null && rooOperations == null)){
+            return;
+        } else {
+            resolveRerences();
+            if (!(gvNIXOperations == null && rooOperations == null)){
+                return;
+            }
+        }
+        
+        while (gvNIXOperations == null && rooOperations == null){
+            try {
+                Thread.sleep(100);
+                resolveRerences();
+            } catch (InterruptedException e) {
+                // Do nothing
+            }
+        }
+    }
+    
+    /**
+     * Try to initialize {@link #gvNIXOperations} and
+     * {@link #rooOperations}. Also store its {@link ServiceReference}
+     * so it can perform a unget on component deactivate.
+     */
+    private void resolveRerences(){
+        // logger.info("Revolving ops");
+        ServiceReference[] sr;
+        try {
+            // FilterMenuOperationHook will return ALL services available
+            sr = context.getAllServiceReferences(MENU_OPERATION_NAME, null);
+        } catch (InvalidSyntaxException e) {
+            logger.log(Level.SEVERE,"Error getting ".concat(MENU_OPERATION_NAME).concat(" service references"),e);
+            return;
+        }
+        if (gvNIXOperations == null){
+            // locate gvNIX MenuOperations service
+            for (int i = 0; i < sr.length; i++) {
+                ServiceReference serviceReference = sr[i];
+                if (isGvNIXOperations(serviceReference)) {
+                    gvNIXOperationsService = serviceReference;
+                    gvNIXOperations = (MenuOperationsImpl) context.getService(serviceReference);
+                    break;
+                }
+            }
+        }
+        if (rooOperations == null){
+            // locate original MenuOperations service
+            for (int i = 0; i < sr.length; i++) {
+                ServiceReference serviceReference = sr[i];
+                if (isRooOperations(serviceReference) ) {
+                    rooOperationsService = serviceReference;
+                    rooOperations = (MenuOperations) context.getService(serviceReference);
+                    break;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Gets the {@link MenuOperations} service instance to use
+     * 
+     * @return
+     */
+    private MenuOperations getOperations(){
+        // Assure than all required services are loaded
+        waitToOperations();
+        
+        if (gvNIXOperations.isGvNixMenuAvailable()){
+            logger.finest("Using gvNIX Menu ops");
+            return gvNIXOperations;
+        } else {
+            logger.finest("Using Roo Menu ops");
+            return rooOperations;
+        }
+    }
+
+    /**
+     * ========================================= 
+     * Delegated {@link MenuOperations} methods
+     * 
+     * This methods use {@link #getOperations()}
+     * to decide which service call
+     * ========================================= 
+     */
+// TODO: Implementación de los métodos de MenuOperations.
+//       Todos los métodos deberán delegar en getOperations().
+....
+....
+....
+                    
+------------------------------------------------------------------------------------------------------------------
++
+Podemos destacar en el código anterior:
+* Las referencias a los servicios no tienen la anotación _@Reference_.
+Se carga en el método _resolveRerences()_ cuando se necesitan. En el
+método _deactivate_ se limpiarán las referencia utilizadas.
+* La decisión de que servicio usar se delega en el método
+_getOperations()_ que, dependiendo de configuración o estado, decide el
+servicio a devolver. Los metodos que implementan el interfaz deben
+usarlo.
+* La propiedad de servidio GVNIX_PROXY_COMPONENT permitirá identificar
+al servicio.
+3.  Para tener un control total de a que servicio tienen acceso terceros
+componentes crearemos un servicio que nos permite filtrar los sevicios
+que el framework OSGi expone. Esto se consegue usando un tipo de
+servicio especial que provee OSGi que permite gestionar (solo eliminar
+elementos) el resultado de la busqueda de servicio
++
+Esta componente se debe estar anotado con _@Component(immediate=true)_ y
+_@Service_ además de implementar el interface
+_org.osgi.framework.hooks.service.FindHook_
++
+En este servicio tambien es muy importante que no tenga ninguna
+referencia a servicios OSGi para garantizar que se inicializa de forma
+inmediata.
++
+Este sería un ejemplo:
++
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+....
+....
+....
+@Component(immediate=true)
+@Service
+public class FilterMenuOperationsHook implements FindHook {
+    
+    private static Logger logger = HandlerUtils
+            .getLogger(FilterMenuOperationsHook.class);
+    
+    /**
+     * Service to manage
+     */
+    private static final String MENU_OPERATION_NAME = MenuOperations.class.getName();
+
+    private BundleContext bundleContext;
+    
+    /**
+     * Method call when component is activated.
+     * 
+     * @param context
+     */
+    protected void activate(ComponentContext context) {
+        logger.finer(this.getClass().getName().concat(" activated"));
+        // Store bundleContext to use it in find method
+        bundleContext = context.getBundleContext();
+    }
+    
+    /**
+     * Filter request returned by framework related to {@link MenuOperations}.
+     * <br>
+     * This method only manage the {@link MenuOperations} service request, removing
+     * from returned collection {@code references} all services except {@link MenuOperationsProxy}.
+     * <br>
+     * For request inside this bundle all services are returned.
+     * 
+     * @see org.osgi.framework.hooks.service.FindHook#find(org.osgi.framework.BundleContext, java.lang.String, java.lang.String, boolean, java.util.Collection)
+     */
+    public void find(BundleContext context, String name, String filter,
+            boolean allServices, Collection references) {
+        if (!MENU_OPERATION_NAME.equals(name)){
+            // It's not the managed service
+            // Do nothing
+            return;
+        }
+        if (context.getBundle().getBundleId() == 0) {
+            // Don't hide anything from  the system bundle
+            return;
+        }
+        
+        if (references.isEmpty()){
+            // Nothing to do
+            return;
+        }
+        
+        if (bundleContext.equals(context)){
+            // Don't hide anything to myself
+            return;
+        }
+        
+        // Remove all ServiceReferes except MenuOpertationProxy service  
+        for (Iterator i = references.iterator(); i.hasNext(); ) {
+            ServiceReference sr = (ServiceReference) i.next();
+            if (isGvNIXOperations(sr)){
+                // logger.finest("   - gvNIX Menu op ( Removing)");
+                i.remove();
+            } else if (isProxy(sr)){
+                // logger.finest("   - gvNIX Menu proxy op");
+                // Don't remove proxy
+            } else {
+                // logger.finest("   - Roo Menu op ( Removing)");
+                i.remove();
+            }
+        }
+    }
+    
+    /**
+     * Check if service reference is the service proxy
+     * <br>
+     * Uses {@link MenuOperationsProxy#GVNIX_PROXY_COMPONENT} service
+     * property.
+     * 
+     * @param sr
+     * @return
+     */
+    public static boolean isProxy(ServiceReference sr){
+        return sr.getProperty(MenuOperationsProxy.GVNIX_PROXY_COMPONENT) != null;
+    }
+    
+    /**
+     * Check if service reference is gvNIX {@link MenuOperations} implementation
+     * <br>
+     * Uses {@link MenuOperationsImpl#GVNIX_COMPONENT} service
+     * property.
+     * 
+     * @param sr
+     * @return
+     */
+    public static boolean isGvNIXOperations(ServiceReference sr){
+        return sr.getProperty(MenuOperationsImpl.GVNIX_COMPONENT) != null;
+    }
+    
+    /**
+     * Check if service reference is Roo original {@link MenuOperations}
+     * <br>
+     * Uses {@link #isProxy(ServiceReference)} and {@link #isGvNIXOperations(ServiceReference)}.
+     *  
+     * @param sr
+     * @return
+     */
+    public static boolean isRooOperations(ServiceReference sr){
+        return !(isProxy(sr) || isGvNIXOperations(sr));
+    }
+}
+                    
+                    
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
++
+Podemos destacar en el código anterior:
+* Solo filtramos para el servicio en cuestión y cuyas peticiones _sean
+de otro bundle_
+* Para identificar que servicio es se utilizan las propiedades del
+servicio añadidas. Ya que el servicio original no tiene ninguna, se
+comprueba que no contenga ninguna de las dos que hemos utilizado para el
+servicio _proxy_ y el que hemos implementado
+* Los métodos que identifican un servicio los declaramos como estáticos
+para poder usarlos en servicio _proxy_ (ya que no podemos hacer
+referencia a el).
+
+La ventaja de esta técnica es que nos permite, no solo sustituir un
+servicio, sino tener el control de las circunstancias en las que se
+ejecuta y actuar en consecuencia, sin perder la funcionalidad que
+ofrece. Todo esto es debido a que el componente _proxy_ es el componente
+que tiene el control de la llamada al servicio en todo momento.
+
+Algunos ejemplos de posible aplicaciones:
+
+* Ajustar los parámetro de entrada/resultado del servicio de forma
+arbitraria.
+* Pre/pos acciones a la ejecución de un servicio.
+* Registro/monitorización de llamadas a un servicio.
+
+De todas formas, es recomendable usar esta técnica con precaución, ya
+que, al ser el entono OSGi tan flexible, podemos encontrarnos en
+circunstancias especiales que pueden ser complejas de resolver.

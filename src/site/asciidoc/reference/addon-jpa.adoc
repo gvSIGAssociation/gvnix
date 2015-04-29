@@ -1,0 +1,466 @@
+Add-on JPA
+----------
+
+Add-on de utilidades enfocadas a la persistencia y consulta de las
+entidades.
+
+Este add-on incluye las siguientes funcionalidades:
+
+* Servicios de persistencia de entidades en bloque.
+* Registro de información adicional para búsquedas por relaciones.
+* Auditoría y registro de histórico de cambios de las endidades.
+* Persistencia de entidades con campos de tipo geográfico.
+
+Para poder utilizar estas funcionalidades hay que ejecutar previamente
+el comando ``.
+
+Servicios persistencia en bloque
+--------------------------------
+
+Esta funcionalidad permite generar _servicios_ que permiten realizar
+operaciones de creación, actualización y eliminación de múltiples
+instancias de una entidad en una sola petición y de forma transaccional.
+
+Estos _servicios_ se generan como un _bean_ de Spring, de forma que,
+para utilizarlos, solo es necesario declararlos como propiedad en la
+clase que los requiera y serán inyectados en el momento de la
+construcción de la instancia por Spring.
+
+Un ejemplo de este servicio generado sería este:
+
+-----------------------------------------------
+package com.springsource.petclinic.domain;
+import org.gvnix.addon.jpa.batch.GvNIXJpaBatch;
+import org.springframework.stereotype.Service;
+
+@Service
+@GvNIXJpaBatch(entity = Owner.class)
+public class OwnerBatchService {
+}
+    
+-----------------------------------------------
+
+En el correspondiente fichero `OwnerBatchService_Roo_GvNIXJpaBatch.aj`
+se generarán los siguientes métodos:
+
+deleteAll()::
+  Elimina todos los registro de la entidad.
+deleteIn(List<Long> ids)::
+  Elimina los registro de la entidad cuyos indentificadores se
+  encuentren en la lista _ids_.
+deleteNotIn(List<Long> ids)::
+  Elimina los registro de la entidad cuyos indentificadores _no_ se
+  encuentren en la lista _ids_.
+create(List<Owner> owners)::
+  Persiste como nuevos todos los elementos de la lista _owners_.
+update(List<Owner> owners)::
+  Persiste todos los elementos de la lista _owners_.
+  +
+  ____________________________________________________________________________________________________________________________________________________________________________________________________________________
+  *Note*
+
+  _Importante:_ Si algún elemento de la lista no tiene establecido su
+  campo de clave primaria o su campo de control de concurrencia (este
+  último sólo si está definido) el registro _se guardará como registro
+  nuevo_.
+  ____________________________________________________________________________________________________________________________________________________________________________________________________________________
+findByValues(Map<String,Object> propertyValues)::
+  Devuelve una lista de elemento cuyas propiedades coincidan (se usa el
+  operador _igual a_) con _todos_ valores recibidos en _propertyValues_.
+deleteByValues(Map<String,Object> propertyValues)::
+  Elimina todos elementos cuyas propiedades coincidan (se usa el
+  operador _igual a_) con _todos_ valores recibidos en _propertyValues_.
+
+Para poder usar este servicio en cualquier clase solo es necesario
+declarar una propiedad con la anotación link:#[@Autowire]. Spring se
+encarga de inyectar una instancia del servicio en la propiedad. Este
+sería un ejemplo de la declaración para usarlo:
+
+-----------------------------------------
+class MyClass {
+
+    @Autowire
+    private OwnerBatchService ownerBatch;
+    
+-----------------------------------------
+
+Todas las operaciones generadas (excepto _findByValues_) son
+_transaccionales_. Por lo que, si se produce un error en cualquier
+elemento afectado, _la operación entera_ será abortada (no se guardarán
+los cambios)
+
+Esta funcionalidad es requerida por otros add-ons como
+link:#addon-web-mvc-datatables[Web Mvc datatables] para poder realizar
+operaciones sobre múltiples registros a la vez.
+
+Para generar estos servicios se pueden utilizar los siguientes comandos:
+
+``::
+  Genera el servicio para una entidad.
+``::
+  Genera el servicio para todas las entidades de la aplicación.
+
+Información adicional para búsquedas por relaciones
+---------------------------------------------------
+
+Esta funcionalidad permite definir información adicional sobre las
+propiedades de la entidad que declaran una relación que permiten
+realizar búsquedas y ordenaciones sobre ella.
+
+Esta información se utiliza actualmente para permitir realizar búsquedas
+de texto dentro de entidades relacionadas y su ordenación cuando se usa
+el link:#apendice-comandos_addon-web-mvc-datatables[add-on web mvc
+datatables].
+
+No tiene implementado ningún comando. Funciona añadiendo la anotación
+_GvNIXJpaQuery_ a la propiedad. Por ejemplo, para permitir que, desde el
+listado de _Pet_, sea posible buscar por el nombre y apellido de su
+_Owner_ y cuando se ordene por su columna se utilicen los mismos campos,
+deberíamos añadir la siguiente anotación:
+
+---------------------------------------------------------------------------------------
+....
+public class Pet {
+    ....
+    ....
+
+    @GvNIXJpaQuery(filterBy={"lastName","firstName"}, orderBy={"lastName","firstName"})
+    @ManyToOne
+    private Owner owner;
+
+    
+---------------------------------------------------------------------------------------
+
+Auditoría y resgistro de cambios de entidades
+---------------------------------------------
+
+Esta funcionalidad añade soporte para hacer auditoría (registrar quíen y
+cuándo se crea o modifica un resigtro) de entidades y, opcionalmente,
+registrar cada uno de los cambios de las modificaciones sufridas por los
+registros de la entidad.
+
+Configurar detalles de usuario
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Es posible configurar la clase que proveerá el nombre de usuario que
+realiza un cambio. Para ello se ejecuta el siguiente comando:
+
+``::
+  Configura la auditoría de historico creando la clase que proveerá del
+  nombre de usuario que realiza el cambio. Sólo se puede ejecutar una
+  vez.
+
+Auditoría básica de entidades
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Para añadir la auditoría a las entidades se pueden utilizar los
+siguientes comandos:
+
+``::
+  Añade auditoría para una entidad.
+``::
+  Añade auditoría para todas las entidades de la aplicación.
+
+Al instalar la auditoría en un proyecto gvNIX se creará una clase (con
+el nombre facilitado en el parámetro _--service_) anotada con
+_@GvNIXJpaAuditUserService_, se incluirá el siguiente método (en su
+correspondiente fichero _.aj_) para obtener los datos del Usuario:
+
+getUser()::
+  Devolverá el tipo facilitado en el parámetro _--userType_. En caso de
+  no definir ninguno, devolverá un tipo _String_
+
+Al activar al auditoría sobre una entidad, que serán marcadas con la
+anotación _GvNIXJpaAudit_, se le incluirán las siguientes propiedades
+(en su correspondiente fichero _.aj_) para almacenar los datos de
+auditoría:
+
+auditCreation::
+  Fecha de creación del elemento.
+auditCreatedBy::
+  Usuario que creó el elemento.
+auditLastUpdate::
+  Fecha de la última modificación del elemento.
+auditLastUpdatedBy::
+  Último usuario que modificó el elemento.
+
+Hay que tener en cuenta que este add-on no provee lógica de pintado,
+pero estas propiedades serán añadidas de forma automática a las
+correspondientes vistas si se han generado, o se generan, utilizando las
+funcionalidades de generación automática.
+
+______________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Note*
+
+En las vistas generadas de forma automática para la creación y
+actualización de elementos puede ser interesante realizar cambios de
+forma manual para que estos campos no sean rellenados o modificado por
+el usuario.
+______________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+__________________________________________________________________________________________________________________
+*Note*
+
+Para evitar la pérdida de los datos de creación, en las vistas generadas
+de forma automática para la actualización
+incluir los datos de auditoría como campos ocultos en el formulario
+. Si no se incluyen estos campos en las peticiones puede perderse sus
+valores en el proceso de
+binding
+de los objetos recibidos
+__________________________________________________________________________________________________________________
+
+___________________________________________________________________
+*Note*
+
+Es muy importante
+no utilizar
+actualizaciones/eliminaciones del estilo
+em.createQuery("UPDATE Country SET population = 0, area = 0");
+ya que los cambios aplicados no serán registrados por la auditoría.
+___________________________________________________________________
+
+Para mantener esta información acutalizada se genera un clase, anotada
+con _GvNIXJpaAuditListener_, que será registrada como _EntityListener_
+de la librería _JPA_. Una instancia de esta clase será llamada cada vez
+que un elemento de la entidad sea creado/modificado.
+
+Esta clase tendrá implementados los siguientes métodos:
+
+onCreate::
+  Método llamado antes de la creación de un registro. Rellena todos los
+  campos de auditoría de la entidad (creación y actualización).
+onUpdate::
+  Método antes de la actualización de un registro. Rellena los campos de
+  auditoría correspondientes a la última actualización.
+  +
+  ____________________________________________________
+  *Note*
+
+  Este método
+  sólo será llamado
+  después de un
+  merge
+  si el registro a sufrido modificaciones en sus datos
+  .
+  ____________________________________________________
+
+Las clases _EntityListener_ requeridas por esta funcionalidad se
+registran de forma automática en el fichero `src/main/resources/orm.xml`
+del proyecto.
+
+Auditoría y registro de cambios de entidades
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Esta funcionalidad almacena todos los cambios sufridos por las entidades
+auditadas de forma que sea posible identificar qué, quién y cuándo se
+produjeron. Esto incluye las eliminaciones de los registros. Esta
+funcionalidad sólo se aplica a aquellas entidades marcadas con la
+anotación _GvNIXJpaAudit_ (ver link:#addon-jpa_audit-basic[Auditoría
+básica de entidades])
+
+___________________________________________________________________________________________________________
+*Note*
+
+En caso de
+actualizar
+o
+eliminar
+registros mediante el uso de
+executeQuery
+no se almacenarán los cambios sufridos por las entidades auditadas. Esto
+se debe a que no se dispararán los
+listeners
+necesarios para llevar a cabo este proceso.
+___________________________________________________________________________________________________________
+
+Ya que esta funcionalidad puede implementarse de distinta forma, incluso
+dependiendo de la implementación de JPA que se esté utilizando en el
+proyecto, para empezar a utilizarla es necesario seleccionar un
+_proveedor_. Esto proveedores deben de estar instalados como add-on en
+el framework.
+
+Para seleccionar el proveedor de registro de cambios se debe utilizar el
+siguiente comando:
+
+``::
+  Selecciona el proveedor de registro de cambios a usar.
+
+Al activar el proveedor, se instalarán las librerías requeridas y se
+creará una clase que representará el registro índice de cambios en la
+aplicación. Esta clase será anotada con _GvNIXJpaAuditRevisionEntity_
+sus métodos y propiedades serán generados por el proveedor.
+
+Para aquellas entidades anotadas con _GvNIXJpaAudit_ y cuyo valor
+_storeRevisionLog_ sea el adecuado (_YES_ o _PROVIDER_DEFAULT/null_ y la
+opción por defecto del proveedor sea activar el registro) se generarán
+en el _.aj_ los siguientes métodos:
+
+findAll_Entidad_::
+  Devuelve la lista de todos elementos de la entidad, al estado en el
+  que estuviesen en una fecha en concreto o en un número revisión.
+find_Entidad_::
+  Devuelve una entidad por código en el estado que estuviese en un fecha
+  en concreto o en un número de revisión
+get_Entidad_Revisions::
+  Devuelve una lista de _elementos de revisión_ de la entidad entre
+  fechas o números de revisión para un elemento en concreto, pudiendo
+  especificar números de registros a devolver.
+getRevisionNumberForDate::
+  Devuelve el identificador de revisión activo a una fecha.
+find_Entidad_RevisionsByDates::
+  Devuelve una lista de _elementos de revisión_ de la entidad entre
+  fechas, pudiendo especificar filtros, ordenación y números de
+  registros a devolver.
+find_Entidad_Revisions::
+  Devuelve una lista de _elementos de revisión_ de la entidad entre
+  números de revisión, pudiendo especificar filtros, ordenación y
+  números de registros a devolver.
+
+Varios de los métodos arriba descritos devuelven _elementos de
+revisión_. Este elemento es una clase declarada para añadir información
+adicional a la entidad sobre los cambios producidos en una revisión del
+elemento de la entidad. Esta clase se generará en el fichero _.aj_ de la
+entidad y tendrá los siguientes métodos:
+
+getItem::
+  Devuelve el objeto en el estado (valores de sus datos) en una
+  revisión.
+  +
+  _______________________________________________________________________________________________________________________________________________________________________________________
+  *Note*
+
+  Para el registro de cambios de eliminación, el estado devuelto por
+  este método será el estado anterior a la eliminación (los valores
+  antes que tenía el elemento cuando fue eliminado).
+  _______________________________________________________________________________________________________________________________________________________________________________________
+getRevisionNumber::
+  Devuelve el identificador de la revisión.
+getRevisionUserName::
+  Devuelve el nombre del usuario que realizó los cambios registrados.
+getRevisionDate::
+  Devuelve la fecha en el que se registraron los cambios.
+isCreate::
+  Informa si tipo de cambio registrado en este elemento es una
+  _creación_.
+isUpdate::
+  Informa si tipo de cambio registrado en este elemento es una
+  _actualización_.
+isDelete::
+  Informa si tipo de cambio registrado en este elemento es una
+  _eliminación_.
+  +
+  ________________________________________________________________________________________________________
+  *Note*
+
+  Para estos casos, el estado devuelto por el método
+  getItem()
+  será el estado anterior a la eliminación (los valores antes que tenía
+  el elemento cuando fue eliminado).
+  ________________________________________________________________________________________________________
+getType::
+  Devuelve una cadena que representa el tipo de cambio del registro:
+  _CREATE_, _UPDATE_ o _DELETE_.
+
+Además de lo métodos aquí descritos, cada proveedor puede incluir
+métodos necesario para dar soporte a su funcionalidad.
+
+Proveedor de registro de cambios Hibernate Envers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Esta implementación de provee la funcionalidad de gestión de revisiones
+basada en el el módulo de la implementación de JPA
+http://docs.jboss.org/hibernate/orm/4.2/devguide/en-US/html/index.html[Hibernate]
+denominado
+http://docs.jboss.org/hibernate/orm/4.2/devguide/en-US/html/ch15.html[Envers].
+
+Para seleccionar este proveedor hay que ejecutar el comando:
+`jpa audit revisionLog --provider H-ENVERS`
+
+Lógicamente, al ser un módulo de _Hibernate_, este proveedor de gestión
+de revisiones _sólo estará disponible en aquellos proyectos cuyo
+proveedor de persistencia sea Hibernate_.
+
+Las características de este proveedor son:
+
+* Mantiene el estado de relaciones (siempre que ambas entidades estén
+gestionadas).
+* Los estados se mantienen en tablas adjuntas a las auditadas.
+* Soporta búsquedas en el histórico utilizando su propio API. Esto tiene
+la limitación de únicamente poder filtrar sobre los datos de la entidad
+principal de la búsqueda (en la implementación actual, aunque en la
+documentación comentan que en un futuro habrá soporte para filtrar por
+las relaciones).
+
+En los proyectos en los que _Spring Security_ sea el proveedor de
+seguridad, el proveedor ya genera el código necesario, en la clase
+_RevisionEntity_ para obtener el usuario que está realizando el cambio.
+Para el resto, será necesario realizar un _push-in_ de la clase
+_RevisionLogEntityListener_ y ajustar la implementación del método
+_newRevision_.
+
+Para acceder a la API de lectura de _Envers_ se genera un método
+estático en las entidad con el soporte establecido llamado
+_auditReader_. Para ver mas información sobre el uso de
+_AuditEntityReader_ ver la documentación de el JavaDoc de la clase o la
+documentación del módulo _Envers_.
+
+Persistencia de entidades con campos de tipo geográfico
+-------------------------------------------------------
+
+Esta funcionalidad permite guardar entidades con campos de tipo
+geográfico.
+
+Configuración del proyecto para soporte geográfico
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Para poder guardar entidades con campos de tipo GEO es necesario
+configurar el proyecto generado. Para ello se ejecuta el siguiente
+comando:
+
+``::
+  Configura el proyecto para poder guardar entidades con campos de tipo
+  geográfico. Este comando solo funcionará si se ha instalado
+  persistencia en el proyecto con proveedor _HIBERNATE_ y se ha
+  seleccionado una de las siguientes bases de datos:
+  +
+  * POSTGRES
+  * MYSQL
+  * ORACLE
+  * MSSQL
+
+Añadir campos de tipo geográfico a entidades
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Una vez configurado el proyecto para poder guardar entidades con campos
+de tipo geográfico, ya es posible añadir campos de tipo geográfico a las
+entidades. Para poder añadir estos nuevos tipos de campo, es necesario
+ejecutar este comando:
+
+``::
+  Añade un nuevo campo de tipo GEO a la entidad seleccionada. Los nuevos
+  campos añadidos pueden ser de los siguientes tipos:
+  +
+  * POINT (Se guarda un único punto en la base de datos)
+  * LINESTRING (Se guardan una serie de puntos que forman una linea
+  continua)
+  * MULTILINESTRING (Se guardan una serie de puntos que forman varias
+  lineas continuas)
+  * POLYGON (Se guardan una serie de puntos que forman un polígono.
+  Siempre empieza y acaba en el mismo punto.)
+  * GEOMETRY (Se guarda una serie de puntos que forman una geometría.
+  Acepta cualquiera de las geometrías anteriores.)
+
+Implementación de buscadores para campos GEO
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Para poder realizar búsquedas sobre campos de tipo GEO es necesario
+generar una serie de métodos. Para ello se ejecutan los siguientes
+comandos:
+
+``::
+  Genera los buscadores de todos los campos de tipo GEO de _todas_ las
+  entidades registradas en el proyecto.
+``::
+  Genera los buscadores de todos los campos de tipo GEO para la entidad
+  seleccionada.

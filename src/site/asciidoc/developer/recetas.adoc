@@ -1,0 +1,1105 @@
+Recetas
+-------
+
+TBC (de roo-addon-desarrollo.rst) [Las recetas que todavía sean válidas
+en M1. Ver si extraer alguna de los add-ons implementados]
+
+En este capitulo se incluyen una serie de recetas que pueden ser útiles
+en el desarrollo de framework para realizar algunas funciones comunes.
+
+Clases de utilidad
+------------------
+
+El framework provee de una serie de clases para la ayuda al add-on.
+Estas clases son abstractas con sus métodos declarados como estáticos.
+Entre ellas encontramos:
+
+org.springframework.roo.support.util.FileCopyUtils::
+  Utilidades de copia de ficheros.
+org.springframework.roo.support.util.FileUtils::
+  Utilidades para manejo de ficheros.
+org.springframework.roo.support.util.DomUtils::
+  Utilidades para el manejo del API Dom (búsquedas de elementos,
+  etc...).
+org.springframework.roo.support.util.Assert::
+  Utilidades para hacer comprobaciones de parámetros y variables.
+org.springframework.roo.support.util.XmlUtils::
+  Utilidases para editar o crear ficheros xml.
+org.springframework.roo.support.util.WebXmlUtils::
+  Utilidades para actualizar el fichero web.xml en proyectos web.
+
+Servicios del framework
+-----------------------
+
+El framework provee de una serie de servicios
+(link:#creacion-addon_osgi[componentes-servicios OSGi]) que podemos
+necesitar para desarrollar nuestros add-ons. Para usarlos debemos
+revisar que nuestro add-on tiene registradas la dependencias de los
+proyecto de cada bundle.
+
+org.springframework.roo.process.manager.FileManager::
+  Servicios para modificación de ficheros. Es necesario su uso para
+  habilitar el soporte de _deshacer cambios ante un fallo_.
+org.springframework.roo.project.PathResolver::
+  Ayudas para el manejo de rutas de fichero dentro de proyecto (obtener
+  rutas absolutas a partir de relativas al proyecto).
+org.springframework.roo.metadata.MetadataService::
+  Permite consultar metadatos de nuestra aplicación.
+org.springframework.roo.metadata.MetadataDependencyRegistry::
+  Gestiona las dependencias entre metadatos.
+org.springframework.roo.project.ProjectOperations::
+  Operaciones para la gestión del proyecto.
+
+Ficheros XML
+------------
+
+La clase org.springframework.roo.support.util.XmlUtils tiene
+herramientas básica para la lectura, búsqueda, creación y modificación
+de fichero XML. Entre sus métodos encontramos:
+
+* getDocumentBuilder
+* writeXml
+* findElements
+
+Aquí hay una serie de recetas para el manejo de este tipo de ficheros.
+
+Crear un fichero XML
+~~~~~~~~~~~~~~~~~~~~
+
+Este ejemplo crea un fichero `cxf-servlet.xml` dentro del directorio
+`WEB-INF` de la aplicación:
+
+------------------------------------------------------------------------------------------------
+    //Ruta relativa 
+    String xmlPath =pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/cxf-servlet.xml");
+
+    Document xml;
+    MutableFile mutableFile= fileManager.createFile(xmlPath);
+
+    Element root = xml.createElement("root");
+        
+    Element child1 = xml.createElement("child1");
+    child1.setNodeValue("nodo 1");
+    root.appendChild(child1);
+
+    Element child2 = xml.createElement("child2");
+    child2.setAttribute("attr", "hola");
+
+    Element child3 = xml.createElement("child3");
+    child3.setNodeValue("nodo 3");
+
+    child2.appendChild(child3);
+    root.appendChild(child2);
+        
+        
+    xml.appendChild(root);
+
+
+    // Write file
+    XmlUtils.writeXml(mutableFile.getOutputStream(), xml);
+
+    fileManager.scan();
+------------------------------------------------------------------------------------------------
+
+Añadir DTD a un XML
+~~~~~~~~~~~~~~~~~~~
+
+Al utilizar el método `XmlUtils.writeXml(OutpuStream,
+      Xml)` en un xml con DTD elimina el DTD al actualizarlo o si
+definimos uno cuando creamos un archivo xml.
+
+Para evitar este problema se ha de crear un Transformer con los datos
+necesarios de nuestro DTD:
+
+----------------------------------------------------------------------------------------------------------
+    final static String DOCTYPE_PUBLIC = "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN";
+    final static String DOCTYPE_SYSTEM = "http://tiles.apache.org/dtds/tiles-config_2_1.dtd";
+----------------------------------------------------------------------------------------------------------
+
+Crear un Transformer para llamar al método sobrecargado que contiene el
+parámetro del tipo _transformer_ y así definir la gramática del xml:
+
+-------------------------------------------------------------------------------------------------
+   // Define DTD
+   Transformer xformer;
+   try {
+       xformer = XmlUtils.createIndentingTransformer();
+   } catch (Exception ex) {
+       throw new IllegalStateException(ex);
+   }
+
+   xformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC);
+   xformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM);
+   
+   XmlUtils.writeXml(xformer, webXmlMutableFileDestination.getOutputStream(), webXmlDestination);
+-------------------------------------------------------------------------------------------------
+
+Crear un XML a partir de una plantilla
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+El siguiente ejemplo crea un fichero `cxf-servlet.xml` dentro del
+directorio `WEB-INF` de la aplicación a partir de una plantilla que
+hayamos incluido en los recursos del add-on:
+
+--------------------------------------------------------------------------------------------------------
+    //Ruta relativa 
+    String xmlPath =pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/cxf-servlet.xml");
+
+    Document xml;
+    MutableFile mutableFile= fileManager.createFile(xmlPath);
+    InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "cxf-servlet-template.xml");
+    try {
+            xml = XmlUtils.getDocumentBuilder().parse(templateInputStream);
+    } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+    }
+
+    // Write file
+    XmlUtils.writeXml(mutableFile.getOutputStream(), xml);
+
+    fileManager.scan();
+--------------------------------------------------------------------------------------------------------
+
+Realizar cambios en XML con posibilidad de deshacer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Este ejemplo se busca dentro del fichero `webmvc-config.xml` el bean del
+tema por defecto y lo cambia el ID del tema actual:
+
+-----------------------------------------------------------------------------
+  /**
+   * Get and initialize the absolute path for {@code webmvc-config.xml}.
+   * 
+   * @return the absolute path to the file (never null)
+   */
+  public String getMvcConfigFile() {
+
+    // resolve absolute path for menu.jspx if it hasn't been resolved yet
+    return getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP,
+          "/WEB-INF/spring/webmvc-config.xml");
+  }
+
+  /**
+   * Open WEB-INF/spring/webmvc-config.xml file and set the default theme
+   * to given theme Id.
+   * <p>
+   * {@link FileManager} is used for safe update.
+   * 
+   * @param id
+   */
+  private void updateDefaultTheme(String themeId) {
+
+    String webMvc = getMvcConfigFile();
+    MutableFile mutableConfigXml = null;
+    Document webConfigDoc;
+
+    try {
+      if (fileManager.exists(webMvc)) {
+        mutableConfigXml = fileManager.updateFile(webMvc);
+        webConfigDoc = org.springframework.roo.support.util.XmlUtils
+            .getDocumentBuilder().parse(mutableConfigXml.getInputStream());
+      }
+      else {
+        throw new IllegalStateException("Could not acquire ".concat(webMvc));
+      }
+    }
+    catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+
+    // Get themeResolver bean to change default theme
+    Element resolverElement = org.springframework.roo.support.util.XmlUtils
+        .findFirstElement("//*[@id='themeResolver']",
+            (Element) webConfigDoc.getFirstChild());
+
+    // throw exception if themeResolver doesn't exist
+    Assert.notNull(resolverElement,
+        "Could not find bean 'themeResolver' in ".concat(webMvc));
+
+    resolverElement.setAttribute("p:defaultThemeName", themeId);
+
+    org.springframework.roo.support.util.XmlUtils.writeXml(
+        mutableConfigXml.getOutputStream(), webConfigDoc);
+  }
+-----------------------------------------------------------------------------
+
+Dependencias del proyecto
+-------------------------
+
+Añadir dependencias y propiedades al proyecto
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+En este ejemplo veremos cómo añadir dependencias y propiedades al
+proyecto a partir del fichero configuration.xml ubicado dentro de los
+recursos del add-on, SRC_MAIN_RESOURCES/PACKAGE/.
+
+El fichero de definición puede ser como este:
+
+---------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+  <gvnix>
+    <web-menu>
+      <dependencies>
+        <cxf>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-api</artifactId>
+        <version>2.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxws</artifactId>
+        <version>2.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-transports-http</artifactId>
+        <version>2.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.1</version>
+      </dependency>
+        </cxf>
+      </dependencies>
+      <properties>
+        <gvnix.version>${project.version}</gvnix.version>
+      </properties>
+    </web-menu>
+  </gvnix>
+</configuration>
+---------------------------------------------------------
+
+El siguiente código añade las dependencias al proyecto:
+
+--------------------------------------------------------------------------------
+  /** {@inheritDoc} */
+  public void setup() {
+    // Parse the configuration.xml file
+    Element configuration = XmlUtils.getConfiguration(getClass());
+
+    // Add POM properties
+    updatePomProperties(configuration);
+
+    // Add dependencies to POM
+    updateDependencies(configuration);
+
+    // ...
+  }
+
+  /**
+   * Install properties defined in external XML file
+   * @param configuration
+   */
+  private void updatePomProperties(Element configuration) {
+    List<Element> addonProperties = XmlUtils.findElements(
+        "/configuration/gvnix/web-menu/properties/*", configuration);
+    for (Element property : addonProperties) {
+      projectOperations.addProperty(new Property(property));
+    }
+  }
+
+  /**
+   * Install dependencies defined in external XML file
+   * @param configuration
+   */
+  private void updateDependencies(Element configuration) {
+    List<Dependency> dependencies = new ArrayList<Dependency>();
+    List<Element> securityDependencies = XmlUtils.findElements(
+        "/configuration/gvnix/web-menu/dependencies/dependency", configuration);
+    for (Element dependencyElement : securityDependencies) {
+      dependencies.add(new Dependency(dependencyElement));
+    }
+    projectOperations.addDependencies(dependencies);
+  }
+--------------------------------------------------------------------------------
+
+Comprobar si existe una dependencia
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+En este trozo de código investiga si el proyecto ya incluye una
+dependencia con una librería en concreto, comprobando también si existe
+pero con versión distinta:
+
+-------------------------------------------------------------------
+  /** {@inheritDoc} */
+  public boolean isSpringSecurityInstalled() {
+
+    if(!isProjectAvailable()) {
+      // no project available yet, we cannot check for SS
+      return false;
+    }
+
+    ProjectMetadata projectMetadata = getProjectMetadata();
+
+    // create Spring Security dependency entity
+    Dependency dep = new Dependency("org.springframework.security",
+        "spring-security-core", "3.0.5.RELEASE");
+
+    // locate Spring Security dependency
+    Set<Dependency> dependencies = projectMetadata
+        .getDependenciesExcludingVersion(dep);
+
+    // if didn't find, Spring Security is not installed
+    if (dependencies.isEmpty()) {
+      return false;
+    }
+    return true;
+  }
+-------------------------------------------------------------------
+
+Actualización de versiones de dependencias
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Hemos visto como añadir propiedades y dependencias al archivo _pom.xml_
+del proyecto. Por lo general, es interesante que si una nueva versión de
+gvNIX hace uso de versiones más nuevas de librerías de terceros, se
+actualice las partes necesarias del _pom.xml_ del proyecto para
+favorecernos de las mejoras que puedan aportar. Spring Roo ya lo hace
+eactualizando la proiedad _<roo.version/>_ cada vez que liberan una
+nueva versión del framework.
+
+___________________________________________________________________________________________________________________________________________________________________________
+*Note*
+
+Es posible que, en función de donde queramos usar el código siguiente,
+necesitemos modificarlo para que se adapte a las necesidades
+particulares del addón donde lo usamos.
+___________________________________________________________________________________________________________________________________________________________________________
+
+Para poder contemplar esta funcionalidad necesitmos el siguiente código:
+
+-----------------------------------------------------------
+public enum Qualifiers {
+
+    RELEASE("RELEASE"), EMPTY(""), SNAPSHOT("SNAPSHOT");
+
+    private String qualifier;
+
+    private Qualifiers(String qualifier) {
+        this.qualifier = qualifier;
+    }
+
+    public boolean isRelease() {
+        return this.equals(RELEASE) || this.equals(EMPTY);
+    }
+
+    public boolean isSnapshot() {
+        return this.equals(SNAPSHOT);
+    }
+
+    /**
+     * Says if the qualifier is newer than passed qualifier
+     * <ul>
+     * <li>RELEASE equals to EMPTY</li>
+     * <li>RELEASE newer than SNAPSHOT</li>
+     * </ul>
+     * 
+     * @param q
+     * @return <ul>
+     *         <li>0 if this equals to q</li>
+     *         <li>1 if this newer than q</li>
+     *         <li>-1 otherwise</li>
+     *         </ul>
+     */
+    public int newerThan(Qualifiers q) {
+        if (this.equals(q)) {
+            return 0;
+        }
+        if (this.isRelease() && q.isSnapshot()) {
+            return 1;
+        }
+        return -1;
+    }
+}
+-----------------------------------------------------------
+
+El enumerado _Qualifiers_ sirve para poder decidir de entre dos
+versiones iguales cual es más nueva basado en su cualificador (ej.:
+X.Y.Z > X.Y.Z-SNAPSHOT. La ausencia de cualificador indica que es una
+versión RELEASE).
+
+-----------------------------------------------------------------------------
+public class VersionInfo {
+    private Integer major = 0;
+    private Integer minor = 0;
+    private Integer patch = 0;
+    private Qualifiers qualifier = Qualifiers.EMPTY;
+
+    public int compareTo(VersionInfo v) {
+        if (v == null) {
+            throw new NullPointerException();
+        }
+        int result = major.compareTo(v.major);
+        if (result != 0) {
+            return result;
+        }
+        result = minor.compareTo(v.minor);
+        if (result != 0) {
+            return result;
+        }
+        result = patch.compareTo(v.patch);
+        if (result != 0) {
+            return result;
+        }
+        result = qualifier.newerThan(v.qualifier);
+        if (result != 0) {
+            return result;
+        }
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return major + "." + minor + "." + patch + "." + qualifier;
+    }
+
+    /**
+     * Extracts the version information from the string. Never throws an
+     * exception. <br/>
+     *
+     * @param version
+     *            to extract from (can be null or empty)
+     * @return the version information or null if it was not in a normal form
+     */
+    public static VersionInfo extractVersionInfoFromString(String version) {
+        if (version == null || version.length() == 0) {
+            return null;
+        }
+
+        String[] ver = version.split("\\.");
+        try {
+            // versions as x.y.z
+            if (ver.length == 3) {
+                VersionInfo result = new VersionInfo();
+                result.major = new Integer(ver[0]);
+                result.minor = new Integer(ver[1]);
+                // gvNIX versions can be x.y.z (for final versions or release
+                // versions) and x.y.z-q (for snapshots versions)
+                String[] patchVerQualifier = ver[2].split("-");
+                result.patch = new Integer(patchVerQualifier[0]);
+                if (patchVerQualifier.length == 2) {
+                    String qualifier = patchVerQualifier[1];
+                    if (qualifier.equalsIgnoreCase(Qualifiers.RELEASE
+                            .toString())) {
+                        result.qualifier = Qualifiers.RELEASE;
+                    } else if (qualifier.equalsIgnoreCase(Qualifiers.SNAPSHOT
+                            .toString())) {
+                        result.qualifier = Qualifiers.SNAPSHOT;
+                    }
+                }
+                return result;
+            }
+            // versions as x.y
+            if (ver.length == 2) {
+                VersionInfo result = new VersionInfo();
+                result.major = new Integer(ver[0]);
+                result.minor = new Integer(ver[1]);
+                return result;
+            }
+        } catch (RuntimeException e) {
+            return null;
+        }
+        return null;
+    }
+}
+-----------------------------------------------------------------------------
+
+VersionInfo es la clase que permite decidir que versión es mayor de
+entre dos. Realmente permite crear un objeto basándonos en una caden que
+informa de un número de versión (según las recomendaciones Maven), esto
+es, _X.Y.Z-QUALIFIER (donde X=Versión mayor, Y=Version menor, Z=Versión
+del patch y QUALIFIER=[RELEASE|SNAPSHOT|...]._ La implementación del
+método *comparteTo(...)* permite esta operación.
+
+Finalmente una clase de utilidad que nos permite manipular el pom.xml
+del proyecto para usando las clases anteriores:
+
+------------------------------------------------------------------------------------
+public class DependenciesVersionManager {
+    private static final String PROJECT_METADATA_IDENTIFIER = ProjectMetadata
+            .getProjectIdentifier();
+
+    /**
+     * Given a list of DOM elements representing Maven dependencies determines
+     * if may add or not them to project's pom.xml
+     * 
+     * @param metadataService
+     * @param projectOperations
+     * @param dependenciesElements
+     * @return true if a dependency has been added or updated, false otherwise
+     */
+    (
+            MetadataService metadataService,
+            ProjectOperations projectOperations,
+            List<Element> dependenciesElements) {
+        // Get project metadata in order to check existing properties
+        ProjectMetadata md = (ProjectMetadata) metadataService
+                .get(PROJECT_METADATA_IDENTIFIER);
+        if (md == null) {
+            return false;
+        }
+
+        boolean updateDependency = true;
+        Set<Dependency> results;
+        Dependency dependency = null;
+        for (Element depen : dependenciesElements) {
+            dependency = new Dependency(depen);
+            // Get existing dependencies for check them against new dependencies
+            results = md.getDependenciesExcludingVersion(dependency);
+
+            VersionInfo existingDepVersionInfo = null;
+            VersionInfo newDepVersionInfo = VersionInfo
+                    .extractVersionInfoFromString(dependency.getVersionId());
+
+            for (Dependency existingDependency : results) {
+                existingDepVersionInfo = VersionInfo
+                        .extractVersionInfoFromString(existingDependency
+                                .getVersionId());
+                if (existingDepVersionInfo != null) {
+                    // Remove existing dependency in pom.xml just if it's older
+                    // than the new one
+                    if (existingDepVersionInfo.compareTo(newDepVersionInfo) < 0) {
+                        projectOperations.removeDependency(existingDependency);
+                        updateDependency = true;
+                    } else {
+                        updateDependency = false;
+                    }
+                }
+            }
+        }
+        // Add the new dependency just if needed
+        if (updateDependency) {
+            projectOperations.addDependency(dependency);
+        }
+        return updateDependency;
+    }
+
+    /**
+     * Given a list of DOM elements representing Maven properties determines if
+     * may add or not them to project's pom.xml
+     * 
+     * @param metadataService
+     * @param projectOperations
+     * @param projectProperties
+     * @return true if a property has been added or updated, false otherwise
+     */
+    (
+            MetadataService metadataService,
+            ProjectOperations projectOperations, List<Element> projectProperties) {
+
+        boolean propertiesUpdated = false;
+
+        // Get project metadata in order to check existing properties
+        ProjectMetadata md = (ProjectMetadata) metadataService
+                .get(PROJECT_METADATA_IDENTIFIER);
+        if (md == null) {
+            return propertiesUpdated;
+        }
+
+        Set<Property> results = null;
+        Property property = null;
+        VersionInfo existingPropVersionInfo = null;
+        VersionInfo newPropVersionInfo = null;
+        for (Element elemProperty : projectProperties) {
+            propertiesUpdated = true;
+            // Create a new property instance for the property in add-on config
+            property = new Property(elemProperty);
+            newPropVersionInfo = VersionInfo
+                    .extractVersionInfoFromString(property.getValue());
+            // Get existing properties for check them against new properties
+            results = md.getPropertiesExcludingValue(property);
+            for (Property existingProperty : results) {
+                existingPropVersionInfo = VersionInfo
+                        .extractVersionInfoFromString(existingProperty
+                                .getValue());
+                if (existingPropVersionInfo != null) {
+                    // Remove existing property in pom.xml just if it's older
+                    // than the new one
+                    if (existingPropVersionInfo.compareTo(newPropVersionInfo) < 0) {
+                        // We don't need to remove the property since it's
+                        // defined and addProperty will replace it, so, just
+                        // mark is as updatable
+                        // projectOperations.removeProperty(property);
+                        propertiesUpdated = true;
+                    } else {
+                        propertiesUpdated = false;
+                    }
+                }
+            }
+            // Add the new property just if needed
+            if (propertiesUpdated) {
+                projectOperations.addProperty(new Property(elemProperty));
+            }
+        }
+        return propertiesUpdated;
+    }
+
+}
+------------------------------------------------------------------------------------
+
+Los métodos *manageDependencyVersion* y *managePropertyVersion* se
+ocupan de buscar entre las dependencias (y propiedades) ya configuradas
+del proyecto en el pom.xml una dependencia o una propiedad determinada y
+sirviendose del objeto
+link:#recetas-actualizacion_versiones-VersionInfo[VersionInfo] decidir
+que hacer con la nueva dependencia / propiedad que se desea saber si hay
+que añadir al descriptor del proyecto.
+
+La búsqueda de dependencias / propiedades definidas en el proyecto se
+hace mediante los métodos:
+
+-----------------------------------------------------------
+ProjectMetadata#getDependenciesExcludingVersion(dependency)
+y
+ProjectMetadata#getPropertiesExcludingValue(property)
+-----------------------------------------------------------
+
+Estos métodos ofrecen la búsqueda de dependencias y propiedades en el
+descriptor del proyecto sin hacer caso al número de versión (o valor en
+el caso de las propiedades). En caso de que exista la dependencia o
+propiedad buscada debemos decidir si la actualizamos o la dejamos tal
+cual está definida. Para ello nos valemos de VersionInfo. En caso de
+querer actualizar una versión de una dependencia, primero debemos
+eliminar la descripción de la misma en el pom.xml
+(_ProjectOperations#removeDependency(dependency)_) y luego añadir la
+nueva (_ProjectOperations#addDependency(dependency)_). En el caso de las
+propiedades no es necesario eliminar la definición existente ya que el
+método _ProjectOperations#addProperty(property)_ modificará el valor de
+la propiedad por el nuevo.
+
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Important*
+
+*En gvNIX se ha tomado la decisión de que han de prevalecer las
+versiones mayores de las dependencias definidas*. Esto quiere decir que
+si una versión de gvNIX actualiza la versión de una dependencía a una
+versión mayor (incluida la versión de la propia dependencía con un
+add-on en el caso del uso de anotaciones definidas por la librería del
+add-on), aunque posteriormente el proyecto se gestione con una versión
+de gvNIX anterior (abrimos una versión previa de gvNIX en el directorio
+del proyecto con el que se está trabajando) la versión que prevalecerá
+será la más nueva. Ejemplo:
+
+1.  Creamos un proyecto con gvNIX.
+2.  Este proyecto hace uso del add-on Service en una versión antigua.
+3.  Actualizamos gvNIX a una versión posterior y abrimos el mismo
+proyecto con esta nueva versión de gvNIX. Entonces la dependencia con el
+add-on Service se actualizará a la nueva versión (casi seguramente).
+4.  Volvemos a abrir con un gvNIX antiguo sobre el proyecto. La
+dependencia con el add-on Service debe permanecer con la versión más
+nueva.
+
+La misma decisión es aplicable a librerías de terceros (JasperReports,
+CXF, Axis, ...)
+_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Metadatos del proyecto
+----------------------
+
+Acceso a los metadatos del proyecto desde el metodo _activate_ de un
+componente OSGi.
+
+-----------------------------------------------------------------------------------------------------
+public class PageOperationsImpl implements PageOperations {
+
+  /**
+   * Use ProjectMetadataProvider to access project metadata.
+   */
+  @Reference private ProjectMetadataProvider projectMetadataProvider;
+
+  /**
+   * Utility to get {@link ProjectMetadata}.
+   * <p>
+   * This method will thrown if unavailable project metadata.
+   *  
+   * @return ProjectMetadata or null if project isn't available yet
+   */
+  private ProjectMetadata getProjectMetadata() {
+    return (ProjectMetadata) projectMetadataProvider.get(ProjectMetadata.getProjectIdentifier());    
+  }
+}
+-----------------------------------------------------------------------------------------------------
+
+Crear listeners del filesystem
+------------------------------
+
+En la mayoría de casos no usaremos este tipo de listeners ya que
+normalmente dependeremos de los metadatos.
+
+Para solicitar notificaciones del filesystem debemos de crear una clase
+que implemente FileEventListener.
+
+Se añaden las anotaciones @Component y @Service a la clase para que el
+FileMonitorService de Roo lo detecte automáticamente. Para ver más sobre
+esto leer link:#creacion-addon_osgi[declaración y uso de
+componente-servicios OSGi].
+
+El servicio _no monitoriza todos los ficheros_ de base. Puede ser
+necesario registrar los recursos que deseamos monitorizar (aunque por
+defecto ya pueden estar los que necesitamos). Esto se maneja desde el la
+clase que implementa la interfaz FileMonitorService:
+NotifiableFileMonitorService.
+
+Este ejemplo muestra un mensaje de _log_ de cada cambio producido en los
+recursos monitorizados:
+
+-------------------------------------------------------------------------------------------------------------
+  @Component
+  @Service
+  public class LogFiles implements FileEventListener {
+        
+       private static Logger logger = Logger.getLogger(LogFiles.class.getName());
+                                
+       public void onFileEvent(FileEvent fileEvent) {
+           logger.warning(fileEvent.getOperation().name()+":"+fileEvent.getFileDetails().getCanonicalPath());
+       }
+  }
+-------------------------------------------------------------------------------------------------------------
+
+Crear listener de metadatos
+---------------------------
+
+Este es un ejemplo sencillo de implementación de listener de metadatos.
+
+La clase de listener debe implementar la interfaz
+MetadataNotificationListener y se añaden las anotaciones @Component y
+@Service a la clase para que el MetadataDependencyRegistry la inyecte
+automáticamente al ser un módulo OSGI que implementa
+MetadataNotificationListener.
+
+En este ejemplo crearemos un listener que muestra información sobre los
+eventos recibidos de clase java. Si, además es una entidad muestra sus
+métodos:
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+@Component
+@Service
+public class JavaClassMetadataListener implements MetadataNotificationListener {
+
+   private static Logger logger = Logger.getLogger(JavaClassMetadataListener.class.getName());
+
+   private static final String javaClassMetadataType = MetadataIdentificationUtils.getMetadataClass(PhysicalTypeIdentifier.getMetadataIdentiferType());
+
+   @Reference
+   private MetadataDependencyRegistry metadataDependencyRegistry;
+
+   @Reference
+   private MetadataService metadataService;
+
+   public void notify(String upstreamDependency, String downstreamDependency) {
+
+     if (!javaClassMetadataType.equals(MetadataIdentificationUtils.getMetadataClass(upstreamDependency))){
+       // NO es la notificación del metadato de tipo "clase java"
+      return;
+     }
+     logger.warning("---------------------------------------------");
+     PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(upstreamDependency);
+
+     PhysicalTypeDetails details = physicalTypeMetadata.getPhysicalTypeDetails();
+
+     JavaType javaType = details.getName();
+     Path path = PhysicalTypeIdentifierNamingUtils.getPath(javaClassMetadataType, upstreamDependency);
+
+     logger.warning("Notificación de la clase: "+ javaType.getSimpleTypeName());
+
+     EntityMetadata entityMetadata = (EntityMetadata) metadataService.get(EntityMetadata.createIdentifier(javaType, path));
+     if (entityMetadata == null){
+        logger.warning("\tNo es entiedad");
+     } else {
+        logger.warning("\tmetodos: ");
+        for (MethodMetadata method : entityMetadata.getItdTypeDetails().getDeclaredMethods()){
+          logger.warning("\t\t"+method.getMethodName());
+        }
+     }
+     logger.warning("---------------------------------------------");
+  }
+}
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Copiar directorios recursivamente
+---------------------------------
+
+TBC: Desactualizado. Actualizar con lo desarrollado en add-web-theme de
+gvNIX 0.6
+
+Ejemplo sencillo para la copia de un directorio de forma recursiva
+dentro del proyecto específico.
+
+Se utiliza el componente FileManager para la gestión de archivos para
+tener el soporte de deshacer la acción ante un error.
+
+Este método se llama a si mismo recursivamente para los directorios y
+para los fichero delega en un método fileCopyToProject que definido más
+abajo:
+
+-----------------------------------------------------------------------------------------------------
+    private boolean copyRecursively(File source, File destination, boolean deleteDestinationOnExit) {
+    
+      Assert.notNull(source, "Source directory required");
+      Assert.notNull(destination, "Destination directory required");
+      Assert.isTrue(source.exists(), "Source directory '" + source + "' must exist");
+      Assert.isTrue(source.isDirectory(), "Source directory '" + source + "' must be a directory");
+      if (destination.exists()) {
+          Assert.isTrue(destination.isDirectory(), "Destination directory '"
+            + destination + "' must be a directory");
+      } else {
+          destination.mkdirs();
+          if (deleteDestinationOnExit) {
+            destination.deleteOnExit();
+          }
+      }
+      for (File s : source.listFiles()) {
+          File d = new File(destination, s.getName());
+          if (deleteDestinationOnExit) {
+            d.deleteOnExit();
+          }
+          if (s.isFile()) {
+            fileCopyToProject(s, d);
+          } else {
+            // It's a sub-directory, so copy it
+            d.mkdir();
+            if (!copyRecursively(s, d, deleteDestinationOnExit)) {
+                return false;
+            }
+          }
+      }
+      return true;
+    }
+-----------------------------------------------------------------------------------------------------
+
+El método fileCopyToProject copia un archivo utilizando el servicio
+FileManager mediante del archivo origen al destino:
+
+-----------------------------------------------------------------------------
+   private void fileCopyToProject(File source, File destination) {
+      MutableFile mutableFile;
+      byte[] template;
+
+      InputStream templateInputStream;
+      InputStreamReader readerFile;
+
+      try {
+
+        templateInputStream = new FileInputStream(source);
+
+        readerFile = new InputStreamReader(templateInputStream);
+
+        template = FileCopyUtils.copyToByteArray(templateInputStream);
+
+      } catch (IOException ioe) {
+        throw new IllegalStateException("Unable load ITD css template", ioe);
+      }
+
+      if (!fileManager.exists(destination.getAbsolutePath())) {
+        mutableFile = fileManager.createFile(destination.getAbsolutePath());
+        Assert.notNull(mutableFile, "Could not create ITD file '"
+            + destination.getAbsolutePath() + "'");
+      } else {
+        mutableFile = fileManager.updateFile(destination.getAbsolutePath());
+      }
+
+      try {
+
+        FileCopyUtils.copy(template, mutableFile.getOutputStream());
+      } catch (IOException ioe) {
+        throw new IllegalStateException("Could not output '"
+            + mutableFile.getCanonicalPath() + "'", ioe);
+      }
+   }
+-----------------------------------------------------------------------------
+
+Monitorización de directorios no registrados
+--------------------------------------------
+
+En este ejemplo necesitamos monitorizar los cambios en un directorio que
+no está registrado para monitorizar en la configuración por defecto del
+framework.
+
+Para habilitar la monitorización del directorio debemos registrar un
+instancia de DirectoryMonitoringRequest en el servicio
+NotifiableFileMonitorService:
+
+-----------------------------------------------------------------------------------------------
+   @Reference
+   private NotifiableFileMonitorService fileMonitorService;
+   .
+   .
+   .
+        DirectoryMonitoringRequest directoryMonitoringRequest = new DirectoryMonitoringRequest(
+        new File("./myDir"), true, (MonitoringRequest
+          .getInitialMonitoringRequest("./myDir"))
+          .getNotifyOn());
+
+        fileMonitorService.add(directoryMonitoringRequest);
+        fileMonitorService.scanAll();
+-----------------------------------------------------------------------------------------------
+
+En la llamada al fileMonitorService.scanAll() ya comenzará las
+notificaciones de este directorio.
+
+Crear una clase java desde código
+---------------------------------
+
+_[Hay que revisar el código]_
+
+En este ejemplo creamos una clase Java usando código Java. En este caso
+estamos generando una clase que implementa un interface, rellenando su
+método:
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+  private void generateJavaFile(JavaType initializerClass) {
+      String ressourceIdentifier = classpathOperations.getPhysicalLocationCanonicalPath(
+              initializerClass, Path.SRC_MAIN_JAVA);
+      String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(initializerClass, 
+              pathResolver.getPath(ressourceIdentifier));
+
+      List<MethodMetadata> declaredMethods = new ArrayList<MethodMetadata>(1);
+
+      InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+      bodyBuilder.appendFormalLine(
+             "binder.registerCustomEditor(java.lang.String.class, new org.springframework.beans.propertyeditors.StringTrimmerEditor(true);");
+
+      // Params
+      List<JavaType> params = new ArrayList<JavaType>(2);
+      params.add(new JavaType("org.springframework.web.bind.WebDataBinder"));
+      params.add(new JavaType("org.springframework.web.context.request.WebRequest"));
+
+      // Params Names
+      List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>(2);
+      paramNames.add(new JavaSymbolName("binder"));
+      paramNames.add(new JavaSymbolName("request"));
+
+
+      //Annotations
+      List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>(1);
+      annotations.add(new DefaultAnnotationMetadata(new JavaType(Override.class.getName()), null));
+
+      declaredMethods.add(new DefaultMethodMetadata(
+             declaredByMetadataId,
+             Modifier.PUBLIC,
+             new JavaSymbolName("initBinder"),
+             null,
+             AnnotatedJavaType.convertFromJavaTypes(params),
+             paramNames,
+             annotations,
+             null,
+             body)
+        );
+
+
+      List<JavaType> implementsTypes = new ArrayList<JavaType>();
+      implementsTypes.add( new JavaType("org.springframework.web.bind.support.WebBindingInitializer"));
+
+
+      ClassOrInterfaceTypeDetails details = new DefaultClassOrInterfaceTypeDetails(
+             declaredByMetadataId,
+             initializerClass,
+             Modifier.PUBLIC,
+             PhysicalTypeCategory.CLASS,
+             null,null,declaredMethods,null,null,implementsTypes,null,null
+             );
+
+      classpathOperations.generateClassFile(details);
+
+  }
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Alterar comportamiento de métodos existentes
+--------------------------------------------
+
+La librería _AspectJ_ permite, dentro de un fichero `.aj`, añadir
+anotaciones a método de la clase a que ser asocia. Esto _no está
+limitado a los métodos que definimos en nuestro fichero o a los método
+declarados en el .java_, también podemos añadir anotaciones a métodos
+definidos en otros .`aj` que no hayamos definido nosotros.
+
+La información está recogida de este mensaje en el foro:
+http://forum.springsource.org/showpost.php?p=286967&postcount=3
+
+Comprobar existencia en Java antes de generar en AJ
+---------------------------------------------------
+
+A la hora de generar código en un AJ hay que comprobar si ya existe en
+el Java. Si se intenta crear en el AJ un método, anotación, etc. y ya
+existe en Java se producirán comportamientos inesperados que puede que
+no sean fáciles de resolver si no es debugando la clase Metadata para
+detectar la excepción que se produce.
+
+Generar tests funcionales de Selenium
+-------------------------------------
+
+http://projects.disid.com/issues/5823
+
+org.springframework.roo.addon.web.selenium.SeleniumOperationsImpl
+
+No se añade un elemento en Java o AJ
+------------------------------------
+
+Si no se añade alguna propiedad, método, etc. a un fichero Java o AJ
+puede ser debido a que dicho elemento no está asociado al metadataId
+adecuado.
+
+No se añade un elemento en Java o AJ
+------------------------------------
+
+Si no se añade alguna propiedad, método, etc. a un fichero Java o AJ
+puede ser debido a que dicho elemento no está asociado al metadataId
+adecuado.
+
+Múltiples modificaciones mismo fichero
+--------------------------------------
+
+Si se producen múltiples modificaciones sucesivas de un mismo fichero en
+la consola al ejecutar un comando, puede evitarse cambiando a false la
+variable writeImmediately de los métodos del fileManager.
+
+Utilidades XML
+--------------
+
+Existen ahora código de Roo que facilita la escritura de algunos
+archivos como, por ejemplo, XML (xmlRoundTripFileManager) y que puede
+que haya implementaciones propias de gvNIX que hacen prácticamente los
+mismo.
+
+Evitar parseado XML en metadatas y listeners
+--------------------------------------------
+
+Tal y como se ha detectado en #5800, los metadata y listeners se
+ejecutan gran cantidad de veces, principalmente en el arranque de la
+consola. Esto sucede en los addons de gvNIX y también en los de Roo.
+
+Es por ello, que no se deben hacer operaciones computacionalmente muy
+costosas como, por ejemplo, parseado de XMLs. Un caso habitual de este
+tipo son los setup que suelen existir en todos los addons que se
+encargan de añadir dependencias, propiedades, plugins, etc. en el
+pom.xml o en otros ficheros de configuración como web.xml,
+webmvc-config.xml, etc.
+
+La recomendación a partir de ahora es que los setup solo se realicen
+desde los comandos y nunca desde los metadata o listeners.
+
+Clases OSGi con anotación @Service y/o @Component
+-------------------------------------------------
+
+Cuando anotamos una clase con @Service y/o @Component estamos definiendo
+una clase servidor, es decir todos sus atributos de clase tienen valor
+durante toda la vida de la clase.
+
+Hay que tener mucho cuidado con la lógica que actúa sobre atributos: Si
+el atributo es otro servicio o componente no habrá mayor problema. Si el
+atributo es interno (no es componente), se inicializa en una petición y
+en sucesivas peticiones se ejecuta lógica sobre ese atributo. En estos
+casos podría producirse errores si el atributo no se reinicializa
+adecuadamente. Para estas situaciones sería interesante trabajar como si
+fuera un entorno web: cada petición debe obtener todo lo necesario para
+una respuesta correcta.
+
+Remove all @Reference PathResolver
+----------------------------------
+
+Remove all @Reference PathResolver declarations from classes and
+retrieve PathResolver from ProjectMetadata instead.
+https://jira.springsource.org/browse/ROO-2097.

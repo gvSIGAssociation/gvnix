@@ -1,0 +1,43 @@
+Crear ITD
+---------
+
+TBC [Describir que es un ITD y enumerar de que se compone.
+
+La anotación
+------------
+
+TBC [Describir que es una anotación. Cómo definirla. Cómo se empaquetan
+en un jar distinto y por qué.]
+
+La clase Metadata
+-----------------
+
+TBC [Describir que es la clase Metadata y sus métodos básicos. Describir
+la mecánica a usar para prepara descripciones de métodos, etc en base a
+Metadatos de una clase o los datos de la anotación. @AutoPopulate.
+Describir el Builder. Identificador. Dividir en secciones??]
+
+La clase MetadataProvider
+-------------------------
+
+TBC [Describir que es la clase]
+
+Registro de Trigers y dependencias
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TBC [Que son trigers, dependencias, listeners, y cómo se registran]
+
+Construcción del Metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TBC [Cuando se construye la clase Metadata relacionada]
+
+Generación de .aj
+~~~~~~~~~~~~~~~~~
+
+TBC [Creación, actualización y limpieza de archivos .aj]
+
+Generación de otros artefactos.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TBC [Creación y mantenimiento de otros artefactos o .aj manuales]

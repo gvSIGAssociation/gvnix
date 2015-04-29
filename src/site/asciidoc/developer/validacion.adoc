@@ -1,0 +1,242 @@
+Validación de Add-ons
+---------------------
+
+TBC [FALTA Info del proceso]
+
+Test Integración
+----------------
+
+TBC [FALTA Info del proceso]
+
+Test Funcionales
+----------------
+
+TBC [FALTA Info del proceso]
+
+Integración contínua
+--------------------
+
+Servidor Jenkins: http://dailybuild.disid.com:8081/
+
+En el servidor será necesario tener instalado y, por lo tanto,
+disponible desde la consola: startx (iniciador de interfaces gráficas
+para lanzar los tests de integración de selenium) y zip (para empaquetar
+la distribución) ya que los utiliza el script de shell que ejecuta todas
+las pruebas.
+
+También será necesario disponer desde Jenkins del siguiente software
+instalado: Maven 3.0.X (mayor revisión) y Java 1.6.X (mayor revisión).
+
+Se descarga el código de http://scmcit.gva.es/svn/gvnix/trunk/code
+haciendo una descarga limpia del código (delete and checkout) para
+ejecutar el test con la última versión de código disponible y sin
+posibles cambios locales. La fecha y hora del servidor debe ser correcta
+para asegurar que las descargas de código sean correctas.
+
+La tarea de prueba se ejecuta todos los días cada 2 horas entre las 6 y
+las 20 horas. Actualmente, el test tarda algo mas de 1 hora.
+
+Se ejecuta el script build.sh que construye la distribución de gvNIX a
+partir del código fuente:
+`export M2_HOME=/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/apache-maven-3.0.4
+    export PATH=$M2_HOME/bin:$PATH
+    export MAVEN_OPTS="$MAVEN_OPTS -Dgpg.skip=true -Xmx1024m -XX:MaxPermSize=512m"
+    cd ${WORKSPACE}/code
+    ./build.sh` Observar que se establece la ruta en donde Jenkins tiene
+instalada la versión de Maven.
+
+Se ejecuta el script code/src/test/resources/integration.sh que prueba
+la distribución:
+`export M2_HOME=/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/apache-maven-3.0.4
+    export PATH=$M2_HOME/bin:$PATH
+    export MAVEN_OPTS="$MAVEN_OPTS -Xmx1024m -XX:MaxPermSize=512m"
+    chmod 744 ${WORKSPACE}/code/src/test/resources/integration.sh
+    ${WORKSPACE}/code/src/test/resources/integration.sh /tmp/gvNIX-X.Y.Z-SNAPSHOT/bin ${WORKSPACE}`
+Observar que se establece la ruta en donde Jenkins tiene instalada la
+versión de Maven. Tener precaución ya que la ruta al empaquetado de la
+versión X.Y.Z de gvNIX se estable en la configuración, por lo que si
+cambia la versión habrá que modificar este valor.
+
+Algunos scripts ejecutados por _integration.sh_ requieren que exista
+alguna base de datos para realizar ingenierías inversas. Consultar dicho
+script para conocer mas detalles sobre este requerimiento.
+
+Con el _Text-finder Plugin_ se busca la cadena _BUILD FAILURE|Script
+execution aborted|Undo create|Undo manage|ERROR 404: Not Found|ERROR
+400: Bad Request|ERROR 405: Method Not Allowed_ y en el caso de
+encontrarla se marca el build como inestable.
+
+Se avisa por correo de ejecuciones erróneas al responsable técnico del
+proyecto y a las personas que hayan producido el error. Para ello, debe
+estar configurado en el sistema de build continuo el servidor de correo
+saliente a mail.disid.com y el sufijo de email por defecto a @disid.com.
+
+Es necesario tener instalados los plugins _Run Condition Plugin_ y
+_Text-finder Plugin_.
+
+Desplegado nocturno de snapshots
+--------------------------------
+
+Servidor Jenkins: http://dailybuild.disid.com:8081/
+
+En el servidor será necesario tener configurado desde la consola:
+
+Añadir la cuenta con la que se subirán los snapshots al repositorio de
+google code en
+/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/apache-maven-3.0.4/conf/settings.xml
+`
+    <server>
+      <id>Google Code</id>
+      <username>gvnixscm@gmail.com</username>
+      <password>XXXXXXXXXXXX</password>
+    </server>
+    `
+
+Algunas librerías deben ser instaladas de forma manual en el repositorio
+local de maven: `
+    mssql-4.0.2206.100.jar
+    ojdbc14-10.2.0.5.jar
+    ojdbc6-11.2.0.3.jar
+    postgresql-9.1-902.jdbc3.jar
+    postgresql-9.1-902.jdbc4.jar
+    postgis-jdbc-1.5.3.jar
+    `
+
+Será necesario disponer desde Jenkins del siguiente software instalado:
+Maven 3.0.X (mayor revisión) y Java 1.6.X (mayor revisión).
+
+Se descarga el código de http://scmcit.gva.es/svn/gvnix/trunk/code
+haciendo una descarga limpia del código (delete and checkout) para
+empaquetar la última versión de código disponible y sin posibles cambios
+locales. La fecha y hora del servidor debe ser correcta para asegurar
+que las descargas de código sean correctas.
+
+La tarea de prueba se ejecuta todas las noches a la 1am.
+
+Se ejecuta el siguiente código:
+`export M2_HOME=/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/apache-maven-3.0.4
+    export PATH=$M2_HOME/bin:$PATH
+    export MAVEN_OPTS="$MAVEN_OPTS -Dgpg.skip=true -Xmx1024m -XX:MaxPermSize=512m"
+    cd ${WORKSPACE}/code
+    mvn deploy` Observar que se establece la ruta en donde Jenkins tiene
+instalada la versión de Maven.
+
+Con el _Text-finder Plugin_ se busca la cadena _BUILD FAILURE_ y en el
+caso de encontrarla se marca el build como inestable.
+
+Se avisa por correo de ejecuciones erróneas al responsable técnico del
+proyecto y a las personas que hayan producido el error. Para ello, debe
+estar configurado en el sistema de build continuo el servidor de correo
+saliente a mail.disid.com y el sufijo de email por defecto a @disid.com.
+
+Es necesario tener instalados los plugins _Run Condition Plugin_ y
+_Text-finder Plugin_.
+
+Actualización del mirror de código fuente en github
+---------------------------------------------------
+
+Servidor Jenkins: http://dailybuild.disid.com:8081/
+
+En el servidor será necesario tener configurado desde la consola:
+
+Establecer las configuraciones globales de acceso al repositorio de git:
+`
+    git config --global user.email "mmartinez@disid.com"
+    git config --global user.name "marsanm2"
+    git config --global credential.helper 'cache'
+    `
+
+Copiar en /var/lib/jenkins/.ssh/ las claves de acceso a GIT: `
+    total 24
+    drwx------  2 jenkins nogroup 4096 abr 18 19:03 .
+    drwxr-xr-x 20 jenkins adm     4096 abr 19 09:23 ..
+    -rw-------  1 jenkins nogroup  401 abr 18 19:02 authorized_keys
+    -rwx------  1 jenkins nogroup 1766 abr 18 17:48 id_rsa
+    -rwx------  1 jenkins nogroup  401 abr 18 17:53 id_rsa.pub
+    -rw-r--r--  1 jenkins nogroup  884 abr 18 17:37 known_hosts
+    `
+
+No se configurará ningún origen de código fuente configurado ya que se
+obtendrá mediante la línea de comandos.
+
+La tarea de prueba se ejecuta todas las noches a la 3am.
+
+Se ejecuta el siguiente código:
+`#Primera ejecución de descarga de SVN, subida a Github e inicio del agente SSH para el recordatorio de clave
+    #Realizada accediendo directamente a la línea de comandos con el usuario jenkins
+    #cd ~/jobs/gvnix-github-mirror-repository/workspace/
+    #apt-get install git-svn
+    #git svn clone http://scmcit.gva.es/svn/gvnix/trunk/code gvnix.git
+    #cd gvnix.git
+    #git remote add origin git@github.com:DISID/gvnix.git
+    #git push origin master
+    
+    #En caso de que se pierda la sesión del agente debido a un reinicio, actualización del servidor, o simplemente por el paso del tiempo,
+    #se accederá mediante ssh al servidor y se ejecutarán estos 3 comandos.
+    #rm ~/etc/ssh/ssh-agent-socket;
+    #eval \`ssh-agent -s -a ~/etc/ssh/ssh-agent-socket\`;
+    #ssh-add;
+
+    # Ejecuciones sucesivas de descarga de SVN, subida a Github y usando la clave almacenada
+    SSH_AGENT_PID=\`ps -fC ssh-agent |grep 'etc/ssh/ssh-agent-socket' |sed -r 's/^\S+\s+(\S+).*$/\1/'\`;
+    export SSH_AGENT_PID;
+    SSH_AUTH_SOCK=~/etc/ssh/ssh-agent-socket;
+    export SSH_AUTH_SOCK;
+    cd gvnix.git
+    git svn rebase
+    git push origin master
+    `
+
+Con el _Text-finder Plugin_ se busca la cadena _BUILD FAILURE_ y en el
+caso de encontrarla se marca el build como inestable.
+
+Se avisa por correo de ejecuciones erróneas al responsable técnico del
+proyecto y a las personas que hayan producido el error. Para ello, debe
+estar configurado en el sistema de build continuo el servidor de correo
+saliente a mail.disid.com y el sufijo de email por defecto a @disid.com.
+
+Es necesario tener instalados los plugins _Run Condition Plugin_ y
+_Text-finder Plugin_.
+
+Calidad de código con SONAR
+---------------------------
+
+Servidor Jenkins: http://dailybuild.disid.com:8081/
+
+Servidor Sonar: http://hq02.disid.com:9000/
+
+Configurar el servidor Jenkins tal y como se indica en
+link:#calidad-codigo_lanzar-proceso-comprobacion-settings[Configuración
+del entorno para lanzar el análisis de Sonar].
+
+También será necesario disponer desde Jenkins del siguiente software
+instalado: Maven 3.0.X (mayor revisión) y Java 1.6.X (mayor revisión).
+
+Se descarga el código de http://scmcit.gva.es/svn/gvnix/trunk/code
+haciendo una descarga limpia del código (delete and checkout) para
+ejecutar el análisis con la última versión de código disponible y sin
+posibles cambios locales. La fecha y hora del servidor debe ser correcta
+para asegurar que las descargas de código sean correctas.
+
+La tarea de análisis se ejecuta todos los días a las 5am.
+
+Se ejecuta el siguiente comando maven a partir del código fuente para
+compilar, empaquetar e instalar: `clean install -Dgpg.skip=true`
+
+Se ejecuta el siguiente comando maven a partir del código fuente para
+ejecutar el análisis: `sonar:sonar -Dgpg.skip=true`
+
+Una vez finalice el análisis se puede consultar el resultado en
+http://hq02.disid.com:9000
+
+Se avisa por correo de ejecuciones erróneas al responsable técnico del
+proyecto y a las personas que hayan producido el error. Para ello, debe
+estar configurado en el sistema de build continuo el servidor de correo
+saliente a mail.disid.com y el sufijo de email por defecto a @disid.com.
+
+También se puede crear otro job con exáctamente la misma configuración
+pero descargando el código de http://scmcit.gva.es/svn/aplusu/trunk para
+ejecutar el análisis de un proyecto generado. En este caso, la única
+diferencia sería utilizar el comando de compilado, empaquetado e
+instalación `clean install -P dev` y una hora distinta de ejecución como
+puede ser las 4am.

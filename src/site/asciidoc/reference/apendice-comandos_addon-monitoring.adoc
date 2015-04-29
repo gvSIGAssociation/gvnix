@@ -1,0 +1,98 @@
+Comandos del add-on Monitoring
+------------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-monitoring[add-on
+Monitoring].
+
+.Comandos del add-on Monitoring
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-monitoring_monitoring_setup[monitoring
+setup] |Instala las dependencias de JavaMelody además de configurar el
+proyecto con lo necesario para su funcionamiento.
+
+|link:#apendice-comandos_addon-monitoring_monitoring_all[monitoring all]
+|Establece todas las clases del proyecto para ser monitorizadas a través
+de Spring.
+
+|link:#apendice-comandos_addon-monitoring_monitoring-add-class[monitoring
+add class] |Añade la monitorización a una clase determinada.
+
+|link:#apendice-comandos_addon-monitoring_monitoring-add-method[monitoring
+add method] |Añade la monitorización de un método de una clase. Es
+posible que si se trata de una clase controlador y el método que
+deseamos monitorizar está incluido en el .aj no funcione, para
+solucionarlo bastará con hacer push-in del método previo a ejecutar el
+comando.
+
+|link:#apendice-comandos_addon-monitoring_monitoring-add-package[monitoring
+add package] |Añade la monitorización a un paquete determinado.
+|=======================================================================
+
+monitoring setup
+~~~~~~~~~~~~~~~~
+
+Instala las dependencias de JavaMelody además de configurar el proyecto
+con lo necesario para su funcionamiento.
+
+Sus parámetros son:
+
+--path::
+  _[Cadena]_
+  +
+  Ruta de la carpeta donde se guardaran los datos de la monitorización
+  dentro del servidor.
+
+monitoring all
+~~~~~~~~~~~~~~
+
+Establece todas las clases del proyecto para ser monitorizadas a través
+de Spring.
+
+monitoring add class
+~~~~~~~~~~~~~~~~~~~~
+
+Añade la monitorización a una clase determinada.
+
+Sus parámetros son:
+
+--name::
+  _[Requerido] [Cadena]_
+  +
+  Ruta de la clase sobre la que se va a establecer la monitorización.
+
+monitoring add method
+~~~~~~~~~~~~~~~~~~~~~
+
+Añade la monitorización de un método de una clase. Es posible que si se
+trata de una clase controlador y el método que deseamos monitorizar está
+incluido en el .aj no funcione, para solucionarlo bastará con hacer
+push-in del método previo a ejecutar el comando.
+
+Sus parámetros son:
+
+--name::
+  _[Requerido] [Cadena]_
+  +
+  Nombre del método de la clase que se va a establecer la
+  monitorización.
+--class::
+  _[Requerido] [Cadena]_
+  +
+  Ruta de la clase sobre cuyo método se va a establecer la
+  monitorización.
+
+monitoring add package
+~~~~~~~~~~~~~~~~~~~~~~
+
+Añade la monitorización a un paquete determinado.
+
+Sus parámetros son:
+
+--path::
+  _[Requerido] [Cadena]_
+  +
+  Ruta del paquete sobre cuyas clases se va a establecer la
+  monitorización.

@@ -1,0 +1,39 @@
+Metodología de desarrollo
+-------------------------
+
+A la hora de abordar la creación de un nuevo add-on, se deben seguir los
+siguientes pasos:
+
+1.  Crear la carpeta que contendrá el add-on o la librería. Así
+tendremos un sitio para almacenar documentos que podamos necesitar para
+su desarrollo.
+2.  Crear el documento `readme.rst` dentro de esta carpeta donde
+informaremos brevemente del propósito de la funcionalidad.
++
+TBC: Secciones y contenidos del readme.rst
+3.  Crear la carpeta `docs` dentro de la carpeta que hemos creado
+anteriormente.
+4.  Añadir dentro de `docs` documentación pertinente, entre la que
+podemos encontrar.
++
+TBC: Revisar puntos, con el documento de comandos del add-on se cubren
+varios puntos de una vez.
+* requisitos
+* casos de uso
+* análisis
+* diseños
+* propuesta
+* estimación de propuesta
+5.  Crear proyecto de prueba de concepto. Si el código fuente del add-on
+se donará al proyecto gvNIX, el proyecto de prueba se almacenará en el
+repositorio que a tal efecto proporciona gvNIX,
+http://scmcit.gva.es/svn/gvnix-proof.
+6.  Documentar dónde se encuentra la prueba de concepto en la
+funcionalidad, como mínimo en el `readme.rst`.
+7.  Mantener actualizada la documentación del add-on.
+8.  Desarrollar el add-on con la experiencia que dé la prueba de
+concepto.
+
+En caso de que el add-on evolucione y sea necesario realizar una prueba
+de concepto, no reutilizar la prueba anterior. Crear una prueba a partir
+el resultado actual del add-on o desde cero.

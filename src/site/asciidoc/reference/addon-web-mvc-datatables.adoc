@@ -1,0 +1,446 @@
+Add-on Web MVC Datatables
+-------------------------
+
+Uso del componente http://datatables.net/[dataTables] en las vistas
+_list_ de los controladores.
+
+Descripción
+-----------
+
+Este Add-on reemplaza el widget de lista de las vistas de las entidades
+para usar el plugin de http://jquery.com/[jQuery]
+http://datatables.net/[dataTables]. Para ello, se usa una adaptación de
+la librería de tag JSP
+http://dandelion.github.io/datatables[Dandelion-DataTables] que se
+integra y adapta a la generación de vistas de Spring Roo.
+
+Las opciones de este add-on _no son compatibles con el
+link:#addon-web-screen-patterns[add-on Web Screen Patterns]_.
+
+Las principales características de este widget son:
+
+Ordenación de datos por uno o más campos.::
+  La tabla permite al usuario final ordenar los datos, por una o más
+  columnas, y en el sentido que el desee. Las columnas disponibles para
+  la ordenación y su sentido son configurables en la página.
+Filtrados por columnas y búsquedas globales::
+  Soporta filtrar los datos mostrados por columna, además de hacer
+  búsquedas de texto sobre los resultados de los filtros. La
+  configuración de que filtros están disponibles para el usuario se
+  pueden configurar en la página. Además, estos filtros por columna
+  disponen de un asistente para realizar búsquedas dependiendo del tipo
+  de dato representado en cada una de ellas.
+Paginación de datos ajustable::
+  Los datos, filtrados o sin filtrar, se paginan sin necesidad de
+  refrescar la página. El tamaño de la página puede ser seleccionado por
+  el usuario final.
+Acceso a los datos en la misma página o por petición por AJAX::
+  Los datos que alimentan la tabla pueden estar integrados en la página
+  o usar peticiones AJAX para ir solicitándolos a medida que el usuario
+  los requiera.
+Soporta múltiples plugins y es extensible::
+  Soporta múltiples plugins como _ColReorder_ (permite al usuario
+  reordenar las columnas), _FixedHeader_ (que mantiene las cabeceras de
+  las columnas visibles cuando se desciende por páginas largas), etc.
+Registro de Callbacks en distintos eventos::
+  Soporta registrar funciones JavaScript a ejecutar por el widged
+  cuando: termina la inicialización, al crear una línea, al pintar el
+  píe de tabla, etc...
+Visualización en modo Registro::
+  Permite realizar la visualización en modo Registro, es decir,
+  mostrando un registro por página con sus valores completos.
+Visualización de Detalles::
+  Se puede añadir la visualización de un o varios detalles (listado de
+  entidades relacionadas), con varios niveles, al marcar o visualizar
+  (dependiendo del modo de visualización) un elemento de la tabla.
+Actualización en línea::
+  Modo que permite actualizar los elementos de la tabla desde la misma
+  línea que los está visualizando. Es posible modificar multiples
+  registro a la vez.
+
+Instalación del soporte para Datatables
+---------------------------------------
+
+Esta funcionalidad depende de las librerías de _jQuery_ por lo que, el
+primer paso, será instalar las librerías usando el comando `` si no
+estuviese ya instalado.
+
+Para instalar esta funcionalidad hay que ejecutar el comando ``.
+
+Este comando añadirá los siguientes elementos:
+
+1.  Imágenes y hojas de estilo utilizadas por el widget. Estos ficheros
+se instalan en `webapp/images/datatables` y `webapp/styles/datatables`
+respectivamente.
+2.  Los archivos javaScript de jQuery.datatables ( tanto en su versión
+optimizada como estándar) y algunos plugins para dataTables, creados por
+el equipo de gvNIX, para utilizados en las funcionalidades disponibles
+(como selección, edición, etc...), en el directorio
+`webapp/scripts/datatables`. Para obtener información de las versiones
+de estos ficheros, consultar el fichero `README.txt` que se instala en
+el directorio.
+3.  `Tagx` necesarios utilizados en las páginas para el pintado del
+widged, almacenados en `WEB-INF/tags/datatables`.
+4.  Unos fichero de propiedades para diversos aspectos de configuración
+en `src/main/resources/datatables*.properties` y las cadenas de
+internacionalización.
+5.  Actualiza el fichero `WEB-INF/tags/util/load-scripts.tagx` para que
+las páginas puedan localizar los recursos de hojas de estilo y
+javaScript requeridos.
+6.  Algunos ajustes en el fichero `WEB-INF/web.xml` y
+`WEB-INF/spring/webmvc-config.xml` requeridos para el correcto
+funcionamiento de widget.
+7.  La dependencia a este add-on, librerías de utilidades utilizadas
+para la gestión de peticiones de datos y a la librería de tag adaptada.
+Esta última tiene como dependencias las dependencias a las librerías de
+http://dandelion.github.io/datatables[Dandelion-DataTables].
+
+Para más información sobre el comando ver `` en el
+link:#apendice-comandos_addon-web-mvc-datatables[apéndice de comandos de
+este add-on].
+
+Usar datatables en la vista "list" de un controlador.
+-----------------------------------------------------
+
+Para poder utilizar el widged de datatables en el listado es necesario
+que esté usando los componentes _jQuery_. Para ello usar el comando `` o
+`` antes de utilizar este add-on con un controlador.
+
+Para utilizar el widged de datatables en el listado de un controlador de
+entidad es necesario ejecutar el comando ``.
+
+Este comando añade la anotación @GvNIXDatatables al controller para
+generar los métodos necesario para gestionar las peticiones que realiza
+el widget.
+
+Además, actualiza la página `list.jspx` para cambiar las rutas a los
+tagx utilizados para pintar la tabla a los instalados por el add-on en
+el directorio `WEB-INF/tags/datatables`.
+
+Este add-on incluye, además, el comando `` que aplica los cambios a
+todos los controllers de la aplicación.
+
+Para mas información sobre los comandos ver el
+link:#apendice-comandos_addon-web-mvc-datatables[apéndice de comandos de
+este add-on].
+
+Ajustar la configuración del datatables de una vista.
+-----------------------------------------------------
+
+Los tags creados para este add-on, que se pueden encontrar en
+`WEB-INF/tags/datatables`, son compatibles con los tags estándar que se
+incluyen por defecto, incorporando además las opciones que ofrece la
+librería de http://dandelion.github.io/datatables[Dandelion-DataTables].
+
+Las opciones disponibles para los tags se pueden consultar en la
+declaración de los propios ficheros de tags, o en
+http://dandelion.github.io/datatables/docs/ref/jsp/[la página de
+referencia de Dandelion-DataTables]. Algunos de los atributos no están
+disponibles debido a la integración con Spring Roo o los algunas
+opciones necesarias para la integración de los distintos modos de
+visualización preparados.
+
+Para personalizar los ajustes de alguna vista, modificar el fichero
+`list.jspx` correspondiente tal y como se realiza con los tags estándar.
+
+Cambiar el modo de datos de Datatables.
+---------------------------------------
+
+Para proveer de datos al widget, se dispone de dos métodos.
+
+1.  _DOM_ o la carga de datos incrustados en la misma página. Una vez
+cargados los datos, el widged se encarga de paginarlos, ordenarlos y
+filtrarlos a través de javaScript en la propia página.
+2.  _AJAX_ el widged hace peticiones
+http://es.wikipedia.org/wiki/AJAX[AJAX] al servidor para obtener los
+datos en base a la paginación, orden y filtro. Luego los muestra
+repintando la tabla a través de javaScript en la propia página.
+
+La opción por defecto que instala el add-on es la de AJAX, ya que es más
+escalable para volúmenes de datos grandes.
+
+El modo de datos del controlador se establece con la opción `--ajax` al
+ejecutar el comando `` o modificar el atributo _ajax_ de la anotación
+GvNIXDatatables. gvNIX actualizará el controlador para que el modo sea
+accesible tanto en el mismo (para los métodos de peticiones) como en la
+página.
+
+El control de búsqueda y filtros por columnas.
+----------------------------------------------
+
+Por defecto, la tabla muestra un control de búsqueda que permite filtrar
+el contenido visualizado en la tabla. Esta búsqueda se realiza _en
+formato texto_. Es decir, _compara el texto de cada valor_ sea cual sea
+su tipo.
+
+_Dependiendo del modo de acceso a datos y del tipo de dato el resultado
+de la búsqueda puede ser distinto_: Para tablas en modo DOM, la búsqueda
+ser realiza sobre el texto que se visualiza en cada celda, mientras que,
+en modo AJAX se ejecuta una consulta contra la base de datos.
+
+Para las búsquedas en las tablas en modo AJAX hay que tener en cuenta lo
+siguiente:
+
+* Para los campos de tipo entidad hay que anotar la propiedad de la
+relación con la anotación @GvNIXJpaQuery del
+link:#addon-jpa_query[add-on jpa] para que se pueda construir la
+consulta con dichos campos.
+* Es posible buscar por los campos de tipo fecha, pero hay que tener en
+cuenta que, _la transformación a texto la realiza la base de datos con
+su formato predeterminado_ no por el formato en el que se visualiza.
+
+Los filtros por columna funcionan de la misma forma que la búsqueda,
+aplicando las misma reglas explicadas anteriormente, pero sólo con los
+datos de dicha columna. Ambas opciones se acumulan para mostrar el
+resultado en la tabla.
+
+Para activar el filtrado en una columna hay que añadir el parámetro
+`filterable="true"` en la etiqueta table:column correspondiente a la
+columna en el fichero `list.jspx`. Al añadir este filtrado por columna
+se añadirán de forma automática un asistente de búsqueda al lado de cada
+filtro que permitirá realizar búsquedas avanzadas dependiendo del tipo
+de dato representado en cada columna.
+
+Filtros Simples
+---------------
+
+Los filtros por columna llevan predefinidas unas operaciones dependiendo
+del tipo de campo de la columna. Los nombres de estas operaciones son
+multidioma y pueden ser configuradas por el desarrollador. Estas
+operaciones pueden ser introducidas manualmente o utilizando el
+asistente de búsqueda comentado anteriormente. Por defecto se pueden
+utilizar las siguientes operaciones:
+
+_Campos de Tipo Texto_
+
+* _cadena_: Buscará la cadena de texto introducida
+* _=cadena_: Buscará la cadena de texto introducida después del simbolo
+igual
+* _CONTIENE(cadena)_: Buscará todos los registros que para esa columna
+contengan la cadena de texto introducida
+* _EMPIEZA(cadena)_: Buscará todos los registros que para esa columna
+empiecen por la cadena de texto introducida
+* _TERMINA(cadena)_: Buscará todos los registros que para esa columna
+terminen por la cadena de texto introducida
+* _ESVACIO_: Buscará todos los registros que para esa columna estén
+vacios o sean nulos
+* _NOESVACIO_: Buscará todos los registros que para esa columna no estén
+vacios y no sean nulos
+* _ESNULO_: Buscará todos los registros que para esa columna sean nulos
+* _NONULO_: Buscará todos los registros que para esa columna no sean
+nulos
+
+_Campos de Tipo Numérico_
+
+* _número_: Buscará el valor numérico exacto en la columna actual
+* _=número_: Buscará el valor numérico exacto en la columna actual
+* _>número_: Buscará todos los registros cuyo valor sea mayor que el
+indicado
+* _>=número_: Buscará todos los registros cuyo valor sea mayor o igual
+que el indicado
+* _<número_: Buscará todos los registros cuyo valor sea menor que el
+indicado
+* _<=número_: Buscará todos los registros cuyo valor sea menor o igual
+que el indicado
+* _<>número_: Buscará todos los registros cuyo valor sea distinto que el
+indicado
+* _!=número_: Buscará todos los registros cuyo valor sea distinto que el
+indicado
+* _ENTRENUMERO(n1;n2)_: Buscará todos los registros cuyo valor se
+encuentre entre el primer número indicado y el segundo
+* _ESNULO_: Buscará todos los registros que para esa columna sean nulos
+* _NONULO_: Buscará todos los registros que para esa columna no sean
+nulos
+
+_Campos de Tipo Fecha_
+
+* _FECHA(fecha)_: Buscará todos los registros con la fecha introducida
+para la columna del filtro
+* _ESANYO(año)_: Buscará todos los registros que contengan el año en la
+fecha de la columna del filtro
+* _ESMES(mes)_: Buscará todos los registros que contengan el mes en la
+fecha de la columna del filtro
+* _ESDIA(dia)_: Buscará todos los registros que contengan el día en la
+fecha de la columna del filtro
+* _ENTREFECHA(fecha1;fecha2)_: Buscará todos los registros cuyas fechas
+se encuentren entre la primera fecha y la segunda
+* _ESNULO_: Buscará todos los registros que para esa columna sean nulos
+* _NONULO_: Buscará todos los registros que para esa columna no sean
+nulos
+
+_Campos de Tipo Boolean_
+
+* _VERDADERO_: Buscará todos los registros cuyo valor para la columna
+sea true
+* _FALSO_: Buscará todos los registros cuyo valor para la columna sea
+false
+* _ESNULO_: Buscará todos los registros que para esa columna sean nulos
+* _NONULO_: Buscará todos los registros que para esa columna no sean
+nulos
+
+Modo visualización de registro.
+-------------------------------
+
+Este modo de visualización muestra un registro por cada página para
+mostrar mas información sobre cada uno.
+
+Para ello, se pinta la vista _show_ del propio registro y se incrusta
+dentro de la celda de la tabla.
+
+Este modo de visualización sólo permite el
+link:#addon-web-mvc-datatables_data-mode[modo de acceso a datos _AJAX_]
+y no están soportadas la herramientas de búsqueda, ordenación, filtros y
+edición.
+
+Para establece este modo de visualización hay que usar el parámetro
+`--mode show` al ejecutar el comando ``.
+
+Para vistas que ya transformadas, se pude establecer este modo
+modificando los valores de la anotación @GvNIXDatatables y añadirle el
+atributo `mode = "show"`. Comprobar que también esta establecido el
+valor `ajax = true`.
+
+Visualización de detalles.
+--------------------------
+
+Este opción permite la visualización de datos relacionados con un
+registro al pie de la página. Los datos mostrados se obtendrán a parir
+de una propiedad de relación 1:N de la entidad actual. La propiedad debe
+tener configurada el valor `mappedBy` en la anotación @OneToMany
+
+Para mostrar los datos del detalle se utilizará la vista _list_ de la
+entidad hija, la cual _debe de utilizar también una vista dataTable_,
+usando exactamente la misma configuración de visualización y modo de
+datos (pero con sus datos filtrados para mostrar los datos relacionados
+con el padre). En la vista de detalle estarán disponibles todas las
+opciones disponibles originalmente, incluido si tiene activado la
+visualización de detalles.
+
+Los registros mostrados en el detalle dependerá del registro actual.
+Este dependiendo del modo de visualización se selecciona:
+
+modo tabular (estándar)::
+  Haciendo _doble click_ sobre la linea deseada. La linea actual se
+  marcará de un color distinto (por defecto verde) y en caso de disponer
+  detalles asociados, se desplazará hasta la posición de los mismos para
+  facilitar su localización.
+modo registro::
+  El detalle muestra los datos para el registro actual (sólo se ve un
+  registro por página)
+
+Para añadir las visualización del detalle en una vista hay que usar
+comando ``.
+
+Eliminación múltiple.
+---------------------
+
+Las listas soportan eliminación múltiple de líneas. Esta operación se
+activa de forma automática cuando el controlador tiene activado las
+link:#addon-web-mvc_batch[operaciones de actualización en bloque].
+
+Cuando esta opción está disponible, en la tabla aparecerá una columna de
+controles de marcado para permitir la selección de los elemento sobre
+los que se quiere actuar. En la cabecera de esta columna se mostrará un
+icono que permite la selección de todos los elementos o limpiar la
+selección.
+
+La opción de _seleccionar todo_ selecciona todos los registros del
+listado _incluidos los que no se están visualizando en la página
+actual_. La selección se mantiene con las operaciones de búsqueda,
+filtrado y paginación.
+
+En la linea de estado se informa del total de registros seleccionados y
+cuantos de ellos están en la página actual.
+
+Al pulsar sobre el botón elimina de la cabecera de la tabla, se pedirá
+confirmación, mostrando el total de registros a eliminar. El botón de
+eliminación de la línea sigue funcionando de la forma habitual.
+
+Edición en línea.
+-----------------
+
+Las listas soportan la edición sobre la misma de líneas de los datos de
+la entidad sin necesidad de cambiar de página o recargarla.
+
+Esta opción _requiere que el controlador tenga activado las
+link:#[operaciones de actualización en bloque]_ y _no está soportado
+para el link:#[modo de visualización registro]_
+
+Entrar en modo edición hay que pulsar sobre el botón de editar de dicho
+registro o seleccionar los registros deseados en el control de marcado y
+pulsar el botón de edición de la cabecera de la tabla.
+
+Al activar la edición de un registro, el control solicita al servidor el
+contenido de la vista _update_ de la entidad y cambia el contenido de
+las columnas de dicha fila por los controles de entrada del formulario
+original. Por tanto los ajuste de los controles de actualización se
+realizan en un único lugar.
+
+Después de entrar en modo edición aparecerán dos botones en la cabecera
+de la tabla para guardar los cambios o cancelar la edición. Estas
+acciones _afectan a todos los registros en edición, se estén
+visualizando o no_.
+
+Durante la edición, las funciones de paginación, filtrado, búsqueda y
+ordenación estarán disponibles de la forma habitual, _manteniendo los
+cambios realizados_ en los campos de las filas en edición.
+
+Para que la actualización funcione correctamente _la tabla debe contener
+todas las columnas requeridas para la edición del elemento_. De no ser
+así la actualización de los registros fallará.
+
+Al pulsar sobre el botón de guardar, el control recogerá los datos de
+las filas en edición y realizará una petición de actualización _en
+bloque_, de forma que _si hay algún problema con algún registro ningún
+cambio se persistirá_
+
+Si se encuentra algún problema de validación en algún registro, el
+control mantendrá el estado de edición de las lineas, marcando las
+lineas afectadas por errores de un color rojizo. Además, mostrará el
+mensaje de error generado en el servidor debajo de cada campo afectado.
+
+Para activar esta opción hay que usar el parámetro `--inline true` al
+ejecutar el comando ``.
+
+Para vistas que ya transformadas, se pude activar la opción modificando
+los valores de la anotación @GvNIXDatatables y añadirle el atributo
+`inlineEditing = true`.
+
+Registro creado en primera posición
+-----------------------------------
+
+Al crear un nuevo registro, se colocará automáticamente en la primera
+posición del listado sin tener en cuenta los filtros u ordenación del
+Datatable.
+
+Gracias a esto tendremos siempre visible el registro que se ha editado.
+
+Al recargar la página, se ordenará el registro de forma correcta
+siguiendo la ordenación y los filtros establecidos en el Datatable.
+
+Esta funcionalidad se aplica tanto a Datatables maestros como para
+detalles asociados
+
+Registro editado en primera posición
+------------------------------------
+
+Al actualizar un registro, se colocará automáticamente en la primera
+posición sin tener en cuenta los filtros u ordenación del Datatable.
+
+Gracias a esto tendremos siempre visible el registro que se ha editado.
+
+Al recargar la página, se ordenará el registro de forma correcta
+siguiendo la ordenación y los filtros establecidos en el Datatable.
+
+Esta funcionalidad se aplica tanto a Datatables maestros como para
+detalles asociados
+
+Registro seleccionado siempre visible
+-------------------------------------
+
+Al acceder a una página del listado Datatable que contenga un registro
+seleccionado por el usuario, se navegará de forma automática hasta este
+registro.
+
+Gracias a esto tendremos siempre posicionado en pantalla el registro que
+se ha seleccionado.

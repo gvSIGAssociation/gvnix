@@ -1,0 +1,575 @@
+Gestión de la capa web
+----------------------
+
+La capa web de la aplicación contiene la infraestructura necesaria para
+gestionar las peticiones HTTP y visualizar cierta información al usuario
+como respuesta. Actualmente esta capa puede desarrollarse con
+http://docs.spring.io/spring/docs/3.2.4.RELEASE/spring-framework-reference/html/mvc.html[Spring
+MVC], http://code.google.com/webtoolkit/[GWT],
+http://www.adobe.com/es/products/flex.html[Flex],
+http://javaserverfaces.java.net/[JSF] y https://vaadin.com/[Vaadin].
+Cada una de estas tecnologías está integrada a distinto nivel con la
+generación de código del framework por lo que cada una de ellas ofrecerá
+ciertas características. Este capítulo se centrará en la generación de
+la capa web con Spring MVC ya que se trata de la tecnología más
+evolucionada dentro de la generación de código del framework y para la
+que gvNIX ha añadido la mayoría de sus nuevas funcionalidades.
+
+La gestión de peticiones en Spring MVC se basa en los controladores,
+clases en las que, mediante anotaciones, se definen los métodos que
+atienden peticiones HTTP.
+
+Un controlador es una clase Java anotada con @Controller a la que le
+llegan las peticiones que realiza el usuario vía el navegador web.
+Identifica las URLs que atiende mediante la anotación @RequestMapping.
+Esta última anotación se puede usar tanto en la clase como en los
+métodos del controlador.
+
+Actualmente se pueden generar automáticamente los controladores
+necesarios para gestionar los objetos de la aplicación: crear, leer,
+actualizar, borrar y buscar (CRUDS).
+
+Crear la capa web con el intérprete de comandos
+-----------------------------------------------
+
+Desde el intérprete de comandos se puede crear la capa web en Spring MVC
+de forma sencilla, con los comandos siguientes:
+
+* `web mvc setup`
+* `web mvc scaffold`
+* `web mvc all`
+* `web mvc controller`
+
+web mvc setup
+~~~~~~~~~~~~~
+
+Este comando crea toda la configuración necesaria para el funcionamiento
+de Spring MVC en el proyecto. Esto implica varios ficheros de
+configuración preparados para su correcto funcionamiento en el proyecto
+actual, recursos gráficos, hojas de estilo, soporte multidioma, páginas
+iniciales, tags, menú, etc.
+
+web mvc scaffold
+~~~~~~~~~~~~~~~~
+
+Este comando crea un controlador con el CRUD (creación, lectura,
+actualización y borrado) de la entidad especificada. No hay
+restricciones para crear varios controladores para la misma entidad.
+
+Este comando, además de generar el controlador, genera también las
+vistas para la creación, visualización, listado y actualización de los
+registros de la entidad y toda la configuración necesaria para que las
+peticiones del usuario lleguen al controlador y se visualize al usuario
+la respuesta (página) correspondiente.
+
+Las URL de las peticiones que acepta el Controller generado siguen el
+convenio
+http://en.wikipedia.org/wiki/Representational_State_Transfer[RESTful]
+(http://es.wikipedia.org/wiki/Representational_State_Transfer[en
+español]). Toda la lógica se genera en un fichero `*_Roo_*.aj` asociado
+al controller, de forma que la clase Java queda limpia de los métodos
+generados automáticamente.
+
+Los parámetros obligatorios para este comando son:
+
+--class::
+  Nombre de la clase java para el controller (incluido su paquete).
+  Recordar que se puede usar el `~` para especificar el paquete base de
+  la aplicación. Por convención, estas clases se suelen emplazar en el
+  paquete `~.web` y con el formato `EntidadController`.
+
+Los parámetros opcionales para este comando son:
+
+--backingType::
+  Nombre de la clase Entidad que manejará el controlador. Si no se
+  especifica este parámetro, se tomará como valor la clase en la cual se
+  encuentre el contexto de la consola.
+--path::
+  Ruta base para la generación de la URL para las peticiones basadas en
+  RESTful.
+--disallowedOperations::
+  Lista de operaciones, separada por comas, de las operaciones NO
+  permitidas en este controller. Los elementos de esta lista deben estar
+  entre estos: `create update
+              delete`.
+
+web mvc all
+~~~~~~~~~~~
+
+Este comando ejecuta un
+link:#guia-desarrollo_web_definir-controller_comandos_controller-scaffold[web
+mvc scaffold] para cada una de las entidades registradas en la
+aplicación.
+
+Los parámetros para este comando son:
+
+--package::
+  Nombre del paquete donde se generarán los controladores. Por
+  convención, se suele utilizar el nombre de paquete `~.web`.
+
+Un ejemplo:
+
+-----------
+roo-gvNIX> 
+roo-gvNIX> 
+-----------
+
+web mvc controller
+~~~~~~~~~~~~~~~~~~
+
+Este comando permite crear un controlador de uso general no vinculado a
+ninguna entidad. Servirá para realizar implementaciones a medida.
+
+Los parámetros para este comando son:
+
+--class::
+  Nombre de la clase java para el controlador (incluido su paquete).
+  Recordar que se puede usar el `~` para especificar el paquete base de
+  la aplicación.Por convención, estas clases se suelen emplazar en el
+  paquete `~.web`.
+--preferredMapping::
+  Permite definir la ruta de la petición para este controller.
+
+Un ejemplo:
+
+-----------
+roo-gvNIX> 
+roo-gvNIX> 
+-----------
+
+Genera una clase como esta:
+
+------------------------------------------------------------------------------------------
+@RequestMapping("/my/**")
+@Controller
+public class MyController {
+
+    @RequestMapping
+    public void get(ModelMap modelMap, HttpServletRequest request,
+            HttpServletResponse response) {
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "{id}")
+    public void post(@PathVariable Long id, ModelMap modelMap, HttpServletRequest request,
+            HttpServletResponse response) {
+    }
+
+    @RequestMapping
+    public String index() {
+        return "my/index";
+    }
+}
+------------------------------------------------------------------------------------------
+
+En este ejemplo la clase atenderá cualquier petición cuya URL comience
+por `{URLBase}/my` definido por la anotación @RequestMapping asociada a
+la clase. El método receptor, tal cual están definidas las anotaciones
+@RequestMapping en los métodos, cumplirán las siguientes reglas:
+
+1.  Las peticiones de tipo POST con una petición cuya URL cumpla
+`{URLBase}/myController/{entero}` entrarán por el método post de la
+clase.
+2.  Las peticiones a `{URLBase}/my/index` se atenderán en el método
+index que mostrará la vista `my/index`.
+3.  El resto de peticiones serán atendidas en el método get de la clase.
+
+Para más información sobre la anotación @RequestMapping ver la
+documentación de
+http://docs.spring.io/spring/docs/3.2.4.RELEASE/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping[Spring
+MVC].
+
+Este comando, además, generará la vista la vista
+`WEB-INF/views/my/index.jspx`, añadirá una entrada de menú para ella y
+actualizará el fichero `WEB-INF/i18n/application.properties` con
+entradas de internacionalización.
+
+Proyecto ejemplo
+~~~~~~~~~~~~~~~~
+
+Continuando con el proyecto del tutorial, la capa web de la aplicación
+de venta de pizzas se creará con la siguiente secuencia de comandos:
+
+-------------------------------
+~.domain.PizzaOrder roo-gvNIX> 
+~.domain.PizzaOrder roo-gvNIX> 
+-------------------------------
+
+Crear la capa web con un IDE
+----------------------------
+
+Para que una clase `Java` sea un controlador de Spring MVC debe estar
+anotada con la anotación @Controller y añadir la anotación
+http://docs.spring.io/spring/docs/3.2.4.RELEASE/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping[@RequestMapping]
+como convenga para definir la correspondencia entre una URL y los
+métodos del controlador. Los controladores pueden ser a medida, para
+realizar las operaciones específicas o se pueden crear controladores
+para la gestión del CRUD (creación, lectura, actualización y borrado) de
+las entidades.
+
+Controlador a medida
+~~~~~~~~~~~~~~~~~~~~
+
+Para crear un controlador a medida, además de generar la clase con la
+anotaciones pertinentes, se debe tener en cuenta las siguientes
+cuestiones:
+
+* Si se utiliza una vista, crearla dentro de `WEB-INF/views/{path}`
+junto con un fichero `WEB-INF/views/{path}/views.xml` de configuración
+del `Tiles`.
+* Si se utilizan cadenas de literales susceptibles de
+internacionalización, darlas de alta en los ficheros
+`WEB-INF/i18n/*.properties` para los idiomas disponibles.
+
+Controlador CRUD
+~~~~~~~~~~~~~~~~
+
+Se puede crear un controlador en Spring MVC que realice de forma
+automática la creación, lectura, actualización y borrado de registros de
+la entidad. Estas clases tienen el siguiente aspecto:
+
+---------------------------------------------------------------
+@RequestMapping("/bases")
+@Controller
+@RooWebScaffold(path = "bases", formBackingObject = Base.class)
+public class BaseController {
+}
+---------------------------------------------------------------
+
+Estas clases contienen, además de las anotaciones ya explicadas, la
+anotación @RooWebScaffold que admite los siguientes atributos
+obligatorios:
+
+path::
+  Ruta base del controlador. Debe coincidir con la ruta de la anotación
+  @RequestMapping de la clase. También se usará como ruta base para
+  crear las vistas automáticas a partir de `WEB-INF/views/` en la
+  aplicación.
+formBackingObject::
+  Objeto que maneja el controlador. Debe ser una clase java anotada como
+  entidad.
+update, delete y create::
+  Define si deben permitirse estas operaciones en el controlador. Por
+  defecto `true`.
+populateMethods::
+  Indica si deben generarse los métodos encargados de publicar las
+  listas de valores que sean necesarias en las vistas. Por defecto
+  `True`.
+
+Cuando el framework detecte la anotación realizará las siguientes
+operaciones:
+
+1.  Creará un fichero *_Roo_Controller.aj donde generará todos los
+métodos para gestionar las peticiones que lleguen al controller.
+2.  Añadirá las vistas necesarias en `WEB-INF/views/{nombre_controller}`
+para gestionar las acciones configuradas en la anotación (creación,
+actualización y/o borrado).
+3.  Añadirá las entradas de menú necesarias.
+4.  Añadirá en el fichero `WEB-INF/i18n/application.properties` las
+entradas multidioma necesarias.
+
+Código generado en las vistas de la capa web
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cuando se genera capa web de la aplicación lo hace generando ficheros
+jspx y tagx. Los ficheros jspx no son más que JSPs que tienen un formato
+XML válido. A su vez las jspx hacen uso de tags de las librerías JSTL,
+Spring Framework y otras que se generán también como parte de la
+aplicación ubicadas en WEB-INF/tags.
+
+Ya que es una buena práctica la reutilización de código o de componentes
+de la vista web, se utiliza el motor de plantillas
+http://tiles.apache.org/[Apache Tiles]. Este motor de plantillas permite
+definir fragmentos que pueden ser integrados en una página completa en
+tiempo de ejecución, facilitando el desarrollo de la capa de
+presentación de una forma consistente en toda la aplicación.
+
+Estructura de archivos de las vistas en la capa web
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+En el proyecto de ejemplo PizzaShop, se habrá creado hasta el momento la
+estructura de directorios y archivos que se puede ver en la siguiente
+imagen:
+
+image:images/webinf-tree.png[Estructura archivos Pizza Shop]
+
+De todas las carpetas anteriores el desarrollo se centrará en _layouts,
+tags y views_.
+
+Motor de plantillas: Tiles
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Dentro de _views_ hay varios ficheros jspx y varias carpetas. Entre los
+ficheros se encuentra _views.xml_. Este fichero establece la
+configuración de vistas que Tiles deberá generar. Tiles se basa en que
+todas las vistas de una aplicación web son similares, tienen el mismo
+diseño y estructura, pero cada página está compuesta de distintos trozos
+que conforman el contenido pero siempre colocados de la misma forma. Al
+mismo tiempo permite modificar ciertos aspectos del diseño para
+adaptarlos a las necesidades de una vista concreta. Por ejemplo, es
+común que una página web tenga una cabecera, donde se puede ver el
+título de la misma, un menú con las distintas secciones que hay en el
+site, un pie de página y una parte principal con el contenido. Tiles nos
+brinda la posibilidad de especificar que una disposición de la página
+contiene estos cuatro bloques, pero por contra en alguna sección o
+situación (por ejemplo: el usuario de la web está o no logado en la
+aplicación) se desea que el menú no se muestre.
+
+-----------------------------------------------------------------
+<definition name="index" extends="default">
+  <put-attribute name="body" value="/WEB-INF/views/index.jspx" />
+</definition>
+-----------------------------------------------------------------
+
+El código anterior, extraido de _view.xml_, define una vista llamada
+_index_ que se basa en, extiende de, otra vista _default_ y a la que se
+le pasa como atributo _body_ la página definida por el fichero
+_index.jspx._ La definición de la vista _default_ ayudará a entender
+esta otra. _default_ se define en el fichero
+_WEB-INF/layouts/layouts.xml_.
+
+--------------------------------------------------------------------
+<definition name="default" template="/WEB-INF/layouts/default.jspx">
+  <put-attribute name="header" value="/WEB-INF/views/header.jspx" />
+  <put-attribute name="menu" value="/WEB-INF/views/menu.jspx" />
+  <put-attribute name="footer" value="/WEB-INF/views/footer.jspx" />
+</definition>
+--------------------------------------------------------------------
+
+En la definición de esta vista se indica que la plantilla (_template_)
+que va a dibujar está parte de la web está programada en la JSP
+_default.jspx_. Además, aquí ya se observan otros fragmentos que van a
+definir la composición de la vista: la cabecera (_header_), menú
+(_menu_) y pie de página (_footer_), los cuales serán dibujados por las
+respectivas páginas jspx. Volviendo a la definición de la vista _index_
+del fragmento de código anterior, se observa cómo uniendo los atributos
+de las dos definiciones se obtiene que la vista _index_ se compone de
+los cuatro fragmentos que comentados anteriormente: cabecera, menú, pie
+de página y cuerpo. Así pues, es sencillo definir una nueva vista con
+esta misma estructura simplemente indicando que el contenido principal,
+el cuerpo, viene definido por otra JSP cualquiera.
+
+Como aclaración, se puede analizar el contenido del fichero
+_default.jspx_:
+
+---------------------------------------------------------------------------------
+<html xmlns:jsp="http://java.sun.com/JSP/Page"
+ xmlns:c="http://java.sun.com/jsp/jstl/core"
+ xmlns:tiles="http://tiles.apache.org/tags-tiles"
+ xmlns:spring="http://www.springframework.org/tags"
+ xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" >
+
+  <jsp:output doctype-root-element="HTML" doctype-system="about:legacy-compat" />
+
+  <jsp:directive.page contentType="text/html;charset=UTF-8" />
+  <jsp:directive.page pageEncoding="UTF-8" />
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+
+    
+
+    
+    <title><spring:message code="welcome_h3" arguments="${app_name}" /></title>
+  </head>
+
+  <body class="tundra spring">
+    <div id="wrapper">
+      
+      <tiles:insertAttribute name="menu" ignore="true" />
+      <div id="main">
+        
+        <tiles:insertAttribute name="footer" ignore="true"/>
+      </div>
+    </div>
+  </body>
+</html>
+---------------------------------------------------------------------------------
+
+En el fragmento de código anterior aparecen etiquetas de HTML y algunas
+otras etiquetas resaltadas en negrita. *<util:load-scripts />* es una
+etiqueta definida dentro del proyecto, luego se verá su finalidad. Las
+etiquetas *<spring:message .../>*son de Spring Framework y sirven para
+mostrar texto traducido a los distintos idiomas soportados por la
+aplicación. Por último las etiquetas *<tiles:insertAttribute ...
+ignore="true" />* son propias de Tiles y permiten insertar en esa
+posición de la página JSP el contenido del fichero que se ha
+especificado en la definición de las vistas como parámetro (_head, menu,
+body, footer_). Cabe destacar el atributo _ignore_ que acompaña a alguna
+de estas etiquetas. El atributo _ignore_ con valor _true_ indica que, si
+el bloque que debe insertarse en el lugar de esa etiqueta no está
+establecido en la definición de la vista, lo ignore y siga con el
+dibujado del resto de la página, por contra, en ausencia de este
+atributo o con valor _false_, al dibujar la página, si el bloque a
+insertar no está definido, se produciría una excepción en tiempo de
+ejecución y por tanto no se dibujaría la página.
+
+Con esto ya se conoce el funcionamiento del motor de plantillas usado en
+el framework, a continuación se verá el resto de directorios y ficheros
+que componen la capa web de la aplicación.
+
+Vistas CRUD (Create, Read, Update, Delete)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Observando las carpetas contenidas en la carpeta views, se puede
+observar que hay una carpeta por cada una de las entidades de la lógica
+de negocio. Cada una de estas carpetas contiene las páginas JSP que
+dibujarán las vistas para las operaciones de Creación (Create), Lectura
+(Read), Modificación (Update) y Borrado (Delete). Tomando como ejemplo
+la entidad _bases_:
+
+---------------
+bases
+|-- create.jspx
+|-- list.jspx
+|-- show.jspx
+|-- update.jspx
+`-- views.xml
+---------------
+
+Cabe destacar que también existe un archivo _views.xml_. También se
+trata de un archivo de definiciones de vistas. Mirando su contendo se
+observa que define varias vistas que se basan en _default_ tal y como se
+ha comentado anteriormente pero cada una de ellas define un _body_ con
+una JSP distinta.
+
+Parece bastante evidente cual es el cometido de cada una de las JSP:
+
+* _create.jspx_ muestra el formulario de creación de un nuevo registro
+de la entidad Base,
+* _list.jspx_ muestra el listado de todas las bases de pizza existentes,
+* _show.jspx_ mostrará la información detallada de la base de pizza
+seleccionada
+* y por último _update.jspx_ muestra el formulario de actualización del
+registro.
+
+No hay una JSP dedicada al borrado de registros porque ya se incluye un
+botón para el borrado de un registro tanto en _show_ como en _list_.
+
+Componentes de las JSP de las vistas CRUD
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Se van a analizar los componentes que forman las vistas CRUD del
+proyecto.
+
+______________________________________________________________________________________________________________________________________________________________________________________________________________
+*Note*
+
+Se listan algunos componentes que pueden aparecer en cada vista aunque
+cada uno de estos componentes puede no aparecer, aparecer varias veces o
+aparecer otros distintos dependiendo de los campos a informar.
+______________________________________________________________________________________________________________________________________________________________________________________________________________
+
+*create.jspx*
+
+-------------------
+<form:create>
+  <field:input/>
+  <field:datetime/>
+  <field:select/>
+</form:create>
+<form:dependency/>
+-------------------
+
+_<form:create/>_ define un formulario en el que los campos vienen
+definidos por las etiquetas _<field:xxxx/>_. Las etiquetas _form_
+generan el código HTML correspondiente a la infraestructura de un
+formulario de creación siguiendo la definición RESTful. Las etiquetas
+_field_ generan el código HTML necesario para mostrar campos de texto,
+introducción de fechas o desplegables de selección. En este caso cada
+campo puede utilizar una etiqueta distinta en función del tipo de datos
+que contenga y la forma en la que se desee presentar su información en
+pantalla.
+
+*list.jspx*
+
+-------------------
+<page:list>
+  <table:table>
+    <table:column/>
+  </table:table>
+</page:list>
+-------------------
+
+_<table:table/>_ y _<page:list/>_ generarán el HTML de una página y una
+tabla donde las distintas columnas serán los campos indicados a través
+de la etiqueta _<table:column/>_ y en cada fila se emplazará cada uno de
+los registros de la entidad paginados. Puesto que esta página solo
+proporciona la visualización de los valores de cada campo sin edición,
+no es necesario especificar distintos tipos de columna para cada campo.
+
+*show.jspx*
+
+------------------
+<page:show>
+  <field:display/>
+</page:show>
+------------------
+
+Muestra los campos de un registro concreto de la entidad en formato
+texto en la que cada campo se representa mediante la etiqueta
+_<field:display/>_. Esta página también solo proporciona visualización
+de valores, por lo que tampoco es necesario especificar distintos tipos
+de columna para cada campo.
+
+*update.jspx*
+
+-------------------
+<form:update>
+  <field:input/>
+  <field:datetime/>
+  <field:select/>
+</form:update>
+-------------------
+
+Se comporta de forma muy parecida a la página _create.jspx_ pero esta
+página permite la actualización de los datos de un registro. Las
+etiquetas _field_ que aparecen sirven en este caso para la modificación
+de un registro y son exáctamente las mismas que en el caso del alta de
+un nuevo registro.
+
+Visualización de entidades en la capa web
+-----------------------------------------
+
+Con los componentes <field:display/>, <table:column/> y <field:.../> se
+consigue mostrar datos de las entidades de la aplicación, es decir, en
+el proyecto PizzaShop de ejemplo, tomando la definición de la página
+jspx de listado de como la entidad PizzaOrder:
+
+----------------------------------------------------------------------------
+<field:display 
+        id="s_com_disid_roo_pizzashop_domain__pizzas" object="${pizzaorder}"
+        z="WSxjsiiEWhA5vo8ecxRoox5EjKA="/>
+----------------------------------------------------------------------------
+
+En la página se mostrará información de las Pizzas ligadas a un
+PizzaOrder. El framework utilizará para la visualización en la capa web
+de estos objetos relacionados los llamados *Converters*. Los Converters
+son clases java que, como su nombre indica, convierten un objeto dado en
+otro. En este caso particular de los Converters, el framework los
+utiliza para convertir un objeto del modelo (cada Pizza) en una cadena
+de forma que sea legible para un humano.
+
+Este mecanismo está implementado en la clase java
+_ApplicationConversionServiceFactoryBean.java_ que se puede encontrar en
+el mismo paquete donde están los controladores de la aplicación. Esta
+clase la genera el framework de manera automática al generar la capa
+web. Tal y como se ha comentado en el apartado de
+link:#guia-desarrollo_generacion-codigo[generación de código], asociado
+al _ApplicationConversionServiceFactoryBean.java_ existe un Aspecto Java
+(fichero aj) con la declaración de los Converters y un método que los
+registra para que estén disponibles a la hora de "convertir" una entidad
+del modelo a la cadena que se mostrara en página.
+
+Si la cadena que se visualiza en la página web no muestra la información
+deseada para una entidad, se puede modificar el Converter de esa entidad
+y adaptarlo a sus requerimientos. En la sección sobre modificación de
+código se explica como hacerlo.
+
+Mejoras de renimiento
+---------------------
+
+Se pueden implementar algunas mejoras de rendimiento definidas en la
+sección
+link:#guia-desarrollo_mejoras-rendimiento-evitar-carga-listas-innecesarias[Evitar
+la carga de listas de valores innecesarias].

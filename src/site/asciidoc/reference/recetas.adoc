@@ -1,0 +1,539 @@
+Recetas
+-------
+
+En este capítulo se verá como realizar algunas modificaciones sobre el
+código generado para adaptar la aplicación a distintos requerimientos
+habituales dada la experiencia de uso del framework.
+
+Repositorios Maven
+------------------
+
+Cuando una funcionalidad generada por el framework requiere de librerías
+externas, el add-on correspondiente registrará el repositorio de
+artefactos Maven necesario en el fichero _pom.xml_, si todavía no lo
+estaba.
+
+No es habitual, pero en el caso de ser necesario añadir algún
+repositorio adicional al proyecto puede realizarse mediante el comando
+de la consola
+http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-maven-repository-add[maven
+repository add]. El siguiente ejemplo define el repositorio Maven
+interno de la Consejería de Infraestructuras, Transporte y Medio
+Ambiente. Este repositorio es accesible únicamente desde la red interna
+de la Consejería.
+
+--------------------------------------------------------------------------------------
+roo-gvNIX> maven repository add --id citma-maven --name "CITMA Maven Repository" 
+        --url http://benigno.coput.gva.es:8081/nexus/content/groups/public
+Updated ROOT/pom.xml [
+        added repository http://benigno.coput.gva.es:8081/nexus/content/groups/public]
+--------------------------------------------------------------------------------------
+
+El comando modificará el fichero pom.xml y en la sección
+_<repositories>_ añadirá la definición del repositorio indicado.
+
+-------------------------------------------------------------------------------
+<repositories>
+    ...
+    <repository>
+        <id>citma-maven</id>
+        <url>http://benigno.coput.gva.es:8081/nexus/content/groups/public</url>
+        <name>CITMA Maven Repository</name>
+    </repository>
+    ...
+</repositories>
+-------------------------------------------------------------------------------
+
+En el lado opuesto, también es posible eliminar repositorios Maven del
+proyecto mediante el comando
+http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-maven-repository-remove[maven
+repository remove].
+
+Desarrollo de buscadores con gran cantidad de campos
+----------------------------------------------------
+
+El add-on de los buscadores (finder) tiene una limitación impuesta por
+el sistema operativo Windows en el tamaño máximo del nombre de archivos.
+La limitación del tamaño máximo del nombre de archivo limita al comando
+_finder add_ a generar nombres de buscadores que generen paths a
+archivos jspx de tamaño menor de 244 caracteres.
+
+Existe una forma para generar buscadores con un tamaño superior al de la
+limitación impuesta. Consiste en dividir el buscador necesario en varios
+más pequeños, parciales de unos pocos campos cada uno, y al final unir
+el código que se genera para cada uno de ellos en un unico método. Esto
+implica tener que modificar el código que se ha generado para el
+buscador en la entidad, el controlador y la jspx de la siguiente forma:
+
+* En el archivo Java de la entidad para la que se está generando el
+buscador crear un método con el nombre, por ejemplo, _findByTodo_ y
+cuyos parámetros de entrada serán todos los parámetros que reciben los
+métodos de los buscadores parciales que se hayan generado. Del mismo
+modo, el cuerpo de este nuevo método es la unión de la implementación de
+todos los buscadores parciales. Es posible modificar el código, según se
+explica en el siguiente apartado, de forma que los parámetros sean
+opcionales.
+* De manera similar, en el fichero Java del controlador de la entidad
+crear dos métodos: uno _findByTodoForm_ que devolverá la vista del
+formulario del buscador y otro _findByTodo_ que responderá a las
+peticiones que lleguen desde el formulario del buscador. Este segundo
+método, al igual que en el método creado en la entidad, deberá tener
+como parámetros la unión de todos parámetros de los métodos de los
+buscadores parciales en el controlador. El cuerpo de este método deberá
+invocar al método _findByTodo_ creado en la entidad. Para definir la
+anotación @RequestMapping de estos dos métodos se recomienda utilizar
+como guía los buscadores parciales ya existentes.
+* Finalmente, crear una página jspx (por ejemplo, con nombre
+findByTodo.jspx) en el directorio WEB-INF/views/<entidad> que contendrá
+el formulario del buscador. Esta página debe incluir todos los campos
+que hayan en el resto de páginas jspx de los buscadores parciales.
+Recordar, que esta vista se ha de definir también en el fichero
+views.xml que hay en la misma carpeta y que esta vista es la que
+devuelve el método findByTodoForm creada anteriormente en el
+controlador.
+
+Con todo lo anterior se ha descrito un proceso manual que permite montar
+buscadores con cualquier cantidad de campos.
+
+Campos opcionales en los buscadores
+-----------------------------------
+
+El comportamiento que implementa automáticamente la generación de
+buscadores es hacer todos los campos de busqueda obligatorios. Por lo
+tanto, si no se proporciona alguno de los parámetros se generará una
+excepción indicando la falta de un parámetro obligatorio. En ocasiones
+no es lo deseado, es decir, puede necesario que los parámetros no
+informados simplemente no se incluyan en la consulta si no se
+especifican. Para ello se debe modificar el código del método
+_finderByXxxx_ declarado en el aspecto Java _*_Roo_Finder.aj_. A
+continuación se ejemplifica como hacer este cambio.
+
+Hacer _push-in_ del método tal y como se comenta en la sección sobre
+link:#guia-desarrollo_generacion-codigo[modificación del código
+generado] y llevarlo al fichero Java de la entidad. Una vez allí
+modificarlo para que no requiera los campos y así construir la consulta
+considerando tan solo los parámetros que lleguen informados:
+
+--------------------------------------------------------------------
+public static TypedQuery<Owner> findOwnersByLastNameLikeAndCityLike(
+            String lastName, String city) {
+  
+  
+
+  
+    lastName = lastName.replace('*', '%');
+    if (lastName.charAt(0) != '%') {
+        lastName = "%" + lastName;
+    }
+    if (lastName.charAt(lastName.length() - 1) != '%') {
+        lastName = lastName + "%";
+    }
+    
+  }
+
+  
+    city = city.replace('*', '%');
+    if (city.charAt(0) != '%') {
+        city = "%" + city;
+    }
+    if (city.charAt(city.length() - 1) != '%') {
+        city = city + "%";
+    }
+    
+  }
+  
+
+  EntityManager em = Owner.entityManager();
+  TypedQuery<Owner> q = em.createQuery(, Owner.class);
+  
+    q.setParameter("lastName", lastName);
+  }
+  
+    q.setParameter("city", city);
+  }
+  return q;
+}
+--------------------------------------------------------------------
+
+Se han marcado en negrita las líneas de código modificadas. Como puede
+observarse, se construye la consulta de forma dinámica de forma que se
+añaden los distintos filtros al _where_ de la consulta solo si el campo
+asociado al filtro tiene algún valor y se elimina la generación de
+excepciones al detectar alguno de dichos campos como vacío.
+
+En este ejemplo se ha construido la consulta usando un StringBuilder en
+el que se genera la consulta deseada, pero se podría utilizar cualquier
+otra tecnología como por ejemplo Hibernate Criteria Builder.
+
+Como ya se ha comentado, el código generado fuerza que todos los
+parámetros de búsqueda sean obligatorios, esto implica también al
+formulario situadao en la página jspx. Tal como se genera, si alguno de
+los campos no se rellena, no dejará enviar la petición. Se debe editar
+la jspx y modificar el atributo _required_ de los campos _field_ y
+establecer su valor a _false_, no olvidar cambiar el valor del atributo
+_z_ a "_user-managed_" para indicar que este campo ha sido
+personalizado.
+
+---------------------------------------------------------------------------
+<field:input disableFormBinding="true" field="city"
+            id="f_com_springsource_petclinic_domain_Owner_city" max="30" />
+---------------------------------------------------------------------------
+
+En los buscadores en los que uno de los parámetros sea una entidad del
+modelo, es decir una relación con otra entidad del modelo, será
+necesario realizar un cambio adicional. En estos casos se visualiza un
+selector desplegable, mediante el componente _select.tagx_. Sin embargo,
+este selector tiene el inconveniente de que no incluye una opción vacía
+entre las disponibles, con lo que obliga a elegir siempre algún valor.
+Un ejemplo de este caso se encuentra en el buscador findPetsByOwner
+generado para la entidad Pet en el ejemplo de _clinic.roo_ .
+
+La forma de tratar estas peticiones en Spring MVC es intentar cargar el
+registro asociado con el valor del selector que llega como parámetro.
+Por tanto si llega como parámetro un dato que no concuerda con ningún
+registro de la entidad parámetro, usará null como valor. Como se ha
+comentado, el componente _select.tagx_ no ofrece una opción vacía. gvNIX
+en su link:#addon-web-screen-patterns[Add-on Web MVC Pattern] incluye un
+componente _select-withempty.tagx_ que sí lo ofrece. Mediante el comando
+_web mvc pattern setup_ se instalan los componentes de MVC Pattern entre
+los que se incluye el selector con opción vacía. Entonces es posible
+modificar la jspx del buscador findPetsByOwner para que utilice
+_select-withempty_ en lugar del original de la siguiente forma:
+
+-------------------------------------------------------------------------------
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" ... 
+            
+            version="2.0">
+  <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+  <jsp:output omit-xml-declaration="yes"/>
+  <form:find finderName="ByOwner" id="ff_com_springsource_petclinic_domain_Pet"
+        path="/pets" z="ThIGSmua6R7WM6q2P1BpNC3zMi4=">
+      
+  </form:find>
+</div>
+-------------------------------------------------------------------------------
+
+El componente select-withempty.tagx tiene los mismos atributos que el
+select.tagx y otros tres adicionales:
+
+* _emptyValueEnable_: Valor booleano que habilita la opción vacía en el
+selector.
+* _emtpyValue_: Valor a dar para la opción vacía del selector. Si se
+corresponde con una entidad, este valor no debería corresponder con
+ningún identificador existente para esa entidad, de esta forma el valor
+que llega al buscador es nulo.
+* _emptyLabel_: Descripción a mostrar para la opción vacía del selector.
+
+Con este cambio y con el método findPetsByOwner modificado para que no
+sea requerido el parámetro Owner, de la misma forma que se explicado
+antes, se consigue realizar búsquedas por parámetros opcionales sea cual
+sea el tipo del parámetro.
+
+Instalar fuentes de letra para los informes
+-------------------------------------------
+
+Las fuentes instaladas automáticamente proporcionan soporte para la
+inclusión de texto en negrita y cursiva. El desarrollador debe instalar
+cualquier otro tipo de fuente que se utilice en los informes que diseñe.
+Para ello, basta con ampliar las definiciones _fontFamily_ realizadas en
+el archivo _gvnix_reportfonts.xml_ y copiar los archivos de fuente en la
+carpeta _jasperfonts_. La inclusión de nuevas fuentes se puede realizar
+utilizando una utilidad que ofrece iReport. Desde el menú _Herramientas
+> Opciones > Pestaña Fonts_ se accederá a la siguiente pantalla:
+
+image:images/iReportFonts.png[Herramienta de gestión de fuentes de
+IReport]
+
+Desde esta pantalla, seleccionando una fuente de la lista de fuentes
+instaladas en iReports y con el botón _"Export as extension"_ se creará
+un archivo JAR que al descomprimirlo contiene:
+
+* Directorio fonts
+** Archivos de fuentes en formato TTF.
+** Archivo _fontsfamily<IdentificadorAleatorio>.xml_
+* Archivo _jasperreports_extension.properties_
+
+Para instalar esta fuente en la aplicación se deben copiar los ficheros
+con extensión TTF a _/WEB-INF/classes/jasperfonts_ y del archivo
+_fontsfamily<IdentificadorAleatorio>.xml_ adaptar el elemento
+<fontFamily/> para copiarlo en el archivo del proyecto
+_gvnix_reportfonts.xml_ (modificando las rutas para que apunten a
+_jasperfonts_). El archivo _jasperreports_extension.properties_ se puede
+ignorar porque ya se encuentra definido en el proyecto en
+_/WEB-INF/classes._
+
+Diseño de informes con sub informes
+-----------------------------------
+
+gvNIX mediante el link:#addon-web-report[Add-on Web Report] facilita la
+creación de informes sobre una entidad. El add-on genera el diseño de un
+informe Jasper Reports básico el cual se puede modificar utilizando un
+diseñador gráfico como iReport.
+
+Puede ser necesario mostrar en un informe una lista de entidades
+relacionadas con la entidad sobre la que se ha generado el informe. Por
+ejemplo, en la aplicación del script de ejemplo clinic.roo, se podría
+definir un informe sobre la entidad Owner y desear mostrar para cada
+Owner la lista de mascotas que le pertenecen, es decir, listar la
+relación definida por el campo _Set<Pet> pets_ de la entidad Owner.
+
+___________________________________________________________
+*Note*
+
+Para este ejemplo se utilizará la versión 4.0.1 de iReport.
+___________________________________________________________
+
+Partiendo del informe definido por el siguiente comando de gvNIX:
+
+-----------------------------------------------------------------------------------
+roo-gvNIX> web report add --controller ~.web.OwnerController --reportName ownerpets
+-----------------------------------------------------------------------------------
+
+En src/main/webapp/WEB-INF/reports se creará el archivo con el diseño
+del informe _owner_ownerpets.jrxml_. Abriendo este archivo usando
+iReport (_Archivo > Open_) aparecerá una pantalla como la que se muestra
+a continuación.
+
+image:images/recetas-subreport-ireport-1.png[iReport - Diseñador]
+
+En la parte izquierda, en la pestaña con título _Report Inspector_ se
+pueden observar los elementos principales del diseño de informes.
+
+image:images/recetas-subreport-ireport-2.png[iReport - Report Inspector]
+
+Lo primero que se debe hacer es declarar un nuevo parámetro con, por
+ejemplo, el nombre _SubReportPetsLocation_. Para ello hacer click con el
+botón derecho sobre el elemento _Parameters_ y seleccionar la opción
+_Agregar Parameter_. Justo debajo del último parámetro aparecerá uno
+nuevo con nombre _parameter1_. Al seleccionarlo, en la parte derecha de
+la ventana de iReport se podrán ver sus propiedades. Modificar sus
+propiedades estableciendo en la propiedad_Name_ el valor
+_SubReportPetsLocation_ y en la propiedad _Parameter Class_ el valor
+_net.sf.jasperreports.engine.JasperReport_.
+
+A continuación, añadir un elemento _Subreport_ al diseño. Para que
+aparezca el _Subreport_ para cada elemento de la lista de Owners, se
+debe añadir en la banda de detalle _Detail1_ del informe. Será necesario
+aumentar la altura de la banda _Detail1_. Para ello, seleccionarla y en
+sus propiedad _Band height_ especificar el valor _55_. De la paleta de
+elementos seleccionar el _Subreport_ y arrastrarlo a la banda de
+detalle. Se abrirá un asistente, seleccionar la opción _Just create the
+subreport element_ y cerrar con _Terminar_. Es posible modificar las
+dimensiones del elemento _Subreport_ arrastrando las esquinas de la caja
+del elemento.
+
+image:images/recetas-subreport-ireport-3.png[iReport - Subreport]
+
+Antes de seguir con el establecimiento de las propiedades del Subreport,
+es necesario declarar un campo del informe que permitirá acceder al
+campo _pets_ de la Entidad _Owner_. En _Report Inspector_, seleccionar
+_Fields_ y con el botón derecho _Agregar Field_. Modificar también este
+elemento estableciendo en la propiedad _Name_ el valor _pets_ y en la
+propiedad _Field Class_ el valor _java.util.Collection_.
+
+Se debe indicar cuales son las propiedades del _Subreport_. Para ello,
+en la ventana de propiedades de la derecha buscar las siguientes
+propiedades y establecer los valores que se especifican a continuación:
+
+1.  Subreport Expression = $P\{SubReportPetsLocation}
+2.  Expression Class = net.sf.jasperreports.engine.JasperReport
+3.  Connection type = Use a datasource expression
+4.  Data Source Expression = new
+net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F\{pets})
+
+En el flujo de ejecución de un informe en Jasper Reports, los parámetros
+del mismo han de ser informados antes de su visualización o, de lo
+contrario, se tomarán los valores por defecto que se hubiesen definido o
+_null_ en su defecto. Observar que se ha definido el parámetro
+_SubReportPetsLocation_ y el valor que toma este parámetro en tiempo de
+ejecución ha de ser una ruta absoluta al sistema de archivos o al
+classpath de la aplicación. En la sección del
+link:#addon-web-report[Add-on Web Report] se explicó que al añadir un
+informe a la aplicación, utilizando el comando _web report add_, en el
+archivo _src/main/webapp/WEB-INF/spring/jasper-views.xml_ se declara un
+bean que establece la ruta hasta el fichero jrxml del informe añadido.
+Este bean tiene un atributo que indica el lugar donde se declaran los
+subreports que se usan en los distintos informes mediante el atributo
+_p:subReportsUrls-ref_.
+
+------------------------------------------------------------------------------------------------
+<bean id="owner_ownerpets"
+class=
+ "com.springsource.petclinic.web.servlet.view.jasperreports.CustomJasperReportsMultiFormatView" 
+p:reportDataKey="ownerpetsList" p:url="/WEB-INF/reports/owner_ownerpets.jrxml"
+p:subReportDataKeys-ref="subReportDataKeys"  />
+------------------------------------------------------------------------------------------------
+
+El elemento anterior marcado en negrita apunta al elemento
+_<util:map/>_, declarado también en el fichero jasper-views.xml. Aquí se
+ha de especificar el valor que debe tomar el parámetro
+_SubReportPetsLocation._ Modificar este elemento añadiendo una entrada,
+quedando como se muestra a continuación.
+
+---------------------------------------------------------------------------------------
+<util:map id="">
+  <!-- This entry key must be declared exactly as declared in the master JRXML file -->
+  <!-- Add one <entry /> node for each sub-report you need to define -->
+  
+</util:map>
+---------------------------------------------------------------------------------------
+
+En el elemento _<util:map/>_ se pueden definir tantos elementos
+_<entry/>_ como sea necesario para definir los parámetros que indican el
+lugar donde se localizan los archivos jrxml de los distintos subreports.
+
+Ahora se debe diseñar el informe que mostrará el listado de mascotas
+(pets) que conformará el subreport.
+
+Crear un nuevo diseño de informe (_Archivo > Nuevo_), y en el asistente
+seleccionar _Blank A4_ y _Open This Template_. Se solicitará un nombre
+para el diseño y el lugar donde guardarlo. Indicar, por ejemplo
+_owner_ownerpets_sub_pets.jrxml_ y guardarlo en el mismo directorio
+donde se encuentre el report padre (_owner_ownerpets.jrxml_).
+
+image:images/recetas-subreport-ireport-4.png[iReport - Nuevo diseño]
+
+_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Important*
+
+Se debe validar que el nuevo informe se crea con el lenguage Java
+configurado para las expresiones. En _Report Inspector_, al seleccionar
+el primer elemento (el nombre del informe) y mirar en sus propiedades
+(parte derecha de la pantalla de iReport) se debe buscar la propiedad
+_Language_, si no tiene el valor Java, cambiarla usando el desplegable.
+_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Este nuevo informe, que constituirá el subreport, es un informe a todos
+los efectos, por tanto se debe definir los campos (elemento Fields del
+diseño), parámetros (elemento Parameters), etc.
+
+Al igual que se ha hecho anteriormente con el campo pets del informe
+padre, definir los campos que permiten acceder a los valores de la
+entidad Pet que se visualizarán en el subreport. Click con el botón
+derecho sobre Fields y Agregar Field:
+
+1.  Crear field con nombre _name_ y clase _java.lang.String_
+2.  Crear field con nombre _weight_ y clase _java.lang.Float_
+3.  Crear field con nombre _type_ y clase
+_com.springsource.petclinic.reference.PetType_ (enumerado declarado en
+el proyecto clinic.roo)
+
+El diseño del informe se compone de distitnas bandas, donde se colocan
+los elementos a mostrar (_Title, Page Header, Column Header, Detail1,
+Column Footer, ..._). Para un subreport como el de este ejemplo, algunas
+bandas son innecesarias y pueden ser eliminadas. Esto permitirá ajustar
+mejor el diseño completo del informe (informe padre ownerpets +
+subreport pets). Si se hace click con el botón derecho sobre _Title_ y
+se selecciona _Delete Band_, es eliminada. Hacerlo con todas las bandas
+excepto con _Column Header, Detail1 y Summary_.
+
+image:images/recetas-subreport-ireport-6.png[iReport - Bandas subreport]
+
+_Column Header_ es una banda que se dibujará solo al inicio de la
+columna del informe (en este caso solo existirá una). Añadir textos
+estáticos que harán las veces de cabecera de tabla. Para ello, de la
+paleta de componentes, seleccionar _Static Text_ y arrastrarlo hasta la
+banda _Column Header_.
+
+image:images/recetas-subreport-ireport-5.png[iReport - Paleta]
+
+En el primer _Static Text_ establecer el valor _Nombre_ y repetir la
+misma operación para definir un texto para el campo _Peso_ y para el
+campo _Tipo_. Es posible distribuir las etiquetas para que quede tal y
+como se muestra en la captura anterior.
+
+A continuación, hacer lo mismo pero usando el elemento _Text Field_.
+Este elemento sirve para mostrar el valor de un campo de la entidad
+_Pet_ y se ha de corresponder con los field definidos anteriormente
+(_name, weight, type_). Estos elementos _Text Field_ se definirán en la
+banda _Detail1_, puesto que se repetirán para cada uno de los elementos
+de la fuente de datos del subreport. Recordar que la fuente de datos de
+este subreport se había definido anteriormente como
+_JRBeanCollectionDataSource_ usando la colección de _Pets_ que
+pertenecen a un _Owner_.
+
+En los Text Field, es importante establecer correctamente la propiedad
+Expression Class, esta se ha de corresponder con el tipo Java del field
+definido y que se va a usar para mostrarlo. Por ejemplo, el Text Field
+que mostará el peso de la mascota tendría las propiedades como sigue:
+
+* Text Field Expression = $F\{weight}
+* Expression Class = java.lang.Float
+
+Para establecer el Text Field Expression se puede utilizar el diálogo
+que se muestra a continuación Este diálogo permite seleccionar elementos
+de los campos definidos en el informe, de los parámetros e incluso
+acceder a alguna de las operaciones que proporcionan estos objetos.
+
+image:images/recetas-subreport-ireport-7.png[iReport - Diálogo Text
+Field Expression]
+
+Obviamente, en un _Text Field_ es posible establecer expresiones más
+elaboradas, como añadir a la cadena las unidades de peso. Se debe tener
+en cuenta que la propiedad _Expression Class_ deberá establecerse al
+tipo Java resultante de la expresión (por ejemplo, $F\{weight} + "kg" da
+como resultado un java.lang.String). Establecer en el _Text Field_
+asociado con el tipo de mascota la expresión _$F\{type}.toString()_ y la
+clase _java.lang.String_.
+
+Ya está diseñada la banda de detalle y para terminar el subreport,
+opcionalmente, se puede definir un _Text Field_ que indique cuantos
+registros de _Pet_ se han impreso cada vez que se ejecuta el subreport.
+Esto ya se encuentra incluido en el informe padre (owners) y se consigue
+utilizando la variable del report _REPORT_COUNT_, ya difinida por
+defecto. Incluirla en la banda _Summary_ con un _Text Field_ en la que
+el _Expression_ tome el valor _$V\{REPORT_COUNT}_ y el _Class_ sea
+_java.lang.Integer_.
+
+Solo queda arrancar de nuevo la aplicación, desde el Tomcat de Eclipse o
+desde la línea de comandos y probar la generación del informe de Owners.
+
+image:images/recetas-subreport-ireport-8.png[Informe Owners con
+subreport Pets]
+
+JasperReports permite gran cantidad de opciones al trabajar con
+subreports (paso de parámetros desde el informe padre a los subinformes,
+devolución de parámetros desde los subinformes al informe padre,
+actualización de variables, ...). Para conocerlas con profundidad
+consultar la documentación de referencia de Jasper Reports e iReport.
+
+Operaciones durante el inicio de la aplicación
+----------------------------------------------
+
+Se pueden crear clases que se invoquen durante la inicialización de una
+aplicación.
+
+En alguna aplicación puede ser necesario realizar alguna acción durante
+el inicio de una aplicación, como por ejemplo. Existen diversas formas
+para hacer esto en Spring.
+
+Sino se va a interaccionar con datos, se puede usar la anotación
+@PostConstruct en un método de una clase anotada con _@Component_. Hay
+que tener en cuenta que la inicialización del soporte de datos y
+transacciones puede no estar todavía listo en este punto.
+
+Crear un listener del contexto de Spring de la siguiente forma:
+
+---------------------------------------------------------------------------------
+@Component
+  public class DataSeeder implements ApplicationListener<ContextRefreshedEvent> {
+
+    @Override
+        @Transactional
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (Model.countModels() == 0) {
+            // Create initial Model values
+        }
+    }
+---------------------------------------------------------------------------------
+
+Obtener el BindStatus de un atributo dentro de un formulario
+------------------------------------------------------------
+
+Obtener el BindStatus de un atributo dentro de un formulario:
+
+----------------------------------------------------------
+<spring:bind path="${field}">
+        <c:set var="fieldValue" value="${status.value}" />
+    </spring:bind>
+----------------------------------------------------------

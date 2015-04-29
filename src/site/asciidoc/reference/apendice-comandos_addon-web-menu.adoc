@@ -1,0 +1,324 @@
+Comandos del add-on Web Menu
+----------------------------
+
+Para una descripción detallada de las características del add-on
+consultar la documentación del link:#addon-web-menu[add-on Web Menu].
+
+.Comandos del add-on Web Menu
+[width="100%",cols="33%,67%",options="header",]
+|=======================================================================
+|Comando |Descripción
+|link:#apendice-comandos_addon-web-menu_page-menu-setup[menu setup]
+|Instala el sistema de gestión del menú web que permite organizar de
+forma sencilla su estructura de páginas y permisos
+
+|link:#apendice-comandos_addon-web-menu_page-add[menu entry add] |Añade
+un elemento al menú, sea una página o un grupo
+
+|link:#apendice-comandos_addon-web-menu_page-hide[menu entry visibility]
+|Define un elemento del menú como visible o oculto
+
+|link:#apendice-comandos_addon-web-menu_page-show[menu entry roles]
+|Establece una lista de perfiles de usuario para los que se mostrará una
+entrada del menú
+
+|link:#apendice-comandos_addon-web-menu_page-move[menu entry move]
+|Mueve un elemento del menú y todos los hijos que pueda tener
+
+|link:#apendice-comandos_addon-web-menu_page-update[menu entry update]
+|Actualiza un elemento del menú
+
+|link:#apendice-comandos_addon-web-menu_page-info[menu entry info]
+|Muestra por consola los valores establecidos en un elemento del menú y
+en todos los hijos que pueda tener
+
+|link:#apendice-comandos_addon-web-menu_page-list[menu tree] |Muestra
+por consola un árbol con un resumen de los elementos del menú.
+|=======================================================================
+
+menu setup
+~~~~~~~~~~
+
+Instala y activa en la aplicación el sistema de gestión del menú web
+para la organización de su estructura de páginas y la definición de
+permisos. A partir de este momento se podrán utilizar todos los comandos
+de gestión del menú para modificar su modelo de datos y definir permisos
+de visualización sobre las distintas opciones del menú en función del
+perfil de cada usuario. El modelo de datos se encuentra definido en el
+fichero `src/main/webapp/WEB-INF/views/menu.xml`.
+
+Para una descripción detallada de las tareas que realiza este comando
+consultar la documentación de
+link:#addon-web-menu_instalacion[instalación de la gestión del menú].
+
+menu entry add
+~~~~~~~~~~~~~~
+
+Añade un elemento al menú, sea una página o un grupo. La diferencia
+entre ambos es que una página tiene asociada una URL y un grupo no. Este
+comando crea un elemento del menú, pero no crea una nueva vista en el
+proyecto. La creación de una vista puede realizarse con el comando
+http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-web-mvc-view[web
+mvc view].
+
+Sus parámetros son:
+
+--category::
+  _[Opcional] [Elemento del menú] [Autocompletado]_
+  +
+  Identificador del elemento del menú donde incluir la nueva entrada. El
+  elemento del menú puede ser una página o un grupo. Si no se especifica
+  este parámetro la nueva entrada se incluirá en el grupo _Page_ que si
+  no existe será creado al final del menú.
+--url::
+  _[Opcional] [Cadena]_
+  +
+  URL con la que enlazará el elemento del menú.
+--label::
+  _[Requerido] [Cadena]_
+  +
+  Título para el elemento del menú. Se creará una etiqueta con este
+  título en el fichero
+  `src/main/webapp/WEB-INF/i18n/application.properties
+              `. Este título será ignorado si se define el parámetro
+  _messageCode_.
+--messageCode::
+  _[Opcional] [Cadena]_
+  +
+  Etiqueta que representará la traducción en múltiples idiomas del
+  título del elemento del menú. Si todavía no existe, se deberá crear
+  dicha etiqueta en cada fichero de idioma que exista configurado en el
+  proyecto en `src/main/webapp/WEB-INF/i18n/messages_xx.properties
+              `.
+--roles::
+  _[Opcional] [Cadena]_
+  +
+  Lista de perfiles con permiso para ver el elemento del menú. Los
+  distintos elementos de la lista de perfiles deben estar separados por
+  comas. Si no se establece este parámetro, el elemento del menú
+  aparecerá para todos los perfiles.
+
+Al finalizar la ejecución de este comando se informará del identificador
+del nuevo elemento del menú añadido con un texto similar al siguiente.
+
+----------------------------------
+New page 'i_page_xxxx_xxxx' added.
+----------------------------------
+
+menu entry visibility
+~~~~~~~~~~~~~~~~~~~~~
+
+Cambia la visibilidad de un elemento del menú, es decir, permite
+definirlo como visible o oculto.
+
+Sus parámetros son:
+
+--id::
+  _[Requerido] [Elemento del menú] [Autocompletado]_
+  +
+  Identificador del elemento del menú, sea página o grupo.
+--hidden::
+  _[Requerido] [Booleano] [Autocompletado]_
+  +
+  Indica si este elemento del menú debe ocultarse. Si se especifica este
+  parámetro sin ningún valor, tomará el valor _true_ y ocultará el
+  elemento del menú. Si no se especifica este parámetro, tomará el valor
+  _false_ y mostrará el elemento del menú.
+
+menu entry roles
+~~~~~~~~~~~~~~~~
+
+Establece una lista de perfiles de usuario para los que se mostrará una
+entrada del menú. No se mostrará a los usuarios que no tengan algún
+perfil de la lista.
+
+Sus parámetros son:
+
+--id::
+  _[Requerido] [Elemento del menú] [Autocompletado]_
+  +
+  Identificador del elemento del menú, sea página o grupo.
+--roles::
+  [Requerido] [Cadena]
+  +
+  Lista de perfiles con permiso para ver el elemento del menú. Los
+  distintos elementos de la lista de perfiles deben estar separados por
+  comas.
+
+menu entry move
+~~~~~~~~~~~~~~~
+
+Mueve un elemento del menú y todos los hijos que pueda tener. Se puede
+cambiar su posición en el orden de elementos del menú o se puede mover
+dentro de otro elemento del menú.
+
+Sus parámetros son:
+
+--id::
+  _[Requerido] [Elemento del menú] [Autocompletado]_
+  +
+  Identificador del elemento del menú, sea página o grupo.
+--into::
+  _[Opcional] [Elemento del menú] [Autocompletado]_
+  +
+  Identificador de un elemento del menú donde añadir como hijo el
+  elemento del menú. El elemento se insertará en la última posición de
+  la lista de hijos. Este parámetro no se puede especificar
+  simultaneamente junto al parámetro _before_.
+--before::
+  _[Opcional] [Elemento del menú] [Autocompletado]_
+  +
+  Identificador de un elemento del menú antes del cual insertar el
+  elemento del menú. Este parámetro no se puede especificar
+  simultaneamente junto al parámetro _into_.
+
+menu entry update
+~~~~~~~~~~~~~~~~~
+
+Actualiza un elemento del menú, sea una página o un grupo. Los valores
+no especificados en el comando se mantendrán con su valor original.
+
+Sus parámetros son:
+
+--id::
+  _[Requerido] [Elemento del menú] [Autocompletado]_
+  +
+  Identificador del elemento del menú, sea página o grupo.
+--nid::
+  _[Opcional] [Cadena]_
+  +
+  Nuevo identificador para el elemento del menú. Por convención, se
+  utiliza el prefijo _c__ para los grupos e _i__ para las páginas.
+--label::
+  _[Opcional] [Cadena]_
+  +
+  Título para el elemento del menú. Se actualizará con el nuevo título
+  la etiqueta correspondiente en el fichero
+  `src/main/webapp/WEB-INF/i18n/application.properties
+              `. Este título será ignorado si se define o ya estaba
+  definido el parámetro _messageCode_.
+--messageCode::
+  _[Opcional] [Cadena]_
+  +
+  Etiqueta que representará la traducción en múltiples idiomas del
+  título del elemento del menú. Si todavía no existe, se deberá crear
+  dicha etiqueta en cada fichero de idioma que exista configurado en el
+  proyecto en `src/main/webapp/WEB-INF/i18n/messages_xx.properties
+              `.
+--url::
+  _[Opcional] [Cadena]_
+  +
+  URL con la que enlazará el elemento del menú.
+--roles::
+  _[Opcional] [Cadena]_
+  +
+  Lista de perfiles con permiso para ver el elemento del menú. Los
+  distintos elementos de la lista de perfiles deben estar separados por
+  comas.
+--hidden::
+  [Requerido] [Booleano] [Autocompletado]
+  +
+  Indica si este elemento del menú debe ocultarse. Si se especifica este
+  parámetro sin ningún valor, tomará el valor _true_ y ocultará el
+  elemento del menú. Si no se especifica este parámetro, tomará el valor
+  _false_ y mostrará el elemento del menú.
+
+menu entry info
+~~~~~~~~~~~~~~~
+
+Muestra por consola los valores establecidos en un elemento del menú y
+en todos los hijos que pueda tener, formateados de forma amigable para
+su fácil lectura.
+
+Sus parámetros son:
+
+--id::
+  _[Requerido] [Elemento del menú] [Autocompletado]_
+  +
+  Identificador del elemento del menú, sea página o grupo.
+--lang::
+  [Opcional] [Idioma]
+  +
+  Idioma en el que mostrar los valores de las distintas etiquetas
+  definidas para cada elemento del menú.
+
+El comando mostrará un resultado similar al siguiente:
+
+---------------------------------------------------------------------------------------
+[c_person]
+URL          : No
+Label Code   : menu_category_person_label
+Label        : Person
+Message Code : 
+Message      : 
+Roles        : 
+Hidden       : false
+Children     : 
+               [i_person_new]
+               URL          : /people?form
+               Label Code   : menu_item_person_new_label
+               Label        : Person
+               Message Code : global_menu_new
+               Message      : Create new {0}
+               Roles        : 
+               Hidden       : false
+
+               [i_person_list]
+               URL          : /people?page=1&size=${empty param.size ? 10 : param.size}
+               Label Code   : menu_item_person_list_label
+               Label        : People
+               Message Code : global_menu_list
+               Message      : List all {0}
+               Roles        : 
+               Hidden       : false
+---------------------------------------------------------------------------------------
+
+menu tree
+~~~~~~~~~
+
+Muestra por consola un árbol con un resumen de los elementos del menú,
+opcionalmente a partir de un determinado elemento del menú.
+
+Sus parámetros son:
+
+--id::
+  _[Opcional] [Elemento del menú] [Autocompletado]_
+  +
+  Identificador del elemento del menú, sea página o grupo, a partir del
+  cual comenzar a mostrar el árbol resumen. Si no se especifica, se
+  muestran todas las página del menú.
+
+El comando mostrará un resultado similar al siguiente:
+
+----------------------------------------------------------------------------------------
+roo-gvNIX> 
+[c_pet, visible, no-URL]
+          /pets?form  [i_pet_new, visible]
+          /pets?page=1&size=${empty param.size ? 10 : param.size}  [i_pet_list, visible]
+          /pets?find=ByNameAndWeight&form  [fi_pet_nameandweight, visible]
+          /pets?find=ByOwner&form  [fi_pet_owner, visible]
+          /pets?find=BySendRemindersAndWeightLessThan&form
+                [fi_pet_sendremindersandweightlessthan, visible]
+          /pets?find=ByTypeAndNameLike&form  [fi_pet_typeandnamelike, visible]
+
+[c_owner, visible, no-URL]
+          /owners?form  [i_owner_new, visible]
+          /owners?page=1&size=${empty param.size ? 10 : param.size}
+                [i_owner_list, visible]
+
+[c_visit, visible, no-URL]
+          /visits?form  [i_visit_new, visible]
+          /visits?page=1&size=${empty param.size ? 10 : param.size}
+                [i_visit_list, visible]
+          /visits?find=ByDescriptionAndVisitDate&form
+                [fi_visit_descriptionandvisitdate, visible]
+          /visits?find=ByDescriptionLike&form  [fi_visit_descriptionlike, visible]
+          /visits?find=ByVisitDateBetween&form  [fi_visit_visitdatebetween, visible]
+
+[c_vet, visible, no-URL]
+          /vets?form  [i_vet_new, visible]
+          /vets?page=1&size=${empty param.size ? 10 : param.size}  [i_vet_list, visible]
+
+[c_seleniumtests, visible, no-URL]
+          /resources/selenium/test-suite.xhtml  [si_seleniumtests_test, visible]
+----------------------------------------------------------------------------------------

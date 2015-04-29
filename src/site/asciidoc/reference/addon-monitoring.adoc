@@ -1,0 +1,47 @@
+Add-on Monitoring
+-----------------
+
+Uso del componente https://code.google.com/p/javamelody/[Java Melody]
+como sistema de monitorización para aplicaciones web.
+
+Descripción
+-----------
+
+Este Add-on genera una nueva página desde donde podemos ver lo que
+consume la generación y ejecución de vistas, consultas, scripts y demás
+elementos que se generan y componen nuestra aplicación web.
+
+Instalación de la monitorización
+--------------------------------
+
+Para instalarlo, hay que utilizar el comando
+link:#apendice-comandos_addon-monitoring_monitoring_setup[monitoring
+setup], el cual instalará todo lo necesario para el funcionamiento
+básico de la monitorización de nuestra aplicación. Se encargará de las
+dependencias y de modificar los ficheros de configuración necesarios
+para el funcionamiento de la monitorizacion de JSP, SQL, consultas, etc.
+
+Monitorizando a través de Spring
+--------------------------------
+
+Para monitorizar a través de las llamadas de Spring, tendremos que
+configurar que métodos deseamos monitorizar, para ello utilizaremos
+alguno de los siguientes comandos, siempre después de haber instalado el
+add-on:
+link:#apendice-comandos_addon-monitoring_monitoring_all[monitoring all],
+link:#apendice-comandos_addon-monitoring_monitoring_add_class[monitoring
+add class],
+link:#apendice-comandos_addon-monitoring_monitoring_add_method[monitoring
+add method] o
+link:#apendice-comandos_addon-monitoring_monitoring_all_package[monitoring
+add package]. Al ejecutar estos comandos se añadiran anotaciones que nos
+permitirán acceder a las llamadas que se ejecuten a los metodos
+monitorizados y ver sus interacciones.
+
+Accediendo a la monitorización
+------------------------------
+
+Una vez todo configurado y con nuestra aplicación en marcha, bastará
+pulsar en la entrada de menú que se ha generado para su acceso, en caso
+de haberla desactivado, bastará con acceder a la dirección principal de
+nuestra aplicación, seguida de "/monitoring".
