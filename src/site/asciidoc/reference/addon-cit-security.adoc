@@ -1,0 +1,79 @@
+Add-on CIT Security
+--------------------
+
+//Push down level title
+:leveloffset: 2
+
+Descripción
+-----------
+
+El add-on instala un cliente del servicio web de autenticación y
+autorización que utiliza la Consejería de Infraestructuras, Transporte y
+Medio Ambiente (CITMA) y lo integra con el sistema de seguridad Spring
+Security.
+
+Para instalarlo, hay que utilizar el comando
+link:#apendice-comandos_addon-cit-security_cit-security-setup[cit
+security setup] con los parámetro adecuados (url del servicio, nombre de
+aplicación y usuario/clave de acceso al servicio). El add-on instalará
+las clases necesarias para hacer la llamada al servicio, el modelo de
+datos de usuario cumpliendo con los interfaces de Spring Security y el
+proveedor de autentificación que sirve de pasarela entre los dos
+elementos.
+
+------------------------------------------------------------------------------------------
+roo-gvNIX>
+  Created SPRING_CONFIG_ROOT/applicationContext-security.xml
+  Created SRC_MAIN_WEBAPP/WEB-INF/views/login.jspx
+  Updated SRC_MAIN_WEBAPP/WEB-INF/views/views.xml
+  Updated ROOT/pom.xml [
+      added property 'spring-security.version' = '3.1.0.RELEASE'; added dependencies
+      org.springframework.security:spring-security-core:${spring-security.version},
+      org.springframework.security:spring-security-config:${spring-security.version},
+      org.springframework.security:spring-security-web:${spring-security.version},
+      org.springframework.security:spring-security-taglibs:${spring-security.version}]
+  Updated SRC_MAIN_WEBAPP/WEB-INF/web.xml
+  Updated SRC_MAIN_WEBAPP/WEB-INF/spring/webmvc-config.xml
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/
+      ServerWSAuthBindingStub.java
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/ServerWSAuthPort.java
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/
+      ServerWSAuthPortProxy.java
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/
+      ServerWSAuthService.java
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/
+      ServerWSAuthServiceLocator.java
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/
+      WscitAuthenticationProvider.java
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/
+      WscitUserAuthority.java
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/WscitUser.java
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/CredencialCIT.java
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/ModuloStruct.java
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/ValidaStruct.java
+  Created SPRING_CONFIG_ROOT/CITWSAuth.properties
+  Updated SPRING_CONFIG_ROOT/applicationContext-security.xml
+  Updated SRC_MAIN_WEBAPP/WEB-INF/web.xml
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/
+      WscitUserAuthority_Roo_JavaBean.aj
+  Created SRC_MAIN_JAVA/org/gvnix/test/security/authentication/wscit/
+      WscitUser_Roo_JavaBean.aj
+  Updated ROOT/pom.xml [added dependency axis:axis:1.4]
+------------------------------------------------------------------------------------------
+
+Los parámetro de configuración del cliente proporcionados a través del
+comando quedarán almacenados en el fichero de configuración
+`src/main/resources/META-INF/spring/CITWSAuth.properties` del proyecto.
+
+En el caso de que una organización disponga de un sistema de seguridad
+propio, puede hacer uso de este sistema si ofrece la información de
+autorización y autenticación de sus usuarios a través de un servidor de
+servicios web que respete el contrato definido por este servicio.
+
+Para ver con mas detalle el comando que proporciona el add-on consultar
+la sección de link:#apendice-comandos_cit-security[comandos del add-on
+CIT Security].
+
+//Return level title
+:leveloffset: 0

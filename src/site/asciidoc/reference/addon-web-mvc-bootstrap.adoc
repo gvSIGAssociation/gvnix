@@ -1,6 +1,10 @@
 Add-on Bootstrap
 ----------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Implementación de http://getbootstrap.com/[Bootstrap 3] en el proyecto
 gvNIX.
 
@@ -38,3 +42,6 @@ Apendice de comandos
 Para ver con mas detalle el comando que proporciona el add-on consultar
 la sección de link:#apendice-comandos_addon-web-mvc-bootstrap[comandos
 del add-on Bootstrap].
+
+//Return level title
+:leveloffset: 0

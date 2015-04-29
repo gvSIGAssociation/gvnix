@@ -1,6 +1,10 @@
 Add-on Web Dialog
 -----------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Add-on para la gestión de excepciones no controladas y de mensajes de
 usuario.
 
@@ -135,7 +139,7 @@ dialog add] añade la anotación _GvNIXModalDialogs_ en la clase
 controladora que se le indica.
 
 -----------
-roo-gvNIX> 
+roo-gvNIX>
 -----------
 
 La anotación generará dos métodos asociados con el controlador. Un
@@ -267,7 +271,7 @@ public String update(@Valid Owner owner, BindingResult bindingResult, Model uiMo
     uiModel.asMap().clear();
     owner.merge();
 
-    
+
 
     return "redirect:/owners/" + encodeUrlPathSegment(owner.getId().toString(),
             httpServletRequest);
@@ -289,7 +293,7 @@ adecuarla a las necesidades del proyecto:
 ----------------------------------------------------------------------------------
 <div xmlns:c="http://java.sun.com/jsp/jstl/core"
                     xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
-                    xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+                    xmlns:fn="http://java.sun.com/jsp/jstl/functions"
                     xmlns:spring="http://www.springframework.org/tags"
                     xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
   <jsp:directive.page contentType="text/html;charset=UTF-8" />
@@ -354,7 +358,7 @@ public String create(@Valid Owner owner, BindingResult bindingResult, Model uiMo
     uiModel.asMap().clear();
     owner.persist();
 
-    
+
 
     return "redirect:/owners/" + encodeUrlPathSegment(owner.getId().toString(),
             httpServletRequest);
@@ -374,7 +378,7 @@ public String create(@Valid Owner owner, BindingResult bindingResult, Model uiMo
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
 
-    
+
     <form:create id="fc_com_springsource_petclinic_domain_Pet" modelAttribute="pet"
             path="/pets" render="${empty dependencies}" z="lgvEyAlAYOudDmaPjwU0ABseTIk=">
         <field:checkbox field="sendReminders"
@@ -388,13 +392,13 @@ public String create(@Valid Owner owner, BindingResult bindingResult, Model uiMo
         <input type="hidden" id="c_com_springsource_petclinic_domain_Pet_owner"
                 name="owner" value="${owner.id}" />
         <field:select field="owner" id="c_com_springsource_petclinic_domain_Pet_owner"
-                itemValue="id" items="${owners}" path="/owners" render="false" 
+                itemValue="id" items="${owners}" path="/owners" render="false"
                 z="fGzswAP4XXvhPhowJKsRVve929c="/>
         <field:select field="type" id="c_com_springsource_petclinic_domain_Pet_type"
-                items="${pettypes}" path="pettypes" required="true" 
+                items="${pettypes}" path="pettypes" required="true"
                 z="+hDCnUp+Y+A1RlT+AjH07sgipOo="/>
     </form:create>
-    <form:dependency dependencies="${dependencies}" 
+    <form:dependency dependencies="${dependencies}"
             id="d_com_springsource_petclinic_domain_Pet" render="${not empty dependencies}"
             z="kThDNIW+69h9nI/69ynY1WyUieo="/>
 </div>
@@ -412,3 +416,6 @@ información. Así podría definirse un repositorio central de excepciones
 para múltiples aplicaciones y sus mensajes amigables.
 * Envío de un informe por email al responsable de la aplicación con
 información detallada cuando se ha producido una excepción.
+
+//Return level title
+:leveloffset: 0

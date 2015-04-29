@@ -1,6 +1,9 @@
 Código generado por gvNIX/Roo
 -----------------------------
 
+//Push down level title
+:leveloffset: 2
+
 Clases Java y ficheros AJ
 -------------------------
 
@@ -32,3 +35,6 @@ volvería a generar el código automáticamente perdiendo las
 modificaciones que se hubiesen realizado. Y al contrario si en el
 fichero .java se ha creado el getter personalizandolo, automáticamente
 lo borrara del fichero .aj.
+
+//Return level titles
+:leveloffset: 0

@@ -1,6 +1,10 @@
 Working with the Flex Addon for Spring Roo
 ------------------------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Introduction
 ------------
 
@@ -63,7 +67,7 @@ and Eclipse configuration for a Flex project backed by Spring BlazeDS
 Integration. Its execution is as simple as:
 
 --------------------------------------------------------
-org.example.rootunes roo> 
+org.example.rootunes roo>
 Created SRC_MAIN_WEBAPP/WEB-INF/flex
 Created SRC_MAIN_WEBAPP/WEB-INF/flex/services-config.xml
 Created SRC_MAIN_WEBAPP/WEB-INF/spring
@@ -73,7 +77,7 @@ Created SRC_MAIN_WEBAPP/WEB-INF/web.xml
 Created SRC_MAIN_WEBAPP/WEB-INF/urlrewrite.xml
 Managed SRC_MAIN_WEBAPP/WEB-INF/web.xml
 ...
-                
+
 --------------------------------------------------------
 
 Once you have the basic Flex project infrastructure in place, you can
@@ -90,7 +94,7 @@ which will be inferred from the current Roo command context if not
 specified explicitly.
 
 ------------------------------------------------------------------------------------
-~.domain.Artist roo>  --name ~.service.ArtistService          
+~.domain.Artist roo>  --name ~.service.ArtistService
 Created SRC_MAIN_JAVA/org/example/rootunes/service
 Created SRC_MAIN_JAVA/org/example/rootunes/service/ArtistService.java
 Created ROOT/src/main/flex/org/example/rootunes/domain
@@ -101,8 +105,8 @@ Managed ROOT/src/main/flex/rootunes_scaffold-config.xml
 Created ROOT/src/main/flex/org/example/rootunes/presentation/artist
 Created ROOT/src/main/flex/org/example/rootunes/presentation/artist/ArtistEvent.as
 Created ROOT/src/main/flex/org/example/rootunes/presentation/artist/ArtistView.mxml
-Created ROOT/src/main/flex/org/example/rootunes/presentation/artist/ArtistForm.mxml 
-                
+Created ROOT/src/main/flex/org/example/rootunes/presentation/artist/ArtistForm.mxml
+
 ------------------------------------------------------------------------------------
 
 As shown in the listing above, the command causes the following to be
@@ -185,7 +189,7 @@ Created ROOT/src/main/flex/org/example/rootunes/presentation/album
 Created ROOT/src/main/flex/org/example/rootunes/presentation/album/AlbumEvent.as
 Created ROOT/src/main/flex/org/example/rootunes/presentation/album/AlbumView.mxml
 Created ROOT/src/main/flex/org/example/rootunes/presentation/album/AlbumForm.mxml
-                
+
 -----------------------------------------------------------------------------------
 
 Building and Running a Flex Addon Project
@@ -204,15 +208,15 @@ already set up, building the project is as simple as:
 
 ----------------
 mvn install
-                
+
 ----------------
 
 Similarly, running the project from the command line via the already
 configured Maven Tomcat plugin is as simple as:
 
 ----------------------------
-mvn tomcat:run              
-                
+mvn tomcat:run
+
 ----------------------------
 
 (Note - The first time you execute these commands with an unpopulated
@@ -238,7 +242,7 @@ project root you must execute
 
 -------------------
 mvn eclipse:eclipse
-                
+
 -------------------
 
 Once that is done, the project can be imported into SpringSource Tool
@@ -266,7 +270,7 @@ the command would be:
 
 --------------------------------------------------------------
 roo> script --file ~/spring-flex-1.5.0.M1/samples/rootunes.roo
-            
+
 --------------------------------------------------------------
 
 Once the script has completed, you can build and run the example using
@@ -307,3 +311,6 @@ The round-trip updating of `script` blocks in .mxml files is
 destructive, meaning it will overwrite changes. This will be remedied in
 the future by applying the same non-destructive ActionScript metadata
 layer that we use for the .as files.
+
+//Return level title
+:leveloffset: 0

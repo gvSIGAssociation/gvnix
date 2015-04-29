@@ -1,6 +1,10 @@
 Add-on OCC (Optimistic Concurrency Control)
 -------------------------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Add-on de utilidades enfocadas a la persistencia de las entidades.
 
 Este add-on proporciona un sistema que facilita la detección de
@@ -162,7 +166,7 @@ public class OwnerIntegrationTest {
         java.lang.String currentVersion = obj.getOccChekcsum();
         obj.flush();
         org.junit.Assert.assertTrue(
-                "OccCheckSum for 'Owner' failed to modify on flush directive", 
+                "OccCheckSum for 'Owner' failed to modify on flush directive",
                 (currentVersion != null &&
                 ) ||
                 !modified);
@@ -183,12 +187,12 @@ public class OwnerIntegrationTest {
                 com.springsource.petclinic.domain.Owner) obj.merge();
         obj.flush();
         org.junit.Assert.assertEquals(
-                "Identifier of merged object not the same as identifier of " + 
+                "Identifier of merged object not the same as identifier of " +
                         "original object",
                 merged.getId(), id);
         org.junit.Assert.assertTrue(
-                "OccCheckSum for 'Owner' failed to modify on merge and flush " + 
-                        "directive", 
+                "OccCheckSum for 'Owner' failed to modify on merge and flush " +
+                        "directive",
                 (currentVersion != null &&
                 )
                 || !modified);
@@ -196,3 +200,6 @@ public class OwnerIntegrationTest {
 }
 ----------------------------------------------------------------------------------
 _______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+//Return level title
+:leveloffset: 0

@@ -1,0 +1,1255 @@
+Gestión de entidades
+--------------------
+
+//Push down level title
+:leveloffset: 2
+
+El acceso a datos de una aplicación contiene la infraestructura
+necesaria para obtener y almacenar la información en, por ejemplo, una
+base de datos. Este acceso se puede estructurar en una sola capa en la
+que las entidades definen tanto el modelo de los datos, como sus métodos
+de interacción con la base de datos y la lógica de negocio utilizando
+entonces un modelo llamado __Registro Activo__. Existen otros casos más
+clásicos como la estructuración en una capa de entidades, otra de acceso
+a datos (DAO) y una última de servicios con la lógica de negocio; todo
+ello llamado __Servicios y Repositorios__. Este capítulo se centrará en
+la generación de la capa de entidades ya que es el método que se utiliza
+habitualmente en las aplicaciones desarrolladas con gvNIX y para el cual
+ha añadido la mayoría de sus nuevas funcionalidades.
+
+Las entidades del modelo del dominio son uno de los elementos más
+importantes del framework. En Java una entidad se corresponde con una
+clase, definida en un archivo `.java`.
+
+Además de la lógica de negocio, cada clase contiene una serie de
+anotaciones de clase y de atributos que forman parte de la
+metainformación que permite a gvNIX realizar acciones automáticas.
+
+
+---------------------------------
+@RooJavaBean
+@RooToString
+@RooJpaActiveRecord
+public class Entity1 {
+
+        @Size(max = 20)
+        @NotNull
+        private String name;
+
+        @Size(max = 20)
+        private String apellidos;
+}
+---------------------------------
+
+* Anotación de clase
+* Anotación de atributo
+
+El framework añadirá todos los métodos estándar necesarios para
+completar la definición de entidad, como los de persistencia
+(almacenamiento y recuperación), gets/sets y métodos auxiliares como
+toString. Como se vió en la sección de generación de código se crearán
+una serie de archivos `.aj` que en tiempo de compilación se incluyen en
+la clase de forma transparente.
+
+Si por algún motivo es necesario _personalizar el comportamiento_ de
+alguno de los __métodos estándar que se generan__, simplemente hay que
+__definirlos en la clase java__. Cuando el framework detecta el cambio
+actualiza el fichero `aj` correspondiente para eliminar esta definición.
+
+Existen dos formas de crear una entidad:
+
+1.  Usando el intérprete de comandos.
+2.  Usando el IDE de desarrollo.
+
+
+[[guia-desarrollo_gestion-entidades_definicion_crear-con-comando]]
+Crear una entidad con el intérprete de comandos
+-----------------------------------------------
+
+Desde el intérprete de comandos se puede crear entidades de forma
+sencilla con los comandos: `entity jpa` y `field`.
+
+Comando entity jpa
+~~~~~~~~~~~~~~~~~~
+
+Este comando crea una nueva entidad en el proyecto. Requiere como mínimo
+definir el parámetro `--class` para especificar el nombre y el paquete
+de la nueva clase. En este parámetro se puede utilizar el carácter `~`
+como abreviatura del paquete base del proyecto.
+
+Entre los parámetros obligatorios se encuentran :
+
+--class::
+  Nombre de la clase java para la entidad (incluido su paquete)
+  (recordar que se puede usar el `~` para especificar el paquete base de
+  la aplicación).
+
+Entre los principales parámetros opcionales (notar que hay más) se
+encuentran:
+
+--activeRecord::
+  Generar los métodos de creación, lectura, actualización y borrado
+  (CRUD) para esta entidad. Esto implica el uso de un patrón de
+  entidades del tipo registro activo.
+--entityName::
+  Nombre a usar para la entidad. Diferenciar del parámetro _tabla_ que
+  define el nombre de su tabla asociada.
+--identifierType::
+  Permite definir el tipo (clase java) de identificador (clave primaria)
+  que usará esta entidad.
+--identifierField::
+  Nombre del _campo en la entidad_ (no en BBDD) que se usará para el
+  identificador.
+--identifierColumn::
+  Nombre de la _columna de la BBDD_ donde almacenar el valor de clave
+  primaria.
+--persistenceUnit::
+  Unidad de persistencia a utilizar para gestionar la interacción de la
+  entidad con la base de datos. Como cada unidad de persistencia puede
+  estar asociada a una base de datos distinta, es la forma de definir
+  que una entidad se encuentra almacenada en otra base de datos.
+--schema::
+  Esquema de base de datos donde se encontrará la tabla asociada con la
+  entidad.
+--table::
+  Nombre de la _tabla de la BBDD_ donde almacenar los datos para esta
+  entidad.
+--testAutomatically::
+  Genera los test unitarios para esta entidad usando JUnit.
+--versionColumn::
+  Nombre de la columna en base de datos que se comporta como campo de
+  control de concurrencia optimista basado en número de versión.
+--versionType::
+  Tipo de la columna de base de datos que se comporta como campo de
+  control de concurrencia optimista basado en número de versión.
+
+El resto de las opciones podemos verlas con el autocompletado del
+comando escribiendo _--_, en la documentación oficial de Roo o usando el
+comando `help entity`.
+
+______________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Important*
+
+La consola no se utiliza para eliminar o modificar las entidades. Esto
+se debe realizar usando el IDE. Para más información ver la sección
+link:#guia-desarrollo_gestion-entidades_definicion_modificar-modelo[Modificar
+una entidad].
+______________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+
+Comando field
+~~~~~~~~~~~~~
+
+No existe un comando `field` propiamente dicho, sino que es el nombre de
+un grupo de comandos que permiten añadir campos a una entidad. Los
+comandos finales se forman con el formato `field {tipo}` donde `{tipo}`
+es el tipo de dato que va almacenar. Así tenemos los siguientes:
+
+field string::
+  Crea un campo de tipo cadena alfanumérica.
+field boolean::
+  Crea un campo de tipo booleano (valores cierto o falso).
+field date::
+  Crea un campo de tipo fecha.
+field email template::
+  Crea un campo con una plantilla preparada para almacenar direcciones
+  de correo electrónico.
+field embedded::
+  Añade un campo del tipo _@Embedded_
+field enum::
+  Crea un campo de tipo enumerado. El tipo enumerado debe haber sido
+  creado previamente con el comando _enum type_.
+field file::
+  Crea un campo de tipo fichero.
+field number::
+  Crea un campo de tipo numérico (es posible especificarle el tipo
+  mediante el parámetro `--type`).
+field reference::
+  Crea un campo que será una referencia a otra entidad.
+field set::
+  Crea un campo que devolverá una lista de elementos de una entidad
+  relacionados con este elemento.
+field other::
+  Crea un campo de otro tipo no registrado.
+
+Cada uno de estos comandos admiten bastantes parámetros que permiten
+definir múltiples comportamientos especiales, algunos aplicables a todos
+los comandos y otros específicos solo para algunos de ellos. Entre los
+generales que aplicar a la mayoría podemos encontrar los siguientes:
+
+--class::
+  Clase entidad dondecrear el campo. Admite el uso de `~` para
+  identificar al paquete base del proyecto y tiene autocompletado. No es
+  necesario de especificar si acabamos de crear una entidad.
+--column::
+  Nombre de la columna en BBDD donde se almacenará el valor.
+--fieldName::
+  Nombre del campo que vamos a generar.
+--notNull y --nullRequired::
+  Especifica el comportamiento de campo ante los valores nulos.
+--regexp::
+  Permite definir una expresión regular que debe cumplir el valor que se
+  establezca en este campo.
+--sizeMax y --sizeMin::
+  Limitaciones de tamaño.
+--transient::
+  Indica que el campo no tiene asociada ninguna columna en la base de
+  datos, es decir, no se almacena ni obtiene de ella.
+--unique::
+  Indica que el campo tiene la restricción de unicidad para los valores
+  que puede almacenar.
+
+Existen más opciones dependiendo del tipo de dato, para más información
+ver la ayuda de la consola o acceder a la documentación oficial de Roo
+en link:#[http://static.springsource.org/spring-roo/reference/html/]
+
+_______________________________________________________________________________________________________________________________________________________________________
+*Important*
+
+Notar que el parámetro `--column` permiten que en tiempo de creación
+podemos indicar que la entidad sea persistente sobre un modelo
+relacional creado con anterioridad.
+_______________________________________________________________________________________________________________________________________________________________________
+
+__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Important*
+
+No se pueden eliminar o modificar los campos desde línea de comandos.
+Esto se debe realizar usando el IDE. Para más información ver la sección
+link:#guia-desarrollo_gestion-entidades_definicion_modificar-modelo[Modificar
+una entidad].
+__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+
+Proyecto ejemplo
+~~~~~~~~~~~~~~~~
+
+Crear el modelo de dominio de la aplicación de venta de pizzas con la
+siguiente secuencia de comandos a partir del mismo ejemplo iniciado en
+capítulos anteriores:
+
+1.  Topping:
++
+----------------------------
+roo-gvNIX>
+~.domain.Topping roo-gvNIX>
+
+----------------------------
+2.  Base:
++
+----------------------------
+~.domain.Topping roo-gvNIX>
+~.domain.Base roo-gvNIX>
+
+----------------------------
+3.  Pizza:
++
+--------------------------
+~.domain.Base roo-gvNIX>
+~.domain.Pizza roo-gvNIX>
+~.domain.Pizza roo-gvNIX>
+~.domain.Pizza roo-gvNIX>
+~.domain.Pizza roo-gvNIX>
+
+--------------------------
++
+Esta secuencia de comandos genera la siguiente clase Java:
++
+------------------------------------------
+@RooJavaBean
+@RooToString
+@RooJpaActiveRecord
+public class Pizza {
+
+    @NotNull
+    @Column(name = "pizza_nombre")
+    @Size(min = 2)
+    @Pattern(regexp = "[A-Za-z0-9].*")
+    private String name;
+
+    private Float price;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    private Set<Topping> toppings =
+      new HashSet<Topping>();
+
+    @ManyToOne(targetEntity = Base.class)
+    @JoinColumn
+    private Base base;
+}
+------------------------------------------
++
+Validación del texto
++
+Asociación con un conjunto de entidades
++
+Asociación con otra entidad
+4.  PizzaOrder:
++
+------------------------------
+~.domain.Pizza roo-gvNIX>
+~.domain.PizzaOrder roo-gvNIX>
+~.domain.PizzaOrder roo-gvNIX>
+~.domain.PizzaOrder roo-gvNIX>
+~.domain.PizzaOrder roo-gvNIX>
+~.domain.PizzaOrder roo-gvNIX>
+
+------------------------------
+
+En este punto, se ha completado la versión inicial del modelo del
+dominio
+
+
+Crear una entidad con un IDE
+----------------------------
+
+Como se ha visto en el punto anterior, el código Java generado no tiene
+ningún elemento particular del framework, por lo que crear el modelo del
+dominio con cualquier IDE consiste en codificar las clases Java con las
+anotaciones que permiten a la consola monitorizar y generar el código.
+
+Es importante destacar que el objetivo de utilizar anotaciones es
+permitir que el proyecto se pueda gestionar codificando las clases con
+cualquier IDE. Entonces al arrancar la consola se generará toda la
+infraestructura necesaria para la persistencia, validación, etc
+
+Entre las anotaciones que se pueden utilizar en la codificación del
+modelo de entidades, se pueden destacar:
+
+@RooJavaBean::
+  Anotación que implica la generación de los getter/setter que falten
+  para acceder/modificar los valores de las propiedades. Si alguno ya
+  estuviese generado, no se volverá a generar.
+@RooToString::
+  Anotación que implica la generación del método toString() para esta
+  clase. Este método se genera a partir de las propiedades de la clase.
+@RooJpaActiveRecord::
+  Anotación que identifica esta clase como persistente, es decir, la
+  marca como una entidad. Esta anotación genera todos lo métodos de
+  persistencia necesarios para crear, leer, actualizar y borrar (CRUD)
+  la entidad siguiendo un patrón de registro activo.
+
+_________________________________________________________________________
+*Important*
+
+Notar que para usar las anotaciones hay que importar sus clases:
+
+-------------------------------------------------------------------------
+import org.springframework.roo.addon.javabean.RooJavaBean;
+import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
+import org.springframework.roo.addon.tostring.RooToString;
+-------------------------------------------------------------------------
+_________________________________________________________________________
+
+Consultar la link:#[documentación oficial de Roo] para un detalle
+exhaustivo de las anotaciones.
+
+Modificar una entidad
+---------------------
+
+Si se desea añadir un atributo a una entidad existente puede hacerse
+desde la consola. Cuando se crea o modifica una entidad, la consola se
+situa en el contexto de dicha entidad. Por eso en el ejemplo anterior,
+al añadir campos tras crear la entidad PizzaOrder, no es necesario
+especificar en cada comando la entidad sobre la que se están incluyendo.
+
+Añadir un atributo::
+  Para añadir un nuevo campo deberemos usar el mismo comando *field*
+  indicando sobre que entidad queremos trabajar mediante el parámetro
+  _--class._
+  +
+--------------------------
+~.domain.Pizza roo-gvNIX>
+--------------------------
+  +
+  Notar que tras ejecutar el comando _field_ indicando el parámetro
+  _--class_ la consola cambia al contexto de la entidad Pizza y por
+  tanto si se sigue ejecutando el comando field sin indicar _--class_
+  los campos se añadirán a esta entidad.
+  +
+  ___________________________________________________________________________________________________________________________________________________
+  *Note*
+
+  Es posible situarse en el contexto de una entidad (o de cualquier
+  clase del proyecto) mediante el comando *focus* indicando el parámetro
+  _--class_.
+
+------------------------------
+roo-gvNIX>
+~.domain.PizzaOrder roo-gvNIX>
+------------------------------
+  ___________________________________________________________________________________________________________________________________________________
+
+A diferencia de la creación de entidades, la modificación del modelo del
+dominio debe realizarse modificando la clase Java de la entidad, por
+ejemplo, mediante un IDE de desarrollo.
+
+Eliminar una entidad::
+  Borrar el fichero `.java` de que define la entidad y automáticamente
+  se detectará el cambio y se eliminarán todos los elementos
+  relacionados: ficheros `{entidad}_*.aj`, controladores asociados,
+  elementos de menú, etc.
+Eliminar un atributo::
+  Borrar el atributo de la clase Java y todos los componentes
+  relacionados `{entidad}_*.aj` serán actualizados automáticamente.
+
+Modificar un atributo::
+  Modificar el atributo deseado en la clase Java y se actualizarán todos los
+  ficheros `{entidad}_*.aj` relacionados para contemplar los cambios.
+
+[[guia-desarrollo_gestion-entidades_definicion_identificadores-compuestos]]
+Identificadores compuestos
+--------------------------
+
+En el caso de necesitar que alguna de las entidades tenga definida una
+clave primaria compuesta de varios campos se debe hacer de la siguiente
+forma.
+
+---------------------------------------------------------------------
+entity jpa --class ~.domain.Entity --identifierType ~.domain.EntityPK
+---------------------------------------------------------------------
+
+De esta forma se genera una clase _EntityPK_ sobre la que definir los
+campos que conformarán el identificador compuesto y que se
+corresponderán en el modelo relacional de base de datos con una clave
+primaria compuesta. La entidad usará la la clase que representa la clave
+compuesta, en el ejemplo: __Entity__.
+
+-----------------------------------------------------
+field number --fieldName campo1 --type java.lang.Long
+...
+field string --fieldName campo2
+...
+-----------------------------------------------------
+
+Se obtendrá una entidad en la que el tipo del campo identificador es un
+objeto con distintos campos. Este mecanismo es el mismo que se emplea al
+realizar la
+link:#guia-desarrollo_entidades-dbre_clave_compuesta[ingeniería inversa]
+de una BBDD en el caso de que se encuentre una estructura de este tipo,
+es decir, una clave primaria compuesta.
+
+Otra forma de hacer lo mismo sería definir primero la clase que servirá
+de identificador (en el ejemplo __EntityPK__) y luego definir la entidad
+indicando que el identificador es del tipo de la clase que hemos creado
+previamente.
+
+-----------------------------------------------------------------------
+embeddable --class ~.domain.Entity2PK
+...
+field number --fieldName campo1 --type java.lang.Long
+...
+field string --fieldName campo2
+...
+entity jpa --class ~.domain.Entity2 --identifierType ~.domain.EntityPK2
+...
+-----------------------------------------------------------------------
+
+Definir características específicas para el modelo relacional
+-------------------------------------------------------------
+
+Una vez construido el modelo de entidades de la aplicación mediante
+ingeniería directa, tal y como se ha visto hasta ahora, al arrancar la
+aplicación se creará automáticamente el modelo relacional de base de
+datos a partir del modelo de entidades. Puede ocurrir que se desee que
+el modelo relacional de base de datos tenga algunas características
+específicas, en estos casos se pueden modificar las clases Java y
+plasmar las características específicas deseadas. Observar que todas las
+características específicas que se van a adaptar modificando la clase
+Java de las entidades pueden ser definidas en la definición inicial
+realizada con los comandos _entity_ y _field_.
+
+Definir un nombre de tabla
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Con la anotación de clase @RooJpaActiveRecord(..., table = "table_name")
+se puede definir el nombre de la tabla donde se guardará la información
+asociada con la entidad.
+
+---------------------------------------
+@RooJavaBean
+@RooToString
+@RooJpaActiveRecord(table = "entity_1")
+public class Entity1 {
+
+    private String field1;
+}
+---------------------------------------
+
+Definir un nombre de columna
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Existen varias anotaciones que permiten definir la correspondencia entre
+atributos de una entidad y las columnas de la tabla.
+
+Las más importantes son:
+
+link:#[@Column]::
+  Indica el nombre de la columna de la base de datos en donde se
+  almacenará el valor del atributo. Si se omite esta anotación se
+  aplicará una convención por la que el nombre de la columna será el
+  mismo que el del atributo de la clase.
+link:#[@Transient]::
+  Indica que el atributo de la clase Java no tiene representación en la
+  tabla (no será cargado ni almacenado).
+link:#[@JoinColumn], link:#[@JoinColumns], link:#[@OneToOne],
+link:#[@ManyToOne]::
+  Define la correspondencia de una asociación _N-1._
+link:#[@JoinTable], link:#[@OneToMany], link:#[@ManyToMany],
+link:#[@OrderBy]::
+  Define la correspondencia de una asociación _1-N_ o _N-M._
+
+---------------------------------------------------------------
+@RooJavaBean
+@RooToString
+@RooJpaActiveRecord(name = "ENT1")
+public class Entity1 {
+
+    private String field1;
+
+    @Transient
+    private String tmpInfo;
+
+    @Column(name="ORDER_COST", precision=12, scale=2)
+    private BigDecimal cost;
+
+    @ManyToOne(targetEntity = Customer.class)
+    @JoinColumn(name = "CUSTOMER_ID")
+    private Customer customer;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "entity1")
+    private Set<Price> prices = new java.util.HashSet<Price>();
+}
+---------------------------------------------------------------
+
+Este campo se cargará y almacenará en la columna `field1` de la tabla
+`ENT1`
+
+Este campo no se tendrá en cuenta en la carga y guardado de la base de
+datos.
+
+Este campo numérico se cargará y almacenará en la columna `ORDER_COST`
+de la tabla `ENT1`, usando los valores de _precisión_ y _escala_
+especificados.
+
+Declara que la propiedad tiene origen en una relación _n-1_, con la
+entidad Customer. La tabla relacionada y sus columnas se obtendrán de
+las declaraciones que se hayan hecho en dicha entidad.
+
+Especifica que la columna de clave ajena en la tabla `ENT1` para esta
+relación (con Customer) es `CUSTOMER_ID`
+
+Declara que el campo `prices` es una relación _1-n_ con la entidad
+`Price`. También declara que los cambios (actualización, borrado,
+creación, ...) de `Entity1` se aplican en cascada sobre `Price`. El
+campo (propiedad en la clase java) que estable la clave ajena en `Price`
+se llama `entity1`.
+
+Campos calculados
+~~~~~~~~~~~~~~~~~
+
+Los campos _@Transient_ son de utildad cuando necesitamos que en el
+Objeto de la entidad se almacene o se calcule algún dato y que este no
+se tenga en cuenta al guardar (sentencias insert o update) la instancia
+en la BBDD. Por ejemplo, una entidad Persona puede tener la siguiente
+declaración de campos:
+
+----------------------------
+public class Persona {
+
+    private String name;
+    private String lastName;
+
+
+    private String fullName;
+}
+----------------------------
+
+Con esta declaración existe la posibildad de guardar temporalemente en
+el campo _fullName_ la concatenación de _name_ y _lastName_, por motivos
+de simplicidad, y sin tener que modificar la estructura de la tabla de
+la BBDD para ello.
+
+Usando Hibernate como proveedor de persistencia, existe una anotación
+que puede ser útil para que un registro dado se calcule de manera
+automática haciendo una cosulta sobre la BBDD. Se trata de la anotación
+_org.hibernate.annotations.Formula_.
+
+_@Formula_ tiene como atributo una cadena que se usa como sentencia HQL.
+Esta se ejecuta cada vez que se carga el registro de la BBDD y el
+resultado se almacena en el campo con esta anotación. Siguiendo con el
+ejemplo anterior, se podría tener lo siguiente:
+
+----------------------------
+public class Persona {
+
+    private String name;
+    private String lastName;
+
+
+    private String fullName;
+}
+----------------------------
+
+En el ejemplo cuando se carga una instancia de la entidad persona se
+ejecutará la consulta definida y en el campo fullName estará disponible
+el resultado de la consulta. La cosulta puede ser tan compleja como sea
+necesario, incluso incluir subconsultas. El campo anotado con _@Formula_
+es tratado como solo lectura y, por tanto, no se tendrá en cuenta en las
+operaciones de escritura de la BBDD.
+
+Otra forma de calcular valores, sin el uso de campos de la BBDD,
+consiste en declarar un método en la entidad que realice las operaciones
+necesarias para devolver el valor calculado. De esta forma, se podrá
+acceder al cálculo sin tener que declarar un campo (con sus respectivos
+get/set).
+
+Clave primaria
+~~~~~~~~~~~~~~
+
+Por defecto, una clave primaria se representa en la clase java como una
+propiedad con nombre _id_ y tipo java.lang.Long. A continuación se
+muestra un ejemplo de cómo se pueden cambiar distintas características.
+
+Modificar la anotación @RooJpaActiveRecord para ajustar el nombre y el
+tipo de la columna que hace de clave primaria en la tabla o el nombre de
+la propiedad identificadora en la clase.
+
+-------------------------------------------------------------
+@RooJavaBean
+@RooToString
+@RooJpaActiveRecord(identifierField="ent1Id",
+        identifierType=Long.class, identifierColumn="ENT_ID")
+public class Entity1 {
+
+    private String field1;
+
+}
+-------------------------------------------------------------
+
+Observar que todas estas características se pueden especificar en el
+momento de la creación de la entidad mediante el comando _entity_.
+
+Si se utiliza Hibernate como proveedor ORM, usará la secuencia
+_hibernate_sequence_ para obtener de forma incremental el identificador
+al crear un nuevo registro en la entidad. Por tanto, esta secuencia debe
+existir en la BBDD sobre la que se ejecuta la aplicación, de lo
+contrario se producirá un error al no poder obtener el siguiente valor
+de la sequencia antes de crear un nuevo registro. Por defecto, todas las
+entidades utilizarán la misma secuencia para obtener los identificadores
+de los registros que se vayan creando.
+
+Si se necesita especificar una sequencia distinta para generar los
+identificador para cada Entidad se puede utilizar el atributo
+_--sequenceName_ del comando _entity_. Si la entidad ya fue creada con
+anterioridad y no se desea volver a crearla mediante el comando con la
+nueva característica, modificar la anotación @RooJpaActiveRecord de la
+siguiente forma:
+
+------------------------------------------------------
+@RooJavaBean
+@RooToString
+@RooJpaActiveRecord(sequenceName="ent1_seq_generator")
+public class Entity1 {
+
+    private String field1;
+
+}
+------------------------------------------------------
+
+Como se ha comentado, las secuencias que se usan en las Entidades han de
+existir en la BBDD. Se deberán crear mediante la sintaxis propia de la
+BBDD o bien delegarlo en Hibernate modificando la propiedad del archivo
+_persistence.xml_, _hibernate.hbm2ddl.auto_ con valor _update_ de forma
+que, al arrancar la aplicación, creará las secuencias necesarias.
+*Consultar con el administrador de BBDD si se permite la creación de
+nuevas estructuras.*.
+
+Cuando se usa una secuencia como identificador, antes de insertar un
+nuevo registro, el ORM consulta el valor de la secuencia que debe
+asiganarle. Esto implica una cosulta por cada inserción, con el
+consecuente sobrecoste. Hibernate, por defecto, intenta evitar este
+sobrecoste reservando un conjunto de valores de la secuencia la primera
+vez que se usa tras arrancar la aplicación (por defecto reserva los
+siguientes 50). Mientras no consuma estos valores, no volverá a
+solicitar el siguiente valor de la secuencia. Para más información sobre
+la optimización de generadores de secuencia consultar la
+link:#[documentación de Hibernate]. Es posible modificar este
+comportamiento haciendo push-in de la propiedad id y añadiendo a la
+anotación _@SequenceGenerator_ el atributo _allocationSize = 1._
+
+Campo para el control de concurrencia optimista.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+En la ingeniería directa, por defecto, para cada entidad se genera un
+campo de control de concurrencia optimista con nombre `version` y de
+tipo java.lang.Integer
+
+El control por versión utiliza números de versión, o sellos de fecha
+(timestamps), para detectar actualizaciones en conflicto y prevenir la
+pérdida de actualizaciones. Cuando 2 usuarios actualizan el mismo
+registro de forma simultánea, sin control de concurrencia, los cambios
+del segundo usuario en actualizar sobreescriben los datos actualizados
+por el primer, dando la sensación al primer usuario que sus datos se
+perdieron o nunca existieron.
+
+En el control de concurrencia por versión hay una columna _Version_ en
+la tabla de base de datos que se mapea a un atributo de la entidad
+anotado con _@Version_. Al hacer update o delete se añade al WHERE la
+clave primaria y la comparación de versión, _si version != VERSION_DB_
+no se actualiza nada.
+
+Observar que todas estas características se pueden especificar en el
+momento de la creación de la entidad mediante el comando entity. Para
+ajustarlo posteriormente existen otras opciones:
+
+1.  Configurar la anotación @RooJpaActiveRecord para ajustar el nombre
+del campo, el nombre de la columna y el tipo de datos.
++
+-------------------------------------------------------
+@RooJavaBean
+@RooToString
+@RooJpaActiveRecord(versionField="version",
+        versionType=Long.class, versionColumn="ENT_ID")
+public class Entity1 {
+
+    private String field1;
+
+}
+-------------------------------------------------------
+2.  Otro ejemplo desactivando el control de concurrencia optimista:
++
+------------------------------------
+@RooJavaBean
+@RooToString
+@RooJpaActiveRecord(versionField="")
+public class Entity1 {
+
+    private String field1;
+
+}
+------------------------------------
+
+Mas adelante se verán otros mecanismos para realizar un control de
+concurrencia optimista. Para más información consultar el comando ``.
+
+Regeneración de la Base de datos en cada arranque.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Recordar que por defecto, en la ingeniería directa, la configuración que
+se genera *reconstruye la base de datos en cada ejecución de la
+aplicación*. Si se desea modificar este comportamiento consultar la
+sección
+link:#guia-desarrollo_acceso-datos_actualizacion-esquema[Actualización
+automática del esquema] .
+
+Creación de una nueva entidad sin comandos
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+En el ejemplo que se está siguiendo a lo largo de la documentación, se
+puede definir una nueva entidad _Repartidor_ creando la siguiente clase
+Java. También se puede realizar su creación mediante los comandos
+_entity_ y _field_.
+
+-------------------------------------------------------------------------
+package com.springsource.roo.pizzashop.domain;
+
+import org.springframework.roo.addon.javabean.RooJavaBean;
+import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
+import org.springframework.roo.addon.tostring.RooToString;
+
+@RooJavaBean
+@RooToString
+@RooJpaActiveRecord
+public class Repartidor {
+
+        private String name;
+}
+-------------------------------------------------------------------------
+
+Observar que al salvar la clase Java con las anotaciones
+correspondientes, en la consola aparecen mensajes informando de la
+creación de distintos ficheros de aspectos java (*.aj). A continuación,
+se puede generar los test de integración para la nueva entidad y definir
+una relación entre PizzaOrder y el Repartidor del pedido.
+
+---
+...
+
+...
+---
+
+Finalmente, lanzar los test de integración para confirmar que todo se ha
+generado y funciona correctamente.
+
+-----------------------
+roo-gvNIX> ...
+[INFO] BUILD SUCCESSFUL
+-----------------------
+
+Ingeniería inversa de entidades
+-------------------------------
+
+El framework permite realizar una ingeniería inversa multiesquema e
+incremental de un modelo relacional de base de datos existente, de forma
+que basándose en la metainformación recopilada de la BBDD se generarán
+todas las entidades con sus respectivos campos de manera automática. El
+encargado de esta funcionalidad es el Add-on _Database Reverse
+Engineering_ disponible en el framework de forma automática.
+
+
+[[guia-desarrollo_ingenieria-inversa_instalacion]]
+Instalación del driver JDBC
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+El Add-on DBRE soporta las principales bases de datos relacionales del
+mercado (MySQL, MS SQL, PostgreSQL, Oracle, ...). El driver necesario
+será detectado y se ofrecerá su descarga e instalación automática la
+primera vez que lo requiera alguno de los comandos _database introspect_
+o _database reverse engineer._
+
+_______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Warning*
+
+Si se está trabajando en el entorno de la CITMA, antes de seguir
+adelante es recomendable añadir el repositorio Maven de la CITMA al
+pom.xml del proyecto. En la link:#recetas-repositorio_maven[sección de
+recetas] existe un ejemplo de como hacerlo.
+_______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+____________________________________________________________________________________________________________________________________________________________
+*Warning*
+
+Si se lanza este comando con la configuración actual del proyecto que
+usa HYPERSONIC_PERSISTENT como BBDD indicará que no hay driver
+disponible para HSQLDB.
+____________________________________________________________________________________________________________________________________________________________
+
+Por ejemplo, si se ejecuta la ingeniería inversa en un proyecto con
+PostgreSQL configurado como sistema de base de datos:
+
+-----------------------------------------------------------------------------------------
+roo-gvNIX> database introspect --schema unable-to-obtain-connection
+Located add-on that may offer this JDBC driver
+1 found, sorted by rank; T = trusted developer; R = Roo 1.2 compatible
+ID T R DESCRIPTION -------------------------------------------------------------
+01 Y Y 9.1.0.901_0001 Postgres #jdbcdriver...
+--------------------------------------------------------------------------------
+[HINT] use 'addon info id --searchResultId ..' to see details about a search result
+[HINT] use 'addon install id --searchResultId ..' to install a specific search result, or
+[HINT] use 'addon install bundle --bundleSymbolicName TAB' to install a specific
+    add-on version
+JDBC driver not available for 'org.postgresql.Driver'
+-----------------------------------------------------------------------------------------
+
+Esta salida del comando _database introspect_ informa que hay disponible
+un driver para el soporte de DBRE y sugiere qué hacer a continuación
+(lineas que empiezan con [HINT]).
+
+Se puede obtener más información sobre el driver mediante:
+
+---------------------------------------------------------------------------
+roo-gvNIX> addon info id --searchResultId 01
+Name.........: Spring Roo - Wrapping - postgresql-jdbc4
+BSN..........: org.springframework.roo.wrapping.postgresql-jdbc4
+Version......: 9.1.0.901_0001 [available versions: 9.0.801.0001,
+               9.1.0.901_0001]
+Roo Version..: 1.2
+Ranking......: 0.0
+JAR Size.....: 513073 bytes
+PGP Signature: 0xEC67B395 signed by Alan Stewart (stewarta@vmware.com)
+OBR URL......: http://spring-roo-repository.springsource.org/repository.xml
+---------------------------------------------------------------------------
+
+Donde se está pidiendo más información (--searchResultId) del Add-on 01
+que ha devuelto el comando anterior.
+
+Para instalarlo usar el id del Add-on o bien su nombre simbólico.
+
+------------------------------------
+addon install id --searchResultId 01
+------------------------------------
+
+o
+
+--------------------------------------------------------------------------------
+addon install bundle
+          --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc4
+--------------------------------------------------------------------------------
+
+Al instante estará disponible el driver JDBC y se podrá empezar a usar
+los comandos _database introspect_ y _database reverse._
+
+
+Comandos de la ingeniería inversa
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+DBRE ofrece dos comandos: _database introspect_ y _database reverse
+engineer._
+
+---------------------------------------------------
+ <nombre del esquema>
+          --file <nombre del fichero> --enableViews
+---------------------------------------------------
+
+El comando mostrará la estructura de la BBDD en formato XML. Es
+obligatorio indicar el esquema, para ello presionado la tecla TAB se
+mostrará la lista de esquemas de la BBDD. Algunas BBDD no usan el
+concepto de esquema, MySQL entre ellas, aun así la opción --schema es
+necesaria y por ello el asistente mostrará como esquema
+"no-schema-required". La opción --file indica que guarde la información
+también en un fichero determinado y --enableViews especifica que también
+debe obtener información sobre las vistas.
+
+---------------------------------------------------------------------
+          --package --testAutomatically --enableViews --includeTables
+          --excludeTables --includeNonPortableAttributes
+---------------------------------------------------------------------
+
+Este comando crea las entidades JPA del proyecto representando las
+tablas y columnas de la BBDD. Al igual que antes --schema es
+obligatorio. Se debe usar --package para indicar el nombre del paquete
+del proyecto donde crear las clases Java, como convención se recomienda
+utilizar el subpaquete domain dentro del paquete base, ese decir,
+_~.domain_.
+
+Podemos indicar también que se generen automáticamente los test de
+integración para cada una de las nuevas entidades creadas con
+--testAutomatically.
+
+Si se especifica la opción --enableViews en este comando, se crearan
+entidades JPA que representen las vistas que se encuentren en la
+inspección de la BBDD.
+
+Se pueden filtrar las tablas que se van a considerar en la operación.
+--includeTables indicará cuales son las tablas que deben ser tenidas en
+cuenta. Se pueden indicar uno o varios nombres de tabla, si se indican
+más de uno, se deberán especificar separadas por espacios y todas ellas
+entre comillas dobles. Se permite el uso de * para hacer matching de uno
+o varios caracteres en la búsqueda o el uso de ? para indicar un único
+caracter. De manera opuesta --excludeTables indica qué tablas no han de
+ser tenidas en cuenta durante la ingeniería inversa y admite el mismo
+uso de * y ?. Las exclusiones de tablas son requeridas especialmente en
+aquellas ocasiones en las que tablas incluidas en la ingeniería inversa
+tienen relaciones con otras tablas no incluidas, por lo que estas
+segundas deberán excluirse. Un ejemplo:
+
+--------------------------------------------------------
+database reverse engineer --schema no-schema-required
+          --package ~.domain --includeTables "foo* bar?"
+--------------------------------------------------------
+
+Con este comando se generarían las entidades de aquellas tablas de la
+BBDD que tengan como nombre foo<cualquier cosa> y bar<otro caracter
+más>, por ejemplo 'foo_tabla_cool' y 'bars'.
+
+___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Warning*
+
+Al excluir tablas, además de evitar que se creen las entidades de estas
+tablas se evita también que se creen las asociaciones y relaciones en
+otras entidades. Esto se hace para evitar problemas de compilación en el
+código del proyecto.
+___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Como DBRE ofrece ingeniería inversa incremental, se puede ejecutar este
+comando tantas veces como sea necesario y de esta forma se mantendrán
+todas las entidades JPA de manera automática.
+
+El parámetro *--includeNonPortableAttributes* puede ser de utilidad. En
+versiones anteriores de la funcionalidad de ingeniería inversa de BBDD
+este parámetro no existía y, por defecto, cuando se generaban las
+entidades se incluía en las anotaciones JPA un atributo que rompía la
+portabilidad del código Java para trabajar con BBDD distintas a la de
+origen. El atributo en cuestión es _columnDefinition_ en la anotación
+_@Column_, que sirve para indicar el tipo de dato usado para crear la
+columna en la BBDD. Este atributo se utiliza en dos fases: cuando se
+delega en JPA la creación de las tablas de la BBDD (propiedad
+_hibernate.hbm2ddl.auto_ con valor _create_ de Hibernate), de esta forma
+se indica el tipo de dato físico utilizado en la BBDD y también se
+utiliza en la fase de validación del esquema de BBDD en el arranque de
+la aplicación (propiedad _hibernate.hbm2ddl.auto_ con valor _validate_),
+que comprueba que las entidades del proyecto cumplen con el esquema de
+BBDD y por tanto son compatibles.
+
+Por lo tanto, hay que tener en cuenta este detalle al hacer la
+ingeniería inversa de la BBDD. Si se va a seguir trabajando con la misma
+BBDD, se puede optar por requerir que se incluyan los atributos "no
+portables" en la generación de las entidades. Por contra, si la
+aplicación se va a ejecutar en distintas bases de datos, es mejor no
+incluir estos atributos y no usar este parámetro del comando _database
+reverse engineer_.
+
+______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Important*
+
+Cuando se utiliza el Add-on de ingeniería inversa se modifica el fichero
+META-INF/persistence.xml cambiando el valor de la propiedad
+_hibernate.hbm2ddl.auto_ por el de _none_ para evitar poner en peligro
+la integridad de la BBDD a la que se está conectando desde el proyecto.
+Si se ha utilizado la opción --includeNonPortableAttributes el valor de
+esta propiedad será _validate_ de modo que en el arranque de la
+aplicación se realizará la fase de validación del esquema.
+______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+*Important*
+
+Si se realiza la ingeniería inversa de alguna vista, es recomendable
+leer la sección
+link:#guia-desarrollo_gestion-entidades_ingenieria_inversa-vistas[Ingeniería
+inversa de vistas] ya que puede ser necario realizar alguna
+personalización.
+______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Anotación @RooDbManaged
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Tal y como se ha comentado en la sección
+link:#guia-desarrollo_gestion-entidades_definicion_crear-a-mano[Crear
+una entidad con un IDE] se hace uso de una serie de anotaciones Java
+para que el framework gestione el código del proyecto. A las anotaciones
+descritas anteriormente se suma ahora la anotación @RooDbManaged que se
+añade a todas las entidades creadas durante el proceso de ingeniería
+inversa.
+
+----------------------------
+@RooJavaBean
+@RooToString
+(automaticallyDelete = true)
+@RooJpaActiveRecord
+public class Pizza {
+}
+----------------------------
+
+El atributo _automaticallyDelete_ que acompaña a la anotación y que toma
+el valor _true_ indica que se debe eliminar la entidad en el caso de que
+la tabla de la BBDD a la cual hace referencia sea eliminada. Si el
+atributo toma el valor _false_ la entidad no se eliminará en caso de que
+la tabla desaparezca de la BBDD.
+
+Soporte de funcionalidades JPA 2.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+El Add-on DBRE crea y mantiene claves primarias simples, claves
+primarias compuestas, relaciones entre entidades, restricciones tamaño,
+gestión de valores nulos, etc. A continuación, se verá como realiza la
+gestión de algunos de estos elementos.
+
+Claves primarias simples
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Para el caso de claves primarias simples DBRE genera un campo
+identificador en el aspecto java de la entidad marcado con la anotación
+@Id de forma similar a como se hace al ejecutar el comando _entity_.
+
+Claves primarias compuestas
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+En este caso DBRE utiliza una solución más elaborada. Crea una clase
+Java que representa la clave primaria anotándola con
+@RooIdentifier(dbManaged = true) y añade el atributo "identifierType"
+con el nombre de la clase del identificador a la anotación
+@RooJpaActiveRecord en la clase de la entidad. Por ejemplo:
+
+---------------------------------------------------------------------------
+@RooJavaBean
+@RooToString
+@RooDbManaged(automaticallyDelete = true)
+@RooJpaActiveRecord(identifierType = LineItemPK.class, table = "line_item",
+    schema = "order")
+public class LineItem {
+}
+---------------------------------------------------------------------------
+
+--------------------------------
+@RooIdentifier(dbManaged = true)
+public class LineItemPK {
+}
+--------------------------------
+
+En el aspecto java de la entidad LineItem existirá un campo anotado con
+@EmbeddedId del tipo LineItemPK:
+
+--------------------------------------------------------------------------
+privileged aspect LineItem_Roo_Jpa_Entity {
+
+    declare @type: LineItem: @Entity;
+
+    declare @type: LineItem: @Table(name = "line_item", schema = "order");
+
+    @EmbeddedId
+    private LineItemPK LineItem.id;
+
+    public LineItemPK LineItem.getId() {
+        return this.id;
+    }
+
+    public void LineItem.setId(LineItemPK id) {
+        this.id = id;
+    }
+
+    ...
+}
+--------------------------------------------------------------------------
+
+Y en el aspecto java de la clase que representa la clave compuesta
+estarán los campos de la clave primaria con la anotación @Embeddable:
+
+----------------------------------------------------------------------
+privileged aspect LineItemPK_Roo_Identifier {
+
+    declare @type: LineItemPK: @Embeddable;
+
+    @Column(name = "line_item_id", nullable = false)
+    private BigDecimal LineItemPK.lineItemId;
+
+    @Column(name = "order_id", nullable = false)
+    private BigDecimal LineItemPK.orderId;
+
+    public LineItemPK.new(BigDecimal lineItemId, BigDecimal orderId) {
+        super();
+        this.lineItemId = lineItemId;
+        this.orderId = orderId;
+    }
+
+    private LineItemPK.new() {
+        super();
+    }
+
+    ...
+}
+----------------------------------------------------------------------
+
+Ingeniería inversa multi esquema
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+La ingeniería inversa proporcionada por el framework ofrece soporte para
+la conexión con múltiples esquemas de la misma base de datos de forma
+automática.
+
+El opción _--schema_ de los comandos de la ingeniería inversa permiten
+especificar una lista de esquemas separados por espacios y englobados
+todos ellos por dobles comillas.
+
+La ingeniería inversa también se puede hacer de distintas fuentes de
+datos utilizando para ello la documentación de la sección
+link:#guia-desarrollo_gestion-acceso-datos_multiples-fuentes-datos[Múltiples
+fuentes de datos].
+
+
+Ingeniería inversa incremental
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+La ingeniería inversa proporcionada por el framework permite ejecutarse
+todas las veces que sea necesario de forma que se pueden modificar las
+características y elementos incluidos en ingenierías inversas
+anteriores.
+
+Si al hacer una ingeniería inversa no se incluyó alguna tabla que
+posteriormente se ha visto necesario, basta con volver a ejecutar el
+comando de ingeniería inversa incluyendo la nueva tabla. Todas las
+modificaciones realizadas sobre las entidades que ya existían no se
+perderán.
+
+Ingeniería inversa de vistas
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Tras realizar la ingeniería inversa de una vista de la base de datos es
+muy probable que se tengan que realizar algunas modificaciones manuales
+para que funcione correctamente y que no son posibles realizar de manera
+automática ya que se requiere tomar ciertas decisiones de diseño.
+
+En una vista, por definición, no existe definida ninguna clave primaria.
+Sin embargo, al convertir esta estructura relacional al modelo orientado
+a objetos es necesario definir uno o varios campos que identifiquen de
+forma unívoca cada resultado que se vaya a obtener de la vista.
+
+La ingeniería inversa de vistas, por defecto, configura todas las
+columnas de la vista como clave primaria compuesta. Es por ello que
+todas las propiedades serán creadas en la clase con sufijo PK, por
+ejemplo EntidadPK, y no se creará ninguna propiedad en la clase base,
+por ejemplo Entidad.
+
+Habitualmente algunas columnas de la vista serán opcionales. Sin
+embargo, en el modelo orientado a objetos es incorrecto que alguna de
+las propiedades que representan a la clave primaria compuesta tenga
+valores nulos.
+
+Es por ello que deberemos analizar el modo en el que está construida la
+vista en la base de datos para así identificar uno o varios campos que
+representen de forma unívoca cada resultado de la vista. En algunos
+casos en los que la vista de alimenta de otra tabla, la clave primaria
+de la vista suele ser la misma que la de la tabla.
+
+Una vez detectadas las propiedades que conforman la clave primaria de la
+vista deberán realizarse las siguientes modificaciones:
+
+Copiar propiedades en la entidad.::
+  Copiar las propiedades de la clase EntidadPK que no representan a la
+  clave primaria en la clase Entidad. Las propiedades de la clase
+  EntidadPK se encuentran en el fichero EntidadPK_Roo_Identifier.aj. Al
+  copiar las propiedades, recordar eliminar el prefijo "EntidadPK." que
+  tiene cada una de las propiedades.
+Modificar propiedades en la clave primaria.::
+  Hacer push-in de las propiedades de la clase EntidadPK que no
+  representan a la clave primaria compuesta, añadirles la anotación
+  @Transient y eliminar cualquier otra anotación que tengan. Las
+  propiedades de la clase EntidadPK se encuentran en el fichero
+  EntidadPK_Roo_Identifier.aj y al hacer push-in pasarán a estar en el
+  fichero EntidadPK.java.
+Desactivar operaciones en la capa de entidades.::
+  Añadir a la anotación @RooJpaActiveRecord de la clase Entidad los
+  siguientes atributos que desactivarán el borrado, creación y
+  actualización en la capa de entidades: removeMethod = "",
+  persistMethod = "", mergeMethod = "".
+Desactivar operaciones en la capa web.::
+  Si se ha generado la capa web asociada a la entidad que representa a
+  la vista, añadir a la anotación @RooWebScaffold de la clase
+  EntidadController los siguientes atributos que desactivarán el
+  borrado, creación y actualización en la capa web: removeMethod = "",
+  persistMethod = "", mergeMethod = "".
+
+Tests de la ingeniería inversa de vistas
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+En las vistas que no realizamos push-in e identificamos un elemento como
+clave primaria hay que realizar los siguientes cambios si deseamos
+mantenerlos ejecutándose con éxito. Como ejemplo pondremos
+VaumAplusuPerfiles.
+
+Realizar push-in::
+  Realizar push-in de todos los métodos: persist, remove, los finder y
+  count.
+Modificar count y persist::
+  Al count y persist le eliminaremos la siguiente línea, que es la
+  primera que tiene en código: Assert.assertNotNull("Data on demand for
+  'VaumAplusuPerfiles' failed to initialize correctly",
+  dod.getRandomVaumAplusuPerfiles()); Esto no afecta a la comprobación
+  de si el count funciona correctamente.
+Modificar finder un resultado::
+  Al finder de un objeto de la entidad en concreto
+  (testFindVaumAplusuPerfiles) lo que haremos será insertar un objeto
+  que sabemos que todos los valores no son null utilizando
+  dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE); y
+  posteriormente buscaremos dicho elemento: Sustituimos
+  VaumAplusuPerfiles obj = dod.getRandomVaumAplusuPerfiles(); por
+  VaumAplusuPerfiles obj =
+  dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE);
+  obj.persist();
+Modificar finder de múltiples resultados::
+  Al finder All y ...Entries tendremos que eliminar las líneas
+  assertNotNull situadas al principio del método y justo debajo de
+  obtener el listado. Assert.assertNotNull("Data on demand for
+  'VaumAplusuPerfiles' failed to initialize correctly",
+  dod.getRandomVaumAplusuPerfiles()); Assert.assertNotNull("Find all
+  method for 'VaumAplusuPerfiles' illegally returned null", result);
+::
+  Al remove le sustetuiremos VaumAplusuPerfiles obj =
+  dod.getRandomVaumAplusuPerfiles(); por VaumAplusuPerfiles obj =
+  dod.getNewTransientVaumAplusuPerfiles(Integer.MAX_VALUE);
+  obj.persist();
+
+
+//Return level titles
+:leveloffset: 0

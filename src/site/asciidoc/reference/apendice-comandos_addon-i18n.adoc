@@ -1,6 +1,10 @@
 Comandos del add-on Web MVC i18n
 --------------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Para una descripción detallada de las características del add-on
 consultar la documentación del link:#addon-web-i18n[add-on Web MVC
 i18n].
@@ -27,3 +31,6 @@ Sus parámetros son:
   +
   Código del idioma a instalar. Los idiomas disponibles son _de, en, es,
   it, nl y sv._
+
+  //Return level title
+  :leveloffset: 0

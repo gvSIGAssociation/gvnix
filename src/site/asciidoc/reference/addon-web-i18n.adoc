@@ -1,6 +1,10 @@
 Add-on Web MVC i18n
 -------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Permite añadir soporte para nuevos idiomas en el proyecto.
 
 Descripción
@@ -24,7 +28,7 @@ web mvc install language y proporcionar como parámetro _code_ el código
 del idioma deseado.
 
 ---------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
     Created SRC_MAIN_WEBAPP/WEB-INF/i18n/messages_ca.properties
     Created SRC_MAIN_WEBAPP/images/ca.png
     Updated SRC_MAIN_WEBAPP/WEB-INF/views/footer.jspx
@@ -66,3 +70,6 @@ Mejoras a incluir en futuras versiones del add-on.
 * Incluir el soporte para el resto de lenguas cooficiales del estado
 español, es decir, Gallego y Euskera. Se deja abierta la posibilidad de
 añadir idiomas de otros estados que pudiesen ser de utilidad.
+
+//Return level title
+:leveloffset: 0

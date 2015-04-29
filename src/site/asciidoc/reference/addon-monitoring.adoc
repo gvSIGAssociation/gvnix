@@ -1,6 +1,10 @@
 Add-on Monitoring
 -----------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Uso del componente https://code.google.com/p/javamelody/[Java Melody]
 como sistema de monitorización para aplicaciones web.
 
@@ -45,3 +49,6 @@ Una vez todo configurado y con nuestra aplicación en marcha, bastará
 pulsar en la entrada de menú que se ha generado para su acceso, en caso
 de haberla desactivado, bastará con acceder a la dirección principal de
 nuestra aplicación, seguida de "/monitoring".
+
+//Return level title
+:leveloffset: 0

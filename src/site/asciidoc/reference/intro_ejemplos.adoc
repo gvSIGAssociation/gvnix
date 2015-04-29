@@ -1,6 +1,9 @@
 Ejemplos gvNIX/Roo
 ------------------
 
+//Push title down one level
+:leveloffset: 2
+
 En el fichero zip de gvNIX se incluye un directorio `samples` donde se
 puede encontrar algunos scripts que generan proyectos de aplicaciones de
 ejemplo.
@@ -9,7 +12,7 @@ Para ejecutarlo puede crearse un nuevo proyecto y ejecutarlo de la
 siguiente forma:
 
 -----------
-roo-gvNIX> 
+roo-gvNIX>
 project ...
 ...
 -----------
@@ -98,3 +101,6 @@ gvasecurity.roo::
 
 La mayoría de esto ejemplos utilizan bases de datos en memoria por lo
 que no necesitan configuración adicional.
+
+//Return title down level
+:leveloffset: 0

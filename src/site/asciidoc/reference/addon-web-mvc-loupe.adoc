@@ -1,6 +1,10 @@
 Add-on Campos Lupa
 ------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Implementación de campos lupa en el proyecto gvNIX.
 
 Descripción
@@ -54,3 +58,6 @@ Apendice de comandos
 Para ver con mas detalle el comando que proporciona el add-on consultar
 la sección de link:#apendice-comandos_addon-web-mvc-loupe[comandos del
 add-on Lupa].
+
+//Return level title
+:leveloffset: 0

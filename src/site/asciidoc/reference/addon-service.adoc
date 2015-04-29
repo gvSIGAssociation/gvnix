@@ -1,6 +1,10 @@
 Add-on Service
 --------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Permite crear servicios locales, servidores de servicios web y clientes
 de servicios web de forma automática.
 
@@ -29,7 +33,7 @@ clase se puede crear con el comando
 link:#apendice-comandos_addon-service_class[remote service class].
 
 ---------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Created SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
 ---------------------------------------------------------
 
@@ -100,10 +104,10 @@ link:#apendice-comandos_addon-service_define_ws[remote service define
 ws].
 
 ------------------------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Updated ROOT/pom.xml [
-        added repository http://repository.gvnix.org; 
-        added dependency org.gvnix:org.gvnix.service.roo.addon:X.Y.Z; 
+        added repository http://repository.gvnix.org;
+        added dependency org.gvnix:org.gvnix.service.roo.addon:X.Y.Z;
         added plugin org.apache.cxf:cxf-java2ws-plugin:${cxf.version}]
 Created SRC_MAIN_WEBAPP/WEB-INF/cxf-appname.xml
 Updated SRC_MAIN_WEBAPP/WEB-INF/web.xml
@@ -149,7 +153,7 @@ privileged aspect Service_Roo_GvNix_WebService {
 declare @type: Service: @WebService(name = "ServicePortType",
         targetNamespace = "http://service.test.gvnix.org/",
         serviceName = "Service", portName = "ServicePortType");
-declare @type: Service: @SOAPBinding(style = Style.DOCUMENT, use = Use.LITERAL, 
+declare @type: Service: @SOAPBinding(style = Style.DOCUMENT, use = Use.LITERAL,
         parameterStyle = ParameterStyle.WRAPPED);
 }
 --------------------------------------------------------------------------------
@@ -163,7 +167,7 @@ link:#apendice-comandos_addon-service_export_operation[remote service
 export operation]
 
 ----------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
 Updated SRC_MAIN_WEBAPP/WEB-INF/cxf-appname.xml
 Updated ROOT/pom.xml
@@ -171,7 +175,7 @@ Deleted SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
 Created SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
 Created SRC_MAIN_JAVA/org/gvnix/test/service/Service_Roo_GvNix_WebService.aj
 Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service_Roo_GvNix_WebService.aj
-      
+
 ----------------------------------------------------------------------------
 
 El comando anterior añade la anotación _@GvNIXWebMethod_ al método, de
@@ -186,7 +190,7 @@ disponible en el servicio web.
             webResultType = Long.class, responseWrapperName = "methodResponse",
             responseWrapperNamespace = "http://service.test.gvnix.org/",
             responseWrapperClassName = "org.gvnix.test.service.MethodResponse")
-public Long method(@GvNIXWebParam(name = "param1", type = String.class) 
+public Long method(@GvNIXWebParam(name = "param1", type = String.class)
         @WebParam(name = "param1", partName = "parameters", mode = Mode.IN, header = false)
         String param1,
         @GvNIXWebParam(name = "param2", type = List.class)
@@ -213,7 +217,7 @@ posteriormente deberán ser personalizadas con la lógica de negocio
 adecuada.
 
 -----------
-roo-gvNIX> 
+roo-gvNIX>
 -----------
 
 La ruta al _WSDL_ puede ser un archivo local mediante _file://ruta_, una
@@ -265,7 +269,7 @@ web y que enmascaran la comunicación con el sistema remoto.
 
 ----------------------------------------------------------------------------------
 privileged aspect Service_Roo_GvNix_WebServiceProxy {
-      
+
     public String Service.method(String param1) {
             org.web.service.RemoteService s = new org.web.service.RemoteService();
         org.web.service.RemoteServiceSoap p = s.getRemoteServiceSoap12();
@@ -329,11 +333,11 @@ hacer esta tarea de manera transparente para el usuario.
 +
 Para ello, se manipula el almacén de certificados de la máquina virtual
 Java siempre que sea posible. Esto es:
-1.  Existe el archivo de keystore en el directorio donde está instalado
+a.  Existe el archivo de keystore en el directorio donde está instalado
 Java, por ejemplo en sistemas linux
 _$JAVA_HOME/jre/lib/security/cacerts_ y es modificable por el usuario
 del sistema que está ejecutando gvNIX.
-2.  La contraseña del _keystore_ es changeit (la contraseña por defecto
+b.  La contraseña del _keystore_ es changeit (la contraseña por defecto
 del keystore).
 +
 Si se puede modificar el keystore, se importarán los certificados
@@ -380,7 +384,7 @@ link:#apendice-comandos_addon-service_security_ws[remote service
 security ws] para añadir la firma en las peticiones del cliente.
 
 ---------------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Created ROOT/src/main/resources/org/gvnix/test/service
 Created ROOT/src/main/resources/org/gvnix/test/service/certificate.p12
 Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
@@ -425,11 +429,11 @@ privileged aspect Service_Roo_GvNIX_WebSecurity {
         final String propPath = "org/gvnix/test/service/ServiceSecurity.properties";
         final String propKey = "org.apache.ws.security.crypto.merlin.keystore.password";
         try {
-// Get class loader to get file from project            
+// Get class loader to get file from project
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             java.io.File file = new java.io.File(classLoader.getResource(propPath).toURI());
             if (file != null && file.exists()) {
-// Load properties                
+// Load properties
                 java.util.Properties properties = new java.util.Properties();
                 java.io.FileInputStream ins = null;
                 try {
@@ -471,7 +475,7 @@ están disponibles para ser ofrecidos al exterior siempre y cuando la
 clase esté definida como un servicio web.
 
 ----------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
 Method list to export as web service operation in '~.service.Service':
     * myMethod2
 ----------------------------------------------------------------------
@@ -488,6 +492,9 @@ roo-gvNIX> remote service ws list
 Services                         exported    imported
 -------------------------------  ---------   ----------
 org.gvnix.test.service.Service1      X
-org.gvnix.test.service.Service2                 X 
+org.gvnix.test.service.Service2                 X
 org.gvnix.test.service.Service3                 X
 -------------------------------------------------------
+
+//Return level title
+:leveloffset: 0

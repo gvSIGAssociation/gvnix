@@ -1,6 +1,10 @@
 Comandos del add-on Web MVC Datatables
 --------------------------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 Para una descripción detallada de las características del add-on
 consultar la documentación del link:#addon-web-mvc-datatables[add-on Web
 MVC Datatables].
@@ -125,3 +129,6 @@ Sus parámetros son:
   +
   Nombre de la propiedad _1 a N_ de la entidad relación con el
   controlador a usar para el detalle.
+
+  //Return level title
+  :leveloffset: 0

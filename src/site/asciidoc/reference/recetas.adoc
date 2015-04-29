@@ -1,6 +1,10 @@
 Recetas
 -------
 
+//Push down level title
+:leveloffset: 2
+
+
 En este capítulo se verá como realizar algunas modificaciones sobre el
 código generado para adaptar la aplicación a distintos requerimientos
 habituales dada la experiencia de uso del framework.
@@ -23,7 +27,7 @@ Ambiente. Este repositorio es accesible únicamente desde la red interna
 de la Consejería.
 
 --------------------------------------------------------------------------------------
-roo-gvNIX> maven repository add --id citma-maven --name "CITMA Maven Repository" 
+roo-gvNIX> maven repository add --id citma-maven --name "CITMA Maven Repository"
         --url http://benigno.coput.gva.es:8081/nexus/content/groups/public
 Updated ROOT/pom.xml [
         added repository http://benigno.coput.gva.es:8081/nexus/content/groups/public]
@@ -117,10 +121,10 @@ considerando tan solo los parámetros que lleguen informados:
 --------------------------------------------------------------------
 public static TypedQuery<Owner> findOwnersByLastNameLikeAndCityLike(
             String lastName, String city) {
-  
-  
 
-  
+
+
+
     lastName = lastName.replace('*', '%');
     if (lastName.charAt(0) != '%') {
         lastName = "%" + lastName;
@@ -128,10 +132,10 @@ public static TypedQuery<Owner> findOwnersByLastNameLikeAndCityLike(
     if (lastName.charAt(lastName.length() - 1) != '%') {
         lastName = lastName + "%";
     }
-    
+
   }
 
-  
+
     city = city.replace('*', '%');
     if (city.charAt(0) != '%') {
         city = "%" + city;
@@ -139,16 +143,16 @@ public static TypedQuery<Owner> findOwnersByLastNameLikeAndCityLike(
     if (city.charAt(city.length() - 1) != '%') {
         city = city + "%";
     }
-    
+
   }
-  
+
 
   EntityManager em = Owner.entityManager();
   TypedQuery<Owner> q = em.createQuery(, Owner.class);
-  
+
     q.setParameter("lastName", lastName);
   }
-  
+
     q.setParameter("city", city);
   }
   return q;
@@ -201,14 +205,14 @@ modificar la jspx del buscador findPetsByOwner para que utilice
 _select-withempty_ en lugar del original de la siguiente forma:
 
 -------------------------------------------------------------------------------
-<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" ... 
-            
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" ...
+
             version="2.0">
   <jsp:directive.page contentType="text/html;charset=UTF-8"/>
   <jsp:output omit-xml-declaration="yes"/>
   <form:find finderName="ByOwner" id="ff_com_springsource_petclinic_domain_Pet"
         path="/pets" z="ThIGSmua6R7WM6q2P1BpNC3zMi4=">
-      
+
   </form:find>
 </div>
 -------------------------------------------------------------------------------
@@ -359,7 +363,7 @@ _p:subReportsUrls-ref_.
 ------------------------------------------------------------------------------------------------
 <bean id="owner_ownerpets"
 class=
- "com.springsource.petclinic.web.servlet.view.jasperreports.CustomJasperReportsMultiFormatView" 
+ "com.springsource.petclinic.web.servlet.view.jasperreports.CustomJasperReportsMultiFormatView"
 p:reportDataKey="ownerpetsList" p:url="/WEB-INF/reports/owner_ownerpets.jrxml"
 p:subReportDataKeys-ref="subReportDataKeys"  />
 ------------------------------------------------------------------------------------------------
@@ -374,7 +378,7 @@ quedando como se muestra a continuación.
 <util:map id="">
   <!-- This entry key must be declared exactly as declared in the master JRXML file -->
   <!-- Add one <entry /> node for each sub-report you need to define -->
-  
+
 </util:map>
 ---------------------------------------------------------------------------------------
 
@@ -537,3 +541,6 @@ Obtener el BindStatus de un atributo dentro de un formulario:
         <c:set var="fieldValue" value="${status.value}" />
     </spring:bind>
 ----------------------------------------------------------
+
+//Return level title
+:leveloffset: 0

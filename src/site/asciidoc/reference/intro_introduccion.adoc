@@ -4,7 +4,6 @@ Introducción
 // Push titles down one level.
 :leveloffset: 2
 
-
 ¿Qué es gvNIX?
 --------------
 
@@ -13,11 +12,11 @@ rápido de aplicaciones web altamente productivo, flexible y que no
 compromete la calidad de los proyectos.
 
 Está compuesto de un conjunto de herramientas de código abierto entre
-las que destaca su núcleo, http://www.springsource.org/spring-roo[Spring
+las que destaca su núcleo, http://projects.spring.io/spring-roo/[Spring
 Roo]. Esto le proporciona un amplio apoyo por parte de importantes
 organizaciones como Spring Source y VMWare. Añade funcionalidades de
 alto nivel a las prestaciones que ya se obtienen con
-http://www.springsource.org/spring-roo[Spring Roo] para mejorar la
+http://projects.spring.io/spring-roo/[Spring Roo] para mejorar la
 productividad.
 
 gvNIX es un proyecto subvencionado y liderado por la Consejería de
@@ -27,7 +26,7 @@ Valenciana.
 gvNIX está disponible dentro del proyecto de Migración a Software de
 fuentes abiertas http://www.gvpontis.gva.es[gvPONTIS].
 
-* http://www.gvnix.org[Comunidad online de gvNIX]
+* http://www.gvnix.org[Página del proyecto gvNIX]
 * http://gvnix.googlecode.com[Proyecto gvNIX en Google Code]
 * http://www.gvpontis.gva.es/cast/gvnix/[Página de gvNIX dentro del
 proyecto gvPONTIS]
@@ -242,4 +241,3 @@ comandos.
 
 // Return to normal title levels.
 :leveloffset: 0
-

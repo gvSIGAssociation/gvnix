@@ -1,6 +1,10 @@
 Buscadores de entidades
 -----------------------
 
+//Push down level title
+:leveloffset: 2
+
+
 En la sección de recetas se puede encontrar información adicional para
 link:#recetas-finders-multitud-campos[desarrollar buscadores con gran
 cantidad de campos] y también para hacer los
@@ -29,7 +33,7 @@ Listar buscadores
 Ejecutar el comando finder list sobre la entidad Owner
 
 -------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
         ...
         findOwnersByLastNameLikeAndCityLike(String lastName, String city)
         ...
@@ -113,10 +117,10 @@ se generará el buscador en la capa de las entidades, pero no se generará
 todavía ningún código en la capa de la vista.
 
 -----------------------------------------------------------------------------------
-roo-gvNIX> 
+roo-gvNIX>
         Updated SRC_MAIN_JAVA/com/springsource/petclinic/domain/Owner.java
         Created SRC_MAIN_JAVA/com/springsource/petclinic/domain/Owner_Roo_Finder.aj
-        
+
 -----------------------------------------------------------------------------------
 
 Consultar la documentación del comando
@@ -134,7 +138,7 @@ una anotación en la clase Java de la entidad especificada.
         @RooJpaActiveRecord()
         public class Owner extends AbstractPerson {
         }
-        
+
 ---------------------------------------------------
 
 La aparición del atributo _finders_ en la anotación _RooJpaActiveRecord_
@@ -174,3 +178,6 @@ privileged aspect Owner_Roo_Finder {
          }
         }
 --------------------------------------------------------------------------------------------------
+
+//Return level title
+:leveloffset: 0

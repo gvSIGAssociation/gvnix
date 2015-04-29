@@ -1,6 +1,9 @@
 Recursos
 --------
 
+//Push down level title
+:leveloffset: 2
+
 En este apartado pondremos una lista de recursos de documentación,
 tutoriales, etc que pueden ser útiles.
 
@@ -57,3 +60,6 @@ Security]
 * http://datatables.net/[DatatTables]
 * http://dandelion.github.io/datatables/[Dandelion-DatatTables]
 * http://jqueryvalidation.org/[jQuery Validation Plugin]
+
+//Return level title
+:leveloffset: 0
