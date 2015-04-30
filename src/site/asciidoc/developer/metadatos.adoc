@@ -117,8 +117,7 @@ de una clase, es lanzado desde un FileListener, que registra el
 framework, cuando detecta algún evento en un fichero `.java`.
 
 Consideraciones sobre los metadatos que generan productos y su orden de
-ejecución
----------------------------------------------------------------------------------
+ejecución.
 
 En principio, por lo que se ha podido observar, *no existe ningún
 control sobre el orden de petición/notificación de metadatos, excepto
@@ -136,7 +135,7 @@ genera metadatos y esos metadatos producen algún tipo de producto,
 correcto *sin esperar ni pretender tener ningún tipos de control sobre
 el orden de ejecución*.
 
-Para ilustrar esto, podemos ver una _traza de notificación de metadatos_
+* Para ilustrar esto, podemos ver una _traza de notificación de metadatos_
 que se produce al añadir un campo sobre una _entidad_ existente en un
 proyecto. Sobre esta _entidad_ ya se había creado un _controlador_
 automático (_scaffold_):
@@ -220,7 +219,7 @@ que la necesita).
 
 Esquema de relación de componentes entre los add-ons y los servicios de
 metadatos
----------------------------------------------------------------------------------
+
 
 image:images/roo-relacion-addon-metadatos.png[Esquema de relación entre
 add-ons y los servicios de metadatos]

@@ -170,15 +170,13 @@ localizada como servicio OSGi al implementar el interface CommandMarker.
 Los requisitos para que esta clase sea usada en el framework son los
 siguientes:
 
-1.  implementar el interface
-org.springframework.roo.shell.CommandMarker.
+1.  implementar el interface _org.springframework.roo.shell.CommandMarker_.
 2.  La clase debe ser un link:#creacion-addon_osgi[componente-servicio
 OSGi].
 3.  Contiene dos tipos de métodos:
-1.  Indicadores de
-_link:#creacion-addon_commands_accesibilidad[accesibilidad]_: Indician
-si un comando es accesible para el usuario en el contexto actual.
-2.  link:#creacion-addon_commands_command[Comandos]: Punto de entrada y
+a. Indicadores de _link:#creacion-addon_commands_accesibilidad[accesibilidad]_:
+Indician si un comando es accesible para el usuario en el contexto actual.
+b. link:#creacion-addon_commands_command[Comandos]: Punto de entrada y
 registro de un comando.
 4.  Tendrá poca o ninguna implementación. La implementación de las
 acciones se realizará en las clases
@@ -485,14 +483,16 @@ librerías de test en el pom.xml del proyecto:
   <scope>test</scope>
 </dependency>
 ------------------------------------------
+
 2.  Crear la clase de Test
 +
 Este primer test está dirigido a la clase Operations del Addon
 WebExceptionHandlerOperationsImpl.
-1.  Crear una nueva clase utilizando el nombre de la clase que se quiere
+
+a.  Crear una nueva clase utilizando el nombre de la clase que se quiere
 hacer el test añadiendo el sufijo Test:
 WebExceptionHandlerOperationsImplTest.
-2.  Declarar como atributo la clase sobre la que se quieren ejecutar los
+b.  Declarar como atributo la clase sobre la que se quieren ejecutar los
 tests y los servicios que utiliza la clase operations del Addon:
 +
 -------------------------------------------------------------------------
@@ -515,7 +515,8 @@ static final String NO_EXC_WEB_XML = "no-exceptions-webmvc-config.xml";
 // Project web config file path
 static final String WEB_XML_PATH = "WEB-INF/spring/webmvc-config.xml";
 -------------------------------------------------------------------------
-3.  Utilizando las anotaciones de JUnit se ha de instanciar la clase de
+
+c.  Utilizando las anotaciones de JUnit se ha de instanciar la clase de
 test y los servicios que utiliza para simular su comportamiento
 instanciándolos como Mocks:
 +
@@ -554,7 +555,8 @@ método de la clase operations. Ahora se han de crear los métodos de test
 por cada uno de los métodos implementados en la clase de operaciones del
 add-on. Puede que para algunos métodos no sea necesario el test debido a
 la simplicidad que representan, pero es recomendable crearlos también.
-4.  Crear test para el método _getHandledExceptionList():_
+
+d.  Crear test para el método _getHandledExceptionList():_
 +
 -------------------------------------------------------------------------------------------------------
 /**
@@ -617,6 +619,7 @@ public void testGetHandledExceptionList() throws Exception {
 +
 Se añade la anotación _@Test_ de _JUnit_ para que el método sea
 reconocido y se ejecute al lanzar el comando test de maven.
+
 3.  Archivos _xml_ para obtener los resultados del test.
 +
 Este test se basa en la comprobación de datos que se obtienen de un

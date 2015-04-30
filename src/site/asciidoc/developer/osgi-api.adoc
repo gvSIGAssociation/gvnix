@@ -265,6 +265,7 @@ public class MenuOperationsProxy implements MenuOperations {
 ------------------------------------------------------------------------------------------------------------------
 +
 Podemos destacar en el código anterior:
+
 * Las referencias a los servicios no tienen la anotación _@Reference_.
 Se carga en el método _resolveRerences()_ cuando se necesitan. En el
 método _deactivate_ se limpiarán las referencia utilizadas.
@@ -410,6 +411,7 @@ public class FilterMenuOperationsHook implements FindHook {
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 +
 Podemos destacar en el código anterior:
+
 * Solo filtramos para el servicio en cuestión y cuyas peticiones _sean
 de otro bundle_
 * Para identificar que servicio es se utilizan las propiedades del

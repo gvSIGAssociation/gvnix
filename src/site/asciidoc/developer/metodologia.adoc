@@ -21,12 +21,14 @@ podemos encontrar.
 +
 TBC: Revisar puntos, con el documento de comandos del add-on se cubren
 varios puntos de una vez.
+
 * requisitos
 * casos de uso
 * análisis
 * diseños
 * propuesta
 * estimación de propuesta
+
 5.  Crear proyecto de prueba de concepto. Si el código fuente del add-on
 se donará al proyecto gvNIX, el proyecto de prueba se almacenará en el
 repositorio que a tal efecto proporciona gvNIX,

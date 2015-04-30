@@ -126,7 +126,6 @@ desarrollo del framework.
 Introducción al desarrollo de gvNIX
 -----------------------------------
 
-
 Esta parte de la documentación de introducción a la arquitectura interna
 y información básica para el desarrollo de gvNIX.
 
@@ -202,13 +201,12 @@ include::validacion.adoc[]
 :leveloffset: 1
 include::distribucion.adoc[]
 
-
 OSGi
 ----
 
 Introducción a OSGi, add-ons como componentes OSGi.
 
-  // Push titles down one level.
+// Push titles down one level.
 :leveloffset: 1
 include::osgi-intro.adoc[]
 
