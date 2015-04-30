@@ -9,7 +9,7 @@
 	        </repository>
 		</repositories>
 		<properties>
-			<gvnix.version>2.0.0.BUILD-SNAPSHOT</gvnix.version>
+			<gvnix.version>2.0.0.M1</gvnix.version>
 			<querydsl.version>3.4.3</querydsl.version>
 		</properties>
 	    <dependencies>
