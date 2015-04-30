@@ -1,6 +1,9 @@
 Creación y modificación de ficheros
 -----------------------------------
 
+//Push down title level
+:leveloffset: 2
+
 TBC
 
 [explicar las recomendaciones con los fichero]
@@ -40,3 +43,6 @@ TBC
 
 Ver ejemplo en el capítulo de recetas, sección _Realizar cambios en XML
 con posibilidad de deshacer_.
+
+//Return level title
+:leveloffset: 0

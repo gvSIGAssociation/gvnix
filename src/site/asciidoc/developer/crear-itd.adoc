@@ -1,6 +1,9 @@
 Crear ITD
 ---------
 
+//Push down title level
+:leveloffset: 2
+
 TBC [Describir que es un ITD y enumerar de que se compone.
 
 La anotación
@@ -41,3 +44,6 @@ Generación de otros artefactos.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 TBC [Creación y mantenimiento de otros artefactos o .aj manuales]
+
+//Return to title level
+:leveloffset: 0

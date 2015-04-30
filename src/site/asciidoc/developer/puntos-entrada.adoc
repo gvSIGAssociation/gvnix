@@ -1,6 +1,9 @@
 Puntos de entrada al framework
 ------------------------------
 
+//Push down title level
+:leveloffset: 2
+
 En el Framework los add-ons pueden tener acciones de dos tipos:
 
 Pasivas::
@@ -59,3 +62,6 @@ ProcessManagerStatusListener::
 
 En muchas ocasiones, nuestros add-ons necesitarán notificaciones del
 listeners de metadatos.
+
+//Return to title level
+:leveloffset: 0

@@ -1,6 +1,9 @@
 Metodología de desarrollo
 -------------------------
 
+//Push down title level
+:leveloffset: 2
+
 A la hora de abordar la creación de un nuevo add-on, se deben seguir los
 siguientes pasos:
 
@@ -37,3 +40,6 @@ concepto.
 En caso de que el add-on evolucione y sea necesario realizar una prueba
 de concepto, no reutilizar la prueba anterior. Crear una prueba a partir
 el resultado actual del add-on o desde cero.
+
+//Return to title level
+:leveloffset: 0

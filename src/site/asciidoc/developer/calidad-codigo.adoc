@@ -1,6 +1,9 @@
 Calidad del código
 ------------------
 
+//Push down title level
+:leveloffset: 2
+
 Recomendaciones a seguir en el código
 -------------------------------------
 
@@ -21,7 +24,7 @@ depuración:
  } catch (Exception toIgnore) {
     LOGGER.finest("Problem do something");
   }
-            
+
 ------------------------------------------
 ** Para condiciones de if que no se utilizan es recomendable eliminarlas
 * _Lanzar las excepciones_
@@ -59,7 +62,7 @@ para asegurarnos que los recursos son liberados. Ejemplo:
                 outs = mutableFile.getOutputStream();
                 TokenReplacementFileCopyUtils.replaceAndCopy(
                         ins, outs, properties);
-                
+
                 insertI18nMessages();
             } catch (IOException ioe) {
                 throw new IllegalStateException(ioe);
@@ -81,7 +84,7 @@ que se requiera que las instancia se _Thread-safe_
 Ejemplo:
 +
 -----------------------------------------------------------------------------------------------
- String.format("Esta concatenación de '%s' es mas compleja ya que %s.%s usar varias cadenas.", 
+ String.format("Esta concatenación de '%s' es mas compleja ya que %s.%s usar varias cadenas.",
                 var1, var2, var3)
 -----------------------------------------------------------------------------------------------
 * _Evitar identificadores de variables o campos de menos de 3
@@ -277,3 +280,6 @@ Pulsar Restaurar
 
 El fichero de reglas utilizado en eXcentia se puede encontrar en
 http://scmcit.gva.es/svn/gvnix/trunk/doc/general/sonar/export-excentia-sonar.xml
+
+//Return level title
+:leveloffset: 0

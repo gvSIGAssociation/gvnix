@@ -1,6 +1,9 @@
 Escucha de eventos
 ------------------
 
+//Push down title level
+:leveloffset: 2
+
 En el framework, además de los comandos de la consola, también puede ser
 necesario gestionar eventos en los artefactos y/o ficheros que estamos
 manejando. Para ello, debemos suscribirnos a los eventos que nos ofrece
@@ -72,3 +75,6 @@ Eventos de procesos
 TBC
 
 [Nuevo]
+
+//Return to title level
+:leveloffset: 0

@@ -1,6 +1,9 @@
 Recetas
 -------
 
+//Push down title level
+:leveloffset: 2
+
 TBC (de roo-addon-desarrollo.rst) [Las recetas que todavía sean válidas
 en M1. Ver si extraer alguna de los add-ons implementados]
 
@@ -70,14 +73,14 @@ Este ejemplo crea un fichero `cxf-servlet.xml` dentro del directorio
 `WEB-INF` de la aplicación:
 
 ------------------------------------------------------------------------------------------------
-    //Ruta relativa 
+    //Ruta relativa
     String xmlPath =pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/cxf-servlet.xml");
 
     Document xml;
     MutableFile mutableFile= fileManager.createFile(xmlPath);
 
     Element root = xml.createElement("root");
-        
+
     Element child1 = xml.createElement("child1");
     child1.setNodeValue("nodo 1");
     root.appendChild(child1);
@@ -90,8 +93,8 @@ Este ejemplo crea un fichero `cxf-servlet.xml` dentro del directorio
 
     child2.appendChild(child3);
     root.appendChild(child2);
-        
-        
+
+
     xml.appendChild(root);
 
 
@@ -130,7 +133,7 @@ parámetro del tipo _transformer_ y así definir la gramática del xml:
 
    xformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC);
    xformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM);
-   
+
    XmlUtils.writeXml(xformer, webXmlMutableFileDestination.getOutputStream(), webXmlDestination);
 -------------------------------------------------------------------------------------------------
 
@@ -142,7 +145,7 @@ directorio `WEB-INF` de la aplicación a partir de una plantilla que
 hayamos incluido en los recursos del add-on:
 
 --------------------------------------------------------------------------------------------------------
-    //Ruta relativa 
+    //Ruta relativa
     String xmlPath =pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/cxf-servlet.xml");
 
     Document xml;
@@ -169,7 +172,7 @@ tema por defecto y lo cambia el ID del tema actual:
 -----------------------------------------------------------------------------
   /**
    * Get and initialize the absolute path for {@code webmvc-config.xml}.
-   * 
+   *
    * @return the absolute path to the file (never null)
    */
   public String getMvcConfigFile() {
@@ -184,7 +187,7 @@ tema por defecto y lo cambia el ID del tema actual:
    * to given theme Id.
    * <p>
    * {@link FileManager} is used for safe update.
-   * 
+   *
    * @param id
    */
   private void updateDefaultTheme(String themeId) {
@@ -396,7 +399,7 @@ public enum Qualifiers {
      * <li>RELEASE equals to EMPTY</li>
      * <li>RELEASE newer than SNAPSHOT</li>
      * </ul>
-     * 
+     *
      * @param q
      * @return <ul>
      *         <li>0 if this equals to q</li>
@@ -525,7 +528,7 @@ public class DependenciesVersionManager {
     /**
      * Given a list of DOM elements representing Maven dependencies determines
      * if may add or not them to project's pom.xml
-     * 
+     *
      * @param metadataService
      * @param projectOperations
      * @param dependenciesElements
@@ -580,7 +583,7 @@ public class DependenciesVersionManager {
     /**
      * Given a list of DOM elements representing Maven properties determines if
      * may add or not them to project's pom.xml
-     * 
+     *
      * @param metadataService
      * @param projectOperations
      * @param projectProperties
@@ -714,11 +717,11 @@ public class PageOperationsImpl implements PageOperations {
    * Utility to get {@link ProjectMetadata}.
    * <p>
    * This method will thrown if unavailable project metadata.
-   *  
+   *
    * @return ProjectMetadata or null if project isn't available yet
    */
   private ProjectMetadata getProjectMetadata() {
-    return (ProjectMetadata) projectMetadataProvider.get(ProjectMetadata.getProjectIdentifier());    
+    return (ProjectMetadata) projectMetadataProvider.get(ProjectMetadata.getProjectIdentifier());
   }
 }
 -----------------------------------------------------------------------------------------------------
@@ -750,9 +753,9 @@ recursos monitorizados:
   @Component
   @Service
   public class LogFiles implements FileEventListener {
-        
+
        private static Logger logger = Logger.getLogger(LogFiles.class.getName());
-                                
+
        public void onFileEvent(FileEvent fileEvent) {
            logger.warning(fileEvent.getOperation().name()+":"+fileEvent.getFileDetails().getCanonicalPath());
        }
@@ -837,7 +840,7 @@ abajo:
 
 -----------------------------------------------------------------------------------------------------
     private boolean copyRecursively(File source, File destination, boolean deleteDestinationOnExit) {
-    
+
       Assert.notNull(source, "Source directory required");
       Assert.notNull(destination, "Destination directory required");
       Assert.isTrue(source.exists(), "Source directory '" + source + "' must exist");
@@ -953,7 +956,7 @@ método:
   private void generateJavaFile(JavaType initializerClass) {
       String ressourceIdentifier = classpathOperations.getPhysicalLocationCanonicalPath(
               initializerClass, Path.SRC_MAIN_JAVA);
-      String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(initializerClass, 
+      String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(initializerClass,
               pathResolver.getPath(ressourceIdentifier));
 
       List<MethodMetadata> declaredMethods = new ArrayList<MethodMetadata>(1);
@@ -1103,3 +1106,6 @@ Remove all @Reference PathResolver
 Remove all @Reference PathResolver declarations from classes and
 retrieve PathResolver from ProjectMetadata instead.
 https://jira.springsource.org/browse/ROO-2097.
+
+//Return to title level
+:leveloffset: 0

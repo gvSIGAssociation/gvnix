@@ -1,6 +1,9 @@
 Distribución de Add-ons
 -----------------------
 
+//Push down title level
+:leveloffset: 2
+
 Los add-ons de gvNIX actualmente son distribuidos en formato binario a
 través de la web de gvPONTIS
 (http://www.gvpontis.gva.es/val/gvnix/gvnix-descargas/) tanto por
@@ -36,7 +39,7 @@ El repositorio de gvNIX en googlecode:
   <name>gvNIX Add-on repository</name>
   <url>https://gvnix.googlecode.com/svn/repo</url>
 </repository>
-      
+
 --------------------------------------------------
 +
 La dependencia al propio add-on para que el proyecto que se está
@@ -214,9 +217,12 @@ Puedes actualizar ejecutando el siguiente comando en la consola de
 gvNIX:
 
 ----------------------------------------------------------------------
-addon upgrade bundle --bundleSymbolicName org.gvnix.service.roo.addon 
+addon upgrade bundle --bundleSymbolicName org.gvnix.service.roo.addon
 ----------------------------------------------------------------------
 
 Con este sistema, podemos distribuir de forma muy ágil pequeñas mejoras
 en algún addon sin necesidad de esperar a hacer una distribución
 completa del framework.
+
+//Return to title level
+:leveloffset: 0

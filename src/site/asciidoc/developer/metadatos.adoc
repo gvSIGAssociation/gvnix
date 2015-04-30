@@ -1,6 +1,9 @@
 Metadatos
 ---------
 
+//Push down title level
+:leveloffset: 2
+
 Como hemos dicho en la descripción del componente
 link:#arquitectura-interna_metadata[Metadata] los metadatos es la
 información sobre el proyecto. Estos pueden obtenerse en cualquier
@@ -229,3 +232,6 @@ framework para manejarlos.
 En este esquema, también se pueden ver los puntos de entrada de la
 aplicación (en color azul oscuro) que describíamos en
 link:#puntos-entrada[Puntos de entrada al framework].
+
+//Return to title level
+:leveloffset: 0

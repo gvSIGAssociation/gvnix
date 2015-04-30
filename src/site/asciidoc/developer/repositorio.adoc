@@ -1,6 +1,9 @@
 Repositorio de gvNIX
 --------------------
 
+//Push down title level
+:leveloffset: 2
+
 El proyecto gvNIX se guarda en un repositorio con la siguiente
 estructura:
 
@@ -54,3 +57,6 @@ code/target::
   Directorio de trabajo de maven, en el repositorio estará vacío.
 code/pom.xml::
   Fichero de proyecto maven principal o padre.
+
+//Return to title level
+:leveloffset: 0

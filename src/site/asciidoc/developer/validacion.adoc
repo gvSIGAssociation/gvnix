@@ -1,6 +1,9 @@
 Validación de Add-ons
 ---------------------
 
+//Push down title level
+:leveloffset: 2
+
 TBC [FALTA Info del proceso]
 
 Test Integración
@@ -170,7 +173,7 @@ Se ejecuta el siguiente código:
     #cd gvnix.git
     #git remote add origin git@github.com:DISID/gvnix.git
     #git push origin master
-    
+
     #En caso de que se pierda la sesión del agente debido a un reinicio, actualización del servidor, o simplemente por el paso del tiempo,
     #se accederá mediante ssh al servidor y se ejecutarán estos 3 comandos.
     #rm ~/etc/ssh/ssh-agent-socket;
@@ -240,3 +243,6 @@ ejecutar el análisis de un proyecto generado. En este caso, la única
 diferencia sería utilizar el comando de compilado, empaquetado e
 instalación `clean install -P dev` y una hora distinta de ejecución como
 puede ser las 4am.
+
+//Return to title level
+:leveloffset: 0

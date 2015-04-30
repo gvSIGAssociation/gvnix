@@ -1,6 +1,9 @@
 Creación de proyecto de add-on
 ------------------------------
 
+//Push down title level
+:leveloffset: 2
+
 Estos son los a seguir para prepara un proyecto de add-on:
 
 1.  Crear el directorio que contendrá el proyecto del add-on.
@@ -96,7 +99,7 @@ public interface MyService {
 @Component
 @Service
 public class MyServiceImpl implements MyService{
-  
+
   private String helloPhrase;
 
   protected void activate(ComponentContext context) {
@@ -200,7 +203,7 @@ Estos son ejemplos de estos métodos:
 ----------------------------------------------------------------------------------
     @CliAvailabilityIndicator("myaddon setup")
     public boolean isSetupAvailable(){
-        return true; 
+        return true;
     }
 
     @CliAvailabilityIndicator({"myaddon add", "myaddon remove", "myaddon update"})
@@ -262,13 +265,13 @@ Estos son ejemplos de estos métodos:
   public void writeHello() {
      operations.writeTextFile("hello");
   }
-  
+
   @CliCommand(value="welcome property", help="Obtains a pre-defined system property")
   public String property(
-          @CliOption(key="name", 
-              mandatory=false, 
-              specifiedDefaultValue="USERNAME", 
-              unspecifiedDefaultValue="USERNAME", 
+          @CliOption(key="name",
+              mandatory=false,
+              specifiedDefaultValue="USERNAME",
+              unspecifiedDefaultValue="USERNAME",
               help="The property name you'd like to display") PropertyName propertyName) {
      return operations.getProperty(propertyName);
   }
@@ -557,7 +560,7 @@ la simplicidad que representan, pero es recomendable crearlos también.
 /**
  * Checks method
  * {@link WebExceptionHandlerOperationsImpl#getHandledExceptionList()}
- * 
+ *
  * @throws Exception
  */
 @Test
@@ -630,8 +633,8 @@ El primero de los archivos _contiene las excepciones instanciadas_ para
 que el test funcione correctamente según se ha implementado el _Test 1:_
 +
 ----------------------------------------------------------------------------------------------------------------------------
-<!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views. 
-     The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet container: 
+<!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views.
+     The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet container:
      this will happen - here with all other types of exceptions. -->
 <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver" p:defaultErrorView="uncaughtException">
  <property name="exceptionMappings">
@@ -650,8 +653,8 @@ utiliza en el _Test 2_ para comprobar que no existen excepciones en el
 archivo de configuración correspondiente:
 +
 ----------------------------------------------------------------------------------------------------------------------------
-<!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views. 
-     The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet container: 
+<!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views.
+     The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet container:
      this will happen - here with all other types of exceptions. -->
 <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver" p:defaultErrorView="uncaughtException">
  <property name="exceptionMappings">
@@ -760,3 +763,6 @@ que nuestro add-on de seguridad CIT invoque como paso previo al add-on
 de seguridad Spring, si no hubiese sido ejecutado todavía. La finalidad
 que se busca es que no obligar a invocar a un comando manualmente antes
 de invocar a otro comando.
+
+//Return to title level
+:leveloffset: 0

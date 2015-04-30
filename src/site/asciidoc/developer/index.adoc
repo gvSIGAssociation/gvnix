@@ -1,3 +1,45 @@
+//
+// Prerequisites:
+//
+//   ruby 1.9.3+
+//   asciidoctor     (use gem to install)
+//   asciidoctor-pdf (use gem to install)
+//
+// Build the document:
+// ===================
+//
+// HTML5:
+//
+//   $ asciidoc -b html5 index.adoc
+//
+// HTML5 Asciidoctor:
+//   # Embed images in XHTML
+//   asciidoctor -b html5 index.adoc
+//
+// PDF Asciidoctor:
+//   $ asciidoctor-pdf index.adoc
+
+
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
+:Author:    DISID Corporation, S.L.
+:corpsite: www.disid.com
+:doctype: docbook
+:keywords: gvNIX, Documentation
+:toc:
+:toc-placement: left
+:toc-title: Table of Contents
+:toclevels: 4
+:numbered:
+:sectnumlevels: 4
+:source-highlighter:  pygments
+ifdef::backend-pdf[]
+:pdf-style: asciidoctor
+:pagenums:
+:pygments-style:  bw
+endif::[]
+
+
 gvNIX - Documentación de desarrollo
 ===================================
 
@@ -80,20 +122,107 @@ https://jira.springsource.org/browse/ROO-726
 * Configuración de las convenciones Java, save actions, etc. para el
 desarrollo del framework.
 
+
+Introducción al desarrollo de gvNIX
+-----------------------------------
+
+
 Esta parte de la documentación de introducción a la arquitectura interna
 y información básica para el desarrollo de gvNIX.
 
 Antes de empezar a trabajar en gvNIX es conveniente leer la siguiente
 documentación:
 
-* Operations, Commands, Utils et all:
-https://jira.springsource.org/browse/ROO-2066
+* Operations, Commands, Utils et all: https://jira.springsource.org/browse/ROO-2066
 * Joey infraestructure: https://jira.springsource.org/browse/ROO-1372
 
+// Push titles down one level.
+:leveloffset: 1
+include::arquitectura-interna.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::puntos-entrada.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::metadatos.adoc[]
+
+Desarrollo de gvNIX
+-------------------
+
 Esta parte de la documentación contiene la información de desarrollo de
-gvNIX
+gvNIX.
+
+// Push titles down one level.
+:leveloffset: 1
+include::convenciones.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::calidad-codigo.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::repositorio.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::metodologia.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::creacion-addon.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::comandos.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::escucha-eventos.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::cambios-ficheros.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::crear-itd.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::compilacion.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::validacion.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::distribucion.adoc[]
+
+
+OSGi
+----
 
 Introducción a OSGi, add-ons como componentes OSGi.
 
+  // Push titles down one level.
+:leveloffset: 1
+include::osgi-intro.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::osgi-api.adoc[]
+
+
+Recursos
+--------
+
 En esta parte podrá encontrar recursos útiles para el desarrollo de
-gvNIX
+gvNIX.
+
+// Push titles down one level.
+:leveloffset: 1
+include::recetas.adoc[]

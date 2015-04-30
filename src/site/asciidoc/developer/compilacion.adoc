@@ -1,6 +1,9 @@
 Compilación e instalación de add-ons
 ------------------------------------
 
+//Push down title level
+:leveloffset: 2
+
 TBC [Pequeña introducción hablando de OSGi e instalación/desinstalación
 en caliente]
 
@@ -64,7 +67,7 @@ del bundle usamos el comando `osgi install` para instalarlo en el
 framework:
 +
 -------------
-roo> 
+roo>
 Bundle ID: 55
 roo>
 -------------
@@ -82,7 +85,7 @@ Como salida el framework nos informa de `ID` del bundle instalado.
 instalado:
 +
 -----------------------------------------------------------------------
-roo> 
+roo>
 [ 1] [...
 [55] [Installed   ] [    1] org.organization.roo.addon (0.1.0.SNAPSHOT)
 roo>
@@ -92,12 +95,12 @@ roo>
 +
 -------------------------
 roo> felix shell start 55
-roo> 
+roo>
 -------------------------
 4.  Comprobamos que el bundle se ha activado.
 +
 ----------------------------------------------------------------------
-roo> 
+roo>
 [ 1] [...
 [55] [Active     ] [    1] org.organization.roo.addon (0.1.0.SNAPSHOT)
 roo>
@@ -117,8 +120,8 @@ Otro comando que nos puede ser útil es `osgi
 parámetro `url` que se utilizó en su instalación:
 
 -----
-roo> 
-roo> 
+roo>
+roo>
 -----
 
 Para poder ver mensajes sobre las instalación y activación del los
@@ -132,8 +135,8 @@ Para desinstalar un add-on podemos usar el comando `osgi
       uninstall`:
 
 -----
-roo> 
-roo> 
+roo>
+roo>
 -----
 
 Instalar copiando el bundle
@@ -218,3 +221,6 @@ Añadir un add-on al la distribución de gvNIX.
 TBC [Describir añadir al pom.xml padre como modulo, limpiar pom.xml del
 addon, añadir artefactos extra a la distribución de binarios en el
 assembly.xml]
+
+//Return level title
+:leveloffset: 0

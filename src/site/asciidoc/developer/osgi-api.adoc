@@ -1,6 +1,9 @@
 Interacción con el contenedor OSGi
 ----------------------------------
 
+//Push down title level
+:leveloffset: 2
+
 Los add-ons, como cualquier componente OSGi, disponen de un API para
 interactuar con el contenedor OSGi. Permitiendo a nuestro código recibir
 eventos OSGi, reemplazar componentes OSGi, etc.
@@ -47,19 +50,19 @@ Este sería un ejemplo de parte de la declaración de la clase:
 
 @Component
 @Service
-public class MenuOperationsImpl implements MenuOperations { 
+public class MenuOperationsImpl implements MenuOperations {
 
   private static Logger logger = HandlerUtils
             .getLogger(MenuOperationsImpl.class);
-  
+
   /**
    * Property to identify this service in {@link FilterMenuOperationsHook}
    * and {@link MenuOperationsProxy}
    */
   @Property(boolValue=true)
   public static final String GVNIX_COMPONENT = "gvNIXComponent";
-  
-  
+
+
   /**
    * Use AddonOperations delegate to operations this add-on offers
    */
@@ -70,7 +73,7 @@ public class MenuOperationsImpl implements MenuOperations {
 ....
 ....
 ....
-                    
+
 --------------------------------------------------------------------------
 2.  Crear el componente-servicio _proxy_. Esta componente se debe estar
 anotado con _@Component(immediate=true)_ y _@Service_
@@ -99,13 +102,13 @@ public class MenuOperationsProxy implements MenuOperations {
 
     private static Logger logger = HandlerUtils
             .getLogger(MenuOperationsProxy.class);
-    
+
     private static final String MENU_OPERATION_NAME = MenuOperations.class.getName();
-    
+
     /*
      * ===========================================================
-     * VERY IMPORTANT: This class **MUST HAS NONE** @Reference   
-     * property to assure this component is really loaded 
+     * VERY IMPORTANT: This class **MUST HAS NONE** @Reference
+     * property to assure this component is really loaded
      * immediately
      * ===========================================================
      */
@@ -116,30 +119,30 @@ public class MenuOperationsProxy implements MenuOperations {
      */
     @Property(boolValue=true)
     public static final String GVNIX_PROXY_COMPONENT = "gvNIXProxyComponent";
-    
+
     /**
      * gvNIX {@link MenuOperations} implementation
      */
     private MenuOperationsImpl gvNIXOperations = null;
-    
+
     /**
      * {@link ServiceReference} to gvNIX {@link MenuOperations}
      * implementation (to perform unget on component deactivate)
      */
     private ServiceReference gvNIXOperationsService = null;
-    
-    
+
+
     /**
      * Original {@link MenuOperations}
      */
     private MenuOperations rooOperations = null;
-    
+
     /**
      * {@link ServiceReference} to original {@link MenuOperations}
      * implementation (to perform unget on component deactivate)
      */
     private ServiceReference rooOperationsService = null;
-    
+
     /**
      * BunleContext
      */
@@ -150,20 +153,20 @@ public class MenuOperationsProxy implements MenuOperations {
         logger.finer("MenuOperation proxy activated");
         this.context = context.getBundleContext();
     }
-    
+
     /** {@inheritDoc} */
     protected void deactivate(ComponentContext context) {
         // unget from gvNIX menu operation
         gvNIXOperations = null;
         context.getBundleContext().ungetService(gvNIXOperationsService);
         gvNIXOperationsService = null;
-        
+
         // unget from original menu operation
         rooOperations = null;
         context.getBundleContext().ungetService(rooOperationsService);
         rooOperationsService = null;
     }
-    
+
     /**
      * Wait until {@link #gvNIXOperations} and {@link #rooOperations}
      * are resolved.
@@ -177,7 +180,7 @@ public class MenuOperationsProxy implements MenuOperations {
                 return;
             }
         }
-        
+
         while (gvNIXOperations == null && rooOperations == null){
             try {
                 Thread.sleep(100);
@@ -187,7 +190,7 @@ public class MenuOperationsProxy implements MenuOperations {
             }
         }
     }
-    
+
     /**
      * Try to initialize {@link #gvNIXOperations} and
      * {@link #rooOperations}. Also store its {@link ServiceReference}
@@ -226,16 +229,16 @@ public class MenuOperationsProxy implements MenuOperations {
             }
         }
     }
-    
+
     /**
      * Gets the {@link MenuOperations} service instance to use
-     * 
+     *
      * @return
      */
     private MenuOperations getOperations(){
         // Assure than all required services are loaded
         waitToOperations();
-        
+
         if (gvNIXOperations.isGvNixMenuAvailable()){
             logger.finest("Using gvNIX Menu ops");
             return gvNIXOperations;
@@ -246,19 +249,19 @@ public class MenuOperationsProxy implements MenuOperations {
     }
 
     /**
-     * ========================================= 
+     * =========================================
      * Delegated {@link MenuOperations} methods
-     * 
+     *
      * This methods use {@link #getOperations()}
      * to decide which service call
-     * ========================================= 
+     * =========================================
      */
 // TODO: Implementación de los métodos de MenuOperations.
 //       Todos los métodos deberán delegar en getOperations().
 ....
 ....
 ....
-                    
+
 ------------------------------------------------------------------------------------------------------------------
 +
 Podemos destacar en el código anterior:
@@ -294,20 +297,20 @@ Este sería un ejemplo:
 @Component(immediate=true)
 @Service
 public class FilterMenuOperationsHook implements FindHook {
-    
+
     private static Logger logger = HandlerUtils
             .getLogger(FilterMenuOperationsHook.class);
-    
+
     /**
      * Service to manage
      */
     private static final String MENU_OPERATION_NAME = MenuOperations.class.getName();
 
     private BundleContext bundleContext;
-    
+
     /**
      * Method call when component is activated.
-     * 
+     *
      * @param context
      */
     protected void activate(ComponentContext context) {
@@ -315,7 +318,7 @@ public class FilterMenuOperationsHook implements FindHook {
         // Store bundleContext to use it in find method
         bundleContext = context.getBundleContext();
     }
-    
+
     /**
      * Filter request returned by framework related to {@link MenuOperations}.
      * <br>
@@ -323,7 +326,7 @@ public class FilterMenuOperationsHook implements FindHook {
      * from returned collection {@code references} all services except {@link MenuOperationsProxy}.
      * <br>
      * For request inside this bundle all services are returned.
-     * 
+     *
      * @see org.osgi.framework.hooks.service.FindHook#find(org.osgi.framework.BundleContext, java.lang.String, java.lang.String, boolean, java.util.Collection)
      */
     public void find(BundleContext context, String name, String filter,
@@ -337,18 +340,18 @@ public class FilterMenuOperationsHook implements FindHook {
             // Don't hide anything from  the system bundle
             return;
         }
-        
+
         if (references.isEmpty()){
             // Nothing to do
             return;
         }
-        
+
         if (bundleContext.equals(context)){
             // Don't hide anything to myself
             return;
         }
-        
-        // Remove all ServiceReferes except MenuOpertationProxy service  
+
+        // Remove all ServiceReferes except MenuOpertationProxy service
         for (Iterator i = references.iterator(); i.hasNext(); ) {
             ServiceReference sr = (ServiceReference) i.next();
             if (isGvNIXOperations(sr)){
@@ -363,38 +366,38 @@ public class FilterMenuOperationsHook implements FindHook {
             }
         }
     }
-    
+
     /**
      * Check if service reference is the service proxy
      * <br>
      * Uses {@link MenuOperationsProxy#GVNIX_PROXY_COMPONENT} service
      * property.
-     * 
+     *
      * @param sr
      * @return
      */
     public static boolean isProxy(ServiceReference sr){
         return sr.getProperty(MenuOperationsProxy.GVNIX_PROXY_COMPONENT) != null;
     }
-    
+
     /**
      * Check if service reference is gvNIX {@link MenuOperations} implementation
      * <br>
      * Uses {@link MenuOperationsImpl#GVNIX_COMPONENT} service
      * property.
-     * 
+     *
      * @param sr
      * @return
      */
     public static boolean isGvNIXOperations(ServiceReference sr){
         return sr.getProperty(MenuOperationsImpl.GVNIX_COMPONENT) != null;
     }
-    
+
     /**
      * Check if service reference is Roo original {@link MenuOperations}
      * <br>
      * Uses {@link #isProxy(ServiceReference)} and {@link #isGvNIXOperations(ServiceReference)}.
-     *  
+     *
      * @param sr
      * @return
      */
@@ -402,8 +405,8 @@ public class FilterMenuOperationsHook implements FindHook {
         return !(isProxy(sr) || isGvNIXOperations(sr));
     }
 }
-                    
-                    
+
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 +
 Podemos destacar en el código anterior:
@@ -433,3 +436,6 @@ arbitraria.
 De todas formas, es recomendable usar esta técnica con precaución, ya
 que, al ser el entono OSGi tan flexible, podemos encontrarnos en
 circunstancias especiales que pueden ser complejas de resolver.
+
+//Return to title level
+:leveloffset: 0

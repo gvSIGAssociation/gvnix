@@ -1,6 +1,9 @@
 Arquitectura interna
 --------------------
 
+//Push down title level
+:leveloffset: 2
+
 Esquema general de componentes
 ------------------------------
 
@@ -120,3 +123,6 @@ _TBC_.
 
 [Características. Descripción de los servicios y componentes.
 Referencias.] (Nuevo)
+
+//Return level title
+:leveloffset: 0
