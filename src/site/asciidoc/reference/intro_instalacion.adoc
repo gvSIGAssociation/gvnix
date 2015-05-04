@@ -30,9 +30,8 @@ gvNIX desde Eclipse o STS tal y como se detallará posteriomente.
 Una vez descargado el archivo de instalación de Java JDK y Maven veamos
 como configurar el entorno de trabajo para usar estas herramientas.
 
-_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Note*
-
+[NOTE]
+====
 Las siguientes notas sobre configuración son una recomendación de buenas
 prácticas. La variable _$HOME_ hace referencia al path del directorio de
 raíz de usuario (por ejemplo: _/home/usuario_). Se supondrñá instalado
@@ -40,7 +39,7 @@ Java JDK y Maven en:
 
 1.  Java JDK 1.6 instalada en: _/home/usuario/software/jdk1.6.0_35_
 2.  Maven 3 instalado en: _/home/usuario/software/apache-maven-3.0.4_
-_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
 * *Variables de entorno*.
 +

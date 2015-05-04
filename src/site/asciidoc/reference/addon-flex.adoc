@@ -58,8 +58,7 @@ Flex Commands
 The Flex Addon provides its functionality through just a few simple
 commands.
 
-flex setup
-^^^^^^^^^^
+.flex setup
 
 Once a basic Spring Roo project has been set up, the Flex Addon provides
 a single `flex setup` command for adding the necessary Spring, Maven,
@@ -83,8 +82,7 @@ Managed SRC_MAIN_WEBAPP/WEB-INF/web.xml
 Once you have the basic Flex project infrastructure in place, you can
 start generating remoting destinations and scaffolding.
 
-flex remoting scaffold
-^^^^^^^^^^^^^^^^^^^^^^
+.flex remoting scaffold
 
 The `flex remoting scaffold` command will create a Spring-managed
 `@RemotingDestination` and Flex UI scaffolding for a given Java domain
@@ -158,8 +156,7 @@ instance.
 existing Artist instance matching the provided id.
 |=======================================================================
 
-flex remoting all
-^^^^^^^^^^^^^^^^^
+.flex remoting all
 
 The `flex remoting all` command is a convenient variation of
 `flex remoting scaffold` that will create a Spring-managed
@@ -200,15 +197,13 @@ the project for both running and building from the command line, via
 Maven, or running as a Flex and WTP project in SpringSource Tool Suite
 with the Flash Builder v4 plugin installed.
 
-Building and Running a Flex Addon Project with Maven
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.Building and Running a Flex Addon Project with Maven
 
 With the necessary configuration for both the Java and Flex source
 already set up, building the project is as simple as:
 
 ----------------
 mvn install
-
 ----------------
 
 Similarly, running the project from the command line via the already
@@ -216,7 +211,6 @@ configured Maven Tomcat plugin is as simple as:
 
 ----------------------------
 mvn tomcat:run
-
 ----------------------------
 
 (Note - The first time you execute these commands with an unpopulated
@@ -233,16 +227,14 @@ distribution (and in the above examples), we create a project named
 
 * http://localhost:8080/rootunes/rootunes_scaffold.html
 
-Importing a Flex Addon Project into SpringSource Tool Suite and Flash
+.Importing a Flex Addon Project into SpringSource Tool Suite and Flash
 Builder
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To generate the necessary Eclipse metadata for the project, from the
 project root you must execute
 
 -------------------
 mvn eclipse:eclipse
-
 -------------------
 
 Once that is done, the project can be imported into SpringSource Tool
@@ -270,7 +262,6 @@ the command would be:
 
 --------------------------------------------------------------
 roo> script --file ~/spring-flex-1.5.0.M1/samples/rootunes.roo
-
 --------------------------------------------------------------
 
 Once the script has completed, you can build and run the example using

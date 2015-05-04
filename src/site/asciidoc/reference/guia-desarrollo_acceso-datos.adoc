@@ -83,17 +83,15 @@ commons-pool:commons-pool:1.5.6, commons-dbcp:commons-dbcp:1.4]
 roo-gvNIX>
 --------------------------------------------------------------------------------------------
 
-_________________________________________________________________________________________________________________________________________________________
-*Warning*
-
+[WARNING]
+====
 Este tipo de bases de datos no es la mejor opción para un entorno de
 producción, utilizarla sólo para entornos de desarrollo, demostraciones
 y formación.
-_________________________________________________________________________________________________________________________________________________________
+====
 
-___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Warning*
-
+[WARNING]
+====
 Con la ingeniería directa, es decir, la creación de entidades y campos
 mediante los comandos de la consola, se configura el sistema de
 persistencia para crear la base de datos cada vez que se arranca la
@@ -107,7 +105,7 @@ la sección
 link:#guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd[enlazar
 base de datos existente] para aprender cómo cambiar el comportamiento
 por defecto.
-___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
 Configurar la conexión con la base de datos
 -------------------------------------------
@@ -234,7 +232,7 @@ Los pasos a seguir para la configuración son:
 1.  Usar el comando `persistence
           setup` con los parámetros que disponemos:
 +
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 roo-gvNIX>
 Created SPRING_CONFIG_ROOT/database.properties
 Please update your database details in
@@ -250,10 +248,10 @@ Updated ROOT/pom.xml [added dependencies postgresql:postgresql:9.1-901-1.jdbc4,
  org.springframework:spring-orm:${spring.version}, commons-pool:commons-pool:1.5.6,
  commons-dbcp:commons-dbcp:1.4]
 roo-gvNIX>
----------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 2.  Comprobar como ha quedado la configuración de la conexión. Para ello
-usar el comando `database properties
-          list`:
+usar el comando `database properties list`:
 +
 ----------------------------------------------------
 roo-gvNIX>
@@ -269,15 +267,16 @@ datos en la propiedad `database.url`. Observar que el puerto configurado
 automáticamente es el puerto por defecto de la base de datos, sin
 embargo en este ejemplo el servidor de base de datos utiliza uno
 distinto.
+
 3.  Configurar la URL de conexión al servidor correctamente usando el
-comando `database properties
-          set`:
+comando `database properties set`:
 +
 ----------------------------------------------
 roo-gvNIX>
 Updated SPRING_CONFIG_ROOT/database.properties
 roo-gvNIX>
 ----------------------------------------------
+
 4.  Volver a comprobar el estado de los parámetros con el comando
 `database properties list`:
 +

@@ -34,11 +34,11 @@
 :numbered:
 :sectnumlevels: 4
 :source-highlighter:  pygments
-ifdef:backend-pdf[]
+ifdef::backend-pdf[]
 :pdf-style: asciidoctor
 :pagenums:
 :pygments-style:  bw
-endif:[]
+endif::[]
 
 
 This work is licensed under the Creative Commons Attribution-Share Alike
@@ -171,7 +171,7 @@ name.
 ** Namespace doesn’t change to aviod changes in Web Service Contract. If
 you would to change it uptade it in **@GvNIXWebService** annotation.
 
-[[publish-operation.]]
+[[publish-operation]]
 +Publish operation.+
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -197,12 +197,14 @@ be the same type as defined in java code.
 These behaviors are managed by the MetadataProvider that catches changes
 in a class annotated with **@GvNIXWebService**.
 
-NOTE: If an operation is updated manually updating attributes in
+[NOTE]
+====
+If an operation is updated manually updating attributes in
 **@GvNIXWebMethod** and doesn’t complain with defined rules, gvNIX will
 throw Exception message to complain with defined interoperabily rules.
+====
 
-
-[[publicar-objetos-para-la-comunicación.]]
+[[publicar-objetos-para-la-comunicación]]
 +Publicar Objetos para la comunicación.+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -213,7 +215,7 @@ los atributos de la anotación (name y namespace).
 * Si se cambia el paquete o el nombre de la clase, no varía ya que el
 contrato depende del name y el namespace definido.
 
-[[publicar-excepción.]]
+[[publicar-excepción]]
 +Publicar excepción.+
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -327,7 +329,7 @@ class. i.e.
 +
 `responseWrapperClassName = "org.example.wrapper.ResponseWrapper"`.
 
-[[define-java-object-in-web-service-operations.]]
+[[define-java-object-in-web-service-operations]]
 Define Java Object in Web Service Operations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -967,7 +969,6 @@ Más info:
 Los consumidores de los servicios web se crean configurando la ruta a los WSDLs
 en el plugin axistools-maven-plugin, dentro de la sección urls.
 
-[source]
 ----
 `<url>http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL</url>`
 ----

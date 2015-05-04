@@ -85,10 +85,11 @@ Documentation
 Documentation index
 -------------------
 
-* On each gvNIX project module you can find technical and user guides in the *module/docs/* folder in reStructuredText format and English:
+* On each gvNIX project module you can find technical and user guides in
+the *module/docs/* folder in ASCIIdoc format and English:
 
-  * td-module.rst: Technical design
-  * ug-module.rst: User guide
+  * td-module.adoc: Technical design
+  * ug-module.adoc: User guide
 
 * gvNIX work guides are placed at src/site/docbook/ in docbook format and Spanish (deprecated):
 

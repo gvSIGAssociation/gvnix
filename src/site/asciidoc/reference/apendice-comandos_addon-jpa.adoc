@@ -109,14 +109,13 @@ Sus parámetros son:
   +
   Clase a usar como usuario. Por defecto ``String``.
 
-________________________________________________________________________________________________________
-*Note*
-
+[NOTE]
+====
 Lanzará un warning informando que tiene que ajustar la implementación de
 la clase en dos circunstancias:
 Si no está configurado Spring Security::
 Si la clase ``userType`` no es String y no implementa ``UserDetails``.::
-________________________________________________________________________________________________________
+====
 
 jpa audit add
 ~~~~~~~~~~~~~

@@ -213,8 +213,7 @@ etc.).
 A continuación se muestra una pequeña demostración de implementación de
 algunos de estos mensajes personalizados.
 
-Mensaje de aviso de aplicación
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.Mensaje de aviso de aplicación
 
 En ocasiones puede ser necesario que tras una acción (una petición al
 servidor) se muestre en la respuesta algún mensaje acerca del resultado
@@ -230,8 +229,7 @@ modalDialog(DialogType.Info, "message_info_title", "message_description_key",
                 httpServletRequest);
 -----------------------------------------------------------------------------
 
-Mensaje de confirmación
-^^^^^^^^^^^^^^^^^^^^^^^
+.Mensaje de confirmación
 
 Puede ser necesario que tras una acción, la aplicación deba preguntar si
 se desea ir a una página en concreto. A continuación se verán los pasos
@@ -323,8 +321,7 @@ En este caso se ha resaltado el accesso al HashMap de parámetros del
 diálogo (dialogParams) para demostrar el modo en que se debe extraer los
 datos que le llegan al diálogo desde el controlador.
 
-Diálogo modal con formulario
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.Diálogo modal con formulario
 
 En alguna ocasión puede ser necesario mostrar un formulario en un
 diálogo modal para solicitar información al usuario, siguiendo el
@@ -342,6 +339,7 @@ web mvc dialog add --class ~.web.OwnerController --name createPetInModal
 Esto genera un método _createPetInModal_ disponible en _OwnerController_
 y una jspx base llamada _createPetInModal_ en _WEB-INF/dialogs_ que será
 personalizada.
+
 2.  Modifica el método create de OwnerController. Al igual que en el
 ejemplo anterior debemos hacer el Push-in del método. Lo modificamos
 para que quede como se muestra:
@@ -364,6 +362,7 @@ public String create(@Valid Owner owner, BindingResult bindingResult, Model uiMo
             httpServletRequest);
 }
 ------------------------------------------------------------------------------------
+
 3.  Modificar la jspx incluyendo el formulario de creación de mascotas
 (Pets):
 +

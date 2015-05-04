@@ -329,7 +329,10 @@ namespace is derived from the package name.
 ** serviceName: Specifies the name of the published service. This
 property is mapped to the name attribute of the wsdl:service element
 that defines the published service. The default is to use the name of
-the service’s implementation class. Note: Not allowed on the SEI
+the service’s implementation class.
++
+[NOTE]
+Not allowed on the SEI
 
 ** wsdlLocation: Specifies the URI at which the service’s WSDL contract
 is stored. The default is the URI at which the service is deployed. The
@@ -337,14 +340,19 @@ location of a predefined WSDL file describing the service.
 
 ** endpointInterface: Specifies the full name of the SEI that the
 implementation class implements. This property is only used when the
-attribute is used on a service implementation class. Note: Not allowed
-on the SEI
+attribute is used on a service implementation class.
++
+[NOTE]
+Not allowed on the SEI
 
 ** portName: Specifies the name of the endpoint at which the service is
 published. This property is mapped to the name attribute of the
 wsdl:port element that specifies the endpoint details for a published
 service. The default is the append Port to the name of the service’s
-implementation class. Note: Not allowed on the SEI
+implementation class.
++
+[NOTE]
+Not allowed on the SEI
 
 * @WebParam ( name=``name'' ): Required for Java does not lose the name
 of a web parameter and thus prevent constains arg0 in wsdl instead of

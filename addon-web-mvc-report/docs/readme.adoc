@@ -70,7 +70,7 @@ documentation of this project.
 Installation
 ------------
 
-[[install-the-add-on.]]
+[[install-the-add-on]]
 Install the Add-on.
 ~~~~~~~~~~~~~~~~~~~
 

@@ -133,15 +133,14 @@ pestaña con el título Open Roo Command Wizard.
 
 image:images/eclipse_gvNIX_shell.png[Consola gvNIX en Eclipse]
 
-____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Note*
-
+[NOTE]
+====
 Hay que tener en cuenta una pequeña diferencia a la hora de usar la
 línea de comandos desde Eclipse con respecto a la linea de comandos de
 gvNIX en la consola del sistema. Mientras en una consola del sistema se
 utiliza la tecla TAB para completar los comandos, en el IDE se utilizará
 Ctrl+Space que es el atajo por defecto usado en Eclipse.
-____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
 
 Utilizar Eclipse como IDE
@@ -469,9 +468,8 @@ soportar mas de 4 cambios en el proyecto antes de llenarse y dejar de
 funcionar. Para evitar esto, se puede incrementar la cantidad de memoria
 con la que arranca Tomcat.
 
-________________________________________________________________________________________________________________________________________________________________________
-*Important*
-
+[IMPORTANT]
+====
 Es muy interesante modificar los parámetros de memoría con los que
 trabaja el servidor. Para ello:
 
@@ -481,7 +479,8 @@ _Open launch configuration_
 texo que aparece en el apartado _VM Arguments_ lo siguiente:
 `-Xms64m -Xmx256m -XX:MaxPermSize=128m
             -XX:PermSize=128m`
-________________________________________________________________________________________________________________________________________________________________________
+====
+
 
 Ejecución de la aplicación en el Servidor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -566,13 +565,12 @@ tiene declarado ese campo o método. Por ejemplo, si se accede al método
 _Timer.toString()_ se abrirá el editor con el archivo
 _Timer_Roo_ToString.aj_.
 
-___________________________________________________________________________________________________________________________________________________________________________
-*Important*
-
+[IMPORTANT]
+====
 Cabe destacar que para que aparezca esta información sobre el código
 asociado a una clase Java mediante aspectos java, la clase debe estar
 libre de errores de compilación.
-___________________________________________________________________________________________________________________________________________________________________________
+====
 
 Modificación del código generado
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -610,13 +608,13 @@ sin peligro de que se pierdan por la acción de gvNIX/Roo.
 Del mismo modo, si se necesita añadir nuevos métodos o campos a la clase
 Java, se debe hacer directamente en el .java.
 
-_____________________________________________________________________________________________________________________________________________________________________
-*Important*
 
+[IMPORTANT]
+====
 Es interesante tener abierta la consola gvNIX para que los cambios
 realizados sobre los ficheros del proyecto disparen los cambios
 automáticos que realiza gvNIX/Roo.
-_____________________________________________________________________________________________________________________________________________________________________
+====
 
 //Return level title
 :leveloffset: 0

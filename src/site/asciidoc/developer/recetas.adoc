@@ -364,13 +364,12 @@ favorecernos de las mejoras que puedan aportar. Spring Roo ya lo hace
 eactualizando la proiedad _<roo.version/>_ cada vez que liberan una
 nueva versión del framework.
 
-___________________________________________________________________________________________________________________________________________________________________________
-*Note*
-
+[NOTE]
+====
 Es posible que, en función de donde queramos usar el código siguiente,
 necesitemos modificarlo para que se adapte a las necesidades
 particulares del addón donde lo usamos.
-___________________________________________________________________________________________________________________________________________________________________________
+====
 
 Para poder contemplar esta funcionalidad necesitmos el siguiente código:
 
@@ -673,9 +672,8 @@ propiedades no es necesario eliminar la definición existente ya que el
 método _ProjectOperations#addProperty(property)_ modificará el valor de
 la propiedad por el nuevo.
 
-_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Important*
-
+[IMPORTANT]
+====
 *En gvNIX se ha tomado la decisión de que han de prevalecer las
 versiones mayores de las dependencias definidas*. Esto quiere decir que
 si una versión de gvNIX actualiza la versión de una dependencía a una
@@ -684,20 +682,20 @@ add-on en el caso del uso de anotaciones definidas por la librería del
 add-on), aunque posteriormente el proyecto se gestione con una versión
 de gvNIX anterior (abrimos una versión previa de gvNIX en el directorio
 del proyecto con el que se está trabajando) la versión que prevalecerá
-será la más nueva. Ejemplo:
+será la más nueva.
 
-1.  Creamos un proyecto con gvNIX.
-2.  Este proyecto hace uso del add-on Service en una versión antigua.
+Ejemplo:
+1.  Creamos un proyecto con gvNIX. +
+2.  Este proyecto hace uso del add-on Service en una versión antigua. +
 3.  Actualizamos gvNIX a una versión posterior y abrimos el mismo
 proyecto con esta nueva versión de gvNIX. Entonces la dependencia con el
-add-on Service se actualizará a la nueva versión (casi seguramente).
+add-on Service se actualizará a la nueva versión (casi seguramente). +
 4.  Volvemos a abrir con un gvNIX antiguo sobre el proyecto. La
 dependencia con el add-on Service debe permanecer con la versión más
-nueva.
-
+nueva. +
 La misma decisión es aplicable a librerías de terceros (JasperReports,
 CXF, Axis, ...)
-_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
 Metadatos del proyecto
 ----------------------

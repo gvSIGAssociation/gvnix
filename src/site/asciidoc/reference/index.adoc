@@ -24,7 +24,7 @@
 :Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
 :Author:    DISID Corporation, S.L.
 :corpsite: www.disid.com
-:doctype: docbook
+:doctype: book
 :keywords: gvNIX, Documentation
 :toc:
 :toc-placement: left

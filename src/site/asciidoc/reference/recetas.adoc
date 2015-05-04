@@ -281,11 +281,10 @@ definir un informe sobre la entidad Owner y desear mostrar para cada
 Owner la lista de mascotas que le pertenecen, es decir, listar la
 relación definida por el campo _Set<Pet> pets_ de la entidad Owner.
 
-___________________________________________________________
-*Note*
-
+[NOTE]
+====
 Para este ejemplo se utilizará la versión 4.0.1 de iReport.
-___________________________________________________________
+====
 
 Partiendo del informe definido por el siguiente comando de gvNIX:
 
@@ -397,15 +396,14 @@ donde se encuentre el report padre (_owner_ownerpets.jrxml_).
 
 image:images/recetas-subreport-ireport-4.png[iReport - Nuevo diseño]
 
-_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Important*
-
+[IMPORTANT]
+====
 Se debe validar que el nuevo informe se crea con el lenguage Java
 configurado para las expresiones. En _Report Inspector_, al seleccionar
 el primer elemento (el nombre del informe) y mirar en sus propiedades
 (parte derecha de la pantalla de iReport) se debe buscar la propiedad
 _Language_, si no tiene el valor Java, cambiarla usando el desplegable.
-_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
 Este nuevo informe, que constituirá el subreport, es un informe a todos
 los efectos, por tanto se debe definir los campos (elemento Fields del

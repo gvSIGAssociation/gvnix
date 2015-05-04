@@ -287,8 +287,7 @@ definir fragmentos que pueden ser integrados en una página completa en
 tiempo de ejecución, facilitando el desarrollo de la capa de
 presentación de una forma consistente en toda la aplicación.
 
-Estructura de archivos de las vistas en la capa web
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.Estructura de archivos de las vistas en la capa web
 
 En el proyecto de ejemplo PizzaShop, se habrá creado hasta el momento la
 estructura de directorios y archivos que se puede ver en la siguiente
@@ -299,8 +298,7 @@ image:images/webinf-tree.png[Estructura archivos Pizza Shop]
 De todas las carpetas anteriores el desarrollo se centrará en _layouts,
 tags y views_.
 
-Motor de plantillas: Tiles
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+.Motor de plantillas: Tiles
 
 Dentro de _views_ hay varios ficheros jspx y varias carpetas. Entre los
 ficheros se encuentra _views.xml_. Este fichero establece la
@@ -412,8 +410,7 @@ Con esto ya se conoce el funcionamiento del motor de plantillas usado en
 el framework, a continuación se verá el resto de directorios y ficheros
 que componen la capa web de la aplicación.
 
-Vistas CRUD (Create, Read, Update, Delete)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.Vistas CRUD (Create, Read, Update, Delete)
 
 Observando las carpetas contenidas en la carpeta views, se puede
 observar que hay una carpeta por cada una de las entidades de la lógica
@@ -450,19 +447,17 @@ registro.
 No hay una JSP dedicada al borrado de registros porque ya se incluye un
 botón para el borrado de un registro tanto en _show_ como en _list_.
 
-Componentes de las JSP de las vistas CRUD
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.Componentes de las JSP de las vistas CRUD
 
 Se van a analizar los componentes que forman las vistas CRUD del
 proyecto.
 
-______________________________________________________________________________________________________________________________________________________________________________________________________________
-*Note*
-
+[NOTE]
+====
 Se listan algunos componentes que pueden aparecer en cada vista aunque
 cada uno de estos componentes puede no aparecer, aparecer varias veces o
 aparecer otros distintos dependiendo de los campos a informar.
-______________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
 *create.jspx*
 

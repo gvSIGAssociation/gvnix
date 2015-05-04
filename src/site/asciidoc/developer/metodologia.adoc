@@ -14,6 +14,7 @@ su desarrollo.
 informaremos brevemente del propósito de la funcionalidad.
 +
 TBC: Secciones y contenidos del readme.rst
+
 3.  Crear la carpeta `docs` dentro de la carpeta que hemos creado
 anteriormente.
 4.  Añadir dentro de `docs` documentación pertinente, entre la que

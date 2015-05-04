@@ -72,9 +72,7 @@ link:#recetas_crear-listener-metadatos[crear listener de metadatos].
 Eventos de procesos
 -------------------
 
-TBC
-
-[Nuevo]
+TBC (Nuevo)
 
 //Return to title level
 :leveloffset: 0

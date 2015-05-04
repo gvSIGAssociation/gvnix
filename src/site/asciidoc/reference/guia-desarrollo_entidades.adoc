@@ -127,15 +127,13 @@ El resto de las opciones podemos verlas con el autocompletado del
 comando escribiendo _--_, en la documentación oficial de Roo o usando el
 comando `help entity`.
 
-______________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Important*
-
+[IMPORTANT]
+====
 La consola no se utiliza para eliminar o modificar las entidades. Esto
 se debe realizar usando el IDE. Para más información ver la sección
 link:#guia-desarrollo_gestion-entidades_definicion_modificar-modelo[Modificar
 una entidad].
-______________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-
+====
 
 Comando field
 ~~~~~~~~~~~~~
@@ -203,22 +201,20 @@ Existen más opciones dependiendo del tipo de dato, para más información
 ver la ayuda de la consola o acceder a la documentación oficial de Roo
 en link:#[http://static.springsource.org/spring-roo/reference/html/]
 
-_______________________________________________________________________________________________________________________________________________________________________
-*Important*
-
+[IMPORTANT]
+====
 Notar que el parámetro `--column` permiten que en tiempo de creación
 podemos indicar que la entidad sea persistente sobre un modelo
 relacional creado con anterioridad.
-_______________________________________________________________________________________________________________________________________________________________________
+====
 
-__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Important*
-
+[IMPORTANT]
+====
 No se pueden eliminar o modificar los campos desde línea de comandos.
 Esto se debe realizar usando el IDE. Para más información ver la sección
 link:#guia-desarrollo_gestion-entidades_definicion_modificar-modelo[Modificar
 una entidad].
-__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
 
 Proyecto ejemplo
@@ -329,9 +325,8 @@ modelo de entidades, se pueden destacar:
   persistencia necesarios para crear, leer, actualizar y borrar (CRUD)
   la entidad siguiendo un patrón de registro activo.
 
-_________________________________________________________________________
-*Important*
-
+[IMPORTANT]
+====
 Notar que para usar las anotaciones hay que importar sus clases:
 
 -------------------------------------------------------------------------
@@ -339,7 +334,7 @@ import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.addon.tostring.RooToString;
 -------------------------------------------------------------------------
-_________________________________________________________________________
+====
 
 Consultar la link:#[documentación oficial de Roo] para un detalle
 exhaustivo de las anotaciones.
@@ -366,10 +361,9 @@ Añadir un atributo::
   _--class_ la consola cambia al contexto de la entidad Pizza y por
   tanto si se sigue ejecutando el comando field sin indicar _--class_
   los campos se añadirán a esta entidad.
-  +
-  ___________________________________________________________________________________________________________________________________________________
-  *Note*
-
++
+[NOTE]
+====
   Es posible situarse en el contexto de una entidad (o de cualquier
   clase del proyecto) mediante el comando *focus* indicando el parámetro
   _--class_.
@@ -378,7 +372,7 @@ Añadir un atributo::
 roo-gvNIX>
 ~.domain.PizzaOrder roo-gvNIX>
 ------------------------------
-  ___________________________________________________________________________________________________________________________________________________
+====
 
 A diferencia de la creación de entidades, la modificación del modelo del
 dominio debe realizarse modificando la clase Java de la entidad, por
@@ -808,22 +802,20 @@ será detectado y se ofrecerá su descarga e instalación automática la
 primera vez que lo requiera alguno de los comandos _database introspect_
 o _database reverse engineer._
 
-_______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Warning*
-
+[WARNING]
+====
 Si se está trabajando en el entorno de la CITMA, antes de seguir
 adelante es recomendable añadir el repositorio Maven de la CITMA al
 pom.xml del proyecto. En la link:#recetas-repositorio_maven[sección de
 recetas] existe un ejemplo de como hacerlo.
-_______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
-____________________________________________________________________________________________________________________________________________________________
-*Warning*
-
+[WARNING]
+====
 Si se lanza este comando con la configuración actual del proyecto que
 usa HYPERSONIC_PERSISTENT como BBDD indicará que no hay driver
 disponible para HSQLDB.
-____________________________________________________________________________________________________________________________________________________________
+====
 
 Por ejemplo, si se ejecuta la ingeniería inversa en un proyecto con
 PostgreSQL configurado como sistema de base de datos:
@@ -943,14 +935,13 @@ Con este comando se generarían las entidades de aquellas tablas de la
 BBDD que tengan como nombre foo<cualquier cosa> y bar<otro caracter
 más>, por ejemplo 'foo_tabla_cool' y 'bars'.
 
-___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Warning*
-
+[WARNING]
+====
 Al excluir tablas, además de evitar que se creen las entidades de estas
 tablas se evita también que se creen las asociaciones y relaciones en
 otras entidades. Esto se hace para evitar problemas de compilación en el
 código del proyecto.
-___________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
 Como DBRE ofrece ingeniería inversa incremental, se puede ejecutar este
 comando tantas veces como sea necesario y de esta forma se mantendrán
@@ -980,9 +971,8 @@ aplicación se va a ejecutar en distintas bases de datos, es mejor no
 incluir estos atributos y no usar este parámetro del comando _database
 reverse engineer_.
 
-______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Important*
-
+[IMPORTANT]
+====
 Cuando se utiliza el Add-on de ingeniería inversa se modifica el fichero
 META-INF/persistence.xml cambiando el valor de la propiedad
 _hibernate.hbm2ddl.auto_ por el de _none_ para evitar poner en peligro
@@ -990,17 +980,16 @@ la integridad de la BBDD a la que se está conectando desde el proyecto.
 Si se ha utilizado la opción --includeNonPortableAttributes el valor de
 esta propiedad será _validate_ de modo que en el arranque de la
 aplicación se realizará la fase de validación del esquema.
-______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
-______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Important*
-
+[IMPORTANT]
+====
 Si se realiza la ingeniería inversa de alguna vista, es recomendable
 leer la sección
 link:#guia-desarrollo_gestion-entidades_ingenieria_inversa-vistas[Ingeniería
 inversa de vistas] ya que puede ser necario realizar alguna
 personalización.
-______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
 Anotación @RooDbManaged
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1210,8 +1199,7 @@ Desactivar operaciones en la capa web.::
   borrado, creación y actualización en la capa web: removeMethod = "",
   persistMethod = "", mergeMethod = "".
 
-Tests de la ingeniería inversa de vistas
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.Tests de la ingeniería inversa de vistas
 
 En las vistas que no realizamos push-in e identificamos un elemento como
 clave primaria hay que realizar los siguientes cambios si deseamos

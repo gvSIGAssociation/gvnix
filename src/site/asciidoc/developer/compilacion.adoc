@@ -4,8 +4,8 @@ Compilación e instalación de add-ons
 //Push down title level
 :leveloffset: 2
 
-TBC [Pequeña introducción hablando de OSGi e instalación/desinstalación
-en caliente]
+TBC Pequeña introducción hablando de OSGi e instalación/desinstalación
+en caliente
 
 Compilación y empaquetado de un add-on.
 ---------------------------------------
@@ -72,15 +72,15 @@ Bundle ID: 55
 roo>
 -------------
 +
-_______________________________________________________________________________________________________________________________________________________________________
-*Warning*
-
+[WARNING]
+====
 Hay que usar el _.jar que no tiene sufijo_. Si se usa el `*-sources.jar`
 o `*-test.jar` no se mostrará ningún mensaje de error, pero el add-on
 _no se habrá instalado_.
-_______________________________________________________________________________________________________________________________________________________________________
+====
 +
 Como salida el framework nos informa de `ID` del bundle instalado.
+
 2.  Usamos el comando `osgi list` para comprobar que el bundle está
 instalado:
 +
@@ -106,14 +106,13 @@ roo>
 roo>
 ----------------------------------------------------------------------
 +
-_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Note*
-
+[NOTE]
+====
 Si no aparece como `Active` puede que sea porque no están disponibles en
 el `classpath` de framework alguna de las dependencias del add-on. Ver
 la sección link:#compilacion_instalacion_dependencias[Instalar
 dependencias de terceros].
-_________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
 Otro comando que nos puede ser útil es `osgi
       update`. Permite reinstalar el jar usando la versión actual del
@@ -155,11 +154,11 @@ los jar de estas librerías en el directorio `bin` de la instalación.
 Estas librerías serán incluidas automáticamente en la próxima arranque
 del framework.
 
-Instalar en desarrollo.
-~~~~~~~~~~~~~~~~~~~~~~~
+Instalar en desarrollo
+~~~~~~~~~~~~~~~~~~~~~~
 
-TBC [Hablar de dónde está el directorio bundle en desarrollo, hacer un
-mvn clean para limpiar...]
+TBC Hablar de dónde está el directorio bundle en desarrollo, hacer un
+mvn clean para limpiar...
 
 Depuración de add-on
 ~~~~~~~~~~~~~~~~~~~~
@@ -172,8 +171,7 @@ tiene configurada los parámetros necesario para ello.
 La recomendación es depurar con eclipse. Para tener el proyecto y el
 eclipse preparado se deben seguir los siguientes pasos:
 
-Importar el proyecto de add-on en el eclipse.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.Importar el proyecto de add-on en el eclipse
 
 Para importar un proyecto en el eclipse hay que seguir dos pasos:
 
@@ -182,8 +180,7 @@ sistema, estando situados en el directorio del add-on.
 2.  Importar el proyecto en el eclipse usando la opción
 _Import../Existing Project into Workspace_
 
-Preparar el Debug en eclipse
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.Preparar el Debug en eclipse
 
 Hay que crear una nueva configuración de arranque de depuración en
 eclipse. Para ello seguir los siguientes pasos:
@@ -200,8 +197,7 @@ el valor `4000`
 6.  La propiedad `host` debe de ser en este caso `localhost`.
 7.  Guardar la configuración con el botón `Apply`
 
-Arrancar el Debug
-^^^^^^^^^^^^^^^^^
+.Arrancar el Debug
 
 Antes de arrancar el Debug de eclipse es necesario que el framework esté
 arrancado con `gvnix-dev-debug`. Luego ya podremos arrancar la
@@ -209,18 +205,18 @@ depuración con la configuración que se ha creado en el punto anterior.
 
 Recordar instalar el add-on en el entorno de desarrollo.
 
-Añadir en una instalación de gvNIX.
+Añadir en una instalación de gvNIX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TBC [Describir como añadir en una instalación de binarios de gvnix:
-igual que en desarrollo o copiando al directorio 'plugins']
+TBC (Describir como añadir en una instalación de binarios de gvnix:
+igual que en desarrollo o copiando al directorio 'plugins')
 
-Añadir un add-on al la distribución de gvNIX.
+Añadir un add-on al la distribución de gvNIX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TBC [Describir añadir al pom.xml padre como modulo, limpiar pom.xml del
+TBC (Describir añadir al pom.xml padre como modulo, limpiar pom.xml del
 addon, añadir artefactos extra a la distribución de binarios en el
-assembly.xml]
+assembly.xml)
 
 //Return level title
 :leveloffset: 0

@@ -59,15 +59,15 @@ create(List<Owner> owners)::
   Persiste como nuevos todos los elementos de la lista _owners_.
 update(List<Owner> owners)::
   Persiste todos los elementos de la lista _owners_.
-  +
-  ____________________________________________________________________________________________________________________________________________________________________________________________________________________
-  *Note*
++
+[IMPORTANT]
+====
+Si algún elemento de la lista no tiene establecido su
+campo de clave primaria o su campo de control de concurrencia (este
+último sólo si está definido) el registro _se guardará como registro
+ nuevo_.
+====
 
-  _Importante:_ Si algún elemento de la lista no tiene establecido su
-  campo de clave primaria o su campo de control de concurrencia (este
-  último sólo si está definido) el registro _se guardará como registro
-  nuevo_.
-  ____________________________________________________________________________________________________________________________________________________________________________________________________________________
 findByValues(Map<String,Object> propertyValues)::
   Devuelve una lista de elemento cuyas propiedades coincidan (se usa el
   operador _igual a_) con _todos_ valores recibidos en _propertyValues_.
@@ -193,18 +193,16 @@ pero estas propiedades serán añadidas de forma automática a las
 correspondientes vistas si se han generado, o se generan, utilizando las
 funcionalidades de generación automática.
 
-______________________________________________________________________________________________________________________________________________________________________________________________________________________
-*Note*
-
+[NOTE]
+====
 En las vistas generadas de forma automática para la creación y
 actualización de elementos puede ser interesante realizar cambios de
 forma manual para que estos campos no sean rellenados o modificado por
 el usuario.
-______________________________________________________________________________________________________________________________________________________________________________________________________________________
+====
 
-__________________________________________________________________________________________________________________
-*Note*
-
+[NOTE]
+====
 Para evitar la pérdida de los datos de creación, en las vistas generadas
 de forma automática para la actualización
 incluir los datos de auditoría como campos ocultos en el formulario
@@ -212,17 +210,15 @@ incluir los datos de auditoría como campos ocultos en el formulario
 valores en el proceso de
 binding
 de los objetos recibidos
-__________________________________________________________________________________________________________________
+====
 
-___________________________________________________________________
-*Note*
-
-Es muy importante
-no utilizar
+[NOTE]
+====
+Es muy importante no utilizar
 actualizaciones/eliminaciones del estilo
 em.createQuery("UPDATE Country SET population = 0, area = 0");
 ya que los cambios aplicados no serán registrados por la auditoría.
-___________________________________________________________________
+====
 
 Para mantener esta información acutalizada se genera un clase, anotada
 con _GvNIXJpaAuditListener_, que será registrada como _EntityListener_
@@ -237,17 +233,16 @@ onCreate::
 onUpdate::
   Método antes de la actualización de un registro. Rellena los campos de
   auditoría correspondientes a la última actualización.
-  +
-  ____________________________________________________
-  *Note*
-
++
+[NOTE]
+====
   Este método
   sólo será llamado
   después de un
   merge
   si el registro a sufrido modificaciones en sus datos
   .
-  ____________________________________________________
+====
 
 Las clases _EntityListener_ requeridas por esta funcionalidad se
 registran de forma automática en el fichero `src/main/resources/orm.xml`
@@ -263,9 +258,8 @@ funcionalidad sólo se aplica a aquellas entidades marcadas con la
 anotación _GvNIXJpaAudit_ (ver link:#addon-jpa_audit-basic[Auditoría
 básica de entidades])
 
-___________________________________________________________________________________________________________
-*Note*
-
+[NOTE]
+====
 En caso de
 actualizar
 o
@@ -276,7 +270,7 @@ no se almacenarán los cambios sufridos por las entidades auditadas. Esto
 se debe a que no se dispararán los
 listeners
 necesarios para llevar a cabo este proceso.
-___________________________________________________________________________________________________________
+====
 
 Ya que esta funcionalidad puede implementarse de distinta forma, incluso
 dependiendo de la implementación de JPA que se esté utilizando en el
@@ -330,14 +324,14 @@ entidad y tendrá los siguientes métodos:
 getItem::
   Devuelve el objeto en el estado (valores de sus datos) en una
   revisión.
-  +
-  _______________________________________________________________________________________________________________________________________________________________________________________
-  *Note*
-
++
+[NOTE]
+====
   Para el registro de cambios de eliminación, el estado devuelto por
   este método será el estado anterior a la eliminación (los valores
   antes que tenía el elemento cuando fue eliminado).
-  _______________________________________________________________________________________________________________________________________________________________________________________
+====
+
 getRevisionNumber::
   Devuelve el identificador de la revisión.
 getRevisionUserName::
@@ -353,15 +347,15 @@ isUpdate::
 isDelete::
   Informa si tipo de cambio registrado en este elemento es una
   _eliminación_.
-  +
-  ________________________________________________________________________________________________________
-  *Note*
-
++
+[NOTE]
+====
   Para estos casos, el estado devuelto por el método
   getItem()
   será el estado anterior a la eliminación (los valores antes que tenía
   el elemento cuando fue eliminado).
-  ________________________________________________________________________________________________________
+====
+
 getType::
   Devuelve una cadena que representa el tipo de cambio del registro:
   _CREATE_, _UPDATE_ o _DELETE_.
