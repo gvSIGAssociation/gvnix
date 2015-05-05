@@ -436,7 +436,13 @@ estáticos que harán las veces de cabecera de tabla. Para ello, de la
 paleta de componentes, seleccionar _Static Text_ y arrastrarlo hasta la
 banda _Column Header_.
 
+ifdef::backend-html5[]
 image::./images/recetas-subreport-ireport-5.png[iReport - Paleta,align=center]
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+image::./images/recetas-subreport-ireport-5.png[iReport - Paleta,align=center,width=273]
+endif::backend-pdf[]
 
 En el primer _Static Text_ establecer el valor _Nombre_ y repetir la
 misma operación para definir un texto para el campo _Peso_ y para el
@@ -466,7 +472,13 @@ que se muestra a continuación Este diálogo permite seleccionar elementos
 de los campos definidos en el informe, de los parámetros e incluso
 acceder a alguna de las operaciones que proporcionan estos objetos.
 
+ifdef::backend-html5[]
 image::./images/recetas-subreport-ireport-7.png[iReport - Diálogo Text Field Expression,align=center]
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+image::./images/recetas-subreport-ireport-7.png[iReport - Diálogo Text Field Expression,align=center,width=300]
+endif::backend-pdf[]
 
 Obviamente, en un _Text Field_ es posible establecer expresiones más
 elaboradas, como añadir a la cadena las unidades de peso. Se debe tener
