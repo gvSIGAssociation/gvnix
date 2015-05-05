@@ -42,8 +42,8 @@ pasos:__
 * Si no se dispone todavía de él, descargar Eclipse IDE for Java EE
 Developers de link:#[http://www.eclipse.org/downloads/]
 * Crear la variable de classpath de Eclipse M2_REPO, para ello:
-1.  *_`Window > Preferences > Java > Build Path
-                  > Classpath Variables`_*, botón __`New...`__.
+1.  *_Window > Preferences > Java > Build Path
+                  > Classpath Variables_*, botón __`New...`__.
 2.  Definir los siguientes valores:
 ** __`Name`__ = __`M2_REPO`__.
 ** __`Path`__ = directorio correspondiente al repositorio de Maven
@@ -73,11 +73,9 @@ Seleccionarlos y seguir haciendo click en _Next_. La URL indicada es de
 la versión actual, revisar el sitio oficial de link:#[Subeclipse] para
 más información y futuras versiones.
 * Para instalar el plugin STS seguir las instrucciones del punto "UPDATE
-SITE INSTALLATION" del documento
-+
-Spring Source Tool Suite Installation Instructions
-+
-.
+SITE INSTALLATION" del documento _Spring Source Tool Suite Installation
+Instructions_.
+
 
 Integrar soporte ROO en STS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,9 +92,7 @@ Para incluir este soporte, sigue los siguientes pasos:
 Roo Extension_
 4.  Reinicia tu STS
 
-image:images/sts_install.jpeg[Integrando soporte ROO en STS]
-
-image:images/sts_install.png[Integrando soporte ROO en STS]
+image::./images/sts_install.jpeg[Integrando soporte ROO en STS,align=center]
 
 
 Consola gvNIX / Roo integrada en Eclipse
@@ -111,8 +107,7 @@ En el menú _Window > Preferences > Spring > Roo Support_. Pulsar sobre
 el botón Add y buscar en el navegador de archivos el lugar donde está
 instalado gvNIX. Aparecerá una pantalla similar a la siguiente:
 
-image:images/preferences_roo.png[Configuración del soporte gvNIX en
-Eclipse]
+image::./images/preferences_roo.png[Configuración del soporte gvNIX en Eclipse, align=center]
 
 Presionando en OK sobre las dos pantallas que abiertas ya estará
 configurado el soporte para la linea de comandos de gvNIX. Para poder
@@ -131,7 +126,7 @@ La ejecución de comandos también se puede hacer de forma gráfica
 pulsando en el botón que aparece en la parte superior derecha de la
 pestaña con el título Open Roo Command Wizard.
 
-image:images/eclipse_gvNIX_shell.png[Consola gvNIX en Eclipse]
+image::./images/eclipse_gvNIX_shell.png[Consola gvNIX en Eclipse, align=center]
 
 [NOTE]
 ====
@@ -152,8 +147,7 @@ Crear proyecto gvNIX en Eclipse IDE
 Crear un proyecto gvNIX desde Eclipse a través del menú: __File > New >
 Spring Roo Project__:
 
-image:images/eclipse_new_roo_project.png[Nuevo proyecto Spring Roo con
-soporte gvNIX]
+image::./images/eclipse_new_roo_project.png[Nuevo proyecto Spring Roo con soporte gvNIX, align=center]
 
 Esta primera pantalla habrá ejecutado de forma automática el comando de
 creación de un nuevo proyecto:
@@ -253,8 +247,7 @@ Crear proyecto gvNIX en Eclipse IDE
 Crear un proyecto gvNIX desde Eclipse a través del menú: __File > New >
 Spring Roo Project__:
 
-image:images/eclipse_new_roo_project.png[Nuevo proyecto Spring Roo con
-soporte gvNIX]
+image::./images/eclipse_new_roo_project.png[Nuevo proyecto Spring Roo con soporte gvNIX,align=center]
 
 Esta primera pantalla habrá ejecutado de forma automática el comando de
 creación de un nuevo proyecto:
@@ -417,11 +410,13 @@ pasos indicados a continuación:
 
 1.  Dentro de la pestaña Servers, pinchar con el segundo botón del ratón
 y seleccionar New > Server.
+
 2.  Seleccionar `Apache Tomcat
           v6.0 Server` de la lista de tipos y pulsar el botón `Next`.
 +
 En el caso en que no aparezca ningún tipo de servidor o no aparezcan los
 de Apache Tomcat se ha de realizar lo siguiente:
+
 * Ir a `Help > Install New
               Software...`.
 * Desmarcar la casilla "_Hide items that are already installed._"
@@ -434,6 +429,7 @@ seleccionar el de la última versión).
 * Instalar (seleccionándolos) `WST Server
               tests` y `JST Server Tests` (si ya están instalado
 aparecerá su icono en gris)
+
 3.  Introducir un nombre para la configuración.
 4.  Seleccionar el directorio donde se encuentra una instalación de
 Tomcat 6. Si no se dispone de ninguna instalación de Tomcat 6 crear un
@@ -492,13 +488,11 @@ y seleccionar la opción _Add and Remove ..._. En el diálogo que se abre
 seleccionar de la lista de la izquierda la aplicación y pulsar el botón
 _Add_. Por último, cerrar el diálogo con _Finish_.
 
-image:images/eclipse_servers-addremoveapp.png[Añadir / Eliminar
-aplicaciones al Servidor]
+image::./images/eclipse_servers-addremoveapp.png[Añadir / Eliminar aplicaciones al Servidor, align=center]
 
 Ya es posible arrancar el servidor y probar la aplicación.
 
-image:images/eclipse_servers.png[Vista de servidores disponibles en el
-workspace de Eclipse]
+image::./images/eclipse_servers.png[Vista de servidores disponibles en el workspace de Eclipse, align=center]
 
 En la imagen anterior se observa un servidor Tomcat 6 con la aplicación
 _tenminutes_ disponible para ejecutar. Con los botones disponibles se
@@ -507,8 +501,7 @@ manera normal (botón verde con triángulo blanco en el centro), arrancar
 en modo profile, pararlo o re-publicar los cambios del proyecto en el
 servidor.
 
-image:images/eclipse_servers-buttons.png[Botones de la vista servidores
-de Eclipse]
+image::./images/eclipse_servers-buttons.png[Botones de la vista servidores de Eclipse, align=center]
 
 Una vez arrancado el servidor se podrá navegar por la aplicación bien
 desde un navegador externo (Firefox) o bien desde un navegador propio
@@ -518,7 +511,7 @@ dirección se corresponde con el nombre de la aplicación proporcionado al
 crear el proyecto. Para abrir el navegador interno de Eclipse utilizar
 _Window > Show view > Internal Web Browser_.
 
-image:images/eclipse_browser.png[Navegador interno de Eclipse]
+image::./images/eclipse_browser.png[Navegador interno de Eclipse , align=center]
 
 Ejecutar la apliación desde Eclipse puede ser muy útil a la hora de
 hacer cambios en el proyecto, modificaciones en las vistas, en los
@@ -535,8 +528,7 @@ de la aplicación para añadir más funcionalidades y/o modificar alguna de
 las que se han generado. A continuación se explicarán un par de detalles
 que simplificaran esta tarea usando Eclipse y el plugin STS instalado.
 
-image:images/eclipse_crossreference.png[Vista de editor y Cross
-References en Eclipse]
+image::./images/eclipse_crossreference.png[Vista de editor y Cross References en Eclipse, align=center]
 
 En la imagen anterior se observa el editor de Eclipse con el archivo
 Timer.java que se ha generado al ejecutar los comandos _entity_ y
@@ -557,7 +549,7 @@ accesible haciendo click con el botón derecho sobre la flecha que hay a
 la izquierda de la declaración de la clase. El menú contextual es el
 siguiente.
 
-image:images/eclipse_cross-contextual.png[Contextual Cross References]
+image::./images/eclipse_cross-contextual.png[Contextual Cross References, align=center]
 
 Haciendo click sobre una de las entradas que aparecen en la ventana
 _Cross References_ o en el menú contextual, se abrirá el fichero .aj que
@@ -585,8 +577,7 @@ clase Java*. gvNIX/Roo ya nos lo avisa en la primera línea del archivo
 al arrancar, gvNIX/Roo volvería a generar el código automáticamente
 perdiendo las modificaciones que hubiésemos realizado.
 
-image:images/eclipse_edicion-aj.png[Edición archivo
-Timer_Roo_ToString.aj]
+image::./images/eclipse_edicion-aj.png[Edición archivo Timer_Roo_ToString.aj, align=center]
 
 Para modificar el código de un método o la declaración de un campo que
 se encuentre en un aspecto java, se puede mover el método o el campo a
@@ -599,8 +590,7 @@ Seleccionando el nombre del método a mover y a través del menú
 contextual _AspectJ Refactoring > Push In ..._ Eclipse se ocupará de
 eliminar el código del .aj y moverlo al .java.
 
-image:images/eclipse_pushincontextual.png[Menú contextual AspecJ
-Refactoring]
+image::./images/eclipse_pushincontextual.png[Menú contextual AspecJ Refactoring, align=center]
 
 Una vez en el .java, se podrá hacer cuantas modificaciones se necesiten
 sin peligro de que se pierdan por la acción de gvNIX/Roo.

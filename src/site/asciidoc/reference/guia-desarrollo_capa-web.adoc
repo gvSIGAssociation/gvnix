@@ -293,7 +293,7 @@ En el proyecto de ejemplo PizzaShop, se habrá creado hasta el momento la
 estructura de directorios y archivos que se puede ver en la siguiente
 imagen:
 
-image:images/webinf-tree.png[Estructura archivos Pizza Shop]
+image::./images/webinf-tree.png[Estructura archivos Pizza Shop,align=center]
 
 De todas las carpetas anteriores el desarrollo se centrará en _layouts,
 tags y views_.
@@ -391,7 +391,7 @@ _default.jspx_:
 En el fragmento de código anterior aparecen etiquetas de HTML y algunas
 otras etiquetas resaltadas en negrita. *<util:load-scripts />* es una
 etiqueta definida dentro del proyecto, luego se verá su finalidad. Las
-etiquetas *<spring:message .../>*son de Spring Framework y sirven para
+etiquetas *<spring:message .../>* son de Spring Framework y sirven para
 mostrar texto traducido a los distintos idiomas soportados por la
 aplicación. Por último las etiquetas *<tiles:insertAttribute ...
 ignore="true" />* son propias de Tiles y permiten insertar en esa
@@ -565,11 +565,10 @@ deseada para una entidad, se puede modificar el Converter de esa entidad
 y adaptarlo a sus requerimientos. En la sección sobre modificación de
 código se explica como hacerlo.
 
-Mejoras de renimiento
----------------------
+Mejoras de rendimiento
+-----------------------
 
-Se pueden implementar algunas mejoras de rendimiento definidas en la
-sección
+Se pueden implementar algunas mejoras de rendimiento definidas en la sección
 link:#guia-desarrollo_mejoras-rendimiento-evitar-carga-listas-innecesarias[Evitar
 la carga de listas de valores innecesarias].
 

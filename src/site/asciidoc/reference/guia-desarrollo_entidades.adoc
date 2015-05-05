@@ -352,21 +352,21 @@ Añadir un atributo::
   Para añadir un nuevo campo deberemos usar el mismo comando *field*
   indicando sobre que entidad queremos trabajar mediante el parámetro
   _--class._
-  +
++
 --------------------------
 ~.domain.Pizza roo-gvNIX>
 --------------------------
-  +
-  Notar que tras ejecutar el comando _field_ indicando el parámetro
-  _--class_ la consola cambia al contexto de la entidad Pizza y por
-  tanto si se sigue ejecutando el comando field sin indicar _--class_
-  los campos se añadirán a esta entidad.
++
+Notar que tras ejecutar el comando _field_ indicando el parámetro
+_--class_ la consola cambia al contexto de la entidad Pizza y por
+tanto si se sigue ejecutando el comando field sin indicar _--class_
+los campos se añadirán a esta entidad.
 +
 [NOTE]
 ====
-  Es posible situarse en el contexto de una entidad (o de cualquier
-  clase del proyecto) mediante el comando *focus* indicando el parámetro
-  _--class_.
+Es posible situarse en el contexto de una entidad (o de cualquier
+clase del proyecto) mediante el comando *focus* indicando el parámetro
+_--class_.
 
 ------------------------------
 roo-gvNIX>
@@ -724,7 +724,7 @@ public class Entity1 {
 }
 ------------------------------------
 
-Mas adelante se verán otros mecanismos para realizar un control de
+Máss adelante se verán otros mecanismos para realizar un control de
 concurrencia optimista. Para más información consultar el comando ``.
 
 Regeneración de la Base de datos en cada arranque.
@@ -767,11 +767,13 @@ creación de distintos ficheros de aspectos java (*.aj). A continuación,
 se puede generar los test de integración para la nueva entidad y definir
 una relación entre PizzaOrder y el Repartidor del pedido.
 
----
+-------------------------------------------------------------------------------
+test integration --entity ~.domain.Repartidor
 ...
-
+field reference --class ~.domain.PizzaOrder --fieldName repartidor
+--type ~.domain.Repartidor
 ...
----
+-------------------------------------------------------------------------------
 
 Finalmente, lanzar los test de integración para confirmar que todo se ha
 generado y funciona correctamente.

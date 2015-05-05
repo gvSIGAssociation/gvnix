@@ -16,7 +16,7 @@ Este add-on incluye las siguientes funcionalidades:
 * Persistencia de entidades con campos de tipo geográfico.
 
 Para poder utilizar estas funcionalidades hay que ejecutar previamente
-el comando ``.
+el comando link:#linkapendice-comandos_addon-jpa_jpa-gvnix-setup[_jpa gvnix setup_].
 
 Servicios persistencia en bloque
 --------------------------------
@@ -99,9 +99,9 @@ operaciones sobre múltiples registros a la vez.
 
 Para generar estos servicios se pueden utilizar los siguientes comandos:
 
-``::
+link:#apendice-comandos_addon-jpa_jpa-batch_jpa-batch-add[_jpa batch add_]::
   Genera el servicio para una entidad.
-``::
+link:#apendice-comandos_addon-jpa_jpa-batch_jpa-batch-all[_jpa batch all_]::
   Genera el servicio para todas las entidades de la aplicación.
 
 Información adicional para búsquedas por relaciones
@@ -149,7 +149,7 @@ Configurar detalles de usuario
 Es posible configurar la clase que proveerá el nombre de usuario que
 realiza un cambio. Para ello se ejecuta el siguiente comando:
 
-``::
+link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-setup[_jpa audit setup_]::
   Configura la auditoría de historico creando la clase que proveerá del
   nombre de usuario que realiza el cambio. Sólo se puede ejecutar una
   vez.
@@ -160,9 +160,9 @@ Auditoría básica de entidades
 Para añadir la auditoría a las entidades se pueden utilizar los
 siguientes comandos:
 
-``::
+link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-add[_jpa audit add_]::
   Añade auditoría para una entidad.
-``::
+link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-all[_jpa audit all_]::
   Añade auditoría para todas las entidades de la aplicación.
 
 Al instalar la auditoría en un proyecto gvNIX se creará una clase (con
@@ -236,12 +236,8 @@ onUpdate::
 +
 [NOTE]
 ====
-  Este método
-  sólo será llamado
-  después de un
-  merge
-  si el registro a sufrido modificaciones en sus datos
-  .
+Este método sólo será llamado después de un merge si el registro
+ a sufrido modificaciones en sus datos.
 ====
 
 Las clases _EntityListener_ requeridas por esta funcionalidad se
@@ -281,7 +277,7 @@ el framework.
 Para seleccionar el proveedor de registro de cambios se debe utilizar el
 siguiente comando:
 
-``::
+link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-revisionlog[_jpa audit revisionLog_]::
   Selecciona el proveedor de registro de cambios a usar.
 
 Al activar el proveedor, se instalarán las librerías requeridas y se
@@ -294,23 +290,23 @@ _storeRevisionLog_ sea el adecuado (_YES_ o _PROVIDER_DEFAULT/null_ y la
 opción por defecto del proveedor sea activar el registro) se generarán
 en el _.aj_ los siguientes métodos:
 
-findAll_Entidad_::
+_findAll_Entidad_::
   Devuelve la lista de todos elementos de la entidad, al estado en el
   que estuviesen en una fecha en concreto o en un número revisión.
-find_Entidad_::
+_find_Entidad_::
   Devuelve una entidad por código en el estado que estuviese en un fecha
   en concreto o en un número de revisión
-get_Entidad_Revisions::
+_get_Entidad_Revisions_::
   Devuelve una lista de _elementos de revisión_ de la entidad entre
   fechas o números de revisión para un elemento en concreto, pudiendo
   especificar números de registros a devolver.
-getRevisionNumberForDate::
+_getRevisionNumberForDate_::
   Devuelve el identificador de revisión activo a una fecha.
-find_Entidad_RevisionsByDates::
+_find_Entidad_RevisionsByDates_::
   Devuelve una lista de _elementos de revisión_ de la entidad entre
   fechas, pudiendo especificar filtros, ordenación y números de
   registros a devolver.
-find_Entidad_Revisions::
+_find_Entidad_Revisions_::
   Devuelve una lista de _elementos de revisión_ de la entidad entre
   números de revisión, pudiendo especificar filtros, ordenación y
   números de registros a devolver.
@@ -327,9 +323,9 @@ getItem::
 +
 [NOTE]
 ====
-  Para el registro de cambios de eliminación, el estado devuelto por
-  este método será el estado anterior a la eliminación (los valores
-  antes que tenía el elemento cuando fue eliminado).
+Para el registro de cambios de eliminación, el estado devuelto por
+este método será el estado anterior a la eliminación (los valores
+antes que tenía el elemento cuando fue eliminado).
 ====
 
 getRevisionNumber::
@@ -350,10 +346,9 @@ isDelete::
 +
 [NOTE]
 ====
-  Para estos casos, el estado devuelto por el método
-  getItem()
-  será el estado anterior a la eliminación (los valores antes que tenía
-  el elemento cuando fue eliminado).
+Para estos casos, el estado devuelto por el método
+getItem() será el estado anterior a la eliminación (los valores antes que tenía
+el elemento cuando fue eliminado).
 ====
 
 getType::
@@ -416,12 +411,12 @@ Para poder guardar entidades con campos de tipo GEO es necesario
 configurar el proyecto generado. Para ello se ejecuta el siguiente
 comando:
 
-``::
+link:#apendice-comandos_addon-jpa_jpa-geo_jpa-geo-setup[_jpa geo setup_]::
   Configura el proyecto para poder guardar entidades con campos de tipo
   geográfico. Este comando solo funcionará si se ha instalado
   persistencia en el proyecto con proveedor _HIBERNATE_ y se ha
   seleccionado una de las siguientes bases de datos:
-  +
+
   * POSTGRES
   * MYSQL
   * ORACLE
@@ -435,10 +430,10 @@ de tipo geográfico, ya es posible añadir campos de tipo geográfico a las
 entidades. Para poder añadir estos nuevos tipos de campo, es necesario
 ejecutar este comando:
 
-``::
+link:#apendice-comandos_addon-jpa_jpa-geo_field-geo[_field geo_]::
   Añade un nuevo campo de tipo GEO a la entidad seleccionada. Los nuevos
   campos añadidos pueden ser de los siguientes tipos:
-  +
+
   * POINT (Se guarda un único punto en la base de datos)
   * LINESTRING (Se guardan una serie de puntos que forman una linea
   continua)
@@ -456,12 +451,12 @@ Para poder realizar búsquedas sobre campos de tipo GEO es necesario
 generar una serie de métodos. Para ello se ejecutan los siguientes
 comandos:
 
-``::
+link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-all[_finder geo all_]::
   Genera los buscadores de todos los campos de tipo GEO de _todas_ las
   entidades registradas en el proyecto.
-``::
+link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-add[_finder geo add_]::
   Genera los buscadores de todos los campos de tipo GEO para la entidad
   seleccionada.
 
-  //Return level title
-  :leveloffset: 0
+//Return level title
+:leveloffset: 0

@@ -4,9 +4,6 @@ Mejoras de rendimiento
 //Push down level title
 :leveloffset: 2
 
-
-#
-
 Descripción
 -----------
 
@@ -33,14 +30,13 @@ continuación se recomiendan unos valores adecuados para cada tipo de
 entorno:
 
 -----------------------------------------------------------------------------------------------------
-        Entornos de desarrollo e integración: %d{dd/MM/yyyy HH:mm:ss.SSS} [%t] %p %c{1}.%M(%L) | %m%n
-        Entornos de preproducción y producción: %d{dd/MM/yyyy HH:mm:ss.SSS} [%t] %p %c{1} | %m%n
-
+Entornos de desarrollo e integración: %d{dd/MM/yyyy HH:mm:ss.SSS} [%t] %p %c{1}.%M(%L) | %m%n
+Entornos de preproducción y producción: %d{dd/MM/yyyy HH:mm:ss.SSS} [%t] %p %c{1} | %m%n
 -----------------------------------------------------------------------------------------------------
 
 Los distintos valores en función del entorno se pueden establecer de
 forma automática mediante el link:#addon-dynamic_config[add-on de
-configuración dinámica]. __
+configuración dinámica].
 
 Evitar la carga de listas de valores innecesarias
 -------------------------------------------------

@@ -91,7 +91,14 @@ controller (obligatorio): Controlador que se anotará y en el que se generarán 
 
 El nuevo componente visual que se creará utilizando los comandos y componentes anteriores tendrá el siguiente aspecto:
 
+ifdef::backend-html5[]
 image::./images/lupa.png[lupa,align=center]
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+image::./images/lupa.png[lupa,align=center]
+endif::backend-pdf[]
+
 
 [[diseno-tecnico]]
 === Diseño técnico

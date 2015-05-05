@@ -138,7 +138,7 @@ podrá generar también una capa de Servicios y/o DAO si fuese necesario.
 A continuación se puede ver un diagrama de los componentes de la
 arquitectura, capas y tecnologías relacionadas en Roo/gvNIX:
 
-image:images/gvnix-arquitectura-v1.0.png[Diagrama Arquitectura]
+image::./images/gvnix-arquitectura-v1.0.png[Diagrama Arquitectura,align=center]
 
 El intérprete de comandos
 -------------------------
@@ -192,23 +192,26 @@ nunca el control del proyecto.
 
 Este diagrama muestra a alto nivel el modelo funcional de Roo y gvNIX:
 
-image:images/modelo-roo.png[Diagrama de modelo funcional de Roo y gvNIX]
+image::./images/modelo-roo.png[Diagrama de modelo funcional de Roo y gvNIX,align=center]
 
 * Proyecto Java
 +
 Es el contenido de nuestra aplicación formada por todos los archivos
 necesarios.
-* ** Add-ons
+
+** Add-ons
 +
 Componentes que automáticamente monitorizan y realizan cambios en
 nuestro proyecto.
 +
 También ofrecen un conjunto de comandos para que los desarrolladores
 puedan realizar operaciones a través del intérprete de comandos.
+
 ** Intérprete de comandos (Shell)
 +
 Componente que permite la recepción y ejecución de órdenes del
 desarrollador
+
 ** STS: SpringSource Tool Suite
 +
 Plugin/Aplicación Eclipse de SpringSource para trabajar con proyectos

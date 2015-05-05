@@ -35,7 +35,7 @@ desarrollos.
 Por tanto, lo primero que se debe hacer es definir el modelo del
 dominio:
 
-image:images/pizza.png[Pizza Shop Domain Model]
+image::./images/pizza.png[Pizza Shop Domain Model,align=center]
 
 Crear un nuevo proyecto
 -----------------------
@@ -80,7 +80,7 @@ com.springsource.roo.pizzashop roo-gvNIX>
 Por otro lado, la estructura de directorios creada esta basada en las
 recomendaciones de Maven.
 
-image:images/projectfolders.png[Estructura de carpetas]
+image::./images/projectfolders.png[Estructura de carpetas,align=center]
 
 //Return level titles
 :leveloffset: 0

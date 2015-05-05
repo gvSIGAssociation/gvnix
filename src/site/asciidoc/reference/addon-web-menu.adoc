@@ -69,7 +69,7 @@ Instalación de la gestión del menú
 
 El uso del sistema de gestión del menú aportado por esta herramienta es
 opcional. Por ello, para instalarlo y activarlo es necesario ejecutar en
-primer lugar el comando ``.
+primer lugar el comando link:#[`menu setup`].
 
 ------------------------------------------------------------------------------------
 roo-gvNIX>
@@ -94,7 +94,7 @@ Updated ROOT/pom.xml [added property 'gvnix.version' = 'X.Y.Z']
 Este comando añadirá los siguientes elementos:
 
 1.  Clases que representan el modelo de datos del menú. Cada una de
-estas clases estarán anotadas con @GvNIXMenu* para poder ser
+estas clases estarán anotadas con *@GvNIXMenu* para poder ser
 identificadas. Estas clases se crearán en el subpaquete `web.menu`.
 2.  Una Clase para la carga del menú y hacerlo disponible para su
 pintado en la vista. Esta clase se creará en el subpaquete `web.menu`.
@@ -108,7 +108,7 @@ los _tagx_ de pintado del menú, creada en `WEB-INF/views/menu.jspx`.
 6.  Clases para el uso de los menús contextuales. Estas clases se
 crearán en el subpaquete `web.menu`.
 
-Para más información sobre el comando ver `` en el
+Para más información sobre el comando ver link:#[`menu setup`] en el
 link:#apendice-comandos_addon-web-menu[apéndice de comandos de este
 add-on].
 

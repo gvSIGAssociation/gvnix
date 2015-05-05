@@ -131,7 +131,7 @@ Los parámetros obligatorios que requiere este comando son:
 
 --provider::
   Identificador de la herramienta ORM. Los valores posibles son:
-  +
+
   DATANUCLEUS;;
     http://www.datanucleus.org/[Data Nucleus]
   ECLIPSELINK;;
@@ -142,8 +142,8 @@ Los parámetros obligatorios que requiere este comando son:
     http://openjpa.apache.org/[OpenJPA]
 --database::
   Identificador de la base de datos. Los valores posibles son:
-  +
-  * ORACLE_. Debido a que los drivers JDBC no están disponibles en
+
+  * ORACLE. _Debido a que los drivers JDBC no están disponibles en
   ningún repositorio Maven, en caso de utilizar Oracle habrá que
   instalar manualmente el driver JDBC._
   * MSSQL.
@@ -301,16 +301,17 @@ automáticamente el esquema de base de datos que se corresponde con el
 modelo de entidades. Esto no es así cuando se realiza la ingeniería
 inversa a partir de un esquema de base de datos ya existente.
 
-_Si se desea cambiar este comportamiento para, por ejemplo, que los
+*Si se desea cambiar este comportamiento para, por ejemplo, que los
 datos almacenados no desaparezca en cada arranque seguir los siguientes
-pasos_:
+pasos*:
 
 * Editar el archivo `src/main/resources/META-INF/persistence.xml`
 * Cambiar el valor de la propiedad _hibernate.hbm2ddl.auto_:
 +
 Existen cinco valores _validate, update, create, create-drop y none_.
-Estos valores deben utilizarse con precauciñón por el peligr" puede
+Estos valores deben utilizarse con precaución por el peligro que puede
 suponer para la integridad de la BBDD.
+
 ** _validate_: valida que el modelo de objetos y el modelo relacional de
 base de datos son equivalentes. En caso de no ser iguales no se
 permitirá el arranque de la aplicación.
@@ -321,7 +322,7 @@ se correspondan con el modelo de objetos.
 la información existente.
 ** _create-drop_: hace un _drop_ de las tablas al parar la aplicación y
 en el arranque las crea.
-** none: no hace absolutamente ninguna validación ni modificación del
+** _none_: no hace absolutamente ninguna validación ni modificación del
 esquema.
 
 Múltiples fuentes de datos

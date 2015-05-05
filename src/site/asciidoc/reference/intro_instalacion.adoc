@@ -41,7 +41,7 @@ Java JDK y Maven en:
 2.  Maven 3 instalado en: _/home/usuario/software/apache-maven-3.0.4_
 ====
 
-* *Variables de entorno*.
+* *Variables de entorno*
 +
 En entornos Unix, se puede utilizar _$HOME/.bashrc_ para definir las
 variables de entorno y automáticamente se cargarán al abrir una nueva
@@ -52,6 +52,7 @@ _$HOME/.bash_devel_.
 En sistemas Windows, establecer en las propiedades de "Mi PC" únicamente
 las variables de entorno que se definen a continuación en el segundo
 punto.
+
 ** *Modificar _$HOME/.bashrc_ para que cargue el archivo
 _$HOME/.bash_devel_*:
 +
@@ -212,6 +213,7 @@ _Solo será necesaria si se utiliza gvNIX desde la consola del sistema.
 Por lo tanto, no será necesario realizar todos los pasos indicados en
 este punto si se utiliza gvNIX desde Eclipse o STS tal y como se
 detallará posteriomente._
+
 * Ejemplo para sistemas Unix y Apple:
 +
 ------------------------------------------------------

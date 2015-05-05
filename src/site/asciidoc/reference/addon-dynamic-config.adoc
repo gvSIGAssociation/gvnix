@@ -235,8 +235,7 @@ También es posible elegir la configuración (perfil) a utilizar desde
 Eclipse/STS desde las propiedades del proyecto accediendo a la opción
 _Maven_ del menú.
 
-image:images/eclipse_maven_profiles.png[Selección del perfil Maven desde
-Eclipse]
+image::./images/eclipse_maven_profiles.png[Selección del perfil Maven desde Eclipse,align=center]
 
 Mejoras de renimiento
 ---------------------

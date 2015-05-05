@@ -24,7 +24,7 @@ Estos son los ficheros que genera automáticamente el framework y que
 contienen las operaciones básicas, los campos definidos con sus getter y
 setter, el identificador, etc. En general contine el código que un
 programador haria de manera rutinaria. Estos ficheros tienen nombres
-como *_Roo_*.aj y *_gvNIX_*aj. Se trata de aspectos java que no son más
+como *_Roo_*.aj y *_gvNIX_*.aj. Se trata de aspectos java que no son más
 que porciones de código que al compilar el proyecto, se asocian como
 código de la propia clase Java a la que están vinculadas. Si se desea
 personalizar alguna de las operaciones básicas, un getter determinado o
