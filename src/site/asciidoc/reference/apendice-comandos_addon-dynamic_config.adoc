@@ -6,7 +6,7 @@ Comandos del add-on Dynamic Configuration
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-dynamic_config[add-on Dynamic
+consultar la documentación del link:#_add_on_dynamic_configuration[add-on Dynamic
 Configuration].
 
 .Comandos del add-on Dynamic Configuration

@@ -16,7 +16,7 @@ Este add-on incluye las siguientes funcionalidades:
 * Persistencia de entidades con campos de tipo geográfico.
 
 Para poder utilizar estas funcionalidades hay que ejecutar previamente
-el comando link:#linkapendice-comandos_addon-jpa_jpa-gvnix-setup[_jpa gvnix setup_].
+el comando link:#_jpa_gvnix_setup['jpa gvnix setup'].
 
 Servicios persistencia en bloque
 --------------------------------
@@ -76,7 +76,7 @@ deleteByValues(Map<String,Object> propertyValues)::
   operador _igual a_) con _todos_ valores recibidos en _propertyValues_.
 
 Para poder usar este servicio en cualquier clase solo es necesario
-declarar una propiedad con la anotación link:#[@Autowire]. Spring se
+declarar una propiedad con la anotación _@Autowire_. Spring se
 encarga de inyectar una instancia del servicio en la propiedad. Este
 sería un ejemplo de la declaración para usarlo:
 
@@ -94,14 +94,14 @@ elemento afectado, _la operación entera_ será abortada (no se guardarán
 los cambios)
 
 Esta funcionalidad es requerida por otros add-ons como
-link:#addon-web-mvc-datatables[Web Mvc datatables] para poder realizar
+link:#_add_on_web_mvc_datatables[Web Mvc datatables] para poder realizar
 operaciones sobre múltiples registros a la vez.
 
 Para generar estos servicios se pueden utilizar los siguientes comandos:
 
-link:#apendice-comandos_addon-jpa_jpa-batch_jpa-batch-add[_jpa batch add_]::
+link:#_jpa_batch_add['jpa batch add']::
   Genera el servicio para una entidad.
-link:#apendice-comandos_addon-jpa_jpa-batch_jpa-batch-all[_jpa batch all_]::
+link:#_jpa_batch_all['jpa batch all']::
   Genera el servicio para todas las entidades de la aplicación.
 
 Información adicional para búsquedas por relaciones
@@ -149,7 +149,7 @@ Configurar detalles de usuario
 Es posible configurar la clase que proveerá el nombre de usuario que
 realiza un cambio. Para ello se ejecuta el siguiente comando:
 
-link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-setup[_jpa audit setup_]::
+link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-setup['jpa audit setup']::
   Configura la auditoría de historico creando la clase que proveerá del
   nombre de usuario que realiza el cambio. Sólo se puede ejecutar una
   vez.
@@ -160,9 +160,9 @@ Auditoría básica de entidades
 Para añadir la auditoría a las entidades se pueden utilizar los
 siguientes comandos:
 
-link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-add[_jpa audit add_]::
+link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-add['jpa audit add']::
   Añade auditoría para una entidad.
-link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-all[_jpa audit all_]::
+link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-all['jpa audit all']::
   Añade auditoría para todas las entidades de la aplicación.
 
 Al instalar la auditoría en un proyecto gvNIX se creará una clase (con
@@ -277,7 +277,7 @@ el framework.
 Para seleccionar el proveedor de registro de cambios se debe utilizar el
 siguiente comando:
 
-link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-revisionlog[_jpa audit revisionLog_]::
+link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-revisionlog['jpa audit revisionLog']::
   Selecciona el proveedor de registro de cambios a usar.
 
 Al activar el proveedor, se instalarán las librerías requeridas y se
@@ -411,7 +411,7 @@ Para poder guardar entidades con campos de tipo GEO es necesario
 configurar el proyecto generado. Para ello se ejecuta el siguiente
 comando:
 
-link:#apendice-comandos_addon-jpa_jpa-geo_jpa-geo-setup[_jpa geo setup_]::
+link:#apendice-comandos_addon-jpa_jpa-geo_jpa-geo-setup['jpa geo setup']::
   Configura el proyecto para poder guardar entidades con campos de tipo
   geográfico. Este comando solo funcionará si se ha instalado
   persistencia en el proyecto con proveedor _HIBERNATE_ y se ha
@@ -430,7 +430,7 @@ de tipo geográfico, ya es posible añadir campos de tipo geográfico a las
 entidades. Para poder añadir estos nuevos tipos de campo, es necesario
 ejecutar este comando:
 
-link:#apendice-comandos_addon-jpa_jpa-geo_field-geo[_field geo_]::
+link:#apendice-comandos_addon-jpa_jpa-geo_field-geo['field geo']::
   Añade un nuevo campo de tipo GEO a la entidad seleccionada. Los nuevos
   campos añadidos pueden ser de los siguientes tipos:
 
@@ -451,10 +451,10 @@ Para poder realizar búsquedas sobre campos de tipo GEO es necesario
 generar una serie de métodos. Para ello se ejecutan los siguientes
 comandos:
 
-link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-all[_finder geo all_]::
+link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-all['finder geo all']::
   Genera los buscadores de todos los campos de tipo GEO de _todas_ las
   entidades registradas en el proyecto.
-link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-add[_finder geo add_]::
+link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-add['finder geo add']::
   Genera los buscadores de todos los campos de tipo GEO para la entidad
   seleccionada.
 

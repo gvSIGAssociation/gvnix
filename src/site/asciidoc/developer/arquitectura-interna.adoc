@@ -15,7 +15,7 @@ image::./images/roo-esquema-general-componentes.png[Esquema General de component
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-image::./images/roo-esquema-general-componentes.png[Esquema General de componentes del framework,align=center]
+image::./images/roo-esquema-general-componentes.png[Esquema General de componentes del framework,align=center,width=400]
 endif::backend-pdf[]
 
 

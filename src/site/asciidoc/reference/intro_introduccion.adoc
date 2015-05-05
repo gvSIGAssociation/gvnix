@@ -131,8 +131,8 @@ tradicionales generadas a mano es que, por defecto, no añade capas de
 abstracción innecesarias. Las aplicaciones Java más tradicionales tienen
 una capa DAO, capas de servicios, capa de dominio y una capa de control.
 En una aplicación generada con Roo/gvNIX inicialmente solo se usa una
-link:#guia-desarrollo_gestion-entidades[capa de Entidad] (que es similar
-a la capa de dominio) y una link:#guia-desarrollo_capa-web[capa Web]. Se
+link:#_gestión_de_entidades[capa de Entidad] (que es similar
+a la capa de dominio) y una link:#_gestión_de_la_capa_web[capa Web]. Se
 podrá generar también una capa de Servicios y/o DAO si fuese necesario.
 
 A continuación se puede ver un diagrama de los componentes de la

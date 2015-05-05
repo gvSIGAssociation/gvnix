@@ -20,22 +20,22 @@ recibir peticiones de creación, actualización y eliminación de registros
 de una entidad en bloque.
 
 Actualmente se utiliza para dar soporte a las operaciones de
-modificación múltiple que el link:#addon-web-mvc-datatables[add-on web
+modificación múltiple que el link:#_add_on_web_mvc_datatables[add-on web
 mvc datatables].
 
 Los método añadidos por esta funcionalidad se apoyan en las operaciones
-de persistencia en bloque generadas por el link:#addon-jpa_batch[_add-on jpa_]
+de persistencia en bloque generadas por el link:#addon-jpa_batch['add-on jpa']
 proporciona. Por ello,
 sólo se podrá añadir sobre controladores cuya entidad relacionada tenga
 generado este servicio.
 
 Para generar estos métodos se pueden utilizar los siguientes comandos:
 
-link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-setup[_web mvc batch setup_]::
+link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-setup['web mvc batch setup']::
   Instala las dependencias y ajusta la configuración.
-link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-add[_web mvc batch add_]::
+link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-add['web mvc batch add']::
   Genera los métodos en un controlador.
-link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-all[_web mvc batch all_]::
+link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-all['web mvc batch all']::
   Genera los métodos para todos los controladores.
 
 Métodos de creación y actualización
@@ -132,7 +132,7 @@ Las opciones de este add-on _no son compatibles con el
 link:#addon-web-screen-patterns[add-on Web Screen Patterns]_.
 
 Para poder utilizar el _list_ generado por el
-link:#addon-web-mvc-datatables[add-on web mvc datatables] es necesario
+link:#_add_on_web_mvc_datatables[add-on web mvc datatables] es necesario
 que la vista esté convertida a jQuery (ya que el componente _dataTables_
 que se utiliza está creado en base a esta librería).
 
@@ -147,13 +147,13 @@ componentes.
 
 Para utilizar esta funcionalidad dispone de los siguientes comandos:
 
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup[_web mvc jquery setup_]::
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup['web mvc jquery setup']::
   Instala los artefactos necesarios.
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-add[_web mvc jquery add_]::
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-add['web mvc jquery add']::
   Convierte las vista de un controlador a jQuery.
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-all[_web mvc jquery all_]::
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-all['web mvc jquery all']::
   Convierte todas las vistas a jQuery.
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-update-tags[_web mvc jquery update tags_]::
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-update-tags['web mvc jquery update tags']::
   Actualiza los artefactos requeridos por jQuery. Util para actualizar
   un proyecto a una nueva versión de gvNIX.
 

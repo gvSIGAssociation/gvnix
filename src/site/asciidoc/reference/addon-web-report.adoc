@@ -36,6 +36,8 @@ como http://jasperforge.org/projects/ireport[iReport].
 
 image::./images/ireport.png[Editor de informes iReport,align=center]
 
+
+
 Instalación
 -----------
 

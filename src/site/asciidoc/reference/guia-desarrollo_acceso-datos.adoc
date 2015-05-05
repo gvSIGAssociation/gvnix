@@ -102,7 +102,7 @@ inversa a partir de un esquema de base de datos ya existente.
 Este comportamiento se puede cambiar en la configuración del sistema de
 persistencia: `src/main/resources/META-INF/persistence.xml`. Consultar
 la sección
-link:#guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd[enlazar
+link:#_regeneración_de_la_base_de_datos_en_cada_arranque[enlazar
 base de datos existente] para aprender cómo cambiar el comportamiento
 por defecto.
 ====

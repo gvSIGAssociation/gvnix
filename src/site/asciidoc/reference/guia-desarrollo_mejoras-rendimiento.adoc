@@ -35,7 +35,7 @@ Entornos de preproducción y producción: %d{dd/MM/yyyy HH:mm:ss.SSS} [%t] %p %c
 -----------------------------------------------------------------------------------------------------
 
 Los distintos valores en función del entorno se pueden establecer de
-forma automática mediante el link:#addon-dynamic_config[add-on de
+forma automática mediante el link:#_add_on_dynamic_configuration[add-on de
 configuración dinámica].
 
 Evitar la carga de listas de valores innecesarias

@@ -131,7 +131,7 @@ comando `help entity`.
 ====
 La consola no se utiliza para eliminar o modificar las entidades. Esto
 se debe realizar usando el IDE. Para más información ver la sección
-link:#guia-desarrollo_gestion-entidades_definicion_modificar-modelo[Modificar
+link:#_modificar_una_entidad[Modificar
 una entidad].
 ====
 
@@ -212,7 +212,7 @@ relacional creado con anterioridad.
 ====
 No se pueden eliminar o modificar los campos desde línea de comandos.
 Esto se debe realizar usando el IDE. Para más información ver la sección
-link:#guia-desarrollo_gestion-entidades_definicion_modificar-modelo[Modificar
+link:#_modificar_una_entidad[Modificar
 una entidad].
 ====
 
@@ -419,7 +419,7 @@ field string --fieldName campo2
 Se obtendrá una entidad en la que el tipo del campo identificador es un
 objeto con distintos campos. Este mecanismo es el mismo que se emplea al
 realizar la
-link:#guia-desarrollo_entidades-dbre_clave_compuesta[ingeniería inversa]
+link:#_claves_primarias_compuestas[ingeniería inversa]
 de una BBDD en el caso de que se encuentre una estructura de este tipo,
 es decir, una clave primaria compuesta.
 
@@ -478,19 +478,25 @@ atributos de una entidad y las columnas de la tabla.
 
 Las más importantes son:
 
-link:#[@Column]::
+http://docs.oracle.com/javaee/6/docs/api/javax/persistence/Column.html[@Column]::
   Indica el nombre de la columna de la base de datos en donde se
   almacenará el valor del atributo. Si se omite esta anotación se
   aplicará una convención por la que el nombre de la columna será el
   mismo que el del atributo de la clase.
-link:#[@Transient]::
+http://docs.oracle.com/javaee/6/docs/api/javax/persistence/Transient.html[@Transient]::
   Indica que el atributo de la clase Java no tiene representación en la
   tabla (no será cargado ni almacenado).
-link:#[@JoinColumn], link:#[@JoinColumns], link:#[@OneToOne],
-link:#[@ManyToOne]::
+
+http://docs.oracle.com/javaee/6/docs/api/javax/persistence/JoinColumn.html[@JoinColumn],
+http://docs.oracle.com/javaee/6/docs/api/javax/persistence/JoinColumns.html[@JoinColumns],
+http://docs.oracle.com/javaee/6/docs/api/javax/persistence/OneToOne.html[@OneToOne],
+http://docs.oracle.com/javaee/6/docs/api/javax/persistence/ManyToOne.html[@ManyToOne]::
   Define la correspondencia de una asociación _N-1._
-link:#[@JoinTable], link:#[@OneToMany], link:#[@ManyToMany],
-link:#[@OrderBy]::
+
+http://docs.oracle.com/javaee/6/api/javax/persistence/JoinTable.html[@JoinTable]
+http://docs.oracle.com/javaee/6/api/javax/persistence/OneToMany.html[@OneToMany]
+http://docs.oracle.com/javaee/6/api/javax/persistence/ManyToMany.html[@ManyToMany]
+http://docs.oracle.com/javaee/6/api/javax/persistence/OrderBy.html[@OrderBy]::
   Define la correspondencia de una asociación _1-N_ o _N-M._
 
 ---------------------------------------------------------------
@@ -725,17 +731,18 @@ public class Entity1 {
 ------------------------------------
 
 Máss adelante se verán otros mecanismos para realizar un control de
-concurrencia optimista. Para más información consultar el comando ``.
+concurrencia optimista. Para más información consultar el comando
+link:#_occ_checksum_set[occ checksum set].
 
-Regeneración de la Base de datos en cada arranque.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Regeneración de la Base de datos en cada arranque
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Recordar que por defecto, en la ingeniería directa, la configuración que
 se genera *reconstruye la base de datos en cada ejecución de la
 aplicación*. Si se desea modificar este comportamiento consultar la
 sección
-link:#guia-desarrollo_acceso-datos_actualizacion-esquema[Actualización
-automática del esquema] .
+link:#_actualización_automática_del_esquema[Actualización
+automática del esquema].
 
 Creación de una nueva entidad sin comandos
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -808,7 +815,7 @@ o _database reverse engineer._
 ====
 Si se está trabajando en el entorno de la CITMA, antes de seguir
 adelante es recomendable añadir el repositorio Maven de la CITMA al
-pom.xml del proyecto. En la link:#recetas-repositorio_maven[sección de
+pom.xml del proyecto. En la link:#_repositorios_maven[sección de
 recetas] existe un ejemplo de como hacerlo.
 ====
 
@@ -988,7 +995,7 @@ aplicación se realizará la fase de validación del esquema.
 ====
 Si se realiza la ingeniería inversa de alguna vista, es recomendable
 leer la sección
-link:#guia-desarrollo_gestion-entidades_ingenieria_inversa-vistas[Ingeniería
+link:#_ingeniería_inversa_de_vistas[Ingeniería
 inversa de vistas] ya que puede ser necario realizar alguna
 personalización.
 ====
@@ -997,7 +1004,7 @@ Anotación @RooDbManaged
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Tal y como se ha comentado en la sección
-link:#guia-desarrollo_gestion-entidades_definicion_crear-a-mano[Crear
+link:#_crear_una_entidad_con_un_ide[Crear
 una entidad con un IDE] se hace uso de una serie de anotaciones Java
 para que el framework gestione el código del proyecto. A las anotaciones
 descritas anteriormente se suma ahora la anotación @RooDbManaged que se
@@ -1125,7 +1132,7 @@ todos ellos por dobles comillas.
 
 La ingeniería inversa también se puede hacer de distintas fuentes de
 datos utilizando para ello la documentación de la sección
-link:#guia-desarrollo_gestion-acceso-datos_multiples-fuentes-datos[Múltiples
+link:#_múltiples_fuentes_de_datos[Múltiples
 fuentes de datos].
 
 

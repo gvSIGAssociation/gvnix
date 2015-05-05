@@ -6,7 +6,7 @@ Comandos del add-on Web MVC Datatables
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-web-mvc-datatables[add-on Web
+consultar la documentación del link:#_add_on_web_mvc_datatables[add-on Web
 MVC Datatables].
 
 .Comandos del add-on Web MVC Datatables
@@ -94,13 +94,13 @@ Sus parámetros son:
   _[Opcional] [Cadena]_
   +
   Establece el modo de visualización a
-  link:#addon-web-mvc-datatables_register-modeaddon-web-mvc-datatables_register-mode[modo
+  link:#_add_on_web_mvc_datatables_register-modeaddon-web-mvc-datatables_register-mode[modo
   registro].
 --inline::
   _[Opcional] [Boolean] [Autocompletado]_
   +
   Habilita la funcionalidad
-  link:#addon-web-mvc-datatables_inline-editing[edición en línea].
+  link:#_add_on_web_mvc_datatables_inline-editing[edición en línea].
 
 web mvc datatables all
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -115,7 +115,7 @@ web mvc datatables details add
 
 Un detalle a la vista list para en base a una propiedad _1 a N_ de la
 entidad relacionada (ver descripción en
-link:#addon-web-mvc-datatables_add-details[Visualización de detalles]).
+link:#_add_on_web_mvc_datatables_add-details[Visualización de detalles]).
 
 Sus parámetros son:
 

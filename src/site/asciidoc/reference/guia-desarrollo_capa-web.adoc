@@ -101,7 +101,7 @@ web mvc all
 ~~~~~~~~~~~
 
 Este comando ejecuta un
-link:#guia-desarrollo_web_definir-controller_comandos_controller-scaffold[web
+link:#_web_mvc_scaffold[web
 mvc scaffold] para cada una de las entidades registradas en la
 aplicación.
 
@@ -553,9 +553,10 @@ Este mecanismo está implementado en la clase java
 _ApplicationConversionServiceFactoryBean.java_ que se puede encontrar en
 el mismo paquete donde están los controladores de la aplicación. Esta
 clase la genera el framework de manera automática al generar la capa
-web. Tal y como se ha comentado en el apartado de
-link:#guia-desarrollo_generacion-codigo[generación de código], asociado
-al _ApplicationConversionServiceFactoryBean.java_ existe un Aspecto Java
+web. Tal y como se ha comentado en el apartado
+link:#_código_generado_por_gvnix_roo[generación de código].
+
+Asociado al _ApplicationConversionServiceFactoryBean.java_ existe un Aspecto Java
 (fichero aj) con la declaración de los Converters y un método que los
 registra para que estén disponibles a la hora de "convertir" una entidad
 del modelo a la cadena que se mostrara en página.
@@ -569,7 +570,7 @@ Mejoras de rendimiento
 -----------------------
 
 Se pueden implementar algunas mejoras de rendimiento definidas en la sección
-link:#guia-desarrollo_mejoras-rendimiento-evitar-carga-listas-innecesarias[Evitar
+link:#_evitar_la_carga_de_listas_de_valores_innecesarias[Evitar
 la carga de listas de valores innecesarias].
 
 //Return level title

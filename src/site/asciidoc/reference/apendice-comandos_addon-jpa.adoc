@@ -15,10 +15,10 @@ consultar la documentación del link:#addon-jpa[add-on JPA].
 |link:#apendice-comandos_addon-jpa_jpa-gvnix-setup[jpa gvnix setup]
 |Instala el soporte para la funcionalidad
 
-|link:#apendice-comandos_addon-jpa_jpa-batch_jpa-batch-add[jpa batch
+|link:#_jpa_batch_add[jpa batch
 add] |Genera el servicio de persistencia en bloque para una entidad.
 
-|link:#apendice-comandos_addon-jpa_jpa-batch_jpa-batch-all[jpa batch
+|link:#_jpa_batch_all[jpa batch
 all] |Genera el servicio de persistencia en bloque para todas las
 entidades.
 

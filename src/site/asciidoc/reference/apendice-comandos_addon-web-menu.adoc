@@ -12,31 +12,31 @@ consultar la documentación del link:#addon-web-menu[add-on Web Menu].
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-web-menu_page-menu-setup[menu setup]
+|link:#_comandos_del_add_on_web_menu_page-menu-setup[menu setup]
 |Instala el sistema de gestión del menú web que permite organizar de
 forma sencilla su estructura de páginas y permisos
 
-|link:#apendice-comandos_addon-web-menu_page-add[menu entry add] |Añade
+|link:#_comandos_del_add_on_web_menu_page-add[menu entry add] |Añade
 un elemento al menú, sea una página o un grupo
 
-|link:#apendice-comandos_addon-web-menu_page-hide[menu entry visibility]
+|link:#_comandos_del_add_on_web_menu_page-hide[menu entry visibility]
 |Define un elemento del menú como visible o oculto
 
-|link:#apendice-comandos_addon-web-menu_page-show[menu entry roles]
+|link:#_comandos_del_add_on_web_menu_page-show[menu entry roles]
 |Establece una lista de perfiles de usuario para los que se mostrará una
 entrada del menú
 
-|link:#apendice-comandos_addon-web-menu_page-move[menu entry move]
+|link:#_comandos_del_add_on_web_menu_page-move[menu entry move]
 |Mueve un elemento del menú y todos los hijos que pueda tener
 
-|link:#apendice-comandos_addon-web-menu_page-update[menu entry update]
+|link:#_comandos_del_add_on_web_menu_page-update[menu entry update]
 |Actualiza un elemento del menú
 
-|link:#apendice-comandos_addon-web-menu_page-info[menu entry info]
+|link:#_comandos_del_add_on_web_menu_page-info[menu entry info]
 |Muestra por consola los valores establecidos en un elemento del menú y
 en todos los hijos que pueda tener
 
-|link:#apendice-comandos_addon-web-menu_page-list[menu tree] |Muestra
+|link:#_comandos_del_add_on_web_menu_page-list[menu tree] |Muestra
 por consola un árbol con un resumen de los elementos del menú.
 |=======================================================================
 

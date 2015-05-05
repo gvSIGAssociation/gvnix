@@ -33,13 +33,13 @@ Disponible::
 Un Tema, para poder ser _establecido_ en la aplicación en desarrollo,
 debe de estar _Instalado_. La instalación de un Tema puede hacerse
 mediante el comando
-link:#apendice-comandos_addon-theme-manager_theme-install[`theme
+link:#_theme_install[`theme
     install`] o copiando el tema en el directorio `themes` de la
 aplicación con la que se está trabajando. gvNIX detectará la instalación
 manual de un tema y por lo tanto se podrá establecer en la aplicación.
 
 Para establecer un tema se utiliza el comando
-link:#apendice-comandos_addon-theme-manager_theme-set[`theme
+link:#_theme_set[`theme
     set`]. Este comando copiará el contenido del tema al directorio de
 la aplicación, sobreescribiendo los fichero ya existentes. Este comando
 *sobreescribe los ficheros y no implementa ningún mecanismo para
@@ -58,7 +58,7 @@ directamente las CSS de los temas o de otros addons. Esta hoja de
 estilos no se reemplaza al reinstalar un tema.
 
 Para ver todos los comandos y sus opciones ver el
-link:#apendice-comandos_addon-theme-manager[apéndice de comandos].
+link:#_comandos_del_add_on_theme_manager[apéndice de comandos].
 
 Temas disponibles por defecto.
 ------------------------------

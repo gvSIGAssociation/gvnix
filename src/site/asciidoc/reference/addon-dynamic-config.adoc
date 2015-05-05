@@ -237,8 +237,8 @@ _Maven_ del menú.
 
 image::./images/eclipse_maven_profiles.png[Selección del perfil Maven desde Eclipse,align=center]
 
-Mejoras de renimiento
----------------------
+Mejoras de rendimiento
+----------------------
 
 Se pueden definir algunos valores óptimos de rendimiento definidos en la
 sección link:#guia-desarrollo_mejoras-rendimiento-patrones-log[Patrones

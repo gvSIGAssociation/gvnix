@@ -225,7 +225,7 @@ image::./images/roo-relacion-addon-metadatos.png[Esquema de relación entre add-
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-image::./images/roo-relacion-addon-metadatos.png[Esquema de relación entre add-ons y los servicios de metadatos,align=center]
+image::./images/roo-relacion-addon-metadatos.png[Esquema de relación entre add-ons y los servicios de metadatos,align=center,width=400]
 endif::backend-pdf[]
 
 Este esquema sirve para ver como se relacionan los componentes de un

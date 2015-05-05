@@ -39,7 +39,7 @@ aplicación se puede realizar de dos formas distintas.
 
 Si la consola del framework se está ejecutando desde un Eclipse o un
 STS, consultar la sección de la documentación
-link:#guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse[Arrancar
+link:#_arrancar_la_aplicación_con_eclipse[Arrancar
 la aplicación con Eclipse] en la que se explica tanto la instalación de
 un servidor en el IDE como el modo de arrancar la aplicación.
 

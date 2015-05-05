@@ -70,7 +70,7 @@ nombre Subeclipse por ejemplo y en la URL indicar
 _http://subclipse.tigris.org/update_1.6.x_ guardar con _OK_ y la ventana
 anterior empezará la carga de los plugins que hay disponibles.
 Seleccionarlos y seguir haciendo click en _Next_. La URL indicada es de
-la versión actual, revisar el sitio oficial de link:#[Subeclipse] para
+la versión actual, revisar el sitio oficial de http://subclipse.tigris.org/[Subeclipse] para
 más información y futuras versiones.
 * Para instalar el plugin STS seguir las instrucciones del punto "UPDATE
 SITE INSTALLATION" del documento _Spring Source Tool Suite Installation
@@ -176,7 +176,7 @@ El comando *jpa setup* permite configurar la capa de acceso a datos de
 manera sencilla. El comando *entitiy jpa* sirve para crear una nueva
 entidad y *field* crea atributos en la entidad. Estos comandos se verán
 con más detalle en la sección
-link:#guia-desarrollo-acceso-datos_persistencia-objetos[Persistencia de
+link:#_persistencia_de_objetos[Persistencia de
 objetos] y
 link:#guia-desarrollo_gestion-entidades_definicion_crear-con-comando[Crear
 una entidad con el intérprete de comandos], también se verá como generar
@@ -191,7 +191,7 @@ Created ...
 
 Los comandos *web mvc* crean la capa capa web que gestionaran la
 interacción del usuario con la aplicación. Se verán con más detalle en
-link:#guia-desarrollo_web_definir-controller[Crear la capa web con el
+link:#_web_mvc_controller[Crear la capa web con el
 intérprete de comandos].
 
 ------------------------------------------------------
@@ -238,120 +238,6 @@ del ratón eligiendo la opción _Configure_. Esto es muy importante ya que
 en el caso de no estar correctamente configurado nos aparecerán falsos
 errores en el proyecto.
 
-Utilizar Eclipse como IDE
--------------------------
-
-Crear proyecto gvNIX en Eclipse IDE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Crear un proyecto gvNIX desde Eclipse a través del menú: __File > New >
-Spring Roo Project__:
-
-image::./images/eclipse_new_roo_project.png[Nuevo proyecto Spring Roo con soporte gvNIX,align=center]
-
-Esta primera pantalla habrá ejecutado de forma automática el comando de
-creación de un nuevo proyecto:
-
-----------------------------------------------
-project --topLevelPackage com.gvnix.tenminutes
-----------------------------------------------
-
-En este punto ya se dispone de un proyecto Maven preparado.
-
-A continuación, añadir el soporte para el manejo de la persistencia de
-datos a través de JPA. El siguiente ejemplo muestra los comandos que se
-deben usar para configurar el soporte JPA. Recordar que se puede usar
-Ctrl+Space como ayuda a la escritura en los comandos:
-
--------------------------------------------------------------------------
-roo-gvNIX> jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
-Created ...
-roo-gvNIX> entity jpa --class ~.domain.Timer --testAutomatically
-Created ...
-~.domain.Timer roo-gvNIX> field string --fieldName message --notNull
-Managed ...
--------------------------------------------------------------------------
-
-El comando *jpa setup* permite configurar la capa de acceso a datos de
-manera sencilla. El comando *entitiy jpa* sirve para crear una nueva
-entidad y *field* crea atributos en la entidad. Estos comandos se verán
-con más detalle en la sección
-link:#guia-desarrollo-acceso-datos_persistencia-objetos[Persistencia de
-objetos] y
-link:#guia-desarrollo_gestion-entidades_definicion_crear-con-comando[Crear
-una entidad con el intérprete de comandos], también se verá como generar
-todas las entidades de una aplicación mediante el proceso de ingeniería
-inversa contra un esquema de BBDD existente.
-
------------------------------------------------------
-~.domain.Timer roo-gvNIX> web mvc setup
-~.domain.Timer roo-gvNIX> web mvc all --package ~.web
-Created ...
------------------------------------------------------
-
-Los comandos *web mvc* crean la capa capa web que gestionaran la
-interacción del usuario con la aplicación. Se verán con más detalle en
-link:#guia-desarrollo_web_definir-controller[Crear la capa web con el
-intérprete de comandos].
-
------------------------------------------------------------------
-~.web roo-gvNIX> selenium test --controller ~.web.TimerController
-Created ...
------------------------------------------------------------------
-
-Si se desea incluir en el proyecto los tests funcionales existe el
-comando *selenium test* que generará los scripts necesarios para probar
-la interfaz web de la aplicación. Más adelante se verá como poner en
-marcha la aplicación y como ejecutar estos tests.
-
----------------------------------------
-~.web roo-gvNIX> theme install --id cit
-~.web roo-gvNIX> theme set --id cit
----------------------------------------
-
-Mediante el comando **theme**, del _Add-on Theme Manager_ propio de
-gvNIX, se puede configurar el tema visual que presentará la aplicación.
-
-
-Importar proyecto gvNIX en Eclipse
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-gvNIX/Roo permite crear proyectos desde la linea de comandos, aunque
-puede suceder que se necesite importar un proyecto ya existente en el
-IDE. Si se está ejecutando gvNIX en la línea de comandos, bastaría con
-ejecutar el comando `perform eclipse` para crear una estructura de
-proyecto Eclipse:
-
--------------------------------
-~.domain.PizzaOrder roo-gvNIX>
-
-~.domain.PizzaOrder roo-gvNIX>
--------------------------------
-
-Este comando termina ejecutando el comando del
-sistema`mvn eclipse:eclipse` en el proyecto, por lo que es indiferente
-el uso de cualquiera de los dos métodos. Tener en cuenta que este último
-comando necesita tener configurado Maven.
-
-Ahora se puede importar en el entorno de trabajo mediante
-`File > Import > General > Existing Projects
-      into workSpace`. Si aparece el mensaje _Turn Weaving Service on?_,
-marcar la casilla _Don't ask again until next upgrade_ y clic en _Yes_
-(será necesario reiniciar Eclipse).
-
-También es posible borrar la configuración de eclipse ejecutando el
-comando `mvn eclipse:clean` en una consola del sistema que tenga
-configurada Maven. Para regenerar la configuración de eclipse en un solo
-comando usar `mvn eclipse:clean eclipse:eclipse`.
-
-Al importar un proyecto en Eclipse es importante comprobar que dicho
-proyecto tiene configuradas las características de proyecto Maven y
-proyecto de aspectos java. Esto aparece de forma visual en el proyecto
-mediante unas pequeñas letras M y AJ. Si no apareciesen se pueden añadir
-estas características seleccionando el proyecto y con el segundo botón
-del ratón eligiendo la opción _Configure_. Esto es muy importante ya que
-en el caso de no estar correctamente configurado nos aparecerán falsos
-errores en el proyecto.
 
 Generación de pruebas de integración
 ------------------------------------
@@ -541,8 +427,8 @@ declarados en una clase.
 
 La particularidad de la vista Cross References es que muestra los campos
 y métodos asociados a la clase Java mediante aspectos java que se verán
-en el Cápitulo sobre el link:#guia-desarrollo_generacion-codigo[código
-que genera gvNIX/Roo].
+en el Cápitulo sobre el
+link:#_código_generado_por_gvnix_roo[código que genera gvNIX/Roo].
 
 Esta información también está disponible desde un menú contextual
 accesible haciendo click con el botón derecho sobre la flecha que hay a

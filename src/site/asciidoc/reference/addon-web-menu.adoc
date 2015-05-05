@@ -69,7 +69,7 @@ Instalación de la gestión del menú
 
 El uso del sistema de gestión del menú aportado por esta herramienta es
 opcional. Por ello, para instalarlo y activarlo es necesario ejecutar en
-primer lugar el comando link:#[`menu setup`].
+primer lugar el comando link:#_menu_setup[`menu setup`].
 
 ------------------------------------------------------------------------------------
 roo-gvNIX>
@@ -108,8 +108,8 @@ los _tagx_ de pintado del menú, creada en `WEB-INF/views/menu.jspx`.
 6.  Clases para el uso de los menús contextuales. Estas clases se
 crearán en el subpaquete `web.menu`.
 
-Para más información sobre el comando ver link:#[`menu setup`] en el
-link:#apendice-comandos_addon-web-menu[apéndice de comandos de este
+Para más información sobre el comando ver link:#_menu_setup[`menu setup`] en el
+link:#_comandos_del_add_on_web_menu[apéndice de comandos de este
 add-on].
 
 El nombre del fichero XML que contiene el modelo de datos del menú se
@@ -124,7 +124,7 @@ en la consola, que serán accesibles después de haber instalado la nueva
 gestión del menú.
 
 Para mas información sobre los comandos ver el
-link:#apendice-comandos_addon-web-menu[apéndice de comandos de este
+link:#_comandos_del_add_on_web_menu[apéndice de comandos de este
 add-on].
 
 Futuras versiones

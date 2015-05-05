@@ -14,7 +14,7 @@ patrones de pantalla estándar"]
 
 Las opciones de este add-on _no son compatibles con el
 link:#addon-web-mvc_jquery[add-on web mvc de jQuery] ni con
-link:#addon-web-mvc-datatables[add-on web mvc datatables]_.
+link:#_add_on_web_mvc_datatables[add-on web mvc datatables]_.
 
 Descripción
 -----------
@@ -215,7 +215,13 @@ Para aplicar un patrón detalle sobre un controlador, es necesario
 definir previamente un patrón maestro sobre el mismo controlador. Es
 decir, el controlador debe tener definida la anotación _@GvNIXPattern_.
 
+ifdef::backend-html5[]
 image::./images/master-detail.png[Patrón maestro con un detalle,align=center]
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+image::./images/master-detail.png[Patrón maestro con un detalle,align=center, width=300]
+endif::backend-pdf[]
 
 Tipos de patrones
 -----------------
@@ -315,7 +321,13 @@ Las operaciones de creación, actualización y borrado en este formato de
 visualización se realizan sobre un único registro seleccionado de la
 lista tabular y se realiza en una página nueva en formato registro.
 
+ifdef::backend-html5[]
 image::./images/edit.png[Edición,align=center]
+endif::backend-html5[]
+
+ifdef::backend-pdf[]
+image::./images/edit.png[Edición,align=center,width=400]
+endif::backend-pdf[]
 
 El Add-on Web Screen Pattern, genera los componentes necesarios para
 mostrar una entidad en formato tabular con edición registro. Por

@@ -71,9 +71,9 @@ Añadir el control en las entidades
 Para activar esta característica sobre una entidad se pueden utilizar
 los siguientes comandos:
 
-link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-set[_occ checksum set_]::
+link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-set['occ checksum set']::
   Aplica el control de concurrencia a una entidad.
-link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-all[_occ checksum all_]::
+link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-all['occ checksum all']::
   Aplica el control de concurrencia a todas las entidades de la
   aplicación.
 

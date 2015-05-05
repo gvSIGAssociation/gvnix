@@ -13,15 +13,15 @@ Manager].
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-theme-manager_theme-install[theme
+|link:#_theme_install[theme
 install] |Instala un tema en el proyecto de forma que será un candidato
 para establecerlo como tema visible
 
-|link:#apendice-comandos_addon-theme-manager_theme-set[theme set]
+|link:#_theme_set[theme set]
 |Establece el tema en la aplicación de forma que será el tema visible a
 partir de ese momento
 
-|link:#apendice-comandos_addon-theme-manager_theme-list[theme list]
+|link:#_comandos_del_add_on_theme_manager_theme-list[theme list]
 |Lista los temas disponible para instalar, los temas instalados en el
 proyecto y el tema actualmente establecido que se está visualizando en
 la aplicación
@@ -30,10 +30,10 @@ la aplicación
 theme install
 ~~~~~~~~~~~~~
 
-Coje un tema que el framework detecte que está disponible y lo copia en
+Coge un tema que el framework detecte que está disponible y lo copia en
 el directorio `themes` del proyecto. A partir de ese momento el tema
 estará disponible para establecerlo como tema visible mediante el
-comando link:#apendice-comandos_addon-theme-manager_theme-set[theme
+comando link:#_theme_set[theme
 set].
 
 Sus parámetros son:
@@ -46,7 +46,7 @@ Sus parámetros son:
 theme set
 ~~~~~~~~~
 
-Coje un tema que se encuentre instalado en el proyecto y lo establece
+Coge un tema que se encuentre instalado en el proyecto y lo establece
 como visible en la aplicación actualizando la información del fichero
 `src/main/webapp/WEB-INF/theme.xml`. Este comando sobreescribe los
 ficheros que existan en el proyecto sin comprobar si ya había algún tema

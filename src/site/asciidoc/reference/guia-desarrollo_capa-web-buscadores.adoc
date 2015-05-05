@@ -6,9 +6,9 @@ Buscadores en la capa web
 
 
 En la sección de recetas se puede encontrar información adicional para
-link:#recetas-finders-multitud-campos[desarrollar buscadores con gran
+link:#_desarrollo_de_buscadores_con_gran_cantidad_de_campos[desarrollar buscadores con gran
 cantidad de campos] y también para hacer los
-link:#recetas-finders-modificar[campos opcionales en los buscadores] .
+link:#_campos_opcionales_en_los_buscadores[campos opcionales en los buscadores] .
 
 Descripción
 -----------

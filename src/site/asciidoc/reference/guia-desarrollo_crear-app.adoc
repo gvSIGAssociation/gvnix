@@ -43,8 +43,8 @@ Crear un nuevo proyecto
 La creación de un nuevo proyecto se puede realizar de dos formas, en
 función de si se hace desde la consola del sistema operativo o desde el
 IDE. Para ello, leer las secciones
-link:#guia-desarrollo_eclipse-usar[Crear proyecto gvNIX en Eclipse IDE]
-para la creación desde el IDE o link:#instalacion_instalacion[Descarga e
+link:#_crear_proyecto_gvnix_en_eclipse_ide[Crear proyecto gvNIX en Eclipse IDE]
+para la creación desde el IDE o link:#_descarga_e_instalación_de_gvnix[Descarga e
 instalación gvNIX] para la creación desde la consola del sistema.
 
 Acceder a la consola y teclear `hint` para mostrar la información del
