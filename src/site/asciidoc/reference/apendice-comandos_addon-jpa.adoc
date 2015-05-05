@@ -107,14 +107,14 @@ Sus parámetros son:
 --userType::
   _[Opcional] [Clase] [Autocompletado]_
   +
-  Clase a usar como usuario. Por defecto ``String``.
+  Clase a usar como usuario. Por defecto `String`.
 
 [NOTE]
 ====
 Lanzará un warning informando que tiene que ajustar la implementación de
 la clase en dos circunstancias:
 Si no está configurado Spring Security::
-Si la clase ``userType`` no es String y no implementa ``UserDetails``.::
+Si la clase `userType` no es String y no implementa `UserDetails`.
 ====
 
 jpa audit add
@@ -205,7 +205,7 @@ Sus parámetros son:
   +
   Selecciona el tipo de dato GEO que representará el nuevo campo añadido
   a la entidad. Puede tomar los siguientes valores:
-  +
+
   * POINT (Se guarda un único punto en la base de datos)
   * LINESTRING (Se guardan una serie de puntos que forman una linea
   continua)
@@ -235,5 +235,5 @@ Sus parámetros son:
   +
   Entidad sobre la que se quieren generar los métodos de búsqueda.
 
-  //Return level title
-  :leveloffset: 0
+//Return level title
+:leveloffset: 0

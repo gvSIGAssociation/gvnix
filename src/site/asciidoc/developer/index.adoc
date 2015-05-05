@@ -53,6 +53,7 @@ Recopilado de alguna tarea de documentación.
 
 * Remove all @Reference PathResolver declarations from classes and
 retrieve PathResolver from ProjectMetadata instead #4615
+
 * Descripción de la tarea https://jira.springsource.org/browse/ROO-2066
 sobre la conveniencia de uso de las distintas clases habituales en un
 add-on de Roo:
@@ -71,14 +72,17 @@ TypeLocationService and TypeManagementService. Below is the background
 from Ben Alex about this change.
 +
 The general pattern is this:
+
 ** Utils are statless public abstract classes with public static
 methods. They cannot be instantiated or injected with anything. It's OK
 to pass things into the methods if it helps, but it is fairly unusual to
 pass services or complex objects given utility methods are simple.
+
 ** Commands contain shell annotations. Generally call Operations, but
 can call Services as well. Usually deal with formatting for user I/O.
 Also ensure all types are of the intended format for successful method
 invocation.
+
 ** Operations are stateless types which respond to UI commands and offer
 their methods to other Operations types. The point was they were
 different from Commands because they didn't deal with all the user I/O
@@ -88,12 +92,15 @@ infrastructure and services do. They just did something quite simple and
 returned, with no ongoing lifecycle obligations. They are allowed call
 services and other Operations objects. They aren't allowed call
 Commands.
+
 ** Services can be called by anyone, including control flows unrelated
 to a UI command, such as control flows instigated due to a
 MetadataProvider or event. Services should never call an Operations or
 Command object.
+
 ** Listeners are really a special type of Service. Most of the time a
 so-called Service actually implements one of more Listeners.
+
 ** MetadataProviders and metadata infrastructure can call other metadata
 infrastructure and Services. They're really just a very special type of
 service (due to the ability to identify them and invoke and notify them
@@ -111,6 +118,7 @@ all Operations to Services for consistency? The critical thing is one
 cannot "call up" to Commands, as it's silly to re-convert missing
 arguments and figure out defaults etc like the Commands and Converter
 infrastructure does.
+
 * "addon create advanced" y "addon create wrapper"
 * Joey infrastructure https://jira.springsource.org/browse/ROO-1372 -
 http://projects.disid.com/issues/3814

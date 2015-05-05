@@ -63,7 +63,7 @@ excepciones gestionadas por defecto] se incluye esta. Una vez
 inicializada la gestión de excepciones es posible personalizar el
 mensaje usando el comando
 link:#apendice-comandos_addon-web-exception-handler_exception-handler-set-language[web
-mvc dialog exception set language]
+mvc dialog exception set language].
 
 Añadir el control en las entidades
 ----------------------------------
@@ -71,11 +71,9 @@ Añadir el control en las entidades
 Para activar esta característica sobre una entidad se pueden utilizar
 los siguientes comandos:
 
-link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-set[occ
-checksum set]::
+link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-set[_occ checksum set_]::
   Aplica el control de concurrencia a una entidad.
-link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-all[occ
-checksum all]::
+link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-all[_occ checksum all_]::
   Aplica el control de concurrencia a todas las entidades de la
   aplicación.
 

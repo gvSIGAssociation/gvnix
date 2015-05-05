@@ -125,7 +125,7 @@ el nombre del proyecto en googlecode y el directorio en el que será
 almacenada la dependencia:
 +
 -------------------------------------------------------------------
-<!-- DiSiD: Add google code project name and repo folder values -->
+<!-- DISID: Add google code project name and repo folder values -->
 <properties>
  ...
  <google.code.project.name>gvnix</google.code.project.name>
@@ -140,7 +140,7 @@ corresponda con el artifactId del add-on, separado por '/' en lugar de
 * Antes de la sección "build", añadir la url del proyecto en googlecode:
 +
 ----------------------------------------------------------------------------
-<!-- DiSiD: Add google code distribution management -->
+<!-- DISID: Add google code distribution management -->
 <distributionManagement>
  ...
  <repository>
@@ -155,7 +155,7 @@ utilizar el protocolo que se utiliza para subir la dependencia a
 googlecode:
 +
 ----------------------------------------------------
-<!-- DiSiD: Add webdav extension to google code  -->
+<!-- DISID: Add webdav extension to google code  -->
 <extensions>
  ...
  <extension>

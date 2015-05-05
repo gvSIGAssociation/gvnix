@@ -11,13 +11,11 @@ En el esquema siguiente podemos ver los principales componentes del
 framework.
 
 ifdef::backend-html5[]
-image::./images/roo-esquema-general-componentes.png[Esquema General de
-componentes del framework,align=center]
+image::./images/roo-esquema-general-componentes.png[Esquema General de componentes del framework,align=center]
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-image::./images/roo-esquema-general-componentes.png[Esquema General de
-componentes del framework,align=center]
+image::./images/roo-esquema-general-componentes.png[Esquema General de componentes del framework,align=center]
 endif::backend-pdf[]
 
 
@@ -129,8 +127,8 @@ Framework OSGi
 
 _TBC_.
 
-[Características. Descripción de los servicios y componentes.
-Referencias.] (Nuevo)
+(Características. Descripción de los servicios y componentes.
+Referencias.) (Nuevo)
 
 //Return level title
 :leveloffset: 0

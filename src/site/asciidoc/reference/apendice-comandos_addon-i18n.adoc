@@ -32,5 +32,5 @@ Sus parámetros son:
   Código del idioma a instalar. Los idiomas disponibles son _de, en, es,
   it, nl y sv._
 
-  //Return level title
-  :leveloffset: 0
+//Return level title
+:leveloffset: 0

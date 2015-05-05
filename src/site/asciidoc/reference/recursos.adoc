@@ -16,8 +16,7 @@ Valenciana.
 
 * http://www.gvpontis.gva.es/[gvPONTIS]
 * http://www.gvsig.org/[gvSIG]
-*
-http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo/gvhidra-herramienta/[gvHIDRA]
+* http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo/gvhidra-herramienta/[gvHIDRA]
 * http://www.moskitt.org/[Moskitt]
 
 Recursos de Spring Roo
@@ -25,16 +24,13 @@ Recursos de Spring Roo
 
 Esta es una lista de recursos relacionados con Spring Roo:
 
-*
-http://static.springsource.org/spring-roo/reference/html-single/index.html[Documentación
+* http://static.springsource.org/spring-roo/reference/html-single/index.html[Documentación
 de referencia Spring Roo (_on-line_)]
-
 * http://projects.spring.io/spring-roo/[Página del proyecto]
 * http://forum.spring.io/forum/spring-projects/roo[Foro de Spring Roo]
 * https://jira.springsource.org/browse/ROO[JIRA de Spring Roo]
-* http://spring.io/tools[Spring STS (Spring Tools Suite)]
-*
-http://forum.spring.io/forum/spring-projects/roo/64079-latest-project-links-and-version-details[Página
+* http://spring.io/tools[Spring STS (Spring Tools Suite)
+* http://forum.spring.io/forum/spring-projects/roo/64079-latest-project-links-and-version-details[Página
 con recursos para Roo]
 
 Recursos de librerías relacionadas
@@ -44,14 +40,11 @@ Enlaces a recursos de librerías relacionadas con los proyectos
 generados.
 
 * http://spring.io/[Spring]
-*
-http://docs.spring.io/spring/docs/3.2.3.RELEASE/spring-framework-reference/html/[Documentación
+* http://docs.spring.io/spring/docs/3.2.3.RELEASE/spring-framework-reference/html/[Documentación
 de Spring Framework]
-*
-http://docs.spring.io/spring/docs/3.2.3.RELEASE/spring-framework-reference/html/mvc.html[Documentación
+* http://docs.spring.io/spring/docs/3.2.3.RELEASE/spring-framework-reference/html/mvc.html[Documentación
 de Spring MVC]
-*
-http://docs.spring.io/spring-security/site/docs/3.1.4.RELEASE/reference/springsecurity.html/[Spring
+* http://docs.spring.io/spring-security/site/docs/3.1.4.RELEASE/reference/springsecurity.html/[Spring
 Security]
 * http://www.eclipse.org/aspectj/[AspectJ (Aspectos Java)]
 * http://www.eclipse.org/ajdt/[AJDT]

@@ -17,6 +17,7 @@ para este fin.
 Ya sean excepciones ignoradas o condiciones no utilizadas, es
 recomendable no dejar estos bloques sin realizar ninguna operación (los
 comentarios no cuentan como operación). Ejemplos:
+
 ** En el caso de ignorar una excepción podemos lanzar una traza de
 depuración:
 +
@@ -77,11 +78,11 @@ Para cerrar los objetos de tipo`*Stream` es recomendable usar el método
 * _Evitar el uso de operador_ `+`
 +
 Es recomendable usar otras opciones como:
+
 ** `String.concat`
 ** `StringBuilder`. Preferentemente antes que `StringBuffer`, a no ser
 que se requiera que las instancia se _Thread-safe_
-** `String.format`. Para cadenas complejas o con varios argumentos.
-Ejemplo:
+** `String.format`. Para cadenas complejas o con varios argumentos. Ejemplo:
 +
 -----------------------------------------------------------------------------------------------
  String.format("Esta concatenación de '%s' es mas compleja ya que %s.%s usar varias cadenas.",
@@ -93,7 +94,7 @@ caracteres._
 +
 Incluye el `LOGGER`.
 * _No modificar un campo estático desde un método no-estático_
-* _Añadir el modificador_`final` en las propiedades que se establecen en
+* _Añadir el modificador `final` en las propiedades que se establecen en
 el constructor y no se van a ser modificadas
 * _Eliminar código muerto._
 +
@@ -124,7 +125,7 @@ Lanzar proceso de comprobación
 ------------------------------
 
 Para el proyecto gvNIX se ha utilizado la herramienta
-http://www.sonarsource.org/[Sonar] ( http://www.sonarsource.org/). Esta
+http://www.sonarsource.org/[Sonar]. Esta
 herramienta se compone de un lanzador de proceso (en gvNIX se utiliza el
 plugin de maven) que analiza el código y una aplicación servidor que
 permite visualizar y gestionar los resultados.
@@ -211,7 +212,7 @@ resultado desde la aplicación servidor sonar.
 
 Para más información sobre la configuración del plugin de maven ver la
 http://docs.codehaus.org/display/SONAR/Analyzing+with+Maven[documentación
-de sonar] al respecto
+de sonar] al respecto.
 
 Visualizar evidencias de Sonar en proyectos de eclipse
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -221,7 +222,7 @@ detectadas por un análisis de sonar desde el proyecto de un workspace de
 eclipse. La información para instalar, configurar y usar este plugin se
 encuentra en
 http://docs.codehaus.org/display/SONAR/Using+Sonar+in+Eclipse[documentación
-de sonar] al respecto
+de sonar] al respecto.
 
 Establecer el perfil para la aplicación
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -231,15 +232,11 @@ perfil de reglas que se deben aplicar al proyecto. Para ello es
 necesario seguir los siguiente pasos:
 
 * Entrar en http://hq02.disid.com:9000
-+
-Logarse como Administrador
-+
-Seleccionar el proyecto desde el menú Proyectos
-+
-Seleccionar en el menú Configuración del proyecto (debajo del input
+* Logarse como Administrador
+* Seleccionar el proyecto desde el menú Proyectos
+* Seleccionar en el menú Configuración del proyecto (debajo del input
 buscar, en la parte derecha) y seleccionar Perfiles de calidad
-+
-Seleccionar el perfil a usar para Java
+* Seleccionar el perfil a usar para Java
 
 Exportar/importar perfiles de calidad
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -249,34 +246,23 @@ Es posible exportar e importar los perfiles de calidad.
 Exportar:
 
 * Entrar en http://hq02.disid.com:9000
-+
-Entrar en el menú Configuración de sonar (en la parte derecha de la
+* Entrar en el menú Configuración de sonar (en la parte derecha de la
 barra superior, a la izquierda del input buscar).
-+
-Seleccionar Perfiles de calidad
-+
-Seleccionar el perfil a exportar
-+
-Pulsar sobre pestaña Enlaces permanentes
-+
-Descargar el fichero del link Todas las reglas
+* Seleccionar Perfiles de calidad
+* Seleccionar el perfil a exportar
+* Pulsar sobre pestaña Enlaces permanentes
+* Descargar el fichero del link Todas las reglas
 
 Importar:
 
 * Entrar en http://hq02.disid.com:9000
-+
-Logarse como Administrador
-+
-Entrar en el menú Configuración de sonar (en la parte derecha de la
+* Logarse como Administrador
+* Entrar en el menú Configuración de sonar (en la parte derecha de la
 barra superior, a la izquierda del input buscar).
-+
-Seleccionar Perfiles de calidad
-+
-Pulsar sobre Restaurar perfil (en la parte derecha arriba)
-+
-Seleccionar el archivo de la exportación.
-+
-Pulsar Restaurar
+* Seleccionar Perfiles de calidad
+* Pulsar sobre Restaurar perfil (en la parte derecha arriba)
+* Seleccionar el archivo de la exportación.
+* Pulsar Restaurar
 
 El fichero de reglas utilizado en eXcentia se puede encontrar en
 http://scmcit.gva.es/svn/gvnix/trunk/doc/general/sonar/export-excentia-sonar.xml

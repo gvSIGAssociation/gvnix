@@ -14,7 +14,7 @@ Descripción
 Este add-on permite configurar el proyecto gvNIX con la estructura HTML
 necesaria para implementar Bootstrap 3. Además, incluye todos los
 recursos necesarios para modificar la apariencia de la aplicación por
-una por defecto basada en Bootstrap 3
+una por defecto basada en Bootstrap 3.
 
 Instalación de Bootstrap 3
 --------------------------

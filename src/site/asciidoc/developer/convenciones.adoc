@@ -41,28 +41,26 @@ cit security setup
 Nombres de paquetes
 -------------------
 
-Paquete raíz de gvNIX: org.gvnix
+Paquete raíz de gvNIX: _org.gvnix_
 
 Paquete raíz para probar funcionalidades genéricas:
-org.gvnix.test.funcionalidad
+_org.gvnix.test.funcionalidad_
 
 Paquete raíz para probar funcionalidades específicas CIT:
-org.gvnix.test.cit.funcionalidad
+_org.gvnix.test.cit.funcionalidad_
 
 Add-ons
 ~~~~~~~
 
 * Para add-ons genéricos que aportará gvNIX añadir al paquete raíz la
 funcionalidad y finalizar con `roo.addon` (esto último es requerimiento
-de Roo). El patrón a seguir sería org.gvnix.FUNCIONALIDAD.roo.addon.
-Ejemplo:
+de Roo). El patrón a seguir sería org.gvnix.FUNCIONALIDAD.roo.addon. Ejemplo:
 +
 ------------------------
  org.gvnix.cxf.roo.addon
 ------------------------
 * Para add-ons específicos para un entorno, por ejemplo la CIT, seguir
-el siguiente patrón org.gvnix.ID_ENTORNO.FUNCIONALIDAD.roo.addon.
-Ejemplo:
+el siguiente patrón org.gvnix.ID_ENTORNO.FUNCIONALIDAD.roo.addon. Ejemplo:
 +
 --------------------------------
 org.gvnix.cit.security.roo.addon
@@ -155,8 +153,9 @@ Ya está accesible y actualizado a media noche el javadoc de todos los
 módulos de gvNIX:
 
 http://projects.disid.com/projects/fwjava/wiki/Javadoc
+
 En el proyecto gvNIX ha llegado un momento que la documentación de cada
-módulo en su directorio "doc" se queda anticuada rápidamente debido a
+módulo en su directorio "docs" se queda anticuada rápidamente debido a
 que es fácil olvidarse de actualizarla al hacer algún cambio en el
 código, a parte de ser un "coñazo" cambiar código en un sitio y
 documentación en otro.
@@ -168,11 +167,11 @@ Para cada módulo, a parte de la documentación javadoc que se incluye en
 cada clase java, existen ficheros especiales del proyecto que se
 incluyen en el javadoc:
 
-package.html: se puede añadir en cada paquete java y se incluirá como
+* _package.html_: se puede añadir en cada paquete java y se incluirá como
 documentación adicional en la página javadoc de cada paquete
 
-overview.html: se puede añadir en src/main/javadoc y se incluirá como
-documentación adicional en la página principal del javadoc
+* _overview.html_: se puede añadir en _src/main/javadoc_ y se incluirá como
+documentación adicional en la página principal del javadoc.
 
 Con esto, creo que podemos dejar de mantener la documentación por
 separado (javadoc y rst en docs). Además, tenemos la posibilidad de
@@ -246,7 +245,9 @@ Copiar al directorio `legal` del addon el archivo
 `gvnix/trunk/code/LICENSE.TXT.`
 
 El texto original de la licencia se encuentra en
-http://www.gnu.org/licenses/gpl-3.0.txt. Guía de referencia:
+http://www.gnu.org/licenses/gpl-3.0.txt.
+
+Guía de referencia:
 http://www.gnu.org/licenses/quick-guide-gplv3.html.
 
 Licencia a integrar en las cabeceras de las clases java:

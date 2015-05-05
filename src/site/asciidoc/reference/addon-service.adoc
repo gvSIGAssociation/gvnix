@@ -333,10 +333,12 @@ hacer esta tarea de manera transparente para el usuario.
 +
 Para ello, se manipula el almacén de certificados de la máquina virtual
 Java siempre que sea posible. Esto es:
+
 a.  Existe el archivo de keystore en el directorio donde está instalado
 Java, por ejemplo en sistemas linux
 _$JAVA_HOME/jre/lib/security/cacerts_ y es modificable por el usuario
 del sistema que está ejecutando gvNIX.
+
 b.  La contraseña del _keystore_ es changeit (la contraseña por defecto
 del keystore).
 +

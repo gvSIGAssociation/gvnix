@@ -146,16 +146,16 @@ formatos de fichero en los que se puede generar el informe son:
 
 * PDF
 +
-: Portable Document Format.
+Portable Document Format.
 * XLS
 +
-: Excel.
+Excel.
 * CSV
 +
-: Comma Separated Values.
+Comma Separated Values.
 * HTML
 +
-: Hyper Text Markup Language.
+Hyper Text Markup Language.
 
 --------------------------------------------------------------------------------
 roo-gvNIX>
@@ -200,7 +200,7 @@ tiene como principal cometido establecer, de manera dinámica, el nombre
 del archivo del informe que se genera para su descarga.
 * En el archivo `jasper-views.xml` añade la definición de una nueva
 vista que será el nuevo informe añadido a la aplicación. Se define para
-ello un bean cuyo id es _<fromBackingObject>_<reportname>_ y
+ello un bean cuyo id es _<fromBackingObject><reportname>_ y
 _CustomJasperReportsMultiFormatView_ como clase del bean. Si
 _formBackingObject_ de _@RooWebScaffold_ tiene como valor _Entity_ y el
 nombre definido para el informe es _informe_:
@@ -217,9 +217,8 @@ clase Entity (siguiendo el ejemplo anterior). El archivo se creará en
 `src/main/webapp/WEB-INF/reports` con el nombre `entity_informe.jrxml`.
 Este archivo se referenciará en el _bean_ del fichero `jasper-views.xml`
 desde el atributo _p:url_.
-* Crea un formulario web bajo `
-        src/main/webapp/WEB-INF/views/<entity>
-        `con nombre _informe.jspx_ siguiendo con el ejemplo anterior. Y
+* Crea un formulario web bajo `src/main/webapp/WEB-INF/views/<entity>`
+con nombre _informe.jspx_ siguiendo con el ejemplo anterior. Y
 define esta nueva vista en el fichero `views.xml` situado en el mismo
 directorio. Esta página permitirá solicitar la generación del informe y
 por defecto lo hará incluyendo los 10 primeros registros de la entidad.

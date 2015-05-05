@@ -11,7 +11,7 @@ Introduction
 Spring Roo brings brings a whole new level of productivity to building
 Java applications. From the Spring Roo Reference Guide:
 
-"http://www.springsource.org/roo[Spring Roo] is an easy-to-use
+http://projects.spring.io/spring-roo/[Spring Roo] is an easy-to-use
 productivity tool for rapidly building enterprise applications in the
 Java programming language. It allows you to build high-quality,
 high-performance, lock-in-free enterprise applications in just minutes.
@@ -22,7 +22,7 @@ program in your normal Java way and Roo just works, sitting in the
 background taking care of the things you don't want to worry about."
 
 To learn more about Spring Roo itself, you'll find numerous resources
-from the project's homepage at http://www.springsource.org/roo
+from the project's homepage at http://projects.spring.io/spring-roo/
 
 The Flex Addon for Spring Roo aims to raise the bar for developer
 productivity in building Spring-based RIAs with a Flex client by meeting
@@ -33,7 +33,7 @@ Spring BlazeDS Integration set up and running.
 2.  Eliminate the need to manually perform repetitive tasks such as
 keeping ActionScript and Java domain objects in sync.
 3.  Automate round-tripping code-generation of Flex artifacts with a
-focus on letting developers do what they do best - write code.
+focus on letting developers do what they do best-write code.
 
 Flex Addon for Spring Roo Features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -131,7 +131,7 @@ The `@RemotingDestination` that gets generated (in this example,
 CRUD functionality for the given `Artist` entity. The generated methods
 that provide this functionality are as follows:
 
-[cols=",",options="header",]
+[options="header"]
 |=======================================================================
 |Method Signature  |Comment 
 |public Artist *create*(Artist artist)\{..} |The create method will

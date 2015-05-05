@@ -312,5 +312,5 @@ Sus parámetros son:
   herramienta para evitar que se pierdan los cambios aplicados sobre el
   mapa.
 
-  //Return level title
-  :leveloffset: 0
+//Return level title
+:leveloffset: 0

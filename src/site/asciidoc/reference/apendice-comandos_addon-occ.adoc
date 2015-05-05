@@ -87,5 +87,5 @@ Sus parámetros son:
   algorithm)]. Por defecto, se utilizará el algoritmo _md5_, pero pueden
   utilizarse otros como por ejemplo _sha_.
 
-  //Return level title
-  :leveloffset: 0
+//Return level title
+:leveloffset: 0

@@ -4,8 +4,8 @@ Recetas
 //Push down title level
 :leveloffset: 2
 
-TBC (de roo-addon-desarrollo.rst) [Las recetas que todavía sean válidas
-en M1. Ver si extraer alguna de los add-ons implementados]
+TBC (de roo-addon-desarrollo.rst) (Las recetas que todavía sean válidas
+en M1. Ver si extraer alguna de los add-ons implementados)
 
 En este capitulo se incluyen una serie de recetas que pueden ser útiles
 en el desarrollo de framework para realizar algunas funciones comunes.
@@ -685,7 +685,8 @@ del proyecto con el que se está trabajando) la versión que prevalecerá
 será la más nueva.
 
 Ejemplo:
-1.  Creamos un proyecto con gvNIX. +
+
+1.  Creamos un proyecto con gvNIX.
 2.  Este proyecto hace uso del add-on Service en una versión antigua. +
 3.  Actualizamos gvNIX a una versión posterior y abrimos el mismo
 proyecto con esta nueva versión de gvNIX. Entonces la dependencia con el
@@ -944,7 +945,7 @@ notificaciones de este directorio.
 Crear una clase java desde código
 ---------------------------------
 
-_[Hay que revisar el código]_
+TBC _(Hay que revisar el código)_
 
 En este ejemplo creamos una clase Java usando código Java. En este caso
 estamos generando una clase que implementa un interface, rellenando su

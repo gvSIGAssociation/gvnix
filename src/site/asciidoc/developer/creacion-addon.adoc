@@ -301,7 +301,7 @@ tipo. Es recomendable que estos tipos se creen como _tipos inmutables_
 (al objeto de tipos se inicializa en el constructor y no permite
 modificar sus datos).
 
-TBC [Añadir la descripción de la clase]
+TBC (Añadir la descripción de la clase)
 
 La interface Operations
 -----------------------
