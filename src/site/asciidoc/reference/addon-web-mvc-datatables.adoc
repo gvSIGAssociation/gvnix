@@ -47,7 +47,7 @@ Soporta múltiples plugins y es extensible::
   reordenar las columnas), _FixedHeader_ (que mantiene las cabeceras de
   las columnas visibles cuando se desciende por páginas largas), etc.
 Registro de Callbacks en distintos eventos::
-  Soporta registrar funciones JavaScript a ejecutar por el widged
+  Soporta registrar funciones JavaScript a ejecutar por el widget
   cuando: termina la inicialización, al crear una línea, al pintar el
   píe de tabla, etc...
 Visualización en modo Registro::
@@ -66,10 +66,12 @@ Instalación del soporte para Datatables
 ---------------------------------------
 
 Esta funcionalidad depende de las librerías de _jQuery_ por lo que, el
-primer paso, será instalar las librerías usando el comando `` si no
-estuviese ya instalado.
+primer paso, será instalar las librerías usando el comando
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup[_web mvc jquery setup_]
+ si no estuviese ya instalado.
 
-Para instalar esta funcionalidad hay que ejecutar el comando ``.
+Para instalar esta funcionalidad hay que ejecutar el comando
+link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-setup[_web mvc datatables setup_].
 
 Este comando añadirá los siguientes elementos:
 
@@ -84,7 +86,7 @@ el equipo de gvNIX, para utilizados en las funcionalidades disponibles
 de estos ficheros, consultar el fichero `README.txt` que se instala en
 el directorio.
 3.  `Tagx` necesarios utilizados en las páginas para el pintado del
-widged, almacenados en `WEB-INF/tags/datatables`.
+widget, almacenados en `WEB-INF/tags/datatables`.
 4.  Unos fichero de propiedades para diversos aspectos de configuración
 en `src/main/resources/datatables*.properties` y las cadenas de
 internacionalización.
@@ -99,19 +101,24 @@ para la gestión de peticiones de datos y a la librería de tag adaptada.
 Esta última tiene como dependencias las dependencias a las librerías de
 http://dandelion.github.io/datatables[Dandelion-DataTables].
 
-Para más información sobre el comando ver `` en el
-link:#apendice-comandos_addon-web-mvc-datatables[apéndice de comandos de
+Para más información sobre el comando ver
+link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-setup[_web mvc datatables setup_]
+en el link:#apendice-comandos_addon-web-mvc-datatables[apéndice de comandos de
 este add-on].
 
 Usar datatables en la vista "list" de un controlador.
 -----------------------------------------------------
 
-Para poder utilizar el widged de datatables en el listado es necesario
-que esté usando los componentes _jQuery_. Para ello usar el comando `` o
-`` antes de utilizar este add-on con un controlador.
+Para poder utilizar el widget de datatables en el listado es necesario
+que esté usando los componentes _jQuery_. Para ello usar el comando
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-add[_web mvc jquery add_]
+o
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-all[_web mvc jquery all_]
+antes de utilizar este add-on con un controlador.
 
-Para utilizar el widged de datatables en el listado de un controlador de
-entidad es necesario ejecutar el comando ``.
+Para utilizar el widget de datatables en el listado de un controlador de
+entidad es necesario ejecutar el comando
+link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add[_web mvc datatables add_].
 
 Este comando añade la anotación @GvNIXDatatables al controller para
 generar los métodos necesario para gestionar las peticiones que realiza
@@ -121,8 +128,9 @@ Además, actualiza la página `list.jspx` para cambiar las rutas a los
 tagx utilizados para pintar la tabla a los instalados por el add-on en
 el directorio `WEB-INF/tags/datatables`.
 
-Este add-on incluye, además, el comando `` que aplica los cambios a
-todos los controllers de la aplicación.
+Este add-on incluye, además, el comando
+link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-all[_web mvc datatables all_]
+que aplica los cambios a todos los controllers de la aplicación.
 
 Para mas información sobre los comandos ver el
 link:#apendice-comandos_addon-web-mvc-datatables[apéndice de comandos de
@@ -153,9 +161,9 @@ Cambiar el modo de datos de Datatables.
 Para proveer de datos al widget, se dispone de dos métodos.
 
 1.  _DOM_ o la carga de datos incrustados en la misma página. Una vez
-cargados los datos, el widged se encarga de paginarlos, ordenarlos y
+cargados los datos, el widget se encarga de paginarlos, ordenarlos y
 filtrarlos a través de javaScript en la propia página.
-2.  _AJAX_ el widged hace peticiones
+2.  _AJAX_ el widget hace peticiones
 http://es.wikipedia.org/wiki/AJAX[AJAX] al servidor para obtener los
 datos en base a la paginación, orden y filtro. Luego los muestra
 repintando la tabla a través de javaScript en la propia página.
@@ -164,7 +172,9 @@ La opción por defecto que instala el add-on es la de AJAX, ya que es más
 escalable para volúmenes de datos grandes.
 
 El modo de datos del controlador se establece con la opción `--ajax` al
-ejecutar el comando `` o modificar el atributo _ajax_ de la anotación
+ejecutar el comando
+link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add[_web mvc datatables add_]
+o modificar el atributo _ajax_ de la anotación
 GvNIXDatatables. gvNIX actualizará el controlador para que el modo sea
 accesible tanto en el mismo (para los métodos de peticiones) como en la
 página.
@@ -282,8 +292,8 @@ false
 * _NONULO_: Buscará todos los registros que para esa columna no sean
 nulos
 
-Modo visualización de registro.
--------------------------------
+Modo visualización de registro
+------------------------------
 
 Este modo de visualización muestra un registro por cada página para
 mostrar mas información sobre cada uno.
@@ -297,15 +307,16 @@ y no están soportadas la herramientas de búsqueda, ordenación, filtros y
 edición.
 
 Para establece este modo de visualización hay que usar el parámetro
-`--mode show` al ejecutar el comando ``.
+`--mode show` al ejecutar el comando
+link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add[_web mvc datatables add_].
 
 Para vistas que ya transformadas, se pude establecer este modo
 modificando los valores de la anotación @GvNIXDatatables y añadirle el
 atributo `mode = "show"`. Comprobar que también esta establecido el
 valor `ajax = true`.
 
-Visualización de detalles.
---------------------------
+Visualización de detalles
+-------------------------
 
 Este opción permite la visualización de datos relacionados con un
 registro al pie de la página. Los datos mostrados se obtendrán a parir
@@ -333,10 +344,11 @@ modo registro::
   registro por página)
 
 Para añadir las visualización del detalle en una vista hay que usar
-comando ``.
+comando
+link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-details-add[_web mvc datatables details add_].
 
-Eliminación múltiple.
----------------------
+Eliminación múltiple
+--------------------
 
 Las listas soportan eliminación múltiple de líneas. Esta operación se
 activa de forma automática cuando el controlador tiene activado las
@@ -360,8 +372,8 @@ Al pulsar sobre el botón elimina de la cabecera de la tabla, se pedirá
 confirmación, mostrando el total de registros a eliminar. El botón de
 eliminación de la línea sigue funcionando de la forma habitual.
 
-Edición en línea.
------------------
+Edición en línea
+----------------
 
 Las listas soportan la edición sobre la misma de líneas de los datos de
 la entidad sin necesidad de cambiar de página o recargarla.
@@ -395,8 +407,8 @@ así la actualización de los registros fallará.
 
 Al pulsar sobre el botón de guardar, el control recogerá los datos de
 las filas en edición y realizará una petición de actualización _en
-bloque_, de forma que _si hay algún problema con algún registro ningún
-cambio se persistirá_
+bloque_, de forma que *si hay algún problema con algún registro ningún
+cambio se persistirá*.
 
 Si se encuentra algún problema de validación en algún registro, el
 control mantendrá el estado de edición de las lineas, marcando las
@@ -404,7 +416,8 @@ lineas afectadas por errores de un color rojizo. Además, mostrará el
 mensaje de error generado en el servidor debajo de cada campo afectado.
 
 Para activar esta opción hay que usar el parámetro `--inline true` al
-ejecutar el comando ``.
+ejecutar el comando
+link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add[_web mvc datatables add_].
 
 Para vistas que ya transformadas, se pude activar la opción modificando
 los valores de la anotación @GvNIXDatatables y añadirle el atributo
@@ -437,7 +450,7 @@ Al recargar la página, se ordenará el registro de forma correcta
 siguiendo la ordenación y los filtros establecidos en el Datatable.
 
 Esta funcionalidad se aplica tanto a Datatables maestros como para
-detalles asociados
+detalles asociados.
 
 Registro seleccionado siempre visible
 -------------------------------------

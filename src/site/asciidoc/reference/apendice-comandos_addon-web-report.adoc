@@ -84,5 +84,5 @@ Sus parámetros son:
   siempre serán convertidos a minúsculas. Si este parámetro no se
   especifica, tomará por defecto el valor _pdf_.
 
-  //Return level title
-  :leveloffset: 0
+//Return level title
+:leveloffset: 0

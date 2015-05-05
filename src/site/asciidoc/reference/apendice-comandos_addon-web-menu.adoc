@@ -82,9 +82,8 @@ Sus parámetros son:
   _[Requerido] [Cadena]_
   +
   Título para el elemento del menú. Se creará una etiqueta con este
-  título en el fichero
-  `src/main/webapp/WEB-INF/i18n/application.properties
-              `. Este título será ignorado si se define el parámetro
+  título en el fichero `src/main/webapp/WEB-INF/i18n/application.properties`.
+  Este título será ignorado si se define el parámetro
   _messageCode_.
 --messageCode::
   _[Opcional] [Cadena]_
@@ -92,8 +91,7 @@ Sus parámetros son:
   Etiqueta que representará la traducción en múltiples idiomas del
   título del elemento del menú. Si todavía no existe, se deberá crear
   dicha etiqueta en cada fichero de idioma que exista configurado en el
-  proyecto en `src/main/webapp/WEB-INF/i18n/messages_xx.properties
-              `.
+  proyecto en `src/main/webapp/WEB-INF/i18n/messages_xx.properties`.
 --roles::
   _[Opcional] [Cadena]_
   +
@@ -198,8 +196,8 @@ Sus parámetros son:
   +
   Título para el elemento del menú. Se actualizará con el nuevo título
   la etiqueta correspondiente en el fichero
-  `src/main/webapp/WEB-INF/i18n/application.properties
-              `. Este título será ignorado si se define o ya estaba
+  `src/main/webapp/WEB-INF/i18n/application.properties`.
+  Este título será ignorado si se define o ya estaba
   definido el parámetro _messageCode_.
 --messageCode::
   _[Opcional] [Cadena]_
@@ -207,8 +205,7 @@ Sus parámetros son:
   Etiqueta que representará la traducción en múltiples idiomas del
   título del elemento del menú. Si todavía no existe, se deberá crear
   dicha etiqueta en cada fichero de idioma que exista configurado en el
-  proyecto en `src/main/webapp/WEB-INF/i18n/messages_xx.properties
-              `.
+  proyecto en `src/main/webapp/WEB-INF/i18n/messages_xx.properties`.
 --url::
   _[Opcional] [Cadena]_
   +

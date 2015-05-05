@@ -432,7 +432,7 @@ donde los campos _name_ y _weight_ se visualizan uno junto al otro en la
 misma fila.
 
 La jspx propia del patrón registro usa el componente _show.tagx_ de la
-librería de tags_pattern_.
+librería de _tags_pattern_.
 
 -------------------------------------------------------------------------------------
 <page:show id="ps_com_springsource_petclinic_domain_Pet" object="${pet}" path="/pets"

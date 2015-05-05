@@ -466,8 +466,7 @@ que se muestra a continuación Este diálogo permite seleccionar elementos
 de los campos definidos en el informe, de los parámetros e incluso
 acceder a alguna de las operaciones que proporcionan estos objetos.
 
-image::./images/recetas-subreport-ireport-7.png[iReport - Diálogo Text
-Field Expression,align=center]
+image::./images/recetas-subreport-ireport-7.png[iReport - Diálogo Text Field Expression,align=center]
 
 Obviamente, en un _Text Field_ es posible establecer expresiones más
 elaboradas, como añadir a la cadena las unidades de peso. Se debe tener

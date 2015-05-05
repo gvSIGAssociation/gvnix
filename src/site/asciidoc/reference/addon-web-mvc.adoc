@@ -24,17 +24,18 @@ modificación múltiple que el link:#addon-web-mvc-datatables[add-on web
 mvc datatables].
 
 Los método añadidos por esta funcionalidad se apoyan en las operaciones
-de persistencia en bloque generadas por el `` proporciona. Por ello,
+de persistencia en bloque generadas por el link:#addon-jpa_batch[_add-on jpa_]
+proporciona. Por ello,
 sólo se podrá añadir sobre controladores cuya entidad relacionada tenga
 generado este servicio.
 
 Para generar estos métodos se pueden utilizar los siguientes comandos:
 
-``::
+link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-setup[_web mvc batch setup_]::
   Instala las dependencias y ajusta la configuración.
-``::
+link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-add[_web mvc batch add_]::
   Genera los métodos en un controlador.
-``::
+link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-all[_web mvc batch all_]::
   Genera los métodos para todos los controladores.
 
 Métodos de creación y actualización
@@ -53,10 +54,10 @@ status::
 exceptionMessage::
   Mensaje de error (si lo hay) encontrado al ejecutar la operación.
 bindingResult::
-  Errores encontrados en la carga y/o validación de los datos recibidos.
-  +
-  El formato de este objeto en JSON es como el siguiente:
-  +
+Errores encontrados en la carga y/o validación de los datos recibidos.
++
+El formato de este objeto en JSON es como el siguiente:
++
 ----------------------------------------------------------------------------------------
  {
     OBJECT_INDEX : { FIELD1_NAME : FIELD_ERROR_MSG, FIELD2_NAME : FIELD_ERROR_MSG, ...},
@@ -70,7 +71,6 @@ bindingResult::
     },
     ...
  }
-
 ----------------------------------------------------------------------------------------
 value::
   Objetos persistidos o recibidos.
@@ -122,8 +122,6 @@ El _Jackson2RequestMappingHandlerAdapter_ se configura en el fichero
 consumes = "application/json"
 -----------------------------
 
-.
-
 Visualización con jQuery
 ------------------------
 
@@ -149,13 +147,13 @@ componentes.
 
 Para utilizar esta funcionalidad dispone de los siguientes comandos:
 
-``::
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup[_web mvc jquery setup_]::
   Instala los artefactos necesarios.
-``::
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-add[_web mvc jquery add_]::
   Convierte las vista de un controlador a jQuery.
-``::
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-all[_web mvc jquery all_]::
   Convierte todas las vistas a jQuery.
-``::
+link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-update-tags[_web mvc jquery update tags_]::
   Actualiza los artefactos requeridos por jQuery. Util para actualizar
   un proyecto a una nueva versión de gvNIX.
 

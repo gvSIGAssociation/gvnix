@@ -130,5 +130,5 @@ Sus parámetros son:
   Nombre de la propiedad _1 a N_ de la entidad relación con el
   controlador a usar para el detalle.
 
-  //Return level title
-  :leveloffset: 0
+//Return level title
+:leveloffset: 0
