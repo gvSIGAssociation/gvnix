@@ -6,37 +6,37 @@ Comandos del add-on Web Menu
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-web-menu[add-on Web Menu].
+consultar la documentación del link:#_add_on_web_menu[add-on Web Menu].
 
 .Comandos del add-on Web Menu
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#_comandos_del_add_on_web_menu_page-menu-setup[menu setup]
+|link:#_menu_setup[menu setup]
 |Instala el sistema de gestión del menú web que permite organizar de
 forma sencilla su estructura de páginas y permisos
 
-|link:#_comandos_del_add_on_web_menu_page-add[menu entry add] |Añade
+|link:#_menu_entry_add[menu entry add] |Añade
 un elemento al menú, sea una página o un grupo
 
-|link:#_comandos_del_add_on_web_menu_page-hide[menu entry visibility]
+|link:#_menu_entry_visibility[menu entry visibility]
 |Define un elemento del menú como visible o oculto
 
-|link:#_comandos_del_add_on_web_menu_page-show[menu entry roles]
+|link:#_menu_entry_roles[menu entry roles]
 |Establece una lista de perfiles de usuario para los que se mostrará una
 entrada del menú
 
-|link:#_comandos_del_add_on_web_menu_page-move[menu entry move]
+|link:#_menu_entry_move[menu entry move]
 |Mueve un elemento del menú y todos los hijos que pueda tener
 
-|link:#_comandos_del_add_on_web_menu_page-update[menu entry update]
+|link:#_menu_entry_update[menu entry update]
 |Actualiza un elemento del menú
 
-|link:#_comandos_del_add_on_web_menu_page-info[menu entry info]
+|link:#_menu_entry_info[menu entry info]
 |Muestra por consola los valores establecidos en un elemento del menú y
 en todos los hijos que pueda tener
 
-|link:#_comandos_del_add_on_web_menu_page-list[menu tree] |Muestra
+|link:#_menu_tree[menu tree] |Muestra
 por consola un árbol con un resumen de los elementos del menú.
 |=======================================================================
 
@@ -53,7 +53,7 @@ fichero `src/main/webapp/WEB-INF/views/menu.xml`.
 
 Para una descripción detallada de las tareas que realiza este comando
 consultar la documentación de
-link:#addon-web-menu_instalacion[instalación de la gestión del menú].
+link:#_instalación_de_la_gestión_del_menú[instalación de la gestión del menú].
 
 menu entry add
 ~~~~~~~~~~~~~~

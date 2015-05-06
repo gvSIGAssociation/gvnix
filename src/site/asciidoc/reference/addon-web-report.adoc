@@ -12,7 +12,7 @@ desde la interfaz web mediante un formulario que se crea para tal
 efecto.
 
 En la sección de recetas se puede encontrar información adicional para
-realizar el link:#recetas-reports-subinforme[diseño de informes con sub
+realizar el link:#_diseño_de_informes_con_sub_informes[diseño de informes con sub
 informes].
 
 Descripción
@@ -51,7 +51,7 @@ la capa web. Esto es, el archivo de configuración _webmvc-config.xml_
 debe existir en _/WEB-INF/spring_.
 
 Estas operaciones de configuración las realiza el comando del add-on
-link:#apendice-comandos_addon-web-report_setup[web report setup]:
+link:#_web_report_setup[web report setup]:
 
 -------------------------------------------------------------------------------------------
     roo-gvNIX>
@@ -119,7 +119,7 @@ el informe.
 Si se desean utilizar fuentes de letra adicionales a parte de las
 incluidas por defecto por el add-on, deberán ser instaladas de forma
 manual en el proyecto. Para ello se puede consultar la sección
-link:#recetas-reports-fuentes[Instalar fuentes de letra para los
+link:#_instalar_fuentes_de_letra_para_los_informes[Instalar fuentes de letra para los
 informes] de la sección de recetas.
 
 Generación de un informe
@@ -136,13 +136,13 @@ aplicación, ha de ser atendida por un controlador. No obstante, los
 informes muestran información referente a una entidad del modelo de
 datos de la aplicación, por tanto el controlador debe atender peticiones
 referentes a una determinada entidad. Esto, como se comentó en
-link:#guia-desarrollo_web_definir-controller_a-mano_automatico[CRUDS
-automático], se configura mediante la anotación _@RooWebScaffold_ y su
-atributo _formBackingObject._ Así pues, no se puede definir un informe
-sobre un controlador que no disponga de la anotación _@RooWebScaffold_.
+link:#_controlador_crud[CRUDS
+automático], se configura mediante la anotación '@RooWebScaffold' y su
+atributo 'formBackingObject'. Así pues, no se puede definir un informe
+sobre un controlador que no disponga de la anotación '@RooWebScaffold'.
 
 La generación de un informe se realiza mediante el comando
-link:#apendice-comandos_addon-web-report_add[web report add] o
+link:#_web_report_add[web report add] o
 incluyendo la anotación @GvNIXReports en la clase del controlador. Los
 formatos de fichero en los que se puede generar el informe son:
 
@@ -314,7 +314,7 @@ Futuras versiones
 visualización de las relaciones que pueda tener la entidad sobre la que
 se declara el informe. En la sección de recetas se muestra una forma de
 mostrar las relaciones de una entidad en el informe mediante el
-link:#recetas-reports-subinforme[uso de subinformes].
+link:#_diseño_de_informes_con_sub_informes[uso de subinformes].
 
 //Return level title
 :leveloffset: 0

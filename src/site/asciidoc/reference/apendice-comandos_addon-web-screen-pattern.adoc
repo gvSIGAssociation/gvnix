@@ -13,19 +13,19 @@ Web Screen Patterns].
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-web_mvc_pattern_setup[web mvc pattern
+|link:#_web_mvc_pattern_setup[web mvc pattern
 setup] |Crea en el proyecto los ficheros que utilizarán los patrones de
 visualización
 
-|link:#apendice-comandos_addon-web_mvc_pattern_update_tags[web mvc
+|link:#_web_mvc_pattern_update_tags[web mvc
 pattern update tags] |Actualiza en el proyecto los ficheros que
 utilizarán los patrones de visualización
 
-|link:#apendice-comandos_addon-web_mvc_pattern_master[web mvc pattern
+|link:#_web_mvc_pattern_master[web mvc pattern
 master] |Crea un patrón de visualización maestro en el controlador que
 gestiona una entidad del proyecto
 
-|link:#apendice-comandos_addon-web_mvc_relation_pattern_detail[web mvc
+|link:#_web_mvc_pattern_detail[web mvc
 pattern detail] |Crea un patrón de visualización detalle en el
 controlador que gestiona una entidad del proyecto dada una de las
 relaciones de la entidad

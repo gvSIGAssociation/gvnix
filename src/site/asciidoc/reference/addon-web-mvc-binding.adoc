@@ -21,7 +21,7 @@ http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html
 de conversión de beans] de la documentación de Spring.
 
 El comando
-link:#apendice-comandos_addon-web-mvc-binding_web-binding-setup[web mvc
+link:#_web_mvc_binding_stringtrimmer[web mvc
 binding stringTrimmer] permite registrar un editor especialmente útil.
 Este editor elimina los espacios en blanco al principio y al final de
 las cadenas y además permite transformar las cadenas vacías en valores
@@ -75,7 +75,7 @@ adecuado, como se hace en el ejemplo anterior asociando _String_ con
 _StringTrimmerEditor_.
 
 Para obtener mas detalles sobre el comando ver el
-link:#apendice-comandos_addon-web-mvc-binding[apéndice de comandos] de
+link:#_comandos_del_add_on_web_mvc_binding[apéndice de comandos] de
 este add-on.
 
 Futuras versiones

@@ -6,42 +6,42 @@ Comandos del add-on Service
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-service[add-on Service].
+consultar la documentación del link:#_add_on_service[add-on Service].
 
 .Comandos del add-on Service
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-service_class[remote service class] |Crea
+|link:#_remote_service_class[remote service class] |Crea
 una clase Java que actuará como servicio local dentro de la aplicación
 
-|link:#apendice-comandos_addon-service_operation[remote service
+|link:#_remote_service_operation[remote service
 operation] |Añade un nuevo método en una clase Java
 
-|link:#apendice-comandos_addon-service_define_ws[remote service define
+|link:#_remote_service_define_ws[remote service define
 ws] |Hace que una clase Java pueda ser accedida desde el exterior a
 través de un servicio web
 
-|link:#apendice-comandos_addon-service_export_operation[remote service
+|link:#_remote_service_export_operation[remote service
 export operation] |Hace que un método de una clase Java pueda ser
 accedido desde el exterior a través de una operación del servicio web
 
-|link:#apendice-comandos_addon-service_list_operation[remote service
+|link:#_remote_service_list_operation[remote service
 list operation] |Muestra el listado de métodos de una clase Java que
 podrían ser ofrecidos al exterior como operaciones del servicio web
 
-|link:#apendice-comandos_addon-service_export_ws[remote service export
+|link:#_remote_service_export_ws[remote service export
 ws] |Crea en el proyecto la infraestructura necesaria definida por un
 _WSDL_ para ofrecer ciertas operaciones mediante un servicio web
 
-|link:#apendice-comandos_addon-service_import_ws[remote service import
+|link:#_remote_service_import_ws[remote service import
 ws] |Crea en el proyecto la infraestructura necesaria definida por un
 _WSDL_ para acceder a ciertas operaciones situadas en un servicio web
 
-|link:#apendice-comandos_addon-service_ws_list[remote service ws list]
+|link:#_remote_service_ws_list[remote service ws list]
 |Lista los servicios web que se encuentran definidos en la aplicación
 
-|link:#apendice-comandos_addon-service_security_ws[remote service
+|link:#_remote_service_security_ws[remote service
 security ws] |Añade o actualiza la configuración necesaria para firmar
 las peticiones que se hacen a un servicio web remoto
 |=======================================================================

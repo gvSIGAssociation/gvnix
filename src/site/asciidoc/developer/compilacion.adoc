@@ -110,7 +110,7 @@ roo>
 ====
 Si no aparece como `Active` puede que sea porque no están disponibles en
 el `classpath` de framework alguna de las dependencias del add-on. Ver
-la sección link:#compilacion_instalacion_dependencias[Instalar
+la sección link:#_instalar_dependencias_de_terceros[Instalar
 dependencias de terceros].
 ====
 

@@ -221,7 +221,7 @@ Servidor Jenkins: http://dailybuild.disid.com:8081/
 Servidor Sonar: http://hq02.disid.com:9000/
 
 Configurar el servidor Jenkins tal y como se indica en
-link:#calidad-codigo_lanzar-proceso-comprobacion-settings[Configuración
+link:#_configuración_del_entorno_para_lanzar_el_análisis_de_sonar[Configuración
 del entorno para lanzar el análisis de Sonar].
 
 También será necesario disponer desde Jenkins del siguiente software

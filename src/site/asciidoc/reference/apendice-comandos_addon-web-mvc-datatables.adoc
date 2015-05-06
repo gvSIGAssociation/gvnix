@@ -17,7 +17,7 @@ MVC Datatables].
 mvc datatables setup] |Instala los artefactos y dependencias requeridas
 para el funcionamiento del add-on.
 
-|link:#_comandos_del_add_on_web_mvc_datatables_web-mvc-datatables-update-tags[web
+|link:#_web_mvc_datatables_update_tags[web
 mvc datatables update tags] |Actualiza los artefactos, ya instalados en
 el add-on, por los actuales.
 
@@ -94,20 +94,20 @@ Sus parámetros son:
   _[Opcional] [Cadena]_
   +
   Establece el modo de visualización a
-  link:#_add_on_web_mvc_datatables_register-modeaddon-web-mvc-datatables_register-mode[modo
+  link:#_modo_visualización_de_registro[modo
   registro].
 --inline::
   _[Opcional] [Boolean] [Autocompletado]_
   +
   Habilita la funcionalidad
-  link:#_add_on_web_mvc_datatables_inline-editing[edición en línea].
+  link:#_edición_en_línea[edición en línea].
 
 web mvc datatables all
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Añade el uso de Datatables a todos los controladores de la aplicación,
 usando los valores por defecto del comando
-link:#apendice-comandos_addon-web-mvc_jquery_web-mvc-jquery-add[web mvc
+link:#_web_mvc_jquery_add[web mvc
 jquery add].
 
 web mvc datatables details add
@@ -115,7 +115,7 @@ web mvc datatables details add
 
 Un detalle a la vista list para en base a una propiedad _1 a N_ de la
 entidad relacionada (ver descripción en
-link:#_add_on_web_mvc_datatables_add-details[Visualización de detalles]).
+link:#_visualización_de_detalles[Visualización de detalles]).
 
 Sus parámetros son:
 

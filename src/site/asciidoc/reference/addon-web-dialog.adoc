@@ -41,7 +41,7 @@ Instalación
 -----------
 
 Para aplicar esta funcionalidad sobre un proyecto se debe ejecutar en
-primer lugar el comando link:#apendice-comandos_addon-web-dialog[web mvc
+primer lugar el comando link:#_web_mvc_dialog_setup[web mvc
 dialog setup]. Al hacerlo se incluye el soporte para diálogos modales en
 la aplicación.
 
@@ -119,7 +119,7 @@ aplicación.
 
 Para obtener más información sobre estos comandos de gestión de
 excepciones consultar el apendice
-link:#apendice-comandos_addon-web-dialog[Comandos del Add-on Web
+link:#_comandos_del_add_on_web_dialog[Comandos del Add-on Web
 Dialog].
 
 Nuevos diálogos modales
@@ -130,12 +130,12 @@ cualquier circunstancía tras una operación determinada.
 
 Para aplicar esta funcionalidad sobre el proyecto primero se debe haber
 ejecutado el comando
-link:#apendice-comandos_addon-web-exception-handler_dialog-setup[web mvc
+link:#_web_mvc_dialog_setup[web mvc
 dialog setup].
 
 El comando
-link:#apendice-comandos_addon-web-exception-handler_dialog-add[web mvc
-dialog add] añade la anotación _GvNIXModalDialogs_ en la clase
+link:#_web_mvc_dialog_add[web mvc
+dialog add] añade la anotación 'GvNIXModalDialogs' en la clase
 controladora que se le indica.
 
 -----------

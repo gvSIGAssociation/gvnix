@@ -5,10 +5,10 @@ Metadatos
 :leveloffset: 2
 
 Como hemos dicho en la descripción del componente
-link:#arquitectura-interna_metadata[Metadata] los metadatos es la
+link:#_metadata[Metadata] los metadatos es la
 información sobre el proyecto. Estos pueden obtenerse en cualquier
 momento, siempre que se conozca el tipo, usando el servicio
-_MetadataService_.
+'MetadataService'.
 
 Al desarrollar un add-on podemos tener que realizar operaciones sobre
 artefactos o dependientes de ellos pero esto puede requerir _marcar_ o
@@ -40,7 +40,7 @@ Metadatos de tipo físico
 Son la representación de las `clases` e `interfaces` del proyecto.
 Normalmente los prepara el propio framework usando un `parser` para
 ficheros `.java` en los eventos del
-link:#arquitectura-interna_file-monitor[File Monitor].
+link:#_file_monitor[File Monitor].
 
 Metadatos ITD
 -------------
@@ -234,7 +234,7 @@ framework para manejarlos.
 
 En este esquema, también se pueden ver los puntos de entrada de la
 aplicación (en color azul oscuro) que describíamos en
-link:#puntos-entrada[Puntos de entrada al framework].
+link:#_puntos_de_entrada_al_framework[Puntos de entrada al framework].
 
 //Return to title level
 :leveloffset: 0

@@ -171,16 +171,16 @@ Los requisitos para que esta clase sea usada en el framework son los
 siguientes:
 
 1.  implementar el interface _org.springframework.roo.shell.CommandMarker_.
-2.  La clase debe ser un link:#creacion-addon_osgi[componente-servicio
+2.  La clase debe ser un link:#_declaración_y_uso_de_componente_servicios_osgi[componente-servicio
 OSGi].
 3.  Contiene dos tipos de métodos:
-a. Indicadores de _link:#creacion-addon_commands_accesibilidad[accesibilidad]_:
+a. Indicadores de _link:#_métodos_de_accesibilidad[accesibilidad]_:
 Indician si un comando es accesible para el usuario en el contexto actual.
-b. link:#creacion-addon_commands_command[Comandos]: Punto de entrada y
+b. link:#_métodos_de_comando[Comandos]: Punto de entrada y
 registro de un comando.
 4.  Tendrá poca o ninguna implementación. La implementación de las
 acciones se realizará en las clases
-link:#creacion-addon_operationsimpl[OperationsImpl].
+link:#_la_clase_operationsimpl[OperationsImpl].
 
 Estas clases no requieren ser registradas ya que se localizan gracias al
 framework OSGi.
@@ -250,7 +250,7 @@ help::
 optionContext::
   Opciones de contexto para el parámetro. Esta cadena es útil para
   configurar los parámetro de un tipo asociado a un
-  link:#creacion-addon_converters[Converter].
+  link:#_converters_del_shell[Converter].
 * Su valor de retorno debe ser void o String, dependiendo si es un
 comando que realiza alguna opción o es un comando que devuelve
 información a la consola (como el `help`, `hint` o el `properties
@@ -287,7 +287,7 @@ Sus características principales son:
 
 1.  Deben implementar el interface
 org.springframework.roo.shell.Converter.
-2.  Deben ser link:#creacion-addon_osgi[componente-servicio OSGi].
+2.  Deben ser link:#_declaración_y_uso_de_componente_servicios_osgi[componente-servicio OSGi].
 
 Existen algunos ya registrados en el sistema que pueden ser útiles:
 
@@ -318,7 +318,7 @@ implementación de las operaciones disponibles en el add-on.
 
 Sus requisitos son:
 
-* Debe ser un link:#creacion-addon_osgi[componente-servicio OSGi].
+* Debe ser un link:#_declaración_y_uso_de_componente_servicios_osgi[componente-servicio OSGi].
 * Implementar el interface Operations que usará la clase Commands.
 * No tener método constructor.
 
@@ -353,7 +353,7 @@ La clase PropertyName
 
 Esta clase es un ejemplo de clase que se puede registrar en el
 StaticFieldConverter comentado en la sección de
-link:#creacion-addon_converters[Converter].
+link:#_converters_del_shell[Converter].
 
 Test unitarios
 --------------

@@ -13,7 +13,7 @@ Medio Ambiente (CITMA) y lo integra con el sistema de seguridad Spring
 Security.
 
 Para instalarlo, hay que utilizar el comando
-link:#apendice-comandos_addon-cit-security_cit-security-setup[cit
+link:#_cit_security_setup[cit
 security setup] con los parámetro adecuados (url del servicio, nombre de
 aplicación y usuario/clave de acceso al servicio). El add-on instalará
 las clases necesarias para hacer la llamada al servicio, el modelo de
@@ -72,7 +72,7 @@ autorización y autenticación de sus usuarios a través de un servidor de
 servicios web que respete el contrato definido por este servicio.
 
 Para ver con mas detalle el comando que proporciona el add-on consultar
-la sección de link:#apendice-comandos_cit-security[comandos del add-on
+la sección de link:#_comandos_del_add_on_cit_security[comandos del add-on
 CIT Security].
 
 //Return level title

@@ -58,7 +58,7 @@ FileEventListener::
   Recibe los cambios en fichero y directorios.
 ProcessManagerStatusListener::
   Recibe los cambios en el estado de
-  link:#arquitectura-interna_process-manager[Process Manager].
+  link:#_process_manager[Process Manager].
 
 En muchas ocasiones, nuestros add-ons necesitarán notificaciones del
 listeners de metadatos.

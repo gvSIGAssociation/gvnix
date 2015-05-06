@@ -29,7 +29,7 @@ de referencia Spring Roo (_on-line_)]
 * http://projects.spring.io/spring-roo/[Página del proyecto]
 * http://forum.spring.io/forum/spring-projects/roo[Foro de Spring Roo]
 * https://jira.springsource.org/browse/ROO[JIRA de Spring Roo]
-* http://spring.io/tools[Spring STS (Spring Tools Suite)
+* http://spring.io/tools[Spring STS Spring Tools Suite]
 * http://forum.spring.io/forum/spring-projects/roo/64079-latest-project-links-and-version-details[Página
 con recursos para Roo]
 

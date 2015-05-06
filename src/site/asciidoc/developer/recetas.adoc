@@ -35,7 +35,7 @@ Servicios del framework
 -----------------------
 
 El framework provee de una serie de servicios
-(link:#creacion-addon_osgi[componentes-servicios OSGi]) que podemos
+(link:#_declaración_y_uso_de_componente_servicios_osgi[componentes-servicios OSGi]) que podemos
 necesitar para desarrollar nuestros add-ons. Para usarlos debemos
 revisar que nuestro add-on tiene registradas la dependencias de los
 proyecto de cada bundle.
@@ -646,7 +646,7 @@ Los métodos *manageDependencyVersion* y *managePropertyVersion* se
 ocupan de buscar entre las dependencias (y propiedades) ya configuradas
 del proyecto en el pom.xml una dependencia o una propiedad determinada y
 sirviendose del objeto
-link:#recetas-actualizacion_versiones-VersionInfo[VersionInfo] decidir
+link:#_actualización_de_versiones_de_dependencias[VersionInfo] decidir
 que hacer con la nueva dependencia / propiedad que se desea saber si hay
 que añadir al descriptor del proyecto.
 
@@ -736,7 +736,7 @@ que implemente FileEventListener.
 
 Se añaden las anotaciones @Component y @Service a la clase para que el
 FileMonitorService de Roo lo detecte automáticamente. Para ver más sobre
-esto leer link:#creacion-addon_osgi[declaración y uso de
+esto leer link:#_declaración_y_uso_de_componente_servicios_osgi[declaración y uso de
 componente-servicios OSGi].
 
 El servicio _no monitoriza todos los ficheros_ de base. Puede ser

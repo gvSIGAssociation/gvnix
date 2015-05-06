@@ -6,27 +6,27 @@ Comandos del add-on WEB MVC Lupa
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación dellink:#addon-web-mvc-loupe[add-on Lupa].
+consultar la documentación del link:#_add_on_campos_lupa[add-on Lupa].
 
 .Comandos de Addo-on Componentes Lupa
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-web-mvc-loupe_setup[web mvc loupe setup]
+|link:#_web_mvc_loupe_setup[web mvc loupe setup]
 |Este comando importará a nuestro proyecto todos los recursos necesarios
 para utilizar componentes lupa.
 
-|link:#apendice-comandos_addon-web-mvc-loupe_set[web mvc loupe set]
+|link:#_web_mvc_loupe_set[web mvc loupe set]
 |Este comando nos permite generar los métodos necesarios para la
 búsqueda y visualización de registros del componente lupa en el
 controlador seleccionado.
 
-|link:#apendice-comandos_addon-web-mvc-loupe_field[web mvc loupe field]
+|link:#_web_mvc_loupe_field[web mvc loupe field]
 |Este comando nos permite transformar a componente lupa cualquier campo
 válido de la entidad a la que está asociado el Controlador en el que se
 han generado los métodos de lupa.
 
-|link:#apendice-comandos_addon-web-mvc-loupe_update[web mvc loupe
+|link:#_web_mvc_loupe_update[web mvc loupe
 update] |Este comando nos permite mantener actualizados todos los
 componentes importados mediante el comando de instalación.
 |=======================================================================

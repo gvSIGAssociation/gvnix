@@ -30,7 +30,7 @@ Creación de servicios locales
 Un servicio local es una clase Java con una serie de métodos que se
 desea que estén disponibles de forma interna para toda la aplicación. La
 clase se puede crear con el comando
-link:#apendice-comandos_addon-service_class[remote service class].
+link:#_remote_service_class[remote service class].
 
 ---------------------------------------------------------
 roo-gvNIX>
@@ -59,7 +59,7 @@ Service service;
 
 Una vez creada la clase se pueden crear los métodos que se desea ofrecer
 en el servicio. Los métodos se pueden crear mediante el comando
-link:#apendice-comandos_addon-service_operation[remote service
+link:#_remote_service_operation[remote service
 operation] que permite añadir métodos en una clase.
 
 ----------------------------------------------------------
@@ -90,17 +90,17 @@ exterior mediante operaciones de un servicio web.
 En primer lugar se debe elegir una clase Java que contendrá los métodos
 que se desea ofrecer al exterior mediante el servicio web. La clase
 puede ser cualquiera existente previamente o se puede crear una nueva
-mediante el comando link:#apendice-comandos_addon-service_class[remote
+mediante el comando link:#_remote_service_class[remote
 service class].
 
 A continuación, se debe elegir los métodos a ofrecer a través del
 servicio web. Si todavía no existen, se pueden crear mediante el comando
-link:#apendice-comandos_addon-service_operation[remote service
+link:#_remote_service_operation[remote service
 operation].
 
 De momento la clase no es accesible mediante un servicio web. Para ello
 se debe ejecutar el comando
-link:#apendice-comandos_addon-service_define_ws[remote service define
+link:#_remote_service_define_ws[remote service define
 ws].
 
 ------------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ embargo no dispondrá de ninguna operación ya que por defecto todos los
 métodos de la clase publicada son configurados inicialmente como no
 accesibles por motivos de seguridad. Se podrá hacer accesible cada uno
 de los métodos de la clase por separado mediante el comando
-link:#apendice-comandos_addon-service_export_operation[remote service
+link:#_remote_service_export_operation[remote service
 export operation]
 
 ----------------------------------------------------------------------------
@@ -210,8 +210,8 @@ Creación de servidores desde WSDL
 Existe otro modo para crear servidores de servicios web. Consiste en
 ofrecer al exterior un servicio web partiendo de un archivo de contrato
 de servicio conocido como _WSDL_. Con el comando
-link:#apendice-comandos_addon-service_export_ws[remote service export
-ws] se proporciona la ruta a un archivo _WSDL_ y se generará una réplica
+link:#_remote_service_export_ws[remote service export
+ws] se proporciona la ruta a un archivo 'WSDL' y se generará una réplica
 del servicio en la que las operaciones son métodos vacios que
 posteriormente deberán ser personalizadas con la lógica de negocio
 adecuada.
@@ -233,8 +233,8 @@ Creación de clientes
 
 Es posible generar un cliente que permita realizar peticiones a un
 servicio web remoto existente utilizando para ello el comando
-link:#apendice-comandos_addon-service_import_ws[remote service import
-ws]. Facilitando la ruta a un _WSDL_, se generará una clase en la ruta
+link:#_remote_service_import_ws[remote service import
+ws]. Facilitando la ruta a un 'WSDL', se generará una clase en la ruta
 que se especifique y que contendrá los métodos del cliente que darán
 acceso al servicio web remoto.
 
@@ -382,7 +382,7 @@ Para ello se debe disponer de:
 4.  Alias a usar con el certificado
 
 Disponiendo de esto elementos, se puede hacer uso del comando
-link:#apendice-comandos_addon-service_security_ws[remote service
+link:#_remote_service_security_ws[remote service
 security ws] para añadir la firma en las peticiones del cliente.
 
 ---------------------------------------------------------------------------------
@@ -464,14 +464,14 @@ privileged aspect Service_Roo_GvNIX_WebSecurity {
 
 Para realizar cambios en los parámetros de firma del servicio es posible
 ejecutar de nuevo el comando
-link:#apendice-comandos_addon-service_security_ws[remote service
+link:#_remote_service_security_ws[remote service
 security ws] con los nuevos datos sobre la misma clase (opción
 recomendada) o modificar los ficheros antes mencionados a mano.
 
 Listar los servicios
 --------------------
 
-El comando link:#apendice-comandos_addon-service_list_operation[remote
+El comando link:#_remote_service_list_operation[remote
 service list operation] muestra los métodos existentes en una clase que
 están disponibles para ser ofrecidos al exterior siempre y cuando la
 clase esté definida como un servicio web.
@@ -482,7 +482,7 @@ Method list to export as web service operation in '~.service.Service':
     * myMethod2
 ----------------------------------------------------------------------
 
-El comando link:#apendice-comandos_addon-service_ws_list[remote service
+El comando link:#_remote_service_ws_list[remote service
 ws list] permite obtener un listado de los servicios ofrecidos al
 exterior o aquellos servicios externos que son utilizados en la
 aplicación.

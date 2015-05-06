@@ -13,7 +13,7 @@ http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns["1
 patrones de pantalla estándar"]
 
 Las opciones de este add-on _no son compatibles con el
-link:#addon-web-mvc_jquery[add-on web mvc de jQuery] ni con
+link:#_visualización_con_jquery[add-on web mvc de jQuery] ni con
 link:#_add_on_web_mvc_datatables[add-on web mvc datatables]_.
 
 Descripción
@@ -44,7 +44,7 @@ Instalación
 -----------
 
 El add-on ofrece el comando
-link:#apendice-comandos_addon-web_mvc_pattern_setup[web mvc pattern
+link:#_web_mvc_pattern_setup[web mvc pattern
 setup] que crea en el proyecto los ficheros que utilizarán los patrones
 de visualización.
 
@@ -58,7 +58,7 @@ existentes
 Este comando solo estará disponible para la inicialización de los
 artefactos. Si se desea restaurar los artefactos o acualizarlos después
 de un cambio de versión del add-on es necesario utilizar el comando
-link:#apendice-comandos_addon-web_mvc_pattern_update_tags[web mvc
+link:#_web_mvc_pattern_update_tags[web mvc
 pattern update tags].
 
 La ejecución del comando realizará las siguientes modificaciones en el
@@ -127,7 +127,7 @@ Creación de un patrón
 El add-on proporciona una serie de anotaciones que sirven para definir
 patrones de visualización sobre el controlador de una entidad de la
 aplicación. Por comodidad se han definido una serie de
-link:#apendice-comandos_web-relation-styles[comandos] para facilitar la
+link:#_comandos_del_add_on_web_screen_patterns[comandos] para facilitar la
 aplicación de estas anotaciones en las clases Java necesarias.
 
 Al definir un patrón de visualización sobre un controlador, se está
@@ -182,11 +182,10 @@ _Controlador2_.
 Creación de un patrón maestro
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mediante el commando
-link:#apendice-comandos_addon-web_mvc_pattern_master[web mvc pattern
+Mediante el commando link:#_web_mvc_pattern_master[web mvc pattern
 master] es posible definir un patrón de visualización maestro sobre el
 controlador de cualquier entidad. Al usar el comando, además de añadir
-la anotación _@GvNIXPattern_ al controlador elegido, se instalarán /
+la anotación '@GvNIXPattern' al controlador elegido, se instalarán /
 crearán / modificarán los componentes Spring MVC necesarios (diferentes
 archivos tagx, jspx, imágenes, javascript, ...) y se generarán los
 aspectos Java apropiados para lograr visualizar el patrón elegido.
@@ -197,14 +196,15 @@ Creación de un patrón detalle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 El comando
-link:#apendice-comandos_addon-web_mvc_relation_pattern_detail[web mvc
-pattern detail] permite definir el formato de visualización del detalle
+link:#_web_mvc_pattern_detail[web mvcpattern detail]
+permite definir el formato de visualización del detalle
 de una entidad dado su controlador, esto es, como se visualizarán las
 entidades relacionadas al visualizar la entidad maestra. Notar que el
 comando se aplica sobre un campo, una relación, determinada de la
 entidad maestra (en el ejemplo propuesto, se aplicaría el comando una
-vez sobre _campo2_ y opcionalmente otra vez sobre _campo3_). Este
-comando también instala / crea / modifica componentes Spring MVC, añade
+vez sobre 'campo2' y opcionalmente otra vez sobre 'campo3').
+
+Este comando también instala / crea / modifica componentes Spring MVC, añade
 la anotación _@GvNIXRelationsPattern_ en el controlador de la entidad
 maestra y añade la anotación _@GvNIXRelatedPattern_ sobre el controlador
 de la entidad detalle. Estas anotaciones harán que se genere, en caso
@@ -303,7 +303,7 @@ modificarlo.
 permiso para realizar las operaciones de creación, actualización,
 borrado y refresco de los registros del patrón. Este atributo solo es
 útil si se encuentra aplicada la seguridad, por ejemplo mediante el
-link:#addon-cit-security[add-on CIT Security] o el add-on Typical
+link:#_add_on_cit_security[add-on CIT Security] o el add-on Typical
 security.
 
 Tabular con edición registro
@@ -380,7 +380,7 @@ se debe ver en pantalla.
 permiso para realizar las operaciones de creación, actualización,
 borrado y refresco de los registros del patrón. Este atributo solo es
 útil si se encuentra aplicada la seguridad, por ejemplo mediante el
-link:#addon-cit-security[add-on CIT Security] o el add-on Typical
+link:#_add_on_cit_security[add-on CIT Security] o el add-on Typical
 security.
 
 Registro
@@ -470,7 +470,7 @@ principal de la vista del patrón.
 permiso para realizar las operaciones de creación, actualización,
 borrado y refresco de los registros del patrón. Este atributo solo es
 útil si se encuentra aplicada la seguridad, por ejemplo mediante el
-link:#addon-cit-security[add-on CIT Security] o el add-on Typical
+link:#_add_on_cit_security[add-on CIT Security] o el add-on Typical
 security.
 
 //Return level title

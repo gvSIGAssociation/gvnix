@@ -6,7 +6,7 @@ Comandos del add-on WEB MVC Bootstrap
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-web-mvc-bootstrap[add-on
+consultar la documentación del link:#_add_on_bootstrap[add-on
 Bootstrap].
 
 .Comandos de Addo-on Bootstrap

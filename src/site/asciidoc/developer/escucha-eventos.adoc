@@ -34,17 +34,17 @@ Las notificaciones que podemos recibir son de los siguientes tipos:
 El servicio del framework encargado de la monitorización de los cambios
 en disco es el que implementa el interface FileMonitorService. Este
 servicio notificará de los cambios a todos los
-link:#creacion-addon_osgi[componente-servicio OSGi] que cumplan el
+link:#_declaración_y_uso_de_componente_servicios_osgi[componente-servicio OSGi] que cumplan el
 interface FileEventListener en el método onFileEvent que recibe un
 FileEvent.
 
 Los recursos que monitoriza el FileMonitorService se registran como
 instancias de MonitoringRequest a través del método add.
 
-En el capítulo de link:#recetas[recetas] podemos encontrar un ejemplo de
-link:#recetas_crear-listener-filesystem[crear listeners del Filesystem]
+En el capítulo de link:#_recetas[recetas] podemos encontrar un ejemplo de
+link:#_crear_listeners_del_filesystem[crear listeners del Filesystem]
 y otro para
-link:#recetas_monitorizacion-directorios-no-registrados[monitorización
+link:#_monitorización_de_directorios_no_registrados[monitorización
 de directorios no registrados].
 
 Eventos de metadatos
@@ -66,8 +66,8 @@ upstream::
 downstream::
   `null`
 
-En el capítulo de link:#recetas[recetas] podemos encontrar un ejemplo de
-link:#recetas_crear-listener-metadatos[crear listener de metadatos].
+En el capítulo de link:#_recetas[recetas] podemos encontrar un ejemplo de
+link:#_crear_listener_de_metadatos[crear listener de metadatos].
 
 Eventos de procesos
 -------------------
