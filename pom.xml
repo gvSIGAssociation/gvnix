@@ -7,9 +7,9 @@
       <distribution>repo</distribution>
       <comments>
       <![CDATA[
-      gvNIX is sponsored by the General Directorate for Information 
-      Technologies (DGTI) of the Regional Ministry of Finance and Public 
-      Administration of the Generalitat Valenciana (Valencian Community, 
+      gvNIX is sponsored by the General Directorate for Information
+      Technologies (DGTI) of the Regional Ministry of Finance and Public
+      Administration of the Generalitat Valenciana (Valencian Community,
       Spain), managed by gvSIG Association and led by DISID.
 
       Copyright (C) 2010 DGTI - Generalitat Valenciana
@@ -36,28 +36,28 @@
   <artifactId>org.gvnix.root</artifactId>
   <packaging>pom</packaging>
   <!--
-  gvNIX versions are series of individual numbers, separated by periods, 
-  with a progression such as 1.7.0, 1.8.0, 1.8.1, 1.9.0, 1.10.0, 1.11.0, 
+  gvNIX versions are series of individual numbers, separated by periods,
+  with a progression such as 1.7.0, 1.8.0, 1.8.1, 1.9.0, 1.10.0, 1.11.0,
   1.11.1, 1.11.2, and so on.
-  The early stages are identified with "ALPHA", "BETA" or "BUILD-SNAPSHOT" 
+  The early stages are identified with "ALPHA", "BETA" or "BUILD-SNAPSHOT"
   qualifiers.
   -->
   <version>2.0.0.M1</version>
   <name>gvNIX</name>
 
   <description>
-  gvNIX is an open source tool for rapid application development (RAD) with 
+  gvNIX is an open source tool for rapid application development (RAD) with
   which you can create Java web applications in minutes.
 
-  It is a distribution of Spring Roo that provides the set of Spring Roo tools 
-  plus a suite of features that increase development productivity and improve 
+  It is a distribution of Spring Roo that provides the set of Spring Roo tools
+  plus a suite of features that increase development productivity and improve
   the user experience.
   </description>
 
   <organization>
     <name>
     General Directorate for Information Technologies (DGTI) of
-    the Regional Ministry of Finance and Public Administration of the 
+    the Regional Ministry of Finance and Public Administration of the
     Generalitat Valenciana.
     </name>
     <url>http://www.dgti.gva.es/</url>
@@ -106,6 +106,7 @@
         <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
+
   <repositories>
     <repository>
       <id>spring-roo-repository-release</id>
@@ -151,36 +152,29 @@
     <developer>
       <name>Jose Manuel Vivó (Chema)</name>
       <id>jmvivo</id>
-      <email>jmvivo at disid.com</email>
-      <organization>DiSiD Corporation</organization>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <name>Óscar Rovira</name>
-      <id>orovira</id>
-      <email>orovira at disid.com</email>
-      <organization>DiSiD Corporation</organization>
+      <email>jmvivo at DISID.com</email>
+      <organization>DISID Corporation</organization>
       <timezone>+1</timezone>
     </developer>
     <developer>
       <name>Mario Martínez</name>
       <id>mmartinez</id>
-      <email>mmartinez at disid.com</email>
-      <organization>DiSiD Corporation</organization>
+      <email>mmartinez at DISID.com</email>
+      <organization>DISID Corporation</organization>
       <timezone>+1</timezone>
     </developer>
     <developer>
       <name>Enrique Ruiz</name>
       <id>eruiz</id>
-      <email>eruiz at disid.com</email>
-      <organization>DiSiD Corporation</organization>
+      <email>eruiz at DISID.com</email>
+      <organization>DISID Corporation</organization>
       <timezone>+1</timezone>
     </developer>
     <developer>
       <name>Juan Carlos García</name>
       <id>jcgarcia</id>
-      <email>jcgarcia at disid.com</email>
-      <organization>DiSiD Corporation</organization>
+      <email>jcgarcia at DISID.com</email>
+      <organization>DISID Corporation</organization>
       <timezone>+1</timezone>
     </developer>
   </developers>
@@ -938,7 +932,7 @@
         <version>3.1.0.RELEASE</version>
       </extension>
 
-      <!-- DiSiD: Add webdav extension to google code -->
+      <!-- DISID: Add webdav extension to google code -->
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav-jackrabbit</artifactId>
@@ -994,7 +988,7 @@
 
       <plugin>
         <!--
-        Each module updates the local OBR index.xml file during the install 
+        Each module updates the local OBR index.xml file during the install
         phase.
         Then the add-on deploy bundle details to the local OBR repository at
         ${target.osgi-repository.directory}.
@@ -1124,19 +1118,21 @@
               <goal>jar</goal>
             </goals>
             <!-- To compile ROO using Java 8 uncomment this -->
-            <!-- 
+            <!--
             <configuration>
               <additionalparam>-Xdoclint:none</additionalparam>
-      	    </configuration> 
+      	    </configuration>
             -->
           </execution>
         </executions>
       </plugin>
-      <!-- DiSiD: Keep from Roo deployment-support module: DocBook (with thanks to Spring Batch's config!) -->
-      <plugin>
+
+      <!-- DISID: Keep from Roo deployment-support module:
+      DocBook (with thanks to Spring Batch's config!) -->
+<!--       <plugin>
         <groupId>com.agilejava.docbkx</groupId>
         <artifactId>docbkx-maven-plugin</artifactId>
-        <version>2.0.8</version> <!-- 2.0.9 -->
+        <version>2.0.8</version> 2.0.9
         <executions>
           <execution>
             <id>reference-single-page</id>
@@ -1330,9 +1326,84 @@
             </entity>
           </entities>
         </configuration>
+      </plugin> -->
+
+      <!-- AsciiDoctor plugin -->
+      <plugin>
+        <groupId>org.asciidoctor</groupId>
+        <artifactId>asciidoctor-maven-plugin</artifactId>
+        <version>1.5.0</version>
+        <dependencies>
+            <dependency>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctorj</artifactId>
+                <version>1.5.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctorj-pdf</artifactId>
+                <version>1.5.0-alpha.6</version>
+            </dependency>
+        </dependencies>
+        <executions>
+            <execution>
+                <id>output-html</id>
+                <phase>generate-resources</phase>
+                <goals>
+                    <goal>process-asciidoc</goal>
+                </goals>
+                <configuration>
+                    <backend>html5</backend>
+                    <sourceHighlighter>coderay</sourceHighlighter>
+                    <attributes>
+                      <toc/>
+                      <!-- <toc-placement>left</toc-placement> -->
+                      <sectanchors>true</sectanchors>
+                      <!-- set the idprefix to blank -->
+                      <idprefix/>
+                      <idseparator>-</idseparator>
+                      <docinfo1>true</docinfo1>
+                    </attributes>
+                </configuration>
+            </execution>
+            <execution>
+                <id>generate-pdf-doc</id>
+                <phase>generate-resources</phase>
+                <goals>
+                    <goal>process-asciidoc</goal>
+                </goals>
+                <configuration>
+                    <backend>pdf</backend>
+                    <!--WARNING callout bullets don't yet work with CodeRay-->
+                    <sourceHighlighter>coderay</sourceHighlighter>
+                    <attributes>
+                      <pagenums/>
+                      <toc/>
+                      <idprefix/>
+                      <idseparator>-</idseparator>
+                    </attributes>
+                </configuration>
+            </execution>
+        </executions>
+        <configuration>
+            <doctype>book</doctype>
+            <!-- <sourceDirectory>src/main/asciidoc</sourceDirectory> -->
+            <sourceDirectory>src/site/asciidoc</sourceDirectory>
+            <!-- more directories -->
+            <sourceDirectory>src/site/asciidoc/reference</sourceDirectory>
+            <sourceDirectory>src/site/asciidoc/d</sourceDirectory>
+            <headerFooter>true</headerFooter>
+            <data-uri/>
+            <outputDirectory>target/generated-docs</outputDirectory>
+        </configuration>
       </plugin>
+
+
+
+
+
       <!-- Other -->
-      <!-- DiSiD: Keep from old Roo versions -->
+      <!-- DISID: Keep from old Roo versions -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
@@ -1413,7 +1484,7 @@
         </configuration>
       </plugin>
 
-      <!-- DiSiD: Keep from Roo deployment-support module -->
+      <!-- DISID: Keep from Roo deployment-support module -->
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
@@ -1437,7 +1508,7 @@
     <scr.plugin.version>1.20.0</scr.plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <target.osgi-repository.directory>${project.build.directory}/../../target/osgi-repository-bin</target.osgi-repository.directory>
-    <!-- DiSiD: Add google code project name -->
+    <!-- DISID: Add google code project name -->
     <dandelion-datatables.version>0.9.3-GVNIX</dandelion-datatables.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <devel.resources.path>../devel-resources</devel.resources.path>
