@@ -119,6 +119,10 @@ public final class WebJpaBatchMetadataProvider extends
         JpaBatchMetadata serviceMetadata = (JpaBatchMetadata) getMetadataService()
                 .get(serviceMetadataKey);
 
+        if (serviceMetadata == null) {
+            return null;
+        }
+
         return new WebJpaBatchMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, annotationValues,
                 serviceMetadata, webScaffoldMetadataValue);
