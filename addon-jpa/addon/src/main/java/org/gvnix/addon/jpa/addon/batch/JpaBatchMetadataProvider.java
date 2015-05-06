@@ -146,6 +146,10 @@ public final class JpaBatchMetadataProvider extends
         JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) getMetadataService()
                 .get(entityMetadataKey);
 
+        if (entityMetadata == null) {
+            return null;
+        }
+
         // register downstream dependency (entityActiveRecord --> jpaBatch)
         getMetadataDependencyRegistry().registerDependency(entityMetadataKey,
                 metadataIdentificationString);

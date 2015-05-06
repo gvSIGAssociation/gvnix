@@ -66,59 +66,23 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+	<scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
+	<scope>provided</scope>
     </dependency>
     
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.scr.annotations</artifactId>
+	<scope>provided</scope>
     </dependency>
 
-    <!-- Roo -->
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.addon.web.mvc.jsp</artifactId>
-    </dependency>
-
-    <!-- gvNIX -->
-    <dependency>
-      <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.support</artifactId>
-      <version>${gvnix.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.web.i18n.roo.addon</artifactId>
-      <version>${gvnix.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.addon.jpa.addon</artifactId>
-      <version>${gvnix.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.addon.web.mvc.addon</artifactId>
-      <version>${gvnix.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.addon.geo.addon</artifactId>
-      <version>${gvnix.version}</version>
-    </dependency>
   </dependencies>
   
-  <!-- DiSiD: Add google code distribution management -->
-  <distributionManagement>
-    <repository>
-      <id>Google Code</id>
-      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
-    </repository>
-  </distributionManagement>
 
   <build>
 

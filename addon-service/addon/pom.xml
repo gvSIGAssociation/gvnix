@@ -58,6 +58,42 @@
   		<artifactId>org.gvnix.service.roo.addon.annotations</artifactId>
   		<version>${gvnix.version}</version>
   	</dependency>
+
+
+    <!-- OSGi -->
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+
+    <!-- Apache Felix -->
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
+    </dependency>
+
+    <!-- Roo -->
+    <dependency>
+        <groupId>org.springframework.roo</groupId>
+        <artifactId>org.springframework.roo.classpath.antlrjavaparser</artifactId>
+    </dependency>
+
+    <!-- gvNIX -->
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.dynamic.configuration.roo.addon</artifactId>
+      <version>${gvnix.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.support</artifactId>
+      <version>${gvnix.version}</version>
+    </dependency>
+
   </dependencies>
 
    <properties>

@@ -54,20 +54,23 @@
 
   <dependencies>
 
-    <!-- OSGi -->
+ <!-- OSGi -->
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+	<scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
+	<scope>provided</scope>
     </dependency>
     
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.scr.annotations</artifactId>
+	<scope>provided</scope>
     </dependency>
 
     <!-- Roo -->
@@ -97,15 +100,8 @@
       <artifactId>org.gvnix.addon.web.mvc.addon</artifactId>
       <version>${gvnix.version}</version>
     </dependency>
-  </dependencies>
+</dependencies>
   
-  <!-- DiSiD: Add google code distribution management -->
-  <distributionManagement>
-    <repository>
-      <id>Google Code</id>
-      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
-    </repository>
-  </distributionManagement>
 
   <build>
 

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
-package org.gvnix.addon.jpa.annotations.geo.providers.hibernatespatial;
+package org.gvnix.addon.jpa.addon.geo.providers.hibernatespatial;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;

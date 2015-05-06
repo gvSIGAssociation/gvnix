@@ -22,8 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.springframework.roo.model.JavaSymbolName;
-
 /**
  * Annotation for Web MVC Controllers which list uses JQuery datatables
  * component.

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
  */
-package org.gvnix.addon.jpa.annotations.geo.providers.hibernatespatial;
+package org.gvnix.addon.jpa.addon.geo.providers.hibernatespatial;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.jpa.annotations.geo.providers.hibernatespatial.GvNIXEntityMapLayer;
 import org.gvnix.support.PhysicalTypeUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;

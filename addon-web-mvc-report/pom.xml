@@ -63,16 +63,19 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+	<scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
+	<scope>provided</scope>
     </dependency>
     
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.scr.annotations</artifactId>
+	<scope>provided</scope>
     </dependency>
 
     <!-- Roo -->
@@ -90,14 +93,6 @@
     
   </dependencies>
   
-  <!-- DiSiD: Add google code distribution management -->
-  <distributionManagement>
-    <repository>
-      <id>Google Code</id>
-      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
-    </repository>
-  </distributionManagement>
-
   <build>
 	<!-- DiSiD: Add build resources filtering -->
     <resources>

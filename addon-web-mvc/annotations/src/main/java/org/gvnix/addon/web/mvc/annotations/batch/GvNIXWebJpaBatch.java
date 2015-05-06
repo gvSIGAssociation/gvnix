@@ -22,8 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.gvnix.addon.jpa.annotations.batch.GvNIXJpaBatch;
-
 /**
  * Trigger annotation for controller jpa batch operations.
  * 

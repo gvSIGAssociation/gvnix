@@ -63,34 +63,22 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+	<scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
+	<scope>provided</scope>
     </dependency>
 
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.scr.annotations</artifactId>
-    </dependency>
-
-    <!-- gvNIX -->
-    <dependency>
-      <groupId>org.gvnix</groupId>
-      <artifactId>org.gvnix.support</artifactId>
-      <version>${gvnix.version}</version>
+	<scope>provided</scope>
     </dependency>
 
   </dependencies>
-
-  <!-- DISID: Add google code distribution management -->
-  <distributionManagement>
-    <repository>
-      <id>Google Code</id>
-      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
-    </repository>
-  </distributionManagement>
 
   <build>
 	<!-- DISID: Add build resources filtering -->
