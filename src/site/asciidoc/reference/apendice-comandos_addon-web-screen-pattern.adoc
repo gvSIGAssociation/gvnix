@@ -6,7 +6,7 @@ Comandos del add-on Web Screen Patterns
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-web-screen-patterns[add-on
+consultar la documentación del link:#_add_on_web_screen_patterns[add-on
 Web Screen Patterns].
 
 .Comandos del add-on Web Screen Patterns
@@ -40,7 +40,7 @@ opcional.
 
 Para una descripción detallada de los ficheros que instala este comando
 en el proyecto consultar la sección de
-link:#addon-web-screen-patterns[instalación] del add-on Web Screen
+link:#_add_on_web_screen_patterns[instalación] del add-on Web Screen
 Patterns.
 
 web mvc pattern update tags
@@ -52,7 +52,7 @@ opcional.
 
 Para una descripción detallada de los ficheros que instala este comando
 en el proyecto consultar la sección de
-link:#addon-web-screen-patterns[instalación] del add-on Web Screen
+link:#_add_on_web_screen_patterns[instalación] del add-on Web Screen
 Patterns.
 
 web mvc pattern master

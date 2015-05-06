@@ -13,23 +13,23 @@ MVC Datatables].
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-setup[web
+|link:#_web_mvc_datatables_setup[web
 mvc datatables setup] |Instala los artefactos y dependencias requeridas
 para el funcionamiento del add-on.
 
-|link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-update-tags[web
+|link:#_comandos_del_add_on_web_mvc_datatables_web-mvc-datatables-update-tags[web
 mvc datatables update tags] |Actualiza los artefactos, ya instalados en
 el add-on, por los actuales.
 
-|link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add[web
+|link:#_web_mvc_datatables_add[web
 mvc datatables add] |Añade el uso de datatables al controlador
 especificado.
 
-|link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-all[web
+|link:#_web_mvc_datatables_all[web
 mvc datatables all] |Añade el uso de Datatables a todos los
 controladores de la aplicación.
 
-|link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-details-add[web
+|link:#_web_mvc_datatables_details_add[web
 web mvc datatables details add] |Añade un detalle a la vistas list de un
 controlador.
 |=======================================================================

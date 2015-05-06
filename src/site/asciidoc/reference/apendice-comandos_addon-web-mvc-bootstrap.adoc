@@ -13,14 +13,14 @@ Bootstrap].
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-web-mvc-bootstrap_setup[web mvc bootstrap
+|link:#_web_mvc_bootstrap_setup[web mvc bootstrap
 setup] |Este comando importará e instalará todos los recursos necesarios
 para utilizar bootstrap. Además, modificará la estructura de algunos
 tagx existentes para que funcionen correctamente con Bootstrap y
 modificará todas las vistas de la aplicación para que utilicen los tags
 de JQuery.
 
-|link:#apendice-comandos_addon-web-mvc-bootstrap_update[web mvc
+|link:#_web_mvc_bootstrap_update[web mvc
 bootstrap update] |Este comando permite regenerar de forma correcta
 todos los componentes importados por Bootstrap. En caso de una
 modificación incorrecta de estos componentes, podremos regenerarlos para

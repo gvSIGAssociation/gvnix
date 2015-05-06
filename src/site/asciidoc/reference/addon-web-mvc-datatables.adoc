@@ -19,7 +19,7 @@ http://dandelion.github.io/datatables[Dandelion-DataTables] que se
 integra y adapta a la generación de vistas de Spring Roo.
 
 Las opciones de este add-on _no son compatibles con el
-link:#addon-web-screen-patterns[add-on Web Screen Patterns]_.
+link:#_add_on_web_screen_patterns[add-on Web Screen Patterns]_.
 
 Las principales características de este widget son:
 
@@ -67,11 +67,11 @@ Instalación del soporte para Datatables
 
 Esta funcionalidad depende de las librerías de _jQuery_ por lo que, el
 primer paso, será instalar las librerías usando el comando
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup['web mvc jquery setup']
+link:#_web_mvc_jquery_setup['web mvc jquery setup']
  si no estuviese ya instalado.
 
 Para instalar esta funcionalidad hay que ejecutar el comando
-link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-setup['web mvc datatables setup'].
+link:#_web_mvc_datatables_setup['web mvc datatables setup'].
 
 Este comando añadirá los siguientes elementos:
 
@@ -102,23 +102,23 @@ Esta última tiene como dependencias las dependencias a las librerías de
 http://dandelion.github.io/datatables[Dandelion-DataTables].
 
 Para más información sobre el comando ver
-link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-setup['web mvc datatables setup']
-en el link:#apendice-comandos_addon-web-mvc-datatables[apéndice de comandos de
+link:#_web_mvc_datatables_setup['web mvc datatables setup']
+en el link:#_comandos_del_add_on_web_mvc_datatables[apéndice de comandos de
 este add-on].
 
-Usar datatables en la vista "list" de un controlador.
------------------------------------------------------
+Usar datatables en la vista "list" de un controlador
+----------------------------------------------------
 
 Para poder utilizar el widget de datatables en el listado es necesario
 que esté usando los componentes _jQuery_. Para ello usar el comando
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-add['web mvc jquery add']
+link:#_web_mvc_jquery_add['web mvc jquery add']
 o
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-all['web mvc jquery all']
+link:#_web_mvc_jquery_all['web mvc jquery all']
 antes de utilizar este add-on con un controlador.
 
 Para utilizar el widget de datatables en el listado de un controlador de
 entidad es necesario ejecutar el comando
-link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add['web mvc datatables add'].
+link:#_web_mvc_datatables_add['web mvc datatables add'].
 
 Este comando añade la anotación @GvNIXDatatables al controller para
 generar los métodos necesario para gestionar las peticiones que realiza
@@ -129,15 +129,15 @@ tagx utilizados para pintar la tabla a los instalados por el add-on en
 el directorio `WEB-INF/tags/datatables`.
 
 Este add-on incluye, además, el comando
-link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-all['web mvc datatables all']
+link:#_web_mvc_datatables_all['web mvc datatables all']
 que aplica los cambios a todos los controllers de la aplicación.
 
 Para mas información sobre los comandos ver el
-link:#apendice-comandos_addon-web-mvc-datatables[apéndice de comandos de
+link:#_comandos_del_add_on_web_mvc_datatables[apéndice de comandos de
 este add-on].
 
-Ajustar la configuración del datatables de una vista.
------------------------------------------------------
+Ajustar la configuración del datatables de una vista
+----------------------------------------------------
 
 Los tags creados para este add-on, que se pueden encontrar en
 `WEB-INF/tags/datatables`, son compatibles con los tags estándar que se
@@ -155,8 +155,8 @@ visualización preparados.
 Para personalizar los ajustes de alguna vista, modificar el fichero
 `list.jspx` correspondiente tal y como se realiza con los tags estándar.
 
-Cambiar el modo de datos de Datatables.
----------------------------------------
+Cambiar el modo de datos de Datatables
+--------------------------------------
 
 Para proveer de datos al widget, se dispone de dos métodos.
 
@@ -173,14 +173,14 @@ escalable para volúmenes de datos grandes.
 
 El modo de datos del controlador se establece con la opción `--ajax` al
 ejecutar el comando
-link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add['web mvc datatables add']
-o modificar el atributo _ajax_ de la anotación
+link:#_web_mvc_datatables_add['web mvc datatables add']
+o modificar el atributo 'ajax' de la anotación
 GvNIXDatatables. gvNIX actualizará el controlador para que el modo sea
 accesible tanto en el mismo (para los métodos de peticiones) como en la
 página.
 
-El control de búsqueda y filtros por columnas.
-----------------------------------------------
+El control de búsqueda y filtros por columnas
+---------------------------------------------
 
 Por defecto, la tabla muestra un control de búsqueda que permite filtrar
 el contenido visualizado en la tabla. Esta búsqueda se realiza _en
@@ -197,7 +197,7 @@ siguiente:
 
 * Para los campos de tipo entidad hay que anotar la propiedad de la
 relación con la anotación @GvNIXJpaQuery del
-link:#addon-jpa_query[add-on jpa] para que se pueda construir la
+link:#_información_adicional_para_búsquedas_por_relaciones[add-on jpa] para que se pueda construir la
 consulta con dichos campos.
 * Es posible buscar por los campos de tipo fecha, pero hay que tener en
 cuenta que, _la transformación a texto la realiza la base de datos con
@@ -302,13 +302,13 @@ Para ello, se pinta la vista _show_ del propio registro y se incrusta
 dentro de la celda de la tabla.
 
 Este modo de visualización sólo permite el
-link:#_add_on_web_mvc_datatables_data-mode[modo de acceso a datos _AJAX']
+link:#_cambiar_el_modo_de_datos_de_datatables[modo de acceso a datos 'AJAX']
 y no están soportadas la herramientas de búsqueda, ordenación, filtros y
 edición.
 
 Para establece este modo de visualización hay que usar el parámetro
 `--mode show` al ejecutar el comando
-link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add['web mvc datatables add'].
+link:#_web_mvc_datatables_add['web mvc datatables add'].
 
 Para vistas que ya transformadas, se pude establecer este modo
 modificando los valores de la anotación @GvNIXDatatables y añadirle el
@@ -345,14 +345,14 @@ modo registro::
 
 Para añadir las visualización del detalle en una vista hay que usar
 comando
-link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-details-add['web mvc datatables details add'].
+link:#_web_mvc_datatables_details_add['web mvc datatables details add'].
 
 Eliminación múltiple
 --------------------
 
 Las listas soportan eliminación múltiple de líneas. Esta operación se
 activa de forma automática cuando el controlador tiene activado las
-link:#addon-web-mvc_batch[operaciones de actualización en bloque].
+link:#_interfaz_para_operaciones_de_persistencia_en_bloque[operaciones de actualización en bloque].
 
 Cuando esta opción está disponible, en la tabla aparecerá una columna de
 controles de marcado para permitir la selección de los elemento sobre
@@ -379,8 +379,8 @@ Las listas soportan la edición sobre la misma de líneas de los datos de
 la entidad sin necesidad de cambiar de página o recargarla.
 
 Esta opción _requiere que el controlador tenga activado las
-link:#[operaciones de actualización en bloque]_ y _no está soportado
-para el link:#[modo de visualización registro]_
+operaciones de actualización en bloque y no está soportado
+para el modo de visualización registro_.
 
 Entrar en modo edición hay que pulsar sobre el botón de editar de dicho
 registro o seleccionar los registros deseados en el control de marcado y
@@ -417,7 +417,7 @@ mensaje de error generado en el servidor debajo de cada campo afectado.
 
 Para activar esta opción hay que usar el parámetro `--inline true` al
 ejecutar el comando
-link:#apendice-comandos_addon-web-mvc-datatables_web-mvc-datatables-add['web mvc datatables add'].
+link:#_web_mvc_datatables_add['web mvc datatables add'].
 
 Para vistas que ya transformadas, se pude activar la opción modificando
 los valores de la anotación @GvNIXDatatables y añadirle el atributo

@@ -19,7 +19,7 @@ Instalación de la monitorización
 --------------------------------
 
 Para instalarlo, hay que utilizar el comando
-link:#apendice-comandos_addon-monitoring_monitoring_setup[monitoring
+link:#_monitoring_setup[monitoring
 setup], el cual instalará todo lo necesario para el funcionamiento
 básico de la monitorización de nuestra aplicación. Se encargará de las
 dependencias y de modificar los ficheros de configuración necesarios
@@ -32,12 +32,11 @@ Para monitorizar a través de las llamadas de Spring, tendremos que
 configurar que métodos deseamos monitorizar, para ello utilizaremos
 alguno de los siguientes comandos, siempre después de haber instalado el
 add-on:
-link:#apendice-comandos_addon-monitoring_monitoring_all[monitoring all],
-link:#apendice-comandos_addon-monitoring_monitoring_add_class[monitoring
+link:#_monitoring_all[monitoring all],
+link:#_monitoring_add_class[monitoring
 add class],
-link:#apendice-comandos_addon-monitoring_monitoring_add_method[monitoring
-add method] o
-link:#apendice-comandos_addon-monitoring_monitoring_all_package[monitoring
+link:#_monitoring_add_method[monitoring
+add method] o link:#_monitoring_add_package[monitoring
 add package]. Al ejecutar estos comandos se añadiran anotaciones que nos
 permitirán acceder a las llamadas que se ejecuten a los metodos
 monitorizados y ver sus interacciones.

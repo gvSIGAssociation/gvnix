@@ -24,18 +24,18 @@ modificación múltiple que el link:#_add_on_web_mvc_datatables[add-on web
 mvc datatables].
 
 Los método añadidos por esta funcionalidad se apoyan en las operaciones
-de persistencia en bloque generadas por el link:#addon-jpa_batch['add-on jpa']
+de persistencia en bloque generadas por el link:#_servicios_persistencia_en_bloque['add-on jpa']
 proporciona. Por ello,
 sólo se podrá añadir sobre controladores cuya entidad relacionada tenga
 generado este servicio.
 
 Para generar estos métodos se pueden utilizar los siguientes comandos:
 
-link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-setup['web mvc batch setup']::
+link:#_web_mvc_batch_setup['web mvc batch setup']::
   Instala las dependencias y ajusta la configuración.
-link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-add['web mvc batch add']::
+link:#_web_mvc_batch_add['web mvc batch add']::
   Genera los métodos en un controlador.
-link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-all['web mvc batch all']::
+link:#_web_mvc_batch_all['web mvc batch all']::
   Genera los métodos para todos los controladores.
 
 Métodos de creación y actualización
@@ -128,13 +128,13 @@ Visualización con jQuery
 Esta funcionalidad permite modificar la visualización de las vista para
 que utilice la librería _jQuery_ en vez de la estándar _jQuery_.
 
-Las opciones de este add-on _no son compatibles con el
-link:#addon-web-screen-patterns[add-on Web Screen Patterns]_.
+Las opciones de este add-on _no son compatibles_ con el
+link:#_add_on_web_screen_patterns[add-on Web Screen Patterns].
 
 Para poder utilizar el _list_ generado por el
-link:#_add_on_web_mvc_datatables[add-on web mvc datatables] es necesario
-que la vista esté convertida a jQuery (ya que el componente _dataTables_
-que se utiliza está creado en base a esta librería).
+link:#_add_on_web_mvc_datatables[add-on web mvc datatables]
+es necesario que la vista esté convertida a jQuery (ya que el componente
+dataTables que se utiliza está creado en base a esta librería).
 
 Los artefactos que se instalan son:
 
@@ -147,13 +147,13 @@ componentes.
 
 Para utilizar esta funcionalidad dispone de los siguientes comandos:
 
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup['web mvc jquery setup']::
+link:#_web_mvc_jquery_setup['web mvc jquery setup']::
   Instala los artefactos necesarios.
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-add['web mvc jquery add']::
+link:#_web_mvc_jquery_add['web mvc jquery add']::
   Convierte las vista de un controlador a jQuery.
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-all['web mvc jquery all']::
+link:#_web_mvc_jquery_all['web mvc jquery all']::
   Convierte todas las vistas a jQuery.
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-update-tags['web mvc jquery update tags']::
+link:#_web_mvc_jquery_update_tags['web mvc jquery update tags']::
   Actualiza los artefactos requeridos por jQuery. Util para actualizar
   un proyecto a una nueva versión de gvNIX.
 

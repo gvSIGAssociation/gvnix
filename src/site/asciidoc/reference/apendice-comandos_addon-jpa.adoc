@@ -22,33 +22,33 @@ add] |Genera el servicio de persistencia en bloque para una entidad.
 all] |Genera el servicio de persistencia en bloque para todas las
 entidades.
 
-|link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-setup[jpa audit
+|link:#_jpa_audit_setup[jpa audit
 setup] |Configura la auditoría de historico creando la clase que
 proveera del nombre de usuario que realiza el cambio. Sólo se puede
 ejecutar una vez.
 
-|link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-add[jpa audit
+|link:#_jpa_audit_add[jpa audit
 add] |Añade el soporte de auditoría a una entidad.
 
-|link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-all[jpa audit
+|link:#_jpa_audit_all[jpa audit
 all] |Añade el soporte de auditoría todas las entidades.
 
-|link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-revisionlog[jpa
+|link:#_jpa_audit_revisionlog[jpa
 audit revisionLog] |Establece el proveedor de registro de cambios a
 usar.
 
-|link:#apendice-comandos_addon-jpa_jpa-geo_jpa-geo-setup[jpa geo setup]
+|link:#_jpa_geo_setup[jpa geo setup]
 |Configura el proyecto para poder guardar entidades con campos de tipo
 geográficos.
 
-|link:#apendice-comandos_addon-jpa_jpa-geo_field-geo[field geo] |Añade
+|link:#_field_geo[field geo] |Añade
 un nuevo campo de tipo geográfico a la entidad seleccionada.
 
-|link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-all[finder geo
+|link:#_finder_geo_all[finder geo
 all] |Genera los buscadores de todos los campos de tipo GEO de _todas_
 las entidades registradas en el proyecto.
 
-|link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-add[finder geo
+|link:#_finder_geo_add[finder geo
 add] |Genera los buscadores de todos los campos de tipo GEO para la
 entidad seleccionada.
 |=======================================================================
@@ -135,7 +135,7 @@ Sus parámetros son:
   auditoría. Si no se establece se genera una clase, basada en el nombre
   de la entidad, en el mismo paquete que la entidad.
 
-jpa adudit all
+jpa audit all
 ~~~~~~~~~~~~~~
 
 Añade el soporte de auditoría a todas las entidades de la aplicación.
@@ -150,7 +150,7 @@ Sus parámetros son:
   nombre de la clase _EntityListener_ se genera a partir del nombre de
   la entidad.
 
-jpa adudit revisionLog
+jpa audit revisionLog
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Selecciona el proveedor de gestión de revisiones de entidades a usar.

@@ -20,9 +20,10 @@ Instalación de Bootstrap 3
 --------------------------
 
 Para instalarlo, hay que utilizar el comando
-link:#apendice-comandos_addon-web-mvc-bootstrap_setup[web mvc bootstrap
+link:#_web_mvc_bootstrap_setup[web mvc bootstrap
 setup], el cual solo estará disponible después de instalar el
-link:#[add-on JQuery] en nuestro proyecto. Este comando detectará de
+link:#_web_mvc_jquery_setup[add-on JQuery] en nuestro proyecto.
+Este comando detectará de
 forma automática, aquellos addons que ya hayan sido instalados y
 modificará sus componentes para una correcta visualización utilizando
 Bootstrap. Además, los addons que se instalen después de instalar
@@ -32,7 +33,7 @@ Actualización de componentes
 ----------------------------
 
 Para actualizar los componentes instalados de Bootstrap basta con
-ejecutar link:#apendice-comandos_addon-web-mvc-bootstrap_update[web mvc
+ejecutar link:#_web_mvc_bootstrap_update[web mvc
 bootstrap update], el cual solo estará disponible después de haber
 instalado Bootstrap.
 
@@ -40,7 +41,7 @@ Apendice de comandos
 --------------------
 
 Para ver con mas detalle el comando que proporciona el add-on consultar
-la sección de link:#apendice-comandos_addon-web-mvc-bootstrap[comandos
+la sección de link:#_comandos_del_add_on_web_mvc_bootstrap[comandos
 del add-on Bootstrap].
 
 //Return level title

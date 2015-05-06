@@ -113,7 +113,7 @@ realizar búsquedas y ordenaciones sobre ella.
 
 Esta información se utiliza actualmente para permitir realizar búsquedas
 de texto dentro de entidades relacionadas y su ordenación cuando se usa
-el link:#apendice-comandos_addon-web-mvc-datatables[add-on web mvc
+el link:#_comandos_del_add_on_web_mvc_datatables[add-on web mvc
 datatables].
 
 No tiene implementado ningún comando. Funciona añadiendo la anotación
@@ -149,7 +149,7 @@ Configurar detalles de usuario
 Es posible configurar la clase que proveerá el nombre de usuario que
 realiza un cambio. Para ello se ejecuta el siguiente comando:
 
-link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-setup['jpa audit setup']::
+link:#_jpa_audit_setup['jpa audit setup']::
   Configura la auditoría de historico creando la clase que proveerá del
   nombre de usuario que realiza el cambio. Sólo se puede ejecutar una
   vez.
@@ -160,9 +160,9 @@ Auditoría básica de entidades
 Para añadir la auditoría a las entidades se pueden utilizar los
 siguientes comandos:
 
-link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-add['jpa audit add']::
+link:#_jpa_audit_add['jpa audit add']::
   Añade auditoría para una entidad.
-link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-all['jpa audit all']::
+link:#_jpa_audit_all['jpa audit all']::
   Añade auditoría para todas las entidades de la aplicación.
 
 Al instalar la auditoría en un proyecto gvNIX se creará una clase (con
@@ -251,7 +251,7 @@ Esta funcionalidad almacena todos los cambios sufridos por las entidades
 auditadas de forma que sea posible identificar qué, quién y cuándo se
 produjeron. Esto incluye las eliminaciones de los registros. Esta
 funcionalidad sólo se aplica a aquellas entidades marcadas con la
-anotación _GvNIXJpaAudit_ (ver link:#addon-jpa_audit-basic[Auditoría
+anotación _GvNIXJpaAudit_ (ver link:#_auditoría_básica_de_entidades[Auditoría
 básica de entidades])
 
 [NOTE]
@@ -277,7 +277,7 @@ el framework.
 Para seleccionar el proveedor de registro de cambios se debe utilizar el
 siguiente comando:
 
-link:#apendice-comandos_addon-jpa_jpa-audit_jpa-audit-revisionlog['jpa audit revisionLog']::
+link:#_jpa_audit_revisionlog['jpa audit revisionLog']::
   Selecciona el proveedor de registro de cambios a usar.
 
 Al activar el proveedor, se instalarán las librerías requeridas y se
@@ -411,7 +411,7 @@ Para poder guardar entidades con campos de tipo GEO es necesario
 configurar el proyecto generado. Para ello se ejecuta el siguiente
 comando:
 
-link:#apendice-comandos_addon-jpa_jpa-geo_jpa-geo-setup['jpa geo setup']::
+link:#_jpa_geo_setup['jpa geo setup']::
   Configura el proyecto para poder guardar entidades con campos de tipo
   geográfico. Este comando solo funcionará si se ha instalado
   persistencia en el proyecto con proveedor _HIBERNATE_ y se ha
@@ -430,7 +430,7 @@ de tipo geográfico, ya es posible añadir campos de tipo geográfico a las
 entidades. Para poder añadir estos nuevos tipos de campo, es necesario
 ejecutar este comando:
 
-link:#apendice-comandos_addon-jpa_jpa-geo_field-geo['field geo']::
+link:#_field_geo['field geo']::
   Añade un nuevo campo de tipo GEO a la entidad seleccionada. Los nuevos
   campos añadidos pueden ser de los siguientes tipos:
 
@@ -451,10 +451,10 @@ Para poder realizar búsquedas sobre campos de tipo GEO es necesario
 generar una serie de métodos. Para ello se ejecutan los siguientes
 comandos:
 
-link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-all['finder geo all']::
+link:#_finder_geo_all['finder geo all']::
   Genera los buscadores de todos los campos de tipo GEO de _todas_ las
   entidades registradas en el proyecto.
-link:#apendice-comandos_addon-jpa_jpa-geo_finder-geo-add['finder geo add']::
+link:#_finder_geo_add['finder geo add']::
   Genera los buscadores de todos los campos de tipo GEO para la entidad
   seleccionada.
 

@@ -13,11 +13,11 @@ Monitoring].
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-monitoring_monitoring_setup[monitoring
+|link:#_monitoring_setup[monitoring
 setup] |Instala las dependencias de JavaMelody además de configurar el
 proyecto con lo necesario para su funcionamiento.
 
-|link:#apendice-comandos_addon-monitoring_monitoring_all[monitoring all]
+|link:#_monitoring_all[monitoring all]
 |Establece todas las clases del proyecto para ser monitorizadas a través
 de Spring.
 

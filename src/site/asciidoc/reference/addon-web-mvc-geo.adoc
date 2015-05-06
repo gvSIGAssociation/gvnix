@@ -13,7 +13,7 @@ Descripción
 
 Este Add-on permite representar en vistas de tipo
 http://leafletjs.com/[Mapa], aquellas entidades que dispongan de
-link:#addon-jpa_geo[campos de tipo GEO.]
+link:#_persistencia_de_entidades_con_campos_de_tipo_geográfico[campos de tipo GEO.]
 
 Las principales características de este widget son:
 
@@ -23,10 +23,10 @@ Representar entidades en Mapa::
   GEO que se deseen.
 Filtrado de entidades::
   Soporta filtrar los registros de una entidad representados en el mapa
-  utilizando el componente link:#[Datatable]
+  utilizando el componente 'Datatable'.
 Selección de entidades::
   Permite seleccionar uno o varios datos representados en la vista de
-  Mapa utilizando el componente link:#[Datatable]
+  Mapa utilizando el componente 'Datatable'.
 Representar Capas Base en Mapa::
   Además de representar entidades en la vista de Mapa, también es
   posible representar capas obtenidas desde un servidor de mapas. Es
@@ -41,7 +41,7 @@ Personalización de componentes (Markers, Colores, etc...)::
   mapa se generan de forma aleatoria. El desarrollador puede
   personalizar el icono, el color del icono, el color del marker o
   linea, etc... Si la entidad tiene la opción de ser seleccionada desde
-  el componente link:#[Datatable] podrá configurar también, la
+  el componente 'Datatable' podrá configurar también, la
   apariencia con la que se representará esta entidad al ser
   seleccionada. De este mismo modo, se podrá configurar la apariencia de
   las herramientas genéricas.
@@ -51,11 +51,11 @@ Instalación del soporte para vista de Mapa
 
 Esta funcionalidad depende de las librerías de _jQuery_ por lo que, el
 primer paso, será instalar las librerías usando el comando
-link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup['web mvc jquery setup']
+link:#_web_mvc_jquery_setup['web mvc jquery setup']
 si no estuviese ya instalado.
 
 Para instalar esta funcionalidad hay que ejecutar el comando
-link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-setup['web mvc geo setup'].
+link:#_web_mvc_geo_setup['web mvc geo setup'].
 
 Este comando añadirá los siguientes elementos:
 
@@ -75,9 +75,9 @@ javaScript requeridos.
 para la gestión de peticiones de datos.
 
 Para más información sobre el comando ver
-link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-setup['web mvc geo setup']
+link:#_web_mvc_geo_setup['web mvc geo setup']
 en el
-link:#apendice-comandos_addon-web-mvc-geo[apéndice de comandos de este
+link:#_comandos_del_add_on_web_mvc_geo[apéndice de comandos de este
 add-on].
 
 Generar vista de Mapa
@@ -85,7 +85,7 @@ Generar vista de Mapa
 
 Para poder visualizar una vista de Mapa en nuestro proyecto, es
 necesario ejecutar el comando
-link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-controller['web mvc geo controller'].
+link:#_web_mvc_geo_controller['web mvc geo controller'].
 
 Este comando genera un controlador anotado con @GvNIXMapViewer que será
 el encargado de mostrar la vista del mapa que acabamos de crear. Además
@@ -95,7 +95,7 @@ Además, genera la página `show.jspx` que será la encargada de
 representar el mapa y todos sus componentes.
 
 Para mas información sobre los comandos ver el
-link:#apendice-comandos_addon-web-mvc-geo[apéndice de comandos de este
+link:#_comandos_del_add_on_web_mvc_geo[apéndice de comandos de este
 add-on].
 
 Generar campos de mapa en vistas CRU
@@ -109,14 +109,14 @@ Sin embargo, este add-on permite transformar estos campos de texto a
 componentes de tipo Mapa, gracias a los cuales se facilita la
 introducción de datos de tipo GEO en una entidad. Para utilizar estos
 tipos de campo, se ejecutará el siguiente comando
-link:#pendice-comandos_addon-web-mvc-geo_web-mvc-geo-field['web mvc geo field'].
+link:#_web_mvc_geo_field['web mvc geo field'].
 
 Este comando modifica las vistas de `create.jspx`, `update.jspx` y
 `show.jspx` de la entidad sobre la que se aplica cambiando los inputs de
 los campos seleccionados por componentes de tipo mapa.
 
 Para mas información sobre los comandos ver el
-link:#apendice-comandos_addon-web-mvc-geo[apéndice de comandos de este
+link:#_comandos_del_add_on_web_mvc_geo[apéndice de comandos de este
 add-on].
 
 Añadir entidades a la vista de Mapa
@@ -129,9 +129,9 @@ Para añadir nuevas entidades a la vista de mapa y que sean representadas
 sus campos de tipo geográfico, es posible ejecutar los siguientes
 comandos:
 
-link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-entity-all['web mvc geo entity all']::
+link:#_web_mvc_geo_entity_all['web mvc geo entity all']::
   Añade todas las entidades con campos de tipo GEO a la vista de mapa
-link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-entity-add['web mvc geo entity add']::
+link:#_web_mvc_geo_entity_add['web mvc geo entity add']::
   Añade la entidad seleccionada a la vista de mapa.
 
 Este comando modifica los controladores de las entidades sobre los que
@@ -141,7 +141,7 @@ Al añadirse esta anotación, se añade en la vista `show.jspx` del mapa la
 nueva entidad a representar.
 
 Para mas información sobre los comandos ver el
-link:#apendice-comandos_addon-web-mvc-geo[apéndice de comandos de este
+link:#_comandos_del_add_on_web_mvc_geo[apéndice de comandos de este
 add-on].
 
 Añadir Capas Base la vista de Mapa
@@ -153,16 +153,16 @@ base por defecto.
 Para añadir nuevas capas base, es posible ejecutar los siguientes
 comandos dependiendo del tipo de Capa Base que queramos crear:
 
-link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-tilelayer['web mvc geo tilelayer']::
+link:#_web_mvc_geo_tilelayer['web mvc geo tilelayer']::
   Añade una capa base de tipo Tile a la vista del mapa
-link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-wmslayer['web mvc geo wmslayer']::
+link:#_web_mvc_geo_wmslayer['web mvc geo wmslayer']::
   Añade una capa base de tipo WMS a la vista del mapa
 
 Estos comandos añaden en la vista `show.jspx` del mapa la nueva capa
 base.
 
 Para mas información sobre los comandos ver el
-link:#apendice-comandos_addon-web-mvc-geo[apéndice de comandos de este
+link:#_comandos_del_add_on_web_mvc_geo[apéndice de comandos de este
 add-on].
 
 Generar nuevas herramientas en la vista del Mapa
@@ -174,16 +174,16 @@ permite desplazarnos por el mapa.
 Sin embargo, este add-on permite añadir nuevas herramientas a la vista
 de mapa ejecutando los siguientes comandos:
 
-link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-tool-measure['web mvc geo tool measure']::
+link:#_web_mvc_geo_tool_measure['web mvc geo tool measure']::
   Añade una herramienta de medición a la vista del mapa
-link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-tool-custom['web mvc geo tool custom']::
+link:#_web_mvc_geo_tool_custom['web mvc geo tool custom']::
   Añade una herramienta personalizada a la vista del mapa
 
 Este comando añade en la vista `show.jspx` del mapa la nueva herramienta
 a utilizar.
 
 Para mas información sobre los comandos ver el
-link:#apendice-comandos_addon-web-mvc-geo[apéndice de comandos de este
+link:#_comandos_del_add_on_web_mvc_geo[apéndice de comandos de este
 add-on].
 
 //Return level title

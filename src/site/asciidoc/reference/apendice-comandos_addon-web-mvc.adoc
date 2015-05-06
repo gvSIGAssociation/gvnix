@@ -12,31 +12,31 @@ consultar la documentación del link:#addon-web-mvc[add-on Web MVC].
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-setup[web
+|link:#_web_mvc_batch_setup[web
 mvc batch setup] |Instala el soporte para la funcionalidad Web Batch
 
-|link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-add[web
+|link:#_web_mvc_batch_add[web
 mvc batch add] |Genera los métodos de de persistencia en bloque para un
 controlador.
 
-|link:#apendice-comandos_addon-web-mvc_mvc-batch_web-mvc-batch-all[web
+|link:#_web_mvc_batch_all[web
 mvc batch all] |Genera los métodos de de persistencia en bloque para
 todos los controladores.
 
 |[multiblock cell omitted] |[multiblock cell omitted]
 
-|link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-setup[web
+|link:#_web_mvc_jquery_setup[web
 mvc jquery setup] |Instala los artefacto necesario para usar vistas
 usando la librería JavaScript jQuery.
 
-|link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-update-tags[web
+|link:#_web_mvc_jquery_update_tags[web
 mvc jquery update tags] |Actualiza los artefactos, ya instalados en el
 add-on, por los actuales.
 
-|link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-add[web
+|link:#_web_mvc_jquery_add[web
 mvc jquery add] |Convierte las vistas de un controlador a jQuery.
 
-|link:#apendice-comandos_addon-web-mvc_mvc-jquery_web-mvc-jquery-all[web
+|link:#_web_mvc_jquery_all[web
 mvc jquery all] |Convierte todas las vistas a jQuery.
 |=======================================================================
 

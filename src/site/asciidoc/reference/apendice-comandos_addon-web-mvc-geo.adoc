@@ -13,35 +13,35 @@ GEO].
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-setup[web mvc geo
+|link:#_web_mvc_geo_setup[web mvc geo
 setup] |Instala los artefactos y dependencias requeridas para el
 funcionamiento del add-on.
 
-|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-controller[web
+|link:#_web_mvc_geo_controller[web
 mvc geo controller] |Genera una nueva vista de Mapa en nuestro proyecto
 
-|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-field[web mvc geo
+|link:#_comandos_del_add_on_web_mvc_geo_web-mvc-geo-field[web mvc geo
 field] |Transforma los campos de texto generados por defecto, a campos
 de tipo mapa para facilitar el guardado de campos geográficos.
 
-|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-entity-all[web
+|link:#_web_mvc_geo_entity_all[web
 mvc geo entity all] |Añade todas las entidades con campos de tipo GEO a
 la vista de mapa
 
-|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-entity-add[web
+|link:#_web_mvc_geo_entity_add[web
 mvc geo entity add] |Añade la entidad seleccionada a la vista de mapa.
 
-|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-tilelayer[web mvc
+|link:#_web_mvc_geo_tilelayer[web mvc
 geo tilelayer] |Añade una capa base de tipo Tile a la vista del mapa
 
-|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-wmslayer[web mvc
+|link:#_web_mvc_geo_wmslayer[web mvc
 geo wmslayer] |Añade una capa base de tipo WMS a la vista del mapa
 
-|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-tool-measure[web
+|link:#_web_mvc_geo_tool_measure[web
 mvc geo tool measure] |Añade una nueva herramienta de medición a la
 vista del mapa
 
-|link:#apendice-comandos_addon-web-mvc-geo_web-mvc-geo-tool-custom[web
+|link:#_web_mvc_geo_tool_custom[web
 mvc geo tool custom] |Añade una nueva herramienta personalizada a la
 vista del mapa
 |=======================================================================

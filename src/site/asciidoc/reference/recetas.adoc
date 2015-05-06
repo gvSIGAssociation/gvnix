@@ -197,7 +197,7 @@ registro asociado con el valor del selector que llega como parámetro.
 Por tanto si llega como parámetro un dato que no concuerda con ningún
 registro de la entidad parámetro, usará null como valor. Como se ha
 comentado, el componente _select.tagx_ no ofrece una opción vacía. gvNIX
-en su link:#addon-web-screen-patterns[Add-on Web MVC Pattern] incluye un
+en su link:#_add_on_web_screen_patterns[Add-on Web MVC Pattern] incluye un
 componente _select-withempty.tagx_ que sí lo ofrece. Mediante el comando
 _web mvc pattern setup_ se instalan los componentes de MVC Pattern entre
 los que se incluye el selector con opción vacía. Entonces es posible
