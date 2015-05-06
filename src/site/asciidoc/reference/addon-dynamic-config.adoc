@@ -72,8 +72,8 @@ información sobre las distintas configuraciones definidas hasta el
 momento.
 
 La creación de una nueva configuración se realiza con el comando
-link:#apendice-comandos_addon-dynamic_config-config_save[configuration
-create] que tiene un único parámetro obligatorio (_name_) que define el
+link:#_configuration_create[configuration
+create] que tiene un único parámetro obligatorio ('name') que define el
 nombre para la nueva configuración.
 
 --------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ realizarlas al inicio y podrán realizarse en cualquier momento.
 
 A partir de este momento es posible añadir nuevas propiedades para que
 estén disponibles para su gestión desde todas las configuraciones con
-link:#apendice-comandos_addon-dynamic_config-config_prop_add[configuration
+link:#_configuration_property_add[configuration
 property add]. Las propiedades inicialmente tomarán el valor que tengan
 definido en el proyecto.
 
@@ -124,7 +124,7 @@ Property available for all configurations
 -----------------------------------------------------------------------
 
 A continuación, se podrán modificar los valores de cada propiedad con
-link:#apendice-comandos_addon-dynamic_config-config_prop_update[configuration
+link:#_configuration_property_value[configuration
 property value].
 
 ----------------------------------------------------------------------
@@ -149,10 +149,10 @@ Property value seted
 En algunos casos, por seguridad, puede ser necesario que el valor de una
 propiedad no esté almacenado en el proyecto, para ello puede utilizarse
 el comando
-link:#apendice-comandos_addon-dynamic_config-config_prop_undefined[configuration
+link:#_configuration_property_undefined[configuration
 property undefined] de forma que el valor se tendrá que proporcionar al
 empaquetar la aplicación con Maven como un parámetro mediante el
-modificador _-D nombre=valor_.
+modificador '-D nombre=valor'.
 
 -------------------------------------------------------------------------
 roo-gvNIX>
@@ -165,7 +165,7 @@ Property value undefined
 Si se desea ver las distintas configuraciones que creadas, sus
 propiedades y los valores definidos para cada una de ellas utilizar el
 comando
-link:#apendice-comandos_addon-dynamic_config-config_list[configuration
+link:#_configuration_list[configuration
 list].
 
 ---------------------------------------------------------------------
@@ -193,7 +193,7 @@ roo-gvNIX>
 
 Para escribir las configuraciones actuales en el proyecto se debe
 utilizar el comando
-link:#apendice-comandos_addon-dynamic_config-config_export[configuration
+link:#_configuration_export[configuration
 export]. Es muy importante destacar que hasta que no se haya ejecutado
 este comando, las configuraciones no serán escritas en los ficheros
 destino y por lo tanto hasta ese momento no se podrán utilizar las
@@ -217,7 +217,7 @@ Configurations exported into project
 Una vez exportadas las configuraciones, pueden utilizarse como perfiles
 desde Maven mediante el modificador _-P nombre_ utilizando como nombre
 el valor que se definió para la configuración con el comando
-link:#apendice-comandos_addon-dynamic_config-config_save[configuration
+link:#_configuration_create[configuration
 create]. Por ejemplo, al empaquetar la aplicación para desplegarla en
 uno u otro entorno, debe especificarse el nombre de la configuración y
 opcionalmente el valor de los parámetros que se crearon como indefinidos
@@ -241,7 +241,7 @@ Mejoras de rendimiento
 ----------------------
 
 Se pueden definir algunos valores óptimos de rendimiento definidos en la
-sección link:#guia-desarrollo_mejoras-rendimiento-patrones-log[Patrones
+sección link:#_patrones_de_conversión_óptimos_en_el_log[Patrones
 de conversión óptimos en el log].
 
 Futuras versiones

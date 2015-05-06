@@ -6,13 +6,13 @@ Comandos del add-on JPA
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-jpa[add-on JPA].
+consultar la documentación del link:#_add_on_jpa[add-on JPA].
 
 .Comandos de add-on jpa
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-jpa_jpa-gvnix-setup[jpa gvnix setup]
+|link:#_jpa_gvnix_setup[jpa gvnix setup]
 |Instala el soporte para la funcionalidad
 
 |link:#_jpa_batch_add[jpa batch

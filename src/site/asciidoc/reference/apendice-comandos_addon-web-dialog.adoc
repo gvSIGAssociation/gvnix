@@ -6,39 +6,39 @@ Comandos del add-on Web Dialog
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-web-dialog[add-on Web
+consultar la documentación del link:#_add_on_web_dialog[add-on Web
 Dialog].
 
 .Comandos del add-on Web Dialog
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix[web
+|link:#_web_mvc_dialog_setup[web
 mvc dialog setup] |Instala el soporte para diálogos modales y realiza la
 gestión de ciertas excepciones para que sean visualizadas de forma
 amigable y en múltiples idiomas
 
-|link:#apendice-comandos_addon-web-exception-handler_exception-handler-list[web
+|link:#_web_mvc_dialog_exception_list[web
 mvc dialog exception list] |Muestra por la consola la lista de
 excepciones que están siendo actualmente gestionadas
 
-|link:#apendice-comandos_addon-web-exception-handler_exception-handler-add[web
+|link:#_web_mvc_dialog_exception_add[web
 mvc dialog exception add] |Incluye una nueva excepción dentro de la
 gestión de excepciones y permite definir el mensaje amigable asociado a
 la excepción en un determinado idioma
 
-|link:#apendice-comandos_addon-web-exception-handler_exception-handler-set-language[web
+|link:#_web_mvc_dialog_exception_set_language[web
 mvc dialog exception set language] |Añade o actualiza un mensaje
 amigable asociado a una excepción en un determinado idioma para lo que
 la excepción debe haber sido incluida previamente en el sistema de
 gestión de excepciones con el comando anterior
 
-|link:#apendice-comandos_addon-web-exception-handler_exception-handler-remove[web
+|link:#_web_mvc_dialog_exception_remove[web
 mvc dialog exception remove] |Quita una excepción de la gestión y por lo
 tanto no se mostrará un mensaje amigable y en múltiples idiomas en el
 caso de producirse y no ser controlada desde el proyecto
 
-|link:#apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix[web
+|link:#_web_mvc_dialog_setup[web
 mvc dialog add] |Añade dos métodos en el código fuente de un controlador
 que permiten abrir un diálogo modal en una página de la aplicación sin
 realizar ninguna implementación en la capa web
@@ -52,7 +52,7 @@ ventana modal (pop-up). A partir de ese momento los mensajes de error de
 la aplicación se mostrarán con ese formato. También configura un sistema
 para visualizar de forma amigable y con soporte multi idioma ciertas
 excepciones que se pueden producir en esta clase de aplicaciones. Ver
-link:#addon-web-dialog[Add-on Web Dialog] para una información más
+link:#_add_on_web_dialog[Add-on Web Dialog] para una información más
 detallada.
 
 web mvc dialog exception list
@@ -174,7 +174,7 @@ web mvc dialog add
 Añade dos métodos en el código fuente de un controlador que permiten
 abrir un diálogo modal en una página de la aplicación sin realizar
 ninguna implementación en la capa web. Ver la sección de inclusión de
-link:#addon-web-exception-handler_nuevos-dialogos[nuevos diálogos
+link:#_nuevos_diálogos_modales[nuevos diálogos
 modales] para una información más detallada.
 
 Sus parámetros son:

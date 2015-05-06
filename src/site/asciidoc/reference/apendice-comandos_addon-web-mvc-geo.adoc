@@ -6,7 +6,7 @@ Comandos del add-on Web MVC GEO
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-web-mvc-geo[add-on Web MVC
+consultar la documentación del link:#_add_on_web_mvc_geo[add-on Web MVC
 GEO].
 
 .Comandos del add-on Web MVC GEO
@@ -20,7 +20,7 @@ funcionamiento del add-on.
 |link:#_web_mvc_geo_controller[web
 mvc geo controller] |Genera una nueva vista de Mapa en nuestro proyecto
 
-|link:#_comandos_del_add_on_web_mvc_geo_web-mvc-geo-field[web mvc geo
+|link:#_web_mvc_geo_field[web mvc geo
 field] |Transforma los campos de texto generados por defecto, a campos
 de tipo mapa para facilitar el guardado de campos geográficos.
 

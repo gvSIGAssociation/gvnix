@@ -198,7 +198,9 @@ Por tanto si llega como parámetro un dato que no concuerda con ningún
 registro de la entidad parámetro, usará null como valor. Como se ha
 comentado, el componente _select.tagx_ no ofrece una opción vacía. gvNIX
 en su link:#_add_on_web_screen_patterns[Add-on Web MVC Pattern] incluye un
-componente _select-withempty.tagx_ que sí lo ofrece. Mediante el comando
+componente 'select-withempty.tagx' que sí lo ofrece.
+
+Mediante el comando
 _web mvc pattern setup_ se instalan los componentes de MVC Pattern entre
 los que se incluye el selector con opción vacía. Entonces es posible
 modificar la jspx del buscador findPetsByOwner para que utilice
@@ -268,7 +270,7 @@ _/WEB-INF/classes._
 Diseño de informes con sub informes
 -----------------------------------
 
-gvNIX mediante el link:#addon-web-report[Add-on Web Report] facilita la
+gvNIX mediante el link:#_add_on_web_report[Add-on Web Report] facilita la
 creación de informes sobre una entidad. El add-on genera el diseño de un
 informe Jasper Reports básico el cual se puede modificar utilizando un
 diseñador gráfico como iReport.
@@ -349,14 +351,16 @@ contrario, se tomarán los valores por defecto que se hubiesen definido o
 _null_ en su defecto. Observar que se ha definido el parámetro
 _SubReportPetsLocation_ y el valor que toma este parámetro en tiempo de
 ejecución ha de ser una ruta absoluta al sistema de archivos o al
-classpath de la aplicación. En la sección del
-link:#addon-web-report[Add-on Web Report] se explicó que al añadir un
-informe a la aplicación, utilizando el comando _web report add_, en el
-archivo _src/main/webapp/WEB-INF/spring/jasper-views.xml_ se declara un
+classpath de la aplicación.
+
+En la sección del
+link:#_add_on_web_report[Add-on Web Report] se explicó que al añadir un
+informe a la aplicación, utilizando el comando 'web report add', en el
+archivo 'src/main/webapp/WEB-INF/spring/jasper-views.xml' se declara un
 bean que establece la ruta hasta el fichero jrxml del informe añadido.
 Este bean tiene un atributo que indica el lugar donde se declaran los
 subreports que se usan en los distintos informes mediante el atributo
-_p:subReportsUrls-ref_.
+'p:subReportsUrls-ref'.
 
 ------------------------------------------------------------------------------------------------
 <bean id="owner_ownerpets"

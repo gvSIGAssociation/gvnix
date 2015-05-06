@@ -6,7 +6,7 @@ Comandos del add-on Web MVC
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-web-mvc[add-on Web MVC].
+consultar la documentación del link:#_add_on_web_mvc[add-on Web MVC].
 
 .Comandos de add-on Web MVC
 [width="100%",cols="33%,67%",options="header",]
@@ -22,8 +22,6 @@ controlador.
 |link:#_web_mvc_batch_all[web
 mvc batch all] |Genera los métodos de de persistencia en bloque para
 todos los controladores.
-
-|[multiblock cell omitted] |[multiblock cell omitted]
 
 |link:#_web_mvc_jquery_setup[web
 mvc jquery setup] |Instala los artefacto necesario para usar vistas

@@ -6,18 +6,18 @@ Comandos del add-on Web Report
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-web-report[add-on Web
+consultar la documentación del link:#_add_on_web_report[add-on Web
 Report].
 
 .Comandos del add-on Web Report
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-web-report_setup[web report setup]
+|link:#_web_report_setup[web report setup]
 |Configura en el proyecto el soporte para la generación de informes en
 formato PDF, XLS, CSV y HTML
 
-|link:#apendice-comandos_addon-web-report_add[web report add] |Crea un
+|link:#_web_report_add[web report add] |Crea un
 nuevo informe y permite su acceso desde el controlador de una entidad
 que se le proporciona como parámetro
 |=======================================================================
@@ -30,14 +30,14 @@ formato PDF, XLS, CSV y HTML mediante _Jasper Reports_ y su descarga
 desde la aplicación web.
 
 El comando sólo estará disponible si el proyecto utiliza Spring MVC en
-la capa web y link:#guia-desarrollo_web_tiles[Tiles] como motor de
+la capa web y link:#Tiles[Tiles] como motor de
 vistas web.
 
 Este comando no tiene ningún parámetro obligatorio ni opcional.
 
 Para una descripción detallada de las configuraciones que realiza este
 comando en el proyecto, consultar la sección de
-link:#addon-web-report_instalacion[instalación] del add-on Web Report.
+link:#_add_on_web_report[instalación] del add-on Web Report.
 
 web report add
 ~~~~~~~~~~~~~~
@@ -51,11 +51,11 @@ Si el comando se ejecuta varias veces sobre el mismo controlador y con
 el mismo nombre de informe, se añadirán al informe existente los nuevos
 formatos de generación que se hayan podido especificar. Para mas
 información consultar la sección de
-link:#addon-web-report_generacion[generación de un informe] del add-on
+link:#_generación_de_un_informe[generación de un informe] del add-on
 Web Report.
 
 El comando sólo estará disponible si el proyecto utiliza Spring MVC en
-la capa web y link:#guia-desarrollo_web_tiles[Tiles] como motor de
+la capa web y link:#Tiles[Tiles] como motor de
 vistas web.
 
 Sus parámetros son:

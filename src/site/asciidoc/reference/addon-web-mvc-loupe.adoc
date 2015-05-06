@@ -19,8 +19,9 @@ Instalación del componente lupa
 -------------------------------
 
 Para instalarlo, hay que utilizar el comando
-link:#apendice-comandos_addon-web-mvc-loupe_setup[web mvc loupe setup],
-el cual solo estará disponible después de instalar el link:#[add-on
+link:#_web_mvc_loupe_setup[web mvc loupe setup],
+el cual solo estará disponible después de instalar el
+link:#_comandos_del_add_on_web_mvc[add-on
 JQuery] en nuestro proyecto.
 
 Permitiendo a una entidad utilizar el campo lupa
@@ -30,7 +31,7 @@ Una vez instalados todos los componentes, es necesario generar una serie
 de métodos para realizar las búsquedas y la visualización de los
 resultados. Para que el controlador disponga de estos métodos,
 utilizaremos el comando
-link:#apendice-comandos_addon-web-mvc-loupe_set[web mvc loupe set] sobre
+link:#_web_mvc_loupe_set[web mvc loupe set] sobre
 el controlador seleccionado.
 
 Utilizando componentes lupa
@@ -38,7 +39,7 @@ Utilizando componentes lupa
 
 Ahora que el Controlador ya dispone de los métodos necesarios,
 ejecutaremos el comando
-link:#apendice-comandos_addon-web-mvc-loupe_field[web mvc loupe field]
+link:#_web_mvc_loupe_field[web mvc loupe field]
 sobre el field de la entidad a la que pertenece el controlador con los
 métodos generados. Una vez ejecutado este comando, transformaremos el
 campo indicado a un campo de tipo lupa en la capa web de nuestra
@@ -49,14 +50,14 @@ Actualizando componentes lupa
 
 Para mantener actualizados los componentes importados mediante el
 comando de instalación, podemos ejecutar el comando
-link:#apendice-comandos_addon-web-mvc-loupe_update[web mvc loupe
+link:#_web_mvc_loupe_update[web mvc loupe
 update].
 
 Apendice de comandos
 --------------------
 
 Para ver con mas detalle el comando que proporciona el add-on consultar
-la sección de link:#apendice-comandos_addon-web-mvc-loupe[comandos del
+la sección de link:#_comandos_del_add_on_web_mvc_lupa[comandos del
 add-on Lupa].
 
 //Return level title

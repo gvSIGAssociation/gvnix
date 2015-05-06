@@ -57,12 +57,12 @@ pero no es apreciable en condiciones del uso cuotidiano de la aplicación
 excepto en procesos de actualizaciones masivas de registros.
 
 Para mostrar un mensaje amigable al usuario se puede utilizar el
-link:#addon-web-exception-handler_descripcion[Add-on Web Dialog] que, en
-el link:#addon-web-exception-handler_excptiones-de-gvnix[conjunto de
+link:#_add_on_web_dialog[Add-on Web Dialog] que, en
+el link:#_excepciones_controladas_por_gvnix[conjunto de
 excepciones gestionadas por defecto] se incluye esta. Una vez
 inicializada la gestión de excepciones es posible personalizar el
 mensaje usando el comando
-link:#apendice-comandos_addon-web-exception-handler_exception-handler-set-language[web
+link:#_web_mvc_dialog_exception_set_language[web
 mvc dialog exception set language].
 
 Añadir el control en las entidades
@@ -71,9 +71,9 @@ Añadir el control en las entidades
 Para activar esta característica sobre una entidad se pueden utilizar
 los siguientes comandos:
 
-link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-set['occ checksum set']::
+link:#_occ_checksum_set['occ checksum set']::
   Aplica el control de concurrencia a una entidad.
-link:#apendice-comandos_addon-persistence_occchecksum_occ-checksum-all['occ checksum all']::
+link:#_occ_checksum_all['occ checksum all']::
   Aplica el control de concurrencia a todas las entidades de la
   aplicación.
 
@@ -93,7 +93,7 @@ detectará esta circunstancia y aplicará el control de concurrencia sobre
 la clase padre.
 
 Para ver todos los comandos y sus opciones ver el
-link:#apendice-comandos_addon-persistence[apéndice de comandos].
+link:#_comandos_del_add_on_occ[apéndice de comandos].
 
 [NOTE]
 ====

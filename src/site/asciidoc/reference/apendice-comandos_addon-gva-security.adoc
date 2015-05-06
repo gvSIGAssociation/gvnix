@@ -6,14 +6,14 @@ Comandos del add-on GVA Security
 
 
 Para una descripción detallada de las características del add-on
-consultar la documentación del link:#addon-gva-security[add-on GVA
+consultar la documentación del link:#_add_on_gva_security[add-on GVA
 Security].
 
 .Comandos de Add-on GVA Security
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-gva-security_gva-security-setup[security
+|link:#_security_provider_add[security
 provider add] |Instala y configura el sistema de autenticación y
 autorización según el proveedor seleccionado
 |=======================================================================

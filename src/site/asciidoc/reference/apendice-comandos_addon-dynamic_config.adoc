@@ -13,24 +13,24 @@ Configuration].
 [width="100%",cols="33%,67%",options="header",]
 |=======================================================================
 |Comando |Descripción
-|link:#apendice-comandos_addon-dynamic_config-config_save[configuration
+|link:#_configuration_create[configuration
 create] |Crea una nueva configuración con un determinado nombre
 
-|link:#apendice-comandos_addon-dynamic_config-config_prop_add[configuration
+|link:#_configuration_property_add[configuration
 property add] |Añade una propiedad a la gestión de configuraciones
 
-|link:#apendice-comandos_addon-dynamic_config-config_prop_update[configuration
+|link:#_configuration_property_value[configuration
 property value] |Cambia el valor que tiene una propiedad en una
 determinada configuración
 
-|link:#apendice-comandos_addon-dynamic_config-config_prop_undefined[configuration
+|link:#_configuration_property_undefined[configuration
 property undefined] |Deja sin valor una propiedad en una determinada
 configuración
 
-|link:#apendice-comandos_addon-dynamic_config-config_list[configuration
+|link:#_configuration_list[configuration
 list] |Lista todas las configuraciones definidas
 
-|link:#apendice-comandos_addon-dynamic_config-config_export[configuration
+|link:#_configuration_export[configuration
 export] |Escribe en el proyecto los cambios definidos hasta el momento
 en las configuraciones
 |=======================================================================

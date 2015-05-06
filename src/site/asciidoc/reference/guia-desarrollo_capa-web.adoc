@@ -298,6 +298,7 @@ image::./images/webinf-tree.png[Estructura archivos Pizza Shop,align=center]
 De todas las carpetas anteriores el desarrollo se centrará en _layouts,
 tags y views_.
 
+[[Tiles]]
 .Motor de plantillas: Tiles
 
 Dentro de _views_ hay varios ficheros jspx y varias carpetas. Entre los

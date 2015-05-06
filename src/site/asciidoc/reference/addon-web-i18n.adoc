@@ -60,7 +60,7 @@ el enlace para el cambio de idioma.
 ------------------------------------------------------
 
 Para mas información sobre este comando ver el
-link:#apendice-comandos_addon-web_i18n[apéndice de comandos del add-on].
+link:#_comandos_del_add_on_web_mvc_i18n[apéndice de comandos del add-on].
 
 Futuras versiones
 -----------------

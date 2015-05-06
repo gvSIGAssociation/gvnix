@@ -16,7 +16,7 @@ addon) pero se pueden añadir nuevos proveedores implementando la
 interfaz SecurityProvider
 
 Para instalarlo, hay que utilizar el comando
-link:#apendice-comandos_addon-gva-security_security-provider-add[security
+link:#_security_provider_add[security
 provider add] con los parámetro adecuados (nombre del proveedor y
 paquete en el que se instalará). El add-on instalará las clases
 necesarias para hacer la llamada al servicio, el modelo de datos de
@@ -83,7 +83,7 @@ wsdl.SAFEAutorizacion.location::
   URL del servicio de Autorización
 
 Para ver con mas detalle el comando que proporciona el add-on consultar
-la sección de link:#apendice-comandos_gva-security[comandos del add-on
+la sección de link:#_comandos_del_add_on_gva_security[comandos del add-on
 GVA Security].
 
 //Return level title
