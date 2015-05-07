@@ -18,29 +18,58 @@
 //
 // PDF Asciidoctor:
 //   $ asciidoctor-pdf index.adoc
-
-
-:Project:   gvNIX. Spring Roo based RAD tool
-:Author:    DISID Corporation, S.L.
-:corpsite: www.disid.com
-:doctype: book
-:keywords: gvNIX, Documentation
+//
+= {title}
+:title:			gvNIX - Documentación de referencia
+:Project:   	gvNIX. Spring Roo based RAD tool
+:Author:    	DISID Corporation, S.L.
+:corpsite: 		www.disid.com
+:copyright: 	CC BY-NC-SA 3.0
+:doctype: 		book
+:keywords: 		gvNIX, Documentation
 :toc:
 :toc-placement: left
-:toc-title: Table of Contents
-:toclevels: 4
+:toc-title: 	Table of Contents
+:toclevels: 	5
 :numbered:
-:sectnumlevels: 4
+:sectnumlevels: 5
 :source-highlighter:  pygments
+:icons:       font
 ifdef::backend-pdf[]
 :pdf-style: asciidoctor
 :pagenums:
 :pygments-style:  bw
 endif::[]
 
+////////////////////////////////////////////////////////////////////////////////
+[abstract]
+_© 2015 The original authors._ +
+_Copies of this document may be made for your own use and for distribution to others,
+provided that you do not charge any fee for such copies and further provided that
+each copy contains this Copyright Notice, whether distributed in print or
+electronically._
 
-gvNIX - Documentación de referencia
-===================================
+:numbered!:
+[preface]
+[[preface]]
+= Preface
+
+[[preface-overview]]
+=== 1. Overview
+
+TBC
+
+[[preface-requirements]]
+=== 2. Requirements
+
+TBC
+
+[[preface-download]]
+=== 3. Download gvNIX
+
+TBC
+
+////////////////////////////////////////////////////////////////////////////////
 
 == Primeros pasos con gvNIX
 
