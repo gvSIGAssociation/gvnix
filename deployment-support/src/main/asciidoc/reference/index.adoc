@@ -18,7 +18,7 @@
 = {title}
 :title:         gvNIX - Documentación de referencia
 :Project:       gvNIX, un Addon de Spring Roo Suite
-:Author:        DISID Corporation, S.L.
+:Author:        Dirección General de Tecnologías de la Información, Asociación gvSIG, DISID Corporation, S.L.
 :version:       1.4.1.RELEASE
 :corpsite:      www.gvnix.org
 :copyright:     CC BY-NC-SA 3.0
