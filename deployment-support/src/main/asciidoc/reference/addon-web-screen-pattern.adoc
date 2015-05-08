@@ -190,7 +190,7 @@ crearán / modificarán los componentes Spring MVC necesarios (diferentes
 archivos tagx, jspx, imágenes, javascript, ...) y se generarán los
 aspectos Java apropiados para lograr visualizar el patrón elegido.
 
-image::./images/tabular.png[Patrón maestro,align=center]
+image::tabular.png[Patrón maestro,align=center]
 
 Creación de un patrón detalle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -216,11 +216,11 @@ definir previamente un patrón maestro sobre el mismo controlador. Es
 decir, el controlador debe tener definida la anotación _@GvNIXPattern_.
 
 ifdef::backend-html5[]
-image::./images/master-detail.png[Patrón maestro con un detalle,align=center]
+image::master-detail.png[Patrón maestro con un detalle,align=center]
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-image::./images/master-detail.png[Patrón maestro con un detalle,align=center, width=300]
+image::master-detail.png[Patrón maestro con un detalle,align=center, width=300]
 endif::backend-pdf[]
 
 Tipos de patrones
@@ -235,7 +235,7 @@ El patrón tabular define una visualización de varios registros
 simultaneos con la posibilidad de desplazarse a lo largo de todos los
 registros existentes mediante paginación.
 
-image::./images/tabular.png[Tabular,align=center]
+image::tabular.png[Tabular,align=center]
 
 Las operaciones de creación, actualización y borrado en este formato de
 visualización se pueden realizar sobre varios registros de forma
@@ -315,18 +315,18 @@ El patrón tabular define una visualización de varios registros
 simultaneos con la posibilidad de desplazarse a lo largo de todos los
 registros existentes mediante paginación.
 
-image::./images/tabular.png[Tabular,align=center]
+image::tabular.png[Tabular,align=center]
 
 Las operaciones de creación, actualización y borrado en este formato de
 visualización se realizan sobre un único registro seleccionado de la
 lista tabular y se realiza en una página nueva en formato registro.
 
 ifdef::backend-html5[]
-image::./images/edit.png[Edición,align=center]
+image::edit.png[Edición,align=center]
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-image::./images/edit.png[Edición,align=center,width=400]
+image::edit.png[Edición,align=center,width=400]
 endif::backend-pdf[]
 
 El Add-on Web Screen Pattern, genera los componentes necesarios para
@@ -392,7 +392,7 @@ Este patrón realiza la visualización de un único registro pero con la
 posibilidad de avanzar, mediante paginación de uno en uno, entre todos
 los registros existentes.
 
-image::./images/register.png[Registro,align=center]
+image::register.png[Registro,align=center]
 
 La generación automática de código de este patrón posiciona los campos
 de la entidad unos debajo de otros. A parte de generar la jspx propia

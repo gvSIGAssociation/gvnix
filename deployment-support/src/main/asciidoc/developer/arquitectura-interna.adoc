@@ -11,11 +11,11 @@ En el esquema siguiente podemos ver los principales componentes del
 framework.
 
 ifdef::backend-html5[]
-image::./images/roo-esquema-general-componentes.png[Esquema General de componentes del framework,align=center]
+image::roo-esquema-general-componentes.png[Esquema General de componentes del framework,align=center]
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-image::./images/roo-esquema-general-componentes.png[Esquema General de componentes del framework,align=center,width=400]
+image::roo-esquema-general-componentes.png[Esquema General de componentes del framework,align=center,width=400]
 endif::backend-pdf[]
 
 

@@ -8,10 +8,6 @@
 // Build the document:
 // ===================
 //
-// HTML5:
-//
-//   $ asciidoc -b html5 index.adoc
-//
 // HTML5 Asciidoctor:
 //   # Embed images in XHTML
 //   asciidoctor -b html5 index.adoc
@@ -20,62 +16,48 @@
 //   $ asciidoctor-pdf index.adoc
 //
 = {title}
-:title:			gvNIX - Documentación de referencia
-:Project:   	gvNIX. Spring Roo based RAD tool
-:Author:    	DISID Corporation, S.L.
-:corpsite: 		www.disid.com
-:copyright: 	CC BY-NC-SA 3.0
-:doctype: 		book
-:keywords: 		gvNIX, Documentation
+:title:         gvNIX - Documentación de referencia
+:Project:       gvNIX, un Addon de Spring Roo Suite
+:Author:        DISID Corporation, S.L.
+:version:       1.4.1.RELEASE
+:corpsite:      www.gvnix.org
+:copyright:     CC BY-NC-SA 3.0
+:keywords:      gvNIX, Documentation
+:doctype:       book
 :toc:
 :toc-placement: left
-:toc-title: 	Table of Contents
-:toclevels: 	5
-:numbered:
+:toc-title:     Índice de contenidos
+:toclevels:     5
 :sectnumlevels: 5
+:numbered:
+:sectanchors:
+:icons:         font
+:imagesdir:     ./images
 :source-highlighter:  pygments
-:icons:       font
 ifdef::backend-pdf[]
-:pdf-style: asciidoctor
+:pdf-style:     asciidoctor
 :pagenums:
 :pygments-style:  bw
 endif::[]
 
-////////////////////////////////////////////////////////////////////////////////
+_{version}_
+
+_{project}_ | link:{corpsite}[{corpsite}]
+
 [abstract]
-_© 2015 The original authors._ +
-_Copies of this document may be made for your own use and for distribution to others,
-provided that you do not charge any fee for such copies and further provided that
-each copy contains this Copyright Notice, whether distributed in print or
-electronically._
 
-:numbered!:
-[preface]
-[[preface]]
-= Preface
+_2010 (C) Dirección General de Tecnologías de la Información - Conselleria de Hacienda y
+Administración Pública - Generalitat Valenciana._ Esta obra está bajo la licencia
+http://creativecommons.org/licenses/by-sa/3.0/es/[Reconocimiento-Compartir bajo la misma licencia 3.0 España]
+de Creative Commons. Puede copiarla, distribuirla y comunicarla públicamente
+siempre que especifique sus autores y comparta cualquier obra derivada bajo la
+misma licencia.
 
-[[preface-overview]]
-=== 1. Overview
-
-TBC
-
-[[preface-requirements]]
-=== 2. Requirements
-
-TBC
-
-[[preface-download]]
-=== 3. Download gvNIX
-
-TBC
-
-////////////////////////////////////////////////////////////////////////////////
 
 == Primeros pasos con gvNIX
 
 Esta parte de la documentación contiene la información necesaria para
 entender qué es gvNIX y cómo empezar a utilizarlo.
-
 
 // Push titles down one level.
 :leveloffset: 1

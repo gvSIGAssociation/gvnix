@@ -247,7 +247,7 @@ carpeta _jasperfonts_. La inclusión de nuevas fuentes se puede realizar
 utilizando una utilidad que ofrece iReport. Desde el menú _Herramientas
 > Opciones > Pestaña Fonts_ se accederá a la siguiente pantalla:
 
-image::./images/iReportFonts.png[Herramienta de gestión de fuentes de IReport,align=center]
+image::iReportFonts.png[Herramienta de gestión de fuentes de IReport,align=center]
 
 Desde esta pantalla, seleccionando una fuente de la lista de fuentes
 instaladas en iReports y con el botón _"Export as extension"_ se creará
@@ -298,12 +298,12 @@ del informe _owner_ownerpets.jrxml_. Abriendo este archivo usando
 iReport (_Archivo > Open_) aparecerá una pantalla como la que se muestra
 a continuación.
 
-image::./images/recetas-subreport-ireport-1.png[iReport - Diseñador,align=center]
+image::recetas-subreport-ireport-1.png[iReport - Diseñador,align=center]
 
 En la parte izquierda, en la pestaña con título _Report Inspector_ se
 pueden observar los elementos principales del diseño de informes.
 
-image::./images/recetas-subreport-ireport-2.png[iReport - Report Inspector,align=center]
+image::recetas-subreport-ireport-2.png[iReport - Report Inspector,align=center]
 
 Lo primero que se debe hacer es declarar un nuevo parámetro con, por
 ejemplo, el nombre _SubReportPetsLocation_. Para ello hacer click con el
@@ -326,7 +326,7 @@ subreport element_ y cerrar con _Terminar_. Es posible modificar las
 dimensiones del elemento _Subreport_ arrastrando las esquinas de la caja
 del elemento.
 
-image::./images/recetas-subreport-ireport-3.png[iReport - Subreport,align=center]
+image::recetas-subreport-ireport-3.png[iReport - Subreport,align=center]
 
 Antes de seguir con el establecimiento de las propiedades del Subreport,
 es necesario declarar un campo del informe que permitirá acceder al
@@ -397,7 +397,7 @@ para el diseño y el lugar donde guardarlo. Indicar, por ejemplo
 _owner_ownerpets_sub_pets.jrxml_ y guardarlo en el mismo directorio
 donde se encuentre el report padre (_owner_ownerpets.jrxml_).
 
-image::./images/recetas-subreport-ireport-4.png[iReport - Nuevo diseño,align=center]
+image::recetas-subreport-ireport-4.png[iReport - Nuevo diseño,align=center]
 
 [IMPORTANT]
 ====
@@ -432,7 +432,7 @@ subreport pets). Si se hace click con el botón derecho sobre _Title_ y
 se selecciona _Delete Band_, es eliminada. Hacerlo con todas las bandas
 excepto con _Column Header, Detail1 y Summary_.
 
-image::./images/recetas-subreport-ireport-6.png[iReport - Bandas subreport,align=center]
+image::recetas-subreport-ireport-6.png[iReport - Bandas subreport,align=center]
 
 _Column Header_ es una banda que se dibujará solo al inicio de la
 columna del informe (en este caso solo existirá una). Añadir textos
@@ -441,11 +441,11 @@ paleta de componentes, seleccionar _Static Text_ y arrastrarlo hasta la
 banda _Column Header_.
 
 ifdef::backend-html5[]
-image::./images/recetas-subreport-ireport-5.png[iReport - Paleta,align=center]
+image::recetas-subreport-ireport-5.png[iReport - Paleta,align=center]
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-image::./images/recetas-subreport-ireport-5.png[iReport - Paleta,align=center,width=273]
+image::recetas-subreport-ireport-5.png[iReport - Paleta,align=center,width=273]
 endif::backend-pdf[]
 
 En el primer _Static Text_ establecer el valor _Nombre_ y repetir la
@@ -477,11 +477,11 @@ de los campos definidos en el informe, de los parámetros e incluso
 acceder a alguna de las operaciones que proporcionan estos objetos.
 
 ifdef::backend-html5[]
-image::./images/recetas-subreport-ireport-7.png[iReport - Diálogo Text Field Expression,align=center]
+image::recetas-subreport-ireport-7.png[iReport - Diálogo Text Field Expression,align=center]
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-image::./images/recetas-subreport-ireport-7.png[iReport - Diálogo Text Field Expression,align=center,width=300]
+image::recetas-subreport-ireport-7.png[iReport - Diálogo Text Field Expression,align=center,width=300]
 endif::backend-pdf[]
 
 Obviamente, en un _Text Field_ es posible establecer expresiones más
@@ -504,7 +504,7 @@ _java.lang.Integer_.
 Solo queda arrancar de nuevo la aplicación, desde el Tomcat de Eclipse o
 desde la línea de comandos y probar la generación del informe de Owners.
 
-image::./images/recetas-subreport-ireport-8.png[Informe Owners con subreport Pets,align=center]
+image::recetas-subreport-ireport-8.png[Informe Owners con subreport Pets,align=center]
 
 JasperReports permite gran cantidad de opciones al trabajar con
 subreports (paso de parámetros desde el informe padre a los subinformes,

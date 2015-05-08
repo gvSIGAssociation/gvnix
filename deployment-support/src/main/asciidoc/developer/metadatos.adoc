@@ -221,11 +221,11 @@ Esquema de relación de componentes entre los add-ons y los servicios de
 metadatos
 
 ifdef::backend-html5[]
-image::./images/roo-relacion-addon-metadatos.png[Esquema de relación entre add-ons y los servicios de metadatos,align=center]
+image::roo-relacion-addon-metadatos.png[Esquema de relación entre add-ons y los servicios de metadatos,align=center]
 endif::backend-html5[]
 
 ifdef::backend-pdf[]
-image::./images/roo-relacion-addon-metadatos.png[Esquema de relación entre add-ons y los servicios de metadatos,align=center,width=400]
+image::roo-relacion-addon-metadatos.png[Esquema de relación entre add-ons y los servicios de metadatos,align=center,width=400]
 endif::backend-pdf[]
 
 Este esquema sirve para ver como se relacionan los componentes de un
