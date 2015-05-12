@@ -350,6 +350,7 @@
   			<activeByDefault>true</activeByDefault>
   		</activation>
   		<properties>
+        <!-- Dir at remote the server that hosts the OSGi repository -->
   			<osgi.repository.dir>home/disid/gvnix-repository/snapshots</osgi.repository.dir>
   		</properties>
   	</profile>
@@ -357,6 +358,7 @@
   	<profile>
   		<id>release</id>
   		<properties>
+        <!-- Dir at remote the server that hosts the OSGi repository -->
   			<osgi.repository.dir>home/disid/gvnix-repository</osgi.repository.dir>
   		</properties>
   	</profile>
