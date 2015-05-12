@@ -22,9 +22,9 @@ repositorio adicional al proyecto puede realizarse mediante el comando
 de la consola
 http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-maven-repository-add[maven
 repository add]. El siguiente ejemplo define el repositorio Maven
-interno de la Consejería de Infraestructuras, Transporte y Medio
+interno de la Conselleria de Infraestructuras, Transporte y Medio
 Ambiente. Este repositorio es accesible únicamente desde la red interna
-de la Consejería.
+de la Conselleria.
 
 --------------------------------------------------------------------------------------
 roo-gvNIX> maven repository add --id citma-maven --name "CITMA Maven Repository"

@@ -10,8 +10,8 @@ tutoriales, etc que pueden ser útiles.
 Proyectos relacionados con gvNIX
 --------------------------------
 
-Proyectos relacionados con gvNIX y con la Consejería de
-Infraestructuras, Transporte y Medio Ambiente de la Generalidad
+Proyectos relacionados con gvNIX y con la Conselleria de
+Infraestructuras, Transporte y Medio Ambiente de la Generalitat
 Valenciana.
 
 * http://www.gvpontis.gva.es/[gvPONTIS]

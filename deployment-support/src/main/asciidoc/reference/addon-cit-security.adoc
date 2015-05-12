@@ -8,7 +8,7 @@ Descripción
 -----------
 
 El add-on instala un cliente del servicio web de autenticación y
-autorización que utiliza la Consejería de Infraestructuras, Transporte y
+autorización que utiliza la Conselleria de Infraestructuras, Transporte y
 Medio Ambiente (CITMA) y lo integra con el sistema de seguridad Spring
 Security.
 

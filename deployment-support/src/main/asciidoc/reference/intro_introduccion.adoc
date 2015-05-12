@@ -19,8 +19,8 @@ alto nivel a las prestaciones que ya se obtienen con
 http://projects.spring.io/spring-roo/[Spring Roo] para mejorar la
 productividad.
 
-gvNIX es un proyecto subvencionado y liderado por la Consejería de
-Infraestructuras, Transporte y Medio Ambiente (CITMA) de la Generalidad
+gvNIX es un proyecto subvencionado y liderado por la Conselleria de
+Infraestructuras, Transporte y Medio Ambiente (CITMA) de la Generalitat
 Valenciana.
 
 gvNIX está disponible dentro del proyecto de Migración a Software de

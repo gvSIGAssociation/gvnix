@@ -22,7 +22,7 @@ cit security setup
 ~~~~~~~~~~~~~~~~~~
 
 Instala y configura el sistema de autenticación y autorización de la
-Consejería de Infraestructuras, Transporte y Medio Ambiente (CITMA) del
+Conselleria de Infraestructuras, Transporte y Medio Ambiente (CITMA) del
 Gobierno de Valencia.
 
 Sus parámetros son:

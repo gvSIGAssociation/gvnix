@@ -21,10 +21,10 @@
 
 
 = Dynamic Configuration Addon User Guide
-:Project:   gvNIX. Spring Roo based RAD tool
-:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
-:Author:    DISID Corporation, S.L.
-:corpsite: www.disid.com
+:Project:   gvNIX, un Addon de Spring Roo Suite
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria de Hacienda y Administración Pública - CC BY-NC-SA 3.0
+:Author:    Dirección General de Tecnologías de la Información, Asociación gvSIG, DISID Corporation, S.L.
+:corpsite: www.gvnix.org
 :doctype: article
 :keywords: gvNIX, Documentation
 :toc:
@@ -40,11 +40,11 @@ ifdef::backend-pdf[]
 :pygments-style:  bw
 endif::[]
 
-This work is licensed under the Creative Commons Attribution-Share Alike
-3.0 Unported License. To view a copy of this license, visit
-http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
-Creative Commons, 171 Second Street, Suite 300, San Francisco,
-California, 94105, USA.
+_2010 (C) Dirección General de Tecnologías de la Información - Conselleria de Hacienda y
+Administración Pública - Generalitat Valenciana._
+This work is licensed under the http://creativecommons.org/licenses/by-sa/3.0/[Creative Commons Attribution-Share Alike
+3.0 Unported License]. If you remix, transform, or build upon the material, you  must give appropriate credit and
+distribute your contributions under the same license as the original.
 
 [[introduction]]
 Introduction

@@ -21,7 +21,7 @@
 :Author:        Dirección General de Tecnologías de la Información, Asociación gvSIG, DISID Corporation, S.L.
 :version:       1.4.1.RELEASE
 :corpsite:      www.gvnix.org
-:copyright:     CC BY-NC-SA 3.0
+:Copyright:     2010 (C) Dirección General de Tecnologías de la Información - Conselleria de Hacienda y Administración Pública - CC BY-NC-SA 3.0
 :keywords:      gvNIX, Documentation
 :doctype:       book
 :toc:

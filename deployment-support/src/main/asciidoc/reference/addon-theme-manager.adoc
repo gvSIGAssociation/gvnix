@@ -66,7 +66,7 @@ Temas disponibles por defecto.
 La distribución de gvNIX viene con dos temas _disponibles_:
 
 cit-theme::
-  Tema visual utilizado en las aplicaciones de la CITMA (Consejería de
+  Tema visual utilizado en las aplicaciones de la CITMA (Conselleria de
   Infraestructuras, Transporte y Medio Ambiente del Govierno de
   Valencia).
 gvNIX-theme::

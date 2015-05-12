@@ -20,11 +20,11 @@
 //   $ asciidoctor-pdf td-addon-web-mvc-datatables-filters_es.adoc
 
 
-= gvNIX 1.3.1 - Filtros Simples
-:Project:   gvNIX. Spring Roo based RAD tool
-:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria d'Hisenda i Administració Pública
-:Author:    DISID Corporation, S.L.
-:corpsite: www.disid.com
+= Filtros Simples
+:Project:   gvNIX, un Addon de Spring Roo Suite
+:Copyright: 2010 (C) Dirección General de Tecnologías de la Información - Conselleria de Hacienda y Administración Pública - CC BY-NC-SA 3.0
+:Author:    Dirección General de Tecnologías de la Información, Asociación gvSIG, DISID Corporation, S.L.
+:corpsite: www.gvnix.org
 :doctype: article
 :keywords: gvNIX, Documentation
 :toc:
@@ -40,6 +40,12 @@ ifdef::backend-pdf[]
 :pygments-style:  bw
 endif::[]
 
+_2010 (C) Dirección General de Tecnologías de la Información - Conselleria de Hacienda y
+Administración Pública - Generalitat Valenciana._ Esta obra está bajo la licencia
+http://creativecommons.org/licenses/by-sa/3.0/es/[Reconocimiento-Compartir bajo la misma licencia 3.0 España]
+de Creative Commons. Puede copiarla, distribuirla y comunicarla públicamente
+siempre que especifique sus autores y comparta cualquier obra derivada bajo la
+misma licencia.
 
 [[descripcion-doc]]
 == Descripción del documento

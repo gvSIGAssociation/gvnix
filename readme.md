@@ -38,7 +38,7 @@ Run gvNIX Roo Addon Suite
 
 To be able to test gvNIX quickly without deploy all components you should following the next steps:
 
-* Add _$ROO_HOME_ variable to your $PATH 
+* Add _$ROO_HOME_ variable to your $PATH
 * Compile gvNIX project using 'mvn clean install' on your project folder
 * Execute ./gvnix-dev
 
@@ -65,7 +65,7 @@ In addition, gvNIX Addon Suite will be deployed in our own gvNIX repository:
 To deploy **RELEASE** artifacts and generate gvNIX Addon Suite you must execute the following command:
 
 	mvn clean deploy -P release
-	
+
 To deploy **SNAPSHOT** artifacts and generate gvNIX Addon Suite you must execute the following command:
 
 	mvn clean deploy
@@ -76,7 +76,7 @@ To deploy **SNAPSHOT** artifacts and generate gvNIX Addon Suite you must execute
 
 gvNIX versions are series of individual numbers, separated by periods, with a progression such as 1.7.0, 1.8.0, 1.8.1, 1.9.0, 1.10.0, 1.11.0, 1.11.1, 1.11.2, and so on.
 
-The early stages are identified with "ALPHA", "BETA" or "BUILD-SNAPSHOT" 
+The early stages are identified with "ALPHA", "BETA" or "BUILD-SNAPSHOT"
 qualifiers.
 
 Documentation
@@ -86,17 +86,17 @@ Documentation index
 -------------------
 
 * On each gvNIX project module you can find technical and user guides in
-the *module/docs/* folder in ASCIIdoc format and English:
+the *module/docs/* folder in ASCIIdoc format and Spanish and English:
 
   * td-module.adoc: Technical design
   * ug-module.adoc: User guide
 
-* gvNIX work guides are placed at src/site/docbook/ in docbook format and Spanish (deprecated):
+* gvNIX work guides are placed at _src/site/docbook/_ in docbook format and Spanish (deprecated):
 
   * reference: Working guide about projects development with gvNIX.
   * developer: Working guide about gvNIX project development.
 
-* gvNIX work guides are placed at src/site/asciidoc/ in AsciiDoc format and Spanish:
+* gvNIX work guides are placed at _/deployment-support_ in AsciiDoc format and Spanish:
 
   * reference: Working guide about projects development with gvNIX.
   * developer: Working guide about gvNIX project development.
