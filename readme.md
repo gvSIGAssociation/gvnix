@@ -3,9 +3,13 @@ gvNIX - Spring Roo Addon Suite ![alt text](https://travis-ci.org/gvSIGAssociatio
 
 Welcome to gvNIX, an Spring Roo Addon Suite.
 
-gvNIX is an Spring Roo Addon Suite that focuses both enterprise knowledge and enterprise standards to build Java applications.
+gvNIX is an Spring Roo Addon Suite that focuses both enterprise knowledge and
+enterprise standards to build Java applications.
 
-gvNIX is sponsored by the <a href="http://www.dgti.gva.es/" target="_blank">General Directorate for Information Technologies</a> (DGTI) at Regional Ministry of Finance and Public Administration of the Generalitat Valenciana (Valencian Community, Spain), and led by <a href="http://www.disid.com" target="_blank">DISID</a>.
+gvNIX is sponsored by the <a href="http://www.dgti.gva.es/" target="_blank">General
+Directorate for Information Technologies</a> (DGTI) at Regional Ministry of Finance
+and Public Administration of the Generalitat Valenciana (Valencian Community, Spain),
+and led by <a href="http://www.disid.com" target="_blank">DISID</a>.
 
 About this doc
 ==============
@@ -91,11 +95,6 @@ the *module/docs/* folder in ASCIIdoc format and Spanish and English:
   * td-module.adoc: Technical design
   * ug-module.adoc: User guide
 
-* gvNIX work guides are placed at _src/site/docbook/_ in docbook format and Spanish (deprecated):
-
-  * reference: Working guide about projects development with gvNIX.
-  * developer: Working guide about gvNIX project development.
-
 * gvNIX work guides are placed at _/deployment-support_ in AsciiDoc format and Spanish:
 
   * reference: Working guide about projects development with gvNIX.
@@ -108,41 +107,34 @@ For more information generate and read the *gvNIX Developer Guide* (Spanish).
 
 Run the following command from the root checkout location:
 
-   bash:~/gvnix$ mvn site
+   bash:~/gvnix$  mvn clean compile install
 
-This will create the guide in the "target/site/developer" directory (in several formats):
+This will create the guide in the _/deployment-support/target/generated-docs_ directory (in several formats):
 
-    target
-    |-- docbkx
-    |	`-- pdf
-    |		`-- index.pdf (reference guide)
-    `-- site
-    	|-- index.html
-        |-- developer
-        |   |-- html
-        |   |   |-- index.html
-        |   |   `-- ...
-        |   `-- html-single
-        |       `-- index.html
-        `-- reference
-            |-- html
-            |   |-- index.html
-            |   `-- ...
-            `-- html-single
-                `-- index.html
+    generated-docs
+    |-- developer
+    |	`-- diagrams (resources)
+    | `-- images (resources)
+    | `-- index.html (developer guide)
+    | `-- index.pdf (developer guide)
+    `-- reference
+    | `-- images (resources)
+    | `-- index.html (reference guide)
+    | `-- index.pdf (reference guide)
 
-The *gvNIX Reference Guide* (Spanish) is the documentation for developing projects with the framework.
 
-And will create a site with the project summary (target/site/index.html).
+The *gvNIX Reference Guide* (Spanish) is the documentation for developing
+projects with the framework.
 
 
 Write doc
 ---------
 
-* Download and install XMLmind XML Editor Personal Edition ( http://www.xmlmind.com/xmleditor/download.shtml )
-* Use the previous editor to open ``src/site/docbook/developer/index.xml`` and contribute with your knowledge.
+gvNIX documentation is moving to AsciiDoc. These docs have the suffix .ad,
+.adoc or .asciidoc.
 
-gvNIX documentation is moving to AsciiDoc. These docs have the suffix .ad, .adoc or .asciidoc. To learn more about how to convert AsciiDoc to PDF, HTML5, etc go to http://asciidoc.org/ or http://asciidoctor.org/
+To learn more about how to convert AsciiDoc to PDF, HTML5,
+etc go to http://asciidoc.org/ or http://asciidoctor.org/
 
 
 Contribute to gvNIX Project
@@ -152,7 +144,8 @@ Do you want to contribute to gvNIX Project? :D
 
 Create an issue
 -----------------
-Create a new issue on gitHub using the following link https://github.com/gvSIGAssociation/gvnix/issues/new
+Create a new issue on gitHub using the following link
+https://github.com/gvSIGAssociation/gvnix/issues/new
 
 Send your Pull Requests
 ------------------------
