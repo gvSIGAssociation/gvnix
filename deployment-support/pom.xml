@@ -87,53 +87,113 @@
           </dependency>
         </dependencies>
         <executions>
+          <!-- Reference guide to pdf -->
           <execution>
-            <id>output-html</id>
+           <id>generate-pdf-reference-doc</id>
+           <phase>generate-resources</phase>
+           <goals>
+               <goal>process-asciidoc</goal>
+           </goals>
+           <configuration>
+               <sourceDirectory>src/main/asciidoc/reference</sourceDirectory>
+               <sourceDocumentName>index.adoc</sourceDocumentName>
+               <headerFooter>true</headerFooter>
+               <data-uri />
+                <preserveDirectories>true</preserveDirectories>
+               <outputDirectory>target/generated-docs/reference</outputDirectory>
+               <backend>pdf</backend>
+               <!-- WARNING callout bullets don't yet work with CodeRay -->
+               <sourceHighlighter>coderay</sourceHighlighter>
+               <attributes>
+                   <pagenums/>
+                   <toc/>
+                   <idprefix/>
+                   <idseparator>-</idseparator>
+               </attributes>
+           </configuration>
+          </execution>
+          <!-- Reference guide to html5 -->
+          <execution>
+            <id>generate-html-reference-doc</id>
             <phase>generate-resources</phase>
             <goals>
-              <goal>process-asciidoc</goal>
+                <goal>process-asciidoc</goal>
             </goals>
             <configuration>
-              <backend>html5</backend>
-              <sourceHighlighter>coderay</sourceHighlighter>
-              <attributes>
-                <toc />
-                <toc-placement>left</toc-placement>
-                <sectanchors>true</sectanchors>
-                <!-- Set the idprefix to blank -->
-                <idprefix />
-                <idseparator>-</idseparator>
-                <docinfo1>true</docinfo1>
-              </attributes>
+                <sourceDirectory>src/main/asciidoc/reference</sourceDirectory>
+                <sourceDocumentName>index.adoc</sourceDocumentName>
+                <headerFooter>true</headerFooter>
+                <data-uri />
+                 <preserveDirectories>true</preserveDirectories>
+                <outputDirectory>target/generated-docs/reference</outputDirectory>
+                <backend>html5</backend>
+                <sourceHighlighter>coderay</sourceHighlighter>
+                <attributes>
+                    <toc />
+                    <toc-placement>left</toc-placement>
+                    <icons>font</icons>
+                    <sectanchors>true</sectanchors>
+                    <!-- set the idprefix to blank -->
+                    <idprefix/>
+                    <idseparator>-</idseparator>
+                    <docinfo1>true</docinfo1>
+                </attributes>
             </configuration>
+        </execution>
+        <!-- Developer guide to pdf -->
+        <execution>
+            <id>generate-pdf-developer-doc</id>
+           <phase>generate-resources</phase>
+           <goals>
+               <goal>process-asciidoc</goal>
+           </goals>
+           <configuration>
+               <sourceDirectory>src/main/asciidoc/developer</sourceDirectory>
+               <sourceDocumentName>index.adoc</sourceDocumentName>
+               <headerFooter>true</headerFooter>
+               <data-uri />
+                <preserveDirectories>true</preserveDirectories>
+               <outputDirectory>target/generated-docs/developer</outputDirectory>
+               <backend>pdf</backend>
+               <!-- WARNING callout bullets don't yet work with CodeRay -->
+               <sourceHighlighter>coderay</sourceHighlighter>
+               <attributes>
+                   <pagenums/>
+                   <toc/>
+                   <idprefix/>
+                   <idseparator>-</idseparator>
+               </attributes>
+           </configuration>
           </execution>
+          <!-- Developer guide to html5 -->
           <execution>
-            <id>generate-pdf-doc</id>
+            <id>generate-html-developer-doc</id>
             <phase>generate-resources</phase>
             <goals>
-              <goal>process-asciidoc</goal>
+                <goal>process-asciidoc</goal>
             </goals>
             <configuration>
-              <backend>pdf</backend>
-              <!-- WARNING callout bullets don't yet work with CodeRay -->
-              <sourceHighlighter>coderay</sourceHighlighter>
-              <attributes>
-                <pagenums />
-                <toc />
-                <idprefix />
-                <idseparator>-</idseparator>
-              </attributes>
+                <sourceDirectory>src/main/asciidoc/developer</sourceDirectory>
+                <sourceDocumentName>index.adoc</sourceDocumentName>
+                <headerFooter>true</headerFooter>
+                <data-uri />
+                <preserveDirectories>true</preserveDirectories>
+                <outputDirectory>target/generated-docs/developer</outputDirectory>
+                <backend>html5</backend>
+                <sourceHighlighter>coderay</sourceHighlighter>
+                <attributes>
+                    <toc />
+                    <toc-placement>left</toc-placement>
+                    <icons>font</icons>
+                    <sectanchors>true</sectanchors>
+                    <!-- set the idprefix to blank -->
+                    <idprefix/>
+                    <idseparator>-</idseparator>
+                    <docinfo1>true</docinfo1>
+                </attributes>
             </configuration>
-          </execution>
+        </execution>
         </executions>
-        <configuration>
-          <doctype>book</doctype>
-          <sourceDirectory>src/main/asciidoc/reference</sourceDirectory>
-          <sourceDocumentName>index.adoc</sourceDocumentName>
-          <headerFooter>true</headerFooter>
-          <data-uri />
-          <outputDirectory>target/generated-docs</outputDirectory>
-        </configuration>
       </plugin>
     </plugins>
   </build>
