@@ -107,7 +107,7 @@ For more information generate and read the *gvNIX Developer Guide* (Spanish).
 
 Run the following command from the root checkout location:
 
-   bash:~/gvnix$  mvn clean compile install
+   bash:~/gvnix$  mvn clean install
 
 This will create the guide in the _/deployment-support/target/generated-docs_ directory (in several formats):
 
