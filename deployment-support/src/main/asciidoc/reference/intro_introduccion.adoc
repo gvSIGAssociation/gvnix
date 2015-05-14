@@ -19,15 +19,16 @@ alto nivel a las prestaciones que ya se obtienen con
 http://projects.spring.io/spring-roo/[Spring Roo] para mejorar la
 productividad.
 
-gvNIX es un proyecto subvencionado y liderado por la Conselleria de
-Infraestructuras, Transporte y Medio Ambiente (CITMA) de la Generalitat
-Valenciana.
+gvNIX está patrocinado por la Dirección General de Tecnologías de la Información
+(DGTI) de la Conselleria de Hacienda y Administración Pública de la
+Generalitat Valenciana (Comunidad Valenciana, España), gestionado por la
+Asociación gvSIG y dirigido por DISID. gvNIX se consolida como estándar para
+desarrollo Java de la DGTI de la Generalitat Valenciana.
 
 gvNIX está disponible dentro del proyecto de Migración a Software de
 fuentes abiertas http://www.gvpontis.gva.es[gvPONTIS].
 
 * http://www.gvnix.org[Página del proyecto gvNIX]
-* http://gvnix.googlecode.com[Proyecto gvNIX en Google Code]
 * http://www.gvpontis.gva.es/cast/gvnix/[Página de gvNIX dentro del
 proyecto gvPONTIS]
 * http://projects.spring.io/spring-roo/[Página oficial de Spring Roo]
