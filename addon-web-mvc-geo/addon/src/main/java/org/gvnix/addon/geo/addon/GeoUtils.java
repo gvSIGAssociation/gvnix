@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gvnix.addon.geo.addon;
 
 import java.util.ArrayList;
@@ -25,16 +43,21 @@ import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
 
+/**
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ */
+
 public class GeoUtils {
 
     private static final JavaType MAP_VIEWER_ANNOTATION = new JavaType(
             GvNIXMapViewer.class.getName());
 
     /**
-     * 
+     *
      * This method updates dependencies and repositories with the added to
      * configuration.xml file
-     * 
+     *
      * @param configuration
      * @param moduleName
      * @param projectOperations
@@ -69,7 +92,7 @@ public class GeoUtils {
 
     /**
      * This method returns a map controller by recived path
-     * 
+     *
      * @param path
      * @return
      */
@@ -106,9 +129,9 @@ public class GeoUtils {
     }
 
     /**
-     * 
+     *
      * This method returns all available maps
-     * 
+     *
      * @param typeLocationService
      * @return
      */
@@ -144,9 +167,9 @@ public class GeoUtils {
     }
 
     /**
-     * 
+     *
      * This method returns all available maps Controllers
-     * 
+     *
      * @param typeLocationService
      * @return
      */
@@ -176,9 +199,9 @@ public class GeoUtils {
     }
 
     /**
-     * 
+     *
      * This method returns map controller by path
-     * 
+     *
      * @param typeLocationService
      * @return
      */
@@ -216,7 +239,7 @@ public class GeoUtils {
 
     /**
      * This method checks if the current entity is a GEO entity or not
-     * 
+     *
      * @param scaffoldAnnotation
      * @param typeLocationService
      * @return

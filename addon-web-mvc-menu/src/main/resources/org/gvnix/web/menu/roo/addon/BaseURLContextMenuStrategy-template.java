@@ -1,3 +1,20 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package __TOP_LEVEL_PACKAGE__.web.menu;
 
 import java.util.Enumeration;
@@ -23,6 +40,9 @@ import javax.servlet.http.HttpServletRequest;
  * <p>
  * If a item has a URL based in an <i>EL</i> Expression this will be evaluated
  * before compare it.
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 public abstract class BaseURLContextMenuStrategy implements ContextMenuStrategy {
 
@@ -30,7 +50,7 @@ public abstract class BaseURLContextMenuStrategy implements ContextMenuStrategy 
 
   /**
    * Get current {@link MenuItem} based on the <code>request</code> URL
-   * 
+   *
    * @param request
    * @param jspContext
    * @param menu
@@ -119,7 +139,7 @@ public abstract class BaseURLContextMenuStrategy implements ContextMenuStrategy 
    * parameters values if {@link MenuItem}'s destination if based on <i>EL</i>
    * expression. Inherit class could override this method to change compare
    * behavior.
-   * 
+   *
    * @param request
    * @param jspContext
    * @param path1

@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package __TOP_LEVEL_PACKAGE__.web.menu;
 
 
@@ -12,11 +30,14 @@ import org.springframework.stereotype.Component;
 /**
  * gvNIX Context menu Strategy (URL match, return children).
  * <p>
- * This strategy decides which menu item (root, subcategory, etc) should act 
+ * This strategy decides which menu item (root, subcategory, etc) should act
  * as root by matching current request URL with all menu entries target URLs.
  * <p>
  * If a match item is found ({@link #query(HttpServletRequest, ServletContext, Menu)})
  * the menu will render the children of the match menu entry.
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 @Component(URLChildrenContextMenuStrategy.NAME)
 @Configurable

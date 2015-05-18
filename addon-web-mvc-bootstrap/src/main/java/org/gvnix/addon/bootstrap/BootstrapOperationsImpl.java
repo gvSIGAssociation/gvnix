@@ -1,3 +1,20 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gvnix.addon.bootstrap;
 
 import java.util.ArrayList;
@@ -28,7 +45,9 @@ import org.w3c.dom.Element;
 
 /**
  * Implementation of Bootstrap Addon operations
- * 
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since 1.1
  */
 @Component
@@ -418,7 +437,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /**
      * Check if login.jspx is modified with bootstrap
-     * 
+     *
      * @return
      */
     @Override
@@ -447,7 +466,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     /**
      * Creates an instance with the {@code src/main/webapp} path in the current
      * module
-     * 
+     *
      * @return
      */
     public LogicalPath getWebappPath() {
@@ -458,7 +477,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /**
      * Gets the feature name managed by this operations class.
-     * 
+     *
      * @return feature name
      */
     @Override

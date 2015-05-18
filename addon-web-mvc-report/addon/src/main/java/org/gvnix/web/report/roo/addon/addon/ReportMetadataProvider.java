@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gvnix.web.report.roo.addon.addon;
 
 import java.util.ArrayList;
@@ -41,7 +59,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * metadata for this add-on. Use this type to reference external types and
  * services needed by the metadata type. Register metadata triggers and
  * dependencies here. Also define the unique add-on ITD identifier.
- * 
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since 1.1
  */
 @Component
@@ -66,7 +86,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
      * command)
-     * 
+     *
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
@@ -84,7 +104,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
      * The deactivate method for this OSGi component, this will be called by the
      * OSGi container upon bundle deactivation (result of the 'addon uninstall'
      * command)
-     * 
+     *
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
@@ -184,7 +204,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
     /**
      * Returns a HashMap<String, String>. Key is reportName; Value is the csv of
      * formats.
-     * 
+     *
      * @param arrayVal
      * @return
      */

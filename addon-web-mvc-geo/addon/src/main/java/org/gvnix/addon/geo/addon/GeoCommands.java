@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gvnix.addon.geo.addon;
 
 import static org.springframework.roo.shell.OptionContexts.UPDATE_PROJECT;
@@ -19,9 +37,12 @@ import org.springframework.roo.shell.CommandMarker;
  * presentation-related logic in this class. You can return any objects from
  * each method, or use the logger directly if you'd like to emit messages of
  * different severity (and therefore different colours on non-Windows systems).
- * 
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since 1.1
  */
+
 @Component
 @Service
 public class GeoCommands implements CommandMarker {
@@ -37,7 +58,7 @@ public class GeoCommands implements CommandMarker {
 
     /**
      * This method checks if the setup method is available
-     * 
+     *
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -48,7 +69,7 @@ public class GeoCommands implements CommandMarker {
 
     /**
      * This method checks if the map method is available
-     * 
+     *
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -59,7 +80,7 @@ public class GeoCommands implements CommandMarker {
 
     /**
      * This method checks if web mvc geo all method is available
-     * 
+     *
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -70,7 +91,7 @@ public class GeoCommands implements CommandMarker {
 
     /**
      * This method checks if web mvc geo add method is available
-     * 
+     *
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -81,7 +102,7 @@ public class GeoCommands implements CommandMarker {
 
     /**
      * This method checks if web mvc geo field method is available
-     * 
+     *
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -93,7 +114,7 @@ public class GeoCommands implements CommandMarker {
     /**
      * This method checks if web mvc geo tilelayer or wmslayer method is
      * available
-     * 
+     *
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -104,7 +125,7 @@ public class GeoCommands implements CommandMarker {
 
     /**
      * This method checks if web mvc geo tool method is available
-     * 
+     *
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -117,7 +138,7 @@ public class GeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     * 
+     *
      * @param type
      */
     @CliCommand(value = "web mvc geo setup",
@@ -129,7 +150,7 @@ public class GeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     * 
+     *
      * @param type
      */
     @CliCommand(value = "web mvc geo controller",
@@ -153,7 +174,7 @@ public class GeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     * 
+     *
      * @param type
      */
     @CliCommand(value = "web mvc geo entity all",
@@ -185,7 +206,7 @@ public class GeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     * 
+     *
      * @param type
      */
     @CliCommand(value = "web mvc geo entity add",
@@ -209,7 +230,7 @@ public class GeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     * 
+     *
      * @param type
      */
     @CliCommand(value = "web mvc geo field",
@@ -244,7 +265,7 @@ public class GeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     * 
+     *
      * @param type
      */
     @CliCommand(value = "web mvc geo tilelayer",
@@ -279,7 +300,7 @@ public class GeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     * 
+     *
      * @param type
      */
     @CliCommand(value = "web mvc geo wmslayer",
@@ -335,7 +356,7 @@ public class GeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     * 
+     *
      * @param type
      */
     @CliCommand(value = "web mvc geo tool measure",
@@ -364,7 +385,7 @@ public class GeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     * 
+     *
      * @param type
      */
     @CliCommand(value = "web mvc geo tool custom",

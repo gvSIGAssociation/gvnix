@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gvnix.web.typicalsecurity.roo.addon;
 
 import java.io.BufferedReader;
@@ -54,7 +72,9 @@ import org.w3c.dom.Element;
 
 /**
  * Implementation of commands that are available via the Roo shell.
- * 
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since 1.1
  */
 @Component
@@ -94,7 +114,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
     /*
      * Not available since Roo 1.1.2 (See ROO-2066)
-     * 
+     *
      * @Reference private ClasspathOperations classpathOperations;
      */
 
@@ -136,7 +156,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
     /**
      * Create All the entities required for User, Role and User Role
-     * 
+     *
      * @param entityPackage
      */
     private void createUserRoleEntities(String entityPackage) {
@@ -188,7 +208,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
     /**
      * Create an Controller for User, Role and UserRole
-     * 
+     *
      * @param entityPackage
      * @param controllerPackage
      */
@@ -219,7 +239,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
     /**
      * Inject database based authentication provider in Spring Security
-     * 
+     *
      * @param entityPackage
      */
     private void injectDatabasebasedSecurity(String entityPackage,
@@ -259,7 +279,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
     /**
      * Inject database based authentication provider into
      * applicationContext-security.xml
-     * 
+     *
      */
     private void injectDatabasebasedAuthProviderInXml() {
         String springSecurity = pathResolver.getFocusedIdentifier(
@@ -361,7 +381,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
     /**
      * Inject MessageDigestPasswordEncoder bean in applicationContext.xml
-     * 
+     *
      */
     private void autowireMessageDigestPasswordEncoder() {
         String applicationContextSecurity = pathResolver.getFocusedIdentifier(
@@ -406,7 +426,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
     /**
      * Copy DatabaseAuthenticationProvider from template
-     * 
+     *
      * @param entityPackage
      */
     private void createAuthenticationProvider(String entityPackage,
@@ -544,7 +564,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
     /**
      * Join a list of element with {@link #SEPARATOR}
-     * 
+     *
      * @param elements
      * @return
      */
@@ -799,7 +819,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
     /**
      * Check if login.jspx is modified with bootstrap
-     * 
+     *
      * @return
      */
     @Override
@@ -818,7 +838,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
     /**
      * Creates an instance with the {@code src/main/webapp} path in the current
      * module
-     * 
+     *
      * @return
      */
     public LogicalPath getWebappPath() {
@@ -828,7 +848,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
     /**
      * This method copy a new file in a directory if the file not exists and
      * update the file if exists
-     * 
+     *
      * @param fileManager
      * @param loadingClass
      * @param filePath

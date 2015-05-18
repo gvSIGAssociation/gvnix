@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package ${PACKAGE};
 
 import java.text.SimpleDateFormat;
@@ -21,6 +39,8 @@ import org.springframework.web.servlet.view.jasperreports.JasperReportsMultiForm
  * Content-disposition HTTP header setting a name for the report file generated
  * in the request.
  *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 public class CustomJasperReportsMultiFormatView extends
         JasperReportsMultiFormatView {
@@ -76,7 +96,7 @@ public class CustomJasperReportsMultiFormatView extends
 
 	/**
 	 * Gets format model key-name
-	 * 
+	 *
 	 * @return the formatKey
 	 */
 	public String getFormatKey() {
@@ -85,7 +105,7 @@ public class CustomJasperReportsMultiFormatView extends
 
 	/**
 	 * Gets format model key-name
-	 * 
+	 *
 	 * @param formatKey the formatKey to set
 	 */
 	public void setFormatKey(String formatKey) {
@@ -94,7 +114,7 @@ public class CustomJasperReportsMultiFormatView extends
 
 	/**
 	 * Gets file-name model key-name
-	 * 
+	 *
 	 * @return the fileNameKey
 	 */
 	public String getFileNameKey() {
@@ -103,7 +123,7 @@ public class CustomJasperReportsMultiFormatView extends
 
 	/**
 	 * Gets file-name model key-name
-	 * 
+	 *
 	 * @param fileNameKey the fileNameKey to set
 	 */
 	public void setFileNameKey(String fileNameKey) {

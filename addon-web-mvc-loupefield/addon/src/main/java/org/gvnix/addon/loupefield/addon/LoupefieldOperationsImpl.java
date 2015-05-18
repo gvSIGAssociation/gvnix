@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gvnix.addon.loupefield.addon;
 
 import java.io.*;
@@ -42,7 +60,9 @@ import org.w3c.dom.*;
 
 /**
  * Implementation of operations this add-on offers.
- * 
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since 1.1
  */
 @Component
@@ -576,7 +596,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * Annotates given Controller with GvNIXLoupeController
-     * 
+     *
      * @param controller
      */
     private void doAddControllerAnnotation(JavaType controller) {
@@ -650,7 +670,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * This method updates create and update views adding loupefield uri
-     * 
+     *
      * @param controller
      */
     private void updateCreateAndUpdateViews(JavaType controller) {
@@ -689,7 +709,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * This method checks if a view exists in the project
-     * 
+     *
      * @param path
      * @return
      */
@@ -708,9 +728,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
-     * 
+     *
      * This method checks if controller is annotated with @GvNIXLoupeController
-     * 
+     *
      * @param controller
      * @return
      */
@@ -725,7 +745,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * This method checks if field exists in the Controller related entity
-     * 
+     *
      * @param controller
      * @return
      */
@@ -770,9 +790,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
-     * 
+     *
      * This method checks if all additionalField exists
-     * 
+     *
      * @param entity
      * @param relatedFields
      * @param additionalFields
@@ -812,7 +832,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * This method checks if caption exists as a related field
-     * 
+     *
      * @param entity
      * @param relatedFields
      * @param caption
@@ -845,9 +865,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
-     * 
+     *
      * This method update field in view to use loupe element
-     * 
+     *
      * @param controller
      * @param path
      * @param field

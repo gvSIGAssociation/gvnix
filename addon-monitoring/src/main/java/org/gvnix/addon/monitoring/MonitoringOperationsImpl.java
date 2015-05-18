@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gvnix.addon.monitoring;
 
 import java.util.ArrayList;
@@ -45,7 +63,10 @@ import org.w3c.dom.NodeList;
 
 /**
  * Implementation of operations this add-on offers.
- * 
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ *
  * @since 1.4.0
  */
 @Component
@@ -278,7 +299,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
     /**
      * This method updates web.xml to add filter, filter-mapping and listener
      * which are needed to proper functioning of JavaMelody
-     * 
+     *
      * @param pathString
      */
     public void updateWebXML(String pathString) {
@@ -417,7 +438,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
     /**
      * Creates an instance with the {@code src/main/webapp} path in the current
      * module
-     * 
+     *
      * @return
      */
     public LogicalPath getWebappPath() {
@@ -435,7 +456,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
     /**
      * Add a path which all his child methods will be monitored as a Spring
      * service
-     * 
+     *
      * @param path Set the package path to be monitored
      */
     @Override
@@ -526,7 +547,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
     /**
      * Adds config data for Spring monitoring
-     * 
+     *
      * @param appContextPath
      */
     public void createMonitoringConfig() {
@@ -552,7 +573,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
     /**
      * Adds an aop:config for Spring monitoring
-     * 
+     *
      * @param appContextPath
      */
     public void createMonitoringAdvisor(String appContextPath) {
@@ -677,7 +698,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
     /**
      * Adds a bean for Spring monitoring
-     * 
+     *
      * @param appContextPath
      */
     public void createMonitoringAutoProxy(String appContextPath) {
@@ -721,7 +742,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
     /**
      * Add a class to be monitored as a Spring service
-     * 
+     *
      * @param name Set the class name to be monitored
      */
     @Override
@@ -748,7 +769,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
     /**
      * Add a method to be monitored as a Spring service
-     * 
+     *
      * @param methodName Set the method name to be monitored
      * @param className Set the class name of the method to be monitored
      */
@@ -792,7 +813,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
     /**
      * This method annotates a class or method
-     * 
+     *
      * @param controller
      */
     private void annotateThing(ClassOrInterfaceTypeDetails controller) {
@@ -801,7 +822,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
     /**
      * This method gets class details
-     * 
+     *
      * @param controller
      * @return
      */
@@ -817,7 +838,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
     /**
      * Gets the feature name managed by this operations class.
-     * 
+     *
      * @return feature name
      */
     @Override
@@ -827,7 +848,7 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
     /**
      * Returns true if the given feature is installed in current project.
-     * 
+     *
      * @param moduleName feature name to check in current project
      * @return true if given feature name is installed, otherwise returns false
      */

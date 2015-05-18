@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package __TOP_LEVEL_PACKAGE__.web.menu;
 
 import java.util.ArrayList;
@@ -9,6 +27,9 @@ import org.w3c.dom.Element;
  * Menu model item.
  * <p>
  * This has all information about a menu's item.
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 public class MenuItem {
 
@@ -28,7 +49,7 @@ public class MenuItem {
 
   /**
    * Load Item values from XML Element. This doesn't load children nodes.
-   * 
+   *
    * @param parent
    * @param element
    */
@@ -41,13 +62,13 @@ public class MenuItem {
     if (element.hasAttribute("hidden")) {
       this.hidden = Boolean.parseBoolean(element.getAttribute("hidden"));
     } else {
-      this.hidden = false; 
+      this.hidden = false;
     }
   }
 
   /**
    * Add a new child menu item. Child item parent is set to <code>this</code>.
-   * 
+   *
    * @param child
    */
   void addChild(MenuItem child) {
@@ -60,7 +81,7 @@ public class MenuItem {
 
   /**
    * Informs if this item has any children.
-   * 
+   *
    * @return
    */
   public boolean hasChildren() {
@@ -69,7 +90,7 @@ public class MenuItem {
 
   /**
    * Children list accessor.
-   * 
+   *
    * @return List
    */
   public List<MenuItem> getChildren() {
@@ -86,7 +107,7 @@ public class MenuItem {
 
   /**
    * roles string accessor.
-   * 
+   *
    * @return comma list
    */
   public String getRoles() {
@@ -95,7 +116,7 @@ public class MenuItem {
 
   /**
    * URL accessor
-   * 
+   *
    * @return
    */
   public String getUrl() {
@@ -104,7 +125,7 @@ public class MenuItem {
 
   /**
    * Parent accessor
-   * 
+   *
    * @return
    */
   public MenuItem getParent() {
@@ -113,7 +134,7 @@ public class MenuItem {
 
   /**
    * ID accessor
-   * 
+   *
    * @return
    */
   public String getId() {
@@ -122,27 +143,27 @@ public class MenuItem {
 
   /**
    * messageCode accessor
-   * 
+   *
    * @return
    */
   public String getMessageCode() {
     return messageCode;
   }
 
-  
+
   /**
    * hidden accessor
-   * 
+   *
    * @return
    */
   public boolean isHidden() {
     return hidden;
   }
 
-  
+
   /**
    * labelCode accessor
-   * 
+   *
    * @return
    */
   public String getLabelCode() {
@@ -159,7 +180,7 @@ public class MenuItem {
    * <li>Replace "_" by "/"</li>
    * </ul>
    * This method doesn't modify the current ID.
-   * 
+   *
    * @return
    */
   protected String getIdAsPath() {
@@ -170,7 +191,7 @@ public class MenuItem {
     String idWithoutPrefix = this.id.substring(2); // current prefixes have length = 2
 
     path.append(idWithoutPrefix.replace("_", DELIMITER));
-    
+
     return path.toString();
   }
 

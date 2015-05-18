@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package __TOP_LEVEL_PACKAGE__.web.menu;
 
 import java.io.InputStream;
@@ -26,9 +44,12 @@ import org.w3c.dom.NodeList;
  * {@link Configurable}).
  * <p>
  * In application initialization ({@link WebApplicationObjectSupport}) loads
- * the menu structure and put it in the application context ready for 
+ * the menu structure and put it in the application context ready for
  * rendering. Then {@link ContextMenuStrategy} and security will decide which
  * section and items have to be shown.
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 @Component
 @Configurable
@@ -64,7 +85,7 @@ public class MenuLoader extends WebApplicationObjectSupport {
    * menu using recursivity. Override this
    * method to change menu's source. Remember to set to <code>null</code>
    * {@link #MENU_CONFIG_FILE}.
-   * 
+   *
    * @return
    * @throws Exception
    */
@@ -96,7 +117,7 @@ public class MenuLoader extends WebApplicationObjectSupport {
     // parse children
     NodeList childNodes = root.getChildNodes();
 
-    // return empty menu if there are no children 
+    // return empty menu if there are no children
     if(childNodes.getLength() == 0) {
       return menu;
     }
@@ -109,11 +130,11 @@ public class MenuLoader extends WebApplicationObjectSupport {
   }
 
   /**
-   * Transform a list of {@code <menu-item>} elements into {@code MenuItem} 
+   * Transform a list of {@code <menu-item>} elements into {@code MenuItem}
    * objects.
    * <p>
    * This method loads the children recursively.
-   * 
+   *
    * @param nodes List of XML elements
    * @return List of MenuItem, note that MenuItem is complete, that is
    * each MenuItem will contain their children List
@@ -128,7 +149,7 @@ public class MenuLoader extends WebApplicationObjectSupport {
         continue;
       }
 
-      // create the MenuItem object 
+      // create the MenuItem object
       MenuItem item = new MenuItem((Element) node);
 
       // recursively load children
@@ -139,7 +160,7 @@ public class MenuLoader extends WebApplicationObjectSupport {
         item.setChildren(childItems);
       }
 
-      // add MenuItem to result list 
+      // add MenuItem to result list
       items.add(item);
     }
     return items;

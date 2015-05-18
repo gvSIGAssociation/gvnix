@@ -17,6 +17,10 @@
  */
 package org.gvnix.web.report.roo.addon.addon;
 
+/**
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ */
 public interface ReportConfigService {
 
     /**
@@ -38,21 +42,21 @@ public interface ReportConfigService {
 
     /**
      * Indicate if is a Spring MVC project
-     * 
+     *
      * @return
      */
     boolean isSpringMvcProject();
 
     /**
      * Indicate if JasperReports views are already installed
-     * 
+     *
      * @return
      */
     boolean isJasperViewsProject();
 
     /**
      * Indicate the project has a web layer based on Spring MVC Tiles.
-     * 
+     *
      * @return true if the user installed an Spring MVC Tiles web layer,
      *         otherwise returns false.
      */
