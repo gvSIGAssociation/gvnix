@@ -1,15 +1,7 @@
 package org.gvnix.addon.loupefield.addon;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,9 +15,7 @@ import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.WebProjectUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
+import org.osgi.framework.*;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.plural.addon.PluralMetadata;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
@@ -33,35 +23,22 @@ import org.springframework.roo.addon.web.mvc.controller.addon.scaffold.WebScaffo
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.TypeLocationService;
-import org.springframework.roo.classpath.TypeManagementService;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
-import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.*;
+import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.persistence.PersistenceMemberLocator;
+import org.springframework.roo.classpath.scanner.MemberDetails;
+import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.LogicalPath;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.project.Property;
-import org.springframework.roo.project.Repository;
+import org.springframework.roo.project.*;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.util.DomUtils;
-import org.springframework.roo.support.util.FileUtils;
-import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
+import org.springframework.roo.support.util.*;
+import org.w3c.dom.*;
 
 /**
  * Implementation of operations this add-on offers.
@@ -97,6 +74,8 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     private WebProjectUtils webProjectUtils;
     private MessageBundleUtils messageBundleUtils;
+
+    private MemberDetailsScanner memberDetailsScanner;
 
     private static final Logger LOGGER = HandlerUtils
             .getLogger(LoupefieldOperationsImpl.class);
@@ -215,6 +194,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         ClassOrInterfaceTypeDetails relatedEntity = getTypeLocationService()
                 .getTypeDetails(fieldType);
 
+        MemberDetails memberDetails = getMemberDetailsScanner()
+                .getMemberDetails(getClass().getName(), relatedEntity);
+
         if (relatedEntity == null) {
             LOGGER.log(Level.INFO, String.format(
                     "Field '%s' could not implements Loupe Field.",
@@ -222,8 +204,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
             return;
         }
 
-        List<? extends FieldMetadata> relatedFields = relatedEntity
-                .getDeclaredFields();
+        List<? extends FieldMetadata> relatedFields = memberDetails.getFields();
         if (relatedFields == null) {
             LOGGER.log(Level.INFO, String.format(
                     "Field '%s' could not implements Loupe Field.",
@@ -755,13 +736,16 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         final ClassOrInterfaceTypeDetails cid = getTypeLocationService()
                 .getTypeDetails(entity);
 
+        MemberDetails memberDetails = getMemberDetailsScanner()
+                .getMemberDetails(getClass().getName(), cid);
+
         if (cid == null) {
             LOGGER.log(Level.INFO,
                     "Controller Entity cannnot be resolved to a type in your project");
             return null;
         }
 
-        List<? extends FieldMetadata> fieldList = cid.getDeclaredFields();
+        List<? extends FieldMetadata> fieldList = memberDetails.getFields();
         Iterator<? extends FieldMetadata> it = fieldList.iterator();
 
         JavaType fieldType = null;
@@ -1263,5 +1247,31 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
             return messageBundleUtils;
         }
 
+    }
+
+    public MemberDetailsScanner getMemberDetailsScanner() {
+        if (memberDetailsScanner == null) {
+            // Get all Services implement MemberDetailsScanner interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MemberDetailsScanner.class.getName(), null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (MemberDetailsScanner) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load MemberDetailsScanner on "
+                        .concat(getClass().getSimpleName()));
+                return null;
+            }
+        }
+        else {
+            return memberDetailsScanner;
+        }
     }
 }
