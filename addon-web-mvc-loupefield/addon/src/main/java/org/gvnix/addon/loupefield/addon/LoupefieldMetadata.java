@@ -124,6 +124,10 @@ public class LoupefieldMetadata extends
      */
     private final ItdBuilderHelper helper;
 
+    private FieldMetadata entityManagerProviderField;
+
+    private FieldMetadata conversionServiceField;
+
     public LoupefieldMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata, JavaType entity) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
@@ -139,10 +143,22 @@ public class LoupefieldMetadata extends
                 .add(new AnnotationMetadataBuilder(SpringJavaType.AUTOWIRED));
 
         // Creating conversionService_loupe field
-        builder.addField(getField("conversionService_loupe", null,
+        conversionServiceField = getField("conversionService_loupe", null,
                 new JavaType(
                         "org.springframework.core.convert.ConversionService"),
-                Modifier.PUBLIC, annotations));
+                Modifier.PUBLIC, annotations);
+        builder.addField(conversionServiceField);
+
+        // Creating entityManagerProvider_loupe field
+        annotations = new ArrayList<AnnotationMetadataBuilder>(1);
+        annotations
+                .add(new AnnotationMetadataBuilder(SpringJavaType.AUTOWIRED));
+
+        entityManagerProviderField = getField("entityManagerProvider_loupe",
+                null, new JavaType(
+                        "org.gvnix.web.datatables.util.EntityManagerProvider"),
+                Modifier.PUBLIC, annotations);
+        builder.addField(entityManagerProviderField);
 
         // Adding showOnlyList method
         builder.addMethod(getShowOnlyListMethod());
@@ -537,17 +553,11 @@ public class LoupefieldMetadata extends
         bodyBuilder.appendFormalLine("try {");
         bodyBuilder.indent();
 
-        // Method entityManagerMethod = targetEntity.getMethod("entityManager");
-        bodyBuilder
-                .appendFormalLine(String
-                        .format("%s entityManagerMethod = targetEntity.getMethod(\"entityManager\");",
-                                helper.getFinalTypeName(new JavaType(
-                                        "java.lang.reflect.Method"))));
-
-        // targetEntityManager = (EntityManager)
-        // entityManagerMethod.invoke(null);
-        bodyBuilder
-                .appendFormalLine("targetEntityManager = (EntityManager) entityManagerMethod.invoke(null);");
+        // targetEntityManager =
+        // entityManagerProvider_loupe.getEntityManager(targetEntity);
+        bodyBuilder.appendFormalLine(String.format(
+                "targetEntityManager = %s.getEntityManager(targetEntity);",
+                entityManagerProviderField.getFieldName().getSymbolName()));
 
         bodyBuilder.indentRemove();
 
