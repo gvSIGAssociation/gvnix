@@ -6,15 +6,16 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *  
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.gvnix.addon.jpa.addon.geo.providers.hibernatespatial;
 
 import java.util.ArrayList;
@@ -45,10 +46,12 @@ import org.springframework.roo.support.logging.HandlerUtils;
 /**
  * Provides {@link GvNIXEntityMapLayerMetadata}.
  * 
+ *  
  * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
  *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since 1.4
  */
+
 @Component
 @Service
 public final class GvNIXEntityMapLayerMetadataProvider extends
@@ -63,7 +66,7 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
 
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
-     * 
+     *
      * @param context the component context
      */
     protected void activate(ComponentContext cContext) {
@@ -76,7 +79,7 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
 
     /**
      * Unregister this provider
-     * 
+     *
      * @param context the component context
      */
     protected void deactivate(ComponentContext context) {

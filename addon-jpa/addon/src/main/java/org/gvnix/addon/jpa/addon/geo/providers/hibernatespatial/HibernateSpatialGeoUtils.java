@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.gvnix.addon.jpa.addon.geo.providers.hibernatespatial;
 
 import java.io.OutputStream;
@@ -26,12 +44,17 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ */
+
 public class HibernateSpatialGeoUtils {
 
     /**
      * This method checks if persistence is setup and if HIBERNATE was selected
      * as provider persistence
-     * 
+     *
      * @param fileManager
      * @param pathResolver
      * @return
@@ -69,9 +92,9 @@ public class HibernateSpatialGeoUtils {
     }
 
     /**
-     * 
+     *
      * This method update repositories with the added to configuration.xml file
-     * 
+     *
      * @param configuration
      * @param moduleName
      * @param projectOperations
@@ -89,9 +112,9 @@ public class HibernateSpatialGeoUtils {
     }
 
     /**
-     * 
+     *
      * This method update dependencies with the added to configuration.xml file
-     * 
+     *
      * @param configuration
      * @param moduleName
      * @param projectOperations
@@ -111,7 +134,7 @@ public class HibernateSpatialGeoUtils {
     /**
      * This method transform current dialect to a valid dialect to use in
      * Hibernate Spatial
-     * 
+     *
      * @param currentDialect
      * @return
      */
@@ -128,7 +151,7 @@ public class HibernateSpatialGeoUtils {
     /**
      * This method checks if the current dialect is a valid Geo dialect to use
      * in Hibernate Spatial
-     * 
+     *
      * @param currentDialect
      * @return
      */
@@ -144,7 +167,7 @@ public class HibernateSpatialGeoUtils {
 
     /**
      * This method returns a Map with Dialects and the GEO dialects associated
-     * 
+     *
      * @return
      */
     public static Map<String, String> getDialects(final Element configuration) {
@@ -163,7 +186,7 @@ public class HibernateSpatialGeoUtils {
 
     /**
      * This method returns a Map with GeoDialects and the dialects associated
-     * 
+     *
      * @return
      */
     public static Map<String, String> getGeoDialects(final Element configuration) {
@@ -181,9 +204,9 @@ public class HibernateSpatialGeoUtils {
     }
 
     /**
-     * 
+     *
      * Checks if Hibernate Spatial is installed
-     * 
+     *
      * @param fileManager
      * @param pathResolver
      * @param currentClass
@@ -266,7 +289,7 @@ public class HibernateSpatialGeoUtils {
 
     /**
      * Checks if Hibernate Spatial dependencies are installed
-     * 
+     *
      * @param fileManager
      * @param pathResolver
      * @param currentClass
@@ -300,7 +323,7 @@ public class HibernateSpatialGeoUtils {
      * <b>package-info.java</b> is generated on current entity package, don't
      * replace or change. If <b>package-info.java</b> is not generated on
      * current entity package, generate it with necessary GEO configuration.
-     * 
+     *
      * @param entityPackage
      * @param pathResolver
      * @param fileManager
