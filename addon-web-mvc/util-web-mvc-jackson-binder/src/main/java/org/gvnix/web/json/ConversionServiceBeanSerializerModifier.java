@@ -1,6 +1,6 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
- * Copyright (C) 2013 Generalitat Valenciana
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,8 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
  * Also, if {@link JsonSerialize#as()} is set, it tries to use this class as
  * serialize target class.
  * 
- * @author gvNIX Team
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since TODO: Class version
  */
 public class ConversionServiceBeanSerializerModifier extends

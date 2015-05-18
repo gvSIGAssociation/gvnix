@@ -1,19 +1,19 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
- * Copyright (C) 2013 Generalitat Valenciana
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.addon.loupefield.addon;
 
@@ -45,8 +45,9 @@ import org.springframework.roo.project.LogicalPath;
 
 /**
  * ITD generator for {@link GvNIXPasswordHandlerSAFE} annotation.
- * 
- * @author gvNIX Team
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since 1.1.0
  */
 public class LoupefieldMetadata extends
@@ -172,7 +173,7 @@ public class LoupefieldMetadata extends
 
     /**
      * Gets <code>showOnlyList</code> method. <br>
-     * 
+     *
      * @return
      */
     private MethodMetadata getShowOnlyListMethod() {
@@ -237,7 +238,7 @@ public class LoupefieldMetadata extends
 
     /**
      * Gets <code>findUsingAjax</code> method. <br>
-     * 
+     *
      * @param entity
      * @return
      */
@@ -361,7 +362,7 @@ public class LoupefieldMetadata extends
 
     /**
      * Builds body method for <code>showOnlyList</code> method. <br>
-     * 
+     *
      * @param bodyBuilder
      */
     private void buildShowOnlyListMethodBody(
@@ -451,7 +452,7 @@ public class LoupefieldMetadata extends
 
     /**
      * Builds body method for <code>findUsingAjax</code> method. <br>
-     * 
+     *
      * @param bodyBuilder
      */
     private void buildFindUsingAjaxMethodBody(
@@ -1019,7 +1020,7 @@ public class LoupefieldMetadata extends
 
     /**
      * Create metadata for a field definition.
-     * 
+     *
      * @return a FieldMetadata object
      */
     private FieldMetadata getField(String name, String value,
@@ -1036,7 +1037,7 @@ public class LoupefieldMetadata extends
      * Gets or creates a field based on parameters.<br>
      * First try to get a suitable field (by name and type). If not found create
      * a new one (adding a counter to name if it's needed)
-     * 
+     *
      * @param fielName
      * @param fieldType
      * @param initializer (String representation)

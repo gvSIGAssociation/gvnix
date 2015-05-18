@@ -103,7 +103,7 @@
     
   </dependencies>
 
-  <!-- DiSiD: Add google code distribution management -->
+  <!-- DISID: Add google code distribution management -->
   <distributionManagement>
     <repository>
       <id>Google Code</id>
@@ -113,7 +113,7 @@
 
   <build>
 
-    <!-- DiSiD: Add webdav extension to google code  -->
+    <!-- DISID: Add webdav extension to google code  -->
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
@@ -124,7 +124,7 @@
 
   </build>
 
-  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
+  <!-- DISID: Add gvNIX version from parent pom and google code project name and repo folder values -->
   <properties>
     <jackson.version>2.2.3</jackson.version>
     <google.code.project.name>gvnix</google.code.project.name>

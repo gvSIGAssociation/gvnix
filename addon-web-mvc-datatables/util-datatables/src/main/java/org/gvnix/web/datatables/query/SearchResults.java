@@ -1,6 +1,6 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana     
- * Copyright (C) 2013 Generalitat Valenciana
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

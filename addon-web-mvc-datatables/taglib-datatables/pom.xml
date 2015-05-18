@@ -145,7 +145,7 @@
   </dependencies>
   <build>
 
-  	<!-- DiSiD: Add build resources filtering -->
+  	<!-- DISID: Add build resources filtering -->
     <resources>
       <resource>
         <directory>src/main/resources</directory>

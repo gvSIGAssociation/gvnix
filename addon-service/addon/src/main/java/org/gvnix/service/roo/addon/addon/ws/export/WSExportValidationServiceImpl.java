@@ -1,18 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
- * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
- * Valenciana
- * 
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -58,14 +57,8 @@ import org.springframework.roo.project.ProjectOperations;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
- *         Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
- * @author Jose Manuel Vivó Arnal at <a href="http://www.disid.com">DiSiD
- *         Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 @Component
 @Service
@@ -106,7 +99,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * Add GvNIXWebFault to exception and extends java types in project.
-     * 
+     *
      * @param method Add annotation to java type exception in project
      * @param targetNamespace Target namespace to add as annotation attribute
      */
@@ -133,7 +126,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      * <li>targetNamespace: from input parameter</li>
      * <li>faultBean: from java type fully qualified type name</li>
      * </ul>
-     * 
+     *
      * @param targetNamespace Target namespace to add as annotation attribute
      * @param type Type to add annotation
      */
@@ -188,7 +181,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      * Return and param types and their params only added to list if exists in
      * project source.
      * </p>
-     * 
+     *
      * @param method Method to check
      * @param types Types list to add types
      */
@@ -208,7 +201,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      * <p>
      * Type and extend types only added to list if exists in project source.
      * </p>
-     * 
+     *
      * @param type Type to check
      * @param types Types list to add types
      */
@@ -244,7 +237,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      * GvNIXXmlElement annotation is added to parent extend types in project and
      * type parameters in project too.
      * </p>
-     * 
+     *
      * @param javaType Java type (can't be null)
      * @return Is it allowed ?
      */
@@ -282,7 +275,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      * <li>exported attribute is always false</li>
      * <li>xmlTypeName from java simple type, if not empty</li>
      * </ul>
-     * 
+     *
      * @param javaType To get attributes for gvNIX annotation
      * @param typeName Type name to add annotation
      */
@@ -353,7 +346,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * Get mutable class or interface type details from java type.
-     * 
+     *
      * @param javaType Java type
      * @return Mutable class or interface type
      */
@@ -394,7 +387,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * Get the path identifier for a java type in the project.
-     * 
+     *
      * @param javaType Java type
      * @return Path identifier in project
      */

@@ -1,6 +1,6 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
- * Copyright (C) 2013 Generalitat Valenciana
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,8 +12,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/copyleft/gpl.html>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.addon.jpa.addon.entitylistener;
 
@@ -42,7 +42,8 @@ import org.springframework.roo.support.logging.HandlerUtils;
 /**
  * Metadata listener which handles metadata reltated to jpa entity listeners
  * 
- * @author gvNIX Team
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 @Component
 @Service

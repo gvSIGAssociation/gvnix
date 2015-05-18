@@ -1,18 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
- * Transport - Generalitat Valenciana Copyright (C) 2010, 2011, 2012, 2013 CIT -
- * Generalitat Valenciana
- * 
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -48,11 +47,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * <br>
  * <b>Very Important</b> This service <b>MUST HAS NONE</b> {@link Reference}
  * property to assure this component is really loaded immediately. <br>
- * 
- * @author Jose Manuel Vivó (jmvivo at disid dot com) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @see MenuOperationsProxy
  */
 @Component
@@ -72,7 +69,7 @@ public class FilterMenuOperationsHook implements FindHook {
 
     /**
      * Method call when component is activated.
-     * 
+     *
      * @param context
      */
     protected void activate(ComponentContext context) {
@@ -87,7 +84,7 @@ public class FilterMenuOperationsHook implements FindHook {
      * removing from returned collection {@code references} all services except
      * {@link MenuOperationsProxy}. <br>
      * For request inside this bundle all services are returned.
-     * 
+     *
      * @see org.osgi.framework.hooks.service.FindHook#find(org.osgi.framework.BundleContext,
      *      java.lang.String, java.lang.String, boolean, java.util.Collection)
      */
@@ -134,7 +131,7 @@ public class FilterMenuOperationsHook implements FindHook {
     /**
      * Check if service reference is the service proxy <br>
      * Uses {@link MenuOperationsProxy#GVNIX_PROXY_COMPONENT} service property.
-     * 
+     *
      * @param sr
      * @return
      */
@@ -145,7 +142,7 @@ public class FilterMenuOperationsHook implements FindHook {
     /**
      * Check if service reference is gvNIX {@link MenuOperations} implementation <br>
      * Uses {@link MenuOperationsImpl#GVNIX_COMPONENT} service property.
-     * 
+     *
      * @param sr
      * @return
      */
@@ -157,7 +154,7 @@ public class FilterMenuOperationsHook implements FindHook {
      * Check if service reference is Roo original {@link MenuOperations} <br>
      * Uses {@link #isProxy(ServiceReference)} and
      * {@link #isGvNIXOperations(ServiceReference)}.
-     * 
+     *
      * @param sr
      * @return
      */

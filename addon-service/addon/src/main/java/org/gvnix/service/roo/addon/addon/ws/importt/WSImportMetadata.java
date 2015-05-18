@@ -1,18 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
- * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
- * Valenciana
- * 
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -63,11 +62,9 @@ import org.xml.sax.SAXException;
  * <p>
  * Compatible address should be SOAP protocol version 1.1 and 1.2.
  * </p>
- * 
- * @author Mario Martínez Sánchez( mmartinez at disid dot com ) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 public class WSImportMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
@@ -158,7 +155,7 @@ public class WSImportMetadata extends
 
     /**
      * Create methods on Aspect file related to this wsdl location.
-     * 
+     *
      * @param root Root element of the wsdl document
      * @param sense Communication sense type
      * @throws IOException No connection to the wsdl location
@@ -207,7 +204,7 @@ public class WSImportMetadata extends
 
     /**
      * Create method on Aspect file related to method object.
-     * 
+     *
      * @param root Root element of the wsdl document
      * @param servicePath Path to the service type
      * @param portTypePath Path to the port type type
@@ -278,7 +275,7 @@ public class WSImportMetadata extends
 
     /**
      * Create method on Aspect file related to method object.
-     * 
+     *
      * @param servicePath Path to the service type
      * @param portTypePath Path to the port type type
      * @param portName Name of port name
@@ -329,7 +326,7 @@ public class WSImportMetadata extends
 
     /**
      * Get object type or primitive java type related to primitive type name.
-     * 
+     *
      * @param root Root element of the wsdl document
      * @param name Type name
      * @return Java type
@@ -409,7 +406,7 @@ public class WSImportMetadata extends
 
     /**
      * Get the primitive object type name related to a primitive type name.
-     * 
+     *
      * @param name Type name
      * @return Java object type or null
      */

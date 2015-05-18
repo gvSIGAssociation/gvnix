@@ -1,18 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
- * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
- * Valenciana
- * 
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -65,11 +64,9 @@ import org.w3c.dom.Element;
 
 /**
  * Implementation of Exception commands that are available via the Roo shell.
- * 
- * @author Ricardo García ( rgarcia at disid dot com ) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 @Component
 @Service
@@ -133,7 +130,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #getHandledExceptionList()
@@ -178,7 +175,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #addNewHandledException(java.lang.String, java.lang.String,
@@ -213,7 +210,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #removeExceptionHandled(java.lang.String)
@@ -238,7 +235,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #languageExceptionHandled(java.lang.String, java.lang.String,
@@ -263,7 +260,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #getLanguagePropertiesFile(java.lang.String)
@@ -299,7 +296,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Checks if the Exception is mapped in the SimpleMappingExceptionResolver
      * Controller
-     * 
+     *
      * @param exceptionName Exception Name to Handle.
      */
     private void existException(String exceptionName) {
@@ -335,7 +332,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Update the webmvc-config.xml with the new Exception.
-     * 
+     *
      * @param exceptionName Exception Name to Handle.
      * @return {@link String} The exceptionViewName to create the .jspx view.
      */
@@ -429,7 +426,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Returns the exception view name checking if exists in the file
      * webmvc-config.xml file.
-     * 
+     *
      * @param exceptionName to create the view.
      * @param root {@link Element} with the values off webmvc-config.xml
      * @return
@@ -471,7 +468,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Removes the definition of the selected Exception in the webmvc-config.xml
      * file.
-     * 
+     *
      * @param exceptionName Exception Name to remove.
      */
     private String removeWebMvcConfig(String exceptionName) {
@@ -529,7 +526,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Update layout.xml to map the new Exception associated View.
-     * 
+     *
      * @param exceptionViewName to create the view and the definition in the xml
      */
     private void updateViewsLayout(String exceptionViewName) {
@@ -553,7 +550,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Removes the definition of the Exception view in layout.xml.
-     * 
+     *
      * @param exceptionViewName Exception Name to remove.
      */
     private void removeViewsLayout(String exceptionViewName) {
@@ -571,7 +568,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Creates a view for the new Handled Exception.
-     * 
+     *
      * @param exceptionName Name of the Exception to handle.
      * @param exceptionTitle Title of the exception view.
      * @param exceptionDescription Description to show in the view.
@@ -665,7 +662,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Removes Exception view .jspx.
-     * 
+     *
      * @param exceptionViewName Exception Name to remove.
      */
     private void removeExceptionView(String exceptionViewName) {
@@ -680,7 +677,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Method to replace the parameters set in the Map into the template.
-     * 
+     *
      * @param template Template to create a new jspx.
      * @param params {@link Map} with the specified parameters.
      * @return {@link String} with the updated parameters values.
@@ -696,7 +693,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Updates the selected language file with the title and the description of
      * the new Exception.
-     * 
+     *
      * @param exceptionName Name of the Exception.
      * @param exceptionTitle Title of the Exception.
      * @param exceptionDescription Description of the Exception.
@@ -768,7 +765,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Updates the selected language file with the title and the description of
      * the new Exception.
-     * 
+     *
      * @param exceptionName Name of the Exception.
      * @param exceptionTitle Title of the Exception.
      * @param exceptionDescription Description of the Exception.
@@ -809,7 +806,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Removes the Language messages properties of the Exception.
-     * 
+     *
      * @param exceptionName Exception Name to remove.
      */
     private void removeMultiLanguageMessages(String exceptionName) {
@@ -846,7 +843,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #setUpGvNIXExceptions()
@@ -1005,7 +1002,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Retrieves the messages properties files of the application
-     * 
+     *
      * @return {@link SortedSet} with the messages properties files
      */
     private SortedSet<FileDetails> getPropertiesFiles() {
@@ -1020,7 +1017,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isExceptionMappingAvailable()
@@ -1062,7 +1059,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isExceptionMappingAvailable()
@@ -1103,7 +1100,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isProjectAvailable()
@@ -1118,7 +1115,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Extract the filename from the given path, e.g. "mypath/myfile.txt" ->
      * "myfile.txt".
-     * 
+     *
      * @param path the file path (may be <code>null</code>)
      * @return the extracted filename, or <code>null</code> if none
      */

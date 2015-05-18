@@ -1,7 +1,7 @@
 /*
- * Copyright 2014 DiSiD Technologies S.L.L. All rights reserved.
+ * Copyright 2015 DISID Corporation S.L. All rights reserved.
  *
- * Project  : DiSiD org.gvnix.addon.datatables
+ * Project  : [PROJECT NAME]
  * SVN Id   : $Id$
  */
 package org.gvnix.addon.datatables.addon;

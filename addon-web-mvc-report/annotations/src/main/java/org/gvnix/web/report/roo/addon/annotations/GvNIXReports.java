@@ -1,7 +1,8 @@
 /*
- * Copyright 2011 DiSiD Technologies S.L.L. All rights reserved.
- * 
- * Project : DiSiD org.gvnix.web.report SVN Id : $Id$
+ * Copyright 2015 DISID Corporation S.L. All rights reserved.
+ *
+ * Project : [PROJECT NAME]
+ * SVN Id : $Id$
  */
 package org.gvnix.web.report.roo.addon.annotations;
 
@@ -12,11 +13,9 @@ import java.lang.annotation.Target;
 
 /**
  * gvNIX Report annotation.
- * 
- * @author Oscar Rovira (orovira at disid dot com) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since 0.6
  */
 @Retention(RetentionPolicy.SOURCE)

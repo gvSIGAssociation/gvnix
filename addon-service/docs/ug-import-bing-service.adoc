@@ -95,7 +95,7 @@ and get the Bing _AppID_ and _Version_, both parameters are required to
 invoke Bing Web Services.
 
 
-*DiSiD tests*
+*DISID tests*
 ----
 AppID: 8DC4F8381BF17A5FE9BF28F7B5AF12F5EA08462F Version: 2.2
 ----

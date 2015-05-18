@@ -81,7 +81,7 @@
 
 
   <build>
-	<!-- DiSiD: Add build resources filtering -->
+	<!-- DISID: Add build resources filtering -->
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -101,7 +101,7 @@
     </resources>
   </build>
 
-  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and repo folder values -->
+  <!-- DISID: Add gvNIX version from parent pom and google code project name and repo folder values -->
   <properties>
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>

@@ -1,18 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
- * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
- * Valenciana
- * 
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,11 +42,9 @@ import org.xml.sax.SAXException;
  * <p>
  * Compatible address should be SOAP protocol version 1.1 and 1.2.
  * </p>
- * 
- * @author Mario Martínez Sánchez( mmartinez at disid dot com ) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 public class WsdlParserUtils {
 
@@ -135,7 +132,7 @@ public class WsdlParserUtils {
 
     /**
      * Get the namespace attribute from root wsdl
-     * 
+     *
      * @param root Root element of the wsdl
      * @return Wsdl namespace
      */
@@ -154,7 +151,7 @@ public class WsdlParserUtils {
      * Package ends with the package separator. Related package is different
      * when web service is rpc encoded or not.
      * </p>
-     * 
+     *
      * @param root Root element of the wsdl
      * @return Equivalent java package or empty
      */
@@ -178,7 +175,7 @@ public class WsdlParserUtils {
      * Package ends with the package separator. If target namespace has not a
      * compatible prefix, empty string will be returned.
      * </p>
-     * 
+     *
      * @param namespace Name space
      * @param root Root element of the wsdl
      * @return Equivalent java package or empty
@@ -192,7 +189,7 @@ public class WsdlParserUtils {
 
     /**
      * Method normalizePackageName.
-     * 
+     *
      * @param pkg
      * @param separator
      * @return
@@ -208,7 +205,7 @@ public class WsdlParserUtils {
 
     /**
      * Method makePackageName.
-     * 
+     *
      * @param namespace
      * @return
      */
@@ -285,7 +282,7 @@ public class WsdlParserUtils {
      * Append it to the target string buffer with a <tt>.</tt> delimiter if
      * <tt>word</tt> is not the first word in the package name.
      * </p>
-     * 
+     *
      * @param sb the buffer to append to
      * @param word the word to append
      * @param firstWord a flag indicating whether this is the first word
@@ -325,7 +322,7 @@ public class WsdlParserUtils {
 
     /**
      * Checks if the input string is a valid java keyword.
-     * 
+     *
      * @return boolean true/false
      */
     public static boolean isJavaKeyword(String keyword) {
@@ -347,7 +344,7 @@ public class WsdlParserUtils {
      * <p>
      * Compatible address should be SOAP protocol version 1.1 and 1.2.
      * </p>
-     * 
+     *
      * @param root Root element of wsdl.
      * @return First compatible address element or null if no element.
      */
@@ -400,7 +397,7 @@ public class WsdlParserUtils {
 
     /**
      * Obtain from the list the element with the reference on the root wsdl.
-     * 
+     *
      * @param root Root wsdl
      * @param elements Elements list to search in
      * @param reference Reference to be searched
@@ -435,7 +432,7 @@ public class WsdlParserUtils {
 
     /**
      * Get the path to the generated service class.
-     * 
+     *
      * @param root Wsdl root element
      * @param sense Communication sense type
      * @return Path to the class
@@ -462,7 +459,7 @@ public class WsdlParserUtils {
 
     /**
      * Get the path to the generated port type class.
-     * 
+     *
      * @param root Wsdl root element
      * @param sense Communication sense type
      * @return Path to the class
@@ -490,7 +487,7 @@ public class WsdlParserUtils {
 
     /**
      * Get the port type Java file
-     * 
+     *
      * @param root Wsdl root element
      * @param sense Communication sense type
      * @return Java file
@@ -503,7 +500,7 @@ public class WsdlParserUtils {
 
     /**
      * Convert the path to a type to the java file path.
-     * 
+     *
      * @param classPath Path to the class
      * @return Path to the java file
      */
@@ -517,7 +514,7 @@ public class WsdlParserUtils {
 
     /**
      * Get the file on path in generated sources folder.
-     * 
+     *
      * @param path Searched path
      * @return File to path
      */
@@ -533,7 +530,7 @@ public class WsdlParserUtils {
      * <p>
      * Compatible service should be SOAP protocol version 1.1 and 1.2.
      * </p>
-     * 
+     *
      * @param root Root element of wsdl
      * @param sense Communication sense type
      * @return First compatible service class name
@@ -551,7 +548,7 @@ public class WsdlParserUtils {
      * <p>
      * Compatible service should be SOAP protocol version 1.1 and 1.2.
      * </p>
-     * 
+     *
      * @param root Root element of wsdl
      * @param sense Communication sense type
      * @return First compatible service class name
@@ -575,7 +572,7 @@ public class WsdlParserUtils {
      * <p>
      * Compatible port should be SOAP protocol version 1.1 and 1.2.
      * </p>
-     * 
+     *
      * @param root Root element of wsdl
      * @return First compatible port element
      */
@@ -599,7 +596,7 @@ public class WsdlParserUtils {
      * Should exists only one compatible port using SOAP protocol version 1.1 or
      * 1.2.
      * </p>
-     * 
+     *
      * @param root Root element of wsdl
      * @return Compatible port element
      */
@@ -623,7 +620,7 @@ public class WsdlParserUtils {
      * Should exists only one compatible address using SOAP protocol version 1.1
      * or 1.2.
      * </p>
-     * 
+     *
      * @param root Root element of wsdl.
      * @return First compatible address element or null if no element.
      */
@@ -698,7 +695,7 @@ public class WsdlParserUtils {
      * <p>
      * Compatible port should be SOAP protocol version 1.1 and 1.2.
      * </p>
-     * 
+     *
      * @param root Root element of wsdl
      * @param sense Communication sense type
      * @return First compatible port element class name
@@ -718,7 +715,7 @@ public class WsdlParserUtils {
      * <p>
      * Compatible port type should be SOAP protocol version 1.1 and 1.2.
      * </p>
-     * 
+     *
      * @param root Root element of wsdl
      * @param sense Communication sense type
      * @return First compatible port type class name
@@ -748,7 +745,7 @@ public class WsdlParserUtils {
      * <p>
      * Compatible binding should be SOAP protocol version 1.1 and 1.2.
      * </p>
-     * 
+     *
      * @param root Root element of wsdl
      * @return First compatible binding element
      */
@@ -776,7 +773,7 @@ public class WsdlParserUtils {
      * 'xmlns' namespace. For example, for element
      * 'xmlns:tns="http://tempuri.org/"' the uri is 'http://tempuri.org/'.
      * </p>
-     * 
+     *
      * @param root Wsdl root element
      * @param namespace Namespace to search it URI
      * @return Namespace URI related to the namespace
@@ -807,7 +804,7 @@ public class WsdlParserUtils {
      * Prefix is the text before first namespace separator character. For
      * example, for name '<soap12:address>' the prefix is 'soap12'.
      * </p>
-     * 
+     *
      * @param elementName An element name
      * @return Prefix of the name or empty if not
      */
@@ -834,7 +831,7 @@ public class WsdlParserUtils {
      * Local name is the text after first namespace separator character. For
      * example, for element name soap12:address the local name is 'address'.
      * </p>
-     * 
+     *
      * @param elementName An element name
      * @return Sufix of the name or name if not
      */
@@ -851,7 +848,7 @@ public class WsdlParserUtils {
      * <p>
      * The conversion is different if RPC/Encoded communication sense.
      * </p>
-     * 
+     *
      * @param name A wsdl name
      * @param sense Communication sense type
      * @return Valid java name
@@ -873,7 +870,7 @@ public class WsdlParserUtils {
      * replaced with none. Other chars are replaced by unicode value with format
      * "_002f". New words in name always will be start by uppercase.
      * </p>
-     * 
+     *
      * @param name A wsdl name
      * @return Valid java name
      */
@@ -944,7 +941,7 @@ public class WsdlParserUtils {
 
     /**
      * Converts a wsdl name to a valid Java format in RPC.
-     * 
+     *
      * @param name A wsdl name
      * @return Valid java name
      */
@@ -961,7 +958,7 @@ public class WsdlParserUtils {
 
     /**
      * Returns true if the name is a valid java identifier.
-     * 
+     *
      * @param id to check
      * @return boolean true/false
      **/
@@ -980,7 +977,7 @@ public class WsdlParserUtils {
 
     /**
      * Map an XML name to a valid Java identifier w/ capitalized first letter.
-     * 
+     *
      * @param name
      * @return
      */
@@ -991,7 +988,7 @@ public class WsdlParserUtils {
 
     /**
      * Capitalize the first character of the name.
-     * 
+     *
      * @param name
      * @return
      */
@@ -1015,7 +1012,7 @@ public class WsdlParserUtils {
     /**
      * Map an XML name to a Java identifier per the mapping rules of JSR 101 (in
      * version 1.0 this is "Chapter 20: Appendix: Mapping of XML Names"
-     * 
+     *
      * @param name is the xml name
      * @return the java name per JSR 101 specification
      */
@@ -1113,7 +1110,7 @@ public class WsdlParserUtils {
 
     /**
      * Is wsdl document root element rpc encoded ?
-     * 
+     *
      * @param root Wsdl document root element
      * @return is rpc endoded
      */
@@ -1151,10 +1148,10 @@ public class WsdlParserUtils {
 
             /*
              * TODO To be completed like next condition for each operation:
-             * 
+             *
              * (bindingStyle = RPC | operationStyle == RPC) & (inputUse =
              * ENCODED | outputUse = ENCODED)
-             * 
+             *
              * If any operation match previous condition, then is rpc encoded
              */
         }
@@ -1166,7 +1163,7 @@ public class WsdlParserUtils {
      * Check connection and WSDL format from the given url.<br/>
      * If you need SSL support acceding to WSLD you should use
      * {@link SecurityService#getWsdl(String)}
-     * 
+     *
      * @param url URL to check
      * @return Wsdl document root element
      * @exception IllegalStateException wsdl no connection or invalid

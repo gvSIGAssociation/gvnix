@@ -11,7 +11,8 @@ import org.springframework.roo.project.Feature;
  * Interface of operations this add-on offers. Typically used by a command type
  * or an external add-on.
  * 
- * @author gvNIX Team
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since 1.4
  */
 public interface JpaGeoOperations extends Feature {

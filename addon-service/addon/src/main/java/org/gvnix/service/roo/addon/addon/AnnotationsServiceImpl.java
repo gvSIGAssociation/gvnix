@@ -27,10 +27,8 @@ import org.w3c.dom.Element;
 /**
  * Utilities to manage annotations.
  * 
- * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 @Component
 @Service

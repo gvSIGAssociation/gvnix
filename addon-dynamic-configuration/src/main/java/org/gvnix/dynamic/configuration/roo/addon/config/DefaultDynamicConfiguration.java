@@ -1,7 +1,6 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
- * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
- * Valenciana This program is free software: you can redistribute it and/or
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version. This program is distributed in the hope that it
@@ -21,31 +20,30 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
  * The manager class is responsible of read and write the properties list of the
  * dynamic configuration file.
  * </p>
- * 
- * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ *
  */
 public interface DefaultDynamicConfiguration {
 
     /**
      * Reads a configuration file and generates a properties list.
-     * 
+     *
      * @return File info getted from the original file.
      */
     DynPropertyList read();
 
     /**
      * Update a configuration file with the values of the properties list.
-     * 
+     *
      * @param file Info to be stored on the original file.
      */
     void write(DynPropertyList dynProperties);
 
     /**
      * Get the dynamic configuration component name.
-     * 
+     *
      * @return Dynamic configuration component name
      */
     String getName();

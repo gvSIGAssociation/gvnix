@@ -1,18 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
- * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
- * Valenciana
- * 
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,12 +22,11 @@ import java.util.List;
 
 import org.springframework.roo.model.JavaType;
 
-/**
- * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+/*
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
+
 public interface WSExportWsdlConfigService {
 
     /**
@@ -67,7 +65,7 @@ public interface WSExportWsdlConfigService {
      * Check correct WSDL format, configure plugin to generate sources and
      * generate java sources.
      * </p>
-     * 
+     *
      * @param wsdlLocation contract wsdl url to export
      */
     public void generateJavaFromWsdl(String wsdlLocation);
@@ -81,7 +79,7 @@ public interface WSExportWsdlConfigService {
      * This makes able {@link WSExportWsdlImpl} to collect java file creation
      * events from wsdl2java maven plugin
      * </p>
-     * 
+     *
      * @param directoryToMonitoring directory to look up for CXF Web Service
      *        generated java files.
      */
@@ -103,7 +101,7 @@ public interface WSExportWsdlConfigService {
      * <li>gvNIX web service list</li>
      * </ul>
      * </p>
-     * 
+     *
      * @return implementation classes
      */
     public List<JavaType> createGvNixClasses();

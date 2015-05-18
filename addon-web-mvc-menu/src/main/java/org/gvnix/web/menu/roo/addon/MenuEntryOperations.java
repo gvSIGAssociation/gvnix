@@ -1,18 +1,17 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
- * Transport - Generalitat Valenciana Copyright (C) 2010, 2011 CIT - Generalitat
- * Valenciana
- * 
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,15 +24,9 @@ import org.w3c.dom.Document;
 /**
  * Interface of operations this add-on offers. Typically used by a command type
  * or an external add-on
- * 
- * @author Jose Manuel Vivó (jmvivo at disid dot com) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
- * @author Enrique Ruiz (eruiz at disid dot com) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  * @since 0.6
  */
 public interface MenuEntryOperations {
@@ -42,14 +35,14 @@ public interface MenuEntryOperations {
 
     /**
      * Indicate project should be available
-     * 
+     *
      * @return true if it should be available, otherwise false
      */
     boolean isProjectAvailable();
 
     /**
      * Indicate the project has a web layer based on Spring MVC Tiles.
-     * 
+     *
      * @return true if the user installed an Spring MVC Tiles web layer,
      *         otherwise returns false.
      */
@@ -57,7 +50,7 @@ public interface MenuEntryOperations {
 
     /**
      * Indicate project has a gvNIX menu.
-     * 
+     *
      * @return true if the user installed the gvNIX menu, otherwise returns
      *         false.
      */
@@ -65,7 +58,7 @@ public interface MenuEntryOperations {
 
     /**
      * Indicate project has a gvNIX Bootstrap menu.
-     * 
+     *
      * @return true if the user installed the gvNIX Bootstrap menu, otherwise
      *         returns false.
      */
@@ -73,7 +66,7 @@ public interface MenuEntryOperations {
 
     /**
      * Checks if Spring Security 3.0.5.RELEASE is installed.
-     * 
+     *
      * @return true if Spring Security 3.0.5 is installed. Otherwise returns
      *         false
      */
@@ -91,7 +84,7 @@ public interface MenuEntryOperations {
 
     /**
      * Create or update menu web layer artefacts.
-     * 
+     *
      * @param classesPackage Web layer artefacts contains references to Java
      *        classes in this package (used to create import declarations in
      *        artefacts)
@@ -115,7 +108,7 @@ public interface MenuEntryOperations {
      * identifier to diffentiate between different categories provided by the
      * same addon. Similarly, the recommended menu item identifier naming
      * convention is <i>menu_item_the-name_the-category_label</i>.
-     * 
+     *
      * @param menuCategoryName
      * @param menuItemId
      * @param globalMessageCode Code to load message from I18N properties
@@ -146,7 +139,7 @@ public interface MenuEntryOperations {
      * {@link org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations#addMenuItem(JavaSymbolName, JavaSymbolName, String, String, String, String)}
      * to provide same functionality for Roo clients when gvNIX MenuOperations
      * service setup will replace Roo MenuOperations service.
-     * 
+     *
      * @param menuCategoryName
      * @param menuItemId
      * @param menuItemLabel Text to be used as argument of message
@@ -180,7 +173,7 @@ public interface MenuEntryOperations {
      * default category will be created automatically.
      * <p>
      * Link is not required because gvNIX menu item could act as sub-category.
-     * 
+     *
      * @param menuCategoryName
      * @param menuItemId
      * @param menuItemLabel Text to be used as argument of message
@@ -202,21 +195,21 @@ public interface MenuEntryOperations {
 
     /**
      * Update menu config file with given contents
-     * 
+     *
      * @param doc new contents for menu.xml
      */
     void writeXMLConfigIfNeeded(Document doc);
 
     /**
      * Gets menu config file loaded in a Document object.
-     * 
+     *
      * @return XML Document
      */
     Document getMenuDocument();
 
     /**
      * Return a formated string that shows complete menu tree info
-     * 
+     *
      * @param pageId menu entry identifier
      * @param lang Create info in this language
      * @return
@@ -227,7 +220,7 @@ public interface MenuEntryOperations {
      * Return a formated string that shows compact menu tree info.
      * <p>
      * Info about labels, roles is not shown
-     * 
+     *
      * @param pageId
      * @return
      */
@@ -237,7 +230,7 @@ public interface MenuEntryOperations {
      * Return a formated string with a list representation of a subtree.
      * <p>
      * By default shows all menu entry Ids plus target URLs.
-     * 
+     *
      * @param pageId root node of subtree to be shown. If null, show complete
      *        menu tree
      * @param label show label values
@@ -252,7 +245,7 @@ public interface MenuEntryOperations {
     /**
      * Move the menu entry node and its children into another node.<br/>
      * The element will be place at the end of <code>into</code> children.
-     * 
+     *
      * @param page
      * @param into
      * @return
@@ -264,7 +257,7 @@ public interface MenuEntryOperations {
      * <p>
      * The element will be place into the same parent of <code>before</code> and
      * before it.
-     * 
+     *
      * @param page
      * @param before
      * @return
@@ -273,7 +266,7 @@ public interface MenuEntryOperations {
 
     /**
      * Update values of a menu entry.
-     * 
+     *
      * @param pageId Current menu entry ID
      * @param nid New menu entry ID
      * @param label New text label
@@ -290,7 +283,7 @@ public interface MenuEntryOperations {
 
     /**
      * Gets the absolute path for the menu config file {@code menu.xml}.
-     * 
+     *
      * @return the absolute path to the file (never null)
      */
     String getMenuConfigFile();

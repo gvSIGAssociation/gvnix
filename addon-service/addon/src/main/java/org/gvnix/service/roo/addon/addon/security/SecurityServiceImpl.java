@@ -1,7 +1,6 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
- * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
- * Valenciana
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -73,15 +72,9 @@ import org.xml.sax.SAXException;
 
 /**
  * Implementation of {@link SecurityService}
- * 
- * @author Jose Manuel Vivó Arnal ( jmvivo at disid dot com ) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
- * @author Óscar Rovira ( orovira at disid dot com ) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 @Component
 @Service
@@ -200,7 +193,7 @@ public class SecurityServiceImpl implements SecurityService {
      * {@link SecurityServiceImpl#installCertificates(String, String)} and retry
      * to parse WSDL from URL.
      * </p>
-     * 
+     *
      * @param loc Location
      * @param pass Password
      * @return WSDL document
@@ -259,7 +252,7 @@ public class SecurityServiceImpl implements SecurityService {
      * its installation in other environments or just in case we reach the
      * problem with the JVM <code>cacerts</code> file permissions.
      * </p>
-     * 
+     *
      * @see GvNix509TrustManager#saveCertFile(String, X509Certificate,
      *      FileManager, PathResolver)
      * @see <a href=
@@ -331,7 +324,7 @@ public class SecurityServiceImpl implements SecurityService {
 
     /**
      * Throw an illegal state exception with a invalid host cert message.
-     * 
+     *
      * @param pass Password
      * @param keystore Keystore
      * @param host Host destination
@@ -368,7 +361,7 @@ public class SecurityServiceImpl implements SecurityService {
      * <p>
      * If CN exists, null otherwise
      * </p>
-     * 
+     *
      * @param dn Distinguished name
      * @return Common name if exists, null otherwise
      */
@@ -391,7 +384,7 @@ public class SecurityServiceImpl implements SecurityService {
 
     /**
      * Stores in keystore needed certificates.
-     * 
+     *
      * @param tm
      * @param host
      * @param keystore
@@ -451,7 +444,7 @@ public class SecurityServiceImpl implements SecurityService {
      * <p>
      * Destination resources file name is gvnix-cacerts.
      * </p>
-     * 
+     *
      * @return File created or existing file
      */
     private File getProjectKeystore() {
@@ -497,7 +490,7 @@ public class SecurityServiceImpl implements SecurityService {
      * <p>
      * "java.home" system property is required.
      * </p>
-     * 
+     *
      * @return JVM keystore file
      */
     private File getJvmKeystore() {
@@ -553,7 +546,7 @@ public class SecurityServiceImpl implements SecurityService {
      * <p>
      * Result element will be like this:
      * </p>
-     * 
+     *
      * <pre>
      * &lt;service name="{serviceName}"&gt;
      *      &lt;requestFlow&gt;
@@ -565,7 +558,7 @@ public class SecurityServiceImpl implements SecurityService {
      *      &lt;/requestFlow&gt;
      * &lt;/service&gt;
      * </pre>
-     * 
+     *
      * @param doc client-config.wsdd document
      * @param serviceName
      * @param parameters

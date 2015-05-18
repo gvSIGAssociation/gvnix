@@ -1,7 +1,7 @@
 /*
- * Copyright 2015 DiSiD Technologies S.L.L. All rights reserved.
+ * Copyright 2015 DISID Corporation S.L. All rights reserved.
  *
- * Project  : DiSiD petclinic
+ * Project  : [PROJECT NAME]
  * SVN Id   : $Id$
  */
 package org.gvnix.web.datatables.util;

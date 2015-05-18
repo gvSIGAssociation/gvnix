@@ -1,7 +1,6 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures i
- * Transport - Generalitat Valenciana Copyright (C) 2010 CIT - Generalitat
- * Valenciana
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,11 +69,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * gvNIX OCCChecksum Metadata
- * 
- * @author Jose Manuel Vivó ( jmvivo at disid dot com ) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
+ *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
 public class OCCChecksumMetadata extends AbstractMetadataItem implements
         ItdTypeDetailsProvidingMetadataItem {
@@ -120,7 +117,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     private JpaActiveRecordMetadata entityMetadata;
 
-    // DiSiD: Used to get the type members
+    // DISID: Used to get the type members
     private final MemberDetailsScanner memberDetailsScanner;
 
     // Used to get related persistence object
@@ -155,7 +152,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         this.aspectName = aspectName;
         this.governorPhysicalTypeMetadata = governorPhysicalTypeMetadata;
 
-        // DiSiD: Initialize memberDetailsScanner
+        // DISID: Initialize memberDetailsScanner
         this.memberDetailsScanner = memberDetailsScanner;
         this.persistenceMemberLocator = persistenceMemberLocator;
 
@@ -216,7 +213,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
      * at same package in src/main/resources. If some method placed in a portion
      * already defined (push-in), don't add it to result string.
      * </p>
-     * 
+     *
      * @param checksumField Checksum field to get field name (one var value).
      * @param persistenceMemberLocator To get identifier field (one var value).
      * @return All template portions replacing vars with values and concatenated
@@ -276,7 +273,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
      * Vars has next format: ${entity_package}. Template will be placed at same
      * package in src/main/resources.
      * </p>
-     * 
+     *
      * @param templateName File name with a template.
      * @param checksumField Checksum field to get field name (one var value).
      * @param persistenceMemberLocator To get identifier field (one var value).
@@ -349,7 +346,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
      * TODO Include embeddedID TODO Include support for relationship and
      * transient (but not by default) TODO Support include/exclude properties
      * (by adding attributes to GvNIXOCCCheck annotation)
-     * 
+     *
      * @return
      */
     private String getCodeToTranformFieldsToString() {
@@ -363,7 +360,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     /**
      * Get string of code required to generate the string representation of a
      * Roo Bean
-     * 
+     *
      * @param members of the Roo Bean
      * @param prefix for every property (use null for this bean itself)
      * @return
@@ -452,7 +449,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     /**
      * Generate to-string code for a Many-to-One member property. This method
      * uses the pk of related object. Supports simple pks or embeddedId pks.
-     * 
+     *
      * @param propAccessor
      * @param field
      * @param aPrefix
@@ -508,7 +505,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     /**
      * Gets method body expression for property-getter method
-     * 
+     *
      * @param prefix
      * @param propAccessorName
      * @param fieldName
@@ -526,7 +523,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     /**
      * Replace map values on a template string
-     * 
+     *
      * @param template
      * @param params
      * @return
@@ -541,7 +538,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     /**
      * Add checksum field (plus getter/setter) to builder
-     * 
+     *
      * @param field
      * @param getter
      * @param setter
@@ -591,7 +588,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     /**
      * Check if received method exists
-     * 
+     *
      * @param mutableTypeDetails
      * @param method
      * @return
@@ -640,7 +637,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     /**
      * Check if recived filed exist
-     * 
+     *
      * @param mutableTypeDetails
      * @param field
      * @return
@@ -719,7 +716,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     /**
      * Checks if Metadata is valid
-     * 
+     *
      * @param metadataIdentificationString
      * @return
      */
@@ -730,7 +727,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     /**
      * Locates the checksum field.
-     * 
+     *
      * @return the checksum (may return null)
      */
     public FieldMetadata getChecksumField() {
@@ -806,7 +803,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     /**
      * Locates the checksum accessor method.
-     * 
+     *
      * @return the version identifier (may return null if there is no version
      *         field declared in this class)
      */
@@ -840,7 +837,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     /**
      * Locates the checksum mutator
-     * 
+     *
      * @return the version identifier (may return null if there is no version
      *         field declared in this class)
      */
