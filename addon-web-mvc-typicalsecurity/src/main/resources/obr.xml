@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-setup' v='typicalsecurity setup'/>
     </capability>
   </resource>

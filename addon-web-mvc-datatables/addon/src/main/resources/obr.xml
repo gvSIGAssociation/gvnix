@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-datatables-add' v='web mvc datatables add'/>
       <p n='command-datatables-detail-add' v='web mvc datatables detail add'/>
       <p n='command-datatables-all' v='web mvc datatables all'/>

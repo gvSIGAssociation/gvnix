@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-remote-service-class' v='remote service class'/>
       <p n='command-remote-service-operation' v='remote service operation'/>
       <p n='command-remote-service-define-ws' v='remote service define ws'/>

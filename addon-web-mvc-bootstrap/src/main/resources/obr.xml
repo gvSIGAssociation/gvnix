@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-setup' v='web mvc bootstrap setup'/>
       <p n='command-update' v='web mvc bootstrap update'/>
     </capability>

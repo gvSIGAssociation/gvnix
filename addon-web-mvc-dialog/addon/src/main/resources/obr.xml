@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-exception-list' v='web mvc dialog exception list'/>
       <p n='command-exception-add' v='web mvc dialog exception add'/>
       <p n='command-exception-remove' v='web mvc dialog exception remove'/>

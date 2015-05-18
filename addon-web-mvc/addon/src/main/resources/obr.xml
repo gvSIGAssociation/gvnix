@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-web-mvc-batch-setup' v='web mvc batch setup'/>
       <p n='command-web-mvc-batch-add' v='web mvc batch add'/>
       <p n='command-web-mvc-batch-all' v='web mvc batch all'/>

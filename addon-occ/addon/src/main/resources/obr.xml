@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-set' v='occ checksum set'/>
       <p n='command-all' v='occ checksum all'/>
     </capability>

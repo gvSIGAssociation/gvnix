@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-web-mvc-geo-setup' v='web mvc geo setup'/>
       <p n='command-web-mvc-geo-controller' v='web mvc geo controller'/>
       <p n='command-web-mvc-geo-entity-all' v='web mvc geo entity all'/>

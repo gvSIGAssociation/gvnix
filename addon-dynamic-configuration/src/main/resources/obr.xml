@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-create' v='configuration create'/>
       <p n='command-property-add' v='configuration property add'/>
       <p n='command-property-value' v='configuration property value'/>

@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-jpa-audit-setup' v='jpa audit setup'/>
       <p n='command-jpa-audit-add' v='jpa audit add'/>
       <p n='command-jpa-audit-all' v='jpa audit all'/>

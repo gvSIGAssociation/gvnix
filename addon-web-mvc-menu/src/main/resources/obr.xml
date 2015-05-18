@@ -1,6 +1,6 @@
 <repository>
   <resource>
-    <capability name='commands'>
+    <capability name='roo-addon'>
       <p n='command-menu-setup' v='menu setup'/>
       <p n='command-menu-entry-add' v='menu entry add'/>
       <p n='command-menu-entry-visibility' v='menu entry visibility'/>
