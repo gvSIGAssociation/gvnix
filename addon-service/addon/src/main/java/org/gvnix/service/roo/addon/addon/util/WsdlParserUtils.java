@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
- * gvNix Wsdl parser utilities.
+ * gvNIX Wsdl parser utilities.
  * <p>
  * Compatible address should be SOAP protocol version 1.1 and 1.2.
  * </p>

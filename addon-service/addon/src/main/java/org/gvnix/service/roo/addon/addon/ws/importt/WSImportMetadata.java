@@ -58,7 +58,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
- * gvNix Web Service Java proxy generation.
+ * gvNIX Web Service Java proxy generation.
  * <p>
  * Compatible address should be SOAP protocol version 1.1 and 1.2.
  * </p>

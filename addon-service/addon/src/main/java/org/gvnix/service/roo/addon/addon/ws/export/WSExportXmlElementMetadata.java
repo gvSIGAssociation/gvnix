@@ -50,7 +50,7 @@ import org.springframework.roo.project.LogicalPath;
 
 /**
  * <p>
- * gvNix Xml Element Marsharlling generation.
+ * gvNIX Xml Element Marsharlling generation.
  * </p>
  * 
  * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for

@@ -30,7 +30,7 @@ import org.springframework.web.servlet.view.jasperreports.JasperReportsMultiForm
 
 /**
  * This class is installed by <b>web report setup</b> from addon-web-report
- * Add-on from gvNix project
+ * Add-on from gvNIX project
  *
  * It only overrides
  * {@link org.springframework.web.servlet.view.jasperreports.JasperReportsMultiFormatView}

@@ -46,7 +46,7 @@ import org.springframework.roo.project.LogicalPath;
 
 /**
  * <p>
- * gvNix Web Service Java Contract generation.
+ * gvNIX Web Service Java Contract generation.
  * </p>
  * 
  * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
