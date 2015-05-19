@@ -159,8 +159,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
 /**
  * {@link GvNIXDatatables} metadata
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1.0
  */
 public class DatatablesMetadata extends
@@ -3035,7 +3036,8 @@ public class DatatablesMetadata extends
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
         parameterNames.add(REQUEST_PARAM_NAME);
-        parameterNames.add(new JavaSymbolName(entityName));
+        parameterNames.add(new JavaSymbolName(StringUtils
+                .uncapitalize(entityName)));
         parameterNames.add(new JavaSymbolName("editing"));
 
         // Create the method body
@@ -3134,7 +3136,9 @@ public class DatatablesMetadata extends
         // request.setAttribute("pet", pet);
         bodyBuilder.appendFormalLine(String.format(
                 "%s.setAttribute(\"%s\", %s);",
-                REQUEST_PARAM_NAME.getSymbolName(), entityName, entityName
+                REQUEST_PARAM_NAME.getSymbolName(),
+                StringUtils.uncapitalize(entityName),
+                StringUtils.uncapitalize(entityName)
 
         ));
         // request.setAttribute("itemId",
@@ -3144,7 +3148,8 @@ public class DatatablesMetadata extends
                         .format("%s.setAttribute(\"itemId\", %s.convert(%s.get%s(),String.class));",
                                 REQUEST_PARAM_NAME.getSymbolName(),
                                 getConversionServiceField().getFieldName()
-                                        .getSymbolName(), entityName,
+                                        .getSymbolName(), StringUtils
+                                        .uncapitalize(entityName),
                                 StringUtils.capitalize(entityIdentifier
                                         .getFieldName().getSymbolName())));
         bodyBuilder.appendFormalLine("");
@@ -3170,7 +3175,8 @@ public class DatatablesMetadata extends
                 "%s bindindResult = new %s(%s, \"%s\");",
                 helper.getFinalTypeName(BEAN_PROPERTY_BINDING_RESULT),
                 helper.getFinalTypeName(BEAN_PROPERTY_BINDING_RESULT),
-                entityName, entityName));
+                StringUtils.uncapitalize(entityName),
+                StringUtils.uncapitalize(entityName)));
         // bindindResult.initConversion(conversionService_datatables);
         bodyBuilder.appendFormalLine(String.format(
                 "bindindResult.initConversion(%s);",
@@ -3181,14 +3187,15 @@ public class DatatablesMetadata extends
                 "%s.setAttribute(%s.MODEL_KEY_PREFIX + \"%s\",bindindResult);",
                 REQUEST_PARAM_NAME.getSymbolName(),
                 helper.getFinalTypeName(SpringJavaType.BINDING_RESULT),
-                entityName));
+                StringUtils.uncapitalize(entityName)));
 
         // // Add date time patterns and enums to populate inputs
         bodyBuilder
                 .appendFormalLine("// Add date time patterns and enums to populate inputs");
         // populateEditForm(uiModel, vet);
         bodyBuilder.appendFormalLine(String.format(
-                "populateEditForm(uiModel, %s);", entityName));
+                "populateEditForm(uiModel, %s);",
+                StringUtils.uncapitalize(entityName)));
 
         if (!entityDatePatterns.isEmpty()) {
             // } else {
