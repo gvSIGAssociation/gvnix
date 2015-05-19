@@ -39,10 +39,10 @@ import org.springframework.roo.shell.CommandMarker;
  * presentation-related logic in this class. You can return any objects from
  * each method, or use the logger directly if you'd like to emit messages of
  * different severity (and therefore different colours on non-Windows systems).
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.4
  */
 @Component
@@ -60,7 +60,7 @@ public class JpaGeoCommands implements CommandMarker {
 
     /**
      * This method checks if the setup method is available
-     *
+     * 
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -71,7 +71,7 @@ public class JpaGeoCommands implements CommandMarker {
 
     /**
      * This method checks if the method to add new field is available
-     *
+     * 
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -83,7 +83,7 @@ public class JpaGeoCommands implements CommandMarker {
     /**
      * This method checks if the method to add new finder to all entities is
      * available
-     *
+     * 
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -94,7 +94,7 @@ public class JpaGeoCommands implements CommandMarker {
 
     /**
      * This method checks if the method to add new finder to entity is available
-     *
+     * 
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -106,7 +106,7 @@ public class JpaGeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     *
+     * 
      * @param type
      */
     @CliCommand(value = "jpa geo setup",
@@ -120,7 +120,7 @@ public class JpaGeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     *
+     * 
      * @param type
      */
     @CliCommand(value = "field geo", help = "Add GEO field on specified Entity")
@@ -148,7 +148,7 @@ public class JpaGeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     *
+     * 
      * @param type
      */
     @CliCommand(value = "finder geo all",
@@ -160,7 +160,7 @@ public class JpaGeoCommands implements CommandMarker {
     /**
      * This method registers a command with the Roo shell. It also offers a
      * mandatory command attribute.
-     *
+     * 
      * @param type
      */
     @CliCommand(value = "finder geo add",

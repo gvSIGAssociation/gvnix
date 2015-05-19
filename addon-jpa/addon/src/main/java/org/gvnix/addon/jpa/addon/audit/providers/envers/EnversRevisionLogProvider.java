@@ -55,8 +55,9 @@ import org.w3c.dom.Element;
  * H-enver one in uses a long id and stores user name of every revision (if
  * Spring Security is available and there is a user logged).
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.3.0
  * 
  */

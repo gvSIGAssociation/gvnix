@@ -28,8 +28,9 @@ import org.springframework.roo.project.LogicalPath;
 /**
  * Utils to work with physical types.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1.0
  */
 @Component

@@ -177,16 +177,16 @@ var GvNIX_RowOnTop;
 			} else {
 				_d.asRowOnTopIds = [atrId];
 			}
-			
+
 			if(_d.asParentTableIdHash == undefined){
 				_d.asParentTableIdHash = _d.asTableIdHash;
 			}
-			
+
 			if (redraw) {
 				oTable.fnStandingRedraw();
 			}
 		},
-		
+
 		/**
 		 * This function generates a unic table hash
 		 */
@@ -201,7 +201,7 @@ var GvNIX_RowOnTop;
 		// private) * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 		/**
-		 * Tranfroms an array of objects to a 
+		 * Tranfroms an array of objects to a
 		 * String array
 		 */
 		"_fnToStringArray" : function(aObject) {
@@ -266,7 +266,7 @@ var GvNIX_RowOnTop;
 			st.oApi._fnCallbackReg(st, 'aoServerParams', function(
 					aoData ) {
 				var aIds = that._data.asRowOnTopIds;
-				// Checking if the topId table match 
+				// Checking if the topId table match
 				// with the current table id
 				var currentHash = that._data.asTableIdHash;
 				if(currentHash == undefined){
@@ -275,17 +275,17 @@ var GvNIX_RowOnTop;
 				}
 				var parentHash = that._data.asParentTableIdHash;
 				var masterParentHash = that._data.asTableIdHashParent;
-				
+
 				if(parentHash == undefined && masterParentHash != undefined){
 					parentHash = masterParentHash;
 				}
-				
+
 				// Inline editing is his own parent
                 if(parentHash == undefined && masterParentHash == undefined){
                     parentHash = [];
                     parentHash[0] = currentHash;
-                } 
-				
+                }
+
 				if(parentHash != undefined){
 					if (aIds && aIds.length && currentHash[0] == parentHash[0]){
 						// Add ids to request
@@ -314,8 +314,8 @@ var GvNIX_RowOnTop;
 					var sLastId = aIds[aIds.length-1];
 					// Clean ShowIdAsFirst
 					that._data.asRowOnTopIds = [];
-					
-					// Checking if the topId table match 
+
+					// Checking if the topId table match
 					// with the current table id
 					var currentHash = that._data.asTableIdHash;
 					if(currentHash == undefined){
@@ -328,12 +328,12 @@ var GvNIX_RowOnTop;
 					if(parentHash == undefined && masterParentHash != undefined){
 						parentHash = masterParentHash;
 					}
-					
+
 					// Inline editing is his own parent
 	                if(parentHash == undefined && masterParentHash == undefined){
 	                    parentHash = [];
 	                    parentHash[0] = currentHash;
-	                } 
+	                }
 
 					if(parentHash != undefined){
 						if (that.s.doRowClickOnCreatedRow &&
@@ -373,7 +373,7 @@ var GvNIX_RowOnTop;
 					}
 					forceRedraw = true;
 				}
-				
+
 				if (iSettings.asTableIdHash){
 					if (jQuery.isArray(iSettings.asTableIdHash)) {
 						_d.asTableIdHashParent = this._fnToStringArray(iSettings.asTableIdHash);
@@ -382,7 +382,7 @@ var GvNIX_RowOnTop;
 					}
 					forceRedraw = true;
 				}
-				
+
 				if (iSettings.asParentTableIdHash){
 					if (jQuery.isArray(iSettings.asParentTableIdHash)) {
 						_d.asParentTableIdHash = this._fnToStringArray(iSettings.asParentTableIdHash);
@@ -508,6 +508,7 @@ var GvNIX_RowOnTop;
  * @param oSettings
  * @param iSettings
  * @return GvNIX_RowOnTop object
+ *
  * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
  *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */
@@ -523,10 +524,10 @@ jQuery.fn.dataTableExt.oApi.fnRowOnTop = function(oSettings,
 	}
 
 	oSettings.GvNIX_RowOnTop_support = rowOnTopSupport;
-	
+
 	// Generating table hash id
 	oSettings.GvNIX_RowOnTop_support.fnSetTableIdHash();
-	
+
 	return rowOnTopSupport;
 };
 
@@ -537,12 +538,13 @@ jQuery.fn.dataTableExt.oApi.fnRowOnTop = function(oSettings,
 * @param oSettings
 * @param iSettings
 * @return GvNIX_RowOnTop object
+*
 * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+*         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
 */
 jQuery.fn.dataTableExt.oApi.fnHasRowOnTop = function(oSettings,
 		iSettings) {
-	
+
 	if (!oSettings) {
 		return false;
 	}

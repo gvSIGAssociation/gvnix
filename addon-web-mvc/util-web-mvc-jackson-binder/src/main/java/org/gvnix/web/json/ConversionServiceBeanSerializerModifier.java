@@ -50,8 +50,9 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
  * Also, if {@link JsonSerialize#as()} is set, it tries to use this class as
  * serialize target class.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since TODO: Class version
  */
 public class ConversionServiceBeanSerializerModifier extends

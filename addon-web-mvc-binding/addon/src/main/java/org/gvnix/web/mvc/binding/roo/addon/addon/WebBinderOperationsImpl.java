@@ -55,8 +55,9 @@ import org.w3c.dom.Element;
 /**
  * Implementation of commands that are available via the Roo shell
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 0.8
  */
 @Component
@@ -129,7 +130,7 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
 
     /**
      * Annotate provided Java type with @GvNIXStringTrimmerBinder
-     *
+     * 
      * @param emptyAsNull
      */
     private void addBindStringTrimmer(JavaType controller, boolean emptyAsNull) {
@@ -189,7 +190,7 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
 
     /**
      * Add addon repository and dependency to get annotations.
-     *
+     * 
      * @param configuration Configuration element
      */
     private void addAnnotations(Element configuration) {

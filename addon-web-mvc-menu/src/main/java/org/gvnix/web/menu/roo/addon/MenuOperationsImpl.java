@@ -40,9 +40,10 @@ import org.w3c.dom.Element;
  * This class extends and replace the services that
  * {@link org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperationsImpl}
  * offers.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 
 @Component
@@ -144,7 +145,7 @@ public class MenuOperationsImpl implements MenuOperations {
 
     /**
      * Attempts to locate a menu item and remove it.
-     *
+     * 
      * @param menuCategoryName the identifier for the menu category (required)
      * @param menuItemName the menu item identifier (required)
      * @param idPrefix the prefix to be used for this menu item (optional,
@@ -192,7 +193,7 @@ public class MenuOperationsImpl implements MenuOperations {
 
     /**
      * Informs if gvNIX menu is activated
-     *
+     * 
      * @return
      */
     public boolean isGvNixMenuAvailable() {

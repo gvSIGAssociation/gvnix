@@ -45,8 +45,9 @@ import org.springframework.roo.project.LogicalPath;
 /**
  * ITD generator for {@link GvNIXEntityMapLayerController} annotation.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.4.0
  */
 public class GvNIXEntityMapLayerMetadata extends

@@ -69,8 +69,9 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * Querydsl utility functions
  * 
- * 
- * @author gvNIX team
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public class QuerydslUtils {
 

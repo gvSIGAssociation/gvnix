@@ -43,8 +43,9 @@ import org.xml.sax.SAXException;
  * Extends this class to manage new XML file values.
  * </p>
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Component(componentAbstract = true)
 public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {

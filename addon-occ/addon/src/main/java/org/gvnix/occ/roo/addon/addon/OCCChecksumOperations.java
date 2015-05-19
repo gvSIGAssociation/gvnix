@@ -22,8 +22,9 @@ import org.springframework.roo.model.JavaType;
 /**
  * gvNIX OCCChecksum operation service
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public interface OCCChecksumOperations {
 
@@ -67,7 +68,7 @@ public interface OCCChecksumOperations {
     public void addOccAll(String fieldName, String digestMethod);
 
     /**
-     * Adds GvNIX annotations library dependency to the current project TO BE
+     * Adds gvNIX annotations library dependency to the current project TO BE
      * REMOVED FROM API
      */
     public void addGvNIXAnnotationsDependecy();

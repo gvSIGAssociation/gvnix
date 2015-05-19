@@ -45,9 +45,10 @@ import org.springframework.roo.project.LogicalPath;
 
 /**
  * ITD generator for {@link GvNIXPasswordHandlerSAFE} annotation.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1.0
  */
 public class LoupefieldMetadata extends
@@ -173,7 +174,7 @@ public class LoupefieldMetadata extends
 
     /**
      * Gets <code>showOnlyList</code> method. <br>
-     *
+     * 
      * @return
      */
     private MethodMetadata getShowOnlyListMethod() {
@@ -238,7 +239,7 @@ public class LoupefieldMetadata extends
 
     /**
      * Gets <code>findUsingAjax</code> method. <br>
-     *
+     * 
      * @param entity
      * @return
      */
@@ -362,7 +363,7 @@ public class LoupefieldMetadata extends
 
     /**
      * Builds body method for <code>showOnlyList</code> method. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildShowOnlyListMethodBody(
@@ -452,7 +453,7 @@ public class LoupefieldMetadata extends
 
     /**
      * Builds body method for <code>findUsingAjax</code> method. <br>
-     *
+     * 
      * @param bodyBuilder
      */
     private void buildFindUsingAjaxMethodBody(
@@ -1020,7 +1021,7 @@ public class LoupefieldMetadata extends
 
     /**
      * Create metadata for a field definition.
-     *
+     * 
      * @return a FieldMetadata object
      */
     private FieldMetadata getField(String name, String value,
@@ -1037,7 +1038,7 @@ public class LoupefieldMetadata extends
      * Gets or creates a field based on parameters.<br>
      * First try to get a suitable field (by name and type). If not found create
      * a new one (adding a counter to name if it's needed)
-     *
+     * 
      * @param fielName
      * @param fieldType
      * @param initializer (String representation)

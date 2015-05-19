@@ -11,7 +11,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -46,9 +46,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
 /**
  * Provides {@link GvNIXEntityMapLayerMetadata}.
  * 
- *  
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.4
  */
 
@@ -66,7 +66,7 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
 
     /**
      * Register itself into metadataDependencyRegister and add metadata trigger
-     *
+     * 
      * @param context the component context
      */
     protected void activate(ComponentContext cContext) {
@@ -79,7 +79,7 @@ public final class GvNIXEntityMapLayerMetadataProvider extends
 
     /**
      * Unregister this provider
-     *
+     * 
      * @param context the component context
      */
     protected void deactivate(ComponentContext context) {

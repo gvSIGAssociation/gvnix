@@ -65,7 +65,7 @@ public interface WSExportWsdlConfigService {
      * Check correct WSDL format, configure plugin to generate sources and
      * generate java sources.
      * </p>
-     *
+     * 
      * @param wsdlLocation contract wsdl url to export
      */
     public void generateJavaFromWsdl(String wsdlLocation);
@@ -79,7 +79,7 @@ public interface WSExportWsdlConfigService {
      * This makes able {@link WSExportWsdlImpl} to collect java file creation
      * events from wsdl2java maven plugin
      * </p>
-     *
+     * 
      * @param directoryToMonitoring directory to look up for CXF Web Service
      *        generated java files.
      */
@@ -101,7 +101,7 @@ public interface WSExportWsdlConfigService {
      * <li>gvNIX web service list</li>
      * </ul>
      * </p>
-     *
+     * 
      * @return implementation classes
      */
     public List<JavaType> createGvNixClasses();

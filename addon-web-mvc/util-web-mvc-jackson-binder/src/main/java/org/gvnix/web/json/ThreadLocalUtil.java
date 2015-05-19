@@ -29,8 +29,9 @@ package org.gvnix.web.json;
  * "http://www.javacodegeeks.com/2012/05/threading-stories-threadlocal-in-web.html"
  * >ThreadLocal in web applications</a>
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since TODO: Class version
  */
 public class ThreadLocalUtil {

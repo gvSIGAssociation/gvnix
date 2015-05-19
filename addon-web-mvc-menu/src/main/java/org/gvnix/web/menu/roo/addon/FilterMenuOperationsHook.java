@@ -47,9 +47,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * <br>
  * <b>Very Important</b> This service <b>MUST HAS NONE</b> {@link Reference}
  * property to assure this component is really loaded immediately. <br>
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @see MenuOperationsProxy
  */
 @Component
@@ -69,7 +70,7 @@ public class FilterMenuOperationsHook implements FindHook {
 
     /**
      * Method call when component is activated.
-     *
+     * 
      * @param context
      */
     protected void activate(ComponentContext context) {
@@ -84,7 +85,7 @@ public class FilterMenuOperationsHook implements FindHook {
      * removing from returned collection {@code references} all services except
      * {@link MenuOperationsProxy}. <br>
      * For request inside this bundle all services are returned.
-     *
+     * 
      * @see org.osgi.framework.hooks.service.FindHook#find(org.osgi.framework.BundleContext,
      *      java.lang.String, java.lang.String, boolean, java.util.Collection)
      */
@@ -131,7 +132,7 @@ public class FilterMenuOperationsHook implements FindHook {
     /**
      * Check if service reference is the service proxy <br>
      * Uses {@link MenuOperationsProxy#GVNIX_PROXY_COMPONENT} service property.
-     *
+     * 
      * @param sr
      * @return
      */
@@ -142,7 +143,7 @@ public class FilterMenuOperationsHook implements FindHook {
     /**
      * Check if service reference is gvNIX {@link MenuOperations} implementation <br>
      * Uses {@link MenuOperationsImpl#GVNIX_COMPONENT} service property.
-     *
+     * 
      * @param sr
      * @return
      */
@@ -154,7 +155,7 @@ public class FilterMenuOperationsHook implements FindHook {
      * Check if service reference is Roo original {@link MenuOperations} <br>
      * Uses {@link #isProxy(ServiceReference)} and
      * {@link #isGvNIXOperations(ServiceReference)}.
-     *
+     * 
      * @param sr
      * @return
      */

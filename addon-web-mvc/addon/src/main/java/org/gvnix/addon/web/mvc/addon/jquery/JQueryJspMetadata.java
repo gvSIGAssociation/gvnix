@@ -43,8 +43,9 @@ import org.springframework.roo.project.LogicalPath;
  * Note this meta-data item neither contains nor composes details of the related
  * Java type because it doesn't create any ITD.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1.0
  */
 public class JQueryJspMetadata extends AbstractMetadataItem {

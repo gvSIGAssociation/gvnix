@@ -55,8 +55,9 @@ import org.springframework.roo.support.util.FileUtils;
  * {@link AbstractItdTypeDetailsProvidingMetadataItem} to register a field in
  * the ITD and a new method.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 0.8
  */
 public class ModalDialogMetadata extends

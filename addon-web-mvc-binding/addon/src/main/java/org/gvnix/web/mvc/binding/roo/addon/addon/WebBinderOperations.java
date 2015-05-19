@@ -22,30 +22,31 @@ import org.springframework.roo.model.JavaType;
 
 /**
  * Operations of Add-on
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 0.8
  */
 public interface WebBinderOperations {
 
     /**
      * Indicate commands should be available
-     *
+     * 
      * @return true if it should be available, otherwise false
      */
     boolean isStringTrimmerAvailable();
 
     /**
      * Annotate provided Java type with @GvNIXStringTrimmerBinder
-     *
+     * 
      * @param emptyAsNull
      */
     void bindStringTrimmer(JavaType controller, boolean emptyAsNull);
 
     /**
      * Annotate all Java types annotated with @Controller with @GvNIXStringTrimmerBinder
-     *
+     * 
      * @param emptyAsNull
      */
     void bindStringTrimmerAll(boolean emptyAsNull);

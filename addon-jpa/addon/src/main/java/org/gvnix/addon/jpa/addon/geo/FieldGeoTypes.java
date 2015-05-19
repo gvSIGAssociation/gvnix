@@ -20,10 +20,10 @@ package org.gvnix.addon.jpa.addon.geo;
 
 /**
  * Example of an enum used for tab-completion of properties.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1.1
  */
 public enum FieldGeoTypes {

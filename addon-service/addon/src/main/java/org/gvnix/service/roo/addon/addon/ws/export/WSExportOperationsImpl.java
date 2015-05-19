@@ -61,9 +61,10 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Addon for Handle Service Layer
- *
- *@author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *        <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Component
 @Service
@@ -131,7 +132,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
     /**
      * Creates the list of annotations attribute values to export a web service
      * class.
-     *
+     * 
      * @param serviceClass to be exported.
      * @param serviceName Name of the service.
      * @param portTypeName Port type name.
@@ -272,7 +273,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * <p>
      * If null return type, get void return type.
      * </p>
-     *
+     * 
      * @param method to get return type
      * @return Method return java type
      */
@@ -307,7 +308,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * <li>javax.xml.ws.ResponseWrapper: responseWrapperName,
      * responseWrapperNamespace, responseWrapperClassName</li>
      * <ul>
-     *
+     * 
      * @param javaType Java type to export a method.
      * @param method Method to export.
      * @param operationName Name of the method to be showed as a Web Service
@@ -366,7 +367,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * <p>
      * If parameters types or names are empty, empty list will return.
      * </p>
-     *
+     * 
      * @param javaType Java type to export a method.
      * @param method Method to export.
      * @param operationName Name of the method to be showed as a Web Service
@@ -428,7 +429,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * <li>javax.xml.ws.ResponseWrapper: responseWrapperName,
      * responseWrapperNamespace, responseWrapperClassName</li>
      * <ul>
-     *
+     * 
      * @param javaType Java type to export a method.
      * @param operationName Name of the method to be showed as a Web Service
      *        operation.
@@ -479,7 +480,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * <li>javax.xml.ws.ResponseWrapper: responseWrapperName,
      * responseWrapperNamespace, responseWrapperClassName</li>
      * <ul>
-     *
+     * 
      * @param javaType Java type to export a method.
      * @param operationName Name of the method to be showed as a Web Service
      *        operation.
@@ -550,7 +551,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * <ul>
      * <li>javax.xml.ws.WebResult: resultName, resultNamespace, webResultType</li>
      * <ul>
-     *
+     * 
      * @return gvNIX web method response attributes for void methods.
      */
     protected List<AnnotationAttributeValue<?>> getResponseVoidAnnotationAttributes() {
@@ -573,7 +574,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
     /**
      * Checks if the selected class exists and contains {@link WSExportMetadata}
      * .
-     *
+     * 
      * @param serviceClass class to be checked.
      * @return true if the {@link JavaType} contains {@link WSExportMetadata}.
      */
@@ -608,7 +609,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
     /**
      * Check if method exists and has no gvNIX web method annotation already.
-     *
+     * 
      * @param method To check
      * @return true if method exists and annotation is not defined
      */
@@ -630,7 +631,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * Each parameter with not empty type and name will be related a
      * GvNIXWebParam annotation and a WebParam annotation.
      * </p>
-     *
+     * 
      * @param method Method to update with annotations
      * @param targetNamespace Web Service Namespace
      * @return Annotation
@@ -676,7 +677,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
     /**
      * Create gvNIX web param annotation with some java type and name.
-     *
+     * 
      * @param javaType Java type
      * @param javaName Java name
      * @return gvNIX web param annotation
@@ -713,7 +714,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * <li>mode: Mode.IN</li>
      * <li>header: Always false</li>
      * </ul>
-     *
+     * 
      * @param targetNamespace Target namespace
      * @param javaType Java type
      * @param javaName Java name

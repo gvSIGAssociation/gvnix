@@ -33,8 +33,9 @@ import java.lang.annotation.Target;
  * relation-field to manage.<br>
  * Annotation applied to a non-supported field will be ignored.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1
  */
 @Target({ TYPE, FIELD })

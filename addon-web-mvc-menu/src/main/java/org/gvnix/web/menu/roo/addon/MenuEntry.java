@@ -26,9 +26,10 @@ import org.w3c.dom.Element;
  * <p>
  * Provides conversion from page ID to XML Element used for shell autocompletion
  * purpouses.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public class MenuEntry {
 
@@ -50,7 +51,7 @@ public class MenuEntry {
 
     /**
      * Menu entry constructor
-     *
+     * 
      * @param id Menu entry id. It cannot have white spaces, as utility white
      *        spaces will be changed to underscores
      */
@@ -60,7 +61,7 @@ public class MenuEntry {
 
     /**
      * Menu entry constructor from XML
-     *
+     * 
      * @param pageItem
      */
     public MenuEntry(Element pageItem) {
@@ -77,7 +78,7 @@ public class MenuEntry {
      * Utility method to convert this.id to JavaSymbolName. It is useful to
      * maintain Roo representation, Roo uses JavaSymbolName to identify a page
      * menu entry.
-     *
+     * 
      * @return
      */
     public JavaSymbolName getJavaSymbolName() {

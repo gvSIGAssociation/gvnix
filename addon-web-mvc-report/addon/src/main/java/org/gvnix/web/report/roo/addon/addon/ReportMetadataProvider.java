@@ -59,9 +59,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * metadata for this add-on. Use this type to reference external types and
  * services needed by the metadata type. Register metadata triggers and
  * dependencies here. Also define the unique add-on ITD identifier.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1
  */
 @Component
@@ -86,7 +87,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
      * command)
-     *
+     * 
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
@@ -104,7 +105,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
      * The deactivate method for this OSGi component, this will be called by the
      * OSGi container upon bundle deactivation (result of the 'addon uninstall'
      * command)
-     *
+     * 
      * @param context the component context can be used to get access to the
      *        OSGi container (ie find out if certain bundles are active)
      */
@@ -159,7 +160,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
                 ArrayAttributeValue<?> arrayVal = (ArrayAttributeValue<?>) val;
                 Map<String, String> validReportNameFormats = getValidReportNameFormats(arrayVal);
                 /*
-                 * Dealing with reportNames defined several times in the GvNIX
+                 * Dealing with reportNames defined several times in the gvNIX
                  * annotation. With the validReportNameFormats HashMap we can
                  * know if a report is defined more than once and handle it as
                  * just one definition aggregating the formats defined in each
@@ -204,7 +205,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
     /**
      * Returns a HashMap<String, String>. Key is reportName; Value is the csv of
      * formats.
-     *
+     * 
      * @param arrayVal
      * @return
      */

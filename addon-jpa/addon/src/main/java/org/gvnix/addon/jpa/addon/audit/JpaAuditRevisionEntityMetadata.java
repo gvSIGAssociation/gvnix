@@ -33,8 +33,9 @@ import org.springframework.roo.project.LogicalPath;
 /**
  * ITD generator for {@link GvNIXJpaAuditRevisionEntity} annotation.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.3.0
  */
 public class JpaAuditRevisionEntityMetadata extends
@@ -174,9 +175,9 @@ public class JpaAuditRevisionEntityMetadata extends
      * Class which contains generation time metadata information useful for
      * {@link RevisionLogRevisionEntityMetadataBuilder}
      * 
-     * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
-     * 
+     * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made
+     *         for <a href="http://www.dgti.gva.es">General Directorate for
+     *         Information Technologies (DGTI)</a>
      */
     private class BuildContext implements Context {
 

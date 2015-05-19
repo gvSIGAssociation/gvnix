@@ -6,12 +6,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,10 +30,10 @@ import org.springframework.roo.shell.CommandMarker;
  * presentation-related logic in this class. You can return any objects from
  * each method, or use the logger directly if you'd like to emit messages of
  * different severity (and therefore different colours on non-Windows systems).
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1
  */
 @Component
@@ -52,7 +52,7 @@ public class JpaCommands implements CommandMarker { // All command types must
 
     /**
      * Informs if jpa gvnix setup is avalilable
-     *
+     * 
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -63,7 +63,7 @@ public class JpaCommands implements CommandMarker { // All command types must
 
     /**
      * Command to enable jpa gvnix utilities on project
-     *
+     * 
      * @param type
      */
     @CliCommand(value = "jpa gvnix setup",

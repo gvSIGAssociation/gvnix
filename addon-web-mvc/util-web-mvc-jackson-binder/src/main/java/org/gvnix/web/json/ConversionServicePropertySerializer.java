@@ -33,8 +33,9 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  * Jackson Serializer which uses {@link ConversionService} to transform value
  * before serialize it.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since TODO: Class version
  */
 public class ConversionServicePropertySerializer extends StdSerializer<Object> {

@@ -71,9 +71,10 @@ import org.w3c.dom.NodeList;
 
 /**
  * Implementation of operations this add-on offers
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 0.6
  */
 @Component
@@ -163,7 +164,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
     /**
      * Inform if roo menu operations must be disabled
-     *
+     * 
      * @return
      */
     public static boolean isRooMenuDisabled() {
@@ -646,7 +647,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * Iterates over a list of menu entry Nodes and call
      * {@link #getCompactInfo(Element, int)} to get the info of all the menu
      * entry Nodes in the given list.
-     *
+     * 
      * @param nodes
      * @param tabSize
      * @return
@@ -678,7 +679,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * &nbsp;&nbsp;&nbsp;&nbsp;/tribunales?form  [i_tribunales_new, visible]<br/>
      * &nbsp;&nbsp;&nbsp;&nbsp;/tribunales?page=1&size=${empty param.size ? 10 : param.size}  [i_tribunales_list, hidden]<br/>
      * </code>
-     *
+     * 
      * @param element
      * @param tabSize
      * @return
@@ -758,7 +759,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
     /**
      * Returns the Root element of the menu.xml file
-     *
+     * 
      * @return
      */
     private Element getMenuRootElement() {
@@ -888,7 +889,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
     /**
      * Get and initialize the absolute path for the {@code menu.jspx}.
-     *
+     * 
      * @return the absolute path to the file (never null)
      */
     public String getMenuFile() {
@@ -906,7 +907,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
     /**
      * Utility to get {@link PathResolver}.
-     *
+     * 
      * @return PathResolver or null if project isn't available yet
      */
     private PathResolver getPathResolver() {
@@ -922,7 +923,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     /**
      * Create Menu model that lets the project works with the underlying menu
      * structure representation, i.e, menu.xml
-     *
+     * 
      * @param targetPackage Java entities will be created inside this package
      */
     protected void createEntityModel(String targetPackage) {
@@ -992,7 +993,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * <p>
      * This method has been copied from Maven addon, maybe it could be
      * refactored to utility class.
-     *
+     * 
      * @param targetFilename File to create. Note this method will create the
      *        file by locating a file template with the same name as target file
      *        but prefixing "-template" to file extension. For example, given
@@ -1051,7 +1052,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     /**
      * Creates or updates the contents for one resource represented by the given
      * target file path and relative source path.
-     *
+     * 
      * @param relativePath path relative to {@link Path.SRC_MAIN_WEBAPP} of
      *        target file
      * @param resourceName path relative to classpath of file to be copied
@@ -1172,7 +1173,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
     /**
      * Get the absolute path to a file name in given package name.
-     *
+     * 
      * @param packageName fully qualified package name
      * @param fileName file to get its absolute path
      * @return Path.SRC_MAIN_JAVA + packagePath + fileName
@@ -1191,7 +1192,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     /**
      * Convert a package name to a fully qualified package name with full
      * support for using "~" as denoting the user's top-level package.
-     *
+     * 
      * @param packageName
      * @param prjMetadata
      * @return
@@ -1336,7 +1337,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * Iterates over a list of menu entry Nodes and call
      * {@link #getFormatedInfo(Element, boolean, boolean, boolean, boolean, int)}
      * to get the info of all the menu entry Nodes in the given list.
-     *
+     * 
      * @param nodes
      * @param label
      * @param messageCode
@@ -1372,7 +1373,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * TODO: I think compact info better. See section "List menu structure" at
      * "docs/pd-addon-web-menu.rst". Note, it means we should refactor this
      * method in 2 methods: on for list command and other for info command
-     *
+     * 
      * @param element
      * @param label
      * @param messageCode
@@ -1478,7 +1479,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
     /**
      * Install properties defined in external XML file
-     *
+     * 
      * @param configuration
      */
     private void updatePomProperties(Element configuration) {
@@ -1493,7 +1494,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
     /**
      * Install dependencies defined in external XML file
-     *
+     * 
      * @param configuration
      */
     private void updateDependencies(Element configuration) {
@@ -1511,7 +1512,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     /**
      * Gets menu item prefix: {@link MenuOperations#DEFAULT_MENU_ITEM_PREFIX} or
      * {@link MenuOperations#FINDER_MENU_ITEM_PREFIX}
-     *
+     * 
      * @param itemId
      * @return MenuOperations.FINDER_MENU_ITEM_PREFIX if given itemId starts
      *         with "fi_", otherwise return
@@ -1529,7 +1530,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
     /**
      * Get the absolute path for {@code webmvc-config.xml}.
-     *
+     * 
      * @return the absolute path to file (never null)
      */
     private String getMvcConfigFile() {
@@ -1544,7 +1545,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
      * Get the absolute path for {@code layouts.xml}.
      * <p>
      * Note that this file is required for any Tiles project.
-     *
+     * 
      * @return the absolute path to file (never null)
      */
     private String getTilesLayoutsFile() {

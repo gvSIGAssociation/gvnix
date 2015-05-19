@@ -32,8 +32,9 @@ import org.springframework.roo.project.Path;
  * and the source {@link Path} of the controller. This can be created using
  * {@link #createIdentifier(JavaType, Path)}.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1.0
  */
 public class DatatablesJspMetadata extends AbstractMetadataItem {

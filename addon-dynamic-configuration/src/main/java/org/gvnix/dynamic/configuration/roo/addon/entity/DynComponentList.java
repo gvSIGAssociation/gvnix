@@ -22,8 +22,9 @@ import java.util.ArrayList;
 /**
  * Dynamic configuration component list entity.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public class DynComponentList extends ArrayList<DynComponent> {
 

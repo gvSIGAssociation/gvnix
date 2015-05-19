@@ -52,8 +52,9 @@ import org.springframework.roo.model.JdkJavaType;
  * ITD builder of {@link EnversRevisionLogProvider} for audited entities
  * (annotated with {@link GvNIXJpaAudit})
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.3.0
  * 
  */

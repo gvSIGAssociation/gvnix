@@ -25,30 +25,30 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
  * The manager class is responsible of read and write the properties list of the
  * dynamic configuration file.
  * </p>
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public interface DefaultDynamicConfiguration {
 
     /**
      * Reads a configuration file and generates a properties list.
-     *
+     * 
      * @return File info getted from the original file.
      */
     DynPropertyList read();
 
     /**
      * Update a configuration file with the values of the properties list.
-     *
+     * 
      * @param file Info to be stored on the original file.
      */
     void write(DynPropertyList dynProperties);
 
     /**
      * Get the dynamic configuration component name.
-     *
+     * 
      * @return Dynamic configuration component name
      */
     String getName();

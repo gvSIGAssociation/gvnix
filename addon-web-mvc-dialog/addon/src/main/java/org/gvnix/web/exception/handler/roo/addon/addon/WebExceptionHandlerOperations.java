@@ -19,9 +19,10 @@ package org.gvnix.web.exception.handler.roo.addon.addon;
 
 /**
  * Interface for {@link WebExceptionHandlerOperationsImpl}.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public interface WebExceptionHandlerOperations {
 
@@ -33,7 +34,7 @@ public interface WebExceptionHandlerOperations {
 
     /**
      * Handles the exception with the provided name, title and description.
-     *
+     * 
      * @param exceptionName Exception Name to Handle.
      * @param exceptionTitle Title of the Exception to show in the view
      * @param exceptionDescription Description of the Exception to show in the
@@ -46,14 +47,14 @@ public interface WebExceptionHandlerOperations {
 
     /**
      * Removes the selected Exception if exists.
-     *
+     * 
      * @param exceptionName Exception to remove.
      */
     public void removeExceptionHandled(String exceptionName);
 
     /**
      * Set the title and description of the exception in the selected language
-     *
+     * 
      * @param exceptionName Exception Name to Handle.
      * @param exceptionTitle Title of the Exception to show in the view
      * @param exceptionDescription Description of the Exception to show in the
@@ -71,7 +72,7 @@ public interface WebExceptionHandlerOperations {
 
     /**
      * Retrieve the Language FileName selected
-     *
+     * 
      * @param exceptionLanguage Language in which.
      */
     public String getLanguagePropertiesFile(String exceptionLanguage);
@@ -79,7 +80,7 @@ public interface WebExceptionHandlerOperations {
     /**
      * Check if there are exceptions mapped in the SimpleMappingExceptionHanlder
      * bean.
-     *
+     * 
      * @return {@link Boolean} true if there are exceptions in the mapping.
      */
     public boolean isExceptionMappingAvailable();
@@ -87,14 +88,14 @@ public interface WebExceptionHandlerOperations {
     /**
      * Check if there are exceptions mapped in the
      * MessageMappingExceptionHanlder bean.
-     *
+     * 
      * @return {@link Boolean} true if there are exceptions in the mapping.
      */
     public boolean isMessageMappingAvailable();
 
     /**
      * Check if project is available and if its a Spring MVC project
-     *
+     * 
      * @return
      */
     public boolean isProjectAvailable();

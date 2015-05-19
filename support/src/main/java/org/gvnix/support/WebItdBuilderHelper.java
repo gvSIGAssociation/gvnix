@@ -41,8 +41,9 @@ import org.springframework.roo.model.SpringJavaType;
  * Helper which provides utilities for a Web MVC Controllers ITD generator
  * (Metadata)
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public class WebItdBuilderHelper extends ItdBuilderHelper {
 

@@ -25,9 +25,10 @@ import org.springframework.roo.project.Feature;
 /**
  * Interface of operations this add-on offers. Typically used by a command type
  * or an external add-on.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1
  */
 public interface LoupefieldOperations extends Feature {
@@ -40,21 +41,21 @@ public interface LoupefieldOperations extends Feature {
 
     /**
      * Indicate commands should be available
-     *
+     * 
      * @return true if it should be available, otherwise false
      */
     boolean isSetupCommandAvailable();
 
     /**
      * Indicate commands should be available
-     *
+     * 
      * @return true if it should be available, otherwise false
      */
     boolean isUpdateCommandAvailable();
 
     /**
      * Indicate commands should be available
-     *
+     * 
      * @return true if it should be available, otherwise false
      */
     boolean isSetCommandAvailable();

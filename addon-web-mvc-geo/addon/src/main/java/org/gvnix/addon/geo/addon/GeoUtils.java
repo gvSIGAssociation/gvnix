@@ -44,8 +44,9 @@ import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
 
 /**
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 
 public class GeoUtils {
@@ -54,10 +55,10 @@ public class GeoUtils {
             GvNIXMapViewer.class.getName());
 
     /**
-     *
+     * 
      * This method updates dependencies and repositories with the added to
      * configuration.xml file
-     *
+     * 
      * @param configuration
      * @param moduleName
      * @param projectOperations
@@ -92,7 +93,7 @@ public class GeoUtils {
 
     /**
      * This method returns a map controller by recived path
-     *
+     * 
      * @param path
      * @return
      */
@@ -129,9 +130,9 @@ public class GeoUtils {
     }
 
     /**
-     *
+     * 
      * This method returns all available maps
-     *
+     * 
      * @param typeLocationService
      * @return
      */
@@ -167,9 +168,9 @@ public class GeoUtils {
     }
 
     /**
-     *
+     * 
      * This method returns all available maps Controllers
-     *
+     * 
      * @param typeLocationService
      * @return
      */
@@ -199,9 +200,9 @@ public class GeoUtils {
     }
 
     /**
-     *
+     * 
      * This method returns map controller by path
-     *
+     * 
      * @param typeLocationService
      * @return
      */
@@ -239,7 +240,7 @@ public class GeoUtils {
 
     /**
      * This method checks if the current entity is a GEO entity or not
-     *
+     * 
      * @param scaffoldAnnotation
      * @param typeLocationService
      * @return

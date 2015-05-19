@@ -33,8 +33,9 @@ import org.springframework.roo.shell.CommandMarker;
  * directly if you'd like to emit messages of different severity (and therefore
  * different colours on non-Windows systems).
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 0.6
  */
 @Component

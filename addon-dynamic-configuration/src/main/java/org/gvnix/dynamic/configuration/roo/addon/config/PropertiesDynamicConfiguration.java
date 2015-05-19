@@ -40,10 +40,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * <li>TODO When file is managed, property order is modified and comments
  * removed</li>
  * </ul>
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Component(componentAbstract = true)
 public abstract class PropertiesDynamicConfiguration extends

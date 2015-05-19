@@ -61,8 +61,9 @@ import org.springframework.roo.project.LogicalPath;
  * Generates ITD with the information collected from properties annotated by
  * {@link GvNIXJpaQuery}.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1.0
  */
 public class JpaQueryMetadata extends

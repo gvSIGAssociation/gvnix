@@ -399,7 +399,7 @@ Analysis
 
 File Monitoring.
 
-Add-on monitorize java files annotated with **@GvNIX…**, for each one
+Add-on monitorize java files annotated with **@gvNIX…**, for each one
 creates its associated AspectJ file where are the jax-ws annotations
 defined using @GVNIX annotations attributes.
 
@@ -511,14 +511,14 @@ inter-operability web service standards by default ?.
 method. Rebuild with defined values in gVNIX annotations. Associated
 Metadata generates AspectJ file.
 
-** Checks if GvNIX annotation is well formed before generate Metadata, if
+** Checks if gvNIX annotation is well formed before generate Metadata, if
 is incorrect shows a message and deletes metadata.
 
 * Add @GvNIXWebFault annotation to method _Exceptions_ if are defined in
 the project. If Exception are imported create a declaration in an
 AspectJ file. Associated Metadata generates AspectJ file.
 
-** Checks if GvNIX annotation is well formed before generate Metadata, if
+** Checks if gvNIX annotation is well formed before generate Metadata, if
 is incorrect shows a message and deletes metadata.
 
 * Checks *Allowed Parameters* involved in operation.

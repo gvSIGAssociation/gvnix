@@ -42,8 +42,9 @@ import org.springframework.web.util.ExpressionEvaluationUtils;
  * some tags extend external tags and can't inherit from the Spring base tags
  * which already provide those utilities.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public class SpringContextHelper {
 

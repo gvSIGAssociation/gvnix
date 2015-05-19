@@ -26,8 +26,9 @@ import org.springframework.roo.model.JavaType;
 /**
  * <code>jpa audit</code> internal operations for revision log providers.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.3.0
  */
 public interface JpaAuditOperationsSPI {

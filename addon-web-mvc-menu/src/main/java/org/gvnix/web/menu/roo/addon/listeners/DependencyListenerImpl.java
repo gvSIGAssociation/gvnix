@@ -35,8 +35,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
 /**
  * Check for Spring Security dependency changes to update menu artifacts.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Component
 @Service

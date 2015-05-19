@@ -21,8 +21,9 @@ package org.gvnix.web.menu.roo.addon.util;
  * Miscellaneous file name utility methods. Mainly for internal use within the
  * framework; based on Jakarta's Commons IO.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 0.6
  * @see Jakarta's Commons IO
  */
