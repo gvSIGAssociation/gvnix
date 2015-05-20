@@ -157,13 +157,8 @@
 														name="${sec_field}" />
 										</c:when>
 										<c:otherwise>
-											<c:set var="fieldValue" value="${field}" />
-											<c:set var="hiddenPath" value="" />
-											<c:if test="${empty not fieldValue}">
-												<c:set var="hiddenPath" value="${field}.${pkField}" />
-											</c:if>
-											<form:hidden id="${sec_field}_loupe_hidden_bind" name="${sec_field}"
-														path="${hiddenPath}" />
+										<form:hidden id="${sec_field}_loupe_hidden_bind" name="${sec_field}"
+                            path="${field}.${pkField}" />
 										</c:otherwise>
 								</c:choose>
 						</div>
