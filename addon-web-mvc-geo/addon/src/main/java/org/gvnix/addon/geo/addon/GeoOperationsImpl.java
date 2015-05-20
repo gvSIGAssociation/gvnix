@@ -96,8 +96,9 @@ import org.w3c.dom.NodeList;
 /**
  * Implementation of GEO Addon operations
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.4
  */
 @Component
@@ -184,7 +185,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method checks if setup command is available
-     *
+     * 
      * @return true if setup command is available
      */
     @Override
@@ -197,7 +198,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method checks if add map command is available
-     *
+     * 
      * @return true if add map command is available
      */
     @Override
@@ -207,7 +208,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method checks if web mvc geo all command is available
-     *
+     * 
      * @return true if web nvc geo all command is available
      */
     @Override
@@ -217,7 +218,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method checks if web mvc geo add command is available
-     *
+     * 
      * @return true if web nvc geo add command is available
      */
     @Override
@@ -424,7 +425,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method transform an input element to map controller on CRU views
-     *
+     * 
      * @param controller
      * @param fieldName
      * @param color
@@ -527,7 +528,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method add new base tile layers on selected map
-     *
+     * 
      * @param name
      * @param url
      * @param path
@@ -556,9 +557,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     *
+     * 
      * This method add new base wms layers on selected map
-     *
+     * 
      * @param name
      * @param url
      * @param path
@@ -599,9 +600,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     *
+     * 
      * This method add new measure tool on selected map
-     *
+     * 
      * @param name
      * @param path
      * @param preventExitMessageCode
@@ -623,9 +624,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     *
+     * 
      * This method add new custom tool on selected map
-     *
+     * 
      * @param name
      * @param path
      * @param preventExitMessageCode
@@ -662,7 +663,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method generate a Map with map path and new tool id
-     *
+     * 
      * @param toolAttr
      * @param path
      * @param string
@@ -728,10 +729,10 @@ public class GeoOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     *
+     * 
      * This method uses id map and id base layer to generate new base layer
      * using baseLayerAttr
-     *
+     * 
      * @param name
      * @param pathsMap
      * @param toolAttr
@@ -812,9 +813,9 @@ public class GeoOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     *
+     * 
      * This method generate a Map with map path and new base layer id
-     *
+     * 
      * @param name
      * @param baseLayerAttr
      * @param path
@@ -881,10 +882,10 @@ public class GeoOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     *
+     * 
      * This method uses id map and id base layer to generate new base layer
      * using baseLayerAttr
-     *
+     * 
      * @param name
      * @param pathsMap
      * @param baseLayerAttr
@@ -972,7 +973,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * Method to update JSPX CRU views with map controls
-     *
+     * 
      * @param path
      * @param fieldName
      * @param fieldType
@@ -1131,7 +1132,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method annotate controller with @GvNIXEntityMapLayer
-     *
+     * 
      * @param controller
      * @param paths
      */
@@ -1190,7 +1191,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method annotate all controllers if has Geo Fields
-     *
+     * 
      * @param path
      */
     public void annotateAllGeoEntityControllers(List<String> paths) {
@@ -1302,7 +1303,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method create necessary views to visualize map
-     *
+     * 
      * @param path
      */
     public void createViews(String controllerPackage, JavaSymbolName path,
@@ -1439,7 +1440,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method generates a new class annotated with @GvNIXMapViewer
-     *
+     * 
      * @param controller
      * @param path
      */
@@ -1482,7 +1483,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method creates a controller using specified configuration
-     *
+     * 
      * @param controller
      * @param target
      * @param path
@@ -1602,7 +1603,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * Generates new JavaType based on <code>controller</code> class name.
-     *
+     * 
      * @param controller
      * @param targetPackage if null uses <code>controller</code> package
      * @return
@@ -1915,7 +1916,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method annotate MapControllers with entities to represent
-     *
+     * 
      * @param mapControllersToAnnotate
      * @param typeLocationService
      * @param typeManagementService
@@ -1991,7 +1992,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
     /**
      * Update the webmvc-config.xml file in order to register
      * Jackson2RequestMappingHandlerAdapter
-     *
+     * 
      * @param targetPackage
      */
     private void updateWebMvcConfig() {
@@ -2041,7 +2042,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method checks if exists some map element
-     *
+     * 
      * @return
      */
     public boolean checkExistsMapElement() {
@@ -2053,7 +2054,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * This method returns position of new base layer
-     *
+     * 
      * @param docRoot
      * @return
      */
@@ -2066,7 +2067,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
     /**
      * Creates an instance with the {@code src/main/webapp} path in the current
      * module
-     *
+     * 
      * @return
      */
     public LogicalPath getWebappPath() {
@@ -2077,7 +2078,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
 
     /**
      * Gets the feature name managed by this operations class.
-     *
+     * 
      * @return feature name
      */
     @Override

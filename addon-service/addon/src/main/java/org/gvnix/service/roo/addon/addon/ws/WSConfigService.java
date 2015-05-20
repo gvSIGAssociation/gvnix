@@ -29,10 +29,11 @@ import org.w3c.dom.Document;
  * It is required to check the configuration with install(CommunicationSense)
  * before executing any operation.
  * </p>
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
+ * 
  */
 public interface WSConfigService {
 
@@ -73,7 +74,7 @@ public interface WSConfigService {
      * When true returned (properties changes) sources regeneration is required
      * to avoid errors compilation errors.
      * </p>
-     *
+     * 
      * @param type Web service type to install library
      * @return Project properties changed ? If true source regeneration required
      */
@@ -88,7 +89,7 @@ public interface WSConfigService {
      * Update cxf file if its necessary to avoid changes in WSDL contract
      * checking type annotation values from service class.
      * </p>
-     *
+     * 
      * @param className to be published as Web Service.
      * @param annotationMetadata with all necessary values to define a Web
      *        Service.
@@ -100,7 +101,7 @@ public interface WSConfigService {
 
     /**
      * Converts package name to a Target Namespace.
-     *
+     * 
      * @param packageName Initial String split with dots.
      * @return Initial String reverted the order.
      */
@@ -114,7 +115,7 @@ public interface WSConfigService {
      * <p>
      * Installs java2ws plugin if it's needed
      * </p>
-     *
+     * 
      * @param serviceClass Service to generate Wsdl.
      * @param serviceName Service name for wsdl file.
      * @param addressName Address to access the service.
@@ -129,7 +130,7 @@ public interface WSConfigService {
      * Adds a wsdl location to the plugin configuration. If code generation
      * plugin configuration not exists, it will be created.
      * </p>
-     *
+     * 
      * @param wsdlLocation WSDL file location
      * @param type Communication sense type
      * @return wsdl location added, or false if already exists
@@ -144,7 +145,7 @@ public interface WSConfigService {
      * Adds a wsdl location to the plugin configuration. If code generation
      * plugin configuration not exists, it will be created.
      * </p>
-     *
+     * 
      * @param wsdlLocation WSDL file location
      * @param wsdlDocument WSDL file
      * @return
@@ -153,7 +154,7 @@ public interface WSConfigService {
 
     /**
      * Imports a Web Service to class.
-     *
+     * 
      * @param className class to import
      * @param wsdlLocation contract wsdl url to import
      * @param type Communication sense type
@@ -167,7 +168,7 @@ public interface WSConfigService {
      * <p>
      * On development mode maven details will be showed, else input message.
      * </p>
-     *
+     * 
      * @param parameters to run with maven.
      * @param message Information showed if no development mode.
      * @throws IOException

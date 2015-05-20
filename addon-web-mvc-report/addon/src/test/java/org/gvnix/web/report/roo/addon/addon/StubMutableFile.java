@@ -32,10 +32,11 @@ import org.springframework.roo.process.manager.MutableFile;
  * Provides an easy way to create a {@link MutableFile} without actually
  * creating a file on the file system. Records all write operations in an
  * OutputStream and makes it available via {@link #getOutputAsString()}.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
+ * 
  * @author Rossen Stoyanchev
  * @since 1.1.1
  */

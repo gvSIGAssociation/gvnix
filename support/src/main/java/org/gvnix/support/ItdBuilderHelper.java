@@ -49,8 +49,9 @@ import org.springframework.roo.model.JavaType;
 /**
  * Helper which provides utilities for a ITD generator (Metadata)
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public class ItdBuilderHelper {
 
@@ -387,9 +388,9 @@ public class ItdBuilderHelper {
      * {@link ItdBuilderHelper#getField(JavaSymbolName, int, JavaType, List, GET_FIELD_EXISTS_ACTION)}
      * when required field is already defined in target class
      * 
-     * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
-     * 
+     * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made
+     *         for <a href="http://www.dgti.gva.es">General Directorate for
+     *         Information Technologies (DGTI)</a>
      */
     public static enum GET_FIELD_EXISTS_ACTION {
         RETURN_EXISTING, RETURN_EXISTING_IF_ANNOTATION_MATCH, CREATE_NEW_ALWAYS, THROW_ERROR

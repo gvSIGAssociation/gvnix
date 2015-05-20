@@ -67,9 +67,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Utilities to manage the CXF web services library.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Component
 @Service
@@ -165,7 +166,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * <p>
      * Creates the cxf config file using project name.
      * </p>
-     *
+     * 
      * @return Absolute path to the Cxf configuration file
      */
     protected String getCxfConfigAbsoluteFilePath() {
@@ -184,7 +185,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * <p>
      * Creates the cxf config file using project name.
      * </p>
-     *
+     * 
      * @return Relative path to the Cxf configuration file
      */
     protected String getCxfConfigRelativeFilePath() {
@@ -194,7 +195,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Returns project name to set CXF configuration file.
-     *
+     * 
      * @return Project Name.
      */
     private String getProjectName() {
@@ -250,7 +251,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Check if all dependencies are registered in project (pom.xml).
-     *
+     * 
      * @param type Web service type
      * @return true if all dependencies are registed already
      */
@@ -292,7 +293,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * Files are stored at src/main/resources in same package as this class
      * (required).
      * </p>
-     *
+     * 
      * @param type Web service type
      * @return Dependency definition file name
      */
@@ -320,7 +321,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Get the dependencies list for certain web service type.
-     *
+     * 
      * @param type Web service type
      * @return List of dependencies as xml elements
      */
@@ -342,7 +343,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * <p>
      * If some dependencies are not installed, will be installed.
      * </p>
-     *
+     * 
      * @param type Web service type
      */
     private void addDependencies(WsType type) {
@@ -372,7 +373,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * <li>Import, export and export from wsdl: CXF version property</li>
      * <li>Import RPC encoded: Axis version property</li>
      * </ul>
-     *
+     * 
      * @param type Web service type
      */
     protected boolean addProperties(WsType type) {
@@ -458,7 +459,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Get CXF servlet definition element.
-     *
+     * 
      * @param web Document representation of web.xml
      * @return Element representation of CXF servlet definition
      */
@@ -482,7 +483,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Get CXF servlet mapping element.
-     *
+     * 
      * @param web Document representation of web.xml
      * @return Element representation of CXF servlet mapping
      */
@@ -509,7 +510,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * <p>
      * IllegalStateException if error parsing input stream.
      * </p>
-     *
+     * 
      * @param input Input stream to parse
      * @return XML document representation of input stream
      */
@@ -528,7 +529,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Get web configuration (web.xml) absolute file path.
-     *
+     * 
      * @return web configuration (web.xml) absolute file path
      */
     protected String getWebConfigFilePath() {
@@ -559,7 +560,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Updates web services configuration file.
-     *
+     * 
      * @param className to export.
      * @param annotationMetadata values from web service class to set in
      *        configuration file.
@@ -1067,7 +1068,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Generates Element for service wsdl generation execution
-     *
+     * 
      * @param pom Pom document
      * @param serviceClass to generate
      * @param addressName of the service
@@ -1196,7 +1197,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * Adds a wsdl location to the codegen plugin configuration. If code
      * generation plugin configuration not exists, it will be created.
      * </p>
-     *
+     * 
      * @param wsdlLocation WSDL file location.
      * @param wsdlDocument WSDL file.
      */
@@ -1269,7 +1270,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Creates execution xml pom element for wsdl2java generation
-     *
+     * 
      * @param pom
      * @param wsdlDocument to generate sources
      * @param wsdlLocation current wsdl location
@@ -1354,7 +1355,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Add default options section to the configuration.
-     *
+     * 
      * @param pom
      * @param configuration
      */
@@ -1443,7 +1444,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * Remove the "file:" prefix from a location string.
-     *
+     * 
      * @param location Location
      * @return Location withou prefix
      */
@@ -1464,7 +1465,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * Adds a wsdl location to the codegen plugin configuration. If code
      * generation plugin configuration not exists, it will be created.
      * </p>
-     *
+     * 
      * @param wsdlLocation WSDL file location
      * @return Location added to pom ?
      */
@@ -1616,7 +1617,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * Adds a wsdl location to the axistools plugin configuration. If code
      * generation plugin configuration not exists, it will be created.
      * </p>
-     *
+     * 
      * @param wsdlLocation WSDL file location
      * @return Location added to pom ?
      */
@@ -1770,7 +1771,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * Checks if exists pom.xml config file. If not exists, null will be
      * returned.
      * </p>
-     *
+     * 
      * @return Path to the pom.xml file or null if not exists.
      */
     private String getPomFilePath() {
@@ -1805,7 +1806,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * Convenience method to return a Collection as a delimited (e.g. CSV)
      * String. E.g. useful for <code>toString()</code> implementations.
-     *
+     * 
      * @param coll the Collection to display
      * @param delim the delimiter to use (probably a ",")
      * @param prefix the String to start each element with

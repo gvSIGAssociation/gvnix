@@ -48,10 +48,11 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * {@link MenuOperations} services will get manually on the first service
  * request. <br>
  * This service requires {@link FilterMenuOperationsHook} service.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
+ * 
  * @see MenuOperations
  * @see FilterMenuOperationsHook
  * @see MenuOperationsImpl
@@ -192,7 +193,7 @@ public class MenuOperationsProxy implements MenuOperations {
 
     /**
      * Gets the {@link MenuOperations} service instance to use
-     *
+     * 
      * @return
      */
     private MenuOperations getOperations() {

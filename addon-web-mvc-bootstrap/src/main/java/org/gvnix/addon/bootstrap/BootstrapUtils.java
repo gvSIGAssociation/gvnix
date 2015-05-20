@@ -36,15 +36,16 @@ import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.FileUtils;
 
 /**
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 
 public class BootstrapUtils {
 
     /**
      * This method update an existing file in a directory
-     *
+     * 
      * @param fileManager
      * @param loadingClass
      * @param filePath
@@ -78,7 +79,7 @@ public class BootstrapUtils {
     /**
      * This method copy a new file in a directory if the file not exists in the
      * system
-     *
+     * 
      * @param fileManager
      * @param loadingClass
      * @param filePath
@@ -112,7 +113,7 @@ public class BootstrapUtils {
     /**
      * This method copy a new file in a directory if the file not exists and
      * update the file if exists
-     *
+     * 
      * @param fileManager
      * @param loadingClass
      * @param filePath
@@ -149,7 +150,7 @@ public class BootstrapUtils {
 
     /**
      * Updates all JSP pages of target controller to use JQuery
-     *
+     * 
      * @param pathResolver
      * @param webappPath
      * @param projectOperations

@@ -38,8 +38,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * Provides the {@link JQueryMetadata}, that is, this class collects from OSGi
  * services the needed info to create the {@link JQueryMetadata}.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1
  */
 @Component

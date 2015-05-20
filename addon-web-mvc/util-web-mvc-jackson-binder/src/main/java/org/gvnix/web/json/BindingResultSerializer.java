@@ -44,9 +44,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  * JSON generated for {@link List} binding errors:
  * 
  * <pre>
- *   { 
- *     OBJECT_INDEX : { FIELD1_NAME : FIELD_ERROR_MSG, FIELD2_NAME : FIELD_ERROR_MSG, ...}, 
- *     OBJECT_INDEX2 : { FIELD1_NAME : FIELD_ERROR_MSG, 
+ *   {
+ *     OBJECT_INDEX : { FIELD1_NAME : FIELD_ERROR_MSG, FIELD2_NAME : FIELD_ERROR_MSG, ...},
+ *     OBJECT_INDEX2 : { FIELD1_NAME : FIELD_ERROR_MSG,
  *         FIELD_OBJECT_NAME : { SUBOBJECT_FIELD: FIELD_ERROR_MSG, ... }
  *         FIELD_LIST_NAME: {
  *              OBJECT_FIELD_ITEM_INDEX : {ITEM_LIST_FIELD: FIELD_ERROR_MSG, ... },
@@ -54,14 +54,14 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  *         },
  *         ...
  *     },
- *     ... 
+ *     ...
  *   }
  * </pre>
  * 
  * JSON for object binding errors:
  * 
  * <pre>
- * { FIELD1_NAME : FIELD_ERROR_MSG, 
+ * { FIELD1_NAME : FIELD_ERROR_MSG,
  *      FIELD_OBJECT_NAME : { SUBOBJECT_FIELD: FIELD_ERROR_MSG, ... }
  *      FIELD_LIST_NAME: {
  *              OBJECT_FIELD_ITEM_INDEX : {ITEM_LIST_FIELD: FIELD_ERROR_MSG, ... },
@@ -71,9 +71,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  * }
  * </pre>
  * 
- * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since TODO: Class version
  */
 public class BindingResultSerializer extends JsonSerializer<Object> {

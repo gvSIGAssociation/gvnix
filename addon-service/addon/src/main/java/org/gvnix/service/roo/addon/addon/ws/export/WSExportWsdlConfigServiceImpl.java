@@ -86,8 +86,9 @@ import com.github.antlrjavaparser.api.expr.StringLiteralExpr;
 import com.github.antlrjavaparser.api.type.ClassOrInterfaceType;
 
 /**
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Component
 @Service
@@ -404,7 +405,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     }
 
     /**
-     * Updates list of files generated to update with '@GvNIX' annotations.
+     * Updates list of files generated to update with '@gvNIX' annotations.
      * <b>For {@link WSExportWsdlImpl} uses only</b>
      * 
      * @param file scanned to add to list.

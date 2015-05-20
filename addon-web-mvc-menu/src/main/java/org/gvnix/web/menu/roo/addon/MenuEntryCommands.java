@@ -39,9 +39,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * logic in this class. You can return any objects from each method, or use the
  * logger directly if you'd like to emit messages of different severity (and
  * therefore different colours on non-Windows systems).
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 0.6
  */
 @Component
@@ -67,7 +68,7 @@ public class MenuEntryCommands implements CommandMarker { // all command types
      * command should not be visible. Command will not be made available before
      * the user has defined his Spring MVC settings in the Roo shell or directly
      * in the project.
-     *
+     * 
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
@@ -82,7 +83,7 @@ public class MenuEntryCommands implements CommandMarker { // all command types
      * Automatic {command hiding in situations when the commands should not be
      * visible. Commands will not be made available before the user has executed
      * {@code menu setup} command in the Roo shell or directly in the project.
-     *
+     * 
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */

@@ -236,7 +236,7 @@ java.
 * Generación activa:
 +
 Es una realimentación automática que genera un modelo detallado de
-metadatos con la ayuda de las anotaciones @Roo y @GvNIX e
+metadatos con la ayuda de las anotaciones @Roo y @gvNIX e
 incrementalmente actualiza archivos aj y jsp. Permite mantener
 automáticamente elementos del proyecto en respuesta a cambios, este tipo
 de generación nunca modifica archivos java, estos solo se modifican por

@@ -11,7 +11,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,10 +41,10 @@ import org.w3c.dom.Element;
 
 /**
  * Implementation of operations this add-on offers.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1
  */
 // Use these Apache Felix annotations to register your commands class in the Roo
@@ -108,7 +108,7 @@ public class JpaOperationsImpl implements JpaOperations {
 
     /**
      * Gets the feature name managed by this operations class.
-     *
+     * 
      * @return feature name
      */
     public String getName() {
@@ -117,7 +117,7 @@ public class JpaOperationsImpl implements JpaOperations {
 
     /**
      * Returns true if the given feature is installed in current project.
-     *
+     * 
      * @param moduleName feature name to check in current project
      * @return true if given feature name is installed, otherwise returns false
      */

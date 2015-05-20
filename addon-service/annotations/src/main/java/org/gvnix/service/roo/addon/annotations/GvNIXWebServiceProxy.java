@@ -21,11 +21,12 @@ import java.lang.annotation.*;
 
 /**
  * <p>
- * GvNix Annotation to identify GvNIX import as WebService.
+ * gvNIX Annotation to identify gvNIX import as WebService.
  * </p>
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)

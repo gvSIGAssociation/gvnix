@@ -26,8 +26,9 @@ import org.springframework.roo.project.Feature;
 /**
  * Interface of operations this add-on offers.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.4.0
  */
 public interface MonitoringOperations extends Feature {
@@ -40,7 +41,7 @@ public interface MonitoringOperations extends Feature {
 
     /**
      * Indicate commands should be available
-     *
+     * 
      * @return true if it should be available, otherwise false
      */
     boolean isCommandAvailable();
@@ -49,7 +50,7 @@ public interface MonitoringOperations extends Feature {
 
     /**
      * Setup all add-on artifacts (dependencies in this case)
-     *
+     * 
      * @param pathString set the storage directory for JavaMelody data files
      *        (Default: <server_temp>/javamelody )
      */
@@ -63,21 +64,21 @@ public interface MonitoringOperations extends Feature {
     /**
      * Add a path which all his child methods will be monitored as a Spring
      * service
-     *
+     * 
      * @param path Set the package path to be monitored
      */
     void addPackage(JavaPackage path);
 
     /**
      * Add a name class to be monitored as a Spring service
-     *
+     * 
      * @param name Set the class name to be monitored
      */
     void addClass(JavaType name);
 
     /**
      * Add a method to be monitored as a Spring service
-     *
+     * 
      * @param methodName Set the method name to be monitored
      * @param className Set the class name of the method to be monitored
      */

@@ -31,8 +31,9 @@ import org.w3c.dom.Element;
  * Offers some utilities in order to manage dependencies and properties values
  * in the project's pom.xml
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 0.7
  */
 public class DependenciesVersionManager {

@@ -44,10 +44,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Implementation of GEO Addon operations
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.4
  */
 @Component
@@ -249,7 +249,7 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
 
     /**
      * This method load new providers
-     *
+     * 
      * @param provider
      */
     protected void bindProvider(final GeoProvider provider) {
@@ -258,7 +258,7 @@ public class JpaGeoOperationsImpl implements JpaGeoOperations {
 
     /**
      * This method remove providers
-     *
+     * 
      * @param provider
      */
     protected void unbindProvider(final GeoProvider provider) {

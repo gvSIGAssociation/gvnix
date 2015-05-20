@@ -515,10 +515,10 @@ var GvNIX_Selection;
 				_d.selectionChangeCallbacks.fireWith(this, [ this, 'select',
 						trId ]);
 			}
-			
+
 			// Save selected rows
 			this.fnSaveState();
-			
+
 			return changed;
 		},
 
@@ -544,10 +544,10 @@ var GvNIX_Selection;
 				}
 				_d.selectionChangeCallbacks.fireWith(this, [ this, 'deselect',
 						trId ]);
-				
+
 				// Save selected rows
 				this.fnSaveState();
-				
+
 				return true;
 			}
 			var changed = false;
@@ -580,10 +580,10 @@ var GvNIX_Selection;
 				_d.selectionChangeCallbacks.fireWith(this, [ this, 'deselect',
 						trId ]);
 			}
-			
+
 			// Save selected rows
 			this.fnSaveState();
-			
+
 			return changed;
 		},
 
@@ -607,10 +607,10 @@ var GvNIX_Selection;
 				this._fnUpdateInfo();
 			}
 			_d.selectionChangeCallbacks.fireWith(this, [ this, 'all', null ]);
-			
+
 			// Save selected rows
 			this.fnSaveState();
-			
+
 			return true;
 		},
 
@@ -640,10 +640,10 @@ var GvNIX_Selection;
 				}
 			}
 			_d.selectionChangeCallbacks.fireWith(this, [ this, 'none', null ]);
-			
+
 			// Save selected rows
 			this.fnSaveState();
-			
+
 			return true;
 		},
 
@@ -924,11 +924,11 @@ var GvNIX_Selection;
 
 			// Update visible rows
 			this.fnRedrawVisibleRows();
-			
+
 			// Load current state
 			this.fnLoadState();
 		},
-		
+
 		/**
 		 * Save current state of control to
 		 * the cookie
@@ -936,25 +936,25 @@ var GvNIX_Selection;
 		 */
 		"fnSaveState" : function(clear) {
 			var _d = this._data, dt = _d.dt;
-			
+
 			// Generating hash location
 			var hashLocation = fnGetHashCode(window.location.pathname);
 			// Getting statePrefix
 			var statePrefix = jQuery(dt.nTable).data().stateprefix;
-			
+
 			// Generating unic sName
 			var sName = hashLocation + "_";
 			if(statePrefix != undefined){
 				sName +=  statePrefix + "_";
 			}
 			sName += "gvnixRowSelected-"+dt.nTable.id;
-			
+
 			var sValue = "";
 			if(clear == undefined){
 				var selectionInfo = this.fnGetSelectionInfo();
 				sValue = dt.oApi._fnJsonString(selectionInfo);
 			}
-			
+
 
 			if(!window.localStorage){
 				dt.oApi._fnCreateCookie(sName,
@@ -967,7 +967,7 @@ var GvNIX_Selection;
 				window.localStorage.setItem(sName,sValue);
 			}
 		},
-		
+
 		/**
 		 * Load previous state of control from
 		 * the cookie
@@ -976,12 +976,12 @@ var GvNIX_Selection;
 		 */
 		"fnLoadState" : function(force) {
 			var dt = this._data.dt;
-			
+
 			// Generating hash location
 			var hashLocation = fnGetHashCode(window.location.pathname);
 			// Getting statePrefix
 			var statePrefix = jQuery(dt.nTable).data().stateprefix;
-			
+
 			// Generating unic sName
 			var sName = hashLocation + "_";
 			if(statePrefix != undefined){
@@ -1193,6 +1193,7 @@ var GvNIX_Selection;
  * @param oSettings
  * @param iSelectionSettings
  * @return GvNIX_Selection object
+ *
  * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
  *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
  */

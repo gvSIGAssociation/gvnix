@@ -1,6 +1,21 @@
-/**
- * 
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package __CONTROLLER_PACKAGE__;
 
 import javax.validation.constraints.NotNull;
@@ -12,8 +27,12 @@ import net.tanesha.recaptcha.ReCaptchaResponse;
 
 /**
  * @author rohit
- * 
+ *
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
+
 public class UserRegistrationForm {
 
 	@NotNull
@@ -35,7 +54,7 @@ public class UserRegistrationForm {
 	private String recaptcha_challenge_field;
 
 	private String recaptcha_response_field;
-	
+
 	private ReCaptcha reCatcpha = ReCaptchaFactory.newReCaptcha("6LdfmL8SAAAAAFnT0l3UNPOV8mkpHIown-ysSR1g", "6LdfmL8SAAAAAHKPqUQV5SxrRX9Id6a8cQo-mgpE", false);
 	/**
 	 * @return the emailAddress
@@ -107,7 +126,7 @@ public class UserRegistrationForm {
 	public void setRepeatPassword(String repeatPassword) {
 		this.repeatPassword = repeatPassword;
 	}
-	
+
 	public String getRecaptcha_challenge_field() {
 
 		return recaptcha_challenge_field;
@@ -131,12 +150,12 @@ public class UserRegistrationForm {
 		this.recaptcha_response_field = recaptcha_response_field;
 
 	}
-	
+
 	public String getReCaptchaHtml(){
-		
+
 		return reCatcpha.createRecaptchaHtml(null, null);
 	}
-	
+
 	public boolean isValidCaptcha(){
         ReCaptchaResponse reCaptchaResponse = reCatcpha.checkAnswer("localhost", getRecaptcha_challenge_field(), getRecaptcha_response_field());
         return reCaptchaResponse.isValid();

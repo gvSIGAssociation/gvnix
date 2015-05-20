@@ -32,9 +32,10 @@ import org.w3c.dom.Element;
 /**
  * Provides conversion to and from {@link PageMenuEntry}, with full support for
  * using IDs to identify a menu entry related to a web page.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Component
 @Service
@@ -45,7 +46,7 @@ public class MenuEntryConverter implements Converter<MenuEntry> {
 
     /**
      * Check if given type can be converted by this Converter
-     *
+     * 
      * @param requiredType Can this type be converted?
      * @param optionContext
      */
@@ -55,7 +56,7 @@ public class MenuEntryConverter implements Converter<MenuEntry> {
 
     /**
      * Convert given ID to {@link PageMenuEntry}
-     *
+     * 
      * @param value Page ID
      * @param requiredType [Not used]
      * @param optionContext [Not used]
@@ -67,7 +68,7 @@ public class MenuEntryConverter implements Converter<MenuEntry> {
 
     /**
      * Get all values
-     *
+     * 
      * @param completions
      * @param requiredType
      * @param existingData

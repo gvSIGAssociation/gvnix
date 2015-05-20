@@ -11,7 +11,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -46,10 +46,10 @@ import org.springframework.roo.project.ProjectOperations;
 
 /**
  * Implementation of {@link JpaBatchOperations}
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1
  */
 @Component
@@ -78,7 +78,7 @@ public class JpaBatchOperationsImpl implements JpaBatchOperations {
     /**
      * Generates new a JavaType for batch service class based on
      * <code>entity</code> class name.
-     *
+     * 
      * @param entity
      * @param targetPackage if null uses <code>entity</code> package
      * @return

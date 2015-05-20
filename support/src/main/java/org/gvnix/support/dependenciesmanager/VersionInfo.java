@@ -24,8 +24,9 @@ import org.apache.commons.lang3.Validate;
  * versions
  * 
  * @see org.springframework.roo.project.AutomaticProjectUpgradeService
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 0.7
  */
 public class VersionInfo {

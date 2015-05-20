@@ -62,9 +62,10 @@ import org.xml.sax.SAXException;
  * <p>
  * Compatible address should be SOAP protocol version 1.1 and 1.2.
  * </p>
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- * <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public class WSImportMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
@@ -155,7 +156,7 @@ public class WSImportMetadata extends
 
     /**
      * Create methods on Aspect file related to this wsdl location.
-     *
+     * 
      * @param root Root element of the wsdl document
      * @param sense Communication sense type
      * @throws IOException No connection to the wsdl location
@@ -204,7 +205,7 @@ public class WSImportMetadata extends
 
     /**
      * Create method on Aspect file related to method object.
-     *
+     * 
      * @param root Root element of the wsdl document
      * @param servicePath Path to the service type
      * @param portTypePath Path to the port type type
@@ -275,7 +276,7 @@ public class WSImportMetadata extends
 
     /**
      * Create method on Aspect file related to method object.
-     *
+     * 
      * @param servicePath Path to the service type
      * @param portTypePath Path to the port type type
      * @param portName Name of port name
@@ -326,7 +327,7 @@ public class WSImportMetadata extends
 
     /**
      * Get object type or primitive java type related to primitive type name.
-     *
+     * 
      * @param root Root element of the wsdl document
      * @param name Type name
      * @return Java type
@@ -406,7 +407,7 @@ public class WSImportMetadata extends
 
     /**
      * Get the primitive object type name related to a primitive type name.
-     *
+     * 
      * @param name Type name
      * @return Java object type or null
      */

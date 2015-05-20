@@ -43,9 +43,10 @@ import org.w3c.dom.Element;
  * <p/>
  * {@link Component} and {@link Service} Apache Felix annotations are used to
  * register your commands class in the Roo container
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1
  */
 @Component
@@ -102,7 +103,7 @@ public class MvcOperationsImpl implements MvcOperations {
 
     /**
      * Gets the feature name managed by this operations class.
-     *
+     * 
      * @return feature name
      */
     public String getName() {
@@ -111,7 +112,7 @@ public class MvcOperationsImpl implements MvcOperations {
 
     /**
      * Returns true if gvNIX Web MVC dependency is installed in current project.
-     *
+     * 
      * @param moduleName feature name to check in current project
      * @return true if given feature name is installed, otherwise returns false
      */

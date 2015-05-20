@@ -66,8 +66,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 
 @Component
@@ -145,11 +146,11 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
 
     /**
      * This method adds new file to the specified Entity.
-     *
+     * 
      * @param JavaSymbolName
      * @param fieldGeoTypes
      * @param entity
-     *
+     * 
      */
     @Override
     public void addField(JavaSymbolName fieldName, FieldGeoTypes fieldGeoType,
@@ -244,7 +245,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     /**
      * This method checks if entity has Geo field and annotate with @GvNIXEntityMapLayer
      * if necessary
-     *
+     * 
      * @param entity
      */
     public boolean annotateEntityWithGeoFields(
@@ -298,7 +299,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     /**
      * This method update Pesistence Dialect to use the required one to the
      * selected database.
-     *
+     * 
      */
     public void updatePersistenceDialect() {
         boolean runTime = false;
@@ -412,9 +413,9 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
 
     /**
      * This method creates types.xml file into src/main/resources/*
-     *
+     * 
      * TODO: Improve <!ENTITY declaration on DOCTYPE
-     *
+     * 
      * @param entity
      */
     private void addTypesXmlFile(JavaType entity) {
@@ -474,7 +475,7 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     /**
      * Method to show which possibilities has the developer to implement new
      * dialect
-     *
+     * 
      * @param value
      */
     public void showRuntimeMessage(String value) {

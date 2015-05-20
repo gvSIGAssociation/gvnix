@@ -45,9 +45,10 @@ import org.w3c.dom.Element;
 
 /**
  * Implementation of Bootstrap Addon operations
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.1
  */
 @Component
@@ -437,7 +438,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /**
      * Check if login.jspx is modified with bootstrap
-     *
+     * 
      * @return
      */
     @Override
@@ -466,7 +467,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
     /**
      * Creates an instance with the {@code src/main/webapp} path in the current
      * module
-     *
+     * 
      * @return
      */
     public LogicalPath getWebappPath() {
@@ -477,7 +478,7 @@ public class BootstrapOperationsImpl implements BootstrapOperations {
 
     /**
      * Gets the feature name managed by this operations class.
-     *
+     * 
      * @return feature name
      */
     @Override

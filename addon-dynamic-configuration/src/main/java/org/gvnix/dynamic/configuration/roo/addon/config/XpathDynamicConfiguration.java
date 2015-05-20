@@ -23,8 +23,9 @@ import org.apache.felix.scr.annotations.Component;
  * Abstract dynamic configuration component of XML files for managing elements
  * with Xpath expressions.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Component(componentAbstract = true)
 public abstract class XpathDynamicConfiguration extends XmlDynamicConfiguration {

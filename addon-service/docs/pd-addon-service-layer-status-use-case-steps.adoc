@@ -107,7 +107,7 @@ definition.
 Steps
 ~~~~~
 
-Create an application using GvNIX to replicate a Web Service Server
+Create an application using gvNIX to replicate a Web Service Server
 using `Service Layer Add-on`.
 
 [[requirements]]
@@ -116,12 +116,12 @@ Requirements
 
 * JDK-1.5.07
 * Maven 2.0.9
-* GvNIX 0.5.0
+* gvNIX 0.5.0
 * Eclipse Galileo 3.5.1
 
 To create and check a test application you have to:
 
-1.  Create java 1.5 web project using GvNIX.
+1.  Create java 1.5 web project using gvNIX.
 2.  Generate a server using the command:
 +
 [source, sh]

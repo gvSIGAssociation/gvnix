@@ -28,9 +28,9 @@ import java.lang.annotation.Target;
  * This annotation is used by current {@link RevisionLogProvider} to generated
  * the required attributes and methods
  * 
- * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.3.0
  */
 @Target(ElementType.TYPE)

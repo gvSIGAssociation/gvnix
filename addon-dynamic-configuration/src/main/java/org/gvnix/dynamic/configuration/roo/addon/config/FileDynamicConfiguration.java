@@ -27,10 +27,10 @@ import org.springframework.roo.project.PathResolver;
 
 /**
  * Abstract dynamic configuration component of any file.
- *
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- *
+ * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Component(componentAbstract = true)
 public abstract class FileDynamicConfiguration {
@@ -42,14 +42,14 @@ public abstract class FileDynamicConfiguration {
 
     /**
      * Get the dynamic configuration file path.
-     *
+     * 
      * @return Dynamic configuration file path
      */
     public abstract String getFilePath();
 
     /**
      * Get the properties mutable file if exists.
-     *
+     * 
      * @return Properties mutable file or null if not exists
      */
     protected MutableFile getFile() {

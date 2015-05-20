@@ -28,8 +28,9 @@ import com.github.dandelion.datatables.jsp.tag.AbstractTableTag;
 import com.github.dandelion.datatables.jsp.tag.ExtraConfTag;
 
 /**
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 
 public class RooExtraConfTag extends ExtraConfTag {
@@ -62,7 +63,7 @@ public class RooExtraConfTag extends ExtraConfTag {
 
     /**
      * TODO
-     *
+     * 
      * @param src
      * @return
      */
@@ -83,7 +84,7 @@ public class RooExtraConfTag extends ExtraConfTag {
 
     /**
      * TBC
-     *
+     * 
      * @param tag
      * @param pageContext
      * @return

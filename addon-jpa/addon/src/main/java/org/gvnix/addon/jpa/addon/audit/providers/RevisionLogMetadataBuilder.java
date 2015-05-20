@@ -34,8 +34,9 @@ import org.springframework.roo.model.JavaType;
  * {@link org.gvnix.addon.jpa.audit.GvNIXJpaAudit} to handle revisionLog
  * functionality.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since 1.3.0
  * 
  */
@@ -225,9 +226,9 @@ public interface RevisionLogMetadataBuilder {
      * Interface which contains generation time metadata information required by
      * {@link RevisionLogMetadataBuilder}
      * 
-     * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
-     * 
+     * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made
+     *         for <a href="http://www.dgti.gva.es">General Directorate for
+     *         Information Technologies (DGTI)</a>
      */
     public interface Context {
         /**

@@ -1,3 +1,21 @@
+/*
+ * gvNIX is an open source tool for rapid application development (RAD).
+ * Copyright (C) 2010 Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package __CONTROLLER_PACKAGE__;
 
 import java.util.Date;
@@ -26,6 +44,13 @@ import __ENTITY_LEVEL_PACKAGE__.User;
 
 @RequestMapping("/signup/**")
 @Controller
+
+/**
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
+ */
+
 public class SignUpController {
 
     @Autowired
@@ -51,7 +76,7 @@ public class SignUpController {
         model.addAttribute("captcha_form",form.getReCaptchaHtml());
         return "signup/index";
     }
-    
+
     @RequestMapping(params = "activate", method = RequestMethod.GET, produces = "text/html")
     public String activateUser(@RequestParam(value = "activate", required = true) String activationKey,@RequestParam(value = "emailAddress", required = true) String emailAddress,Model model) {
         TypedQuery<User> query = User.findUsersByActivationKeyAndEmailAddress(activationKey, emailAddress);
@@ -72,7 +97,7 @@ public class SignUpController {
     public String create(@Valid UserRegistrationForm userRegistration, BindingResult result, Model model, HttpServletRequest request) {
         validator.validate(userRegistration, result);
         if (result.hasErrors()) {
-        	
+
             return createForm(model);
         } else {
             Random random = new Random(System.currentTimeMillis());
@@ -88,11 +113,11 @@ public class SignUpController {
             User.setEnabled(false);
             User.setLocked(false);
             User.persist();
-            
+
             SimpleMailMessage mail = new SimpleMailMessage();
     		mail.setTo(User.getEmailAddress());
     		mail.setSubject("User Activaton");
-    		
+
     		mail.setText("Hi "+User.getFirstName()+",\n. You had registered with us. Please click on this link to activate your account - <a href=\"http://__BASE_URL__/signup?emailAddress="+User.getEmailAddress()+"&activate="+activationKey+"\">Activate Link</a>. \n Thanks Tyical Security Admin");
             mailSender.send(mail);
             return "signup/thanks";

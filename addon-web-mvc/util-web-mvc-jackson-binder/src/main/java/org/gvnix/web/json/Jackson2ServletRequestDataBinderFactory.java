@@ -35,8 +35,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ServletRequestDataB
  * Note by doing that the {@link BindingResult} of JSON deserialization process
  * will be send to Controller as method parameter.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  * @since TODO: Class version
  */
 public class Jackson2ServletRequestDataBinderFactory extends

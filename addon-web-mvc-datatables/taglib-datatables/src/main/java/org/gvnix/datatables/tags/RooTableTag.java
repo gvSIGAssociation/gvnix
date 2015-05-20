@@ -45,8 +45,9 @@ import com.github.dandelion.datatables.jsp.tag.TableTag;
  * attributes. This way it may replace the roo table tag just by changing the
  * xmlns:table reference in the jspx header to the URL of this tag library.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public class RooTableTag extends TableTag {
 

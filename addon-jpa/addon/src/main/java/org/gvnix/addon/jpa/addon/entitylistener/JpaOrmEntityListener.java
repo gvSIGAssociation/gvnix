@@ -24,9 +24,9 @@ import org.springframework.roo.model.JavaType;
  * Required interface for any {@link MetadataItem} which must be registered as a
  * JPA entity listener.
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 public interface JpaOrmEntityListener extends MetadataItem {
 

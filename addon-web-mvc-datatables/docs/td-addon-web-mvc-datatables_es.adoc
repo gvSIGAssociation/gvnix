@@ -270,7 +270,7 @@ Aplicará los siguientes cambios:
 
 
 [[addon-gvnix-datatables---rowontop]]
-== Addon GvNIX Datatables - rowOnTop
+== Addon gvNIX Datatables - rowOnTop
 
 * Componentes involucrados en el proceso:
 ** datatables/list.tagx

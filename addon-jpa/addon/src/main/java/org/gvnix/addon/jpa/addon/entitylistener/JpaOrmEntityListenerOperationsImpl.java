@@ -50,9 +50,9 @@ import org.w3c.dom.Node;
 /**
  * Default implementation of {@link JpaOrmEntityListenerOperations}
  * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
- * 
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 @Component
 @Service
@@ -475,9 +475,9 @@ public class JpaOrmEntityListenerOperationsImpl extends AbstractOperations
      * This compares instances of {@link Pair} which left (or key) element is
      * listener class and right (or value) is the metadataProviderId.
      * 
-     * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
-     * 
+     * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made
+     *         for <a href="http://www.dgti.gva.es">General Directorate for
+     *         Information Technologies (DGTI)</a>
      */
     private class ListenerOrderComparator implements
             Comparator<Pair<String, String>> {

@@ -36,8 +36,9 @@ import com.github.antlrjavaparser.api.body.TypeDeclaration;
 import com.github.antlrjavaparser.api.expr.MemberValuePair;
 
 /**
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for
- *         <a href="http://www.dgti.gva.es">General Directorate for Information Technologies (DGTI)</a>
+ * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
+ *         href="http://www.dgti.gva.es">General Directorate for Information
+ *         Technologies (DGTI)</a>
  */
 
 public interface WsExportWsdl {
@@ -50,7 +51,7 @@ public interface WsExportWsdl {
      * <p>
      * Use this method to ensure it is initialized.
      * </p>
-     *
+     * 
      * @return Generated sources directory.
      */
     public String getGenSourcesDir();
@@ -58,7 +59,7 @@ public interface WsExportWsdl {
     /**
      * Loads fault field declaration into field list to generate fault web
      * service class
-     *
+     * 
      * @param declaredByMetadataId
      * @param compilationUnitServices
      * @param fieldMetadataList
@@ -72,7 +73,7 @@ public interface WsExportWsdl {
     /**
      * Loads fault constructor declaration into contructor list to generate
      * fault web service class
-     *
+     * 
      * @param declaredByMetadataId
      * @param compilationUnitServices
      * @param constructorMetadataList
@@ -86,7 +87,7 @@ public interface WsExportWsdl {
     /**
      * Loads fault method declaration into method list to generate fault web
      * service class
-     *
+     * 
      * @param declaredByMetadataId
      * @param compilationUnitServices
      * @param methodMetadataList
@@ -102,7 +103,7 @@ public interface WsExportWsdl {
      * {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebFault}. TODO to be
      * removed from interface?. This method could be useless outside this
      * service.
-     *
+     * 
      * @param classOrInterfaceDeclaration to retrieve values from @WebFault
      *        annotations and convert to {@link GvNIXWebFault} values.
      * @param exceptionType to retrieve faultBean attribute value
@@ -114,8 +115,8 @@ public interface WsExportWsdl {
             JavaType exceptionType);
 
     /**
-     * Load WebService Field declaration and complete with GvNIX annotations
-     *
+     * Load WebService Field declaration and complete with gvNIX annotations
+     * 
      * @param declaredByMetadataId
      * @param compilationUnitServices
      * @param fieldMetadataList
@@ -127,8 +128,8 @@ public interface WsExportWsdl {
             BodyDeclaration bodyDeclaration);
 
     /**
-     * Load WebService method declaration and complete with GvNIX annotations
-     *
+     * Load WebService method declaration and complete with gvNIX annotations
+     * 
      * @param declaredByMetadataId
      * @param compilationUnitServices
      * @param implementedInterface
@@ -144,7 +145,7 @@ public interface WsExportWsdl {
 
     /**
      * Load field declaration from a type
-     *
+     * 
      * @param id
      * @param compUnit
      * @param fields
@@ -156,7 +157,7 @@ public interface WsExportWsdl {
     /**
      * Extract the filename from the given path, e.g. "mypath/myfile.txt" ->
      * "myfile.txt".
-     *
+     * 
      * @param path the file path (may be <code>null</code>)
      * @return the extracted filename, or <code>null</code> if none
      */
@@ -164,7 +165,7 @@ public interface WsExportWsdl {
 
     /**
      * Search name attributes on pairs and add it as name attrs.
-     *
+     * 
      * @param attrs Annotation attributes to add names
      * @param pairs Pairs to search in name attributes
      */
@@ -173,7 +174,7 @@ public interface WsExportWsdl {
 
     /**
      * If pair has text, add it as xml type name attr.
-     *
+     * 
      * @param attrs Annotation attributes to add xml type name
      * @param pair Pair to test has text
      */
@@ -182,7 +183,7 @@ public interface WsExportWsdl {
 
     /**
      * Add empty ignored attribute to list.
-     *
+     * 
      * @param annotAttrs Attributes list
      * @param pair Pair
      */
@@ -190,7 +191,7 @@ public interface WsExportWsdl {
 
     /**
      * Add pair value with namespace name into attributes list.
-     *
+     * 
      * @param attrs Attributes list
      * @param pair Pair
      */
@@ -199,7 +200,7 @@ public interface WsExportWsdl {
 
     /**
      * Get all pair values and add it as ignored attrs.
-     *
+     * 
      * @param annotAttrs Annotation attributes to add ignored attrs
      * @param pairs Pair to get values
      */
@@ -208,7 +209,7 @@ public interface WsExportWsdl {
 
     /**
      * Add true exported attribute to list.
-     *
+     * 
      * @param annotAttrs Attributes list
      * @param pair Pair
      */
@@ -216,7 +217,7 @@ public interface WsExportWsdl {
 
     /**
      * Add true/false enum element attribute to list when if is/isnot enum.
-     *
+     * 
      * @param typeDecl Type declaration
      * @param annotAttrs Attributes list
      */
