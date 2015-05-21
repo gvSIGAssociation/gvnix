@@ -33,11 +33,10 @@
 :sectanchors:
 :icons:         font
 :imagesdir:     ./images
-:source-highlighter:  pygments
+:source-highlighter:  coderay
 ifdef::backend-pdf[]
 :pdf-style:     asciidoctor
 :pagenums:
-:pygments-style:  bw
 endif::[]
 
 _{version}_

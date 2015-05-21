@@ -33,11 +33,10 @@
 :toclevels: 4
 :numbered:
 :sectnumlevels: 4
-:source-highlighter:  pygments
+:source-highlighter:  coderay
 ifdef::backend-pdf[]
 :pdf-style: asciidoctor
 :pagenums:
-:pygments-style:  bw
 endif::[]
 
 _2010 (C) Dirección General de Tecnologías de la Información - Conselleria de Hacienda y
