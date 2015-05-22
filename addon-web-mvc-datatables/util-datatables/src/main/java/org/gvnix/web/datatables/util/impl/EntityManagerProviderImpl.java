@@ -1,16 +1,17 @@
 /*
- * Copyright 2015 DISID Corporation S.L. All rights reserved.
+ * Copyright 2015 DiSiD Technologies S.L.L. All rights reserved.
  *
- * Project  : [PROJECT NAME]
+ * Project  : DiSiD petclinic
  * SVN Id   : $Id$
  */
-package org.gvnix.web.datatables.util;
+package org.gvnix.web.datatables.util.impl;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import javax.persistence.EntityManager;
 
+import org.gvnix.web.datatables.util.EntityManagerProvider;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,14 +19,21 @@ import org.springframework.stereotype.Service;
  * ActiveRecord Spring-Roo entity
  * 
  * @author gvNIX Team
- * @deprecated use
- *             {@link org.gvnix.web.datatables.util.impl.EntityManagerProviderImpl}
+ * @since 1.4.1
  */
 @Service
 public class EntityManagerProviderImpl implements EntityManagerProvider {
 
-    /* (non-Javadoc)
-     * @see org.gvnix.web.datatables.util.EntityManagerProvider#getEntityManager(java.lang.Class)
+    /**
+     * Gets EntityManger instance for a JPA Entity class <br/>
+     * Use Introspect API to locate and invoke
+     * <code>EntityManager klass.entityManager()</code> static method to get
+     * EntityManager instance.
+     * 
+     * @param klass ActiveRecord JPA Entity class
+     * @return applicable JPA EntityManager for <code>klass</code>
+     * @throws IllegalStateException if <code>klass</code> has no matching
+     *         method or can't be invoke
      */
     public EntityManager getEntityManager(Class klass) {
 

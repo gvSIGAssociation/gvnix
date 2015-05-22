@@ -51,23 +51,6 @@
 				<artifactId>querydsl-jpa</artifactId>
 				<version>${querydsl.version}</version>
 			</dependency>
-			<!-- Hibernate Spatial -->
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-spatial</artifactId>
-				<version>4.3</version>
-			</dependency>
-			<dependency>
-			  <groupId>com.mysema.querydsl</groupId>
-			  <artifactId>querydsl-spatial</artifactId>
-			  <version>${querydsl.version}</version>
-			  <exclusions>
-			  	<exclusion>
-			  		<groupId>org.geolatte</groupId>
-      				<artifactId>geolatte-geom</artifactId>
-			  	</exclusion>
-			  </exclusions>
-			</dependency>
 		</dependencies>
 	</gvnix>
 </configuration>

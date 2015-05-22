@@ -1,21 +1,10 @@
 /*
- * gvNIX is an open source tool for rapid application development (RAD).
- * Copyright (C) 2010 Generalitat Valenciana
- *
-* This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright 2015 DiSiD Technologies S.L.L. All rights reserved.
+ * 
+ * Project  : DiSiD org.gvnix.web.datatables 
+ * SVN Id   : $Id$
  */
-package org.gvnix.web.datatables.util;
+package org.gvnix.web.datatables.util.impl;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -23,7 +12,6 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -41,9 +29,12 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.gvnix.web.datatables.util.EntityManagerProvider;
+import org.gvnix.web.datatables.util.QuerydslUtilsBean;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.convert.ConversionException;
@@ -63,74 +54,25 @@ import com.mysema.query.types.path.DatePath;
 import com.mysema.query.types.path.NumberPath;
 import com.mysema.query.types.path.PathBuilder;
 
-/**
- * Querydsl utility functions
- * 
- * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
- *         href="http://www.dgti.gva.es">General Directorate for Information
- *         Technologies (DGTI)</a>
- * 
- * @deprecated use {@link QuerydslUtilsBean} instead
- */
-@Deprecated
-public class QuerydslUtils {
+public class QuerydslUtilsBeanImpl implements QuerydslUtilsBean {
 
-    public static final String OPERATOR_GOE = "goe";
-    public static final String OPERATOR_LOE = "loe";
-    public static final String OPERATOR_ISNULL = "isnull";
-    public static final String OPERATOR_NOTNULL = "notnull";
-    public static final String G_FIL_OPE_ISNULL = "global.filters.operations.all.isnull";
-    public static final String G_FIL_OPE_NOTNULL = "global.filters.operations.all.notnull";
+    @Autowired
+    private ConversionService conversionService;
 
-    public static final TypeDescriptor STRING_TYPE_DESCRIPTOR = TypeDescriptor
-            .valueOf(String.class);
+    @Autowired
+    private MessageSource messageSource;
+
+    @Autowired
+    private EntityManagerProvider entityManagerProvider;
 
     private static LoadingCache<Class<?>, BeanWrapper> beanWrappersCache = CacheBuilder
             .newBuilder().maximumSize(200)
             .build(new CacheLoader<Class<?>, BeanWrapper>() {
+
                 public BeanWrapper load(Class<?> key) {
                     return new BeanWrapperImpl(key);
                 }
             });
-
-    public static final Set<Class<?>> NUMBER_PRIMITIVES = new HashSet<Class<?>>(
-            Arrays.asList(new Class<?>[] { int.class, long.class, double.class,
-                    float.class, short.class }));
-
-    public static final String OPERATOR_PREFIX = "_operator_";
-
-    private static final String SEPARATOR_FIELDS = ".";
-
-    public static final String[] FULL_DATE_PATTERNS = new String[] {
-            "dd-MM-yyyy HH:mm:ss", "dd/MM/yyyy HH:mm:ss",
-            "MM-dd-yyyy HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "dd-MM-yyyy HH:mm",
-            "dd/MM/yyyy HH:mm", "MM-dd-yyyy HH:mm", "MM/dd/yyyy HH:mm",
-            "dd-MM-yyyy", "dd/MM/yyyy", "MM-dd-yyyy", "MM/dd/yyyy",
-            "dd-MMMM-yyyy HH:mm:ss", "dd/MMMM/yyyy HH:mm:ss",
-            "MMMM-dd-yyyy HH:mm:ss", "MMMM/dd/yyyy HH:mm:ss",
-            "dd-MMMM-yyyy HH:mm", "dd/MMMM/yyyy HH:mm", "MMMM-dd-yyyy HH:mm",
-            "MMMM/dd/yyyy HH:mm", "dd-MMMM-yyyy", "dd/MMMM/yyyy",
-            "MMMM-dd-yyyy", "MMMM/dd/yyyy" };
-
-    public static final String[] FULL_DATE_PATTERNS_WITH_TIME = new String[] {
-            "dd-MM-yyyy HH:mm:ss", "dd/MM/yyyy HH:mm:ss",
-            "MM-dd-yyyy HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "dd-MM-yyyy HH:mm",
-            "dd/MM/yyyy HH:mm", "MM-dd-yyyy HH:mm", "MM/dd/yyyy HH:mm",
-            "dd-MMMM-yyyy HH:mm:ss", "dd/MMMM/yyyy HH:mm:ss",
-            "MMMM-dd-yyyy HH:mm:ss", "MMMM/dd/yyyy HH:mm:ss",
-            "dd-MMMM-yyyy HH:mm", "dd/MMMM/yyyy HH:mm", "MMMM-dd-yyyy HH:mm",
-            "MMMM/dd/yyyy HH:mm" };
-
-    public static final String[] FULL_DATE_PAT_WO_TIME = new String[] {
-            "dd-MM-yyyy", "dd/MM/yyyy", "MM-dd-yyyy", "MMMM/dd/yyyy",
-            "dd-MMMM-yyyy", "dd/MMMM/yyyy", "MMMM-dd-yyyy", "MMMM/dd/yyyy" };
-
-    public static final String[] DAY_AND_MONTH_DATE_PATTERNS = new String[] {
-            "dd-MM", "dd/MM", "MM-dd", "MM/dd", "dd-MMMM", "dd/MMMM",
-            "MMMM-dd", "MMMM/dd" };
-
-    public static final String[] MONTH_AND_YEAR_DATE_PATTERNS = new String[] {
-            "MM-yyyy", "MM/yyyy", "MMMM-yyyy", "MMMM/yyyy" };
 
     /**
      * Get BeanWrapper instance for klass. <b>Warning<b>: BeanWrapper returned
@@ -151,29 +93,11 @@ public class QuerydslUtils {
     }
 
     /**
-     * Creates a WHERE clause by the intersection of the given search-arguments
-     * 
-     * @param entity Entity {@link PathBuilder}. It represents the entity for
-     *        class generation and alias-usage for path generation.
-     *        <p/>
-     *        Example: To retrieve a {@code Customer} with the first name 'Bob'
-     *        entity must be a {@link PathBuilder} created for {@code Customer}
-     *        class and searchArgs must contain the entry
-     *        {@code 'firstName':'Bob'}
-     * @param searchArgs Search arguments to be used to create the WHERE clause.
-     *        It can contain {@code _operator_} entries for each field that want
-     *        to use its own operator. By default {@code EQUALS} operator is
-     *        used.
-     *        <p/>
-     *        Operator entry example: {@code _operator_weight = LT} the
-     *        expression for {@code weight} field will do a less-than value
-     *        comparison
-     * @param conversionService required to transform values
-     * @return the WHERE clause
+     * {@inheritDoc}
      */
-    public static <T> BooleanBuilder createPredicateByAnd(
-            PathBuilder<T> entity, Map<String, Object> searchArgs,
-            ConversionService conversionService) {
+    @Override
+    public <T> BooleanBuilder createPredicateByAnd(PathBuilder<T> entity,
+            Map<String, Object> searchArgs) {
 
         // Using BooleanBuilder, a cascading builder for
         // Predicate expressions
@@ -200,36 +124,23 @@ public class QuerydslUtils {
                 Collection<Object> valueColl = (Collection<Object>) valueToSearch;
                 for (Object valueObj : valueColl) {
                     predicate.and(createObjectExpression(entity, key, valueObj,
-                            operator, conversionService));
+                            operator));
                 }
             }
             else {
                 predicate.and(createObjectExpression(entity, key,
-                        valueToSearch, operator, conversionService));
+                        valueToSearch, operator));
             }
         }
         return predicate;
     }
 
     /**
-     * Creates a WHERE clause to specify given {@code fieldName} must be equal
-     * to one element of the provided Collection.
-     * 
-     * @param entity Entity {@link PathBuilder}. It represents the entity for
-     *        class generation and alias-usage for path generation.
-     *        <p/>
-     *        Example: To retrieve a {@code Customer} with the first name 'Bob'
-     *        entity must be a {@link PathBuilder} created for {@code Customer}
-     *        class and searchArgs must contain the entry
-     *        {@code 'firstName':'Bob'}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param values the Set of values to find the given field name, may be null
-     * @return the WHERE clause
+     * {@inheritDoc}
      */
-    public static <T, E> BooleanBuilder createPredicateByIn(
-            PathBuilder<T> entity, String fieldName, Set<E> values) {
+    @Override
+    public <T, E> BooleanBuilder createPredicateByIn(PathBuilder<T> entity,
+            String fieldName, Set<E> values) {
 
         // Using BooleanBuilder, a cascading builder for
         // Predicate expressions
@@ -245,110 +156,23 @@ public class QuerydslUtils {
     }
 
     /**
-     * Utility for constructing where clause expressions.
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param fieldType Property value {@code Class}
-     * @param searchStr the value to find, may be null
-     * @return Predicate
-     * @deprecated
+     * {@inheritDoc}
      */
-    public static <T> Predicate createExpression(PathBuilder<T> entityPath,
+    @Override
+    public <T> Predicate createExpression(PathBuilder<T> entityPath,
             String fieldName, Class<?> fieldType, String searchStr) {
-        return createExpression(entityPath, fieldName, searchStr, null);
+
+        return createExpression(entityPath, fieldName, searchStr);
+
     }
 
     /**
-     * Utility for constructing where clause expressions.
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param fieldType Property value {@code Class}
-     * @param searchStr the value to find, may be null
-     * @return Predicate
-     * @deprecated
+     * {@inheritDoc}
      */
-    public static <T> Predicate createExpression(PathBuilder<T> entityPath,
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public <T> Predicate createExpression(PathBuilder<T> entityPath,
             String fieldName, String searchStr) {
-        return createExpression(entityPath, fieldName, searchStr, null);
-    }
-
-    /**
-     * Utility for constructing where clause expressions.
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param fieldType Property value {@code Class}
-     * @param searchStr the value to find, may be null
-     * @return Predicate
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static <T> Predicate createExpression(PathBuilder<T> entityPath,
-            String fieldName, String searchStr,
-            ConversionService conversionService) {
-
-        TypeDescriptor descriptor = getTypeDescriptor(fieldName, entityPath);
-        if (descriptor == null) {
-            throw new IllegalArgumentException(String.format(
-                    "Can't found field '%s' on entity '%s'", fieldName,
-                    entityPath.getType()));
-        }
-        Class<?> fieldType = descriptor.getType();
-
-        // Check for field type in order to delegate in custom-by-type
-        // create expression method
-        if (String.class == fieldType) {
-            return createStringLikeExpression(entityPath, fieldName, searchStr);
-        }
-        else if (Boolean.class == fieldType || boolean.class == fieldType) {
-            return createBooleanExpression(entityPath, fieldName, searchStr);
-        }
-        else if (Number.class.isAssignableFrom(fieldType)
-                || NUMBER_PRIMITIVES.contains(fieldType)) {
-            return createNumberExpressionGenerics(entityPath, fieldName,
-                    fieldType, descriptor, searchStr, conversionService);
-        }
-        else if (Date.class.isAssignableFrom(fieldType)
-                || Calendar.class.isAssignableFrom(fieldType)) {
-            BooleanExpression expression = createDateExpression(entityPath,
-                    fieldName, (Class<Date>) fieldType, searchStr);
-            return expression;
-        }
-
-        else if (fieldType.isEnum()) {
-            return createEnumExpression(entityPath, fieldName, searchStr,
-                    (Class<? extends Enum>) fieldType);
-        }
-        return null;
-    }
-
-    /**
-     * Utility for constructing where clause expressions.
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param fieldType Property value {@code Class}
-     * @param searchStr the value to find, may be null
-     * @return Predicate
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static <T> Predicate createExpression(PathBuilder<T> entityPath,
-            String fieldName, String searchStr,
-            ConversionService conversionService, MessageSource messageSource) {
-
         TypeDescriptor descriptor = getTypeDescriptor(fieldName, entityPath);
         if (descriptor == null) {
             throw new IllegalArgumentException(String.format(
@@ -361,17 +185,16 @@ public class QuerydslUtils {
         // create expression method
         if (String.class == fieldType) {
             return createStringExpressionWithOperators(entityPath, fieldName,
-                    searchStr, conversionService, messageSource);
+                    searchStr);
         }
         else if (Boolean.class == fieldType || boolean.class == fieldType) {
             return createBooleanExpressionWithOperators(entityPath, fieldName,
-                    searchStr, conversionService, messageSource);
+                    searchStr);
         }
         else if (Number.class.isAssignableFrom(fieldType)
                 || NUMBER_PRIMITIVES.contains(fieldType)) {
             return createNumberExpressionGenericsWithOperators(entityPath,
-                    fieldName, descriptor, searchStr, conversionService,
-                    messageSource);
+                    fieldName, descriptor, searchStr);
         }
         else if (Date.class.isAssignableFrom(fieldType)
                 || Calendar.class.isAssignableFrom(fieldType)) {
@@ -383,7 +206,7 @@ public class QuerydslUtils {
             }
             BooleanExpression expression = createDateExpressionWithOperators(
                     entityPath, fieldName, (Class<Date>) fieldType, searchStr,
-                    conversionService, messageSource, datePattern);
+                    datePattern);
             return expression;
         }
 
@@ -394,117 +217,117 @@ public class QuerydslUtils {
         return null;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    public static <T> Predicate createNumberExpressionGenerics(
+    public <T> Predicate createNumberExpressionGenerics(
             PathBuilder<T> entityPath, String fieldName, Class<?> fieldType,
-            TypeDescriptor descriptor, String searchStr,
-            ConversionService conversionService) {
+            TypeDescriptor descriptor, String searchStr) {
         Predicate numberExpression = null;
 
-        if (isNumber(searchStr, conversionService, descriptor)) {
+        if (isNumber(searchStr, descriptor)) {
             if (BigDecimal.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<BigDecimal>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (BigInteger.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<BigInteger>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Byte.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Byte>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Double.class.isAssignableFrom(fieldType)
                     || double.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Double>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Float.class.isAssignableFrom(fieldType)
                     || float.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Float>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Integer.class.isAssignableFrom(fieldType)
                     || int.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Integer>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Long.class.isAssignableFrom(fieldType)
                     || long.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Long>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Short.class.isAssignableFrom(fieldType)
                     || short.class == fieldType) {
                 numberExpression = createNumberExpression(entityPath,
                         fieldName, (Class<Short>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
         }
         return numberExpression;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
-    public static <T> Predicate createNumberExpressionGenericsWithOperators(
+    public <T> Predicate createNumberExpressionGenericsWithOperators(
             PathBuilder<T> entityPath, String fieldName,
-            TypeDescriptor descriptor, String searchStr,
-            ConversionService conversionService, MessageSource messageSource) {
+            TypeDescriptor descriptor, String searchStr) {
         Predicate numberExpression = null;
 
         Class<?> fieldType = descriptor.getType();
 
-        if (isNumber(searchStr, conversionService, descriptor)) {
+        if (isNumber(searchStr, descriptor)) {
             if (BigDecimal.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpressionEqual(entityPath,
                         fieldName, (Class<BigDecimal>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (BigInteger.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpressionEqual(entityPath,
                         fieldName, (Class<BigInteger>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Byte.class.isAssignableFrom(fieldType)) {
                 numberExpression = createNumberExpressionEqual(entityPath,
                         fieldName, (Class<Byte>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Double.class.isAssignableFrom(fieldType)
                     || double.class == fieldType) {
                 numberExpression = createNumberExpressionEqual(entityPath,
                         fieldName, (Class<Double>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Float.class.isAssignableFrom(fieldType)
                     || float.class == fieldType) {
                 numberExpression = createNumberExpressionEqual(entityPath,
                         fieldName, (Class<Float>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Integer.class.isAssignableFrom(fieldType)
                     || int.class == fieldType) {
                 numberExpression = createNumberExpressionEqual(entityPath,
                         fieldName, (Class<Integer>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Long.class.isAssignableFrom(fieldType)
                     || long.class == fieldType) {
                 numberExpression = createNumberExpressionEqual(entityPath,
                         fieldName, (Class<Long>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
             if (Short.class.isAssignableFrom(fieldType)
                     || short.class == fieldType) {
                 numberExpression = createNumberExpressionEqual(entityPath,
                         fieldName, (Class<Short>) fieldType, descriptor,
-                        searchStr, conversionService);
+                        searchStr);
             }
         }
         else {
@@ -513,101 +336,71 @@ public class QuerydslUtils {
             if (BigDecimal.class.isAssignableFrom(fieldType)) {
                 numberExpression = getNumericFilterExpression(entityPath,
                         fieldName, (Class<BigDecimal>) fieldType, descriptor,
-                        searchStr, conversionService, messageSource);
+                        searchStr);
             }
             if (BigInteger.class.isAssignableFrom(fieldType)) {
                 numberExpression = getNumericFilterExpression(entityPath,
                         fieldName, (Class<BigInteger>) fieldType, descriptor,
-                        searchStr, conversionService, messageSource);
+                        searchStr);
             }
             if (Byte.class.isAssignableFrom(fieldType)) {
                 numberExpression = getNumericFilterExpression(entityPath,
                         fieldName, (Class<Byte>) fieldType, descriptor,
-                        searchStr, conversionService, messageSource);
+                        searchStr);
             }
             if (Double.class.isAssignableFrom(fieldType)
                     || double.class == fieldType) {
                 numberExpression = getNumericFilterExpression(entityPath,
                         fieldName, (Class<Double>) fieldType, descriptor,
-                        searchStr, conversionService, messageSource);
+                        searchStr);
             }
             if (Float.class.isAssignableFrom(fieldType)
                     || float.class == fieldType) {
                 numberExpression = getNumericFilterExpression(entityPath,
                         fieldName, (Class<Float>) fieldType, descriptor,
-                        searchStr, conversionService, messageSource);
+                        searchStr);
             }
             if (Integer.class.isAssignableFrom(fieldType)
                     || int.class == fieldType) {
                 numberExpression = getNumericFilterExpression(entityPath,
                         fieldName, (Class<Integer>) fieldType, descriptor,
-                        searchStr, conversionService, messageSource);
+                        searchStr);
             }
             if (Long.class.isAssignableFrom(fieldType)
                     || long.class == fieldType) {
                 numberExpression = getNumericFilterExpression(entityPath,
                         fieldName, (Class<Long>) fieldType, descriptor,
-                        searchStr, conversionService, messageSource);
+                        searchStr);
             }
             if (Short.class.isAssignableFrom(fieldType)
                     || short.class == fieldType) {
                 numberExpression = getNumericFilterExpression(entityPath,
                         fieldName, (Class<Short>) fieldType, descriptor,
-                        searchStr, conversionService, messageSource);
+                        searchStr);
             }
         }
         return numberExpression;
+
     }
 
     /**
-     * Return equal expression for {@code entityPath.fieldName}.
-     * <p/>
-     * Expr: {@code entityPath.fieldName eq searchObj}
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param searchObj the value to find, may be null
-     * @return BooleanExpression
+     * {@inheritDoc}
      */
-    public static <T> BooleanExpression createObjectExpression(
-            PathBuilder<T> entityPath, String fieldName, Object searchObj,
-            ConversionService conversionService) {
-        return createObjectExpression(entityPath, fieldName, searchObj, null,
-                conversionService);
+    @Override
+    public <T> BooleanExpression createObjectExpression(
+            PathBuilder<T> entityPath, String fieldName, Object searchObj) {
+        return createObjectExpression(entityPath, fieldName, searchObj, null);
+
     }
 
     /**
-     * Return an expression for {@code entityPath.fieldName} with the
-     * {@code operator} or "equal" by default.
-     * <p/>
-     * Expr: {@code entityPath.fieldName eq searchObj}
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param searchObj the value to find, may be null
-     * @param operator the operator to use into the expression. Supported
-     *        operators:
-     *        <ul>
-     *        <li>For all types: {@code eq}, {@code in}, {@code ne},
-     *        {@code notIn}, {@code isNull} and {@code isNotNull}.</li> <li> For
-     *        strings and numbers: {@code goe}, {@code gt}, {@code loe},
-     *        {@code lt} and {@code like}.</li> <li> For booleans: {@code goe},
-     *        {@code gt}, {@code loe} and {@code lt}.</li> <li> For dates:
-     *        {@code goe}, {@code gt}, {@code before}, {@code loe}, {@code lt}
-     *        and {@code after}. </li>
-     *        </ul>
-     * @return BooleanExpression
+     * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static <T> BooleanExpression createObjectExpression(
+    public <T> BooleanExpression createObjectExpression(
             PathBuilder<T> entityPath, String fieldName, Object searchObj,
-            String operator, ConversionService conversionService) {
+            String operator) {
         if (searchObj == null) {
             return null;
         }
@@ -670,6 +463,7 @@ public class QuerydslUtils {
         }
 
         return entityPath.get(fieldName).eq(searchObj);
+
     }
 
     /**
@@ -707,20 +501,11 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return an expression for {@code entityPath.fieldName} (for Dates) with
-     * the {@code operator} or "equal" by default.
-     * <p/>
-     * Expr: {@code entityPath.fieldName eq searchObj}
-     * 
-     * @param entityPath
-     * @param fieldName
-     * @param searchObj
-     * @param operator
-     * @param fieldType
-     * @return
+     * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
-    public static <T> BooleanExpression createDateExpression(
+    public <T> BooleanExpression createDateExpression(
             PathBuilder<T> entityPath, String fieldName, Object searchObj,
             String operator, Class<?> fieldType) {
         DatePath<Date> dateExpression = entityPath.getDate(fieldName,
@@ -750,20 +535,11 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return an expression for {@code entityPath.fieldName} (for Numerics) with
-     * the {@code operator} or "equal" by default.
-     * <p/>
-     * Expr: {@code entityPath.fieldName eq searchObj}
-     * 
-     * @param entityPath
-     * @param fieldName
-     * @param searchObj
-     * @param operator
-     * @param fieldType
-     * @return
+     * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static <T> BooleanExpression createNumericExpression(
+    public <T> BooleanExpression createNumericExpression(
             PathBuilder<T> entityPath, String fieldName, Object searchObj,
             String operator, Class<?> fieldType) {
         NumberPath numberExpression = null;
@@ -826,18 +602,10 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return an expression for {@code entityPath.fieldName} (for Booleans) with
-     * the {@code operator} or "equal" by default.
-     * <p/>
-     * Expr: {@code entityPath.fieldName eq searchObj}
-     * 
-     * @param entityPath
-     * @param fieldName
-     * @param searchObj
-     * @param operator
-     * @return
+     * {@inheritDoc}
      */
-    public static <T> BooleanExpression createBooleanExpression(
+    @Override
+    public <T> BooleanExpression createBooleanExpression(
             PathBuilder<T> entityPath, String fieldName, Object searchObj,
             String operator) {
         Boolean value = BooleanUtils.toBooleanObject((String) searchObj);
@@ -859,18 +627,10 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return an expression for {@code entityPath.fieldName} (for Strings) with
-     * the {@code operator} or "equal" by default.
-     * <p/>
-     * Expr: {@code entityPath.fieldName eq searchObj}
-     * 
-     * @param entityPath
-     * @param fieldName
-     * @param searchObj
-     * @param operator
-     * @return
+     * {@inheritDoc}
      */
-    public static <T> BooleanExpression createStringExpression(
+    @Override
+    public <T> BooleanExpression createStringExpression(
             PathBuilder<T> entityPath, String fieldName, Object searchObj,
             String operator) {
         if (StringUtils.equalsIgnoreCase(operator, OPERATOR_GOE)) {
@@ -892,21 +652,10 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return equal expression for {@code entityPath.fieldName}.
-     * <p/>
-     * Expr: {@code entityPath.fieldName eq 'searchStr'}
-     * <p/>
-     * Equal operation is case insensitive.
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the value to find, may be null
-     * @return BooleanExpression
+     * {@inheritDoc}
      */
-    public static <T> BooleanExpression createStringExpression(
+    @Override
+    public <T> BooleanExpression createStringExpression(
             PathBuilder<T> entityPath, String fieldName, String searchStr) {
         if (StringUtils.isEmpty(searchStr)) {
             return null;
@@ -917,21 +666,10 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return like expression for {@code entityPath.fieldName}.
-     * <p/>
-     * Expr: {@code entityPath.fieldName like ('%' + searchStr + '%')}
-     * <p/>
-     * Like operation is case insensitive.
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the value to find, may be null
-     * @return BooleanExpression
+     * {@inheritDoc}
      */
-    public static <T> BooleanExpression createStringLikeExpression(
+    @Override
+    public <T> BooleanExpression createStringLikeExpression(
             PathBuilder<T> entityPath, String fieldName, String searchStr) {
         if (StringUtils.isEmpty(searchStr)) {
             return null;
@@ -940,26 +678,15 @@ public class QuerydslUtils {
         BooleanExpression expression = entityPath.getString(fieldName).lower()
                 .like(str);
         return expression;
+
     }
 
     /**
-     * Return like expression for {@code entityPath.fieldName}.
-     * <p/>
-     * Expr: {@code entityPath.fieldName like ('%' + searchStr + '%')}
-     * <p/>
-     * Like operation is case insensitive.
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the value to find, may be null
-     * @return BooleanExpression
+     * {@inheritDoc}
      */
-    public static <T> BooleanExpression createStringExpressionWithOperators(
-            PathBuilder<T> entityPath, String fieldName, String searchStr,
-            ConversionService conversionService, MessageSource messageSource) {
+    @Override
+    public <T> BooleanExpression createStringExpressionWithOperators(
+            PathBuilder<T> entityPath, String fieldName, String searchStr) {
         if (StringUtils.isEmpty(searchStr)) {
             return null;
         }
@@ -1091,28 +818,12 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return where clause expression for number properties by casting it to
-     * string before check its value.
-     * <p/>
-     * Querydsl Expr:
-     * {@code entityPath.fieldName.stringValue() like ('%' + searchStr + '%')}
-     * Database operation:
-     * {@code str(entity.fieldName) like ('%' + searchStr + '%')}
-     * <p/>
-     * Like operation is case sensitive.
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the value to find, may be null
-     * @return PredicateOperation
+     * {@inheritDoc}
      */
-    public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression createNumberExpression(
+    @Override
+    public <T, N extends Number & Comparable<?>> BooleanExpression createNumberExpression(
             PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
-            TypeDescriptor descriptor, String searchStr,
-            ConversionService conversionService) {
+            TypeDescriptor descriptor, String searchStr) {
         if (StringUtils.isBlank(searchStr)) {
             return null;
         }
@@ -1156,30 +867,14 @@ public class QuerydslUtils {
         return expression;
     }
 
-/**
-     * Return where clause expression for number properties by casting it to
-     * string before check its value.
-     * <p/>
-     * Querydsl Expr:
-     * {@code entityPath.fieldName.stringValue() eq searchStr
-     * Database operation:
-     * {@code str(entity.fieldName) = searchStr
-     * <p/>
-     * Like operation is case sensitive.
-     *
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the value to find, may be null
-     * @return PredicateOperation
+    /**
+     * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
-    public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression createNumberExpressionEqual(
+    public <T, N extends Number & Comparable<?>> BooleanExpression createNumberExpressionEqual(
             PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
-            TypeDescriptor descriptor, String searchStr,
-            ConversionService conversionService) {
+            TypeDescriptor descriptor, String searchStr) {
         if (StringUtils.isEmpty(searchStr)) {
             return null;
         }
@@ -1205,65 +900,10 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return where clause expression for date properties, trying to parse the
-     * value to find to date and comparing it to the value of the date; if the
-     * value to find cannot be parsed to date, then try to cast the value to
-     * string before check it.
-     * <p/>
-     * <ul>
-     * <li>
-     * If value to find {@code searchStr} can be parsed using the patterns
-     * <em>dd-MM-yyyy HH:mm:ss</em> or <em>dd-MM-yyyy HH:mm</em> or
-     * <em>dd-MM-yyyy</em> to {@code searchDate}, then search by specific date:
-     * <p/>
-     * - Querydsl Expr: {@code entityPath.fieldName = searchDate}
-     * <p/>
-     * - Database operation: {@code entity.fieldName = searchDate}</li>
-     * <li>
-     * If value to find {@code searchStr} can be parsed using the pattern
-     * <em>dd-MM</em> to {@code searchDate}, then search by specific day and
-     * month:
-     * <p/>
-     * - Querydsl Expr:
-     * {@code entityPath.fieldName.dayOfMonth() = searchDate.day and entityPath.fieldName.month() = searchDate.month}
-     * <p/>
-     * - Database operation:
-     * {@code dayofmonth(entity.fieldName) = searchDate.day && month(entity.fieldName) = searchDate.month}
-     * </li>
-     * <li>
-     * If value to find {@code searchStr} can be parsed using the pattern
-     * <em>MM-aaaa</em> to {@code searchDate}, then obtain the first day of the
-     * month for that year and the last day of the month for that year and check
-     * that value is into between theses values:
-     * <p/>
-     * - Querydsl Expr:
-     * {@code entityPath.fieldName.between(searchDate.firstDayOfMonth, searchDate.lastDayOfMonth)}
-     * <p/>
-     * - Database operation:
-     * {@code entity.fieldName between searchDate.firstDayOfMonth and searchDate.lastDayOfMonth}
-     * </li>
-     * <li>
-     * If value to find cannot be parsed as date, then try to cast the value to
-     * string before check it:
-     * <p/>
-     * - Querydsl Expr:
-     * {@code entityPath.fieldName.stringValue() like ('%' + searchStr + '%')}
-     * <p/>
-     * - Database operation:
-     * {@code str(entity.fieldName) like ('%' + searchStr + '%')}
-     * <p/>
-     * Note that like operation is case sensitive.</li>
-     * </ul>
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the value to find, may be null
-     * @return PredicateOperation
+     * {@inheritDoc}
      */
-    public static <T, C extends java.lang.Comparable<?>> BooleanExpression createDateExpression(
+    @Override
+    public <T, C extends Comparable<?>> BooleanExpression createDateExpression(
             PathBuilder<T> entityPath, String fieldName, Class<C> fieldType,
             String searchStr) {
         if (StringUtils.isEmpty(searchStr)) {
@@ -1373,68 +1013,12 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return where clause expression for date properties, trying to parse the
-     * value to find to date and comparing it to the value of the date; if the
-     * value to find cannot be parsed to date, then try to cast the value to
-     * string before check it.
-     * <p/>
-     * <ul>
-     * <li>
-     * If value to find {@code searchStr} can be parsed using the patterns
-     * <em>dd-MM-yyyy HH:mm:ss</em> or <em>dd-MM-yyyy HH:mm</em> or
-     * <em>dd-MM-yyyy</em> to {@code searchDate}, then search by specific date:
-     * <p/>
-     * - Querydsl Expr: {@code entityPath.fieldName = searchDate}
-     * <p/>
-     * - Database operation: {@code entity.fieldName = searchDate}</li>
-     * <li>
-     * If value to find {@code searchStr} can be parsed using the pattern
-     * <em>dd-MM</em> to {@code searchDate}, then search by specific day and
-     * month:
-     * <p/>
-     * - Querydsl Expr:
-     * {@code entityPath.fieldName.dayOfMonth() = searchDate.day and entityPath.fieldName.month() = searchDate.month}
-     * <p/>
-     * - Database operation:
-     * {@code dayofmonth(entity.fieldName) = searchDate.day && month(entity.fieldName) = searchDate.month}
-     * </li>
-     * <li>
-     * If value to find {@code searchStr} can be parsed using the pattern
-     * <em>MM-aaaa</em> to {@code searchDate}, then obtain the first day of the
-     * month for that year and the last day of the month for that year and check
-     * that value is into between theses values:
-     * <p/>
-     * - Querydsl Expr:
-     * {@code entityPath.fieldName.between(searchDate.firstDayOfMonth, searchDate.lastDayOfMonth)}
-     * <p/>
-     * - Database operation:
-     * {@code entity.fieldName between searchDate.firstDayOfMonth and searchDate.lastDayOfMonth}
-     * </li>
-     * <li>
-     * If value to find cannot be parsed as date, then try to cast the value to
-     * string before check it:
-     * <p/>
-     * - Querydsl Expr:
-     * {@code entityPath.fieldName.stringValue() like ('%' + searchStr + '%')}
-     * <p/>
-     * - Database operation:
-     * {@code str(entity.fieldName) like ('%' + searchStr + '%')}
-     * <p/>
-     * Note that like operation is case sensitive.</li>
-     * </ul>
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the value to find, may be null
-     * @return PredicateOperation
+     * {@inheritDoc}
      */
-    public static <T, C extends java.lang.Comparable<?>> BooleanExpression createDateExpressionWithOperators(
+    @Override
+    public <T, C extends Comparable<?>> BooleanExpression createDateExpressionWithOperators(
             PathBuilder<T> entityPath, String fieldName, Class<C> fieldType,
-            String searchStr, ConversionService conversionService,
-            MessageSource messageSource, String datePattern) {
+            String searchStr, String datePattern) {
         if (StringUtils.isEmpty(searchStr)) {
             return null;
         }
@@ -1591,26 +1175,11 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return where clause expression for non-String
-     * {@code entityPath.fieldName} by transforming it to text before check its
-     * value.
-     * <p/>
-     * Expr:
-     * {@code entityPath.fieldName.as(String.class) like ('%' + searchStr + '%')}
-     * <p/>
-     * Like operation is case insensitive.
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the value to find, may be null
-     * @param enumClass Enumeration type. Needed to enumeration values
-     * @return BooleanExpression
+     * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static <T> BooleanExpression createEnumExpression(
+    public <T> BooleanExpression createEnumExpression(
             PathBuilder<T> entityPath, String fieldName, String searchStr,
             Class<? extends Enum> enumClass) {
         if (StringUtils.isEmpty(searchStr)) {
@@ -1662,21 +1231,10 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return where clause expression for {@code Boolean} fields by transforming
-     * the given {@code searchStr} to {@code Boolean} before check its value.
-     * <p/>
-     * Expr: {@code entityPath.fieldName eq (TRUE | FALSE)}
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the boolean value to find, may be null. Supported string
-     *        are: si, yes, true, on, no, false, off
-     * @return BooleanExpression
+     * {@inheritDoc}
      */
-    public static <T> BooleanExpression createBooleanExpression(
+    @Override
+    public <T> BooleanExpression createBooleanExpression(
             PathBuilder<T> entityPath, String fieldName, String searchStr) {
         if (StringUtils.isBlank(searchStr)) {
             return null;
@@ -1703,23 +1261,11 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return where clause expression for {@code Boolean} fields by transforming
-     * the given {@code searchStr} to {@code Boolean} before check its value.
-     * <p/>
-     * Expr: {@code entityPath.fieldName eq (TRUE | FALSE)}
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
-     * @param searchStr the boolean value to find, may be null. Supported string
-     *        are: si, yes, true, on, no, false, off
-     * @return BooleanExpression
+     * {@inheritDoc}
      */
-    public static <T> BooleanExpression createBooleanExpressionWithOperators(
-            PathBuilder<T> entityPath, String fieldName, String searchStr,
-            ConversionService conversionService, MessageSource messageSource) {
+    @Override
+    public <T> BooleanExpression createBooleanExpressionWithOperators(
+            PathBuilder<T> entityPath, String fieldName, String searchStr) {
         if (StringUtils.isBlank(searchStr)) {
             return null;
         }
@@ -1783,26 +1329,10 @@ public class QuerydslUtils {
     }
 
     /**
-     * Return IN expression for {@code entityPath.fieldName}.
-     * <p/>
-     * Expr: <br/>
-     * entityPath.fieldName IN ( values ) <br/>
-     * <br/>
-     * If values.size() > 500 its generates: <br/>
-     * Expr: <br/>
-     * (entityPath.fieldName IN ( values[0-500] ) OR [entityPath.fieldName IN (
-     * values[501-100]... ])) <br/>
-     * <br/>
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code name} in {@code Pet} entity, {@code firstName} in
-     *        {@code Pet.owner} entity.
-     * @param values the Set of values to find the given field name, may be null
-     * @return BooleanExpression
+     * {@inheritDoc}
      */
-    public static <T, E> BooleanExpression createCollectionExpression(
+    @Override
+    public <T, E> BooleanExpression createCollectionExpression(
             PathBuilder<T> entityPath, String fieldName, Collection<E> values) {
         if (StringUtils.isEmpty(fieldName) || values.isEmpty()) {
             return null;
@@ -1829,26 +1359,18 @@ public class QuerydslUtils {
         }
     }
 
-    public static <T, E> BooleanExpression doCreateCollectionExpression(
+    @Override
+    public <T, E> BooleanExpression doCreateCollectionExpression(
             PathBuilder<T> entityPath, String fieldName, Collection<E> values) {
         BooleanExpression expression = entityPath.get(fieldName).in(values);
         return expression;
     }
 
     /**
-     * Create an order-by-element in a Query instance
-     * 
-     * @param entityPath Full path to entity and associations. For example:
-     *        {@code Pet} , {@code Pet.owner}
-     * @param fieldName Property name in the given entity path. For example:
-     *        {@code weight} in {@code Pet} entity, {@code age} in
-     *        {@code Pet.owner} entity.
-     * @param fieldType Property value {@code Class}. Must implements
-     *        {@link Comparable}
-     * @param order ascending or descending order
-     * @return
+     * {@inheritDoc}
      */
-    public static <T, E extends Comparable<?>> OrderSpecifier<?> createOrderSpecifier(
+    @Override
+    public <T, E extends Comparable<?>> OrderSpecifier<?> createOrderSpecifier(
             PathBuilder<T> entityPath, String fieldName, Class<E> fieldType,
             Order order) {
         OrderSpecifier<?> orderBy = null;
@@ -1864,21 +1386,13 @@ public class QuerydslUtils {
     }
 
     /**
-     * This method returns the query expression based on String expression
-     * user-written.
-     * 
-     * Expression can be "=", ">", "<", ">=", "<=", "<>", "!=",
-     * "ENTRENUMERO(n1;n2)"
-     * 
-     * @param searchStr
-     * @return
+     * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
-    public static <T, N extends java.lang.Number & java.lang.Comparable<?>> BooleanExpression getNumericFilterExpression(
+    public <T, N extends Number & Comparable<?>> BooleanExpression getNumericFilterExpression(
             PathBuilder<T> entityPath, String fieldName, Class<N> fieldType,
-            TypeDescriptor descriptor, String searchStr,
-            ConversionService conversionService, MessageSource messageSource) {
-
+            TypeDescriptor descriptor, String searchStr) {
         if (StringUtils.isEmpty(searchStr)) {
             return null;
         }
@@ -1985,32 +1499,23 @@ public class QuerydslUtils {
         }
 
         return null;
+
     }
 
     /**
-     * Obtains the class type of the property named as {@code fieldName} of the
-     * entity.
-     * 
-     * @param fieldName the field name.
-     * @param entity the entity with a property named as {@code fieldName}
-     * @return the class type
+     * {@inheritDoc}
      */
-    public static <T> Class<?> getFieldType(String fieldName,
-            PathBuilder<T> entity) {
+    @Override
+    public <T> Class<?> getFieldType(String fieldName, PathBuilder<T> entity) {
         TypeDescriptor descriptor = getTypeDescriptor(fieldName, entity);
         return descriptor.getType();
     }
 
     /**
-     * Obtains the class type of the property named as {@code fieldName} of the
-     * entity.
-     * 
-     * @param fieldName the field name.
-     * @param entity the entity with a property named as {@code fieldName}
-     * @return the class type
+     * {@inheritDoc}
      */
-    public static <T> Class<?> getFieldType1(String fieldName,
-            PathBuilder<T> entity) {
+    @Override
+    public <T> Class<?> getFieldType1(String fieldName, PathBuilder<T> entity) {
         Class<?> entityType = entity.getType();
         String fieldNameToFindType = fieldName;
 
@@ -2033,13 +1538,10 @@ public class QuerydslUtils {
     }
 
     /**
-     * Obtains the descriptor of the filtered field
-     * 
-     * @param fieldName
-     * @param entity
-     * @return
+     * {@inheritDoc}
      */
-    public static <T> TypeDescriptor getTypeDescriptor(String fieldName,
+    @Override
+    public <T> TypeDescriptor getTypeDescriptor(String fieldName,
             PathBuilder<T> entity) {
         Class<?> entityType = entity.getType();
         if (entityType == Object.class) {
@@ -2057,13 +1559,10 @@ public class QuerydslUtils {
     }
 
     /**
-     * Obtains the descriptor of the filtered field
-     * 
-     * @param fieldName
-     * @param entityType
-     * @return
+     * {@inheritDoc}
      */
-    public static <T> TypeDescriptor getTypeDescriptor(String fieldName,
+    @Override
+    public <T> TypeDescriptor getTypeDescriptor(String fieldName,
             Class<T> entityType) {
         String fieldNameToFindType = fieldName;
         BeanWrapper beanWrapper = getBeanWrapper(entityType);
@@ -2094,18 +1593,27 @@ public class QuerydslUtils {
     }
 
     /**
-     * This method checks if the search string can be converted to a number
-     * using conversionService with locale.
-     * 
-     * @param searchStr
-     * @param conversionService
-     * @param descriptor
-     * @return
+     * {@inheritDoc}
      */
-    public static boolean isNumber(String searchStr,
-            ConversionService conversionService, TypeDescriptor descriptor) {
-
+    @Override
+    public boolean isNumber(String searchStr, TypeDescriptor descriptor) {
         return isValidValueFor(searchStr, descriptor, conversionService);
-
     }
+
+    protected ConversionService getConversionService() {
+        return conversionService;
+    }
+
+    protected MessageSource getMessageSource() {
+        return messageSource;
+    }
+
+    protected EntityManagerProvider getEntityManagerProvider() {
+        return entityManagerProvider;
+    }
+
+    protected static LoadingCache<Class<?>, BeanWrapper> getBeanWrappersCache() {
+        return beanWrappersCache;
+    }
+
 }

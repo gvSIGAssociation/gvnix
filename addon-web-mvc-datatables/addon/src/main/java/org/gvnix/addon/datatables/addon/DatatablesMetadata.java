@@ -45,7 +45,7 @@ import static org.gvnix.addon.datatables.addon.DatatablesConstants.DATATABLES_HT
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.DATATABLES_PARAMS;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.DATATABLES_PDF_EXPORT;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.DATATABLES_RESPONSE;
-import static org.gvnix.addon.datatables.addon.DatatablesConstants.DATATABLES_UTILS;
+import static org.gvnix.addon.datatables.addon.DatatablesConstants.DATATABLES_UTILS_BEAN;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.DATATABLES_XLSX_EXPORT;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.DATATABLES_XLS_EXPORT;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.DATATABLES_XML_EXPORT;
@@ -77,7 +77,7 @@ import static org.gvnix.addon.datatables.addon.DatatablesConstants.PRINT_WRITER;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.QDSL_BOOLEAN_BUILDER;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.QDSL_JPA_QUERY;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.QDSL_PATH_BUILDER;
-import static org.gvnix.addon.datatables.addon.DatatablesConstants.QUERYDSL_UTILS;
+import static org.gvnix.addon.datatables.addon.DatatablesConstants.QUERYDSL_UTILS_BEAN;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.REDIRECT_ATTRIBUTES;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.REDIRECT_MODEL;
 import static org.gvnix.addon.datatables.addon.DatatablesConstants.RENDER_UPDATE_FORMS_METHOD;
@@ -204,7 +204,7 @@ public class DatatablesMetadata extends
             "retrieveData");
 
     private static final JavaSymbolName DATATABLES_MANAGER_PROVIDER_NAME = new JavaSymbolName(
-            "entityManagerProvider");
+            "entityManagerProvider_dtt");
 
     private static final Logger LOGGER = HandlerUtils
             .getLogger(DatatablesMetadata.class);
@@ -292,6 +292,11 @@ public class DatatablesMetadata extends
     private FieldMetadata conversionService;
 
     /**
+     * field which holds EntityManagerProvider
+     */
+    private FieldMetadata entityManagerProvider;
+
+    /**
      * Field which holds messageSource
      */
     private FieldMetadata messageSource;
@@ -302,7 +307,17 @@ public class DatatablesMetadata extends
     private FieldMetadata beanWrapper;
 
     /**
-     * Itd builder herlper
+     * Field which holds DatatablesUtilsBean
+     */
+    private FieldMetadata datatablesUtilsBean;
+
+    /**
+     * Field which holds QuerydslUtilsBean
+     */
+    private FieldMetadata querydslUtilsBean;
+
+    /**
+     * Itd builder helper
      */
     private final WebItdBuilderHelper helper;
 
@@ -314,7 +329,7 @@ public class DatatablesMetadata extends
     private final Map<FinderMetadataDetails, QueryHolderTokens> findersRegistered;
 
     /**
-     * Name to use for findAll method (name includes entity plurar)
+     * Name to use for findAll method (name includes entity plural )
      */
     private final JavaSymbolName findAllMethodName;
 
@@ -426,6 +441,8 @@ public class DatatablesMetadata extends
         builder.addField(getMessageSourceField());
         builder.addField(getBeanWrapperField());
         builder.addField(getEntityManagerProvider());
+        builder.addField(getDatatablesUtilsBean());
+        builder.addField(getQuerydslUtilsBean());
 
         // Adding methods
         builder.addMethod(getListDatatablesRequestMethod());
@@ -508,20 +525,6 @@ public class DatatablesMetadata extends
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
-    }
-
-    private FieldMetadata getEntityManagerProvider() {
-        JavaType backingType = new JavaType(DATATABLES_MANAGER_PROVIDER);
-
-        // AutoWired
-        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
-        annotations.add(new AnnotationMetadataBuilder(AUTOWIRED));
-
-        final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
-                getId(), Modifier.PRIVATE, annotations,
-                DATATABLES_MANAGER_PROVIDER_NAME, backingType);
-
-        return fieldBuilder.build();
     }
 
     /**
@@ -659,19 +662,20 @@ public class DatatablesMetadata extends
                 "set.addAll(%s.asList(%s));",
                 helper.getFinalTypeName(JdkJavaType.ARRAYS),
                 IDS_PARAM_NAME.getSymbolName()));
-        // BooleanBuilder filterBy = QuerydslUtils.createPredicateByIn(entity,
+        // BooleanBuilder filterBy =
+        // querydslUtilsBean_dtt.createPredicateByIn(entity,
         // "id", set);
         bodyBuilder.appendFormalLine(String.format(
                 "%s filterBy = %s.createPredicateByIn(entity, \"%s\", set);",
-                helper.getFinalTypeName(QDSL_BOOLEAN_BUILDER), helper
-                        .getFinalTypeName(QUERYDSL_UTILS), entityIdentifier
-                        .getFieldName().getSymbolName()));
+                helper.getFinalTypeName(QDSL_BOOLEAN_BUILDER),
+                getQuerydslUtilsBean().getFieldName().getSymbolName(),
+                entityIdentifier.getFieldName().getSymbolName()));
 
         // // Create a query with filter
         bodyBuilder.appendFormalLine("// Create a query with filter");
 
         // JPAQuery query = new
-        // JPAQuery(entityManagerProvider.getEntityManager(Vet.class));
+        // JPAQuery(entityManagerProvider_dtt.getEntityManager(Vet.class));
         bodyBuilder.appendFormalLine(String.format(
                 "%s query = new %s(%s.getEntityManager(%s.class));",
                 helper.getFinalTypeName(QDSL_JPA_QUERY),
@@ -1345,7 +1349,7 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("// Create a query with filter");
         // JPAQuery query = new JPAQuery(Visit.entityManager());
         // JPAQuery query = new
-        // JPAQuery(entityManagerProvider.getEntityManager(Vet.class));
+        // JPAQuery(entityManagerProvider_dtt.getEntityManager(Vet.class));
         bodyBuilder.appendFormalLine(String.format(
                 "%s query = new %s(%s.getEntityManager(%s.class));",
                 helper.getFinalTypeName(QDSL_JPA_QUERY),
@@ -1766,14 +1770,15 @@ public class DatatablesMetadata extends
         // }
         bodyBuilder.appendFormalLine("}");
 
-        // uiModel.addFlashAttribute(DatatablesUtils.ROWS_ON_TOP_IDS_PARAM,
+        // uiModel.addFlashAttribute(DatatablesUtilsBean.ROWS_ON_TOP_IDS_PARAM,
         // pet.getId());
         bodyBuilder.appendFormalLine(String.format(
                 "%s.addFlashAttribute(%s.ROWS_ON_TOP_IDS_PARAM, %s.%s());",
                 REDIRECT_MODEL.getSymbolName(), helper
-                        .getFinalTypeName(DATATABLES_UTILS), entityParamName,
-                helper.getGetterMethodNameForField(entityIdentifier
-                        .getFieldName())));
+                        .getFinalTypeName(DATATABLES_UTILS_BEAN),
+                entityParamName, helper
+                        .getGetterMethodNameForField(entityIdentifier
+                                .getFieldName())));
 
         bodyBuilder
                 .appendFormalLine("// If create success, redirect to given URL: master datatables");
@@ -1916,14 +1921,15 @@ public class DatatablesMetadata extends
         // }
         bodyBuilder.appendFormalLine("}");
 
-        // uiModel.addFlashAttribute(DatatablesUtils.ROWS_ON_TOP_IDS_PARAM,
+        // uiModel.addFlashAttribute(DatatablesUtilsBean.ROWS_ON_TOP_IDS_PARAM,
         // pet.getId());
         bodyBuilder.appendFormalLine(String.format(
                 "%s.addFlashAttribute(%s.ROWS_ON_TOP_IDS_PARAM, %s.%s());",
                 REDIRECT_MODEL.getSymbolName(), helper
-                        .getFinalTypeName(DATATABLES_UTILS), entityParamName,
-                helper.getGetterMethodNameForField(entityIdentifier
-                        .getFieldName())));
+                        .getFinalTypeName(DATATABLES_UTILS_BEAN),
+                entityParamName, helper
+                        .getGetterMethodNameForField(entityIdentifier
+                                .getFieldName())));
 
         bodyBuilder
                 .appendFormalLine("// If update success, redirect to given URL: master datatables");
@@ -2199,32 +2205,20 @@ public class DatatablesMetadata extends
 
         /*
          * for (String key : keySet) { if
-         * (key.startsWith(QuerydslUtils.OPERATOR_PREFIX)) {
+         * (key.startsWith(QuerydslUtilsBean.OPERATOR_PREFIX)) {
          * propertyValuesMap.put(key, params.get(key)); } else if
-         * (DatatablesUtils.ROWS_ON_TOP_IDS_PARAM.equals(key)) {
+         * (DatatablesUtilsBean.ROWS_ON_TOP_IDS_PARAM.equals(key)) {
          * propertyValuesMap.put(key, request.getParams().get(key)); } }
          */
         bodyBuilder.appendFormalLine("for (String key : keySet) {");
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine(String.format(
-                "if (key.startsWith(%s.OPERATOR_PREFIX)) {",
-                helper.getFinalTypeName(QUERYDSL_UTILS)));
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("if (datatablesUtilsBean_dtt.isSpecialFilterParameters(key)) {",
+                                helper.getFinalTypeName(QUERYDSL_UTILS_BEAN)));
         bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("propertyValuesMap.put(key, params.get(key));");
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine(String.format(
-                "} else if (%s.ROWS_ON_TOP_IDS_PARAM.equals(key)) {",
-                helper.getFinalTypeName(DATATABLES_UTILS)));
-        bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("propertyValuesMap.put(key, request.getParameterMap().get(key));");
-        bodyBuilder.indentRemove();
-        bodyBuilder
-                .appendFormalLine("} else if(DatatablesUtils.BOUNDING_BOX_PARAM.equals(key) || DatatablesUtils.BOUNDING_BOX_FIELDS_PARAM.equals(key)){");
-        bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("propertyValuesMap.put(key, request.getParameterMap().get(key));");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
         bodyBuilder.indentRemove();
@@ -2650,20 +2644,22 @@ public class DatatablesMetadata extends
                             expBuilder.append(fHelper
                                     .getToLowerOperatorFor(fieldType));
                         }
-                        // mark as field getter is already processed
+                        // Mark as field getter is already processed
                         isNewField = false;
 
-                        // mark as condition is no included
+                        // Mark as condition is no included
                         isConditionApplied = false;
                         isOperatorApplied = false;
                     }
 
+                    // Reserved is an operator "and" or "or" given
                     if (reservedToken.equalsIgnoreCase("And")
                             || reservedToken.equalsIgnoreCase("Or")) {
+                        // Last token isnt "between"
                         if (!isBetweenCondition) {
                             if (reservedToken.equalsIgnoreCase("And")) {
                                 if (!isConditionApplied) {
-                                    // use .eq() operator if condition not
+                                    // Use .eq() operator if condition not
                                     // applied
                                     expBuilder.append(fHelper
                                             .getEqualExpression(fieldName));
@@ -2673,6 +2669,8 @@ public class DatatablesMetadata extends
                                             lastFieldToken, expBuilder, "and");
                                 }
                                 else {
+                                    // If there is a held condition,
+                                    // create the full expression
                                     createBaseSearchExpressionWithNullCheck(
                                             bodyBuilder, fHelper,
                                             lastFieldToken, condition, "and");
@@ -2681,7 +2679,7 @@ public class DatatablesMetadata extends
 
                             if (reservedToken.equalsIgnoreCase("Or")) {
                                 if (!isConditionApplied) {
-                                    // use .eq() operator if condition not
+                                    // Use .eq() operator if condition not
                                     // applied
                                     expBuilder.append(fHelper
                                             .getEqualExpression(fieldName));
@@ -2692,20 +2690,26 @@ public class DatatablesMetadata extends
                                 }
                                 else {
                                     createBaseSearchExpressionWithNullCheck(
+                                            // Use held condition if a condition
+                                            // was applied
                                             bodyBuilder, fHelper,
                                             lastFieldToken, condition, "or");
                                 }
                             }
                         }
+                        // Hold given operator to create the expression if
+                        // necessary
                         op = reservedToken.toLowerCase();
                         condition = null;
                         isOperatorApplied = true;
+                        // Reset flags to next operation
                         isConditionApplied = false;
                         isBetweenCondition = false;
 
                     }
                     else {
 
+                        // Reserved token is a condition
                         if (reservedToken.equalsIgnoreCase("Between")) {
                             // use .between(minField,maxField) expression
                             createBaseSearchExpressionWithNullCheck(
@@ -2768,6 +2772,8 @@ public class DatatablesMetadata extends
                                     .getEqualExpression(fieldName));
                         }
                         if (expBuilder != null) {
+                            // Hold current expression with condition applied
+                            // to create the full expression with an operator
                             condition = expBuilder;
                         }
                         isConditionApplied = true;
@@ -2789,7 +2795,7 @@ public class DatatablesMetadata extends
                 }
             }
             else {
-                // current token is a field
+                // Current token is a field
                 lastFieldToken = (FieldToken) token;
                 isNewField = true;
             }
@@ -2821,13 +2827,16 @@ public class DatatablesMetadata extends
             isConditionApplied = true;
         }
 
+        // Create the whole expression if it's not alreeady created
         if (!isBetweenCondition) {
             if (!isOperatorApplied) {
+                // Use default operator if it isnt applied
                 createBaseSearchExpressionWithNullCheck(bodyBuilder, fHelper,
                         lastFieldToken, expBuilder, "and");
             }
 
             else {
+                // Use hold operator
                 createBaseSearchExpressionWithNullCheck(bodyBuilder, fHelper,
                         lastFieldToken, expBuilder, op);
             }
@@ -3255,27 +3264,28 @@ public class DatatablesMetadata extends
         bodyBuilder
                 .appendFormalLine("headers.add(\"Content-Type\", \"application/json; charset=utf-8\");");
 
-        // if(beanWrapper == null){
-        bodyBuilder.appendFormalLine("if(beanWrapper == null){");
+        // if(beanWrapper_dtt == null){
+        bodyBuilder.appendFormalLine("if(beanWrapper_dtt == null){");
         bodyBuilder.indent();
 
-        // beanWrapper = new BeanWrapperImpl(XXX.class);
+        // beanWrapper_dtt = new BeanWrapperImpl(XXX.class);
         bodyBuilder.appendFormalLine(String.format(
-                "beanWrapper = new %s(%s.class);", helper
+                "beanWrapper_dtt = new %s(%s.class);", helper
                         .getFinalTypeName(new JavaType(
                                 "org.springframework.beans.BeanWrapperImpl")),
                 helper.getFinalTypeName(entity)));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        // Class type = beanWrapper.getPropertyType(property);
+        // Class type = beanWrapper_dtt.getPropertyType(property);
         bodyBuilder
-                .appendFormalLine("Class type = beanWrapper.getPropertyType(property);");
+                .appendFormalLine("Class type = beanWrapper_dtt.getPropertyType(property);");
 
-        // boolean response = DatatablesUtils.checkFilterExpressions(type,
-        // expression, messageSource_dtt);
+        // boolean response =
+        // datatablesUtilsBean_dtt.checkFilterExpressions(type,
+        // expression);
         bodyBuilder
-                .appendFormalLine("boolean response = DatatablesUtils.checkFilterExpressions(type,expression, messageSource_dtt);");
+                .appendFormalLine("boolean response = datatablesUtilsBean_dtt.checkFilterExpressions(type,expression);");
 
         // return new ResponseEntity<String>(
         // String.format("{ \"response\": %s, \"property\": \"%s\"}",
@@ -4368,19 +4378,16 @@ public class DatatablesMetadata extends
                     jpaQueryMetadata.getOrderByMethodName().getSymbolName());
 
             // SearchResults<Pet> searchResult =
-            // DatatablesUtils.findByCriteria(Pet.class,
-            // Pet.getFilterByAssociations(), Pet.getOrderByAssociations(),
-            // Pet.entityManager(), criterias);
+            // datatablesUtilsBean_dtt.findByCriteria(entity, criterias,
+            // baseSearch);
 
             if (baseSearch) {
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s searchResult = %s.findByCriteria(entity, %s.getEntityManager(%s.class), %s, baseSearch);",
+                                .format("%s searchResult = %s.findByCriteria(entity, %s, baseSearch);",
                                         helper.getFinalTypeName(searchResult),
-                                        helper.getFinalTypeName(DATATABLES_UTILS),
-                                        DATATABLES_MANAGER_PROVIDER_NAME,
-                                        entityTypeName, CRITERIA_PARAM_NAME
-                                                .getSymbolName()));
+                                        getDatatablesUtilsBeanName(),
+                                        CRITERIA_PARAM_NAME.getSymbolName()));
 
             }
             else {
@@ -4399,33 +4406,32 @@ public class DatatablesMetadata extends
                 bodyBuilder
                         .appendFormalLine("setDatatablesBaseFilter(baseSearchValuesMap);");
 
+                // SearchResults<Pet> searchResult =
+                // datatablesUtilsBean_dtt.findByCriteria(Pet.class,
+                // Pet.getFilterByAssociations(),
+                // Pet.getOrderByAssociations(), criteria, baseSearchValuesMap);
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s.getEntityManager(%s.class), %s, baseSearchValuesMap, conversionService_dtt, messageSource_dtt);",
+                                .format("%s searchResult = %s.findByCriteria(%s.class, %s, %s, %s, baseSearchValuesMap);",
                                         helper.getFinalTypeName(searchResult),
-                                        helper.getFinalTypeName(DATATABLES_UTILS),
+                                        getDatatablesUtilsBeanName(),
                                         entityTypeName, filterByInfo,
                                         orderByInfo,
-                                        DATATABLES_MANAGER_PROVIDER_NAME,
-                                        entityTypeName, CRITERIA_PARAM_NAME
-                                                .getSymbolName()));
+                                        CRITERIA_PARAM_NAME.getSymbolName()));
             }
         }
         else {
 
             // SearchResults<Pet> searchResult =
-            // DatatablesUtils.findByCriteria(Pet.class,
-            // Pet.getFilterByAssociations(), Pet.getOrderByAssociations(),
-            // entityManagerProvider.getEntityManager(Pet.class), criterias);
+            // datatablesUtilsBean_dtt.findByCriteria(entity, criterias,
+            // baseSearch);
             if (baseSearch) {
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s searchResult = %s.findByCriteria(entity, %s.getEntityManager(%s.class), %s, baseSearch);",
+                                .format("%s searchResult = %s.findByCriteria(entity, %s, baseSearch);",
                                         helper.getFinalTypeName(searchResult),
-                                        helper.getFinalTypeName(DATATABLES_UTILS),
-                                        DATATABLES_MANAGER_PROVIDER_NAME,
-                                        entityTypeName, CRITERIA_PARAM_NAME
-                                                .getSymbolName()));
+                                        getDatatablesUtilsBeanName(),
+                                        CRITERIA_PARAM_NAME.getSymbolName()));
             }
             else {
 
@@ -4442,15 +4448,17 @@ public class DatatablesMetadata extends
                 bodyBuilder
                         .appendFormalLine("setDatatablesBaseFilter(baseSearchValuesMap);");
 
+                // SearchResults<Pet> searchResult =
+                // datatablesUtilsBean_dtt.findByCriteria(Pet.class,
+                // criterias, baseSearch);
+
                 bodyBuilder
                         .appendFormalLine(String
-                                .format("%s searchResult = %s.findByCriteria(%s.class, %s.getEntityManager(%s.class), %s, baseSearchValuesMap, conversionService_dtt, messageSource_dtt);",
+                                .format("%s searchResult = %s.findByCriteria(%s.class, %s, baseSearchValuesMap);",
                                         helper.getFinalTypeName(searchResult),
-                                        helper.getFinalTypeName(DATATABLES_UTILS),
+                                        getDatatablesUtilsBeanName(),
                                         entityTypeName,
-                                        DATATABLES_MANAGER_PROVIDER_NAME,
-                                        entityTypeName, CRITERIA_PARAM_NAME
-                                                .getSymbolName()));
+                                        CRITERIA_PARAM_NAME.getSymbolName()));
             }
 
         }
@@ -4464,6 +4472,10 @@ public class DatatablesMetadata extends
         bodyBuilder
                 .appendFormalLine("long recordsFound = searchResult.getResultsCount();");
         return entityTypeName;
+    }
+
+    private String getDatatablesUtilsBeanName() {
+        return getDatatablesUtilsBean().getFieldName().getSymbolName();
     }
 
     /**
@@ -4500,18 +4512,16 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("");
         /*
          * DataSet<Map<String, String>> dataSet =
-         * DatatablesUtils.populateDataSet(searchResult.getResult(),
+         * datatablesUtilsBean_dtt.populateDataSet(searchResult.getResult(),
          * pkFieldName, totalRecords, recordsFound, criterias.getColumnDefs(),
-         * datePattern, conversionService_datatables);
+         * datePattern);
          */
 
         bodyBuilder
                 .appendFormalLine(String
-                        .format("%s dataSet = %s.populateDataSet(searchResult.getResults(), pkFieldName, totalRecords, recordsFound, criterias.getColumnDefs(), %s, %s); ",
+                        .format("%s dataSet = %s.populateDataSet(searchResult.getResults(), pkFieldName, totalRecords, recordsFound, criterias.getColumnDefs(), %s); ",
                                 helper.getFinalTypeName(DATA_SET_MAP_STRING_STRING),
-                                helper.getFinalTypeName(DATATABLES_UTILS),
-                                dateFormatVarName, getConversionServiceField()
-                                        .getFieldName().getSymbolName()));
+                                getDatatablesUtilsBeanName(), dateFormatVarName));
 
         // return DatatablesResponse.build(dataSet,criterias);
         bodyBuilder.appendFormalLine(String.format(
@@ -4567,6 +4577,48 @@ public class DatatablesMetadata extends
         return conversionService;
     }
 
+    private FieldMetadata getEntityManagerProvider() {
+        if (entityManagerProvider == null) {
+            JavaSymbolName curName = DATATABLES_MANAGER_PROVIDER_NAME;
+            // Check if field exist
+            FieldMetadata currentField = governorTypeDetails
+                    .getDeclaredField(curName);
+            if (currentField != null
+                    && !isEntityManagerProviderField(currentField)) {
+                // No compatible field: look for new name
+                currentField = null;
+                JavaSymbolName newName = new JavaSymbolName("entityManagerProv");
+                currentField = governorTypeDetails.getDeclaredField(newName);
+                while (currentField != null
+                        && !isConversionServiceField(currentField)) {
+                    newName = new JavaSymbolName(newName.getSymbolName()
+                            .concat("_"));
+                    currentField = governorTypeDetails
+                            .getDeclaredField(newName);
+                }
+                curName = newName;
+            }
+            if (currentField != null) {
+                entityManagerProvider = currentField;
+            }
+            else {
+                // create field
+                JavaType backingType = new JavaType(DATATABLES_MANAGER_PROVIDER);
+
+                // AutoWired
+                List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+                annotations.add(new AnnotationMetadataBuilder(AUTOWIRED));
+                // Using the FieldMetadataBuilder to create the field
+                // definition.
+                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                        getId(), Modifier.PRIVATE, annotations, curName,
+                        backingType);
+                entityManagerProvider = fieldBuilder.build();
+            }
+        }
+        return entityManagerProvider;
+    }
+
     /**
      * Create metadata for auto-wired messageSource field.
      * 
@@ -4614,20 +4666,117 @@ public class DatatablesMetadata extends
     }
 
     /**
+     * Create metadata for DatatablesUtilsBean field.
+     * 
+     * @return a FieldMetadata object
+     */
+    public FieldMetadata getDatatablesUtilsBean() {
+        if (datatablesUtilsBean == null) {
+            JavaSymbolName curName = new JavaSymbolName(
+                    "datatablesUtilsBean_dtt");
+            // Check if field exist
+            FieldMetadata currentField = governorTypeDetails
+                    .getDeclaredField(curName);
+            if (currentField != null && !isDatatablesUtilsBean(currentField)) {
+                // No compatible field: look for new name
+                currentField = null;
+                JavaSymbolName newName = new JavaSymbolName(
+                        "datatablesUtilsBean_dt");
+                currentField = governorTypeDetails.getDeclaredField(newName);
+                while (currentField != null
+                        && !isDatatablesUtilsBean(currentField)) {
+                    newName = new JavaSymbolName(newName.getSymbolName()
+                            .concat("_"));
+                    currentField = governorTypeDetails
+                            .getDeclaredField(newName);
+                }
+                curName = newName;
+            }
+            if (currentField != null) {
+                datatablesUtilsBean = currentField;
+            }
+            else {
+                // create field
+                List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                        1);
+                annotations.add(new AnnotationMetadataBuilder(AUTOWIRED));
+                // Using the FieldMetadataBuilder to create the field
+                // definition.
+                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                        getId(), Modifier.PUBLIC, annotations, curName, // Field
+                        DATATABLES_UTILS_BEAN); // Field type
+                datatablesUtilsBean = fieldBuilder.build(); // Build and
+                                                            // return a
+                // FieldMetadata
+                // instance
+            }
+        }
+        return datatablesUtilsBean;
+    }
+
+    /**
+     * Create metadata for QuerydslUtilsBean field
+     * 
+     * @return FieldMetadata
+     */
+    public FieldMetadata getQuerydslUtilsBean() {
+        if (querydslUtilsBean == null) {
+            JavaSymbolName curName = new JavaSymbolName("querydslUtilsBean_dtt");
+            // Check if field exist
+            FieldMetadata currentField = governorTypeDetails
+                    .getDeclaredField(curName);
+            if (currentField != null && !isQuerydslUtilsBean(currentField)) {
+                // No compatible field: look for new name
+                currentField = null;
+                JavaSymbolName newName = new JavaSymbolName(
+                        "querydslUtilsBean_dt");
+                currentField = governorTypeDetails.getDeclaredField(newName);
+                while (currentField != null
+                        && !isQuerydslUtilsBean(currentField)) {
+                    newName = new JavaSymbolName(newName.getSymbolName()
+                            .concat("_"));
+                    currentField = governorTypeDetails
+                            .getDeclaredField(newName);
+                }
+                curName = newName;
+            }
+            if (currentField != null) {
+                querydslUtilsBean = currentField;
+            }
+            else {
+                // create field
+                List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                        1);
+                annotations.add(new AnnotationMetadataBuilder(AUTOWIRED));
+                // Using the FieldMetadataBuilder to create the field
+                // definition.
+                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                        getId(), Modifier.PUBLIC, annotations, curName, // Field
+                        QUERYDSL_UTILS_BEAN); // Field type
+                querydslUtilsBean = fieldBuilder.build(); // Build and return
+                                                          // a
+                // FieldMetadata
+                // instance
+            }
+        }
+        return querydslUtilsBean;
+    }
+
+    /**
      * Create metadata for beanWrapper field.
      * 
      * @return a FieldMetadata object
      */
     public FieldMetadata getBeanWrapperField() {
         if (beanWrapper == null) {
-            JavaSymbolName curName = new JavaSymbolName("beanWrapper");
+            JavaSymbolName curName = new JavaSymbolName("beanWrapper_dtt");
             // Check if field exist
             FieldMetadata currentField = governorTypeDetails
                     .getDeclaredField(curName);
             if (currentField != null && !isBeanWrapperField(currentField)) {
                 // No compatible field: look for new name
                 currentField = null;
-                JavaSymbolName newName = new JavaSymbolName("beanWrapper_dtt");
+                JavaSymbolName newName = new JavaSymbolName("beanWrapper_dt");
                 currentField = governorTypeDetails.getDeclaredField(newName);
                 while (currentField != null
                         && !isConversionServiceField(currentField)) {
@@ -4650,12 +4799,12 @@ public class DatatablesMetadata extends
                 final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
                         getId(), Modifier.PUBLIC, annotations, curName, // Field
                         BEAN_WRAPPER); // Field type
-                messageSource = fieldBuilder.build(); // Build and return a
-                                                      // FieldMetadata
+                beanWrapper = fieldBuilder.build(); // Build and return a
+                                                    // FieldMetadata
                 // instance
             }
         }
-        return messageSource;
+        return beanWrapper;
     }
 
     private boolean isConversionServiceField(FieldMetadata field) {
@@ -4663,9 +4812,26 @@ public class DatatablesMetadata extends
                 && field.getFieldType().equals(CONVERSION_SERVICE);
     }
 
+    private boolean isEntityManagerProviderField(FieldMetadata field) {
+        return field != null
+                && field.getAnnotation(AUTOWIRED) != null
+                && field.getFieldName()
+                        .equals(DATATABLES_MANAGER_PROVIDER_NAME);
+    }
+
     private boolean isMessageSourceField(FieldMetadata field) {
         return field != null && field.getAnnotation(AUTOWIRED) != null
                 && field.getFieldType().equals(MESSAGE_SOURCE);
+    }
+
+    private boolean isDatatablesUtilsBean(FieldMetadata field) {
+        return field != null && field.getAnnotation(AUTOWIRED) != null
+                && field.getFieldType().equals(DATATABLES_UTILS_BEAN);
+    }
+
+    private boolean isQuerydslUtilsBean(FieldMetadata field) {
+        return field != null && field.getAnnotation(AUTOWIRED) != null
+                && field.getFieldType().equals(QUERYDSL_UTILS_BEAN);
     }
 
     private boolean isBeanWrapperField(FieldMetadata field) {
@@ -4958,14 +5124,14 @@ public class DatatablesMetadata extends
 
         /*
          * // 3. Build an instance of "HtmlTable" HtmlTable table =
-         * DatatablesUtils.makeHtmlTable(data, criterias, exportConf, request);
+         * datatablesUtilsBean_dtt.makeHtmlTable(data, criterias, exportConf, request);
          */
         bodyBuilder
                 .appendFormalLine("// 3. Build an instance of \"HtmlTable\"");
         format = "%s table = %s.makeHtmlTable(data, %s, exportConf, %s);";
         bodyBuilder.appendFormalLine(String.format(format,
                 helper.getFinalTypeName(DATATABLES_HTML_TABLE),
-                helper.getFinalTypeName(DATATABLES_UTILS),
+                getDatatablesUtilsBeanName(),
                 CRITERIA_PARAM_NAME.getSymbolName(),
                 REQUEST_PARAM_NAME.getSymbolName()));
 
@@ -5062,34 +5228,33 @@ public class DatatablesMetadata extends
                 .appendFormalLine("setDatatablesBaseFilter(baseSearchValuesMap);");
 
         /*
-         * SearchResults<Visit> searchResult = DatatablesUtils.findByCriteria(
-         * Visit.class, entityManagerProvider.getEntityManager(Visit.class), noPaginationCriteria,
+         * SearchResults<Visit> searchResult = datatablesUtilsBean_dtt.findByCriteria(
+         * Visit.class, noPaginationCriteria,
          * baseSearchValuesMap); org.springframework.ui.Model uiModel = new
          * org.springframework.ui.ExtendedModelMap();
          */
-        format = "%s searchResult = %s.findByCriteria(%s.class, %s.getEntityManager(%s.class), noPaginationCriteria, baseSearchValuesMap);";
+        format = "%s searchResult = %s.findByCriteria(%s.class, noPaginationCriteria, baseSearchValuesMap);";
         String entityTypeName = helper.getFinalTypeName(entity);
         bodyBuilder.appendFormalLine(String.format(format, new JavaType(
                 SEARCH_RESULTS.getFullyQualifiedTypeName(), 0, DataType.TYPE,
-                null, Arrays.asList(entity)), helper
-                .getFinalTypeName(DATATABLES_UTILS), entityTypeName,
-                DATATABLES_MANAGER_PROVIDER_NAME, entityTypeName));
+                null, Arrays.asList(entity)), getDatatablesUtilsBeanName(),
+                entityTypeName, DATATABLES_MANAGER_PROVIDER_NAME,
+                entityTypeName));
 
         String dateFormatVarName = getCodeToAddDateTimeFormatPatterns(bodyBuilder);
 
         /*
          * // Use ConversionService with the obtained data return
-         * DatatablesUtils.populateDataSet(searchResult.getResults(), "id",
+         * datatablesUtilsBean_dtt.populateDataSet(searchResult.getResults(), "id",
          * searchResult.getTotalCount(), searchResult.getResultsCount(),
-         * criterias.getColumnDefs(), null, conversionService_dtt) .getRows();
+         * criterias.getColumnDefs(), null) .getRows();
          */
         bodyBuilder
                 .appendFormalLine("// Use ConversionService with the obtained data");
-        format = "return %s.populateDataSet(searchResult.getResults(), \"id\", searchResult.getTotalCount(), searchResult.getResultsCount(), %s.getColumnDefs(), %s, %s).getRows();";
+        format = "return %s.populateDataSet(searchResult.getResults(), \"id\", searchResult.getTotalCount(), searchResult.getResultsCount(), %s.getColumnDefs(), %s).getRows();";
         bodyBuilder.appendFormalLine(String.format(format,
-                helper.getFinalTypeName(DATATABLES_UTILS),
-                CRITERIA_PARAM_NAME.getSymbolName(), dateFormatVarName,
-                getConversionServiceField().getFieldName().getSymbolName()));
+                getDatatablesUtilsBeanName(),
+                CRITERIA_PARAM_NAME.getSymbolName(), dateFormatVarName));
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(

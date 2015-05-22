@@ -131,8 +131,8 @@ public class DatatablesConstants {
 
     static final JavaType COLLECTIONS = new JavaType(Collections.class);
 
-    static final JavaType DATATABLES_UTILS = new JavaType(
-            "org.gvnix.web.datatables.util.DatatablesUtils");
+    static final JavaType DATATABLES_UTILS_BEAN = new JavaType(
+            "org.gvnix.web.datatables.util.DatatablesUtilsBean");
 
     static final JavaType SEARCH_RESULTS = new JavaType(
             "org.gvnix.web.datatables.query.SearchResults");
@@ -267,8 +267,8 @@ public class DatatablesConstants {
     static final JavaType ARRAY_UTILS = new JavaType(
             "org.apache.commons.lang3.ArrayUtils");
 
-    static final JavaType QUERYDSL_UTILS = new JavaType(
-            "org.gvnix.web.datatables.util.QuerydslUtils");
+    static final JavaType QUERYDSL_UTILS_BEAN = new JavaType(
+            "org.gvnix.web.datatables.util.QuerydslUtilsBean");
 
     static final JavaType BINDING_RESULT = new JavaType(
             "org.springframework.validation.BindingResult");

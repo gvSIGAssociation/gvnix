@@ -59,22 +59,6 @@
   		<version>${gvnix.version}</version>
   	</dependency>
 
-    <!-- OSGi -->
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-    </dependency>
-    
-    <!-- Apache Felix -->
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.scr.annotations</artifactId>
-    </dependency>
-    
     <!-- Roo -->
     <dependency>
       <groupId>org.springframework.roo</groupId>

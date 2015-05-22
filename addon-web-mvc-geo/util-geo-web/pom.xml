@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <licenses>
     <license>
@@ -33,13 +34,15 @@
   </licenses>
   <parent>
     <groupId>org.gvnix</groupId>
-    <artifactId>org.gvnix.addon.datatables</artifactId>
+    <artifactId>org.gvnix.addon.geo</artifactId>
     <version>2.0.0.M1</version>
-    <relativePath>../../addon-web-mvc-datatables</relativePath>
+    <relativePath>../../addon-web-mvc-geo</relativePath>
   </parent>
-  <artifactId>org.gvnix.web.datatables</artifactId>
+  
+  <artifactId>org.gvnix.web.geo</artifactId>
   <packaging>jar</packaging>
-  <name>gvNIX - Library - Dandelion-Datatables Utils</name>
+  <name>gvNIX - Library - Dandelion-Geo Utils</name>
+  
   <organization>
     <name>
     General Directorate for Information Technologies (DGTI) of
@@ -53,31 +56,27 @@
   <url>http://www.gvnix.org</url>
 
   <repositories>
-	<repository>
-       <id>gvNIX External Libraries repo</id>
-       <url>http://repository.gvnix.org</url>
-       <name>gvNIX External Libraries repo</name>
-     </repository>
+    <repository>
+      <id>gvNIX External Libraries repo</id>
+      <url>http://repository.gvnix.org</url>
+      <name>gvNIX External Libraries repo</name>
+    </repository>
   </repositories>
 
   <dependencies>
-	  <dependency>
-	    <groupId>org.apache.commons</groupId>
-	    <artifactId>commons-lang3</artifactId>
-	</dependency>
-<!--
     <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
-    </dependency>-->
-	<!-- Hibernate jpa api -->
-	<dependency>
-		<groupId>org.hibernate.javax.persistence</groupId>
-		<artifactId>hibernate-jpa-2.1-api</artifactId>
-		<version>1.0.0.Final</version>
-		<scope>provided</scope>
-	</dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
+      <version>${slf4j.version}</version> </dependency> -->
+    <!-- Hibernate jpa api -->
+    <dependency>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.1-api</artifactId>
+      <version>1.0.0.Final</version>
+      <scope>provided</scope>
+    </dependency>
 
     <!-- Querydsl -->
     <dependency>
@@ -102,45 +101,37 @@
         <exclusion>
           <groupId>com.mysema.querydsl</groupId>
           <artifactId>querydsl-codegen</artifactId>
-        </exclusion>      
+        </exclusion>
       </exclusions>
     </dependency>
 
-
-    <!-- Dandelion - DataTables -->
     <dependency>
-      <groupId>com.github.dandelion</groupId>
-      <artifactId>datatables-core</artifactId>
-      <version>${dandelion-datatables.version}</version>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-spatial</artifactId>
+      <version>${querydsl.version}</version>
     </dependency>
 
-    <!-- Spring -->
+    <!-- gvNIX DataTables utils -->
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-beans</artifactId>
-      <version>${spring.version}</version>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.web.datatables</artifactId>
+      <version>1.5.0.BUILD-SNAPSHOT</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
 
     <!-- General dependencies for standard applications -->
     <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.5</version>
-        <scope>provided</scope>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>
 
-
   <build>
 
-    <!-- DISID: Add webdav extension to google code  -->
+    <!-- DiSiD: Add webdav extension to google code -->
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
@@ -149,14 +140,14 @@
       </extension>
     </extensions>
 
-	  <!-- DISID: Add build resources filtering -->
+    <!-- DiSiD: Add build resources filtering -->
     <resources>
       <resource>
         <directory>src/main/resources</directory>
         <filtering>false</filtering>
         <excludes>
           <exclude>**/addon/*/configuration.xml</exclude>
-          <!-- JS plugins version  -->
+          <!-- JS plugins version -->
           <exclude>**/addon/*/*.gvnix.*.js</exclude>
         </excludes>
       </resource>
@@ -173,14 +164,14 @@
 
   </build>
 
-  <!-- DISID: Add gvNIX version from parent pom and google code project name and repo folder values -->
+  <!-- DiSiD: Add gvNIX version from parent pom and google code project name and 
+    repo folder values -->
   <properties>
     <google.code.project.name>gvnix</google.code.project.name>
     <gvnix.version>${project.parent.version}</gvnix.version>
-    <querydsl.version>3.4.3</querydsl.version>
+    <querydsl.version>3.6.3</querydsl.version>
     <spring.version>3.2.0.RELEASE</spring.version>
-    <target.osgi-repository.directory>${basedir}/../../target/osgi-repository-bin</target.osgi-repository.directory>
-  	<devel.resources.path>../../devel-resources</devel.resources.path>
+    <devel.resources.path>../../devel-resources</devel.resources.path>
   </properties>
 
 </project>

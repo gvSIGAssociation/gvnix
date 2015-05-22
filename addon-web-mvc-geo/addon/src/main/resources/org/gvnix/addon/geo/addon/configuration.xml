@@ -9,7 +9,7 @@
 	        </repository>
 		</repositories>
 		<properties>
-			<querydsl.version>3.4.3</querydsl.version>
+			<querydsl.version>3.6.3</querydsl.version>
 		</properties>
 		<dependencies>
 			<dependency>
@@ -46,6 +46,12 @@
 			  	</exclusion>
 			  </exclusions>
 			</dependency>
+      <dependency>
+        <groupId>org.gvnix</groupId>
+        <artifactId>org.gvnix.web.geo</artifactId>
+        <version>${gvnix.version}</version>
+        <type>jar</type>
+      </dependency>
 		</dependencies>
 	</gvnix>
 </configuration>

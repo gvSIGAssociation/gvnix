@@ -2037,7 +2037,57 @@ public class GeoOperationsImpl extends AbstractOperations implements
         bean.appendChild(property);
         root.appendChild(bean);
 
-        XmlUtils.writeXml(webMvcXmlMutableFile.getOutputStream(), webMvcXml);
+        boolean writeFile = false;
+
+        // Register querydslUtilsGeoBean bean
+        Element querydslUtilBeanElement = XmlUtils.findFirstElement(
+                "bean[@id='querydslUtilsBean']", root);
+        if (querydslUtilBeanElement == null) {
+            throw new IllegalStateException(
+                    "querydslUtilsBean element cannot be found");
+        }
+        else {
+            if (!querydslUtilBeanElement.getAttribute("class").equals(
+                    "org.gvnix.web.datatables.util.impl.QuerydslUtilsBeanImpl")) {
+                // Bean exists but was modified manually
+                LOGGER.warning("Cannot add geo implementations because querydslUtilsBean was modified manually");
+                writeFile = false;
+            }
+            else {
+                // Replace bean
+                querydslUtilBeanElement.setAttribute("class",
+                        "org.gvnix.web.geo.util.impl.QuerydslUtilsBeanGeoImpl");
+                writeFile = true;
+            }
+        }
+
+        // Register datatablesUtilsGeoBean bean
+        Element datatablesUtilBeanElement = XmlUtils.findFirstElement(
+                "bean[@id='datatableUtilsBean']", root);
+        if (datatablesUtilBeanElement == null) {
+            throw new IllegalStateException(
+                    "datatablesUtilsBean element cannot be found");
+        }
+        else {
+            if (!datatablesUtilBeanElement
+                    .getAttribute("class")
+                    .equals("org.gvnix.web.datatables.util.impl.DatatablesUtilsBeanImpl")) {
+                // Bean exists but was modified manually
+                LOGGER.warning("Cannot add geo implementations because datatableUtilsBean was modified manually");
+                writeFile = false;
+            }
+            else {
+                // Replace bean
+                datatablesUtilBeanElement
+                        .setAttribute("class",
+                                "org.gvnix.web.geo.util.impl.DatatablesUtilsBeanGeoImpl");
+                writeFile = true;
+            }
+        }
+
+        if (writeFile) {
+            XmlUtils.writeXml(webMvcXmlMutableFile.getOutputStream(), webMvcXml);
+        }
     }
 
     /**

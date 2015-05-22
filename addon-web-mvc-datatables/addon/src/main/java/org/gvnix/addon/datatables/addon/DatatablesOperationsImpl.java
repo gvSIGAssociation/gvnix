@@ -831,6 +831,7 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
                         ARGUMENT_RESOLVERS, annotationDriven);
             }
         }
+        boolean writeFile = false;
         if (addBean) {
             if (argumentResolver == null) {
                 // Add missing argument-resolvers tag to annotation driven tag
@@ -843,6 +844,49 @@ public class DatatablesOperationsImpl extends AbstractOperations implements
             bean.setAttribute("class", DATATABLES_CRITERIA_RESOLVER);
 
             argumentResolver.appendChild(bean);
+            writeFile = true;
+        }
+
+        // Register EntityManagerProvider Service
+        Element entityManagerProvBeanElement = XmlUtils.findFirstElement(
+                "bean[@id='entityManagerProvider']", root);
+        if (entityManagerProvBeanElement == null) {
+            entityManagerProvBeanElement = webMvcXml.createElement("bean");
+            entityManagerProvBeanElement.setAttribute("id",
+                    "entityManagerProvider");
+            entityManagerProvBeanElement
+                    .setAttribute("class",
+                            "org.gvnix.web.datatables.util.impl.EntityManagerProviderImpl");
+            root.appendChild(entityManagerProvBeanElement);
+            writeFile = true;
+        }
+
+        // Register DatatableUtilBean bean
+        Element DatatableUtilsBeanElement = XmlUtils.findFirstElement(
+                "bean[@id='datatableUtilsBean']", root);
+        if (DatatableUtilsBeanElement == null) {
+            DatatableUtilsBeanElement = webMvcXml.createElement("bean");
+            DatatableUtilsBeanElement.setAttribute("id", "datatableUtilsBean");
+            DatatableUtilsBeanElement
+                    .setAttribute("class",
+                            "org.gvnix.web.datatables.util.impl.DatatablesUtilsBeanImpl");
+            root.appendChild(DatatableUtilsBeanElement);
+            writeFile = true;
+        }
+
+        // Register QuerydslUtilBean bean
+        Element QuerydslUtilBeanElement = XmlUtils.findFirstElement(
+                "bean[@id='querydslUtilsBean']", root);
+        if (QuerydslUtilBeanElement == null) {
+            QuerydslUtilBeanElement = webMvcXml.createElement("bean");
+            QuerydslUtilBeanElement.setAttribute("id", "querydslUtilsBean");
+            QuerydslUtilBeanElement.setAttribute("class",
+                    "org.gvnix.web.datatables.util.impl.QuerydslUtilsBeanImpl");
+            root.appendChild(QuerydslUtilBeanElement);
+            writeFile = true;
+        }
+
+        if (writeFile) {
             XmlUtils.writeXml(webMvcXmlMutableFile.getOutputStream(), webMvcXml);
         }
     }
