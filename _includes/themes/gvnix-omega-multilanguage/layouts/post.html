@@ -5,6 +5,12 @@
 </head>
 <body class="post-template" itemscope itemtype="http://schema.org/WebPage">
 {% include themes/gvnix-omega-multilanguage/header.html %}
+
+<!-- banner -->
+{% if page.anniversary %}
+  {% include themes/gvnix-omega-multilanguage/anniversary.html %}
+{% endif %}
+
 <div id="main" class="content" role="main" itemprop="mainContentOfPage" itemscope itemtype="http://schema.org/Blog">
     <div class="container">
         <div class="row">
@@ -63,35 +69,41 @@
                         {% endif %}
                         {{ content }}
                         <br>
-                    {% assign tagsize = page.tags.size %}
-                    {% if tagsize != 0 %}
-                    <div class="entry-tags text-center">
 
-                        <i class="fa fa-tags"></i>&nbsp; {{ site.t[page.lang].tagged }} {% for tag in page.tags %}
-                        <!-- <a href="{{ site.url }}/tags/index.html#{{ tag | cgi_encode }}" data-toggle="tooltip" title=" {{ site.t[page.lang].posts-tagged }} {{ tag }}" rel="tag"> -->
-                        <em>{{ tag }}</em>
-                       <!--  </a> -->
-                        {% unless forloop.last %}&nbsp;&bull;&nbsp;{% endunless %}{% endfor %}
-
-                    </div>
-                    {% endif %}
-                    </div>
-
-        </div>
-                    <footer class="post-footer entry-meta">
-                        {% if site.share %}{% include themes/gvnix-omega-multilanguage/share.html %}{% endif %}
-                        {% if site.disqus_shortname and page.comments == true %}
-                            <div id="disqus_thread"></div><!-- /#disqus_thread -->
+                        <!-- timeline -->
+                        {% if page.timeline %}
+                          {% include themes/gvnix-omega-multilanguage/timeline.html %}
                         {% endif %}
-                     <br>
-                     <p><a class="btn btn-lg btn-gvnix pull-right" target="_top" href="javascript:history.back()">{{ site.t[page.lang].back-to-blog }}</a></p>
 
-                    </footer>
+                        {% assign tagsize = page.tags.size %}
+                        {% if tagsize != 0 %}
+                        <div class="entry-tags text-center">
 
-            </article>
+                            <i class="fa fa-tags"></i>&nbsp; {{ site.t[page.lang].tagged }} {% for tag in page.tags %}
+                            <!-- <a href="{{ site.url }}/tags/index.html#{{ tag | cgi_encode }}" data-toggle="tooltip" title=" {{ site.t[page.lang].posts-tagged }} {{ tag }}" rel="tag"> -->
+                            <em>{{ tag }}</em>
+                           <!--  </a> -->
+                            {% unless forloop.last %}&nbsp;&bull;&nbsp;{% endunless %}{% endfor %}
+
+                        </div>
+                        {% endif %}
+                    </div>
+
+          </div>
+          <footer class="post-footer entry-meta">
+                          {% if site.share %}{% include themes/gvnix-omega-multilanguage/share.html %}{% endif %}
+                          {% if site.disqus_shortname and page.comments == true %}
+                              <div id="disqus_thread"></div><!-- /#disqus_thread -->
+                          {% endif %}
+                       <br>
+                       <p><a class="btn btn-lg btn-gvnix pull-right" target="_top" href="javascript:history.back()">{{ site.t[page.lang].back-to-blog }}</a></p>
+
+          </footer>
+        </article>
 
     </div>
 </div>
+
 {% include themes/gvnix-omega-multilanguage/footer.html %}
 {% include themes/gvnix-omega-multilanguage/scripts.html %}
 </body>

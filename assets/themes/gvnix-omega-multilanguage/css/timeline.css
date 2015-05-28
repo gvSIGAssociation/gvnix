@@ -2,7 +2,10 @@
  * Start Bootstrap - Agency Bootstrap Theme (http://startbootstrap.com)
  * Code licensed under the Apache License v2.0.
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Customized for gvNIX by DISID
  */
+
 .timeline {
     position: relative;
     padding: 0;
@@ -69,13 +72,14 @@
     border-radius: 100%;
     text-align: center;
     color: #fff;
-    background-color: #{{ site.color.primary }};
+    background-color: #557633;
 }
 
 .timeline>li .timeline-image h4 {
     margin-top: 12px;
     font-size: 10px;
     line-height: 14px;
+    color: #fff;
 }
 
 .timeline>li.timeline-inverted>.timeline-panel {
@@ -104,11 +108,19 @@
 
 .timeline .timeline-heading h4 {
     margin-top: 0;
+    margin-bottom: 0;
     color: inherit;
+    text-transform: inherit;
 }
 
 .timeline .timeline-heading h4.subheading {
-    text-transform: none;
+    text-transform: uppercase;
+}
+
+.timeline-body > .text-muted.lead {
+  font-size: 14px;
+  line-height: 1.75;
+    color: #777;
 }
 
 .timeline .timeline-body>p,
@@ -185,7 +197,8 @@
     }
 
     .timeline>li .timeline-panel {
-        padding: 0 20px 20px 100px;
+        /* padding: 0 20px 20px 100px; */
+        padding: 0 40px 20px 20px;
     }
 
     .timeline>li .timeline-image {
@@ -199,6 +212,7 @@
     }
 
     .timeline>li.timeline-inverted>.timeline-panel {
-        padding: 0 100px 20px 20px;
+        /* padding: 0 100px 20px 20px; */
+        padding: 0 20px 20px 40px;
     }
 }

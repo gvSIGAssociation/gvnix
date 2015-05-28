@@ -177,6 +177,20 @@
               </div>
             </section>
 
+            <!-- banner -->
+            {% if site.anniversary %}
+              {% if page.lang == "en" %}
+                <a href="{{page.lang}}/aniversario-gvnix/" target="_self" title="We celebrated 5 years!">
+                  {% include themes/gvnix-omega-multilanguage/anniversary.html %}
+                </a>
+              {% endif %}
+              {% if page.lang == "es" %}
+                   <a href="{{page.lang}}/aniversario-gvnix/" target="_self" title="¡Cumplimos 5 años!">
+                    {% include themes/gvnix-omega-multilanguage/anniversary.html %}
+                   </a>
+              {% endif %}
+            {% endif %}
+
             {% if page.lang == "en" %}
               <section class="bg-light-gray">
               {% include themes/gvnix-omega-multilanguage/home/social.html %}
