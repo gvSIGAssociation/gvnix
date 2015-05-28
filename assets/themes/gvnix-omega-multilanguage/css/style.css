@@ -2982,3 +2982,81 @@ ul.ds-btn { display: table; }
   text-transform: uppercase;
   color: #4b731d;
 }
+
+/*aniversary*/
+
+#masthead + #counter{
+  border-top: 5px solid #252525;
+}
+.home-template section>div#counter{
+  border: 1px solid red;
+}
+
+.home-template #counter {
+   margin: 0;
+}
+
+#counter{
+  background-image: url(/assets/themes/gvnix-omega-multilanguage/images/banner-aniversario-gvNIX.png);
+  background-repeat: no-repeat;
+  margin-top: -72px;
+  margin-bottom: 50px;
+  background-size: 1500px;
+  background-position-y: -190px;
+  height: 210px;
+}
+.counter-box{
+  padding: 40px 0 40px;
+  color: #fff;
+  text-align: center;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+}
+.counter-box h4 {
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1em;
+  color: #fff;
+}
+.counter-box p {
+  font-size: 1.5em;
+  line-height: 1.6em;
+  text-align: center;
+}
+@media (min-width: 1024px) {
+  .counter-box p {
+    font-size: 1.5em;
+    line-height: 1.6em;
+  }
+}
+
+@media (max-width: 1024px) {
+  .counter-box p {
+  font-size: 1.1em;
+  line-height: 1.2em;
+  }
+}
+
+@media (max-width: 768px) {
+  .counter-container{
+  padding-bottom: 20px;
+  }
+  #counter{
+    margin-bottom: 30px;
+    background-position-y: -90px;
+    height: auto;
+    background-position-x: -700px;
+  }
+  .counter-box{
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+    #counter{
+    margin-bottom: 30px;
+    background-position-y: -90px;
+    height: auto;
+    background-position-x: -950px;
+  }
+
+}

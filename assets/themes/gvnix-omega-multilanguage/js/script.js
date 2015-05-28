@@ -131,5 +131,10 @@ $('.navbar-collapse ul li a').click(function() {
 //	}
 //});
 
-
+/*
+Counters
+*/
+$('.counter-container').waypoint(function() {
+$('.counter-box h4').countTo();
+}, { offset: '100%' });
 
