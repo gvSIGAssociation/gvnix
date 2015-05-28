@@ -19,14 +19,14 @@ proyectos de código abierto de prestigio internacional como gvNIX,
 recientemente la [Dirección General de las Tecnologías de la Información](http://www.dgti.gva.es/){:target="_blank"} (DGTI),
 la [Asociación gvSIG](http://www.gvsig.com){:target="_blank"}, la empresa tecnológica valenciana [DISID Corporation](http://www.disid.com){:target="_blank"} y
 los institutos de la Comunidad Valenciana,
-han unido esfuerzos para formar de forma gratuita a jóvenes institutos-semana-1 de Ingeniería Informática
+han unido esfuerzos para formar de forma gratuita a jóvenes de Ingeniería Informática
 y de Grado Superior en Desarrollo de Aplicaciones Web en el uso del entorno de desarrollo gvNIX.
 
 <figure>
   <img src="{{ site.url }}/images/post/gvnix-seminarios-training.png">
 </figure>
 
-El objetivo principal de la formación es introducir a institutos-semana-1 en el manejo
+El objetivo principal de la formación es introducir a estudiantes en el manejo
 de gvNIX que les sirva para ser más competentes en el ámbito laboral y
 disponer de mayores oportunidades laborales, fomentar la vocación tecnológica
 y científica que permita garantizar un empleo de calidad para nuestros jóvenes,
