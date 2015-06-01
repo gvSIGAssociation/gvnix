@@ -4,8 +4,8 @@ title: Legal Notice
 description: Conditions of use of the information contained in this website
 permalink: en/legal-notice/
 category:
-    - es
-lang: es
+    - en
+lang: en
 ---
 
 ## Conditions of use of the information contained in this website
