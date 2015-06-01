@@ -183,7 +183,7 @@ linksextra:
     springroo:
       title: Spring Roo
       url:   http://projects.spring.io/spring-roo/
-      tooltip: Sitio web framework Spring Roo
+      tooltip: Sitio web herramienta Spring Roo
 #      external: true
     contact:
       title: "Contacto"
