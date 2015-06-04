@@ -23,9 +23,9 @@
   <jsp:directive.attribute name="actionHeaderCssStyle" type="java.lang.String" required="false" description="Custom css-style for action columns header" />
 
   <!-- selection -->
-  <!-- This options now are configured base on datatablesConfig
-  <jsp:directive.attribute name="selection" type="java.lang.Boolean" required="false" description="Enable selection (default: true)" />
-  <jsp:directive.attribute name="selectionMultiRow" type="java.lang.Boolean" required="false" description="Enable selection on multiple rows" />
+  <!-- This options now are configured base on datatablesConfig -->
+  <jsp:directive.attribute name="selection" type="java.lang.Boolean" required="false" description="Enable selection. If has batch support is true by default. Selection only works with batch installed." />
+  <!--<jsp:directive.attribute name="selectionMultiRow" type="java.lang.Boolean" required="false" description="Enable selection on multiple rows" />
   <jsp:directive.attribute name="selectionByCheck" type="java.lang.Boolean" required="false" description="Use checkbox to select" />
    -->
   <jsp:directive.attribute name="selectionCheckCssClass" type="java.lang.String" required="false" description="Css class for selection checkbox" />
@@ -131,6 +131,16 @@
   <jsp:useBean id="datatables_callback_elements" class="java.util.LinkedHashMap" scope="request"/>
   <jsp:useBean id="datatables_export_columns" class="java.util.LinkedHashMap" scope="request"/>
   <jsp:useBean id="datatables_export_columns_title" class="java.util.LinkedHashMap" scope="request"/>
+
+  <!-- selection -->
+  <c:if test="${empty selection and datatablesStandardMode and datatablesHasBatchSupport}">
+    <c:set var="selection" value="true"/>
+  </c:if>
+
+  <c:if test="${empty selection and !datatablesStandardMode and !datatablesHasBatchSupport}">
+    <c:set var="selection" value="false"/>
+  </c:if>
+
 
   <!-- typeIdFieldName -->
   <c:if test="${empty typeIdFieldName}">
@@ -256,7 +266,6 @@
   <!-- enable selection only on standar mode and with batch support -->
   <c:choose>
   <c:when test="${datatablesStandardMode and datatablesHasBatchSupport}">
-    <c:set var="selection" value="true"/>
     <c:set var="selectionMultiRow" value="true"/>
     <c:set var="selectionByCheck" value="true"/>
   </c:when>
@@ -565,7 +574,7 @@
           </spring:escapeBody>
         </c:set>
         <spring:url value="/resources/images/delete.png" var="delete_image_url" />
-        <c:if test="${selectionMultiRow and datatablesHasBatchSupport}">
+        <c:if test="${selection and datatablesHasBatchSupport}">
 	        <c:set var="delete_multirow_confirm_msg">
 	          <spring:escapeBody javaScriptEscape="true" htmlEscape="false">
 	             <spring:message htmlEscape="false" code="entity_delete_multirow_confirm"/>
@@ -685,7 +694,7 @@
 		        		});
 		        }
 
-                      /* Add the delete button to gvNIX toolbar */
+                /* Add the delete button to gvNIX toolbar */
 		    	function ${removeColumnId}_div() {
            			var result =
                        '<a id="${removeColumnId}" href="#" alt="${delete_label}" title="${delete_label}" class="icon delete_entity">'
