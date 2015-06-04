@@ -703,22 +703,22 @@
 		     </c:set>
 
         </c:if>
-                        <!-- Add delete functions to the script element before Datatables element -->
+           	<!-- Add delete functions to the script element before Datatables element -->
 		    <c:set target="${datatables_javaScript_elements_before}" property="${removeColumnId}">
 		        var ${removeColumnId}_confirmation = "${delete_confirm_msg}";
 		        function ${removeColumnId}(data, type, full) {
                 <c:set var="hrefRemoveAction">javascript:${removeColumnId}_selected(\''+full.${typeIdFieldName}+'\')</c:set>
-                <c:choose>
+				<c:choose>
                 	<c:when test="${selectionMultiRow and datatablesHasBatchSupport}">
 		                var result = '<a id="${removeColumnId}" href="${hrefRemoveAction}" alt="${delete_label}" title="${delete_label}" class="icon delete_entity"></a>';
                 	</c:when>
                 	<c:otherwise>
                 		<c:set var="currentId" value="'+full.${typeIdFieldName}+'" />
-                        <!-- Send POST using ajax -->
-                		<c:set var="confirmation_script" value="var confirmDelete = confirm(${removeColumnId}_confirmation); if(confirmDelete){var controllerPath = \'${urlPath}/${currentId}\'; $.ajax({ method: \'DELETE\', url: controllerPath }).done(function() { location.reload(true); }); }" ></c:set>
-
-
-                		var result = '<a id="${removeColumnId}_${currentId}" href="#" alt="${delete_label}" title="${delete_label}" class="icon delete_entity" onclick="${confirmation_script}"/>';
+                		<c:set var="confirmation_script" value="var confirmDelete = confirm(${removeColumnId}_confirmation); if(confirmDelete){jQuery(\'#${removeColumnId}_${currentId}_form\').submit();};" ></c:set>
+                		var result = '<form method="post" id="${removeColumnId}_${currentId}_form" action="${urlPath}/'+full.${typeIdFieldName}+'">
+                						<input type="hidden" value="DELETE" name="_method" data-original-title="" title="" />
+                						<a id="${removeColumnId}_${currentId}" href="#" alt="${delete_label}" title="${delete_label}" class="icon delete_entity" onclick="${confirmation_script}"/>
+                					</form>';
                 	</c:otherwise>
                 </c:choose>
                 return result;
