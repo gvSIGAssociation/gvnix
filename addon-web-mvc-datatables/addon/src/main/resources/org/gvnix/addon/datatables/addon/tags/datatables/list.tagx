@@ -62,7 +62,7 @@
 				<!-- Generate this detail identifier with collection index to avoid collisions when multiple datatables tabs -->
 		    	<c:set value="${mainDatatablesId}_${detailItem.property}" var="datatablesId" />
 
-			    <spring:url value="${detailItem.path}/list" var="datatablesDetailUrl">
+			    <spring:url value="/${detailItem.path}/list" var="datatablesDetailUrl">
 			    	<spring:param name="datatablesMappedProperty" value="${detailItem.mappedBy}"/>
 			    </spring:url>
 
