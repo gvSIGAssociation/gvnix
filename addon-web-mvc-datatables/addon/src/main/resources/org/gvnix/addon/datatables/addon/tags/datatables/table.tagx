@@ -718,7 +718,7 @@
 		        function ${removeColumnId}(data, type, full) {
                 <c:set var="hrefRemoveAction">javascript:${removeColumnId}_selected(\''+full.${typeIdFieldName}+'\')</c:set>
 				<c:choose>
-                	<c:when test="${selectionMultiRow and datatablesHasBatchSupport}">
+                	<c:when test="${selection and datatablesHasBatchSupport}">
 		                var result = '<a id="${removeColumnId}" href="${hrefRemoveAction}" alt="${delete_label}" title="${delete_label}" class="icon delete_entity"></a>';
                 	</c:when>
                 	<c:otherwise>
