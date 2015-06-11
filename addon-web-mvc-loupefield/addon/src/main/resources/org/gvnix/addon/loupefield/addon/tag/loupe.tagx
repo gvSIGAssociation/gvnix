@@ -15,6 +15,7 @@
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
+
   <!-- Configuration -->
   <jsp:directive.attribute name="listPath" type="java.lang.String" required="true" description="Path where the selector view is (Ex: path/list)" />
   <jsp:directive.attribute name="controllerPath" type="java.lang.String" required="true" rtexprvalue="true" description="The relative path to the referenced resource" />
@@ -34,6 +35,7 @@
   <jsp:directive.attribute name="hiddeUtilbox" type="java.lang.String" required="false" description="Specify if hidde elements with utilbox class (default true)" />
   <jsp:directive.attribute name="searchField" type="java.lang.String" required="false" description="Specify the field used to search when the input lost focus (default first element of caption)" />
   <jsp:directive.attribute name="labelTitleModal" type="java.lang.String" required="false" description="Specify the code of the label used for the title of modal, default 'Select' followed by label parameter" />
+  <jsp:directive.attribute name="mode" type="java.lang.String" required="true" rtexprvalue="true" description="Mode of current LoupeField. Could be 'create' or 'update'" />
 
 		<c:if test="${empty render or render}">
 
@@ -157,11 +159,16 @@
 														name="${sec_field}" />
 										</c:when>
 										<c:otherwise>
-										<form:hidden id="${sec_field}_loupe_hidden_bind" name="${sec_field}"
+										    <form:hidden id="${sec_field}_loupe_hidden_bind" name="${sec_field}"
+                            path="${field}" />
+                                            <c:if test="${mode eq 'update'}">
+                                                    <form:hidden id="${sec_field}_loupe_hidden_bind_id" name="${sec_field}_id"
                             path="${field}.${pkField}" />
+                                            </c:if>
 										</c:otherwise>
 								</c:choose>
 						</div>
+
 						<form:errors cssClass="errors alert alert-danger" id="_${sec_field}_error_id" path="${sec_field}" />
 				</div>
 		</c:if>

@@ -600,7 +600,7 @@ var GvNIX_Loupe;
 							// Hidding dropdown div
 							$("#" +data.name + "_dropdown_div" + sufix).html("");
 							timeOutClear = true;
-						},100);
+						},500);
 						timeOutClear = false;
 					}
 					if (timeOutClear) {
@@ -643,7 +643,7 @@ var GvNIX_Loupe;
 								instance._fnFindRecordByField(valueInput, instance, sufix, data.searchfield);
 							}
 						}
-					},100);
+					},500);
 				})
 			},
 
@@ -660,7 +660,7 @@ var GvNIX_Loupe;
 					setTimeout(function(){
 							//Clean search value
 							data.searchvalue = "";
-					},100);
+					},500);
 				})
 			},
 
@@ -927,7 +927,7 @@ var GvNIX_Loupe;
 
 				setTimeout(function(){
 					$("#" + data.name + "_dropdown_div"+ sufix).width(input.width() + 50);
-				},100);
+				},500);
 			},
 
 			/**
@@ -938,10 +938,10 @@ var GvNIX_Loupe;
 			"_fnUseBindingElementsIfNecessary": function(sufix) {
 				var instance = this;
 				var data = this._data;
-				var bindElement = $(":input[id='"+data.name+"_loupe_hidden_bind"+sufix+"']");
+				var bindElement = $(":input[id='"+data.name+"_loupe_hidden_bind_id"+sufix+"']");
                 // Getting again with other jQuery selector
                 if(bindElement.length == 0){
-                    bindElement = $(":input[id='_"+data.name+"_loupe_hidden_bind"+sufix.substring(1)+"']");
+                    bindElement = $(":input[id='_"+data.name+"_loupe_hidden_bind_id"+sufix.substring(1)+"']");
                 }
 				if(bindElement.length > 0){
 					var bindValue = bindElement.val();
@@ -1226,13 +1226,13 @@ var GvNIX_Loupe;
 				var instances = GvNIX_Loupe._aInstances;
 
 				// Iterating instances and returning the correct one
-				for(i in instances){
+				for(var i = 0; i < instances.length; i++){
 					var instance = instances[i];
 					var settings = instance.s;
-					if(settings.id == relatedFieldId){
-						return instances[i];
+					if(settings.id == relatedField.attr("id")){
+                        return instances[i];
 					}
-				}
+				}             
 			}else if ( window.console && console.log ){
 				console.log("[ERROR] Cannot locate loupe field '"+field+"' in current form.");
 			}
