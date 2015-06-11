@@ -93,7 +93,7 @@
                     <c:when test="${empty itemLabel}">
                       <c:choose>
                         <c:when test="${multiple}">
-                          <form:select class="form-control input-sm" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" multiple="${multiple}" />
+                          <form:select class="form-control" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" multiple="${multiple}" />
                         </c:when>
                         <c:otherwise>
                           <form:select class="form-control input-sm" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" />
@@ -103,7 +103,7 @@
                     <c:otherwise>
                       <c:choose>
                         <c:when test="${multiple}">
-                          <form:select class="form-control input-sm" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" multiple="${multiple}" itemLabel="${sec_itemLabel}"/>
+                          <form:select class="form-control" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" multiple="${multiple}" itemLabel="${sec_itemLabel}"/>
                         </c:when>
                         <c:otherwise>
                           <form:select class="form-control input-sm" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" itemLabel="${sec_itemLabel}"/>
