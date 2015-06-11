@@ -960,6 +960,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
             loupe.setAttribute("listPath", entityPath);
         }
 
+        // Adding mode
+        loupe.setAttribute("mode", viewName);
+
         // Append new loupe element to view
         form.appendChild(loupe);
 

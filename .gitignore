@@ -46,3 +46,6 @@ addon-web-mvc/util-web-mvc-jackson-binder/target
 .project
 */.project
 */*/.settings
+.classpath
+*/.classpath
+addon-web-mvc-loupefield/addon/.classpath
