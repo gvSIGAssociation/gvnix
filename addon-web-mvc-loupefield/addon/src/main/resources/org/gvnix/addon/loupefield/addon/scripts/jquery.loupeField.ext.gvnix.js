@@ -939,6 +939,10 @@ var GvNIX_Loupe;
 				var instance = this;
 				var data = this._data;
 				var bindElement = $(":input[id='"+data.name+"_loupe_hidden_bind"+sufix+"']");
+                // Getting again with other jQuery selector
+                if(bindElement.length == 0){
+                    bindElement = $(":input[id='_"+data.name+"_loupe_hidden_bind"+sufix.substring(1)+"']");
+                }
 				if(bindElement.length > 0){
 					var bindValue = bindElement.val();
 					// If not has value, remove element
