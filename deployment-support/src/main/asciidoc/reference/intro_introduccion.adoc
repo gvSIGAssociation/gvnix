@@ -11,11 +11,12 @@ gvNIX es un entorno de trabajo Java de código abierto para el desarrollo
 rápido de aplicaciones web altamente productivo, flexible y que no
 compromete la calidad de los proyectos.
 
-Está compuesto de un conjunto de herramientas de código abierto entre
-las que destaca su núcleo, http://projects.spring.io/spring-roo/[Spring
-Roo]. Esto le proporciona un amplio apoyo por parte de importantes
-organizaciones como Spring Source y VMWare. Añade funcionalidades de
-alto nivel a las prestaciones que ya se obtienen con
+Está compuesto por una serie de herramientas de código abierto distribuídas 
+en forma de http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#available-roo-addon-suites["Spring Roo Add-On Suite"]
+a través de un repositorio OSGi R5.
+Esto le proporciona un amplio apoyo por parte de importantes
+organizaciones como http://spring.io/[Spring] y http://pivotal.io/[Pivotal]. 
+Añade funcionalidades de alto nivel a las prestaciones que ya se obtienen con
 http://projects.spring.io/spring-roo/[Spring Roo] para mejorar la
 productividad.
 
@@ -64,6 +65,18 @@ autocompletado y ayuda en línea.
 * Aprovecha el conocimiento: no necesita más conocimiento que el
 necesario para el desarrollo de aplicaciones JEE.
 
+¿Qué es un "Roo Add-On Suite"?
+------------------------------
+
+Los "Roo Add-On Suites" son la mejor manera de empaquetar y distribuir conjuntos de Add-Ons para que
+puedan ser instalados en distribuciones de Spring Roo de forma rápida y sencilla.
+
+Están basados en subsistemas de OSGi R5, los cuales permiten instalar un conjunto de componentes sobre 
+la distribución de Spring Roo sin comprometer su modularidad.
+
+Por todo lo anterior, decimos que *gvNIX es un "Spring Roo Add-On Suite"* que puede ser instalado en
+distribuciones de Spring Roo para ampliar sus funcionalidades básicas.
+
 ¿Qué ofrece gvNIX?
 ------------------
 
@@ -75,17 +88,21 @@ para aplicaciones corporativas:
 datos.
 * Utilidades de generación de consultas.
 * Utilidades de modificaciones múltiples de entidades.
-* Gestión de temas visuales.
+* Gestión de temas visuales utilizando jQuery, Bootstrap, HTML5 y CSS3. 
 * Gestión de la visualización de excepciones.
 * Gestión de mensajes de usuario en ventana modal.
 * Gestión de la estructura de páginas en el menú.
-* Gestión de patrones de visualización de entidades y sus relaciones.
+* Gestión de patrones de visualización de entidades y sus relaciones utilizando
+el componente Datatables.
 * Gestión de transformación de cadenas vacías a valores nulos.
 * Gestión de servicios locales y servicios web (importación y
 exposición).
 * Control de acceso (autenticación y autorización).
 * Gestión de configuraciones por entorno.
 * Generación de documentos (reportes).
+* Gestión de relaciones utilizando componente Lupa.
+* Gestión de información geográfica.
+* Generación de GeoPortales interactivos.
 
 Arquitectura
 ------------
@@ -109,8 +126,8 @@ en Spring 3:
 ** Gestión de transacciones propia de Spring.
 ** Pruebas unitarias con JUnit.
 ** Configuración Maven para la construcción de las aplicaciones.
-** Vistas JSP usando Spring MVC. Además, se pueden utilizar otras
-tecnologías de visualización tales como Flex, GWT, JSF y Vaadin.
+** Vistas JSP usando Spring MVC.
+
 +
 Las aplicaciones basadas en Spring son probablemente las aplicaciones
 Java más populares seguidas de JSF, Struts y GWT según el
@@ -160,11 +177,11 @@ La consola tiene el siguiente aspecto:
     ____  ____  ____
    / __ \/ __ \/ __ \
   / /_/ / / / / / / /
- / _, _/ /_/ / /_/ /   gvNIX x.x.x distribution
+ / _, _/ /_/ / /_/ /   
 /_/ |_|\____/\____/    x.x.x-RELEASE [rev xxxxxxx]
 
 Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
-roo-gvNIX>
+roo>
 ------------------------------------------------------------------------------
 
 La usabilidad es un factor clave en el entorno de trabajo. Entre las
@@ -187,6 +204,10 @@ y ejecutarlo en el intérprete de Roo.
 plano debe ser un entorno conservador en el sentido que si no cambia
 nada en el proyecto no debe tocar nada, el desarrollador no debe perder
 nunca el control del proyecto.
+* Actualización de versiones: Al ejecutarse sobre un proyecto generado 
+con una versión anterior de Spring Roo, se muestra un mensaje de confirmación
+impidiendo así que aparezcan errores indeseados o se apliquen cambios sin
+conocimiento del desarrollador.
 
 ¿Cómo funciona?
 ---------------
@@ -217,7 +238,7 @@ desarrollador
 +
 Plugin/Aplicación Eclipse de SpringSource para trabajar con proyectos
 Spring. Entre otras, dispone de herramientas para trabajar con
-Roo/gvNIX.
+Spring Roo.
 
 Generación de código
 --------------------

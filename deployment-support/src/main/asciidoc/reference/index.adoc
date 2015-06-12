@@ -17,9 +17,9 @@
 //
 = {title}
 :title:         gvNIX - Documentación de referencia
-:Project:       gvNIX, un Addon de Spring Roo Suite
+:Project:       gvNIX, un Add-On Suite de Spring Roo
 :Author:        Dirección General de Tecnologías de la Información, Asociación gvSIG, DISID Corporation, S.L.
-:version:       1.4.1.RELEASE
+:version:       2.0.0.M1
 :corpsite:      www.gvnix.org
 :Copyright:     2010 (C) Dirección General de Tecnologías de la Información - Conselleria de Hacienda y Administración Pública - CC BY-NC-SA 3.0
 :keywords:      gvNIX, Documentation
@@ -56,7 +56,7 @@ misma licencia.
 == Primeros pasos con gvNIX
 
 Esta parte de la documentación contiene la información necesaria para
-entender qué es gvNIX y cómo empezar a utilizarlo.
+entender qué es gvNIX y cómo utilizarlo.
 
 // Push titles down one level.
 :leveloffset: 1
