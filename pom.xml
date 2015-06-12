@@ -67,6 +67,7 @@
   <url>http://www.gvnix.org</url>
 
   <modules>
+  	<!-- gvNIX Add-Ons -->
     <module>gvnix-osgi-bundles</module>
     <module>support</module>
     <module>addon-web-mvc-bootstrap</module>
@@ -85,12 +86,12 @@
     <module>addon-web-mvc-dialog</module>
     <module>addon-web-mvc-typicalsecurity</module>
     <module>addon-monitoring</module>
-
     <!-- Generate the subsystem .esa file -->
     <module>roo-addon-suite</module>
-
     <!-- Create the local repository and publish it -->
     <module>repository</module>
+    <!-- Documentation -->
+    <module>deployment-support</module>
   </modules>
 
   <!-- Note when doing releases: tagBase is set in release plugin configuration

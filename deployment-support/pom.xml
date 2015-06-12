@@ -38,10 +38,10 @@
     <version>2.0.0.M1</version>
     <relativePath>..</relativePath>
   </parent>
-  <artifactId>org.gvnix.osgi.bundles</artifactId>
+  <artifactId>org.gvnix.deployment.support</artifactId>
   <packaging>pom</packaging>
-  <name>gvNIX - Documentation TBC</name>
-  <description>Provides POM ... TBC </description>
+  <name>gvNIX - Documentation</name>
+  <description>Generates gvNIX documentation</description>
   <organization>
     <name>
     General Directorate for Information Technologies (DGTI) of
