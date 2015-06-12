@@ -7,17 +7,37 @@ Instalación de gvNIX
 Requisitos previos
 ------------------
 
-gvNIX es en si mismo una aplicación Java por lo que requiere tener una
-máquina virtual Java instalada en el sistema.
+Como se comenta en los puntos anteriores gvNIX es un Roo Add-On Suite, 
+es decir, un conjunto de Add-Ons que pueden ser instalados sobre una
+distribución de Spring Roo.
+
+Por ello, es requisito indispensable disponer de la última versión de
+Spring Roo para poder utilizar gvNIX. 
+
+Puedes descargar la última versión de Spring Roo desde 
+http://projects.spring.io/spring-roo/#running-from-shell[aquí].
+
+[NOTE]
+====
+Solo es posible utilizar gvNIX 2.0+ sobre las versiones 2.0
+de Spring Roo en adelante. Esto es debido a que la instalación de 
+"Roo Add-On Suites" es una característica de las últimas versiones 
+de Spring Roo.
+====
+
+Para poder ejecutar Spring Roo en nuestro sistema, es necesario tener una
+máquina virtual Java instalada.
 
 La lista de requisitos es la siguiente:
 
-* Versión más actual de Java JDK 6 instalado en el sistema
+* Versión más actual de Java JDK 6 instalado en el sistema. Se 
+recomienda utiliar *Java 7*, aunque se dispone de soporte para Java 8.
 (http://www.oracle.com/technetwork/java/javase/downloads/index.html[Más
 información]).
-* Maven 3.0.x o superior (http://maven.apache.org/).
-* Conexión a Internet para la descarga de las dependencias de los
-proyectos.
+* Maven 3.0.5 o superior (http://maven.apache.org/).
+* Conexión a Internet para poder instalar de forma correcta gvNIX en
+la distribución de Spring Roo y descargar las dependencias de los
+proyectos generados.
 
 Configuración del entorno
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,11 +54,11 @@ como configurar el entorno de trabajo para usar estas herramientas.
 ====
 Las siguientes notas sobre configuración son una recomendación de buenas
 prácticas. La variable _$HOME_ hace referencia al path del directorio de
-raíz de usuario (por ejemplo: _/home/usuario_). Se supondrñá instalado
+raíz de usuario (por ejemplo: _/home/usuario_). Se supondrá instalado
 Java JDK y Maven en:
 
 1.  Java JDK 1.6 instalada en: _/home/usuario/software/jdk1.6.0_35_
-2.  Maven 3 instalado en: _/home/usuario/software/apache-maven-3.0.4_
+2.  Maven 3 instalado en: _/home/usuario/software/apache-maven-3.0.5_
 ====
 
 * *Variables de entorno*
@@ -98,7 +118,7 @@ java version "1.6.0_35"
 Java(TM) SE Runtime Environment (build 1.6.0_35-b04)
 Java HotSpot(TM) 64-Bit Server VM (build 20.8-b03, mixed mode)
 bash:~$
-Apache Maven 3.0.4 (r1056850; 2012-01-09 17:58:10+0100)
+Apache Maven 3.0.5 (r1056850; 2012-01-09 17:58:10+0100)
 Java version: 1.6.0_35, vendor: Sun Microsystems Inc.
 Java home: /home/usuario/software/jdk1.6.0_35/jre
 Default locale: es_ES, platform encoding: UTF-8
@@ -121,7 +141,7 @@ gvNIX/Roo dispone de un comando que indica si la instalación de Java
 está, o no, configurada para conectar a Internet a través de un proxy.
 +
 ------------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
                      *** Your system has no proxy setup ***
 http://download.oracle.com/javase/6/docs/technotes/guides/net/proxies.html offers
 useful information.
@@ -192,55 +212,146 @@ comentadas porque existirá ya una sección de este tipo como ejemplo:
 </proxy>
 -----------------------------------------------------------------
 
-Descarga e instalación de gvNIX
--------------------------------
+Instalación
+-----------
 
-1.  Descargar (https://code.google.com/p/gvnix/downloads/list) y
-descomprimir el fichero ZIP de la versión de gvNIX más actual, por
-ejemplo gvNIX-X.Y.Z.RELEASE.zip
-* Ejemplo para sistemas Unix y Apple:
-+
--------------------------------------
-bash:~$ unzip gvNIX-X.Y.Z.RELEASE.zip
--------------------------------------
-2.  Al descomprimir el fichero ZIP se creará un nuevo directorio
-_gvNIX-X.Y.Z.RELEASE_. En el resto del documento se hará referencia a
-este directorio como _GVNIX_HOME_
-3.  Incluir el directorio _bin_ de gvNIX en la variable de entorno
-_PATH._
-+
-_Solo será necesaria si se utiliza gvNIX desde la consola del sistema.
-Por lo tanto, no será necesario realizar todos los pasos indicados en
-este punto si se utiliza gvNIX desde Eclipse o STS tal y como se
-detallará posteriomente._
+Para instalar el Roo Add-On Suite gvNIX es necesario que nuestra distribución de Roo
+sepa donde están alojados todos los componentes que la forman. Por ello, es necesario
+instalar en nuestra distribución el repositorio donde se encuentran dichos los componente.
 
-* Ejemplo para sistemas Unix y Apple:
-+
-------------------------------------------------------
-bash:~$ cd gvNIX-X.Y.Z.RELEASE
-bash:~/gvNIX-X.Y.Z.RELEASE$ export PATH=$PWD/bin:$PATH
-------------------------------------------------------
-+
-Se puede definir la variable _GVNIX_HOME_ y su inclusión en el PATH del
-sistema mediante el archivo _.bash_devel_ y así tenerla disponible de
-manera permanente.
-+
-Recordar que en sistemas Windows, se pueden establecer en las
-propiedades de "Mi PC" las variables de entorno que se definen a
-continuación.
-+
-Para ello modificamos el archivo para que quede como sigue:
-+
-----------------------------------------------------
-...
-export GVNIX_HOME=$HOME/software/gvNIX-X.Y.Z.RELEASE
+Sigue los siguientes pasos para instalar el repositorio de gvNIX en tu distribución de
+Spring Roo 2.0+:
 
-export PATH=$JAVA_HOME/bin:$M2:$GVNIX_HOME/bin:$PATH
-----------------------------------------------------
+1. Ejecuta la consola de Spring Roo 2.0+:
 +
-Notar que la última línea es la modificación de la definición de la
-variable _PATH_. Recordar recargar el fichero _.bash_devel_ mediante el
-comando _source_ de la consola de entornos Unix.
+--------------------------------------------
+bash:~$ cd /tmp/new_project
+bash:~$ ~/software/spring-roo-2.0/bin/roo.sh
+--------------------------------------------
+
+2. Accede al http://projects.spring.io/spring-roo/marketplace/["Roo Market Place"] y
+copia la URL del repositorio de gvNIX (http://repository.gvnix.org/index.xml).
+
+3. Ejecuta el siguiente comando en tu consola de Spring Roo 2.0+ para 
+instalar el repositorio anterior:
++
+----------------------------------------------------------------------
+roo> addon repository add --url http://repository.gvnix.org/index.xml
+----------------------------------------------------------------------
+
+4. Valida que se ha instalado el repositorio de forma correcta listando los componentes
+que están disponibles en dicho repositorio. Para ello, ejecuta el siguiente comando:
++
+---------------------------------
+roo> addon repository introspect
+---------------------------------
+
+5. Si todo ha salido bien, aparecerá un listado mostrando todos los componente que forman
+parte de la distribución gvNIX.
++
+----------------------------------------------------------------------------------------
+Not Installed        gvNIX - Addon - Bootstrap3 support (2.0.0.M1)
+Not Installed        gvNIX - Addon - Co-official languages of Spain (2.0.0.M1)
+Not Installed        gvNIX - Addon - Dynamic Configuration (2.0.0.M1)
+Not Installed        gvNIX - Addon - GEO Support (2.0.0.M1)
+Not Installed        gvNIX - Addon - JPA layer services (2.0.0.M1)
+Not Installed        gvNIX - Addon - Loupe Fields (2.0.0.M1)
+Not Installed        gvNIX - Addon - Monitoring Support (2.0.0.M1)
+Not Installed        gvNIX - Addon - Optimistic Concurrency Control (2.0.0.M1)
+Not Installed        gvNIX - Addon - Services Management (2.0.0.M1)
+Not Installed        gvNIX - Addon - Typical Security (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web Datatables Addon (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web MVC (JSP) layer services (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web MVC Bindings (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web MVC Dialogs (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web MVC Menu (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web Report (2.0.0.M1)
+Not Installed        gvNIX - Annotations - GEO Support (2.0.0.M1)
+Not Installed        gvNIX - Annotations - JPA layer services (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Loupe Fields (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Optimistic Concurrency Control (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Services Management (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Web Datatables Addon (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Web MVC (JSP) layer services (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Web MVC Bindings (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Web MVC Dialogs (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Web Report (2.0.0.M1)
+Not Installed        gvNIX - Roo Addon Suite (2.0.0.M1)
+Not Installed        gvNIX - Support Module (2.0.0.M1)
+Not Installed        Spring Roo - Wrapping - derby (10.8.2.2_0002)
+Not Installed        Spring Roo - Wrapping - derbyclient (10.8.2.2_0002)
+Not Installed        Spring Roo - Wrapping - firebird (2.1.6.0021)
+Not Installed        Spring Roo - Wrapping - jtds (1.2.4.0011)
+Not Installed        Spring Roo - Wrapping - jtopen (6.7.0.0011)
+Not Installed        Spring Roo - Wrapping - mysql-connector-java (5.1.18.0002)
+Not Installed        Spring Roo - Wrapping - postgresql-jdbc3 (9.1.0.901_0003)
+
+35 available bundles on installed repositories were found
+----------------------------------------------------------------------------------------
+
+6. Ahora que ya tienes instalado el repositorio que contiene los componentes de gvNIX, continuamos con
+la instalación de los mismos. Para ello ejecuta el siguiente comando:
++
+----------------------------------------------------------------------
+roo> addon suite install name --symbolicName org.gvnix.roo.addon.suite
+----------------------------------------------------------------------
+
+7. Valida que se ha instalado el Roo Add-On Suite de gvNIX ejecutando el siguiente comando:
++
+----------------------
+roo> addon suite list
+----------------------
+
+8. Si todo ha salido bien, aparecerá un listado mostrando todos los Roo Add-On Suites que tienes
+instalados en tu distribución de Spring Roo:
++
+----------------------------------------------------------------
+Getting all 'Roo Addon Suites' installed on Spring Roo Shell... 
+
+   org.osgi.service.subsystem.root
+   
+1 Roo Addon Suites were found at your Spring Roo installation
+----------------------------------------------------------------
+
+9. Para finalizar, valida que todos los componentes de gvNIX se han instalado correctamente 
+en la distribución de Sprign Roo ejecutando el siguiente comando:
++
+----------------
+roo> addon list
+----------------
+
+10. Si todo ha salido bien, al final del listado que aparecerá en la consola, podrás ver
+todos los componentes de gvNIX instalados y activados del siguiente modo:
++
+------------------------------------------------------------------------------------------
+   86|Active     |    1|gvNIX - Annotations - GEO Support (2.0.0.M1)
+   87|Active     |    1|gvNIX - Addon - Dynamic Configuration (2.0.0.M1)
+   88|Active     |    1|gvNIX - Addon - Loupe Fields (2.0.0.M1)
+   89|Active     |    1|gvNIX - Addon - Web MVC (JSP) layer services (2.0.0.M1)
+   90|Active     |    1|gvNIX - Annotations - Web Datatables Addon (2.0.0.M1)
+   91|Active     |    1|gvNIX - Addon - JPA layer services (2.0.0.M1)
+   92|Active     |    1|gvNIX - Addon - Web Datatables Addon (2.0.0.M1)
+   93|Active     |    1|gvNIX - Annotations - Web MVC (JSP) layer services (2.0.0.M1)
+   94|Active     |    1|gvNIX - Addon - Services Management (2.0.0.M1)
+   95|Active     |    1|gvNIX - Annotations - Web Report (2.0.0.M1)
+   96|Active     |    1|gvNIX - Addon - Co-official languages of Spain (2.0.0.M1)
+   97|Active     |    1|gvNIX - Annotations - Optimistic Concurrency Control (2.0.0.M1)
+   98|Active     |    1|gvNIX - Addon - Web MVC Dialogs (2.0.0.M1)
+   99|Active     |    1|gvNIX - Annotations - Services Management (2.0.0.M1)
+  100|Active     |    1|gvNIX - Addon - Monitoring Support (2.0.0.M1)
+  101|Active     |    1|gvNIX - Addon - Bootstrap3 support (2.0.0.M1)
+  102|Active     |    1|gvNIX - Annotations - Web MVC Dialogs (2.0.0.M1)
+  103|Active     |    1|gvNIX - Addon - GEO Support (2.0.0.M1)
+  104|Active     |    1|gvNIX - Addon - Optimistic Concurrency Control (2.0.0.M1)
+  105|Active     |    1|gvNIX - Support Module (2.0.0.M1)
+  106|Active     |    1|gvNIX - Annotations - Loupe Fields (2.0.0.M1)
+  107|Active     |    1|gvNIX - Annotations - JPA layer services (2.0.0.M1)
+  108|Active     |    1|gvNIX - Addon - Web Report (2.0.0.M1)
+  109|Active     |    1|gvNIX - Annotations - Web MVC Bindings (2.0.0.M1)
+  110|Active     |    1|gvNIX - Addon - Typical Security (2.0.0.M1)
+  111|Active     |    1|gvNIX - Addon - Web MVC Menu (2.0.0.M1)
+  112|Active     |    1|gvNIX - Addon - Web MVC Bindings (2.0.0.M1)
+------------------------------------------------------------------------------------------
 
 Una vez hecho esto, ya se puede trabajar con el entorno gvNIX desde la
 línea de comandos. Sin embargo, se recomienda utilizar un IDE de
@@ -255,27 +366,27 @@ a un directorio vacío en el caso de tratarse de un proyecto nuevo:
 ------------------------------
 bash:~$ cd ~/project-directory
 ------------------------------
-* Ejecutar el intérprete de comando de gvNIX para interactuar con el
+* Ejecutar el intérprete de comando de Roo para interactuar con el
 proyecto Java:
 +
 -----------------------------------------------------------
-bash:~/project-directory$ gvnix.sh
+bash:~/project-directory$ roo.sh
 
-(En sistemas windows el intérprete se abrirá con gvnix.bat)
+(En sistemas windows el intérprete se abrirá con roo.bat)
 -----------------------------------------------------------
-* Con esto se abrirá la consola de gvNIX y se mostrará algo similar a lo
+* Con esto se abrirá la consola de Roo y se mostrará algo similar a lo
 siguiente:
 +
 ------------------------------------------------------------------------------------------
-    ____  ____  ____
+                ____  ____  ____
                / __ \/ __ \/ __ \
               / /_/ / / / / / / /
-             / _, _/ /_/ / /_/ /   gvNIX x.x.x distribution
+             / _, _/ /_/ / /_/ /   
             /_/ |_|\____/\____/    x.x.x-RELEASE [rev xxxxxxx]
 
 
             Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
-            roo-gvNIX>
+            roo>
 
 ------------------------------------------------------------------------------------------
 
