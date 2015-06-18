@@ -17,13 +17,15 @@ Si no se solicitó la generación de las pruebas de integración en el
 momento de la creación de una entidad, se pueden generar posteriormente
 con el comando _test integration_.
 
+-----------------------------------------
+~.domain.PizzaOrder roo> test integration
+-----------------------------------------
+
 Para ejecutar los test utilizar el comando `perform
         tests`:
 
 --------------------------------------
-~.domain.PizzaOrder roo-gvNIX>
-
-        ~.domain.PizzaOrder roo-gvNIX>
+~.domain.PizzaOrder roo> perform tests
 --------------------------------------
 
 //Return level title
