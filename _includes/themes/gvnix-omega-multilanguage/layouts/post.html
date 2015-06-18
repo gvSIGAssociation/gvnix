@@ -71,8 +71,11 @@
                         <br>
 
                         <!-- timeline -->
-                        {% if page.timeline %}
+                        {% if page.timeline and page.lang == "en" %}
                           {% include themes/gvnix-omega-multilanguage/timeline.html %}
+                        {% endif %}
+                        {% if page.timeline and page.lang == "es" %}
+                          {% include themes/gvnix-omega-multilanguage/timeline-es.html %}
                         {% endif %}
 
                         {% assign tagsize = page.tags.size %}
