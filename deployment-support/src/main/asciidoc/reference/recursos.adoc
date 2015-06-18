@@ -7,6 +7,19 @@ Recursos
 En este apartado pondremos una lista de recursos de documentación,
 tutoriales, etc que pueden ser útiles.
 
+Proyecto gvNIX
+---------------
+
+* http://www.gvnix.org[Sitio Web]
+* http://github.com/gvSIGAssociation/gvnix[Repositorio]
+
+Ejemplos y Demo Online gvNIX
+-----------------------------
+
+* http://github.com/DISID/gvnix-samples[Repositorio de ejemplos]
+* http://petclinic-gvnix.rhcloud.com[Demo Online]
+* http://geo-gvnix.rhcloud.com[Demo Online componentes GEO]
+
 Proyectos relacionados con gvNIX
 --------------------------------
 

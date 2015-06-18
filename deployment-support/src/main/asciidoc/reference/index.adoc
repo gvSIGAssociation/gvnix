@@ -234,9 +234,8 @@ include::addon-dynamic-config.adoc[]
 include::addon-web-mvc-binding.adoc[]
 
 // Push titles down one level.
-:leveloffset: 1
-include::addon-flex.adoc[]
-
+//:leveloffset: 1
+//include::addon-flex.adoc[]
 
 == Recetas de desarrollo
 

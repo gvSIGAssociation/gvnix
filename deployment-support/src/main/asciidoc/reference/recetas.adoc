@@ -27,7 +27,7 @@ Ambiente. Este repositorio es accesible únicamente desde la red interna
 de la Conselleria.
 
 --------------------------------------------------------------------------------------
-roo-gvNIX> maven repository add --id citma-maven --name "CITMA Maven Repository"
+roo> maven repository add --id citma-maven --name "CITMA Maven Repository"
         --url http://benigno.coput.gva.es:8081/nexus/content/groups/public
 Updated ROOT/pom.xml [
         added repository http://benigno.coput.gva.es:8081/nexus/content/groups/public]
