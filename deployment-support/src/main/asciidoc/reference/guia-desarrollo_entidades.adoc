@@ -227,25 +227,25 @@ capítulos anteriores:
 1.  Topping:
 +
 ----------------------------
-roo-gvNIX>
-~.domain.Topping roo-gvNIX>
+roo>
+~.domain.Topping roo>
 
 ----------------------------
 2.  Base:
 +
 ----------------------------
-~.domain.Topping roo-gvNIX>
-~.domain.Base roo-gvNIX>
+~.domain.Topping roo>
+~.domain.Base roo>
 
 ----------------------------
 3.  Pizza:
 +
 --------------------------
-~.domain.Base roo-gvNIX>
-~.domain.Pizza roo-gvNIX>
-~.domain.Pizza roo-gvNIX>
-~.domain.Pizza roo-gvNIX>
-~.domain.Pizza roo-gvNIX>
+~.domain.Base roo>
+~.domain.Pizza roo>
+~.domain.Pizza roo>
+~.domain.Pizza roo>
+~.domain.Pizza roo>
 
 --------------------------
 +
@@ -283,12 +283,12 @@ Asociación con otra entidad
 4.  PizzaOrder:
 +
 ------------------------------
-~.domain.Pizza roo-gvNIX>
-~.domain.PizzaOrder roo-gvNIX>
-~.domain.PizzaOrder roo-gvNIX>
-~.domain.PizzaOrder roo-gvNIX>
-~.domain.PizzaOrder roo-gvNIX>
-~.domain.PizzaOrder roo-gvNIX>
+~.domain.Pizza roo>
+~.domain.PizzaOrder roo>
+~.domain.PizzaOrder roo>
+~.domain.PizzaOrder roo>
+~.domain.PizzaOrder roo>
+~.domain.PizzaOrder roo>
 
 ------------------------------
 
@@ -354,7 +354,7 @@ Añadir un atributo::
   _--class._
 +
 --------------------------
-~.domain.Pizza roo-gvNIX>
+~.domain.Pizza roo>
 --------------------------
 +
 Notar que tras ejecutar el comando _field_ indicando el parámetro
@@ -369,8 +369,8 @@ clase del proyecto) mediante el comando *focus* indicando el parámetro
 _--class_.
 
 ------------------------------
-roo-gvNIX>
-~.domain.PizzaOrder roo-gvNIX>
+roo>
+~.domain.PizzaOrder roo>
 ------------------------------
 ====
 
@@ -786,7 +786,7 @@ Finalmente, lanzar los test de integración para confirmar que todo se ha
 generado y funciona correctamente.
 
 -----------------------
-roo-gvNIX> ...
+roo> ...
 [INFO] BUILD SUCCESSFUL
 -----------------------
 
@@ -830,7 +830,7 @@ Por ejemplo, si se ejecuta la ingeniería inversa en un proyecto con
 PostgreSQL configurado como sistema de base de datos:
 
 -----------------------------------------------------------------------------------------
-roo-gvNIX> database introspect --schema unable-to-obtain-connection
+roo> database introspect --schema unable-to-obtain-connection
 Located add-on that may offer this JDBC driver
 1 found, sorted by rank; T = trusted developer; R = Roo 1.2 compatible
 ID T R DESCRIPTION -------------------------------------------------------------
@@ -847,31 +847,7 @@ Esta salida del comando _database introspect_ informa que hay disponible
 un driver para el soporte de DBRE y sugiere qué hacer a continuación
 (lineas que empiezan con [HINT]).
 
-Se puede obtener más información sobre el driver mediante:
-
----------------------------------------------------------------------------
-roo-gvNIX> addon info id --searchResultId 01
-Name.........: Spring Roo - Wrapping - postgresql-jdbc4
-BSN..........: org.springframework.roo.wrapping.postgresql-jdbc4
-Version......: 9.1.0.901_0001 [available versions: 9.0.801.0001,
-               9.1.0.901_0001]
-Roo Version..: 1.2
-Ranking......: 0.0
-JAR Size.....: 513073 bytes
-PGP Signature: 0xEC67B395 signed by Alan Stewart (stewarta@vmware.com)
-OBR URL......: http://spring-roo-repository.springsource.org/repository.xml
----------------------------------------------------------------------------
-
-Donde se está pidiendo más información (--searchResultId) del Add-on 01
-que ha devuelto el comando anterior.
-
-Para instalarlo usar el id del Add-on o bien su nombre simbólico.
-
-------------------------------------
-addon install id --searchResultId 01
-------------------------------------
-
-o
+Para instalarlo usar el nombre simbólico del Add-On.
 
 --------------------------------------------------------------------------------
 addon install bundle
