@@ -309,7 +309,7 @@
               <copy file="${basedir}/src/main/resources/obr2html.xsl" 
                 todir="${project.parent.build.directory}/osgi-repository-bin" />
               <copy file="${project.parent.build.directory}/osgi-repository-bin/index.xml"
-              	tofile="${project.parent.build.directory}/osgi-repository-bin/index_${gvnix.version}.xml" />
+              	tofile="${project.parent.build.directory}/osgi-repository-bin/index-${gvnix.version}.xml" />
               </tasks>
             </configuration>
           </execution>
