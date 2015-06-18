@@ -13,13 +13,13 @@ link:#_campos_opcionales_en_los_buscadores[campos opcionales en los buscadores] 
 Descripción
 -----------
 
-El framework permite generar buscadores sobre cualquier entidad del
+Roo permite generar buscadores sobre cualquier entidad del
 modelo de la aplicación mediante el comando
-http://docs.spring.io/spring-roo/reference/html/command-index.html#command-index-finder-commands[finder
+http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#finder-add[finder
 add]. El comando espera el nombre del buscador a generar en un formato
 determinado. Para conocer el formato se puede utilizar como ayuda el
 comando
-http://docs.spring.io/spring-roo/reference/html/command-index.html#command-index-finder-list[finder
+http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#finder-list[finder
 list].
 
 En los siguientes puntos se muestra un ejemplo de como elegir y generar
@@ -33,7 +33,7 @@ Listar buscadores
 Ejecutar el comando finder list sobre la entidad Owner
 
 -------------------------------------------------------------------------
-roo-gvNIX>
+roo>
         ...
         findOwnersByLastNameLikeAndCityLike(String lastName, String city)
         ...
@@ -56,7 +56,7 @@ se le pase como parámetro respectivamente, ambas utilizando para ello el
 operador _like_.
 
 Consultar la documentación del comando
-http://docs.spring.io/spring-roo/reference/html/command-index.html#command-index-finder-list[finder
+http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#finder-list[finder
 list] para más información.
 
 Creación de un buscador
@@ -117,14 +117,14 @@ se generará el buscador en la capa de las entidades, pero no se generará
 todavía ningún código en la capa de la vista.
 
 -----------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
         Updated SRC_MAIN_JAVA/com/springsource/petclinic/domain/Owner.java
         Created SRC_MAIN_JAVA/com/springsource/petclinic/domain/Owner_Roo_Finder.aj
 
 -----------------------------------------------------------------------------------
 
 Consultar la documentación del comando
-http://docs.spring.io/spring-roo/reference/html/command-index.html#command-index-finder-add[finder
+http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#finder-add[finder
 add] para más información.
 
 Código generado
