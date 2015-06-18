@@ -43,9 +43,9 @@ y configurar el sistema de persistencia. Teclear `hint` que sugerirá los
 siguientes pasos a dar:
 
 ---------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Roo requires the installation of a persistence configuration,
-for example, JPA or MongoDB.
+for example, JPA.
 
 For JPA, type 'jpa setup' and then hit TAB three times.
 We suggest you type 'H' then TAB to complete "HIBERNATE".
@@ -56,9 +56,7 @@ As such, you're ready to press ENTER to execute the command.
 
 Once JPA is installed, type 'hint' and ENTER for the next suggestion.
 
-Similarly, for MongoDB persistence, type 'mongo setup' and ENTER.
-
-roo-gvNIX>
+roo>
 ---------------------------------------------------------------------
 
 En el ámbito de esta documentación es suficiente con conectar la
@@ -67,7 +65,7 @@ instalado como Hypersonic e Hibernate como implementación del sistema de
 persistencia:
 
 --------------------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Created SPRING_CONFIG_ROOT/database.properties
 Updated SPRING_CONFIG_ROOT/applicationContext.xml
 Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
@@ -80,7 +78,7 @@ javax.validation:validation-api:1.0.0.GA,
 javax.transaction:jta:1.1, org.springframework:spring-jdbc:${spring.version},
 org.springframework:spring-orm:${spring.version},
 commons-pool:commons-pool:1.5.6, commons-dbcp:commons-dbcp:1.4]
-roo-gvNIX>
+roo>
 --------------------------------------------------------------------------------------------
 
 [WARNING]
@@ -154,12 +152,10 @@ Los parámetros obligatorios que requiere este comando son:
   repositorio Maven, en caso de utilizar DB2 habrá que instalar
   manualmente el driver JDBC._
   * DERBY.
-  * GOOGLE_APP_ENGINE.
   * H2_IN_MEMORY.
   * HYPERSONIC_IN_MEMORY.
   * HYPERSONIC_PERSISTENT.
   * FIREBIRD.
-  * DATABASE_DOT_COM.
 
 --applicationId::
   Identificación de aplicación en Google App Engine (sólo utilizado para
@@ -233,7 +229,7 @@ Los pasos a seguir para la configuración son:
           setup` con los parámetros que disponemos:
 +
 --------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Created SPRING_CONFIG_ROOT/database.properties
 Please update your database details in
  src/main/resources/META-INF/spring/database.properties.
@@ -247,19 +243,19 @@ Updated ROOT/pom.xml [added dependencies postgresql:postgresql:9.1-901-1.jdbc4,
  javax.transaction:jta:1.1, org.springframework:spring-jdbc:${spring.version},
  org.springframework:spring-orm:${spring.version}, commons-pool:commons-pool:1.5.6,
  commons-dbcp:commons-dbcp:1.4]
-roo-gvNIX>
+roo>
 --------------------------------------------------------------------------------
 
 2.  Comprobar como ha quedado la configuración de la conexión. Para ello
 usar el comando `database properties list`:
 +
 ----------------------------------------------------
-roo-gvNIX>
+roo>
 database.driverClassName = org.postgresql.Driver
 database.password = 1234
 database.url = jdbc:postgresql://dbserver:5432/my_db
 database.username = user1
-roo-gvNIX>
+roo>
 ----------------------------------------------------
 +
 Observar que lo único que falta es configurar el puerto de la base de
@@ -272,21 +268,21 @@ distinto.
 comando `database properties set`:
 +
 ----------------------------------------------
-roo-gvNIX>
+roo>
 Updated SPRING_CONFIG_ROOT/database.properties
-roo-gvNIX>
+roo>
 ----------------------------------------------
 
 4.  Volver a comprobar el estado de los parámetros con el comando
 `database properties list`:
 +
 ----------------------------------------------------
-roo-gvNIX>
+roo>
 database.driverClassName = org.postgresql.Driver
 database.password = 1234
 database.url = jdbc:postgresql://dbserver:5438/my_db
 database.username = user1
-roo-gvNIX>
+roo>
 ----------------------------------------------------
 
 Una vez hecho, la siguiente vez que se arranque la aplicación usará la
