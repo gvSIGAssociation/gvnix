@@ -99,18 +99,18 @@ Consola gvNIX / Roo integrada en Eclipse
 ----------------------------------------
 
 El plugin o distribución de STS instalado ofrece la posibilidad de
-incluir la consola de gvNIX en el propio entorno de desarrollo. Para
+incluir la consola de ROO en el propio entorno de desarrollo. Para
 ello antes hay que indicarle a Eclipse donde está instalada la nueva
-versión de gvNIX.
+versión de ROO.
 
 En el menú _Window > Preferences > Spring > Roo Support_. Pulsar sobre
 el botón Add y buscar en el navegador de archivos el lugar donde está
-instalado gvNIX. Aparecerá una pantalla similar a la siguiente:
+instalado ROO. Aparecerá una pantalla similar a la siguiente:
 
 image::preferences_roo.png[Configuración del soporte gvNIX en Eclipse, align=center]
 
 Presionando en OK sobre las dos pantallas que abiertas ya estará
-configurado el soporte para la linea de comandos de gvNIX. Para poder
+configurado el soporte para la linea de comandos de ROO. Para poder
 usarlo abrir la perspectiva de Spring con _Window > Open Perspective >
 Other > Spring_. En la parte inferior de la pantalla aparecerá una
 pestaña llamada Roo Shell. Si no apareciese la pestaña, puede abrirse
@@ -153,7 +153,7 @@ Esta primera pantalla habrá ejecutado de forma automática el comando de
 creación de un nuevo proyecto:
 
 ----------------------------------------------
-project --topLevelPackage com.gvnix.tenminutes
+project setup --topLevelPackage com.gvnix.tenminutes
 ----------------------------------------------
 
 En este punto ya se dispone de un proyecto Maven preparado.
@@ -164,11 +164,11 @@ deben usar para configurar el soporte JPA. Recordar que se puede usar
 Ctrl+Space como ayuda a la escritura en los comandos:
 
 -------------------------------------------------------------------------
-roo-gvNIX> jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+roo> jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 Created ...
-roo-gvNIX> entity jpa --class ~.domain.Timer --testAutomatically
+roo> entity jpa --class ~.domain.Timer --testAutomatically
 Created ...
-~.domain.Timer roo-gvNIX> field string --fieldName message --notNull
+~.domain.Timer roo> field string --fieldName message --notNull
 Managed ...
 -------------------------------------------------------------------------
 
@@ -184,8 +184,8 @@ todas las entidades de una aplicación mediante el proceso de ingeniería
 inversa contra un esquema de BBDD existente.
 
 -----------------------------------------------------
-~.domain.Timer roo-gvNIX> web mvc setup
-~.domain.Timer roo-gvNIX> web mvc all --package ~.web
+~.domain.Timer roo> web mvc setup
+~.domain.Timer roo> web mvc all --package ~.web
 Created ...
 -----------------------------------------------------
 
@@ -195,7 +195,7 @@ link:#_web_mvc_controller[Crear la capa web con el
 intérprete de comandos].
 
 ------------------------------------------------------
-~.web roo-gvNIX> selenium test --controller ~.web.Time
+~.web roo> selenium test --controller ~.web.Time
 ------------------------------------------------------
 
 Importar proyecto gvNIX en Eclipse
@@ -208,9 +208,7 @@ ejecutar el comando `perform eclipse` para crear una estructura de
 proyecto Eclipse:
 
 -------------------------------
-~.domain.PizzaOrder roo-gvNIX>
-
-~.domain.PizzaOrder roo-gvNIX>
+~.domain.PizzaOrder roo> perform eclipse
 -------------------------------
 
 Este comando termina ejecutando el comando del
@@ -250,9 +248,9 @@ Si los tests no fueron creados en el momento de la ejecución del comando
 _entity_, pueden ser generados con posterioridad mediante otro comando:
 
 --------------------------------------------
-    test integration --entity ~.domain.Timer
-
+roo> test integration --entity ~.domain.Timer
 --------------------------------------------
+
 Arrancar la aplicación con Eclipse
 ----------------------------------
 
