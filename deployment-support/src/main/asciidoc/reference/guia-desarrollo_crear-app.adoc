@@ -52,7 +52,7 @@ asistente que cambiará durante el proceso de desarrollo en función del
 estado en el que se encuentre el proyecto:
 
 ------------
-roo-gvNIX>
+roo> hint
 ------------
 
 Muestra las instrucciones para continuar y crear un proyecto. El
@@ -65,16 +65,16 @@ el que se va a trabajar en el proyecto añadiendo el atributo `--java 6`,
 el número 6 corresponde a la versión del JDK utilizado, en este caso JDK
 1.6, si no se especifica Roo por defecto utiliza el JDK 1.6
 
------------
-roo-gvNIX>
------------
+--------------------------------------------------------------------
+roo> project setup --topLevelPackage com.springsource.roo.pizzashop
+--------------------------------------------------------------------
 
 Una vez creado el proyecto observar que el foco de la consola ha
 cambiado, ahora se encuentra apuntando al paquete base del proyecto que
 se ha indicado al crearlo:
 
 -----------------------------------------
-com.springsource.roo.pizzashop roo-gvNIX>
+com.springsource.roo.pizzashop roo>
 -----------------------------------------
 
 Por otro lado, la estructura de directorios creada esta basada en las
