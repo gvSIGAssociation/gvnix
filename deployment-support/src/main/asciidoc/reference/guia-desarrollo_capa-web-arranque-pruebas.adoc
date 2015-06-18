@@ -18,9 +18,9 @@ La creación de las pruebas funcionales se realizan a través del comando
 En el siguiente ejemplo se está generando las pruebas funcionales para
 el controlador de la entidad _Pizza_:
 
-------------------------------------------------
-selenium test --controller ~.web.PizzaController
-------------------------------------------------
+-----------------------------------------------------
+roo> selenium test --controller ~.web.PizzaController
+-----------------------------------------------------
 
 Los test generados estarán en _src/main/webapp/selenium_. La opción
 _--controller_ especifica la clase controladora para la que se desea
