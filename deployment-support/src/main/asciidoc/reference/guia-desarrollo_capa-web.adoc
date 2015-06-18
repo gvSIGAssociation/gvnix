@@ -111,13 +111,6 @@ Los parámetros para este comando son:
   Nombre del paquete donde se generarán los controladores. Por
   convención, se suele utilizar el nombre de paquete `~.web`.
 
-Un ejemplo:
-
------------
-roo-gvNIX>
-roo-gvNIX>
------------
-
 web mvc controller
 ~~~~~~~~~~~~~~~~~~
 
@@ -134,12 +127,6 @@ Los parámetros para este comando son:
 --preferredMapping::
   Permite definir la ruta de la petición para este controller.
 
-Un ejemplo:
-
------------
-roo-gvNIX>
-roo-gvNIX>
------------
 
 Genera una clase como esta:
 
@@ -193,10 +180,10 @@ Proyecto ejemplo
 Continuando con el proyecto del tutorial, la capa web de la aplicación
 de venta de pizzas se creará con la siguiente secuencia de comandos:
 
--------------------------------
-~.domain.PizzaOrder roo-gvNIX>
-~.domain.PizzaOrder roo-gvNIX>
--------------------------------
+-------------------------------------------------------
+~.domain.PizzaOrder roo> web mvc setup
+~.domain.PizzaOrder roo> web mvc all --package ~.web
+-------------------------------------------------------
 
 Crear la capa web con un IDE
 ----------------------------
