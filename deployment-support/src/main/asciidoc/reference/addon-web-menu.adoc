@@ -72,7 +72,7 @@ opcional. Por ello, para instalarlo y activarlo es necesario ejecutar en
 primer lugar el comando link:#_menu_setup[`menu setup`].
 
 ------------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Component org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperationsImpl disabled
 
 Created SRC_MAIN_WEBAPP/WEB-INF/views/menu.xml

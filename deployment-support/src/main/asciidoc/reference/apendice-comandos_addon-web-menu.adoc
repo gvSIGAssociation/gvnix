@@ -292,7 +292,7 @@ Sus parámetros son:
 El comando mostrará un resultado similar al siguiente:
 
 ----------------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 [c_pet, visible, no-URL]
           /pets?form  [i_pet_new, visible]
           /pets?page=1&size=${empty param.size ? 10 : param.size}  [i_pet_list, visible]

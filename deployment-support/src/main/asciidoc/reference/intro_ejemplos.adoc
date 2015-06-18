@@ -27,7 +27,7 @@ https://github.com/DISID/gvnix-samples/[repositorio de ejemplos de gvNIX].
 //siguiente forma:
 //
 //-----------
-//roo-gvNIX>
+//roo>
 //project ...
 //...
 //-----------

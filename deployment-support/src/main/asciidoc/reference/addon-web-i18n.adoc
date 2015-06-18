@@ -28,7 +28,7 @@ web mvc install language y proporcionar como parámetro _code_ el código
 del idioma deseado.
 
 ---------------------------------------------------------------
-roo-gvNIX>
+roo>
     Created SRC_MAIN_WEBAPP/WEB-INF/i18n/messages_ca.properties
     Created SRC_MAIN_WEBAPP/images/ca.png
     Updated SRC_MAIN_WEBAPP/WEB-INF/views/footer.jspx

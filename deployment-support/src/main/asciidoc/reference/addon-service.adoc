@@ -33,7 +33,7 @@ clase se puede crear con el comando
 link:#_remote_service_class[remote service class].
 
 ---------------------------------------------------------
-roo-gvNIX>
+roo>
 Created SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
 ---------------------------------------------------------
 
@@ -63,7 +63,7 @@ link:#_remote_service_operation[remote service
 operation] que permite añadir métodos en una clase.
 
 ----------------------------------------------------------
-roo-gvNIX>  --name myMethod --service ~.service.Service
+roo>  --name myMethod --service ~.service.Service
         --return java.lang.Long --paramNames param1,param2
         --paramTypes "java.lang.String,java.util.List"
 Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
@@ -104,7 +104,7 @@ link:#_remote_service_define_ws[remote service define
 ws].
 
 ------------------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Updated ROOT/pom.xml [
         added repository http://repository.gvnix.org;
         added dependency org.gvnix:org.gvnix.service.roo.addon:X.Y.Z;
@@ -167,7 +167,7 @@ link:#_remote_service_export_operation[remote service
 export operation]
 
 ----------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
 Updated SRC_MAIN_WEBAPP/WEB-INF/cxf-appname.xml
 Updated ROOT/pom.xml
@@ -217,7 +217,7 @@ posteriormente deberán ser personalizadas con la lógica de negocio
 adecuada.
 
 -----------
-roo-gvNIX>
+roo>
 -----------
 
 La ruta al _WSDL_ puede ser un archivo local mediante _file://ruta_, una
@@ -386,7 +386,7 @@ link:#_remote_service_security_ws[remote service
 security ws] para añadir la firma en las peticiones del cliente.
 
 ---------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Created ROOT/src/main/resources/org/gvnix/test/service
 Created ROOT/src/main/resources/org/gvnix/test/service/certificate.p12
 Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
@@ -477,7 +477,7 @@ están disponibles para ser ofrecidos al exterior siempre y cuando la
 clase esté definida como un servicio web.
 
 ----------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Method list to export as web service operation in '~.service.Service':
     * myMethod2
 ----------------------------------------------------------------------
@@ -490,7 +490,7 @@ aplicación.
 El resultado es una salida como esta:
 
 -------------------------------------------------------
-roo-gvNIX> remote service ws list
+roo> remote service ws list
 Services                         exported    imported
 -------------------------------  ---------   ----------
 org.gvnix.test.service.Service1      X

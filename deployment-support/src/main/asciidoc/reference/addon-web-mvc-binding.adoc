@@ -34,7 +34,7 @@ datos del tipo cadena, al almacenar se escribe una cadena vacía. En
 estos casos puede suele ser más interesante almacenar un valor nulo.
 
 -----------------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_JAVA/org/gvnix/test/web/EntityController.java
 Updated ROOT/pom.xml added dependency org.gvnix:org.gvnix.web.mvc.binding.roo.addon:X.Y.Z
 Created SRC_MAIN_JAVA/org/gvnix/test/web/EntityController_Roo_GvNIXStringTrimmerBinder.aj

@@ -11,10 +11,6 @@ include::apendice-comandos_addon-jpa.adoc[]
 
 // Push titles down one level.
 :leveloffset: 2
-include::apendice-comandos_addon-theme.adoc[]
-
-// Push titles down one level.
-:leveloffset: 2
 include::apendice-comandos_addon-web-dialog.adoc[]
 
 // Push titles down one level.
@@ -23,15 +19,7 @@ include::apendice-comandos_addon-web-menu.adoc[]
 
 // Push titles down one level.
 :leveloffset: 2
-include::apendice-comandos_addon-web-screen-pattern.adoc[]
-
-// Push titles down one level.
-:leveloffset: 2
 include::apendice-comandos_addon-gva-security.adoc[]
-
-// Push titles down one level.
-:leveloffset: 2
-include::apendice-comandos_addon-cit-security.adoc[]
 
 // Push titles down one level.
 :leveloffset: 2

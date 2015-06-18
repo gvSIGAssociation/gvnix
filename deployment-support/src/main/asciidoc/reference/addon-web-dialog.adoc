@@ -139,7 +139,7 @@ dialog add] añade la anotación 'GvNIXModalDialogs' en la clase
 controladora que se le indica.
 
 -----------
-roo-gvNIX>
+roo>
 -----------
 
 La anotación generará dos métodos asociados con el controlador. Un

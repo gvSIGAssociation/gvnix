@@ -233,9 +233,7 @@ Es importante que la descripción sea descriptiva del objetivo del add-on
 (por ejemplo, _Site structure management_) y debe incluir información
 sobre la tecnología en la que debe aplicarse (por ejemplo, _for Spring
 MVC based web layer_). Este último punto ayudará a los desarrolladores a
-saber si pueden utilizarlo en determinados add-ons, siguiendo el
-ejemplo, el add-on de menu no podría utilizarse con una capa web basada
-en GWT.
+saber si pueden utilizarlo en determinados add-ons.
 
 Licencia de add-ons
 -------------------

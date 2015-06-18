@@ -196,44 +196,7 @@ La forma de tratar estas peticiones en Spring MVC es intentar cargar el
 registro asociado con el valor del selector que llega como parámetro.
 Por tanto si llega como parámetro un dato que no concuerda con ningún
 registro de la entidad parámetro, usará null como valor. Como se ha
-comentado, el componente _select.tagx_ no ofrece una opción vacía. gvNIX
-en su link:#_add_on_web_screen_patterns[Add-on Web MVC Pattern] incluye un
-componente 'select-withempty.tagx' que sí lo ofrece.
-
-Mediante el comando
-_web mvc pattern setup_ se instalan los componentes de MVC Pattern entre
-los que se incluye el selector con opción vacía. Entonces es posible
-modificar la jspx del buscador findPetsByOwner para que utilice
-_select-withempty_ en lugar del original de la siguiente forma:
-
--------------------------------------------------------------------------------
-<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" ...
-
-            version="2.0">
-  <jsp:directive.page contentType="text/html;charset=UTF-8"/>
-  <jsp:output omit-xml-declaration="yes"/>
-  <form:find finderName="ByOwner" id="ff_com_springsource_petclinic_domain_Pet"
-        path="/pets" z="ThIGSmua6R7WM6q2P1BpNC3zMi4=">
-
-  </form:find>
-</div>
--------------------------------------------------------------------------------
-
-El componente select-withempty.tagx tiene los mismos atributos que el
-select.tagx y otros tres adicionales:
-
-* _emptyValueEnable_: Valor booleano que habilita la opción vacía en el
-selector.
-* _emtpyValue_: Valor a dar para la opción vacía del selector. Si se
-corresponde con una entidad, este valor no debería corresponder con
-ningún identificador existente para esa entidad, de esta forma el valor
-que llega al buscador es nulo.
-* _emptyLabel_: Descripción a mostrar para la opción vacía del selector.
-
-Con este cambio y con el método findPetsByOwner modificado para que no
-sea requerido el parámetro Owner, de la misma forma que se explicado
-antes, se consigue realizar búsquedas por parámetros opcionales sea cual
-sea el tipo del parámetro.
+comentado, el componente _select.tagx_ no ofrece una opción vacía. 
 
 Instalar fuentes de letra para los informes
 -------------------------------------------
@@ -290,7 +253,7 @@ Para este ejemplo se utilizará la versión 4.0.1 de iReport.
 Partiendo del informe definido por el siguiente comando de gvNIX:
 
 -----------------------------------------------------------------------------------
-roo-gvNIX> web report add --controller ~.web.OwnerController --reportName ownerpets
+roo> web report add --controller ~.web.OwnerController --reportName ownerpets
 -----------------------------------------------------------------------------------
 
 En src/main/webapp/WEB-INF/reports se creará el archivo con el diseño

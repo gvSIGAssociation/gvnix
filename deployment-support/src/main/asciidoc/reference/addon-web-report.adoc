@@ -54,7 +54,7 @@ Estas operaciones de configuración las realiza el comando del add-on
 link:#_web_report_setup[web report setup]:
 
 -------------------------------------------------------------------------------------------
-    roo-gvNIX>
+    roo>
     Updated SRC_MAIN_WEBAPP/WEB-INF/spring/webmvc-config.xml
     Created SRC_MAIN_WEBAPP/WEB-INF/spring/jasper-views.xml
     Created SRC_MAIN_WEBAPP/WEB-INF/classes/jasperfonts
@@ -160,7 +160,7 @@ Comma Separated Values.
 Hyper Text Markup Language.
 
 --------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
     Updated SRC_MAIN_JAVA/org/gvnix/test/web/EntityController.java
     Created SRC_MAIN_WEBAPP/WEB-INF/reports
     Created SRC_MAIN_WEBAPP/WEB-INF/reports/entity_informe.jrxml

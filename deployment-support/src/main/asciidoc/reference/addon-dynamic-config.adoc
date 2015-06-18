@@ -77,14 +77,14 @@ create] que tiene un único parámetro obligatorio ('name') que define el
 nombre para la nueva configuración.
 
 --------------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 ...
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Configuration created with currently available properties
 First created configuration set as default
 (use 'configuration property add' to make a property available for all configurations)
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Configuration created with currently available properties
 (use 'configuration property add' to make a property available for all configurations)
@@ -100,22 +100,22 @@ property add]. Las propiedades inicialmente tomarán el valor que tengan
 definido en el proyecto.
 
 -----------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
@@ -128,19 +128,19 @@ link:#_configuration_property_value[configuration
 property value].
 
 ----------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
@@ -155,7 +155,7 @@ empaquetar la aplicación con Maven como un parámetro mediante el
 modificador '-D nombre=valor'.
 
 -------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value undefined
 (use '-D propname=propvalue' on maven commands to set the property value)
@@ -169,7 +169,7 @@ link:#_configuration_list[configuration
 list].
 
 ---------------------------------------------------------------------
-roo-gvNIX>
+roo>
       (Active)      dev
 ----------------------------------------
  * Database Connection Properties
@@ -200,7 +200,7 @@ destino y por lo tanto hasta ese momento no se podrán utilizar las
 configuraciones.
 
 --------------------------------------------------------------
-roo-gvNIX>
+roo>
 Updated ROOT/pom.xml
 Updated ROOT/pom.xml
 Updated SRC_MAIN_RESOURCES/META-INF/spring/database.properties

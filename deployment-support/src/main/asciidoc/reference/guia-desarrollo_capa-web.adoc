@@ -9,15 +9,7 @@ La capa web de la aplicación contiene la infraestructura necesaria para
 gestionar las peticiones HTTP y visualizar cierta información al usuario
 como respuesta. Actualmente esta capa puede desarrollarse con
 http://docs.spring.io/spring/docs/3.2.4.RELEASE/spring-framework-reference/html/mvc.html[Spring
-MVC], http://code.google.com/webtoolkit/[GWT],
-http://www.adobe.com/es/products/flex.html[Flex],
-http://javaserverfaces.java.net/[JSF] y https://vaadin.com/[Vaadin].
-Cada una de estas tecnologías está integrada a distinto nivel con la
-generación de código del framework por lo que cada una de ellas ofrecerá
-ciertas características. Este capítulo se centrará en la generación de
-la capa web con Spring MVC ya que se trata de la tecnología más
-evolucionada dentro de la generación de código del framework y para la
-que gvNIX ha añadido la mayoría de sus nuevas funcionalidades.
+MVC].
 
 La gestión de peticiones en Spring MVC se basa en los controladores,
 clases en las que, mediante anotaciones, se definen los métodos que
