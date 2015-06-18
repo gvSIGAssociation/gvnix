@@ -4,103 +4,118 @@ Ejemplos gvNIX/Roo
 //Push title down one level
 :leveloffset: 2
 
-En el fichero zip de gvNIX se incluye un directorio `samples` donde se
-puede encontrar algunos scripts que generan proyectos de aplicaciones de
-ejemplo.
+Se han desarrollado una serie de ejemplos y guías rápidas de desarrollo (quickstarts) que
+muestran de forma rápida todas las funcionalidades que ofrece el Roo Add-On Suite gvNIX.
 
-Para ejecutarlo puede crearse un nuevo proyecto y ejecutarlo de la
-siguiente forma:
+* *quickstart-app*: Aplicación que contiene todas las funcionalidades de gvNIX como són creación
+de nuevo proyecto, configuración de persistencia, generación del modelo de entidades, buscadores,
+capa web, jQuery, componente Datatables, HTML5, Bootstrap, CSS3, edición en linea, componente lupa,
+gestión de menú, seguridad, informes, control de concurrencia, tests, servicios web...
 
------------
-roo-gvNIX>
-project ...
-...
------------
+* *geo-quickstart-app*: Aplicación que contiene, además de las funcionalidades descritas en el ejemplo
+anterior, funcionalidades para gestionar información geográfica utilizando Geoportales.
 
-Donde `SCRIPT.roo` es el nombre del fichero de ejemplo que se desea
-ejecutar.
+Estos proyecto de muestra pueden encontrarse en el 
+https://github.com/DISID/gvnix-samples/[repositorio de ejemplos de gvNIX].
 
-No todos los scripts descritos a continuación están en el directorio
-samples, pero todos sí pueden ser ejecutados tal y como se ha indicado.
 
-clinic.roo::
-  Ejemplo de una aplicación de clínica veterinaria usando Hibernate,
-  Registro Activo y Spring MVC
-bikeshop.roo::
-  Ejemplo de una aplicación de tienda de bicicletas usando Eclipse Link,
-  DAO y JSF.
-expenses.roo::
-  Ejemplo de una aplicación de control de gastos usando Hibernate,
-  Registro Activo y GWT.
-multimodule.roo::
-  Mismo ejemplo que clinic.roo pero separando la aplicación en tres
-  módulos: core, ui y mvc.
-pizzashop.roo::
-  Ejemplo de una aplicación de venta de pizzas usando Eclipse Link, DAO
-  y ofreciendo acceso remoto con JSON a través de Spring MVC.
-embedding.roo::
-  Ejemplo de una aplicación sin persistencia con elementos web ricos
-  (documentos, mapas, imágenes y videos) en Spring MVC.
-vote.roo::
-  Ejemplo de una aplicación de voto usando Hibernate, Registro Activo,
-  Spring MVC y Seguridad.
-wedding.roo::
-  Ejemplo de aplicación con uso de correo electrónico.
-report.roo::
-  Mismo ejemplo que clinic.roo con generación de informes mediante
-  Jasper Reports.
-theme.roo::
-  Mismo ejemplo que clinic.roo, pero aplicando distinto tema visual.
-es-i18n.roo::
-  Mismo ejemplo que clinic.roo incluyendo la lengua Valenciana.
-occ.roo::
-  Mismo ejemplo que clinic.roo añadiendo control de concurrencia sin
-  columnas adicionales en base de datos.
-menu.roo::
-  Mismo ejemplo que clinic.roo, pero utilizando un sistema de menús
-  gestionable desde la consola.
-service.roo::
-  Mismo ejemplo que clinic.roo incluyendo servicios web.
-bing.roo::
-  Ejemplo de aplicación que utiliza el servicio web de búsqueda bing.
-configuration.roo::
-  Mismo ejemplo que clinic.roo con dos perfiles de configuración
-  distintos: uno para desarrollo y otro para producción.
-dialog.roo::
-  Mismo ejemplo que clinic.roo con visualización de diálogos en ventana
-  emergente y gestión de excepciones.
-flex.roo::
-  Ejemplo de una aplicación de agenda de personas y direcciones usando
-  Hibernate, Registro Activo y Flex. El acceso a la aplicación se debe
-  realizar a través de la siguiente dirección:
-  http://localhost:8080/flexrocks/flexrocks_scaffold.html
-rootunes.roo::
-  Ejemplo de una aplicación de catálogo de canciones usando Hibernate,
-  Registro Activo y Flex. El acceso a la aplicación se debe realizar a
-  través de la siguiente dirección:
-  http://localhost:8080/rootunes/rootunes_scaffold.html
-binding.roo::
-  Mismo ejemplo que clinic.roo configurando el guardado de nulo en lugar
-  de cadenas vacías en base de datos.
-pattern.roo::
-  Ejemplo de una aplicación aplicando distintos patrones de
-  visualización de la información en pantalla de entidades y sus
-  relaciones.
-typicalsecurity.roo::
-  Mismo ejemplo que clinic.roo configurando la seguridad de acceso a la
-  aplicación mediante usuarios almacenados en base de datos.
-bootstrap.roo::
-  Mismo ejemplo que clinic.roo modificando la apariencia para que
-  utilice Bootstrap 3
-datatables.roo::
-  Mismo ejemplo que clinic.roo aplicando datatables en todas las
-  pantallas de listado del proyecto.
-gvasecurity.roo::
-  Mismo ejemplo que clinic.roo configurando como proveedor de seguridad
-  SAFE y APLUSU
+//En el fichero zip de gvNIX se incluye un directorio `samples` donde se
+//puede encontrar algunos scripts que generan proyectos de aplicaciones de
+//ejemplo.
 
-La mayoría de esto ejemplos utilizan bases de datos en memoria por lo
-que no necesitan configuración adicional.
+//Para ejecutarlo puede crearse un nuevo proyecto y ejecutarlo de la
+//siguiente forma:
+//
+//-----------
+//roo-gvNIX>
+//project ...
+//...
+//-----------
+//
+//Donde `SCRIPT.roo` es el nombre del fichero de ejemplo que se desea
+//ejecutar.
+//
+//No todos los scripts descritos a continuación están en el directorio
+//samples, pero todos sí pueden ser ejecutados tal y como se ha indicado.
+//
+//clinic.roo::
+//  Ejemplo de una aplicación de clínica veterinaria usando Hibernate,
+//  Registro Activo y Spring MVC
+//bikeshop.roo::
+//  Ejemplo de una aplicación de tienda de bicicletas usando Eclipse Link,
+//  DAO y JSF.
+//expenses.roo::
+//  Ejemplo de una aplicación de control de gastos usando Hibernate,
+//  Registro Activo y GWT.
+//multimodule.roo::
+//  Mismo ejemplo que clinic.roo pero separando la aplicación en tres
+//  módulos: core, ui y mvc.
+//pizzashop.roo::
+//  Ejemplo de una aplicación de venta de pizzas usando Eclipse Link, DAO
+//  y ofreciendo acceso remoto con JSON a través de Spring MVC.
+//embedding.roo::
+//  Ejemplo de una aplicación sin persistencia con elementos web ricos
+//  (documentos, mapas, imágenes y videos) en Spring MVC.
+//vote.roo::
+//  Ejemplo de una aplicación de voto usando Hibernate, Registro Activo,
+//  Spring MVC y Seguridad.
+//wedding.roo::
+//  Ejemplo de aplicación con uso de correo electrónico.
+//report.roo::
+//  Mismo ejemplo que clinic.roo con generación de informes mediante
+//  Jasper Reports.
+//theme.roo::
+//  Mismo ejemplo que clinic.roo, pero aplicando distinto tema visual.
+//es-i18n.roo::
+//  Mismo ejemplo que clinic.roo incluyendo la lengua Valenciana.
+//occ.roo::
+//  Mismo ejemplo que clinic.roo añadiendo control de concurrencia sin
+//  columnas adicionales en base de datos.
+//menu.roo::
+//  Mismo ejemplo que clinic.roo, pero utilizando un sistema de menús
+//  gestionable desde la consola.
+//service.roo::
+//  Mismo ejemplo que clinic.roo incluyendo servicios web.
+//bing.roo::
+//  Ejemplo de aplicación que utiliza el servicio web de búsqueda bing.
+//configuration.roo::
+//  Mismo ejemplo que clinic.roo con dos perfiles de configuración
+//  distintos: uno para desarrollo y otro para producción.
+//dialog.roo::
+//  Mismo ejemplo que clinic.roo con visualización de diálogos en ventana
+//  emergente y gestión de excepciones.
+//flex.roo::
+//  Ejemplo de una aplicación de agenda de personas y direcciones usando
+//  Hibernate, Registro Activo y Flex. El acceso a la aplicación se debe
+//  realizar a través de la siguiente dirección:
+//  http://localhost:8080/flexrocks/flexrocks_scaffold.html
+//rootunes.roo::
+//  Ejemplo de una aplicación de catálogo de canciones usando Hibernate,
+//  Registro Activo y Flex. El acceso a la aplicación se debe realizar a
+//  través de la siguiente dirección:
+//  http://localhost:8080/rootunes/rootunes_scaffold.html
+//binding.roo::
+//  Mismo ejemplo que clinic.roo configurando el guardado de nulo en lugar
+//  de cadenas vacías en base de datos.
+//pattern.roo::
+//  Ejemplo de una aplicación aplicando distintos patrones de
+//  visualización de la información en pantalla de entidades y sus
+//  relaciones.
+//typicalsecurity.roo::
+//  Mismo ejemplo que clinic.roo configurando la seguridad de acceso a la
+//  aplicación mediante usuarios almacenados en base de datos.
+//bootstrap.roo::
+//  Mismo ejemplo que clinic.roo modificando la apariencia para que
+//  utilice Bootstrap 3
+//datatables.roo::
+//  Mismo ejemplo que clinic.roo aplicando datatables en todas las
+//  pantallas de listado del proyecto.
+//gvasecurity.roo::
+//  Mismo ejemplo que clinic.roo configurando como proveedor de seguridad
+//  SAFE y APLUSU
+//
+//La mayoría de esto ejemplos utilizan bases de datos en memoria por lo
+//que no necesitan configuración adicional.
 
 //Return title down level
 :leveloffset: 0
