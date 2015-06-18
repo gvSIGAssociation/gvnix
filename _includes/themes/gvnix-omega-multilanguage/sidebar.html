@@ -1,7 +1,7 @@
 
 <div class="sidebar">
 
- <div class="project-documentation--container">
+ <div class="project-documentation--container releases">
         <div class="item-dropdown-widget">
             <div class="item-dropdown--title text-center">gvNIX</div>
             <div class="item--dropdown">
@@ -16,18 +16,22 @@
                         <div class="item--left-column">
 
                               {% if badge.name == '1.3.1' or badge.name == '1.3.0' or badge.name == '1.2.0' or badge.name == '1.1.0' or badge.name == '1.0.0' %}
-                              <a data-toggle="tooltip" title="{{ site.t[[page.lang]].download }} {{ badge.name }} {{ site.t[[page.lang]].release }}" target="_blank" href='{{ site.downloads }}gvNIX-{{ badge.name }}-RELEASE.zip/download' class="docs-link reference-link">
                               {{ badge.name }}
+                              <a data-toggle="tooltip" title="{{ site.t[[page.lang]].download }} {{ badge.name }} {{ site.t[[page.lang]].release }}" target="_blank" href='{{ site.downloads }}gvNIX-{{ badge.name }}-RELEASE.zip/download' class="docs-link reference-link">
+                              <i class="fa fa-arrow-circle-down"></i>
                               </a>
+
                               {% else %}
+                              {{ badge.name }}
                               <a data-toggle="tooltip" title="{{ site.t[[page.lang]].download }} {{ badge.name }} {{ site.t[[page.lang]].release }}" target="_blank" href='{{ site.downloads }}gvNIX-{{ badge.name }}.RELEASE.zip/download' class="docs-link reference-link">
-                                {{ badge.name }}
-                                </a>
+                                <i class="fa fa-arrow-circle-down"></i>
+                              </a>
+
+
                               {% endif %}
 
                               {% if badge.name == site.current-version %}
                                <div class="spring-icon spring-icon-current-version"></div>
-                               <div class="spring-icon spring-icon-ga-release"></div>
                               {% endif %}
 
                         </div>
@@ -39,16 +43,6 @@
                     {% endfor %}
                 </div>
             </div>
-
-            <!-- button -->
-            <p class="block">
-              <a class="btn btn-gvnix btn-sm pull-right" data-toggle="tooltip" title="{{ site.t[page.lang].all-versions }}" target="_top" href="{{site.downloads}}">{{ site.t[page.lang].all-versions }}</a>
-            </p>
-
-
-
-
-
         </div>
   </div>
 
