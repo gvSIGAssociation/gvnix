@@ -27,7 +27,7 @@ encargado de gestionar dicha entidad, se generará el buscador en la capa
 de vista.
 
 -----------------------------------------------------------------------------------------
-roo-gvNIX>
+roo>
 Upd SRC_MAIN_JAVA/com/springsource/petclinic/web/OwnerController.java
 Upd SRC_MAIN_WEBAPP/WEB-INF/views/owners/views.xml
 Upd SRC_MAIN_WEBAPP/WEB-INF/i18n/application.properties
@@ -37,7 +37,7 @@ Upd SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
 -----------------------------------------------------------------------------------------
 
 Consultar la documentación del comando
-http://docs.spring.io/spring-roo/reference/html/command-index.html#command-index-web-mvc-finder-add[web
+http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#web-mvc-finder-add[web
 mvc finder add] para más información.
 
 Código generado
