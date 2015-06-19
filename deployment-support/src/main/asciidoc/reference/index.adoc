@@ -199,10 +199,6 @@ include::addon-web-dialog.adoc[]
 
 // Push titles down one level.
 :leveloffset: 1
-include::addon-gva-security.adoc[]
-
-// Push titles down one level.
-:leveloffset: 1
 include::addon-web-report.adoc[]
 
 // Push titles down one level.
