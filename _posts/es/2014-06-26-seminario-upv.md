@@ -22,7 +22,7 @@ uno de los principales desarrolladores de gvNIX.
 Para la asistencia al curso es necesaria la inscripción.
 Las plazas son limitadas y se requiere la confirmación de la asistencia.
 
-Puedes consultarnos tus dudas a través de nuestra cuenta de Twitter [@gvnix]({{ site.twitter}}).
+Puedes consultarnos tus dudas a través de nuestra cuenta de Twitter [@gvnix](http://twitter.com/gvnix).
 
 Puedes hacer el seguimiento del seminario con **#etsinf** **#empretsinf** **#gvnixtraining**.
 
