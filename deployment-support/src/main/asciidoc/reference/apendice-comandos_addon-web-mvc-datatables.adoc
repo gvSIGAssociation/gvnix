@@ -93,9 +93,12 @@ Sus parámetros son:
 --mode::
   _[Opcional] [Cadena]_
   +
-  Establece el modo de visualización a
+  Muestra la vista de la entidad que elijamos. En caso de utilizar
+  la vista de "show" se establece el modo de visualización a
   link:#_modo_visualización_de_registro[modo
   registro].
+  Si se utiliza "--mode list" se estará mostrando la página list.jspx asociada
+  a la entidad.
 --inline::
   _[Opcional] [Boolean] [Autocompletado]_
   +
