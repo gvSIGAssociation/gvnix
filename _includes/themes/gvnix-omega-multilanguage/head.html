@@ -29,7 +29,7 @@
 <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.t[page.lang].description }} {% endif %}">
 <meta property="og:url" content="{{ site.url }}{{ page.url }}">
 <meta property="og:site_name" content="{{ site.title }}">
-{% if page.imagefeature %}<meta property="og:image" content="{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }}">{% else %}<meta property="og:image" content="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }}">{% endif %}
+{% if page.imagefeature %}<meta property="og:image" content="{{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }}">{% else %}<meta property="og:image" content="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }}">{% endif %}
 
 {% if site.google_verify %}<meta name="google-site-verification" content="{{ site.google_verify }}">{% endif %}
 {% if site.bing_verify %}<meta name="msvalidate.01" content="{{ site.bing_verify }}">{% endif %}
