@@ -243,6 +243,6 @@ color: #acc47f;
 
 /** Icons **/
 
-.input-group-addon .glyphicon {
+.input-group-addon.glyphicon {
   top: 0;
 }
