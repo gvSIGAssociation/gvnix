@@ -241,3 +241,8 @@ color: #acc47f;
 	 width: 100%;
 }
 
+/** Icons **/
+
+.input-group-addon .glyphicon {
+  top: 0;
+}

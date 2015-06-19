@@ -128,7 +128,6 @@ div.dataTables_paginate {
 
 /* Selection */
 
-
 table.dataTable tr.even.row_selected td {
 	background-color: #ffff7c;
 }
@@ -147,8 +146,6 @@ a.select_none {
 a.select_toggle {
 	background: url("../../images/datatables/tick.png") no-repeat scroll center center transparent;
 }
-
-
 
 a.update_entity {
 	background: url("../../images/update.png") no-repeat scroll center center transparent;
@@ -189,9 +186,12 @@ table.table tr.row_editing_error td {
 	background-color: #ffa0a0;
 }
 
+/** Create form inline **/
+
 form.create-form {
-  overflow: auto;
+  overflow: visible;
 }
+
 .create-div {
   background-color: #FFFFFF;
   border-color: #DDDDDD;
