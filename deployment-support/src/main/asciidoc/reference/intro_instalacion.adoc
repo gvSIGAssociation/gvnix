@@ -217,7 +217,7 @@ Instalación
 
 Para instalar el Roo Add-On Suite gvNIX es necesario que nuestra distribución de Roo
 sepa donde están alojados todos los componentes que la forman. Por ello, es necesario
-instalar en nuestra distribución el repositorio donde se encuentran dichos los componente.
+instalar en nuestra distribución el repositorio donde se encuentran dichos componentes.
 
 Sigue los siguientes pasos para instalar el repositorio de gvNIX en tu distribución de
 Spring Roo 2.0+:
@@ -309,6 +309,7 @@ instalados en tu distribución de Spring Roo:
 Getting all 'Roo Addon Suites' installed on Spring Roo Shell... 
 
    org.osgi.service.subsystem.root
+   org.gvnix.roo.addon.suite
    
 1 Roo Addon Suites were found at your Spring Roo installation
 ----------------------------------------------------------------
