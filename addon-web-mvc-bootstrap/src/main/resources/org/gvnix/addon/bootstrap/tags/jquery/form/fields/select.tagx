@@ -55,7 +55,7 @@
                 <c:when test="${disableFormBinding}">
                   <c:choose>
                     <c:when test="${multiple}">
-                      <select class="form-control input-sm" id="_${sec_field}_id" name="${sec_field}" multiple="${multiple}">
+                      <select class="form-control" id="_${sec_field}_id" name="${sec_field}" multiple="${multiple}">
                       <c:forEach items="${items}" var="item">
                         <option value="${item}">
                         <c:choose>
@@ -71,7 +71,7 @@
                       </select>
                     </c:when>
                     <c:otherwise>
-                      <select class="form-control input-sm" id="_${sec_field}_id" name="${sec_field}">
+                      <select class="form-control" id="_${sec_field}_id" name="${sec_field}">
                       <c:forEach items="${items}" var="item">
                         <option value="${item}">
                         <c:choose>
@@ -96,7 +96,7 @@
                           <form:select class="form-control" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" multiple="${multiple}" />
                         </c:when>
                         <c:otherwise>
-                          <form:select class="form-control input-sm" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" />
+                          <form:select class="form-control" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" />
                         </c:otherwise>
                      </c:choose>
                     </c:when>
@@ -106,7 +106,7 @@
                           <form:select class="form-control" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" multiple="${multiple}" itemLabel="${sec_itemLabel}"/>
                         </c:when>
                         <c:otherwise>
-                          <form:select class="form-control input-sm" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" itemLabel="${sec_itemLabel}"/>
+                          <form:select class="form-control" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" itemLabel="${sec_itemLabel}"/>
                         </c:otherwise>
                       </c:choose>
                     </c:otherwise>
@@ -121,7 +121,7 @@
                 <c:when test="${disableFormBinding}">
                   <c:choose>
                     <c:when test="${multiple}">
-                      <select class="form-control input-sm" id="_${sec_field}_id" name="${sec_field}" multiple="${multiple}" data-required="${required}">
+                      <select class="form-control" id="_${sec_field}_id" name="${sec_field}" multiple="${multiple}" data-required="${required}">
                         <c:forEach items="${items}" var="item">
                           <option value="${item[fn:escapeXml(itemValue)]}">
                             <c:choose>
@@ -137,7 +137,7 @@
                       </select>
                     </c:when>
                     <c:otherwise>
-                      <select class="form-control input-sm" id="_${sec_field}_id" name="${sec_field}" multiple="${multiple}" data-required="${required}">
+                      <select class="form-control" id="_${sec_field}_id" name="${sec_field}" multiple="${multiple}" data-required="${required}">
                         <c:forEach items="${items}" var="item">
                           <option value="${item[fn:escapeXml(itemValue)]}">
                             <c:choose>
@@ -159,20 +159,20 @@
                     <c:when test="${empty itemLabel}">
                       <c:choose>
                         <c:when test="${multiple}">
-                          <form:select class="form-control input-sm" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" multiple="${multiple}" itemValue="${fn:escapeXml(itemValue)}" data-required="${required}"/>
+                          <form:select class="form-control" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" multiple="${multiple}" itemValue="${fn:escapeXml(itemValue)}" data-required="${required}"/>
                         </c:when>
                         <c:otherwise>
-                          <form:select class="form-control input-sm" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" itemValue="${fn:escapeXml(itemValue)}" data-required="${required}"/>
+                          <form:select class="form-control" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" itemValue="${fn:escapeXml(itemValue)}" data-required="${required}"/>
                         </c:otherwise>
                       </c:choose>
                     </c:when>
                     <c:otherwise>
                       <c:choose>
                         <c:when test="${multiple}">
-                          <form:select class="form-control input-sm" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" multiple="${multiple}" itemValue="${fn:escapeXml(itemValue)}" itemLabel="${sec_itemLabel}" data-required="${required}"/>
+                          <form:select class="form-control" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" multiple="${multiple}" itemValue="${fn:escapeXml(itemValue)}" itemLabel="${sec_itemLabel}" data-required="${required}"/>
                         </c:when>
                         <c:otherwise>
-                          <form:select class="form-control input-sm" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" itemValue="${fn:escapeXml(itemValue)}" itemLabel="${sec_itemLabel}" data-required="${required}"/>
+                          <form:select class="form-control" id="_${sec_field}_id" items="${items}" path="${sec_field}" disabled="${disabled}" itemValue="${fn:escapeXml(itemValue)}" itemLabel="${sec_itemLabel}" data-required="${required}"/>
                         </c:otherwise>
                       </c:choose>
                     </c:otherwise>
