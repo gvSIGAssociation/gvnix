@@ -48,6 +48,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.XmlUtils;
@@ -260,6 +261,7 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
 
         Element conf = XmlUtils.getConfiguration(this.getClass());
 
+        // Install repositories
         List<Element> repos = XmlUtils.findElements(
                 "/configuration/gvnix/repositories/repository", conf);
         for (Element repo : repos) {
@@ -268,6 +270,15 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
                     .getFocusedModuleName(), new Repository(repo));
         }
 
+        // Install properties
+        List<Element> properties = XmlUtils.findElements(
+                "/configuration/gvnix/properties/*", conf);
+        for (Element property : properties) {
+            projectOperations.addProperty(projectOperations
+                    .getFocusedModuleName(), new Property(property));
+        }
+
+        // Install dependencies
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", conf);
         DependenciesVersionManager.manageDependencyVersion(metadataService,

@@ -47,6 +47,7 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.XmlUtils;
@@ -204,6 +205,14 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
 
             projectOperations.addRepository(projectOperations
                     .getFocusedModuleName(), new Repository(repo));
+        }
+
+        // Install properties
+        List<Element> properties = XmlUtils.findElements(
+                "/configuration/gvnix/properties/*", configuration);
+        for (Element property : properties) {
+            projectOperations.addProperty(projectOperations
+                    .getFocusedModuleName(), new Property(property));
         }
 
         List<Element> depens = XmlUtils.findElements(

@@ -38,6 +38,7 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadataB
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
@@ -80,6 +81,14 @@ public class AnnotationsServiceImpl implements AnnotationsService {
                 "/configuration/gvnix/repositories/repository", conf)) {
             projectOperations.addRepository(projectOperations
                     .getFocusedModuleName(), new Repository(repo));
+        }
+
+        // Install properties
+        List<Element> properties = XmlUtils.findElements(
+                "/configuration/gvnix/properties/*", conf);
+        for (Element property : properties) {
+            projectOperations.addProperty(projectOperations
+                    .getFocusedModuleName(), new Property(property));
         }
 
         // Find dependency elements and update them into the project

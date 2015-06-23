@@ -6,6 +6,7 @@
          <jasperreports.version>5.0.1</jasperreports.version>
          <jasperreportsfonts.version>4.0.0</jasperreportsfonts.version>
          <apachepoi.version>3.9</apachepoi.version>
+         <gvnix.version>2.0.0.M1</gvnix.version>
      </properties>
     </web-report>
     <jasperReports>
@@ -20,6 +21,11 @@
                   <artifactId>commons-collections</artifactId>
               </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context-support</artifactId>
+          <version>${spring.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.poi</groupId>

@@ -850,8 +850,9 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         // ROO annotation to generate get and set methods if is not an enum
         if (!isEnum) {
 
-            annots.add(new AnnotationMetadataBuilder(new JavaType(
-                    "org.springframework.roo.addon.javabean.RooJavaBean"),
+            annots.add(new AnnotationMetadataBuilder(
+                    new JavaType(
+                            "org.springframework.roo.addon.javabean.annotations.RooJavaBean"),
                     new ArrayList<AnnotationAttributeValue<?>>()).build());
         }
 
