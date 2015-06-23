@@ -2,7 +2,7 @@
 
 // Repositorio de WS para pruebas: http://soatest.parasoft.com/services/
 
-project --topLevelPackage org.gvnix.test.service.layer.project --projectName service-layer-test
+project setup --topLevelPackage org.gvnix.test.service.layer.project --projectName service-layer-test
 
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 

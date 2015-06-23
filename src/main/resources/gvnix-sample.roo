@@ -1,4 +1,4 @@
-project --topLevelPackage org.gvnix.sample
+project setup --topLevelPackage org.gvnix.sample
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
 entity jpa --class ~.domain.Entity1 --testAutomatically
 field string field1
@@ -11,8 +11,9 @@ web mvc setup
 web mvc all --package ~.web
 selenium test --controller ~.web.Entity1Controller
 selenium test --controller ~.web.Entity2Controller
-theme install --id gvnix 
-theme set --id gvnix 
+// theme command is deprecated
+// theme install --id gvnix 
+// theme set --id gvnix 
 remote service class --class ~.services.ClaseServicio
 remote service operation --name checkString --service ~.services.ClaseServicio
 remote service operation --name inputParameters --service ~.services.ClaseServicio --return java.lang.String --paramTypes java.lang.Integer,java.lang.String --paramNames number,name

@@ -3,7 +3,7 @@
  
 // ATENCIÓN: Asegurarse de crear otro proyecto en STS
 // con Project name "tiendavirtual_datamodel" y Top level package name "org.gvnix.tiendavirtual"
-// project --topLevelPackage org.gvnix.tiendavirtual --projectName tiendavirtual_datamodel --java 6 --packaging JAR
+// project setup --topLevelPackage org.gvnix.tiendavirtual --projectName tiendavirtual_datamodel --java 6 --packaging JAR
 
 // Configura el proveedor de persistencia JPA y la base de datos con los datos de conexión de la base de datos existente
 // (usuario, clave y nombre de la base de datos)

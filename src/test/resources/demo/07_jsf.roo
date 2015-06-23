@@ -3,7 +3,7 @@
 
 // Este comando será el que se habrá ejecutado al crear el proyecto desde STS 
 // con Project name "tiendavirtual_jsf" y Top level package name "org.gvnix.tiendavirtual"
-//project --topLevelPackage org.gvnix.tiendavirtual --projectName tiendavirtual_jsf --java 6 --packaging JAR
+//project setup --topLevelPackage org.gvnix.tiendavirtual --projectName tiendavirtual_jsf --java 6 --packaging JAR
 
 // IMPORTANTE: Ejecutar el script 04a_entitymodel.roo para reaprovechar el modelo de entidades 
 

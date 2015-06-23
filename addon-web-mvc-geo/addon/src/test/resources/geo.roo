@@ -1,5 +1,5 @@
 //Creating Petclinic project
-project --topLevelPackage com.springsource.petclinic --projectName petclinic
+project setup --topLevelPackage com.springsource.petclinic --projectName petclinic
 
 // Persistence
 jpa setup --provider HIBERNATE --database HYPERSONIC_PERSISTENT

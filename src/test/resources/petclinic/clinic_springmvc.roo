@@ -1,4 +1,4 @@
-// project --topLevelPackage org.gvnix.petclinic.springmvc
+// project setup --topLevelPackage org.gvnix.petclinic.springmvc
 
 // script --file clinic_model.roo
 

@@ -1,4 +1,4 @@
-project --topLevelPackage org.gvnix.test
+project setup --topLevelPackage org.gvnix.test
 jpa setup --provider HIBERNATE --database HYPERSONIC_PERSISTENT
 entity jpa --class ~.domain.ValidaDniRequest --testAutomatically
 field boolean --fieldName isSpaniard --class ~.domain.ValidaDniRequest --notNull

@@ -1,4 +1,4 @@
-project --topLevelPackage org.gvnix.test.web.report.project --projectName webreport-test
+project setup --topLevelPackage org.gvnix.test.web.report.project --projectName webreport-test
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
 entity jpa --class ~.domain.Person --testAutomatically

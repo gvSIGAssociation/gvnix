@@ -1,5 +1,5 @@
 
-project --topLevelPackage org.gvnix.test.bing --projectName bing-search-app
+project setup --topLevelPackage org.gvnix.test.bing --projectName bing-search-app
 
 remote service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
 

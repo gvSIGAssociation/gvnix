@@ -1,4 +1,4 @@
-//project --topLevelPackage org.gvnix.petclinic.jsf
+//project setup --topLevelPackage org.gvnix.petclinic.jsf
 
 /*
   Note that the --equals attribute should be specified as true on the 

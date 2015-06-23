@@ -7,7 +7,7 @@
 # Generate automatic test for every screen pattern.
 #
 
-project --topLevelPackage org.gvnix.test.relation.list.table --projectName displayRelationsTable
+project setup --topLevelPackage org.gvnix.test.relation.list.table --projectName displayRelationsTable
 
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
@@ -45,5 +45,6 @@ field set --fieldName cars --type ~.domain.Car --cardinality ONE_TO_MANY --mappe
 web mvc setup
 web mvc all --package ~.web
 
+jpa gvnix setup
 jpa audit setup
 jpa audit all

@@ -1,5 +1,5 @@
 
-project --topLevelPackage org.gvnix.test
+project setup --topLevelPackage org.gvnix.test
 
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 

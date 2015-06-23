@@ -1,5 +1,5 @@
 
-project --topLevelPackage org.gvnix.tiendavirtual --java 6
+project setup --topLevelPackage org.gvnix.tiendavirtual --java 6
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 database properties list
 

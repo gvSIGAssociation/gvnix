@@ -4,7 +4,7 @@
 
 // Este comando será el que se habrá ejecutado al crear el proyecto desde STS 
 // con Project name "tiendavirtual" y Top level package name "org.gvnix.tiendavirtual"
-// project --topLevelPackage org.gvnix.tiendavirtual --projectName tiendavirtual --java 6 --packaging JAR
+// project setup --topLevelPackage org.gvnix.tiendavirtual --projectName tiendavirtual --java 6 --packaging JAR
 
 // Muestra información sobre los posibles pasos a seguir a continuación en función de la estado del proyecto
 hint
