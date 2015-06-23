@@ -53,17 +53,470 @@ siempre que especifique sus autores y comparta cualquier obra derivada bajo la
 misma licencia.
 
 
-== Primeros pasos con gvNIX
+== Prólogo
 
-Esta parte de la documentación contiene la información necesaria para
-entender qué es gvNIX y cómo utilizarlo.
+=== Overview
 
-// Push titles down one level.
-:leveloffset: 1
-include::intro_introduccion.adoc[]
+gvNIX es un entorno de trabajo Java de código abierto para el desarrollo
+rápido de aplicaciones web altamente productivo, flexible y que no
+compromete la calidad de los proyectos.
 
-:leveloffset: 1
-include::intro_instalacion.adoc[]
+gvNIX trabaja sobre la herramienta de desarrollo http://projects.spring.io/spring-roo[Spring Roo] 
+ampliando sus funcionalidades básicas con componentes de alto nivel funcional.
+
+gvNIX está patrocinado por la Dirección General de Tecnologías de la Información
+(DGTI) de la Conselleria de Hacienda y Administración Pública de la
+Generalitat Valenciana (Comunidad Valenciana, España), gestionado por la
+Asociación gvSIG y dirigido por DISID. gvNIX se consolida como estándar para
+desarrollo Java de la DGTI de la Generalitat Valenciana.
+
+gvNIX está disponible dentro del proyecto de Migración a Software de
+fuentes abiertas http://www.gvpontis.gva.es[gvPONTIS].
+
+=== Requisitos
+
+Para poder trabajar con la herramienta de desarrollo gvNIX, es necesario disponer de 
+los siguientes componentes en nuestra máquina de trabajo:
+
+* http://projects.spring.io/spring-roo/#running-from-shell[Spring Roo] descargado y
+descomprimido.
+* Versión más actual de Java JDK 6 instalado en el sistema. Se 
+recomienda utiliar *Java 7*, aunque se dispone de soporte para Java 8.
+(http://www.oracle.com/technetwork/java/javase/downloads/index.html[Más
+información]).
+* Maven 3.0.5 o superior (http://maven.apache.org/).
+* Conexión a Internet para poder instalar de forma correcta gvNIX en
+la distribución de Spring Roo y descargar las dependencias de los
+proyectos generados.
+
+[NOTE]
+====
+Solo es posible utilizar gvNIX 2.0+ sobre las versiones 2.0
+de Spring Roo en adelante. Esto es debido a que la instalación de 
+distribuciones es una característica de las últimas versiones 
+de Spring Roo.
+====
+
+=== Instalar gvNIX
+
+Para instalar el gvNIX sobre una distribución de Spring Roo. es necesario que Roo conozca 
+donde están alojados todos los componentes que forman parte de gvNIX.
+Por ello, es necesario instalar en nuestra distribución de Spring Roo el repositorio donde se 
+encuentran dichos componentes.
+
+Sigue los siguientes pasos para instalar el repositorio de gvNIX en tu distribución de
+Spring Roo 2.0+:
+
+1. Ejecuta la consola de Spring Roo 2.0+:
++
+--------------------------------------------
+bash:~$ cd /tmp/new_project
+bash:~$ ~/software/spring-roo-2.0/bin/roo.sh
+--------------------------------------------
+
+2. Accede al http://projects.spring.io/spring-roo/marketplace/["Roo Market Place"] y
+copia la URL del repositorio de gvNIX (http://repository.gvnix.org/index.xml).
+
+3. Ejecuta el siguiente comando en tu consola de Spring Roo 2.0+ para 
+instalar el repositorio anterior:
++
+----------------------------------------------------------------------
+roo> addon repository add --url http://repository.gvnix.org/index.xml
+----------------------------------------------------------------------
+
+4. Valida que se ha instalado el repositorio de forma correcta listando los componentes
+que están disponibles en dicho repositorio. Para ello, ejecuta el siguiente comando:
++
+---------------------------------
+roo> addon repository introspect
+---------------------------------
+
+5. Si todo ha salido bien, aparecerá un listado mostrando todos los componente que forman
+parte de la distribución gvNIX.
++
+----------------------------------------------------------------------------------------
+Not Installed        gvNIX - Addon - Bootstrap3 support (2.0.0.M1)
+Not Installed        gvNIX - Addon - Co-official languages of Spain (2.0.0.M1)
+Not Installed        gvNIX - Addon - Dynamic Configuration (2.0.0.M1)
+Not Installed        gvNIX - Addon - GEO Support (2.0.0.M1)
+Not Installed        gvNIX - Addon - JPA layer services (2.0.0.M1)
+Not Installed        gvNIX - Addon - Loupe Fields (2.0.0.M1)
+Not Installed        gvNIX - Addon - Monitoring Support (2.0.0.M1)
+Not Installed        gvNIX - Addon - Optimistic Concurrency Control (2.0.0.M1)
+Not Installed        gvNIX - Addon - Services Management (2.0.0.M1)
+Not Installed        gvNIX - Addon - Typical Security (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web Datatables Addon (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web MVC (JSP) layer services (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web MVC Bindings (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web MVC Dialogs (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web MVC Menu (2.0.0.M1)
+Not Installed        gvNIX - Addon - Web Report (2.0.0.M1)
+Not Installed        gvNIX - Annotations - GEO Support (2.0.0.M1)
+Not Installed        gvNIX - Annotations - JPA layer services (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Loupe Fields (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Optimistic Concurrency Control (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Services Management (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Web Datatables Addon (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Web MVC (JSP) layer services (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Web MVC Bindings (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Web MVC Dialogs (2.0.0.M1)
+Not Installed        gvNIX - Annotations - Web Report (2.0.0.M1)
+Not Installed        gvNIX - Roo Addon Suite (2.0.0.M1)
+Not Installed        gvNIX - Support Module (2.0.0.M1)
+----------------------------------------------------------------------------------------
+
+6. Ahora que ya tienes instalado el repositorio que contiene los componentes de gvNIX, continuamos con
+la instalación de los mismos. Para ello ejecuta el siguiente comando:
++
+----------------------------------------------------------------------
+roo> addon suite install name --symbolicName org.gvnix.roo.addon.suite
+----------------------------------------------------------------------
+
+7. Valida que se ha instalado el Roo Add-On Suite de gvNIX ejecutando el siguiente comando:
++
+----------------------
+roo> addon suite list
+----------------------
+
+8. Si todo ha salido bien, aparecerá un listado mostrando todos los Roo Add-On Suites que tienes
+instalados en tu distribución de Spring Roo:
++
+----------------------------------------------------------------
+Getting all 'Roo Addon Suites' installed on Spring Roo Shell... 
+
+   org.osgi.service.subsystem.root
+   org.gvnix.roo.addon.suite
+   
+2 Roo Addon Suites were found at your Spring Roo installation
+----------------------------------------------------------------
+
+9. Para finalizar, valida que todos los componentes de gvNIX se han instalado correctamente 
+en la distribución de Spring Roo ejecutando el siguiente comando:
++
+----------------
+roo> addon list
+----------------
+
+10. Si todo ha salido bien, al final del listado que aparecerá en la consola, podrás ver
+todos los componentes de gvNIX instalados y activados del siguiente modo:
++
+------------------------------------------------------------------------------------------
+   86|Active     |    1|gvNIX - Annotations - GEO Support (2.0.0.M1)
+   87|Active     |    1|gvNIX - Addon - Dynamic Configuration (2.0.0.M1)
+   88|Active     |    1|gvNIX - Addon - Loupe Fields (2.0.0.M1)
+   89|Active     |    1|gvNIX - Addon - Web MVC (JSP) layer services (2.0.0.M1)
+   90|Active     |    1|gvNIX - Annotations - Web Datatables Addon (2.0.0.M1)
+   91|Active     |    1|gvNIX - Addon - JPA layer services (2.0.0.M1)
+   92|Active     |    1|gvNIX - Addon - Web Datatables Addon (2.0.0.M1)
+   93|Active     |    1|gvNIX - Annotations - Web MVC (JSP) layer services (2.0.0.M1)
+   94|Active     |    1|gvNIX - Addon - Services Management (2.0.0.M1)
+   95|Active     |    1|gvNIX - Annotations - Web Report (2.0.0.M1)
+   96|Active     |    1|gvNIX - Addon - Co-official languages of Spain (2.0.0.M1)
+   97|Active     |    1|gvNIX - Annotations - Optimistic Concurrency Control (2.0.0.M1)
+   98|Active     |    1|gvNIX - Addon - Web MVC Dialogs (2.0.0.M1)
+   99|Active     |    1|gvNIX - Annotations - Services Management (2.0.0.M1)
+  100|Active     |    1|gvNIX - Addon - Monitoring Support (2.0.0.M1)
+  101|Active     |    1|gvNIX - Addon - Bootstrap3 support (2.0.0.M1)
+  102|Active     |    1|gvNIX - Annotations - Web MVC Dialogs (2.0.0.M1)
+  103|Active     |    1|gvNIX - Addon - GEO Support (2.0.0.M1)
+  104|Active     |    1|gvNIX - Addon - Optimistic Concurrency Control (2.0.0.M1)
+  105|Active     |    1|gvNIX - Support Module (2.0.0.M1)
+  106|Active     |    1|gvNIX - Annotations - Loupe Fields (2.0.0.M1)
+  107|Active     |    1|gvNIX - Annotations - JPA layer services (2.0.0.M1)
+  108|Active     |    1|gvNIX - Addon - Web Report (2.0.0.M1)
+  109|Active     |    1|gvNIX - Annotations - Web MVC Bindings (2.0.0.M1)
+  110|Active     |    1|gvNIX - Addon - Typical Security (2.0.0.M1)
+  111|Active     |    1|gvNIX - Addon - Web MVC Menu (2.0.0.M1)
+  112|Active     |    1|gvNIX - Addon - Web MVC Bindings (2.0.0.M1)
+------------------------------------------------------------------------------------------
+
+Una vez hecho esto, ya se puede trabajar con el entorno gvNIX desde la
+línea de comandos. Sin embargo, se recomienda utilizar un IDE de
+desarrollo que permita integrar el entorno gvNIX como, por ejemplo STS o
+Eclipse.
+
+== Introducción
+
+=== ¿Qué es gvNIX?
+
+gvNIX es un entorno de trabajo Java de código abierto para el desarrollo
+rápido de aplicaciones web altamente productivo, flexible y que no
+compromete la calidad de los proyectos.
+
+Está compuesto por una serie de herramientas de código abierto distribuídas 
+en forma de http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#available-roo-addon-suites["Spring Roo Add-On Suite"]
+a través de un repositorio OSGi R5.
+Esto le proporciona un amplio apoyo por parte de importantes
+organizaciones como http://spring.io/[Spring] y http://pivotal.io/[Pivotal]. 
+Añade funcionalidades de alto nivel a las prestaciones que ya se obtienen con
+http://projects.spring.io/spring-roo/[Spring Roo] para mejorar la
+productividad.
+
+gvNIX está patrocinado por la Dirección General de Tecnologías de la Información
+(DGTI) de la Conselleria de Hacienda y Administración Pública de la
+Generalitat Valenciana (Comunidad Valenciana, España), gestionado por la
+Asociación gvSIG y dirigido por DISID. gvNIX se consolida como estándar para
+desarrollo Java de la DGTI de la Generalitat Valenciana.
+
+gvNIX está disponible dentro del proyecto de Migración a Software de
+fuentes abiertas http://www.gvpontis.gva.es[gvPONTIS].
+
+* http://www.gvnix.org[Página del proyecto gvNIX]
+* http://www.gvpontis.gva.es/cast/gvnix/[Página de gvNIX dentro del
+proyecto gvPONTIS]
+* http://projects.spring.io/spring-roo/[Página oficial de Spring Roo]
+
+=== ¿Qué es Spring Roo?
+
+Según su creador, Ben Alex: "Roo es un pequeño genio que observa desde
+un segundo plano y gestiona todo aquello de lo que no me quiero
+preocupar".
+
+Spring Roo es un entorno de trabajo Java que permite el desarrollo de
+aplicaciones web de forma rápida y cómoda para el desarrollador. Sus
+principales características son:
+
+* Generación de código en Java (lenguaje estático).
+* Eliminar el trabajo tedioso centrando el desarrollo en la lógica de
+negocio.
+* Convención sobre configuración.
+* Desarrollo dirigido por el dominio (Domain-Driven Development):
+** Diseño dirigido por el modelo de entidades.
+** Lógica en las entidades (Real Object Oriented), eliminando capas
+redundantes.
+** Otras capas opcionales (servicios, DAOs, ...).
+* Crea un proyecto en segundos.
+* Realimentación: añade valor durante todo el ciclo de vida.
+* No incorpora elementos adicionales al entorno de ejecución, por lo que
+no penaliza la velocidad ni la memoria de la aplicación.
+* No requiere ningún IDE.
+* Recibe instrucciones a través de una consola interactiva con
+autocompletado y ayuda en línea.
+* Extensible usando _bundles OSGi_.
+* Aprovecha el conocimiento: no necesita más conocimiento que el
+necesario para el desarrollo de aplicaciones JEE.
+
+=== ¿Qué es un "Roo Add-On Suite"?
+
+Los "Roo Add-On Suites" son la mejor manera de empaquetar y distribuir conjuntos de Add-Ons para que
+puedan ser instalados en distribuciones de Spring Roo de forma rápida y sencilla.
+
+Están basados en subsistemas de OSGi R5, los cuales permiten instalar un conjunto de componentes sobre 
+la distribución de Spring Roo sin comprometer su modularidad.
+
+Por todo lo anterior, decimos que *gvNIX es un "Spring Roo Add-On Suite"* que puede ser instalado en
+distribuciones de Spring Roo para ampliar sus funcionalidades básicas.
+
+=== ¿Qué ofrece gvNIX?
+
+gvNIX aprovecha las características de Spring Roo y aporta su propia
+filosofía, ofrecer al desarrollador componentes de alto valor funcional
+para aplicaciones corporativas:
+
+* Control de concurrencia a nivel de aplicación sin campos en base de
+datos.
+* Utilidades de generación de consultas.
+* Utilidades de modificaciones múltiples de entidades.
+* Gestión de temas visuales utilizando jQuery, Bootstrap, HTML5 y CSS3. 
+* Gestión de la visualización de excepciones.
+* Gestión de mensajes de usuario en ventana modal.
+* Gestión de la estructura de páginas en el menú.
+* Gestión de patrones de visualización de entidades y sus relaciones utilizando
+el componente Datatables.
+* Gestión de transformación de cadenas vacías a valores nulos.
+* Gestión de servicios locales y servicios web (importación y
+exposición).
+* Control de acceso (autenticación y autorización).
+* Gestión de configuraciones por entorno.
+* Generación de documentos (reportes).
+* Gestión de relaciones utilizando componente Lupa.
+* Gestión de información geográfica.
+* Generación de GeoPortales interactivos.
+
+== Empezando con gvNIX: Tutorial (I)
+
+En este capítulo generaremos una aplicación sencilla paso a paso de forma rápida para que 
+puedas ver y entender cómo se trabaja con la herramienta de desarrollo gvNIX en un proyecto básico.
+
+Los detalles sobre la generación del código y la explicación de cada uno de los comandos ejecutados, se
+mostrarán en las siguientes secciones de este manual. 
+
+=== ¿Qué aprenderás?
+
+En este tutorial aprenderás como crear una aplicación desde cero utilizando la herramienta de 
+desarrollo gvNIX sobre el IDE STS.
+
+Las principales características de gvNIX que veremos en este tutorial son las siguientes:
+
+* Creación de un proyecto
+* Configurarción de persistencia
+* Generación del modelo de entidades
+* Generación de métodos de búsqueda
+* Generación de capa web
+* Componente Datatables y Bootstrap
+* Patrones de Pantalla
+* Ejecución de una aplicación en un servidor Tomcat
+* Edición de datos en linea
+* Componente Lupa
+* Instalación y gestión de menú
+* Aplicar seguridad a nuestra aplicación
+* Generación de informes utilizando Jasper Reports
+* Tests funcionales y Tests de integración
+* Generación de servicios web.
+
+
+=== Detalles de la aplicación
+
+La aplicación que se va a generar está basada en la aplicación de ejemplo Petclinic de Spring. Los usuarios de esta aplicación son empleados
+de una clínica veterinaria, que a lo largo de su jornada laboral, necesitan gestionar información sobre veterinarios, clientes y sus mascotas.
+
+Después de esta pequeña introducción sobre la aplicación que se va a desarrollar, hemos generado un diagrama de clases simple 
+para el modelo de entidades de esta aplicación:
+
+image::petclinic-uml.png[Petclinic UML,align=center]  
+
+Para sacar el máximo partido a las funcionalidades de gvNIX y Spring Roo, es recomendable que las aplicaciones se generen 
+siguiendo la filosofía del https://es.wikipedia.org/wiki/Dise%C3%B1o_guiado_por_el_dominio[diseño guiado por el dominio].
+
+[NOTE]
+====
+Hay que tener en cuenta que la aplicación que se va a generar no será una aplicación real, ya que normalmente necesitaría
+una serie de trabajos adicionales para personalizar la capa web, implementar lógica de negocio, etc..
+====
+
+=== Paso 1: Crear un proyecto
+
+A continuación, vamos a crear un nuevo proyecto desde STS. Para ello accede a *"New > Project... > Spring > Spring Roo Project"* 
+como se muestra en la imagen:
+
+image::eclipse_new_roo_project.png[Nuevo proyecto,align=center] 
+
+Una vez seleccionado el tipo de proyecto que queremos generar, configura el proyecto:
+
+image::eclipse_new_roo_project_2.png[Configuración del Proyecto,align=center]
+
+*Nombre del Proyecto:* petclinic
+
+*Top level package:* com.springsource.petclinic
+
+Al clicar sobre Next y Finish se generará el nuevo proyecto y seguidamente se 
+iniciará la consola de Spring Roo.
+
+image::eclipse_roo_shell.png[Consola de gvNIX,align=center] 
+
+*IMPORTANTE* Antes de continuar con el tutorial es necesario que valides que ĺa distribución de 
+Spring Roo que estás utilizando tiene instalados los componentes de gvNIX.
+
+Para ello, ejecuta el siguiente comando:
+
+-----------------------
+roo> addon suite list
+-----------------------
+
+Debe mostrarse el siguiente contenido:
+
+------------------------------------------------------------------
+roo> addon suite list 
+Getting all 'Roo Addon Suites' installed on Spring Roo Shell... 
+ 
+   org.osgi.service.subsystem.root
+   org.gvnix.roo.addon.suite
+ 
+2 Roo Addon Suites were found at your Spring Roo installation
+roo>
+------------------------------------------------------------------ 
+
+En caso de que solo aparezca el Roo Add-On Suite por defecto "org.osgi.service.subsystem.root", significará
+que no has instalado de forma correcta gvNIX. 
+
+Sigue los pasos de la link:#instalar-gvnix[sección anterior] para instalar los componentes de gvNIX
+sobre la distribución de Spring Roo antes de continuar con el tutorial.
+
+=== Paso 2: Configurar persistencia
+
+¿Ya aparecen los componentes de gvNIX instalados en tu distribución de Roo? Si no es así, sigue los pasos de la 
+link:#instalar-gvnix[sección anterior] para instalar los componentes de gvNIX sobre la distribución de Spring Roo 
+antes de continuar con el tutorial.
+
+Vamos a configurar la persistencia de nuestro proyecto. En este caso vamos a utilizar HIBERNATE como ORM y el tipo
+ de base de datos HYPERSONIC_PERSISTENT.
+ 
+Para ello, ejecutamos el siguiente comando sobre la consola de gvNIX en STS:
+
+----------------------------------------------------------------------
+roo> jpa setup --provider HIBERNATE --database HYPERSONIC_PERSISTENT
+----------------------------------------------------------------------
+
+=== Paso 3: Generar modelo de entidades
+
+Siguiendo el modelo de entidades link:#detalles-de-la-aplicación[propuesto anteriormente], ejecutaremos los siguientes comandos
+para generar nuestro dominio:
+
+Crea todas las entidades de nuestra aplicación ejecutando los siguientes comandos:
+
+--------------------------------------------------------------------------
+ entity jpa --class ~.domain.Pet --sequenceName PET_SEQ
+ entity jpa --class ~.domain.Visit --sequenceName VISIT_SEQ
+ entity jpa --class ~.domain.AbstractPerson --abstract
+ entity jpa --class ~.domain.Vet --extends ~.domain.AbstractPerson
+ entity jpa --class ~.domain.Owner --extends ~.domain.AbstractPerson
+--------------------------------------------------------------------------
+
+Crea los enumerados *PetType* y *Speciality* ejecutando los siguientes comandos:
+
+--------------------------------------------------------------------------
+ enum type --class ~.reference.PetType
+ enum constant --name Dog
+ enum constant --name Cat
+ enum constant --name Bird
+ enum type --class ~.reference.Specialty
+ enum constant --name Cardiology
+ enum constant --name Dentistry
+ enum constant --name Nutrition
+--------------------------------------------------------------------------
+
+Añade todos los campos a las entidades ejecutando los siguientes comandos:
+
+--------------------------------------------------------------------------------------------------------------------------------------
+ field string --fieldName firstName --sizeMin 3 --sizeMax 30 --class ~.domain.AbstractPerson
+ field string --fieldName lastName --notNull --sizeMin 3 --sizeMax 30
+ field string --fieldName address --notNull --sizeMax 50 --sizeMin 1
+ field string --fieldName city --notNull --sizeMax 30
+ field string --fieldName telephone --notNull
+ field string --fieldName homePage --sizeMax 30
+ field string --fieldName email --sizeMax 30 --sizeMin 6
+ field date --fieldName birthDay --type java.util.Date --notNull
+ field string --fieldName description --sizeMax 255 --class ~.domain.Visit
+ field date --fieldName visitDate --type java.util.Date --notNull --past
+ field reference --fieldName pet --type ~.domain.Pet --notNull
+ field reference --fieldName vet --type ~.domain.Vet
+ field boolean --fieldName sendReminders --notNull --primitive --class ~.domain.Pet
+ field string --fieldName name --notNull --sizeMin 1
+ field number --fieldName weight --type java.lang.Float --notNull --min 0
+ field reference --fieldName owner --type ~.domain.Owner
+ field enum --fieldName type --type ~.reference.PetType --notNull
+ field date --fieldName employedSince --type java.util.Calendar --notNull --past --class ~.domain.Vet
+ field enum --fieldName specialty --type ~.reference.Specialty --notNull false
+ field set --class ~.domain.Owner --fieldName pets --type ~.domain.Pet --mappedBy owner --notNull false --cardinality ONE_TO_MANY
+ field set --class ~.domain.Vet --fieldName visits --type ~.domain.Visit --mappedBy vet --notNull false --cardinality ONE_TO_MANY
+ field reference --fieldName owner --type ~.domain.Owner --class ~.domain.Vet
+ field set --fieldName vets --type ~.domain.Vet --class ~.domain.Owner --cardinality ONE_TO_MANY --mappedBy owner
+ field set --fieldName visits --type ~.domain.Visit --class ~.domain.Pet --cardinality ONE_TO_MANY --mappedBy pet
+--------------------------------------------------------------------------------------------------------------------------------------
+
+=== Paso 4: Métodos de búsqueda
+=== Paso 5: Capa web
+=== Paso 6: Datatables y Bootstrap
+=== Paso 7: Patrones de Pantalla
+=== Paso 8: Primera ejecución
+=== Paso 9: Edición en linea
+=== Paso 10: Componente Lupa
+=== Paso 11: Instalación del Menú
+=== Paso 12: Aplicar Seguridad
+=== Paso 13: Crear informes
+=== Paso 14: Control de concurrencia
+=== Paso 15: Tests funcionales y tests de integración
+=== Paso 16: Servicios web
 
 :leveloffset: 1
 include::guia-desarrollo_eclipse.adoc[]
