@@ -505,11 +505,197 @@ Añade todos los campos a las entidades ejecutando los siguientes comandos:
 --------------------------------------------------------------------------------------------------------------------------------------
 
 === Paso 4: Métodos de búsqueda
+
+Para ser capaces de filtrar los registros guardados en nuestra base de datos, es necesario que nuestras entidades dispongan
+de unos métodos de búsqueda.
+
+Para instalarlos, ejecutaremos los siguientes comandos:
+
+--------------------------------------------------------------------------------------
+finder add --finderName findPetsByNameAndWeight --class ~.domain.Pet
+finder add --finderName findPetsByOwner
+finder add --finderName findPetsBySendRemindersAndWeightLessThan
+finder add --finderName findPetsByTypeAndNameLike
+finder add --finderName findVisitsByDescriptionAndVisitDate --class ~.domain.Visit
+finder add --finderName findVisitsByVisitDateBetween
+finder add --finderName findVisitsByDescriptionLike
+--------------------------------------------------------------------------------------
+
 === Paso 5: Capa web
-=== Paso 6: Datatables y Bootstrap
-=== Paso 7: Patrones de Pantalla
-=== Paso 8: Primera ejecución
-=== Paso 9: Edición en linea
+
+En este momento ya disponemos de nuestro modelo de entidades generado. Ahora, es necesario que generemos la capa web 
+de nuestra aplicación para que los usuarios puedan acceder a ella a través de un navegador.
+
+En primer lugar instalamos todos los componentes web de nuestra aplicación como imágenes, estilos css, tagx, etc... utilizando
+el siguiente comando:
+
+-------------
+web mvc setup
+-------------
+
+A continuación, generamos la capa web de todas las entidades de nuestro proyecto ejecutando el siguiente comando:
+
+----------------------------
+web mvc all --package ~.web
+----------------------------
+
+Para generar las vistas de los métodos de búsqueda añadidos link:#paso-4-métodos-de-búsqueda[anteriormente] y que el usuario
+pueda realizar búsquedas de forma visual, ejecutaremos el siguiente comando:
+
+-------------------
+web mvc finder all
+-------------------
+
+Si necesitas instalar varios idiomas en tu aplicación, puedes ejecutar los siguientes comandos:
+
+---------------------------
+web mvc language --code es
+web mvc language --code de
+---------------------------
+
+=== Paso 6: Instalar JQuery, Datatables y Bootstrap
+
+A continuación, incluiremos la librería https://jquery.com/[JQuery] en nuestro proyecto generado.
+Además, incluiremos el componente http://datatables.net/[Datatables] que utilizaremos en las vistas de listado y finalmente,
+transformaremos la apariencia de nuestra aplicación para que se muestre con estilo http://getbootstrap.com/[Bootstrap].
+
+Para instalar jQuery en nuestro proyecto, ejecutamos el siguiente comando:
+
+--------------------
+web mvc jquery setup
+--------------------
+
+Para que todas nuestras vistas utilicen componentes jQuery, utilizaremos el siguiente comando:
+
+--------------------
+web mvc jquery all
+--------------------
+
+Seguimos con el tutorial instalando el componente Datatables en nuestro proyecto con el siguiente comando:
+
+-------------------------
+web mvc datatables setup
+-------------------------
+
+[NOTE]
+====
+De momento solo instalamos los componentes Datatables, pero nuestras vistas de listado no lo están utilizando.
+====
+
+Para finalizar este punto, transformamos la apariencia de nuestra aplicación a Bootstrap con el siguiente comando:
+
+-------------------------
+web mvc bootstrap setup
+-------------------------
+
+=== Paso 7: Edición en linea y Selección Múltiple
+
+Entre las múltiples funcionalidades que ofrece el componente Datatables, el cual hemos incluido en el 
+link:#paso-6-instalar-jquery-datatables-y-bootstrap[paso anterior], encontramos la edición en linea y la selección múltiple.
+
+La funcionalidad de edición en linea permite a los usuarios crear y editar registros directamente desde el componente Datatable
+sin abandonar el listado. 
+
+La funcionalidad de selección múltiple permite seleccionar varios registros mostrados en el componente Datatables para así, aplicar
+acciones sobre ellos, como puede ser editar o eliminar. 
+
+Para que los Datatables que utilicemos en nuestra aplicación sean capaces de incluir estas funcionalidades
+, ejecutaremos los siguientes comandos:
+
+--------------------
+jpa gvnix setup
+jpa batch all
+web mvc batch setup
+web mvc batch all
+--------------------
+
+
+=== Paso 8: Patrones de Pantalla
+
+En este punto, vamos a definir una serie de patrones de pantalla "maestro > detalle" utilizando el componente Datatables añadido en el  
+link:#paso-6-instalar-jquery-datatables-y-bootstrap[paso anterior].
+
+==== Creación de Maestros
+
+A continuación creamos todas las vistas maestras de nuestra aplicación:
+
+--------------------------------------------------------------------------------
+web mvc datatables add --type ~.web.VetController --mode show
+web mvc datatables add --type ~.web.PetController
+web mvc datatables add --type ~.web.OwnerController
+web mvc datatables add --type ~.web.VisitController --inline true --ajax true
+--------------------------------------------------------------------------------
+
+[NOTE]
+====
+Utiliza el parámetro *--mode* con valor show para mostrar un único registro por página. Utiliza el parámetro *--inlineEditing* para habilitar
+la edición en linea.
+====
+
+==== Creación de Detalles
+
+Después de crear los maestros, continuamos generando los detalles.
+
+Para generar el patrón de pantalla "Maestro Owners > Detalle Pets" ejecutaremos el siguiente comando:
+
+--------------------------------------------------------------------------
+web mvc datatables detail add --type ~.web.OwnerController --property pets
+--------------------------------------------------------------------------
+
+Para generar el patrón de pantalla "Maestro Owners > Detalle Vets" ejecutaremos el siguiente comando:
+
+--------------------------------------------------------------------------
+web mvc datatables detail add --type ~.web.OwnerController --property vets
+--------------------------------------------------------------------------
+
+Para generar el patrón de pantalla "Maestro Owners > Detalle Pet > Detalle Visit" ejecutaremos el siguiente comando:
+
+--------------------------------------------------------------------------
+web mvc datatables detail add --type ~.web.PetController --property visits
+--------------------------------------------------------------------------
+
+Para generar el patrón de pantalla "Maestro Owners > Detalle Vet > Detalle Visit" ejecutaremos el siguiente comando:
+
+--------------------------------------------------------------------------
+web mvc datatables detail add --type ~.web.VetController --property visits
+--------------------------------------------------------------------------
+
+[NOTE]
+====
+El ejemplo anterior muestra un patrón de pantalla de tres niveles. (Maestro, detalle y detalle de detalle)
+====
+
+=== Paso 9: Primera ejecución
+
+En este momento vamos a ejecutar nuestra aplicación en un servidor Tomcat.
+
+En primer lugar, es necesario añadir el servidor Tomcat a nuestro IDE STS. Para ello, seguiremos los siguientes pasos:
+
+* En la pestaña "Servers" añadiremos un nuevo servidor utilizando "New... > Server".
+* Aparecerá una ventana como la siguiente, donde seleccionaremos el servidor "Apache Tomcat v6.0":
+
+image::eclipse_servers_new.png[Nuevo Servidor,align=center]
+
+* Seleccionamos el directorio donde tengamos descargado nuestro apache-tomcat. Si no lo tienes descargado, puedes hacer
+click sobre el botón "Download and Install" y se descargará de forma automática:
+
+image::eclipse_servers_configure.png[Configurar servidor,align=center]
+
+* A continuación, añadimos nuestra aplicación generada al servidor Tomcat:
+
+image::eclipse_servers-addremoveapp.png[Nueva app,align:center]
+
+Ahora que ya tenemos un servidor Tomcat configurado y nuestra aplicación añadida, podemos arrancar el servidor Tomcat utilizando
+el botón de "Play" con el servidor Tomcat seleccionado:
+
+image::eclipse_servers-buttons.png[Botones Servers,align=center]
+
+
+Una vez haya arrancado, podemos acceder a la URL http://localhost:8080/petclinic/ desde nuestro navegador para 
+visualizar la aplicación generada.
+
+image::sample-application-0.png[Estado de la aplicación,align=center]
+
 === Paso 10: Componente Lupa
 === Paso 11: Instalación del Menú
 === Paso 12: Aplicar Seguridad
