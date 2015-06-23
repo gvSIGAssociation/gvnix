@@ -1,0 +1,305 @@
+#!/bin/bash
+#
+# Script to test gvNIX release
+
+## Exit script on any error
+set -e 
+
+## Get current file abs_path
+function abs_path() {
+    pushd . > /dev/null;
+    if [ -d "$1" ]; then
+      cd "$1";
+      dirs -l +0;
+    else
+      cd "`dirname \"$1\"`";
+      cur_dir=`dirs -l +0`;
+      if [ "$cur_dir" == "/" ]; then
+        echo "$cur_dir`basename \"$1\"`";
+      else
+        echo "$cur_dir/`basename \"$1\"`";
+     fi;
+   fi;
+   popd > /dev/null;
+}
+THIS_FILE=$(abs_path $0)
+
+
+GVNIX_DEPLOYMENT_SUPPORT_DIR=`dirname $THIS_FILE`
+GVNIX_HOME=`dirname $GVNIX_DEPLOYMENT_SUPPORT_DIR`
+
+
+## Load utils functions
+source $GVNIX_DEPLOYMENT_SUPPORT_DIR/build-util.functions
+
+# Gets gvNIX version from first version tag on root pom.xml
+GVNIX_VERSION=`grep "[<]version[>]\K([^<]*)" $GVNIX_HOME/pom.xml -oPm1`
+# Gets roo version from first version tag on root pom.xml
+ROO_VERSION=`grep "[<]roo.version[>]\K([^<]*)" $GVNIX_HOME/pom.xml -oPm1`
+
+
+function usage () {
+cat << EOF
+
+Usage: $0 spring-roo.zip [test|deploy] {--skipCleanRepo} {-d | --debug}
+
+Parameter:
+
+    spring-roo.zip
+
+              Path to Spring Roo instalation zip file to use for test
+              gvNIX distribution.
+
+Actions:
+
+    test        
+              Generates gvNIX package and runs CI test (skip documentation)
+
+    deploy    
+              Generates gvNIX package, runs CI test and deploy all ".jar" 
+              artifacts on Maven Central
+
+Options:
+
+    --skipCleanRepo
+
+              Skip cleaning of Maven local repository (~/.m2/repository)
+              of any gvNIX and Spring Roo artifacts
+
+
+    -d,--debug
+
+              Show executed commands
+
+Description:
+
+    Creates the release ZIP. Automates building deployment ZIPs 
+    and deployment, runs CI test and deploy ".jar" artifacts 
+    on Maven Central.
+
+EOF
+
+}
+
+
+if [ -z "$1" ]; then
+  usage
+  exit 1
+fi
+
+# Get the Roo zip and shift paramters
+export ROO_ZIP=$1
+shift
+
+if [ -z "$1" ]; then
+  usage
+  exit 1
+fi
+
+# Checks roo file exist
+if [ ! -f $ROO_ZIP ]; then
+      echo ""
+      echo "*** Roo zip file not exist: $ROO_ZIP"
+      echo ""
+      usage
+      exit 1
+fi
+
+## Prepare configuration variables
+SKIP_LOCAL_REPO_CLEAN=no
+GENERATE_DOC=yes
+RUN_CI=no
+DEPLOY_JARS=no
+DEBUG=no
+
+## identify action and options
+ACTION="$1"
+shift
+
+while [[ $# > 0 ]]
+do
+  OPTION="$1"
+    case $OPTION in
+        --skipCleanRepo)
+            SKIP_LOCAL_REPO_CLEAN=yes
+            ;;
+        -d|--debug)
+            DEBUG=yes
+            ;;
+        *)
+            echo ""
+            echo "*** Invalid option: $OPTION"
+            echo ""
+            usage
+            exit 1
+            ;;
+    esac
+    ## next option
+    shift 
+done
+
+
+
+case $ACTION in
+test)
+    RUN_CI=yes
+    DEPLOY_JARS=no
+  ;;
+deploy)
+    GENERATE_DOC=yes
+    RUN_CI=yes
+    DEPLOY_JARS=yes
+    echo ""
+    echo "**********************************************************"
+    echo "**********************************************************"
+    echo "***                                                 ******"
+    echo "*** WARNING: deploy action is not full testest!!!!  ******"
+    echo "***                                                 ******"
+    echo "**********************************************************"
+    echo "**********************************************************"
+    echo ""
+    echo "Press <Ctrl>+C to cancel or <Enter> to continue..."
+    read 
+  ;;
+*)
+    echo ""
+    echo "*** Invalid action: $ACTION"
+    echo ""
+    usage
+    exit 1
+  ;;
+esac
+
+
+## Echo all commands
+if [ "$DEBUG" = "yes" ]; then
+    set -x 
+fi
+
+### ROO PACKAGE
+export WORK_DIR=/tmp/gvNIX2.0_test
+show_message_info "Clean and initialize temporal dir ($WORK_DIR)"
+rm -rf $WORK_DIR* || true
+mkdir $WORK_DIR
+
+export WORK_ROO=$WORK_DIR/roo
+mkdir -p $WORK_ROO
+
+show_message_info "Create temporal Roo instalation for test ($WORK_ROO)"
+cd $WORK_ROO
+unzip $ROO_ZIP
+
+export ROO_COMMAND=`find $WORK_ROO -name roo.sh`
+
+if [ ! -x "$ROO_COMMAND" ]; then
+    show_message_problem "ERROR" "Error on roo Version" "Error on zip file $ROO_ZIP" "Not found or non-executable file 'roo.sh'"
+    exit 1;
+fi
+
+## Check required roo version
+if [ ! -d "$WORK_ROO/spring-roo-$ROO_VERSION" ]; then
+    cur_version=`ls $WORK_ROO`
+    show_message_problem "ERROR" "Error on roo Version" "Required roo version: spring-roo-$ROO_VERSION" "Provided roo version: $cur_version"
+    exit 1
+fi
+
+
+if [ "$SKIP_LOCAL_REPO_CLEAN" = "yes" ]; then
+    # Skip remove old roo and gvNIX installed dependencies
+    show_message_info "Clean Maven local repository: Skip"
+else
+    # Remove old roo and gvNIX installed dependencies
+    show_message_info "Clean Maven local repository (~/.m2/repository) of Spring Roo and gvNIX artifacts"
+    rm -rf ~/.m2/repository/org/springframework/roo  || true
+    rm -rf ~/.m2/repository/org/gvnix  || true
+fi
+
+# Install and package modules
+show_message_info "Compilling and install gvNIX"
+cd $GVNIX_HOME
+mvn clean install
+
+## Locate index.xml of addon repository
+export GVNIX_OSGI_BUNDLE_REPO_INDEX=$GVNIX_HOME/target/osgi-repository-bin/index.xml
+
+if [ ! -f "$GVNIX_OSGI_BUNDLE_REPO_INDEX" ]; then
+  show_message_problem "ERROR" "OSGi repository index not found!!!" "required location : $GVNIX_OSGI_BUNDLE_REPO_INDEX"
+  exit 1
+fi
+
+cd $WORK_DIR
+show_message_info "Installing gvNIX add-on suite into temporal roo installation"
+
+## Generate script to install add-on suite
+cat > $WORK_DIR/install_gvnix.roo << EOF
+addon repository add --url file://$GVNIX_OSGI_BUNDLE_REPO_INDEX
+addon suite install name --symbolicName org.gvnix.roo.addon.suite
+EOF
+## Install gvNIX
+$ROO_COMMAND script --file install_gvnix.roo
+if roo_script_fail; then
+  echo ""
+  echo ""
+  echo "======= Fail to install gvNIX addon suite!!!! =============="
+  echo "see $PWD/log.roo"
+  echo ""
+  echo ""
+  exit 1
+fi
+## Clear log file
+rm log.roo
+
+show_message_info "Check installed add-ons"
+## Generate script to check installed add-ons
+echo "-- Geting installed addons"
+cat > $WORK_DIR/list_addons.roo << EOF
+addon list
+EOF
+$ROO_COMMAND script --file list_addons.roo | tee addons.txt
+
+## check installed add-ons
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Dynamic Configuration"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Loupe Fields"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Web MVC (JSP) layer services"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - JPA layer services"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Web Datatables Addon"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Services Management"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Co-official languages of Spain"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Web MVC Dialogs"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Monitoring Support"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Bootstrap3 support"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - GEO Support"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Optimistic Concurrency Control"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Web Report"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Typical Security"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Web MVC Menu"
+assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Web MVC Bindings"
+
+# Run gvNIX integration test
+if [ "$RUN_CI" = "yes" ]; then
+    show_message_info "Run Integration test"
+    bash $GVNIX_DEPLOYMENT_SUPPORT_DIR/gvNIX-CI.sh /tmp/gvnix_int_test $ROO_COMMAND $GVNIX_HOME
+else
+    show_message_info "Run Integration test: Skip"
+fi
+
+# Deploy jars
+if [ "$DEPLOY_JARS" = "yes" ]; then
+    show_message_info "Deploy gvNIX Jars"
+    cd $GVNIX_HOME
+    mvn deploy
+else
+    show_message_info "Deploy gvNIX Jars: Skip"
+fi
+
+## Add roo/bin to path
+ROO_BIN_DIR=`dirname $ROO_COMMAND`
+export PATH=$ROO_BIN_DIR:$PATH
+
+# Info messages
+echo ""
+echo ""
+show_message_info " Build process: SUCCESS"
+echo ""
+echo "gvNIX installed on /tmp and setted on PATH for test purpouses."
+echo "Type roo.sh to start"

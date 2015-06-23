@@ -1,0 +1,265 @@
+#!/bin/bash
+
+## This file contains utility function for building a test gvNIX
+
+function abs_path() {
+    pushd . > /dev/null;
+    if [ -d "$1" ]; then
+      cd "$1";
+      dirs -l +0;
+    else
+      cd "`dirname \"$1\"`";
+      cur_dir=`dirs -l +0`;
+      if [ "$cur_dir" == "/" ]; then
+        echo "$cur_dir`basename \"$1\"`";
+      else
+        echo "$cur_dir/`basename \"$1\"`";
+     fi;
+   fi;
+   popd > /dev/null;
+}
+
+THIS_FILE=$(abs_path $0)
+THIS_FOLDER=`dirname "$THIS_FILE"`
+source "$THIS_FOLDER/assert.functions"
+
+## Check if Spring Roo has exit with error (roo.log file contains a line which starts with the string "// [failed] script")
+## Params:
+##   * path to folder where script has been runing (optional: default $PWD)
+## Returns:
+##  * 0 : if script finishe ok (fail message not found)
+##  * 1 : if script fail (fail message found in roo.log)
+function roo_script_fail() {
+   cur_dir_script=$1
+   if [ -z "$cur_dir_script" ]; then
+      cur_dir_script=$PWD
+   fi
+   FAIL_SCRIPT=`grep '^// [[]failed[]] script' $cur_dir_script/log.roo`
+   if [ -n "$FAIL_SCRIPT" ]; then
+     return 0
+   fi
+   FAIL_SCRIPT=`grep '^Script execution aborted' $cur_dir_script/log.roo`
+   if [ -n "$FAIL_SCRIPT" ]; then
+     return 0
+   fi
+   return 1
+}
+
+## Asserts that a file contains all strings of a list
+##   otherwise show a message and exit shell with 1
+## Params:
+##   * text file path
+##   * fail message
+##   * string list
+function assert_contains_list_in_file() {
+  for cur_string in "$3"
+  do
+    assert_contains_in_file "$1" "$2" "$cur_string"
+  done
+
+}
+
+## Asserts that a file contains a strings
+##   otherwise show a message and exit shell with 1
+## Params:
+##   * text file path
+##   * fail message
+##   * string
+function assert_contains_in_file() {
+  found_string=`grep "$3" "$1"` || true
+  if [ -z "$found_string" ]; then
+    echo ""
+    echo "==== FAIL:"
+    echo "$2 $3"
+    echo ""
+  fi
+}
+
+
+
+## Cleans $CUR_TEST_FOLDER created by init_test_folder function
+## Requieres:
+##   * "$CUR_TEST_FOLDER"
+function clean_test_folder() {
+   rm -rf "$CUR_TEST_FOLDER" || true
+}
+
+## Initializes test forlder and set $CUR_TEST_FOLDER variable
+## Params:
+##   * test name (to compound folder name from $TEST_ROOT
+function init_test_folder() {
+   export CUR_TEST_FOLDER="$TEST_ROOT/$1"
+   clean_test_folder
+   mkdir -p $CUR_TEST_FOLDER
+   cd $CUR_TEST_FOLDER
+}
+
+
+
+## Runs Roo script
+## Params:
+##   * script file
+## Requieres:
+##   * "$ROO_COMMAND": Path to roo.sh
+function run_roo_script() {
+  $ROO_COMMAND script --lineNumbers true --file $1
+  if  roo_script_fail; then
+      echo "==== Roo script fails... ========="
+      echo $1
+      echo "=====  Canceling script!!!!! ======"
+      exit 1
+  fi
+}
+
+## Runs mvn clean and compile command on current folder
+function run_compile() {
+    mvn clean compile
+}
+
+## Runs mvn clean, compile, test, and tomcat command on current folder
+##  (tomcat is runing with "fork" option)
+function run_test_and_tomcat_folk() {
+    mvn clean compile test tomcat:run -Dmaven.tomcat.fork=true
+}
+
+## Runs mvn clean, compile, test, and tomcat command on current folder in "background"
+##    Then tries to get a page from running server. After 40 retries kills "background" process
+## Params:
+##   * page to get (relative to localhost:8080)
+function run_test_and_tomcat_background_wget_page() {
+    mvn clean compile test tomcat:run & 
+    sleep 20
+    if [-z "`jobs`"]; then
+      ## Tomcat not runing
+      echo "====   Maven task is not running... Canceling script!!!!! ======"
+      exit 1
+    fi
+    wget --retry-connrefused -t 20 -T 5 -O target/main.html http://localhost:8080/$1
+    kill -9 %1
+}
+
+## Echo message of starting a test execution
+## Params:
+##   * test name
+function start_test_msg() {
+    echo " "
+    echo " "
+    echo "======================================================"
+    echo "======================================================"
+    echo "--------- starting test: $1"
+    echo " "
+    echo " "
+ 
+}
+
+## Echo message of ending a test execution
+## Params:
+##   * test name
+function end_test_msg() {
+    echo " "
+    echo " "
+    echo "--------- end test: $1"
+    echo "======================================================"
+    echo "======================================================"
+    echo " "
+    echo " "
+ 
+}
+
+## Runs a simple test:
+##   * Prepares test folder
+##   * Runs roo script
+##   * Compiles, run tests and starts tomcat
+##   * Cleans forlder
+## Params:
+##   * test name
+##   * path to roo script file
+## Requieres:
+##   * "$TEST_ROO": root folder for test
+##   * "$ROO_COMMAND": Path to roo.sh
+function test_simple() {
+    cd $TEST_ROOT
+    start_test_msg $1
+    init_test_folder $1
+    run_roo_script $2
+    run_test_and_tomcat_folk
+    clean_test_folder
+    cd $TEST_ROOT
+    end_test_msg $1
+}
+
+## Runs a "just compile" test:
+##   * Prepares test folder
+##   * Runs roo script
+##   * Compiles
+##   * Cleans forlder
+## Params:
+##   * test name
+##   * path to roo script file
+## Requieres:
+##   * "$TEST_ROO": root folder for test
+##   * "$ROO_COMMAND": Path to roo.sh
+function test_compile() {
+    cd $TEST_ROOT
+    start_test_msg $1
+    init_test_folder $1
+    run_roo_script $2
+    run_compile
+    clean_test_folder
+    cd $TEST_ROOT
+    end_test_msg $1
+}
+
+## Runs test checking if a page is avaliable:
+##   * Prepares test folder
+##   * Runs roo script
+##   * Compiles, run tests and starts tomcat in background
+##   * Uses "wget" to get page
+##   * Cleans forlder
+## Params:
+##   * test name
+##   * path to roo script file
+##   * page to check (relative to http://localhost:8080)
+## Requieres:
+##   * "$TEST_ROO": root folder for test
+##   * "$ROO_COMMAND": Path to roo.sh
+function test_page_available() {
+    cd $TEST_ROOT
+    start_test_msg $1
+    init_test_folder $1
+    run_roo_script $2
+    run_test_and_tomcat_background_wget_page $3
+    clean_test_folder
+    cd $TEST_ROOT
+    end_test_msg $1
+}
+## Show  message info to stdout
+## Params:
+##   * message to show
+function show_message_info() {
+  echo ""
+  echo ""
+  echo "####################################################"
+  echo "    $1"
+  echo "####################################################"
+  echo ""
+  echo ""
+}
+
+## Show  message problem to stdout
+## Params:
+##   * Problem type
+##   * Problem description
+##   * Aditional info
+##   * Aditional info
+function show_message_problem() {
+  echo ""
+  echo ""
+  echo "####################################################"
+  echo "    $1:  $2"
+  echo "        $3"
+  echo "        $4"
+  echo "####################################################"
+  echo ""
+  echo ""
+}

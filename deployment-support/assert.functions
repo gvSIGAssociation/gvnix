@@ -1,0 +1,43 @@
+#!/bin/bash
+
+## This file contains assert function for building a test gvNIX
+
+
+## Asserts that a file contains all strings of a list
+##   otherwise show a message and exit shell with 1
+## Params:
+##   * text file path
+##   * fail message
+##   * string list
+function assert_contains_list_in_file {
+  for cur_string in "$3"
+  do
+    assert_contains_in_file "$1" "$2" "$cur_string"
+  done
+
+}
+
+## Asserts that a file contains a strings
+##   otherwise show a message and exit shell with 1
+## Params:
+##   * text file path
+##   * fail message
+##   * string
+function assert_contains_in_file {
+  found_string=`grep "$3" "$1"` || true
+  if [ -z "$found_string" ]; then
+    echo ""
+    echo ""
+    echo "####################################################"
+    echo "    Assertion FAIL:"
+    echo "       $2 $3"
+    echo "       "
+    echo "       File: $1"
+    echo "       Expression not found: $3"
+    echo "####################################################"
+    echo ""
+    echo ""
+  fi
+}
+
+
