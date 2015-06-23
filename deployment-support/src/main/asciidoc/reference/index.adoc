@@ -75,8 +75,16 @@ fuentes abiertas http://www.gvpontis.gva.es[gvPONTIS].
 
 === Requisitos
 
-Para poder trabajar con la herramienta de desarrollo gvNIX, es necesario disponer de 
-los siguientes componentes en nuestra máquina de trabajo:
+Antes de empezar a trabajar con la herramienta de desarrollo gvNIX, es aconsejable conocer cómo 
+funciona Spring Roo. Para ello, se recomienda leer la 
+http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/[documentación de referencia].
+
+Además, para entender mejor la arquitectura de las aplicaciones generadas, se aconseja tener unos conocimientos
+básicos sobre aplicaciones desarrolladas utilizando 
+http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/[Spring].
+
+Para poder trabajar con la herramienta de desarrollo gvNIX en un entorno de desarrollo, es necesario disponer de 
+los siguientes componentes:
 
 * http://projects.spring.io/spring-roo/#running-from-shell[Spring Roo] descargado y
 descomprimido.
@@ -88,6 +96,7 @@ información]).
 * Conexión a Internet para poder instalar de forma correcta gvNIX en
 la distribución de Spring Roo y descargar las dependencias de los
 proyectos generados.
+
 
 [NOTE]
 ====
@@ -697,104 +706,238 @@ visualizar la aplicación generada.
 image::sample-application-0.png[Estado de la aplicación,align=center]
 
 === Paso 10: Componente Lupa
+
+El componente lupa provee funcionalidades para buscar datos relacionados de forma rápida y sencilla utilizando AJAX.
+
+Para instalar el componente lupa en nuestra aplicación generada, es necesario ejecutar el siguiente comando:
+
+--------------------
+web mvc loupe setup
+--------------------
+
+A continuación, añadimos una serie de funcionalidades necesarias para el correcto funcionamiento del componente
+en la capa controladora:
+
+------------------------------------------------------
+web mvc loupe set --controller ~.web.VisitController
+------------------------------------------------------
+
+Finalmente, convertimos los elementos "combobox" a componentes lupa utilizando los siguientes comandos:
+
+---------------------------------------------------------------------------------------------------------------------------
+web mvc loupe field --controller ~.web.VisitController --field pet --caption name --additionalFields name,weight --max 5
+web mvc loupe field --controller ~.web.VisitController --field vet
+---------------------------------------------------------------------------------------------------------------------------
+
 === Paso 11: Instalación del Menú
+
+gvNIX provee un menú mucho más personalizable que el definido inicialmente por Spring Roo. Por ello, se aconseja 
+que todas las aplicaciones incorporen el menú de gvNIX utilizando este sencillo comando:
+
+-----------
+menu setup
+-----------
+
 === Paso 12: Aplicar Seguridad
-=== Paso 13: Crear informes
+
+Aplicar seguridad a un proyecto puede ser algo complicado. Utilizando el siguiente comando, se añade seguridad a nuestro proyecto
+generado utilizando http://projects.spring.io/spring-security/[Spring Security].
+
+--------------
+security setup
+--------------
+
+=== Paso 13: Gestión de Informes
+
+Vamos a añadir un informe sobre los "Owners" que tenemos registrados en nuestro sistema petclinic. Para ello, ejecutamos los 
+siguientes comandos:
+
+--------------------------------------------------------------------------------
+web report setup
+web report add --controller ~.web.OwnerController --reportName report_owners
+--------------------------------------------------------------------------------
+
 === Paso 14: Control de concurrencia
+
+Vamos a añadir control de concurrencia sobre la entidad "Pet" de nuestro proyecto, para así evitar que se pierdan
+los datos guardados cuando varios usuarios editan un mismo registro.
+
+Para ello, basta con ejecutar el siguiente comando:
+
+-----------------------------------------
+occ checksum set --entity ~.domain.Pet
+-----------------------------------------
+
 === Paso 15: Tests funcionales y tests de integración
+
+En este momento, vamos a añadir una serie de tests funcionales y tests de integración a nuestra aplicación generada. Para los
+tests funcionales utilizaremos http://www.seleniumhq.org/[Selenium] y para los tests de integración utilizaremos http://junit.org/[JUnit].
+
+Añadimos los tests funcionales a todas las vistas de nuestro proyecto utilizando los siguientes comandos:
+
+--------------------------------------------------
+selenium test --controller ~.web.OwnerController
+selenium test --controller ~.web.PetController
+selenium test --controller ~.web.VetController
+selenium test --controller ~.web.VisitController
+--------------------------------------------------
+
+Añadimos los tests de integración a cada una de las entidades de nuestro proyecto utilizando los siguientes comandos:
+
+-----------------------------------------
+test integration --entity ~.domain.Vet
+test integration --entity ~.domain.Owner
+test integration --entity ~.domain.Pet
+test integration --entity ~.domain.Visit
+-----------------------------------------
+
 === Paso 16: Servicios web
+
+Para acabar con esta guía rápida sobre las funcionalidades disponibles en la herramienta de desarrollo gvNIX, vamos a servir 
+varios servicios web desde nuestra aplicación generada.
+
+Para ello, ejecutamos los siguientes comandos:
+
+----------------------------------------------------------------------------------------
+remote service define ws --class ~.services.PetsServices --serviceName ws_get_all_pets
+remote service operation --name ws_list_pets --service ~.services.PetsServices
+----------------------------------------------------------------------------------------
+
+[NOTE]
+====
+Estos servicios estarán disponibles en http://localhost:8080/petclinic/services y podrán ser consumidos
+por aplicaciones externas.
+====
+
+=== Resultado
+
+Después de seguir este rápido tutorial donde se muestran algunas de las funcionalidades que ofrece la herramienta gvNIX,
+tendremos una aplicación generada con el siguiente aspecto:
+
+image::sample-application-login.png[Login,align=center]
+image::sample-application-pet-creation.png[Alta de una mascota,align=center]
+image::sample-application-pet-list.png[Listado de mascotas,align=center]
+image::sample-application-visit-inline.png[Edición en linea,align=center]
+
+Ahora que ya conoces las funcionalidades básicas de gvNIX, te recomendamos que continues leyendo este manual. 
+Algunas secciones que pueden interesarte son:
+
+* link:#gvnix-avanzado-componentes-geo-tutorial-ii[gvNIX Avanzado - Componentes GEO: Tutorial (II)]
+* link:#gvnix-addons[Listado de Add-Ons disponibles en gvNIX]
+
+
+== gvNIX avanzado: Componentes GEO (Tutorial II)
+
+=== ¿Qué aprenderás?
+=== Detalles de la aplicación
+=== Paso 1: Configurar persistencia GEO
+=== Paso 2: Añadir soporte GEO al proyecto
+=== Paso 3: Añadir campos GEO a entidades
+=== Paso 4: Generar buscadores GEO
+=== Paso 5: Generar mapas en CRU
+=== Paso 6: Generar Geoportal
+=== Paso 7: Añadir entidades al Geoportal
+=== Paso 8: Añadir capas base al Geoportal
+=== Paso 9: Añadir herramientas al Geoportal
+=== Paso 10: Funcionalidades avanzadas
+==== Filtrar Datos utilizando Datatables
+==== Selección de Datos utilizando Datatables
+==== Agrupación de elementos en Geoportal
+
+
+
 
 :leveloffset: 1
 include::guia-desarrollo_eclipse.adoc[]
 
-:leveloffset: 1
-include::intro_ejemplos.adoc[]
 
-== Desarrollo de aplicaciones con gvNIX
-
-En esta sección se verá paso a paso cómo desarrollar una aplicación web
-desde cero demostrando cómo utilizar gvNIX en cualquier proyecto web.
-Algunas de las características de gvNIX que se verán son:
-
-* Creación de un nuevo proyecto.
-* Configuración del acceso a datos.
-* Código genereado automáticamente.
-* Gestión del modelo de entidades.
-* Gestión de la capa web.
-
+//== Desarrollo de aplicaciones con gvNIX
+//
+//En esta sección se verá paso a paso cómo desarrollar una aplicación web
+//desde cero demostrando cómo utilizar gvNIX en cualquier proyecto web.
+//Algunas de las características de gvNIX que se verán son:
+//
+//* Creación de un nuevo proyecto.
+//* Configuración del acceso a datos.
+//* Código genereado automáticamente.
+//* Gestión del modelo de entidades.
+//* Gestión de la capa web.
+//
 // Push titles down one level.
-:leveloffset: 1
-include::guia-desarrollo_crear-app.adoc[]
-
+//:leveloffset: 1
+//include::guia-desarrollo_crear-app.adoc[]
+//
 // Push titles down one level.
-:leveloffset: 1
-include::guia-desarrollo_acceso-datos.adoc[]
-
+//:leveloffset: 1
+//include::guia-desarrollo_acceso-datos.adoc[]
+//
 // Push titles down one level.
-:leveloffset: 1
-include::guia-desarrollo_generacion-codigo.adoc[]
-
+//:leveloffset: 1
+//include::guia-desarrollo_generacion-codigo.adoc[]
+//
 // Push titles down one level.
-:leveloffset: 1
-include::guia-desarrollo_entidades.adoc[]
-
+//:leveloffset: 1
+//include::guia-desarrollo_entidades.adoc[]
+//
 // Push titles down one level.
-:leveloffset: 1
-include::guia-desarrollo_entidades-buscadores.adoc[]
-
+//:leveloffset: 1
+//include::guia-desarrollo_entidades-buscadores.adoc[]
+//
 // Push titles down one level.
-:leveloffset: 1
-include::guia-desarrollo_entidades-pruebas.adoc[]
-
+//:leveloffset: 1
+//include::guia-desarrollo_entidades-pruebas.adoc[]
+//
 // Push titles down one level.
-:leveloffset: 1
-include::guia-desarrollo_capa-web.adoc[]
-
+//:leveloffset: 1
+//include::guia-desarrollo_capa-web.adoc[]
+//
 // Push titles down one level.
-:leveloffset: 1
-include::guia-desarrollo_capa-web-buscadores.adoc[]
-
+//:leveloffset: 1
+//include::guia-desarrollo_capa-web-buscadores.adoc[]
+//
 // Push titles down one level.
-:leveloffset: 1
-include::guia-desarrollo_capa-web-arranque-pruebas.adoc[]
-
+//:leveloffset: 1
+//include::guia-desarrollo_capa-web-arranque-pruebas.adoc[]
+//
 // Push titles down one level.
-:leveloffset: 1
-include::guia-desarrollo_mejoras-rendimiento.adoc[]
+//:leveloffset: 1
+//include::guia-desarrollo_mejoras-rendimiento.adoc[]
+//
+//== Desarrollo avanzado con gvNIX
+//
+//En esta parte se va a ver cómo ampliar una aplicación web básica creada con la herramienta
+//de desarrollo gvNIX para cumplir con los requerimientos de cualquier proyecto
+//real.
+//
+//Se revisará las características distintivas que ofrece gvNIX y que van
+//enfocadas al desarrollo de funcionalidades de alto nivel para facilitar
+//el desarrollo y proporcionar una mejor experiencia de uso al usuario:
+//
+//* Organización de la estructura de páginas en el menú.
+//* Gestión de patrones de visualización de entidades y sus relaciones.
+//* Control de concurrencia a nivel de aplicación sin campos en base de
+//datos.
+//* Gestión de la visualización de excepciones y gestión de mensajes de
+//usuario en ventana modal.
+//* Control de acceso (autenticación y autorización) y seguridad.
+//* Generación de documentos (reportes).
+//* Gestión de servicios locales y servicios web (importación y
+//exposición).
+//* Soporte de idiomas oficiales para el estado Español (inicialmente
+//incluido el Valenciano).
+//* Gestión de configuraciones por entorno.
+//* Gestión de transformación de cadenas vacías a valores nulos.
+//
+//Cada uno de estos elementos son añadidos (add-ons) que el Roo Add-On 
+//suite gvNIX incluye en Spring Roo al ser instalado. 
+//
+//Estos add-ons han sido inicialmente diseñados para ser aplicados en un
+//modelo de dominio del tipo registro activo y una capa visual del tipo
+//spring MVC. Sin embargo, pueden funcionar también con otros modelos de
+//dominio y visuales y en futuras versiones se irá incrementando dicha
+//compatibilidad.
 
-== Desarrollo avanzado con gvNIX
-
-En esta parte se va a ver cómo ampliar una aplicación web básica creada con la herramienta
-de desarrollo gvNIX para cumplir con los requerimientos de cualquier proyecto
-real.
-
-Se revisará las características distintivas que ofrece gvNIX y que van
-enfocadas al desarrollo de funcionalidades de alto nivel para facilitar
-el desarrollo y proporcionar una mejor experiencia de uso al usuario:
-
-* Organización de la estructura de páginas en el menú.
-* Gestión de patrones de visualización de entidades y sus relaciones.
-* Control de concurrencia a nivel de aplicación sin campos en base de
-datos.
-* Gestión de la visualización de excepciones y gestión de mensajes de
-usuario en ventana modal.
-* Control de acceso (autenticación y autorización) y seguridad.
-* Generación de documentos (reportes).
-* Gestión de servicios locales y servicios web (importación y
-exposición).
-* Soporte de idiomas oficiales para el estado Español (inicialmente
-incluido el Valenciano).
-* Gestión de configuraciones por entorno.
-* Gestión de transformación de cadenas vacías a valores nulos.
-
-Cada uno de estos elementos son añadidos (add-ons) que el Roo Add-On 
-suite gvNIX incluye en Spring Roo al ser instalado. 
-
-Estos add-ons han sido inicialmente diseñados para ser aplicados en un
-modelo de dominio del tipo registro activo y una capa visual del tipo
-spring MVC. Sin embargo, pueden funcionar también con otros modelos de
-dominio y visuales y en futuras versiones se irá incrementando dicha
-compatibilidad.
+== gvNIX Add-Ons
 
 // Push titles down one level.
 :leveloffset: 1
@@ -856,16 +999,16 @@ include::addon-dynamic-config.adoc[]
 :leveloffset: 1
 include::addon-web-mvc-binding.adoc[]
 
-== Recetas de desarrollo
-
-En esta parte se verán distintas guías para realizar ciertas
-modificaciones sobre el código generado para adaptarlo a distintas
-necesidades.
-
+//== Recetas de desarrollo
+//
+//En esta parte se verán distintas guías para realizar ciertas
+//modificaciones sobre el código generado para adaptarlo a distintas
+//necesidades.
+//
 // Push titles down one level.
-:leveloffset: 1
-include::recetas.adoc[]
-
+//:leveloffset: 1
+//include::recetas.adoc[]
+//
 == Apéndices
 
 Listado de comandos adicionales incluidos en gvNIX detallando cada uno
