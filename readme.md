@@ -53,6 +53,13 @@ STS can be used to develop gvNIX Roo Addon Suite.
 
 Every addon can be imported via *File > Import > Maven > Existing Maven Project*.
 
+Run gvNIX CI test
+=======================
+
+To Run Continuous integration test just execute:
+
+  $ deployment-support/build.sh spring-roo-xxx.zip test
+
 Deploy gvNIX artifacts
 =======================
 
@@ -68,11 +75,11 @@ In addition, gvNIX Addon Suite will be deployed in our own gvNIX repository:
 
 To deploy **RELEASE** artifacts and generate gvNIX Addon Suite you must execute the following command:
 
-	mvn clean deploy -P release
+	$ deployment-support/build.sh spring-roo-xxx.zip release
 
 To deploy **SNAPSHOT** artifacts and generate gvNIX Addon Suite you must execute the following command:
 
-	mvn clean deploy
+	$ deployment-support/build.sh spring-roo-xxx.zip deploy
 
 **NOTE**: _You must have the necessary permissions to deploy gvNIX artifacts_
 

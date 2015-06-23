@@ -57,7 +57,12 @@ Actions:
 
     deploy    
               Generates gvNIX package, runs CI test and deploy all ".jar" 
-              artifacts on Maven Central
+              artifacts and Addon suite as SNAPSHOT
+
+    release
+        
+              Generates gvNIX package, runs CI test and deploy all ".jar" 
+              artifacts and Addon suite as a RELEASE
 
 Options:
 
@@ -107,9 +112,10 @@ fi
 
 ## Prepare configuration variables
 SKIP_LOCAL_REPO_CLEAN=no
-GENERATE_DOC=yes
+#GENERATE_DOC=yes
 RUN_CI=no
 DEPLOY_JARS=no
+DEPLOY_RELEASE=no
 DEBUG=no
 
 ## identify action and options
@@ -146,9 +152,28 @@ test)
     DEPLOY_JARS=no
   ;;
 deploy)
-    GENERATE_DOC=yes
+    SKIP_LOCAL_REPO_CLEAN=no
+    #GENERATE_DOC=yes
     RUN_CI=yes
     DEPLOY_JARS=yes
+    echo ""
+    echo "**********************************************************"
+    echo "**********************************************************"
+    echo "***                                                 ******"
+    echo "*** WARNING: deploy action is not full testest!!!!  ******"
+    echo "***                                                 ******"
+    echo "**********************************************************"
+    echo "**********************************************************"
+    echo ""
+    echo "Press <Ctrl>+C to cancel or <Enter> to continue..."
+    read 
+  ;;
+release)
+    SKIP_LOCAL_REPO_CLEAN=no
+    #GENERATE_DOC=yes
+    RUN_CI=yes
+    DEPLOY_JARS=yes
+    DEPLOY_RELEASE=yes
     echo ""
     echo "**********************************************************"
     echo "**********************************************************"
@@ -285,11 +310,16 @@ fi
 
 # Deploy jars
 if [ "$DEPLOY_JARS" = "yes" ]; then
-    show_message_info "Deploy gvNIX Jars"
-    cd $GVNIX_HOME
+  cd $GVNIX_HOME
+  if [ "$DEPLOY_RELEASE" = "yes" ]; then
+    show_message_info "Deploy gvNIX Jars and Addon suite as RELEASE"
+    mvn deploy -P release
+  else
+    show_message_info "Deploy gvNIX Jars and Addon suite as SNAPSHOT"
     mvn deploy
+  fi
 else
-    show_message_info "Deploy gvNIX Jars: Skip"
+    show_message_info "Deploy gvNIX Jars adn Addon suite: Skip"
 fi
 
 ## Add roo/bin to path
