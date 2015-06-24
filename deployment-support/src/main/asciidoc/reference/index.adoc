@@ -930,13 +930,218 @@ org.hibernate.dialect.SQLServerDialect ==> org.hibernate.spatial.dialect.SQLServ
 
 
 === Paso 3: Añadir campos GEO a entidades
+
+Ahora que ya disponemos de soporte espacial en nuestra aplicación, procedemos a añadir campos de tipo GEO en las entidades generadas
+en la link:#paso-3-generar-modelo-de-entidades[primera parte de este tutorial].
+
+Es funcionalidad permite añadir varios tipos de campos GEO como los siguientes:
+
+* POLYGON
+* POINT
+* LINESTRING
+* MULTILINESTRING
+* GEOMETRY
+
+En este caso añadiremos los campos *localización*, *distancia* y *area* sobre la entidad *Owner*. Para ello, ejecutamos los siguientes
+comandos:
+
+-----------------------------------------------------------------------
+field geo --fieldName location --type POINT --class ~.domain.Owner
+field geo --fieldName distance --type LINESTRING --class ~.domain.Owner
+field geo --fieldName area --type POLYGON --class ~.domain.Owner 
+-----------------------------------------------------------------------
+
+[NOTE]
+====
+Los comandos para añadir campos de tipo GEO solo estarán disponibles una vez añadido el soporte espacial en nuestra apliación.
+====
+
 === Paso 4: Generar buscadores GEO
+
+Para ser capaces de posicionar los distintos registros de las entidades sobre una vista de mapa, necesitamos generar una serie de
+buscadores devuelvan la información geográfica de uno o varios registros.
+
+Para añadir estos métodos de búsqueda a nuestra aplicación generada, utilizaremos el siguiente comando:
+
+--------------
+finder geo all
+--------------
+
 === Paso 5: Generar mapas en CRU
+
+En este punto del tutorial, deberías disponer de una link:#paso-1-configurar-persistencia-geo[Base de datos con soporte GEO], 
+link:#paso-2-añadir-soporte-geo-al-proyecto[soporte espacial] configurado en el proyecto,
+varios link:#paso-3-añadir-campos-geo-a-entidades[campos de tipo GEO] añadidos en las entidades generadas 
+y varios link:#paso-4-generar-buscadores-geo[métodos de búsqueda] de tipo GEO.
+
+En caso afirmativo, continuaremos con la generación de campos de tipo mapa en las vistas de creación, actualización y visualización
+de nuestras entidades.
+
+Gracias a estos campos visuales seremos capaces de gestionar de manera cómoda la información geográfica almacenada en la entidad.
+
+Para añadir estos campos sobre una entidad, ejecutaremos los siguientes comandos:
+
+----------------------------------------------------------------------
+web mvc geo field --controller ~.web.OwnerController --field location
+web mvc geo field --controller ~.web.OwnerController --field distance
+web mvc geo field --controller ~.web.OwnerController --field area 
+----------------------------------------------------------------------
+
+Después de ejecutar los comandos anteriores, las vistas de creación, actualización y visualización de tus entidades con campos
+GEO tendrán el siguiente aspecto:
+
+image::CRU_map.png[Mapa vista CRU,align=center]
+
+[NOTE]
+====
+Estos componentes visuales no son obligatorios para gestionar la información geográfica de una entidad. En caso de no añadirlos,
+se podrá gestionar la información geográfica mediante entrada de texto en formato https://en.wikipedia.org/wiki/Well-known_text[WKT].
+====
+
 === Paso 6: Generar Geoportal
+
+En este momento puedes añadir todos los geoportales que quieras en tu proyecto. Para ello, ejecuta los siguientes comandos:
+
+-----------------------------------------------------------------------------------------------------------
+web mvc geo controller --class ~.web.MapViewerController --preferredMapping mapview --projection EPSG4326
+web mvc geo controller --class ~.web.MapController --preferredMapping map 
+-----------------------------------------------------------------------------------------------------------
+
+Los comandos anteriores generan distintos geoportales en nuestra aplicación y una entrada de menú distinta para cada uno de ellos.
+El primer Geoportal está configurado para utilizar la proyección *EPSG4326*. En el segundo caso no se ha especificado la proyección
+a utilizar, por lo que se utilizará la proyección por defecto *EPSG3857*.
+
+image::menu_geoportal.png[Menu GEO,align=true]
+image::simple_map.png[Geoportal,align=center]
+
+[NOTE]
+====
+Si necesitas configurar opciones como nivel de Zoom inicial, punto central inicial, capas base, etc.. tendrás que editar de forma
+manual las opciones de la vista *views/{mappath}/show.jspx*.
+====
+
 === Paso 7: Añadir entidades al Geoportal
+
+En el link:#paso-6-generar-geoportal[punto anterior] hemos generado varios geoportales vacios, es decir, sin ninguna información representada
+sobre los mismos.
+
+En este punto, aprenderemos cómo añadir entidades a los geoportales generados para así representar la información geográfica almacenada
+en las mismas.
+
+Ejecutamos el siguiente comando para añadir todas las entidades que dispongan de campos de tipo GEO en todos los geoportales generados:
+
+------------------------
+web mvc geo entity all 
+------------------------
+
+[NOTE]
+====
+Si no quieres que la entidad se añada a todos los geoportales generados, utiliza el parámetro *--map* en el comando anterior indicando
+en qué mapa quieres incluir la entidad.
+====
+
+Si has seguido los pasos anteriores, tu aplicación tendrá el siguiente aspecto:
+
+image::map_entities.png[Entidades en mapa,align=center]
+image::map_entity_0.png[Entidad representada en el mapa,align=center]
+image::map_entities_1.png[Todos los campos representados,align=center]
+
 === Paso 8: Añadir capas base al Geoportal
+
+La herramienta gvNIX también nos permite añadir una serie de capas base en nuestro geoportal generado.
+
+Existe más de un tipo de capas base. En este momento, gvNIX permite añadir dos tipos de capas base:
+
+* http://wiki.openstreetmap.org/wiki/Tiles[Tile Layers]
+* http://wiki.openstreetmap.org/wiki/WMS[WMS Layers]
+
+A continuación añadiremos una capa de tipo Tile en nuestros geoportales generados, en concreto, añadiremos una capa base de satélite del
+proveedor de mapas https://www.here.com/[OVI]. Para ello, ejecutamos el siguiente comando:
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+web mvc geo tilelayer --name satellit --url "http://maptile.maps.svc.ovi.com/maptiler/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8" --index 1 --opacity 0.5
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Además, también añadiremos una capa base de tipo WMS en nuestros geoportales generados, en concreto, añadiremos una capa base con información
+geológica de la provincia de Valencia (España) servida por el http://www.igme.es/actividadesIGME/lineas/cartoGeo.htm[IGME]. Para ello,
+ejecutamos el siguiente comando:
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+web mvc geo wmslayer --name "geological map of valencia" --url "http://mapas.igme.es/gis/services/Cartografia_Geologica/IGME_GeologicoCValenciana_400/MapServer/WMSServer" --format "image/png" --transparent true --version "1.1.1" --crs EPSG4326 --layers "0,1,2,3"
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+[NOTE]
+====
+Al añadir una capa de tipo WMS, es necesario tener en cuenta la proyección en la que se encuentra y en la que está configurada el mapa, ya que
+en caso de no coincidir, podría verse desplazada en el mapa o representada de forma incorrecta.
+====
+
+[NOTE]
+====
+Los comandos anteriores añaden las capas base sobre todos los geoportales generados. Para especificar sobre qué geoportal añadir las capas base
+es necesario incluir el parámetro *--map*.
+====
+
 === Paso 9: Añadir herramientas al Geoportal
+
+Por defecto, al generar un geoportal utilizando la herramienta de desarrollo gvNIX, podrás ver que aparece una barra de herramientas
+en la esquina inferior derecha. En esta barra de herramientas solo aparece una herramienta de tipo "desplazar", representada con el icono
+de una mano.
+
+Gracias a esta herramienta, podemos desplazarnos por el mapa generado. Sin embargo, existen varias herramientas más que gvNIX permite
+añadir en los geoportales generados:
+
+==== Herramienta de medición
+
+Esta herramienta permite medir distancias entre varios puntos dentro del mapa. 
+
+Para añadir esta herramienta en todas las vistas del mapa, ejecutaremos el siguiente comando:
+
+---------------------------------------
+web mvc geo tool measure --name measure
+---------------------------------------
+
+==== Herramienta personalizable
+
+Debido a la gran variedad de herramientas que podían existir en un componente mapa, gvNIX provee una herramienta 
+personalizable, en la que el desarrollador implementa su funcionalidad, así como el icono que mostrará.
+
+Para incluir esta herramienta personalizable en el geoportal generado, ejecutaremos el siguiete comando:
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+web mvc geo tool custom --name latlng --icon fa-location-arrow --activateFunction activateLatLngTool --deactivateFunction deactivateLatLngTool --iconLibrary fa
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Al añadir esta herramienta utilizando el comando anterior, indicamos las funciones javascript que utilizará al 
+activar y desactivar la herramienta.
+
+Así, el desarrollador deberá personalizar estas funciones javascript para añadir la funcionalidad deseada a la herramienta, tal y como
+se muestra a continuación:
+
+------------------------------------------------------
+function activateLatLngTool(element, instance, map){
+ map.on("click", function(e){
+ alert(e.latlng);
+ });
+}
+function deactivateLatLngTool(element, instance, map){
+ map.off("click");
+}
+------------------------------------------------------
+
+Al finalizar los pasos anteriores, aparecerán los siguientes elementos en nuestra barra de herramientas del geoportal:
+
+image::toolbar_geo.png[Toolbar,align=true]
+
+[NOTE]
+====
+Los comandos anteriores añaden las herramientas sobre todos los geoportales generados. Para especificar sobre qué geoportal añadir 
+las herramientas es necesario incluir el parámetro *--map*.
+====
+
 === Paso 10: Funcionalidades avanzadas
+
+
 ==== Filtrar Datos utilizando Datatables
 ==== Selección de Datos utilizando Datatables
 ==== Agrupación de elementos en Geoportal
