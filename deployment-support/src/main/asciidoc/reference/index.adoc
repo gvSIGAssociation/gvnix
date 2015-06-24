@@ -828,10 +828,107 @@ Algunas secciones que pueden interesarte son:
 
 == gvNIX avanzado: Componentes GEO (Tutorial II)
 
+En este capítulo actualizaremos la aplicación generada en la link:#empezando-con-gvnix-tutorial-i[primera parte] de este tutorial 
+incluyendo componentes de tipo geográfico.
+
+Los detalles sobre la generación del código y la explicación de cada uno de los comandos ejecutados, se
+mostrarán en las siguientes secciones de este manual. 
+
 === ¿Qué aprenderás?
-=== Detalles de la aplicación
+
+En esta segunda parte del tutorial, aprenderás a incluir componentes de tipo GEO en tus aplicaciones generadas
+utilizando la herramienta de desarrollo de gvNIX.
+
+Las principales características de gvNIX que veremos en este tutorial son las siguientes:
+
+* Configurar persistencia con BBDD que aceptan campos de tipo GEO.
+* Incluir soporte espacial utilizando http://www.hibernatespatial.org/[Hibernate Spatial].
+* Añadir campos de tipo GEO en entidades generadas.
+* Generar buscadores sobre campos de tipo GEO.
+* Añadir mapas en las vistas de creación, actualización y visualización.
+* Generar geoportales para representar y gestionar los datos de la aplicación.
+* Añadir entidades al geoportal generado
+* Añadir capas base WMS y TileLayers al geoportal generado.
+* Añadir herramientas al geoportal generado.
+* Filtrar datos representados en el geoportal utilizando el componente Datatables
+* Seleccionar datos representados en el geoportal utilizando el componente Datatables
+* Agrupar elementos dependiendo del nivel de zoom.
+
 === Paso 1: Configurar persistencia GEO
+
+Lo primero que debemos saber es que no todas las bases de datos que ofrece la herramienta de desarrollo gvNIX 
+a la hora de configurar la persistencia son compatibles con información geográfica.
+
+Por este motivo, antes de incluir componentes geográficos en nuestra aplicación, es necesario configurar una 
+base de datos válida.
+
+Las bases de datos (que ofrece gvNIX) compatibles con campos de tipo GEO, son las siguientes:
+
+* http://www.postgresql.org/[PostgreSql]
+* https://www.oracle.com/database/index.html[Oracle 10g/11g]
+* http://www.mysql.com/[MySQL]
+* http://www.microsoft.com/es-es/server-cloud/products/sql-server/[SqlServer]
+
+
+En nuestro caso, utilizaremos una base de datos de tipo POSTGRES. Para ello, es necesario que configures una BBDD de tipo 
+http://www.postgresql.org/[POSTGRES] en tu equipo y añadas soporte geográfico incluyendo http://trac.osgeo.org/postgis/[POSTGIS]. 
+
+Para realizar la configuración anterior puedes seguir los siguientes pasos:
+
+* Instala http://www.postgresql.org/[PostgreSql] y http://trac.osgeo.org/postgis/[Postgis].
+* De manera opcional, puedes instalar http://www.pgadmin.org/[pgadmin] para gestionar tus bases de datos Postgres de forma visual.  
+* Crea una nueva base de datos.
+* Añade la extensión *postgis* y *postgis_topology* en la base de datos generada, tal y como se muestra en la siguiente imágen:
+
+image::postgis_db.png[Extensiones Postgis,align=true]
+
+Para más información sobre como configurar Postgis consulta su guía de referencia http://postgis.net/documentation/[aquí].
+
+Ahora que disponemos de una base de datos válida configurada en nuestro equipo, actualizaremos nuestro proyecto generado 
+para utilizar una base de datos de tipo POSTGRES ejecutando el siguiente comando:
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+jpa setup --provider HIBERNATE --database POSTGRES --userName USERNAME --databaseName DATABASENAME --password PASSWORD --hostName HOSTNAME
+-------------------------------------------------------------------------------------------------------------------------------------------
+
 === Paso 2: Añadir soporte GEO al proyecto
+
+En este momento, tu base de datos está configurada para link:#paso-1-configurar-persistencia-geo[soportar campos de tipo GEO] 
+y dispone de una serie de funcionalidades para gestionar información geográfica.  Sin embargo, tu proyecto no acepta estos componentes de momento.
+
+Para añadir soporte espacial en el proyecto generado necesitamos actualizar el mismo para que utilice http://www.hibernatespatial.org/[Hibernate Spatial].
+
+Ejecutando el siguiente comando, nuestro proyecto dispondrá de soporte espacial:
+
+------------------------------------------
+jpa geo setup --provider HIBERNATE_SPATIAL
+------------------------------------------
+
+[NOTE]
+====
+En caso de ejecutar el comando anterior sobre una base de datos no válida aparecerá el siguiente mensaje indicándonos qué
+tipos de base de datos aceptan información geográfica:
+
+----------------------------------------------------------------------------------------------------------------------------------------
+There's not any valid database to apply GEO persistence support. GEO is only supported for POSTGRES, ORACLE, MYSQL and MSSQL databases. 
+You must change it following the next instructions:
+
+Replace your current dialect with the correct one: 
+org.hibernate.dialect.H2Dialect ==> org.hibernate.spatial.dialect.h2geodb.GeoDBDialect
+org.hibernate.dialect.PostgreSQLDialect ==> org.hibernate.spatial.dialect.postgis.PostgisDialect
+org.hibernate.dialect.MySQLDialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatialDialect
+org.hibernate.dialect.MySQL5Dialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatialDialect
+org.hibernate.dialect.MySQLInnoDBDialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatialInnoDBDialect
+org.hibernate.dialect.MySQL5InnoDBDialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatialInnoDBDialect
+org.hibernate.dialect.MySQL5DBDialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatial56Dialect
+org.hibernate.dialect.MySQLSpatial56Dialect ==> org.hibernate.spatial.dialect.mysql.MySQLSpatial5InnoDBDialect
+org.hibernate.dialect.Oracle10gDialect ==> org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect
+org.hibernate.dialect.OracleDialect ==> org.hibernate.spatial.dialect.oracle.OracleSpatial10gDialect
+org.hibernate.dialect.SQLServerDialect ==> org.hibernate.spatial.dialect.SQLServer2008Dialect
+----------------------------------------------------------------------------------------------------------------------------------------
+====
+
+
 === Paso 3: Añadir campos GEO a entidades
 === Paso 4: Generar buscadores GEO
 === Paso 5: Generar mapas en CRU
@@ -843,99 +940,6 @@ Algunas secciones que pueden interesarte son:
 ==== Filtrar Datos utilizando Datatables
 ==== Selección de Datos utilizando Datatables
 ==== Agrupación de elementos en Geoportal
-
-
-
-
-:leveloffset: 1
-include::guia-desarrollo_eclipse.adoc[]
-
-
-//== Desarrollo de aplicaciones con gvNIX
-//
-//En esta sección se verá paso a paso cómo desarrollar una aplicación web
-//desde cero demostrando cómo utilizar gvNIX en cualquier proyecto web.
-//Algunas de las características de gvNIX que se verán son:
-//
-//* Creación de un nuevo proyecto.
-//* Configuración del acceso a datos.
-//* Código genereado automáticamente.
-//* Gestión del modelo de entidades.
-//* Gestión de la capa web.
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::guia-desarrollo_crear-app.adoc[]
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::guia-desarrollo_acceso-datos.adoc[]
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::guia-desarrollo_generacion-codigo.adoc[]
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::guia-desarrollo_entidades.adoc[]
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::guia-desarrollo_entidades-buscadores.adoc[]
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::guia-desarrollo_entidades-pruebas.adoc[]
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::guia-desarrollo_capa-web.adoc[]
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::guia-desarrollo_capa-web-buscadores.adoc[]
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::guia-desarrollo_capa-web-arranque-pruebas.adoc[]
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::guia-desarrollo_mejoras-rendimiento.adoc[]
-//
-//== Desarrollo avanzado con gvNIX
-//
-//En esta parte se va a ver cómo ampliar una aplicación web básica creada con la herramienta
-//de desarrollo gvNIX para cumplir con los requerimientos de cualquier proyecto
-//real.
-//
-//Se revisará las características distintivas que ofrece gvNIX y que van
-//enfocadas al desarrollo de funcionalidades de alto nivel para facilitar
-//el desarrollo y proporcionar una mejor experiencia de uso al usuario:
-//
-//* Organización de la estructura de páginas en el menú.
-//* Gestión de patrones de visualización de entidades y sus relaciones.
-//* Control de concurrencia a nivel de aplicación sin campos en base de
-//datos.
-//* Gestión de la visualización de excepciones y gestión de mensajes de
-//usuario en ventana modal.
-//* Control de acceso (autenticación y autorización) y seguridad.
-//* Generación de documentos (reportes).
-//* Gestión de servicios locales y servicios web (importación y
-//exposición).
-//* Soporte de idiomas oficiales para el estado Español (inicialmente
-//incluido el Valenciano).
-//* Gestión de configuraciones por entorno.
-//* Gestión de transformación de cadenas vacías a valores nulos.
-//
-//Cada uno de estos elementos son añadidos (add-ons) que el Roo Add-On 
-//suite gvNIX incluye en Spring Roo al ser instalado. 
-//
-//Estos add-ons han sido inicialmente diseñados para ser aplicados en un
-//modelo de dominio del tipo registro activo y una capa visual del tipo
-//spring MVC. Sin embargo, pueden funcionar también con otros modelos de
-//dominio y visuales y en futuras versiones se irá incrementando dicha
-//compatibilidad.
 
 == gvNIX Add-Ons
 
@@ -999,24 +1003,32 @@ include::addon-dynamic-config.adoc[]
 :leveloffset: 1
 include::addon-web-mvc-binding.adoc[]
 
-//== Recetas de desarrollo
-//
-//En esta parte se verán distintas guías para realizar ciertas
-//modificaciones sobre el código generado para adaptarlo a distintas
-//necesidades.
-//
-// Push titles down one level.
-//:leveloffset: 1
-//include::recetas.adoc[]
-//
 == Apéndices
 
-Listado de comandos adicionales incluidos en gvNIX detallando cada uno
-de sus parámetros.
+En este capitulo se recoge información adicional sobre todo lo comentado 
+en las secciones anteriores así como un apéndice de todos los comandos disponibles 
+en la herramienta de desarrollo gvNIX.
 
 // Push titles down one level.
 :leveloffset: 1
 include::apendice-comandos.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::guia-desarrollo_eclipse.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::recetas.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::guia-desarrollo_generacion-codigo.adoc[]
+
+// Push titles down one level.
+:leveloffset: 1
+include::guia-desarrollo_mejoras-rendimiento.adoc[]
+
 
 == Recursos
 
