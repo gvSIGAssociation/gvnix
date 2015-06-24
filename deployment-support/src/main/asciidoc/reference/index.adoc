@@ -1141,10 +1141,65 @@ las herramientas es necesario incluir el parámetro *--map*.
 
 === Paso 10: Funcionalidades avanzadas
 
+En este momento, ya dispones de una aplicación completa con componentes GEO generada utilizando la herramienta de desarrollo
+gvNIX! Pero.. ¿Qué me ofrece esta aplicación GEO?
+
+En este capitulo te dejamos una serie de funcionalidades avanzadas que pueden interesarte. 
 
 ==== Filtrar Datos utilizando Datatables
+
+Por defecto, todas las entidades que añades a los geoportales generados pueden ser filtradas. Sabemos que una capa de entidad
+se puede filtrar si aparece el siguiente icono en el panel de capas (https://en.wikipedia.org/wiki/Table_of_contents[TOC])
+
+image::filter_icon.png[Icono de filtro,align=true]
+
+Para realizar el filtrado de datos se utiliza el componente Datatables, el cual actualiza la vista de mapa aplicando los mismos filtros 
+que al listado, tal y como se ve en el siguiente ejemplo:
+
+En este geoportal, visualizamos todos los registros de la entidad Owner:
+
+image::filter_0.png[Filtrado de capas,align=center]
+
+A continuación, filtramos el Datatable para que solo aparezca un propietario en el listado. Como vemos en la imágen, el filtro se aplica 
+al Datatable y el mapa se refresca de forma automática:
+
+image::filter_1.png[Aplicado el filtro,align=center]
+
+[NOTE]
+====
+Para modificar el tipo de filtrado de una entidad representada en los geoportales, modifica el atributo *filterType* de la vista 
+_src/main/webapp/WEB-INF/views/{mappath}/show.jspx_. Si especificas el valor _auto_ en dicha propiedad, al filtrar los datos utilizando
+el componente Datatable, el mapa se actualizará de forma automática. Si por el contrario, estableces la propiedad a _manual_ habrá que actualizar
+los datos refrescando la página de forma manual. Si estableces la propiedad a _none_, desactivarás la funcionalidad de filtrado para dicha 
+capa de entidad.
+====
+
 ==== Selección de Datos utilizando Datatables
+
+Otra funcionalidad interesante es la selección de registros utilizando el componente Datatables. Al igual que en el filtrado, se seleccionarán
+aquellos registros que estén seleccionados en el listado Datatables, tal y como se muestra en la siguiente imágen:
+
+image::selection_map.png[Seleccion en mapa,align=true]
+
+Esta funcionalidad es compatible con el filtrado, por lo que se puede filtrar el componente Datatables y seleccionar un registro al mismo tiempo.
+
+[NOTE]
+====
+Por defecto, el elemento seleccionado se mostrará en color azul. Puedes modificar el estilo de la selección editando el atributo 
+_selection_ de la capa de entidad.
+====
+
 ==== Agrupación de elementos en Geoportal
+
+Otra funcionalidad que ofrecen los geoportales generados utilizando la herramienta de desarrollo gvNIX, es la agrupación de componentes
+dependiendo del nivel de zoom.
+
+Si se representan varios elementos en un espacio muy reducido, cuando el usuario haga zoom para alejar la vista, estos elementos se agruparán
+evitando asi problemas de rendimiento tal y como se ve en la siguiente imágen:
+
+image::grouped_markers.png[Agrupación,align=center]
+
+Si hacemos click sobre uno de los grupos, el mapa se desplazará hasta el nivel mínimo de Zoom en el que se pueden representar los elementos.
 
 == gvNIX Add-Ons
 
