@@ -78,9 +78,8 @@ Options:
 
 Description:
 
-    Creates the release ZIP. Automates building deployment ZIPs 
-    and deployment, runs CI test and deploy ".jar" artifacts 
-    on Maven Central.
+    Runs CI test and deploys artifacst ( ".jar" artifacts 
+    on Maven Central and addon suite).
 
 EOF
 
