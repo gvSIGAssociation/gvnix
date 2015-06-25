@@ -60,7 +60,9 @@
  <link href="{{ ASSET_PATH }}/css/animate.css" rel="stylesheet" type="text/css">
  <!-- timeline  -->
  <link href="{{ ASSET_PATH }}/css/timeline.css" rel="stylesheet" type="text/css">
- <!-- animated divs on scroll (/drafts) -->
+ <!-- cookies  -->
+ <link href="{{ ASSET_PATH }}/css/cookiecuttr.css" rel="stylesheet" type="text/css">
+ <!-- animated divs on scroll (/extra) -->
  <!-- <link href="{{ ASSET_PATH }}/css/animated.css" rel="stylesheet" type="text/css"> -->
 
  <!-- Icons -->
@@ -99,3 +101,28 @@
             showProcessingMessages: false
         });
     </script>{% endif %}
+
+    {% if site.google_analytics %}
+      <!-- jQuery, needed for CookieCuttr -->
+      <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery-1.11.1.js"></script>
+
+      <!-- jQuery CookieCuttr -->
+      <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery.cookie.js"></script>
+      <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery.cookiecuttr.js"></script>
+
+      <script type="text/javascript">
+      if (jQuery.cookie('cc_cookie_accept') == "cc_cookie_accept") {
+        // insert the code you do not want to run UNTIL cookies are accepted here
+        console.log("lala");
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', '{{ site.google_analytics }}']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document. getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+        }
+      </script>
+    {% endif %}
