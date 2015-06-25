@@ -51,14 +51,5 @@ echo "####### ROO Distribution Zip location #######"
 echo $ROO_DISTRIBUTION_ZIP;
 echo "############################################"
 
-# Checks roo file exist
-if [ ! -f $ROO_DISTRIBUTION_ZIP ]; then
-      echo ""
-      echo "*** Roo zip file not exist: $ROO_ZIP"
-      echo ""
-      usage
-      exit 1
-fi
-
 # Starting tests
 ./build.sh $ROO_DISTRIBUTION_ZIP test --skipCleanRepo
