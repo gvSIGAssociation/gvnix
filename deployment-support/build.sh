@@ -41,7 +41,7 @@ ROO_VERSION=`grep "[<]roo.version[>]\K([^<]*)" $GVNIX_HOME/pom.xml -oPm1`
 function usage () {
 cat << EOF
 
-Usage: $0 spring-roo.zip [test|deploy] {--skipCleanRepo} {-d | --debug}
+Usage: $0 spring-roo.zip [test|deploy|release] {--skipCleanRepo} {--skipSign} {-d | --debug}
 
 Parameter:
 
@@ -230,7 +230,7 @@ fi
 show_message_info "Compiling and installing gvNIX"
 cd $GVNIX_HOME
 if [ "$SKIP_ARTIFACTS_SIGN" = "yes" ]; then
-    mvn clean install -P skipSign
+    mvn clean install -Dgpg.skip=true
 else
     # Install and sign all artifacts
     mvn clean install

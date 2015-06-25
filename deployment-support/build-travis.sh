@@ -53,4 +53,4 @@ echo $ROO_DISTRIBUTION_ZIP;
 echo "############################################"
 
 # Starting tests
-$GVNIX_DEPLOYMENT_SUPPORT_DIR/build.sh $ROO_DISTRIBUTION_ZIP test --skipCleanRepo
+$GVNIX_DEPLOYMENT_SUPPORT_DIR/build.sh $ROO_DISTRIBUTION_ZIP test --skipSign
