@@ -55,7 +55,7 @@ misma licencia.
 
 == Prólogo
 
-=== Overview
+=== Información General
 
 gvNIX es un entorno de trabajo Java de código abierto para el desarrollo
 rápido de aplicaciones web altamente productivo, flexible y que no
@@ -79,14 +79,16 @@ Antes de empezar a trabajar con la herramienta de desarrollo gvNIX, es aconsejab
 funciona Spring Roo. Para ello, se recomienda leer la 
 http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/[documentación de referencia].
 
-Además, para entender mejor la arquitectura de las aplicaciones generadas, se aconseja tener unos conocimientos
-básicos sobre aplicaciones desarrolladas utilizando 
-http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/[Spring].
+gvNIX crea aplicaciones web basadas en 
+http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/[Spring Framework] 
+y en el conjunto de tecnologías de http://spring.io/[Spring], 
+por lo que es necesario tener conocimientos del framework Spring y tecnologías relacionadas 
+como Spring MVC, Spring Data JPA, Spring Security, etc.
 
 Para poder trabajar con la herramienta de desarrollo gvNIX en un entorno de desarrollo, es necesario disponer de 
 los siguientes componentes:
 
-* http://projects.spring.io/spring-roo/#running-from-shell[Spring Roo] descargado y
+* http://projects.spring.io/spring-roo/#running-from-shell[Spring Roo 2.0+] descargado y
 descomprimido.
 * Versión más actual de Java JDK 6 instalado en el sistema. Se 
 recomienda utiliar *Java 7*, aunque se dispone de soporte para Java 8.
@@ -249,8 +251,8 @@ Eclipse.
 === ¿Qué es gvNIX?
 
 gvNIX es un entorno de trabajo Java de código abierto para el desarrollo
-rápido de aplicaciones web altamente productivo, flexible y que no
-compromete la calidad de los proyectos.
+rápido de aplicaciones web sobre tecnología Spring. Sus funcionalidades hacen que sea 
+un entorno altamente productivo, flexible y que no compromete la calidad de los proyectos.
 
 Está compuesto por una serie de herramientas de código abierto distribuídas 
 en forma de http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#available-roo-addon-suites["Spring Roo Add-On Suite"]
@@ -264,8 +266,7 @@ productividad.
 gvNIX está patrocinado por la Dirección General de Tecnologías de la Información
 (DGTI) de la Conselleria de Hacienda y Administración Pública de la
 Generalitat Valenciana (Comunidad Valenciana, España), gestionado por la
-Asociación gvSIG y dirigido por DISID. gvNIX se consolida como estándar para
-desarrollo Java de la DGTI de la Generalitat Valenciana.
+Asociación gvSIG y dirigido por DISID.
 
 gvNIX está disponible dentro del proyecto de Migración a Software de
 fuentes abiertas http://www.gvpontis.gva.es[gvPONTIS].
@@ -276,10 +277,6 @@ proyecto gvPONTIS]
 * http://projects.spring.io/spring-roo/[Página oficial de Spring Roo]
 
 === ¿Qué es Spring Roo?
-
-Según su creador, Ben Alex: "Roo es un pequeño genio que observa desde
-un segundo plano y gestiona todo aquello de lo que no me quiero
-preocupar".
 
 Spring Roo es un entorno de trabajo Java que permite el desarrollo de
 aplicaciones web de forma rápida y cómoda para el desarrollador. Sus
@@ -298,7 +295,6 @@ redundantes.
 * Realimentación: añade valor durante todo el ciclo de vida.
 * No incorpora elementos adicionales al entorno de ejecución, por lo que
 no penaliza la velocidad ni la memoria de la aplicación.
-* No requiere ningún IDE.
 * Recibe instrucciones a través de una consola interactiva con
 autocompletado y ayuda en línea.
 * Extensible usando _bundles OSGi_.
