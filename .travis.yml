@@ -1,6 +1,6 @@
 language: java
 jdk:
   - openjdk6
-install: ./deployment-support/build-travis.sh test --skipCleanRepo
+install: ./deployment-support/build-travis.sh
 
   
