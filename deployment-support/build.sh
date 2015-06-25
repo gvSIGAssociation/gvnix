@@ -239,7 +239,7 @@ else
 fi
 
 # Install and package modules
-show_message_info "Compilling and install gvNIX"
+show_message_info "Compiling and installing gvNIX"
 cd $GVNIX_HOME
 mvn clean install
 
