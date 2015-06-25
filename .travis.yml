@@ -1,5 +1,6 @@
 language: java
 jdk:
-  - oraclejdk7
-install: mvn validate
+  - openjdk6
+install: ./deployment-support/build-travis.sh test --skipCleanRepo
+
   
