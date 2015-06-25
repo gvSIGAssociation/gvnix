@@ -53,7 +53,7 @@ Parameter:
 Actions:
 
     test        
-              Generates gvNIX package and runs CI test (skip documentation)
+              Generates gvNIX package and runs CI test
 
     deploy    
               Generates gvNIX package, runs CI test and deploy all ".jar" 
@@ -69,7 +69,8 @@ Options:
     --skipCleanRepo
 
               Skip cleaning of Maven local repository (~/.m2/repository)
-              of any gvNIX and Spring Roo artifacts
+              of any gvNIX and Spring Roo artifacts. Only available for
+              "test" action.
 
 
     -d,--debug
