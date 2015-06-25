@@ -40,3 +40,4 @@ ROO_VERSION=`grep "[<]roo.version[>]\K([^<]*)" $GVNIX_HOME/pom.xml -oPm1`
 # Downloading ROO
 mkdir roo-distribution;
 wget -O roo-distribution/spring-roo-"$ROO_VERSION".zip http://spring-roo-repository.springsource.org.s3.amazonaws.com/milestone/ROO/spring-roo-"$ROO_VERSION".zip
+
