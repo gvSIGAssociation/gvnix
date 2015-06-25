@@ -47,6 +47,10 @@ wget -O roo-distribution/spring-roo-"$ROO_VERSION".zip http://spring-roo-reposit
 
 ROO_DISTRIBUTION_ZIP=$GVNIX_DEPLOYMENT_SUPPORT_DIR"/roo-distribution/spring-roo-"$ROO_VERSION".zip";
 
+echo "####### ROO Distribution Zip location #######"
+echo $ROO_DISTRIBUTION_ZIP;
+echo "############################################"
+
 # Checks roo file exist
 if [ ! -f $ROO_DISTRIBUTION_ZIP ]; then
       echo ""
