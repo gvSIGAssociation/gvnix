@@ -72,6 +72,11 @@ Options:
               of any gvNIX and Spring Roo artifacts. Only available for
               "test" action.
 
+    --skipSign
+
+              Skip signing of gvNIX artifacts. Only available for "test" 
+              action.
+
 
     -d,--debug
 
@@ -112,6 +117,7 @@ fi
 
 ## Prepare configuration variables
 SKIP_LOCAL_REPO_CLEAN=no
+SKIP_ARTIFACTS_SIGN=no
 #GENERATE_DOC=yes
 RUN_CI=no
 DEPLOY_JARS=no
@@ -128,6 +134,9 @@ do
     case $OPTION in
         --skipCleanRepo)
             SKIP_LOCAL_REPO_CLEAN=yes
+            ;;
+        --skipSign)
+            SKIP_ARTIFACTS_SIGN=yes
             ;;
         -d|--debug)
             DEBUG=yes
@@ -156,17 +165,6 @@ deploy)
     #GENERATE_DOC=yes
     RUN_CI=yes
     DEPLOY_JARS=yes
-    echo ""
-    echo "**********************************************************"
-    echo "**********************************************************"
-    echo "***                                                 ******"
-    echo "*** WARNING: deploy action is not full testest!!!!  ******"
-    echo "***                                                 ******"
-    echo "**********************************************************"
-    echo "**********************************************************"
-    echo ""
-    echo "Press <Ctrl>+C to cancel or <Enter> to continue..."
-    read 
   ;;
 release)
     SKIP_LOCAL_REPO_CLEAN=no
@@ -174,17 +172,6 @@ release)
     RUN_CI=yes
     DEPLOY_JARS=yes
     DEPLOY_RELEASE=yes
-    echo ""
-    echo "**********************************************************"
-    echo "**********************************************************"
-    echo "***                                                 ******"
-    echo "*** WARNING: deploy action is not full testest!!!!  ******"
-    echo "***                                                 ******"
-    echo "**********************************************************"
-    echo "**********************************************************"
-    echo ""
-    echo "Press <Ctrl>+C to cancel or <Enter> to continue..."
-    read 
   ;;
 *)
     echo ""
@@ -242,7 +229,12 @@ fi
 # Install and package modules
 show_message_info "Compiling and installing gvNIX"
 cd $GVNIX_HOME
-mvn clean install
+if [ "$SKIP_ARTIFACTS_SIGN" = "yes" ]; then
+    mvn clean install -P skipSign
+else
+    # Install and sign all artifacts
+    mvn clean install
+fi
 
 ## Locate index.xml of addon repository
 export GVNIX_OSGI_BUNDLE_REPO_INDEX=$GVNIX_HOME/target/osgi-repository-bin/index.xml
