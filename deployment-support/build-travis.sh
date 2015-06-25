@@ -37,7 +37,24 @@ GVNIX_VERSION=`grep "[<]version[>]\K([^<]*)" $GVNIX_HOME/pom.xml -oPm1`
 # Gets roo version from first version tag on root pom.xml
 ROO_VERSION=`grep "[<]roo.version[>]\K([^<]*)" $GVNIX_HOME/pom.xml -oPm1`
 
-# Downloading ROO
+# Preparing distribution folder
+if [ -d "roo-distribution" ]; then
+  rm -r roo-distribution;
+fi
 mkdir roo-distribution;
+# Downloading ROO
 wget -O roo-distribution/spring-roo-"$ROO_VERSION".zip http://spring-roo-repository.springsource.org.s3.amazonaws.com/milestone/ROO/spring-roo-"$ROO_VERSION".zip
 
+ROO_DISTRIBUTION_ZIP=$GVNIX_DEPLOYMENT_SUPPORT_DIR"/roo-distribution/spring-roo-"$ROO_VERSION".zip";
+
+# Checks roo file exist
+if [ ! -f $ROO_DISTRIBUTION_ZIP ]; then
+      echo ""
+      echo "*** Roo zip file not exist: $ROO_ZIP"
+      echo ""
+      usage
+      exit 1
+fi
+
+# Starting tests
+./build.sh $ROO_DISTRIBUTION_ZIP test --skipCleanRepo
