@@ -38,14 +38,15 @@ GVNIX_VERSION=`grep "[<]version[>]\K([^<]*)" $GVNIX_HOME/pom.xml -oPm1`
 ROO_VERSION=`grep "[<]roo.version[>]\K([^<]*)" $GVNIX_HOME/pom.xml -oPm1`
 
 # Preparing distribution folder
-if [ -d "roo-distribution" ]; then
-  rm -r roo-distribution;
+ROO_DISTRIBUTION_FOLDER="/tmp/roo-distribution-folder-"$ROO_VERSION;
+if [ -d $ROO_DISTRIBUTION_FOLDER ]; then
+  rm -r $ROO_DISTRIBUTION_FOLDER;
 fi
-mkdir roo-distribution;
+mkdir $ROO_DISTRIBUTION_FOLDER;
 # Downloading ROO
-wget -O roo-distribution/spring-roo-"$ROO_VERSION".zip http://spring-roo-repository.springsource.org.s3.amazonaws.com/milestone/ROO/spring-roo-"$ROO_VERSION".zip
+wget -O "$ROO_DISTRIBUTION_FOLDER"/spring-roo-"$ROO_VERSION".zip http://spring-roo-repository.springsource.org.s3.amazonaws.com/milestone/ROO/spring-roo-"$ROO_VERSION".zip
 
-ROO_DISTRIBUTION_ZIP=$GVNIX_DEPLOYMENT_SUPPORT_DIR"/roo-distribution/spring-roo-"$ROO_VERSION".zip";
+ROO_DISTRIBUTION_ZIP=$ROO_DISTRIBUTION_FOLDER"/spring-roo-"$ROO_VERSION".zip";
 
 echo "####### ROO Distribution Zip location #######"
 echo $ROO_DISTRIBUTION_ZIP;
