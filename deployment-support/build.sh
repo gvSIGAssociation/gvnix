@@ -41,7 +41,7 @@ ROO_VERSION=`grep "[<]roo.version[>]\K([^<]*)" $GVNIX_HOME/pom.xml -oPm1`
 function usage () {
 cat << EOF
 
-Usage: $0 spring-roo.zip [test|deploy|release] {--skipCleanRepo} {--skipSign} {-d | --debug}
+Usage: $0 spring-roo.zip [test|deploy|release] {--skipCleanRepo} {--skipSign} {--lowVerbose} {-d | --debug}
 
 Parameter:
 
@@ -76,6 +76,10 @@ Options:
 
               Skip signing of gvNIX artifacts. Only available for "test" 
               action.
+
+    --lowVerbose
+
+              Reduces log info showed by CI tests
 
 
     -d,--debug
@@ -118,6 +122,7 @@ fi
 ## Prepare configuration variables
 SKIP_LOCAL_REPO_CLEAN=no
 SKIP_ARTIFACTS_SIGN=no
+LOW_VERBOSE=no
 #GENERATE_DOC=yes
 RUN_CI=no
 DEPLOY_JARS=no
@@ -137,6 +142,9 @@ do
             ;;
         --skipSign)
             SKIP_ARTIFACTS_SIGN=yes
+            ;;
+        --lowVerbose)
+            LOW_VERBOSE=yes
             ;;
         -d|--debug)
             DEBUG=yes
@@ -295,7 +303,19 @@ assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Web MVC Bi
 # Run gvNIX integration test
 if [ "$RUN_CI" = "yes" ]; then
     show_message_info "Run Integration test"
-    bash $GVNIX_DEPLOYMENT_SUPPORT_DIR/gvNIX-CI.sh /tmp/gvnix_int_test $ROO_COMMAND $GVNIX_HOME
+    if [ "$LOW_VERBOSE" = "yes" ]; then
+      CI_LOG_FILE=/tmp/gvnix_int_test/ci.log.txt
+      show_message_info "Redirect CI log to $CI_LOG_FILE"
+      $GVNIX_DEPLOYMENT_SUPPORT_DIR/gvNIX-CI.sh /tmp/gvnix_int_test $ROO_COMMAND $GVNIX_HOME > $CI_LOG_FILE
+      CI_RESULT=$?  
+      if [ $CI_RESULT -ne 0 ]; then
+        show_message_problem "ERROR: CI test fail" "See $CI_LOG_FILE for full log" "Last 20 lines: "
+        tail -n 20 $CI_LOG_FILE
+        exit 1
+      fi
+    else
+      bash $GVNIX_DEPLOYMENT_SUPPORT_DIR/gvNIX-CI.sh /tmp/gvnix_int_test $ROO_COMMAND $GVNIX_HOME
+    fi
 else
     show_message_info "Run Integration test: Skip"
 fi

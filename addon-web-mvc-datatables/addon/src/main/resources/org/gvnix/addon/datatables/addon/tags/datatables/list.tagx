@@ -47,15 +47,15 @@
 
     	<!-- Start the JQuery HTML structure to show tabs -->
     	<div id="${mainDatatablesId}">
-    	
+
 	    	<!-- Tabs headers -->
 	    	<ul>
 		    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
 		    	<c:set var="datatablesId">${mainDatatablesId}_${detailItem.property}</c:set>
-		    	<li><a id="${datatablesId}"><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${detailItem.property}" htmlEscape="false" /></a></li>
+		    	<li><a id="${datatablesId}"><spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_${fn:toLowerCase(detailItem.property)}" htmlEscape="false" /></a></li>
 			</c:forEach>
 			</ul>
-			
+
 	    	<!-- Tabs contents -->
 		    <c:forEach items="${detailsInfo}" var="detailItem" varStatus="detailIndex">
 
