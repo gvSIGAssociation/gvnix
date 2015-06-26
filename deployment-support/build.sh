@@ -304,9 +304,15 @@ assert_contains_in_file addons.txt "Missing add-on:" "gvNIX - Addon - Web MVC Bi
 if [ "$RUN_CI" = "yes" ]; then
     show_message_info "Run Integration test"
     if [ "$LOW_VERBOSE" = "yes" ]; then
+      # Check if /tmp/gvnix_int exists
+      if [ -d "/tmp/gvnix_int_test" ]; then
+        rm -r /tmp/gvnix_int_test;
+      fi
+      # Creating gvnix integration test folder
+      mkdir /tmp/gvnix_int_test;
       CI_LOG_FILE=/tmp/gvnix_int_test/ci.log.txt
       show_message_info "Redirect CI log to $CI_LOG_FILE"
-      $GVNIX_DEPLOYMENT_SUPPORT_DIR/gvNIX-CI.sh /tmp/gvnix_int_test $ROO_COMMAND $GVNIX_HOME > $CI_LOG_FILE
+      bash $GVNIX_DEPLOYMENT_SUPPORT_DIR/gvNIX-CI.sh /tmp/gvnix_int_test $ROO_COMMAND $GVNIX_HOME > $CI_LOG_FILE
       CI_RESULT=$?  
       if [ $CI_RESULT -ne 0 ]; then
         show_message_problem "ERROR: CI test fail" "See $CI_LOG_FILE for full log" "Last 20 lines: "
