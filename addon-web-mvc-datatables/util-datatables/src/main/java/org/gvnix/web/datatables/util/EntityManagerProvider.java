@@ -8,6 +8,11 @@ package org.gvnix.web.datatables.util;
 
 import javax.persistence.EntityManager;
 
+/**
+ * Service which provides the EntityManger for a JPA Entity class
+ * 
+ * @author gvNIX
+ */
 public interface EntityManagerProvider {
 
     /**

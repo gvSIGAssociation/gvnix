@@ -9,7 +9,7 @@
 	        </repository>
 		</repositories>
 		<properties>
-			<querydsl.version>3.4.3</querydsl.version>
+			<querydsl.version>3.6.3</querydsl.version>
 			<gvnix.version>2.0.0.M1</gvnix.version>
 		</properties>
 		<dependencies>
