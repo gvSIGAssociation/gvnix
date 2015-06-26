@@ -2,8 +2,7 @@
 layout: post
 title: Taller de gvNIX en las 10as Jornadas Internacionales gvSIG
 description: Taller de gvNIX en las 10as Jornadas Internacionales de gvSIG
-tags: [formación, componente GEO]
-featured: true
+tags: [formación, componente GEO, gvSIG]
 training: true
 comments: true
 share: true

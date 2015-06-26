@@ -5,6 +5,7 @@ description: Free seminar at ETSINF to develop Java applications with gvNIX
 tags: [training, ETSINF, UPV]
 type: photo
 imagefeature: post/gvNIX-training-etsinf-upv.png
+featured: true
 comments: true
 training: true
 share: true
@@ -24,8 +25,8 @@ lang: en
 
 <div class="col-md-6">
 <p>
-The School of Computing (ETSINF) in collaboration with
-DiSiD, a technology company, offer you the chance to meet gvNIX,
+The School of Computing (ETSINF) of the Polytechnic University of Valencia
+in collaboration with DiSiD, a technology company, offer you the chance to meet gvNIX,
 the open source environment for developing Java web applications
 which has become the official standard of the Generalitat Valenciana (Valencian Community).
 </p>

@@ -2,7 +2,7 @@
 layout: post
 title: Seminario gratuito de gvNIX
 description: Desarrollo de aplicaciones Java
-tags: [formación, ETSINF, galería de fotos]
+tags: [formación, ETSINF, UPV, galería de fotos]
 type: photo
 imagefeature: /post/etsinf/etsinf-11.jpg
 training: true

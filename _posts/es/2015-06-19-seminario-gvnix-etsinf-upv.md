@@ -5,6 +5,7 @@ description: Seminario gratuito en la ETSINF para el desarrollo de aplicaciones 
 tags: [formación, ETSINF, UPV]
 type: photo
 imagefeature: post/gvNIX-training-etsinf-upv.png
+featured: true
 training: true
 comments: true
 share: true
@@ -24,8 +25,9 @@ lang: es
 
 <div class="col-md-6">
 <p>
-La Escuela Técnica Superior de Informática (ETSINF) en colaboración con la
-empresa tecnológica DISID te ofrecen la posibilidad de conocer gvNIX,
+La Escuela Técnica Superior de Informática (ETSINF) de la Universidad
+Politécnica de Valencia en colaboración con la empresa tecnológica DISID
+te ofrecen la posibilidad de conocer gvNIX,
 el entorno de código abierto para el desarrollo de aplicaciones Java
 que se ha convertido en el estándar oficial de la Generalitat Valenciana.
 </p>

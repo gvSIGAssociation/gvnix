@@ -4,7 +4,7 @@ type:	video
 title: "Video tutorial gvNIX in 10th Conference gvSIG"
 description: "Taller gvNIX"
 category: en
-tags: [geoportal, tutorial, video]
+tags: [geoportal, tutorial, video, gvSIG]
 video: https://www.youtube.com/watch?v=J1e7igmax0M
 comments: true
 share: true

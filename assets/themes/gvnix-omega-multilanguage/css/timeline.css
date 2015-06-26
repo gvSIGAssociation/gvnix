@@ -120,7 +120,8 @@
 .timeline-body > .text-muted.lead {
   font-size: 14px;
   line-height: 1.75;
-    color: #777;
+  color: #777;
+  text-align: inherit;
 }
 
 .timeline .timeline-body>p,

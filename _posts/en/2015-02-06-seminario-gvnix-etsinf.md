@@ -2,7 +2,7 @@
 layout: post
 title: Free gvNIX seminar
 description: Develop Java applications
-tags: [training, ETSINF, gallery]
+tags: [training, ETSINF, gallery, UPV]
 type: photo
 imagefeature: /post/etsinf/etsinf-11.jpg
 comments: true

@@ -6,6 +6,7 @@ title: gvNIX Anniversary
 description: We celebrated 5 years
 tags: [GVA, gvNIX, Opensource, Proyectos]
 comments: true
+featured: true
 share: true
 category:
     - en
