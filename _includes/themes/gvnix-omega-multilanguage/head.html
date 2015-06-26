@@ -102,6 +102,27 @@
         });
     </script>{% endif %}
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+    {% if site.google_analytics %}
+
+      <!-- jQuery, needed for CookieCuttr -->
+      <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery-1.11.1.js"></script>
+
+      <!-- jQuery CookieCuttr -->
+      <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery.cookie.js"></script>
+      {% if page.lang == 'es' %}
+        <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery.cookiecuttr-es.js"></script>
+      {% endif %}
+      {% if page.lang == 'en' %}
+        <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery.cookiecuttr.js"></script>
+      {% endif %}
+
+      <script type="text/javascript">
+      if (jQuery.cookie('cc_cookie_accept') == "cc_cookie_accept") {
+        // insert the code you do not want to run UNTIL cookies are accepted here
+=======
     {% if site.google_analytics %}
       <!-- jQuery, needed for CookieCuttr -->
       <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery-1.11.1.js"></script>
@@ -114,6 +135,21 @@
       if (jQuery.cookie('cc_cookie_accept') == "cc_cookie_accept") {
         // insert the code you do not want to run UNTIL cookies are accepted here
         console.log("lala");
+>>>>>>> branch 'gh-pages' of https://github.com/gvSIGAssociation/gvnix.git
+=======
+    {% if site.google_analytics %}
+      <!-- jQuery, needed for CookieCuttr -->
+      <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery-1.11.1.js"></script>
+
+      <!-- jQuery CookieCuttr -->
+      <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery.cookie.js"></script>
+      <script type="text/javascript" src="{{ site.url }}{{ ASSET_PATH }}/js/jquery.cookiecuttr.js"></script>
+
+      <script type="text/javascript">
+      if (jQuery.cookie('cc_cookie_accept') == "cc_cookie_accept") {
+        // insert the code you do not want to run UNTIL cookies are accepted here
+        console.log("lala");
+>>>>>>> branch 'gh-pages' of https://github.com/gvSIGAssociation/gvnix.git
         var _gaq = _gaq || [];
         _gaq.push(['_setAccount', '{{ site.google_analytics }}']);
         _gaq.push(['_trackPageview']);
