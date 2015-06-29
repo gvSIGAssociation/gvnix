@@ -159,10 +159,10 @@ public class QuerydslUtilsBeanImpl implements QuerydslUtilsBean {
      * {@inheritDoc}
      */
     @Override
-    public <T> Predicate createExpression(PathBuilder<T> entityPath,
+    public <T> Predicate createFilterExpression(PathBuilder<T> entityPath,
             String fieldName, Class<?> fieldType, String searchStr) {
 
-        return createExpression(entityPath, fieldName, searchStr);
+        return createFilterExpression(entityPath, fieldName, searchStr);
 
     }
 
@@ -171,7 +171,7 @@ public class QuerydslUtilsBeanImpl implements QuerydslUtilsBean {
      */
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public <T> Predicate createExpression(PathBuilder<T> entityPath,
+    public <T> Predicate createFilterExpression(PathBuilder<T> entityPath,
             String fieldName, String searchStr) {
         TypeDescriptor descriptor = getTypeDescriptor(fieldName, entityPath);
         if (descriptor == null) {
@@ -207,6 +207,51 @@ public class QuerydslUtilsBeanImpl implements QuerydslUtilsBean {
             BooleanExpression expression = createDateExpressionWithOperators(
                     entityPath, fieldName, (Class<Date>) fieldType, searchStr,
                     datePattern);
+            return expression;
+        }
+
+        else if (fieldType.isEnum()) {
+            return createEnumExpression(entityPath, fieldName, searchStr,
+                    (Class<? extends Enum>) fieldType);
+        }
+        return null;
+    }
+
+    @Override
+    public <T> Predicate createSearchExpression(PathBuilder<T> entityPath,
+            String fieldName, Class<?> fieldType, String searchStr) {
+        return createSearchExpression(entityPath, fieldName, searchStr);
+    }
+
+    @Override
+    public <T> Predicate createSearchExpression(PathBuilder<T> entityPath,
+            String fieldName, String searchStr) {
+
+        TypeDescriptor descriptor = getTypeDescriptor(fieldName, entityPath);
+        if (descriptor == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Can't found field '%s' on entity '%s'", fieldName,
+                    entityPath.getType()));
+        }
+        Class<?> fieldType = descriptor.getType();
+
+        // Check for field type in order to delegate in custom-by-type
+        // create expression method
+        if (String.class == fieldType) {
+            return createStringLikeExpression(entityPath, fieldName, searchStr);
+        }
+        else if (Boolean.class == fieldType || boolean.class == fieldType) {
+            return createBooleanExpression(entityPath, fieldName, searchStr);
+        }
+        else if (Number.class.isAssignableFrom(fieldType)
+                || NUMBER_PRIMITIVES.contains(fieldType)) {
+            return createNumberExpressionGenerics(entityPath, fieldName,
+                    fieldType, descriptor, searchStr);
+        }
+        else if (Date.class.isAssignableFrom(fieldType)
+                || Calendar.class.isAssignableFrom(fieldType)) {
+            BooleanExpression expression = createDateExpression(entityPath,
+                    fieldName, (Class<Date>) fieldType, searchStr);
             return expression;
         }
 

@@ -710,8 +710,8 @@ public class DatatablesUtilsBeanImpl implements DatatablesUtilsBean {
                 // AND
                 // because we want found the records which columns
                 // match with column filters
-                filterExpression = querydslUtilsBean.createExpression(entity,
-                        fieldName, searchStr);
+                filterExpression = querydslUtilsBean.createFilterExpression(
+                        entity, fieldName, searchStr);
 
                 filtersByColumnPredicate = filtersByColumnPredicate
                         .and(filterExpression);
@@ -743,9 +743,9 @@ public class DatatablesUtilsBeanImpl implements DatatablesUtilsBean {
                         // inside the same column and any of its
                         // property value can match with given search
                         // value
-                        filterExpression = querydslUtilsBean.createExpression(
-                                associationPath, associationFieldName,
-                                searchStr);
+                        filterExpression = querydslUtilsBean
+                                .createFilterExpression(associationPath,
+                                        associationFieldName, searchStr);
                         filtersByAssociationPredicate = filtersByAssociationPredicate
                                 .or(filterExpression);
 
@@ -804,8 +804,9 @@ public class DatatablesUtilsBeanImpl implements DatatablesUtilsBean {
                     // Find in all columns means we want to find given
                     // value in at least one entity property, so we must
                     // join the where clauses by OR
-                    Predicate expression = querydslUtilsBean.createExpression(
-                            entity, fieldName, searchStr);
+                    Predicate expression = querydslUtilsBean
+                            .createSearchExpression(entity, fieldName,
+                                    searchStr);
                     if (expression != null) {
                         filtersByTablePredicate = filtersByTablePredicate
                                 .or(expression);
@@ -826,9 +827,9 @@ public class DatatablesUtilsBeanImpl implements DatatablesUtilsBean {
 
                         for (String associationFieldName : associationFields) {
 
-                            expression = querydslUtilsBean.createExpression(
-                                    associationPath, associationFieldName,
-                                    searchStr);
+                            expression = querydslUtilsBean
+                                    .createSearchExpression(associationPath,
+                                            associationFieldName, searchStr);
                             filtersByTablePredicate = filtersByTablePredicate
                                     .or(expression);
 

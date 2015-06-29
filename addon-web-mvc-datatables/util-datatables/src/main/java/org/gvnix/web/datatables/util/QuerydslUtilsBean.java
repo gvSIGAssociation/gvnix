@@ -107,7 +107,7 @@ public interface QuerydslUtilsBean {
             String fieldName, Set<E> values);
 
     /**
-     * Utility for constructing where clause expressions.
+     * Utility for constructing where clause expressions on column filters.
      * 
      * @param entityPath Full path to entity and associations. For example:
      *        {@code Pet} , {@code Pet.owner}
@@ -119,11 +119,11 @@ public interface QuerydslUtilsBean {
      * @return Predicate
      * 
      */
-    public <T> Predicate createExpression(PathBuilder<T> entityPath,
-            String fieldName, Class<?> fieldType, String searchStr);
+    public <T> Predicate createFilterExpression(PathBuilder<T> entityPath,
+            String fieldName, Class<?> fieldType, String filterStr);
 
     /**
-     * Utility for constructing where clause expressions.
+     * Utility for constructing where clause expressions on column filters.
      * 
      * @param entityPath Full path to entity and associations. For example:
      *        {@code Pet} , {@code Pet.owner}
@@ -133,7 +133,37 @@ public interface QuerydslUtilsBean {
      * @param searchStr the value to find, may be null
      * @return predicate
      */
-    public <T> Predicate createExpression(PathBuilder<T> entityPath,
+    public <T> Predicate createFilterExpression(PathBuilder<T> entityPath,
+            String fieldName, String filterStr);
+
+    /**
+     * Utility for constructing where clause expressions on generic search.
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet} , {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code name} in {@code Pet} entity, {@code firstName} in
+     *        {@code Pet.owner} entity.
+     * @param fieldType Property value {@code Class}
+     * @param searchStr the value to find, may be null
+     * @return Predicate
+     * 
+     */
+    public <T> Predicate createSearchExpression(PathBuilder<T> entityPath,
+            String fieldName, Class<?> fieldType, String searchStr);
+
+    /**
+     * Utility for constructing where clause expressions on generic search.
+     * 
+     * @param entityPath Full path to entity and associations. For example:
+     *        {@code Pet} , {@code Pet.owner}
+     * @param fieldName Property name in the given entity path. For example:
+     *        {@code name} in {@code Pet} entity, {@code firstName} in
+     *        {@code Pet.owner} entity.
+     * @param searchStr the value to find, may be null
+     * @return predicate
+     */
+    public <T> Predicate createSearchExpression(PathBuilder<T> entityPath,
             String fieldName, String searchStr);
 
     public <T> Predicate createNumberExpressionGenerics(
