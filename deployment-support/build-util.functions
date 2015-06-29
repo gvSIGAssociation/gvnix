@@ -138,7 +138,8 @@ function run_test_and_tomcat_background_wget_page() {
     kill -9 %1
 }
 
-## Echo message of starting a test execution
+## Echo message of starting a test execution. Also
+##  initializes variable CUR_TEST_START_TIME
 ## Params:
 ##   * test name
 function start_test_msg() {
@@ -149,16 +150,24 @@ function start_test_msg() {
     echo "--------- starting test: $1"
     echo " "
     echo " "
+    export CUR_TEST_START_TIME=$(date +"%s")
  
 }
 
 ## Echo message of ending a test execution
+##    if CUR_TEST_START_TIME is set, computes diference
 ## Params:
 ##   * test name
 function end_test_msg() {
     echo " "
     echo " "
-    echo "--------- end test: $1"
+    if [ -z "$CUR_TEST_FOLDER" ]; then
+        echo "--------- end test: $1"
+    else
+        CUR_TEST_END_TIME=$(date +"%s")
+        diff=$(($CUR_TEST_END_TIME-$CUR_TEST_START_TIME))
+        echo "--------- end test: $1 in $(($diff / 60))m $(($diff % 60))s"
+    fi
     echo "======================================================"
     echo "======================================================"
     echo " "
