@@ -66,6 +66,10 @@
   <inceptionYear>2010</inceptionYear>
   <url>http://www.gvnix.org</url>
 
+  <scm>
+	<url>https://github.com/gvSIGAssociation/gvnix</url>
+  </scm>
+
   <modules>
   	<!-- gvNIX Add-Ons -->
     <module>gvnix-osgi-bundles</module>
