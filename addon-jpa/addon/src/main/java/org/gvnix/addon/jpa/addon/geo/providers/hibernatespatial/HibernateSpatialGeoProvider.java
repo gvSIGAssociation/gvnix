@@ -34,12 +34,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.addon.jpa.addon.JpaOperations;
 import org.gvnix.addon.jpa.addon.geo.FieldGeoTypes;
 import org.gvnix.addon.jpa.addon.geo.providers.GeoProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.jpa.annotations.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -76,7 +78,7 @@ import org.w3c.dom.NodeList;
 public class HibernateSpatialGeoProvider implements GeoProvider {
 
     private static final JavaType JPA_ACTIVE_RECORD_ANNOTATION = new JavaType(
-            "org.springframework.roo.addon.jpa.annotations.activerecord.RooJpaActiveRecord");
+            RooJpaActiveRecord.class);
 
     // ------------ OSGi component attributes ----------------
     private BundleContext context;
@@ -90,6 +92,8 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
     private TypeManagementService typeManagementService;
 
     private ProjectOperations projectOperations;
+
+    private JpaOperations jpaOperations;
 
     /**
      * DECLARING CONSTANTS
@@ -138,6 +142,8 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
      */
     @Override
     public void setup() {
+        // Setup gvNIX JPA
+        getJpaOperations().setup();
         // Updating Persistence dialect
         updatePersistenceDialect();
         // Adding hibernate-spatial dependencies
@@ -676,4 +682,29 @@ public class HibernateSpatialGeoProvider implements GeoProvider {
 
     }
 
+    public JpaOperations getJpaOperations() {
+        if (jpaOperations == null) {
+            // Get all Services implement ProjectOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(JpaOperations.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (JpaOperations) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load gvnix JpaOperations on HibernateSpatialGeoProvider.");
+                return null;
+            }
+        }
+        else {
+            return jpaOperations;
+        }
+
+    }
 }
