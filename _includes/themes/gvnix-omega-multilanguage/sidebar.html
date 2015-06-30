@@ -21,18 +21,22 @@
                               <i class="fa fa-arrow-circle-down"></i>
                               </a>
 
-                              {% else %}
+                              {% elsif badge.name == '1.4.1' or badge.name == '1.4.0' %}
                               {{ badge.name }}
                               <a data-toggle="tooltip" title="{{ site.t[[page.lang]].download }} {{ badge.name }} {{ site.t[[page.lang]].release }}" target="_blank" href='{{ site.downloads }}gvNIX-{{ badge.name }}.RELEASE.zip/download' class="docs-link reference-link">
                                 <i class="fa fa-arrow-circle-down"></i>
                               </a>
 
+                              {% else %}
+                              <a data-toggle="tooltip" title="{{ site.t[[page.lang]].download }} {{ badge.name }} {{ site.t[[page.lang]].release }}" target="_blank" href='{{ site.download }}' class="docs-link reference-link">
+                              {{ badge.name }}
+                              </a>
 
                               {% endif %}
 
-                              {% if badge.name == site.current-version %}
+<!--                               {% if badge.name == site.current-version %}
                                <div class="spring-icon spring-icon-current-version"></div>
-                              {% endif %}
+                              {% endif %} -->
 
                         </div>
                         <div class="item--right-column">
