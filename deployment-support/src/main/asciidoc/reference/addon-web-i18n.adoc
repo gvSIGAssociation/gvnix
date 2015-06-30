@@ -1,6 +1,3 @@
-Add-on Web MVC i18n
--------------------
-
 //Push down level title
 :leveloffset: 2
 

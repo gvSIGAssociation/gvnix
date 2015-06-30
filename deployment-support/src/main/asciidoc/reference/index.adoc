@@ -28,8 +28,8 @@
 :toc-placement: left
 :toc-title:     Índice de contenidos
 :toclevels:     5
-:sectnumlevels: 5
 :numbered:
+:sectnumlevels:		5
 :sectanchors:
 :icons:         font
 :imagesdir:     ./images
@@ -52,10 +52,13 @@ de Creative Commons. Puede copiarla, distribuirla y comunicarla públicamente
 siempre que especifique sus autores y comparta cualquier obra derivada bajo la
 misma licencia.
 
+// Disable auto-numbering on Preface only in order to chapter one start at 1. Then on first chapter
+// re-enable the auto-numbering.
+:numbered!:
+[preface]
+= Prólogo
 
-== Prólogo
-
-=== Información General
+=== 1. Información General
 
 gvNIX es un entorno de trabajo Java de código abierto para el desarrollo
 rápido de aplicaciones web altamente productivo, flexible y que no
@@ -73,7 +76,7 @@ desarrollo Java de la DGTI de la Generalitat Valenciana.
 gvNIX está disponible dentro del proyecto de Migración a Software de
 fuentes abiertas http://www.gvpontis.gva.es[gvPONTIS].
 
-=== Requisitos
+=== 2. Requisitos
 
 Antes de empezar a trabajar con la herramienta de desarrollo gvNIX, es aconsejable conocer cómo 
 funciona Spring Roo. Para ello, se recomienda leer la 
@@ -108,7 +111,7 @@ distribuciones es una característica de las últimas versiones
 de Spring Roo.
 ====
 
-=== Instalar gvNIX
+=== 3. Instalar gvNIX
 
 Para instalar el gvNIX sobre una distribución de Spring Roo. es necesario que Roo conozca 
 donde están alojados todos los componentes que forman parte de gvNIX.
@@ -245,6 +248,9 @@ Una vez hecho esto, ya se puede trabajar con el entorno gvNIX desde la
 línea de comandos. Sin embargo, se recomienda utilizar un IDE de
 desarrollo que permita integrar el entorno gvNIX como, por ejemplo STS o
 Eclipse.
+
+:numbered:
+= I. Introducción
 
 == Introducción
 
@@ -1205,96 +1211,84 @@ image::grouped_markers.png[Agrupación,align=center]
 
 Si hacemos click sobre uno de los grupos, el mapa se desplazará hasta el nivel mínimo de Zoom en el que se pueden representar los elementos.
 
-== gvNIX Add-Ons
+:numbered:
+= II. gvNIX Add-Ons
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Web Menu
 include::addon-web-menu.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on JPA
 include::addon-jpa.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Monitoring
 include::addon-monitoring.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Web MVC
 include::addon-web-mvc.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Bootstrap
 include::addon-web-mvc-bootstrap.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Web MVC Datatables
 include::addon-web-mvc-datatables.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Web MVC GEO
 include::addon-web-mvc-geo.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Campos Lupa
 include::addon-web-mvc-loupe.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on OCC (Optimistic Concurrency Control)
 include::addon-occ.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Web Dialog
 include::addon-web-dialog.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Web Report
 include::addon-web-report.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Service
 include::addon-service.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Web MVC i18n
 include::addon-web-i18n.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Dynamic Configuration
 include::addon-dynamic-config.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+== Add-on Web MVC Binding
 include::addon-web-mvc-binding.adoc[]
 
-== Apéndices
+:numbered:
+= III. Apéndices
 
 En este capitulo se recoge información adicional sobre todo lo comentado 
 en las secciones anteriores así como un apéndice de todos los comandos disponibles 
 en la herramienta de desarrollo gvNIX.
 
-// Push titles down one level.
-:leveloffset: 1
+[appendix]
+== Apéndice de comandos
 include::apendice-comandos.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+[appendix]
+== Desarrollo con eclipse
 include::guia-desarrollo_eclipse.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+[appendix]
+== Recetas
 include::recetas.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+[appendix]
+== Código generado por gvNIX/Roo
 include::guia-desarrollo_generacion-codigo.adoc[]
 
-// Push titles down one level.
-:leveloffset: 1
+[appendix]
+== Mejoras de rendimiento
 include::guia-desarrollo_mejoras-rendimiento.adoc[]
 
 
-== Recursos
+:numbered:
+= IV. Recursos
 
 // Push titles down one level.
 :leveloffset: 1

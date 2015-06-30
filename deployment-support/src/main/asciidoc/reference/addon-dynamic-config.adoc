@@ -1,6 +1,3 @@
-Add-on Dynamic Configuration
-----------------------------
-
 //Push down level title
 :leveloffset: 2
 

@@ -1,6 +1,3 @@
-Add-on Web MVC Datatables
--------------------------
-
 //Push down level title
 :leveloffset: 2
 

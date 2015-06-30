@@ -1,6 +1,3 @@
-Add-on Bootstrap
-----------------
-
 //Push down level title
 :leveloffset: 2
 

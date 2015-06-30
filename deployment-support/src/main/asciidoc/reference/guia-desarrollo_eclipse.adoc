@@ -1,6 +1,3 @@
-Desarrollo con Eclipse
-----------------------
-
 //Push down level title
 :leveloffset: 2
 

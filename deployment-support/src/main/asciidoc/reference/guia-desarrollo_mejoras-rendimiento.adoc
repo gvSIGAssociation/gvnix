@@ -1,6 +1,3 @@
-Mejoras de rendimiento
-----------------------
-
 //Push down level title
 :leveloffset: 2
 

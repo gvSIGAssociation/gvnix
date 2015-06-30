@@ -1,6 +1,3 @@
-Add-on Web MVC Binding
-----------------------
-
 //Push down level title
 :leveloffset: 2
 
