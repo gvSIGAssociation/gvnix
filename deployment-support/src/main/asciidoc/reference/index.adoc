@@ -101,6 +101,7 @@ información]).
 * Conexión a Internet para poder instalar de forma correcta gvNIX en
 la distribución de Spring Roo y descargar las dependencias de los
 proyectos generados.
+* En caso de utilizar un IDE durante el desarrollo, se recomienda utilizar https://spring.io/tools/sts/all[STS] 3.7+. 
 
 
 [NOTE]
@@ -109,6 +110,12 @@ Solo es posible utilizar gvNIX 2.0+ sobre las versiones 2.0
 de Spring Roo en adelante. Esto es debido a que la instalación de 
 distribuciones es una característica de las últimas versiones 
 de Spring Roo.
+====
+
+[NOTE]
+====
+Si se utiliza gvNIX sobre el IDE de desarrollo STS, será necesario utilizar la versión
+3.7 o superior del mismo, ya que soporta las últimas funcionalidades de gvNIX 2.0
 ====
 
 === 3. Instalar gvNIX
@@ -355,7 +362,7 @@ mostrarán en las siguientes secciones de este manual.
 === ¿Qué aprenderás?
 
 En este tutorial aprenderás como crear una aplicación desde cero utilizando la herramienta de 
-desarrollo gvNIX sobre el IDE STS.
+desarrollo gvNIX sobre el IDE STS 3.7+.
 
 Las principales características de gvNIX que veremos en este tutorial son las siguientes:
 
