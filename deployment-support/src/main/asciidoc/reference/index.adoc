@@ -695,6 +695,11 @@ el botón de "Play" con el servidor Tomcat seleccionado:
 
 image::eclipse_servers-buttons.png[Botones Servers,align=center]
 
+Otra forma de arrancar nuestro proyecto es hacer click derecho sobre el proyecto en
+STS y seleccionando la opción "Run as... > Run On Server", seleccionamos el servidor sobre el cual
+queremos ejecutar nuestro proyecto y presionamos "Finish" para iniciar la ejecución.
+
+image::eclipse_run-on-server.png[Ejecutar aplicación en servidor,align=center]
 
 Una vez haya arrancado, podemos acceder a la URL http://localhost:8080/petclinic/ desde nuestro navegador para 
 visualizar la aplicación generada.
@@ -736,7 +741,7 @@ menu setup
 
 === Paso 12: Aplicar Seguridad
 
-Aplicar seguridad a un proyecto puede ser algo complicado. Utilizando el siguiente comando, se añade seguridad a nuestro proyecto
+Aplicar seguridad a un proyecto es muy sencillo con gvNIX. Utilizando el siguiente comando, se añade seguridad a nuestro proyecto
 generado utilizando http://projects.spring.io/spring-security/[Spring Security].
 
 --------------
@@ -745,8 +750,8 @@ security setup
 
 === Paso 13: Gestión de Informes
 
-Vamos a añadir un informe sobre los "Owners" que tenemos registrados en nuestro sistema petclinic. Para ello, ejecutamos los 
-siguientes comandos:
+A continuación, incluiremos las funcionalidades necesarias para generar un informe sobre los "Owners" 
+que tenemos registrados en nuestro sistema petclinic. Para ello, ejecutamos los siguientes comandos:
 
 --------------------------------------------------------------------------------
 web report setup
@@ -755,7 +760,7 @@ web report add --controller ~.web.OwnerController --reportName report_owners
 
 === Paso 14: Control de concurrencia
 
-Vamos a añadir control de concurrencia sobre la entidad "Pet" de nuestro proyecto, para así evitar que se pierdan
+Configuraremos el control de concurrencia sobre la entidad "Pet" de nuestro proyecto, para así evitar que se pierdan
 los datos guardados cuando varios usuarios editan un mismo registro.
 
 Para ello, basta con ejecutar el siguiente comando:
@@ -789,7 +794,7 @@ test integration --entity ~.domain.Visit
 
 === Paso 16: Servicios web
 
-Para acabar con esta guía rápida sobre las funcionalidades disponibles en la herramienta de desarrollo gvNIX, vamos a servir 
+Para acabar con esta guía rápida sobre las funcionalidades disponibles en la herramienta de desarrollo gvNIX, serviremos 
 varios servicios web desde nuestra aplicación generada.
 
 Para ello, ejecutamos los siguientes comandos:
@@ -808,12 +813,14 @@ por aplicaciones externas.
 === Resultado
 
 Después de seguir este rápido tutorial donde se muestran algunas de las funcionalidades que ofrece la herramienta gvNIX,
-tendremos una aplicación generada con el siguiente aspecto:
+tendremos una aplicación adaptativa (responsive UI) que podrá ser visualizada en cualquier dispositivo ya sea ordenadores,
+tablets o incluso móviles. La aplicación adaptativa generada tendrá el siguiente aspecto:
 
 image::sample-application-login.png[Login,align=center]
 image::sample-application-pet-creation.png[Alta de una mascota,align=center]
 image::sample-application-pet-list.png[Listado de mascotas,align=center]
 image::sample-application-visit-inline.png[Edición en linea,align=center]
+
 
 Ahora que ya conoces las funcionalidades básicas de gvNIX, te recomendamos que continues leyendo este manual. 
 Algunas secciones que pueden interesarte son:
@@ -852,13 +859,14 @@ Las principales características de gvNIX que veremos en este tutorial son las s
 
 === Paso 1: Configurar persistencia GEO
 
-Lo primero que debemos saber es que no todas las bases de datos que ofrece la herramienta de desarrollo gvNIX 
-a la hora de configurar la persistencia son compatibles con información geográfica.
+Lo primero que debemos saber es que no todas las bases de datos tienen soporte para tipos de datos 
+geográficos, consultas geoespaciales, etc.
 
-Por este motivo, antes de incluir componentes geográficos en nuestra aplicación, es necesario configurar una 
-base de datos válida.
+Por este motivo, antes de incluir componentes geográficos en nuestra aplicación, es necesario 
+configurar una base de datos válida.
 
-Las bases de datos (que ofrece gvNIX) compatibles con campos de tipo GEO, son las siguientes:
+gvNIX nos ayudará en esta tarea y nos propone sólo bases de datos compatibles con campos de tipo GEO. 
+Actualmente gvNIX soporta las siguientes bases de datos con soporte geo:
 
 * http://www.postgresql.org/[PostgreSql]
 * https://www.oracle.com/database/index.html[Oracle 10g/11g]
