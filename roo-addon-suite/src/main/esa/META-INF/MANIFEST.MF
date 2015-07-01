@@ -8,6 +8,6 @@ Bundle-Name: gvNIX - Roo Addon Suite
 Bundle-SymbolicName: org.gvnix.roo.addon.suite
 Bundle-Vendor: Conselleria d'Infraestrures i Transport, Generalitat Vale
  nciana
-Bundle-Version: 2.0.0.M1
+Bundle-Version: 2.0.0.BUILD-SNAPSHOT
 Created-By: Apache Maven Bundle Plugin
 Tool: Bnd-2.3.0.201405100607

@@ -37,7 +37,7 @@ Upd SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
 -----------------------------------------------------------------------------------------
 
 Consultar la documentación del comando
-http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#web-mvc-finder-add[web
+http://docs.spring.io/spring-roo/docs/2.0.0.BUILD-SNAPSHOT/reference/html/#web-mvc-finder-add[web
 mvc finder add] para más información.
 
 Código generado

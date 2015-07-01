@@ -12,7 +12,7 @@ rápido de aplicaciones web altamente productivo, flexible y que no
 compromete la calidad de los proyectos.
 
 Está compuesto por una serie de herramientas de código abierto distribuídas 
-en forma de http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#available-roo-addon-suites["Spring Roo Add-On Suite"]
+en forma de http://docs.spring.io/spring-roo/docs/2.0.0.BUILD-SNAPSHOT/reference/html/#available-roo-addon-suites["Spring Roo Add-On Suite"]
 a través de un repositorio OSGi R5.
 Esto le proporciona un amplio apoyo por parte de importantes
 organizaciones como http://spring.io/[Spring] y http://pivotal.io/[Pivotal]. 

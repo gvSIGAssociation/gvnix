@@ -11,7 +11,7 @@
           </dependency>
       </dependencies>
       <properties>
-			<gvnix.version>2.0.0.M1</gvnix.version>
+			<gvnix.version>2.0.0.BUILD-SNAPSHOT</gvnix.version>
 		</properties>
   </gvnix>
   <dependencies>

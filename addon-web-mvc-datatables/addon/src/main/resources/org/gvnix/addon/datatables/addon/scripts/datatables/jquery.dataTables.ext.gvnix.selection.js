@@ -1177,7 +1177,7 @@ var GvNIX_Selection;
 	 * @type StrFing
 	 * @default See code
 	 */
-	GvNIX_Selection.VERSION = "2.0.0.M1";
+	GvNIX_Selection.VERSION = "2.0.0.BUILD-SNAPSHOT";
 	GvNIX_Selection.prototype.VERSION = GvNIX_Selection.VERSION;
 
 	/** TODO Add as datatable feature * */

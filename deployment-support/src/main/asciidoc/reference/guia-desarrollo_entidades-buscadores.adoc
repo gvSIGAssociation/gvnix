@@ -15,11 +15,11 @@ Descripción
 
 Roo permite generar buscadores sobre cualquier entidad del
 modelo de la aplicación mediante el comando
-http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#finder-add[finder
+http://docs.spring.io/spring-roo/docs/2.0.0.BUILD-SNAPSHOT/reference/html/#finder-add[finder
 add]. El comando espera el nombre del buscador a generar en un formato
 determinado. Para conocer el formato se puede utilizar como ayuda el
 comando
-http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#finder-list[finder
+http://docs.spring.io/spring-roo/docs/2.0.0.BUILD-SNAPSHOT/reference/html/#finder-list[finder
 list].
 
 En los siguientes puntos se muestra un ejemplo de como elegir y generar
@@ -56,7 +56,7 @@ se le pase como parámetro respectivamente, ambas utilizando para ello el
 operador _like_.
 
 Consultar la documentación del comando
-http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#finder-list[finder
+http://docs.spring.io/spring-roo/docs/2.0.0.BUILD-SNAPSHOT/reference/html/#finder-list[finder
 list] para más información.
 
 Creación de un buscador
@@ -124,7 +124,7 @@ roo>
 -----------------------------------------------------------------------------------
 
 Consultar la documentación del comando
-http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#finder-add[finder
+http://docs.spring.io/spring-roo/docs/2.0.0.BUILD-SNAPSHOT/reference/html/#finder-add[finder
 add] para más información.
 
 Código generado

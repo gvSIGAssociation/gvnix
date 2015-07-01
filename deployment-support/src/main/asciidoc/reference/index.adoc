@@ -19,7 +19,7 @@
 :title:         gvNIX - Documentación de referencia
 :Project:       gvNIX, un Add-On Suite de Spring Roo
 :Author:        Dirección General de Tecnologías de la Información, Asociación gvSIG, DISID Corporation, S.L.
-:version:       2.0.0.M1
+:version:       2.0.0.BUILD-SNAPSHOT
 :corpsite:      www.gvnix.org
 :Copyright:     2010 (C) Dirección General de Tecnologías de la Información - Conselleria de Hacienda y Administración Pública - CC BY-NC-SA 3.0
 :keywords:      gvNIX, Documentation
@@ -80,7 +80,7 @@ fuentes abiertas http://www.gvpontis.gva.es[gvPONTIS].
 
 Antes de empezar a trabajar con la herramienta de desarrollo gvNIX, es aconsejable conocer cómo 
 funciona Spring Roo. Para ello, se recomienda leer la 
-http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/[documentación de referencia].
+http://docs.spring.io/spring-roo/docs/2.0.0.BUILD-SNAPSHOT/reference/html/[documentación de referencia].
 
 gvNIX crea aplicaciones web basadas en 
 http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/[Spring Framework] 
@@ -156,34 +156,34 @@ roo> addon repository introspect
 parte de la distribución gvNIX.
 +
 ----------------------------------------------------------------------------------------
-Not Installed        gvNIX - Addon - Bootstrap3 support (2.0.0.M1)
-Not Installed        gvNIX - Addon - Co-official languages of Spain (2.0.0.M1)
-Not Installed        gvNIX - Addon - Dynamic Configuration (2.0.0.M1)
-Not Installed        gvNIX - Addon - GEO Support (2.0.0.M1)
-Not Installed        gvNIX - Addon - JPA layer services (2.0.0.M1)
-Not Installed        gvNIX - Addon - Loupe Fields (2.0.0.M1)
-Not Installed        gvNIX - Addon - Monitoring Support (2.0.0.M1)
-Not Installed        gvNIX - Addon - Optimistic Concurrency Control (2.0.0.M1)
-Not Installed        gvNIX - Addon - Services Management (2.0.0.M1)
-Not Installed        gvNIX - Addon - Typical Security (2.0.0.M1)
-Not Installed        gvNIX - Addon - Web Datatables Addon (2.0.0.M1)
-Not Installed        gvNIX - Addon - Web MVC (JSP) layer services (2.0.0.M1)
-Not Installed        gvNIX - Addon - Web MVC Bindings (2.0.0.M1)
-Not Installed        gvNIX - Addon - Web MVC Dialogs (2.0.0.M1)
-Not Installed        gvNIX - Addon - Web MVC Menu (2.0.0.M1)
-Not Installed        gvNIX - Addon - Web Report (2.0.0.M1)
-Not Installed        gvNIX - Annotations - GEO Support (2.0.0.M1)
-Not Installed        gvNIX - Annotations - JPA layer services (2.0.0.M1)
-Not Installed        gvNIX - Annotations - Loupe Fields (2.0.0.M1)
-Not Installed        gvNIX - Annotations - Optimistic Concurrency Control (2.0.0.M1)
-Not Installed        gvNIX - Annotations - Services Management (2.0.0.M1)
-Not Installed        gvNIX - Annotations - Web Datatables Addon (2.0.0.M1)
-Not Installed        gvNIX - Annotations - Web MVC (JSP) layer services (2.0.0.M1)
-Not Installed        gvNIX - Annotations - Web MVC Bindings (2.0.0.M1)
-Not Installed        gvNIX - Annotations - Web MVC Dialogs (2.0.0.M1)
-Not Installed        gvNIX - Annotations - Web Report (2.0.0.M1)
-Not Installed        gvNIX - Roo Addon Suite (2.0.0.M1)
-Not Installed        gvNIX - Support Module (2.0.0.M1)
+Not Installed        gvNIX - Addon - Bootstrap3 support (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Co-official languages of Spain (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Dynamic Configuration (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - GEO Support (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - JPA layer services (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Loupe Fields (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Monitoring Support (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Optimistic Concurrency Control (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Services Management (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Typical Security (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Web Datatables Addon (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Web MVC (JSP) layer services (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Web MVC Bindings (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Web MVC Dialogs (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Web MVC Menu (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Addon - Web Report (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Annotations - GEO Support (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Annotations - JPA layer services (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Annotations - Loupe Fields (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Annotations - Optimistic Concurrency Control (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Annotations - Services Management (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Annotations - Web Datatables Addon (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Annotations - Web MVC (JSP) layer services (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Annotations - Web MVC Bindings (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Annotations - Web MVC Dialogs (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Annotations - Web Report (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Roo Addon Suite (2.0.0.BUILD-SNAPSHOT)
+Not Installed        gvNIX - Support Module (2.0.0.BUILD-SNAPSHOT)
 ----------------------------------------------------------------------------------------
 
 6. Ahora que ya tienes instalado el repositorio que contiene los componentes de gvNIX, continuamos con
@@ -222,33 +222,33 @@ roo> addon list
 todos los componentes de gvNIX instalados y activados del siguiente modo:
 +
 ------------------------------------------------------------------------------------------
-   86|Active     |    1|gvNIX - Annotations - GEO Support (2.0.0.M1)
-   87|Active     |    1|gvNIX - Addon - Dynamic Configuration (2.0.0.M1)
-   88|Active     |    1|gvNIX - Addon - Loupe Fields (2.0.0.M1)
-   89|Active     |    1|gvNIX - Addon - Web MVC (JSP) layer services (2.0.0.M1)
-   90|Active     |    1|gvNIX - Annotations - Web Datatables Addon (2.0.0.M1)
-   91|Active     |    1|gvNIX - Addon - JPA layer services (2.0.0.M1)
-   92|Active     |    1|gvNIX - Addon - Web Datatables Addon (2.0.0.M1)
-   93|Active     |    1|gvNIX - Annotations - Web MVC (JSP) layer services (2.0.0.M1)
-   94|Active     |    1|gvNIX - Addon - Services Management (2.0.0.M1)
-   95|Active     |    1|gvNIX - Annotations - Web Report (2.0.0.M1)
-   96|Active     |    1|gvNIX - Addon - Co-official languages of Spain (2.0.0.M1)
-   97|Active     |    1|gvNIX - Annotations - Optimistic Concurrency Control (2.0.0.M1)
-   98|Active     |    1|gvNIX - Addon - Web MVC Dialogs (2.0.0.M1)
-   99|Active     |    1|gvNIX - Annotations - Services Management (2.0.0.M1)
-  100|Active     |    1|gvNIX - Addon - Monitoring Support (2.0.0.M1)
-  101|Active     |    1|gvNIX - Addon - Bootstrap3 support (2.0.0.M1)
-  102|Active     |    1|gvNIX - Annotations - Web MVC Dialogs (2.0.0.M1)
-  103|Active     |    1|gvNIX - Addon - GEO Support (2.0.0.M1)
-  104|Active     |    1|gvNIX - Addon - Optimistic Concurrency Control (2.0.0.M1)
-  105|Active     |    1|gvNIX - Support Module (2.0.0.M1)
-  106|Active     |    1|gvNIX - Annotations - Loupe Fields (2.0.0.M1)
-  107|Active     |    1|gvNIX - Annotations - JPA layer services (2.0.0.M1)
-  108|Active     |    1|gvNIX - Addon - Web Report (2.0.0.M1)
-  109|Active     |    1|gvNIX - Annotations - Web MVC Bindings (2.0.0.M1)
-  110|Active     |    1|gvNIX - Addon - Typical Security (2.0.0.M1)
-  111|Active     |    1|gvNIX - Addon - Web MVC Menu (2.0.0.M1)
-  112|Active     |    1|gvNIX - Addon - Web MVC Bindings (2.0.0.M1)
+   86|Active     |    1|gvNIX - Annotations - GEO Support (2.0.0.BUILD-SNAPSHOT)
+   87|Active     |    1|gvNIX - Addon - Dynamic Configuration (2.0.0.BUILD-SNAPSHOT)
+   88|Active     |    1|gvNIX - Addon - Loupe Fields (2.0.0.BUILD-SNAPSHOT)
+   89|Active     |    1|gvNIX - Addon - Web MVC (JSP) layer services (2.0.0.BUILD-SNAPSHOT)
+   90|Active     |    1|gvNIX - Annotations - Web Datatables Addon (2.0.0.BUILD-SNAPSHOT)
+   91|Active     |    1|gvNIX - Addon - JPA layer services (2.0.0.BUILD-SNAPSHOT)
+   92|Active     |    1|gvNIX - Addon - Web Datatables Addon (2.0.0.BUILD-SNAPSHOT)
+   93|Active     |    1|gvNIX - Annotations - Web MVC (JSP) layer services (2.0.0.BUILD-SNAPSHOT)
+   94|Active     |    1|gvNIX - Addon - Services Management (2.0.0.BUILD-SNAPSHOT)
+   95|Active     |    1|gvNIX - Annotations - Web Report (2.0.0.BUILD-SNAPSHOT)
+   96|Active     |    1|gvNIX - Addon - Co-official languages of Spain (2.0.0.BUILD-SNAPSHOT)
+   97|Active     |    1|gvNIX - Annotations - Optimistic Concurrency Control (2.0.0.BUILD-SNAPSHOT)
+   98|Active     |    1|gvNIX - Addon - Web MVC Dialogs (2.0.0.BUILD-SNAPSHOT)
+   99|Active     |    1|gvNIX - Annotations - Services Management (2.0.0.BUILD-SNAPSHOT)
+  100|Active     |    1|gvNIX - Addon - Monitoring Support (2.0.0.BUILD-SNAPSHOT)
+  101|Active     |    1|gvNIX - Addon - Bootstrap3 support (2.0.0.BUILD-SNAPSHOT)
+  102|Active     |    1|gvNIX - Annotations - Web MVC Dialogs (2.0.0.BUILD-SNAPSHOT)
+  103|Active     |    1|gvNIX - Addon - GEO Support (2.0.0.BUILD-SNAPSHOT)
+  104|Active     |    1|gvNIX - Addon - Optimistic Concurrency Control (2.0.0.BUILD-SNAPSHOT)
+  105|Active     |    1|gvNIX - Support Module (2.0.0.BUILD-SNAPSHOT)
+  106|Active     |    1|gvNIX - Annotations - Loupe Fields (2.0.0.BUILD-SNAPSHOT)
+  107|Active     |    1|gvNIX - Annotations - JPA layer services (2.0.0.BUILD-SNAPSHOT)
+  108|Active     |    1|gvNIX - Addon - Web Report (2.0.0.BUILD-SNAPSHOT)
+  109|Active     |    1|gvNIX - Annotations - Web MVC Bindings (2.0.0.BUILD-SNAPSHOT)
+  110|Active     |    1|gvNIX - Addon - Typical Security (2.0.0.BUILD-SNAPSHOT)
+  111|Active     |    1|gvNIX - Addon - Web MVC Menu (2.0.0.BUILD-SNAPSHOT)
+  112|Active     |    1|gvNIX - Addon - Web MVC Bindings (2.0.0.BUILD-SNAPSHOT)
 ------------------------------------------------------------------------------------------
 
 Una vez hecho esto, ya se puede trabajar con el entorno gvNIX desde la
@@ -268,7 +268,7 @@ rápido de aplicaciones web sobre tecnología Spring. Sus funcionalidades hacen 
 un entorno altamente productivo, flexible y que no compromete la calidad de los proyectos.
 
 Está compuesto por una serie de herramientas de código abierto distribuídas 
-en forma de http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#available-roo-addon-suites["Spring Roo Add-On Suite"]
+en forma de http://docs.spring.io/spring-roo/docs/2.0.0.BUILD-SNAPSHOT/reference/html/#available-roo-addon-suites["Spring Roo Add-On Suite"]
 a través de un repositorio OSGi R5.
 Esto le proporciona un amplio apoyo por parte de importantes
 organizaciones como http://spring.io/[Spring] y http://pivotal.io/[Pivotal]. 
