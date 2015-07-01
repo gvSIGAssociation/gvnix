@@ -724,7 +724,7 @@
                 	<c:otherwise>
                 		<c:set var="currentId" value="'+full.${typeIdFieldName}+'" />
                 		<c:set var="confirmation_script" value="var confirmDelete = confirm(${removeColumnId}_confirmation); if(confirmDelete){jQuery(\'#${removeColumnId}_${currentId}_form\').submit();};" ></c:set>
-                		var result = '<form method="post" id="${removeColumnId}_${currentId}_form" action="${urlPath}/'+full.${typeIdFieldName}+'">
+                		var result = '<form method="post" id="${removeColumnId}_${currentId}_form" action="${urlPath}/${currentId}">
                 						<input type="hidden" value="DELETE" name="_method" data-original-title="" title="" />
                 						<a id="${removeColumnId}_${currentId}" href="#" alt="${delete_label}" title="${delete_label}" class="icon delete_entity" onclick="${confirmation_script}"/>
                 					</form>';
