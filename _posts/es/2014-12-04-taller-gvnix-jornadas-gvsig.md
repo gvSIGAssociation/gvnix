@@ -46,7 +46,7 @@ distintos ejercicios del mismo, los **requisitos previos** son:
 * [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
 * [Maven 3.2](http://maven.apache.org/download.cgi)
 * [STS 3.6](https://spring.io/tools/sts/all)
-* [Guía instalación gvNIX](https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX.adoc)
+* [Guía instalación gvNIX](http://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc)
 * Tener instalado POSTGRESQL y la extensión espacial POSTGIS
   * [PostgreSQL 9.3](http://www.postgresql.org/download/)
   * [PostGIS 2](http://postgis.net/install)
