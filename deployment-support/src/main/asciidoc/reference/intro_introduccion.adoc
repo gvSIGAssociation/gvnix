@@ -12,7 +12,7 @@ rápido de aplicaciones web altamente productivo, flexible y que no
 compromete la calidad de los proyectos.
 
 Está compuesto por una serie de herramientas de código abierto distribuídas 
-en forma de http://docs.spring.io/spring-roo/docs/2.0.0.BUILD-SNAPSHOT/reference/html/#available-roo-addon-suites["Spring Roo Add-On Suite"]
+en forma de http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#available-roo-addon-suites["Spring Roo Add-On Suite"]
 a través de un repositorio OSGi R5.
 Esto le proporciona un amplio apoyo por parte de importantes
 organizaciones como http://spring.io/[Spring] y http://pivotal.io/[Pivotal]. 
@@ -23,8 +23,7 @@ productividad.
 gvNIX está patrocinado por la Dirección General de Tecnologías de la Información
 (DGTI) de la Conselleria de Hacienda y Administración Pública de la
 Generalitat Valenciana (Comunidad Valenciana, España), gestionado por la
-Asociación gvSIG y dirigido por DISID. gvNIX se consolida como estándar para
-desarrollo Java de la DGTI de la Generalitat Valenciana.
+Asociación gvSIG y dirigido por DISID.
 
 gvNIX está disponible dentro del proyecto de Migración a Software de
 fuentes abiertas http://www.gvpontis.gva.es[gvPONTIS].
@@ -37,13 +36,26 @@ proyecto gvPONTIS]
 ¿Qué es Spring Roo?
 -------------------
 
-Según su creador, Ben Alex: "Roo es un pequeño genio que observa desde
-un segundo plano y gestiona todo aquello de lo que no me quiero
-preocupar".
+Spring Roo es una herramienta para el desarrollo de aplicaciones web que se 
+utiliza exclusivamente en tiempo de desarrollo, es similares a herramientas 
+como Eclipse.
 
-Spring Roo es un entorno de trabajo Java que permite el desarrollo de
-aplicaciones web de forma rápida y cómoda para el desarrollador. Sus
-principales características son:
+Spring Roo genera aplicaciones web basadas en Spring Framework y en el 
+conjunto de tecnologías de Spring:
+
+* Spring Framework
+* Spring MVC
+* Spring AOP
+* Spring Testing
+* Spring Integration
+* Spring Data
+* Spring Security
+* ... y en general cualquier tecnología Spring necesaria para satisfacer los
+requerimientos de los proyectos.
+
+Es un entorno de trabajo que permite el desarrollo de aplicaciones web de 
+forma rápida y cómoda para el desarrollador. Sus principales características 
+son:
 
 * Generación de código en Java (lenguaje estático).
 * Eliminar el trabajo tedioso centrando el desarrollo en la lógica de
@@ -53,23 +65,25 @@ negocio.
 ** Diseño dirigido por el modelo de entidades.
 ** Lógica en las entidades (Real Object Oriented), eliminando capas
 redundantes.
-** Otras capas opcionales (servicios, DAOs, ...).
+** Lógica de negocio en capa de servicios.
+** Repositorio de entidades.
 * Crea un proyecto en segundos.
 * Realimentación: añade valor durante todo el ciclo de vida.
 * No incorpora elementos adicionales al entorno de ejecución, por lo que
 no penaliza la velocidad ni la memoria de la aplicación.
-* No requiere ningún IDE.
+* El uso de IDEs es opcional.
 * Recibe instrucciones a través de una consola interactiva con
 autocompletado y ayuda en línea.
 * Extensible usando _bundles OSGi_.
 * Aprovecha el conocimiento: no necesita más conocimiento que el
-necesario para el desarrollo de aplicaciones JEE.
+necesario para el desarrollo de aplicaciones Spring.
 
 ¿Qué es un "Roo Add-On Suite"?
 ------------------------------
 
-Los "Roo Add-On Suites" son la mejor manera de empaquetar y distribuir conjuntos de Add-Ons para que
-puedan ser instalados en distribuciones de Spring Roo de forma rápida y sencilla.
+Los "Roo Add-On Suites" son la mejor manera de empaquetar y distribuir
+conjuntos de Add-Ons para que puedan ser instalados en distribuciones de
+Spring Roo de forma rápida y sencilla.
 
 Están basados en subsistemas de OSGi R5, los cuales permiten instalar un conjunto de componentes sobre 
 la distribución de Spring Roo sin comprometer su modularidad.
