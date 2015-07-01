@@ -38,16 +38,20 @@ badges:
       icon: globe
 
   additional:
-    - name: gvNIX install guide
-      url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX.adoc
+    - name: gvNIX install guide (version 1.x.)
+      url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc
+    - name: gvNIX install guide (version 2.x.)
+      url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-2.x.adoc
     - name: gvNIX quick start application
       url: https://github.com/DISID/gvnix-samples/tree/master/quickstart-app
     - name: gvNIX quick start GEO application
       url: https://github.com/DISID/gvnix-samples/tree/master/quickstart-geo-app
     - name: gvNIX styleguide <i>(Spanish)</i>
       url: /styleguide/gvnix-guia-estilo.html
-    - name: Installing gvNIX <i>(Video)</i>
-      url: es/video-install-gvnix/
+    - name: Installing gvNIX (version 1.x.) <i>(Video)</i>
+      url: /es/video-install-gvnix/
+    - name: How to work with gvNIX (version 2.x.) <i>(Video)</i>
+      url: http://youtu.be/wS8oLfRZY54
     - name: Geoportal in gvNIX <i>(Video)</i>
       url: /en/video-geoportal-gvnix/
     - name: Video tutorial de gvNIX <i>(Spanish video)</i>
