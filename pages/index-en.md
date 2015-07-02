@@ -50,7 +50,7 @@ badges:
       url: /styleguide/gvnix-guia-estilo.html
     - name: Installing gvNIX (version 1.x.) <i>(Video)</i>
       url: /es/video-install-gvnix/
-    - name: How to work with gvNIX (version 2.x.) <i>(Video)</i>
+    - name: How to work with gvNIX <i>(Video)</i>
       url: http://youtu.be/wS8oLfRZY54
     - name: Geoportal in gvNIX <i>(Video)</i>
       url: /en/video-geoportal-gvnix/
