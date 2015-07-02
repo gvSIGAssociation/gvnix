@@ -113,6 +113,8 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         // If jQuery is installed, setup command is available
         return getProjectOperations().isFeatureInstalledInFocusedModule(
                 "gvnix-jquery")
+                && getProjectOperations().isFeatureInstalledInFocusedModule(
+                        "gvnix-datatables")
                 && !getProjectOperations().isFeatureInstalledInFocusedModule(
                         "gvnix-loupe");
     }
