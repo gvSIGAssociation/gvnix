@@ -49,7 +49,7 @@ y te invitamos a participar con los hashtags **#etsinf** **#empretsinf** **#gvni
 <br>
 Te invitamos a asistir y mejorar tus oportunidades profesionales.
 
-Más información detallada en el blog de la [subdirección de relaciones con Empresas de la ETSINF](http://empretsinf.blogs.upv.es/2015/06/18/seminario-gratuito-gvnix-en-la-2/).
+Más información detallada en el blog de la [subdirección de relaciones con Empresas de la ETSINF](http://empretsinf.blogs.upv.es/2015/06/18/seminario-gratuito-gvnix-en-la-etsinf-2/).
 
 La apertura del seminario contó con la presencia de Jorge Elena, Director de Administración en DISID,
 y César Ferri Subdirector de Relaciones con el Entorno Profesional de la  ETSINF.
