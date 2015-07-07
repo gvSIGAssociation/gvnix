@@ -62,7 +62,7 @@ at DISID working on gvNIX project.
   <a href="{{ site.url }}/images/post/etsinf-20150629/5.png"><img src="{{ site.url }}/images/post/etsinf-20150629/5.png"></a>
 </figure>
 <figure class="third">
-    <a href="{{ site.url }}/images/post/etsinf-20150629-20150629/4.png"><img src="{{ site.url }}/images/post/etsinf-20150629/4.png"></a>
+    <a href="{{ site.url }}/images/post/etsinf-20150629/4.png"><img src="{{ site.url }}/images/post/etsinf-20150629/4.png"></a>
     <a href="{{ site.url }}/images/post/etsinf-20150629/6.png"><img src="{{ site.url }}/images/post/etsinf-20150629/6.png"></a>
     <a href="{{ site.url }}/images/post/etsinf-20150629/8.png"><img src="{{ site.url }}/images/post/etsinf-20150629/8.png"></a>
 </figure>
