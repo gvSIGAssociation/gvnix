@@ -5,6 +5,8 @@ description: Seminario gratuito en la ETSINF para el desarrollo de aplicaciones 
 tags: [formación, ETSINF, UPV]
 type: photo
 imagefeature: post/etsinf-20150629/III-edicion seminario-gvNIX-UPV.png
+#image:
+#  thumb: post/etsinf-20150629/III-edicion seminario-gvNIX-UPV.png #keep it square 200x200 px is good
 training: true
 comments: true
 share: true
@@ -47,7 +49,7 @@ y te invitamos a participar con los hashtags **#etsinf** **#empretsinf** **#gvni
 <br>
 Te invitamos a asistir y mejorar tus oportunidades profesionales.
 
-Más información detallada en el blog de la [subdirección de relaciones con Empresas de la ETSINF](http://empretsinf-20150629.blogs.upv.es/2015/06/18/seminario-gratuito-gvnix-en-la-2/).
+Más información detallada en el blog de la [subdirección de relaciones con Empresas de la ETSINF](http://empretsinf.blogs.upv.es/2015/06/18/seminario-gratuito-gvnix-en-la-2/).
 
 La apertura del seminario contó con la presencia de Jorge Elena, Director de Administración en DISID,
 y César Ferri Subdirector de Relaciones con el Entorno Profesional de la  ETSINF.
