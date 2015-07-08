@@ -4,7 +4,7 @@ title: Third Edition gvNIX seminar at UPV
 description: Free seminar at ETSINF to develop Java applications with gvNIX
 tags: [training, ETSINF, UPV]
 type: photo
-imagefeature: post/etsinf-20150629/III-edicion seminario-gvNIX-UPV.png
+imagefeature: post/etsinf-20150629/III-edicion-seminario-gvNIX-UPV.png
 training: true
 comments: true
 share: true
