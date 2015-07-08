@@ -13,14 +13,19 @@
 <!-- <meta name="description" content="{% if page.type == 'pages' %}{{ site.t[page.lang].description }}{% else %}{{ page.excerpt | strip_html | replace: "[[", " ("  | replace: "]]", ")" }}{% endif %}"> -->
 {% if page.tags %}<meta name="keywords" content="{{ page.tags | join: ', ' }}">{% endif %}
 {% if site.owner.twitter %}
-<!-- Twitter Cards -->
-{% if page.imagefeature %}<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="{{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }}">
-{% else %}<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="{% if page.image.thumb %}{{ site.url }}{{ ASSET_PATH }}/images/{{ page.image.thumb }}{% else %}{{ site.url }}{{ ASSET_PATH }}/images/{{ site.logo }}{% endif %}">{% endif %}
+  <!-- Twitter Cards -->
+  {% if page.imagefeature %}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="{{ site.url }}/images/{{ page.imagefeature }}">
+  {% else %}
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="{% if page.image.thumb %}{{ site.url }}/images/{{ page.image.thumb }}{% else %}{{ site.url }}{{ ASSET_PATH }}/images/{{ site.owner.default_bg }}{% endif %}">
+  {% endif %}
+
 <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
-<meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.t[page.lang].description }} {% endif %}">
-<meta name="twitter:creator" content="@{{ site.owner.twitter }}">{% endif %}
+<meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.t[page.lang].description }}{% endif %}">
+<meta name="twitter:creator" content="@{{ site.owner.twitter }}">
+{% endif %}
 
 <!-- Open Graph -->
 <meta property="og:locale" content="{{page.lang}}">
@@ -29,7 +34,12 @@
 <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.t[page.lang].description }} {% endif %}">
 <meta property="og:url" content="{{ site.url }}{{ page.url }}">
 <meta property="og:site_name" content="{{ site.title }}">
-{% if page.imagefeature %}<meta property="og:image" content="{{ site.url }}{{ ASSET_PATH }}/images/{{ page.imagefeature }}">{% else %}<meta property="og:image" content="{{ site.url }}{{ ASSET_PATH }}/images/{{ site.default_bg }}">{% endif %}
+
+{% if page.imagefeature %}
+  <meta property="og:image" content="{{ site.url }}/images/{{ page.imagefeature }}">
+{% else %}
+  <meta property="og:image" content="{% if page.image.thumb %}{{ site.url }}/images/{{ page.image.thumb }}{% else %}{{ site.url }}{{ ASSET_PATH }}/images/{{ site.owner.default_bg }}{% endif %}">
+{% endif %}
 
 {% if site.google_verify %}<meta name="google-site-verification" content="{{ site.google_verify }}">{% endif %}
 {% if site.bing_verify %}<meta name="msvalidate.01" content="{{ site.bing_verify }}">{% endif %}

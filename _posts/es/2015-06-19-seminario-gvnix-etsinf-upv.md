@@ -5,8 +5,6 @@ description: Seminario gratuito en la ETSINF para el desarrollo de aplicaciones 
 tags: [formación, ETSINF, UPV]
 type: photo
 imagefeature: post/etsinf-20150629/III-edicion seminario-gvNIX-UPV.png
-#image:
-#  thumb: post/etsinf-20150629/III-edicion seminario-gvNIX-UPV.png #keep it square 200x200 px is good
 training: true
 comments: true
 share: true
