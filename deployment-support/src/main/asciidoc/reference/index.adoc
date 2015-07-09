@@ -256,6 +256,26 @@ línea de comandos. Sin embargo, se recomienda utilizar un IDE de
 desarrollo que permita integrar el entorno gvNIX como, por ejemplo STS o
 Eclipse.
 
+=== 4. Novedades de la versión 2.0.0.M1
+
+==== Roo Add-On Suite
+
+gvNIX deja de ser una distribución personalizada de Spring Roo y se convierte en un "Roo Add-On Suite". 
+Además, se incluye gvNIX en el http://projects.spring.io/spring-roo/marketplace/[Spring Roo MarketPlace], 
+estando disponible para toda la comunidad.
+
+==== Reestructuración de paquetes
+
+Para facilitar el desarrollo de nuevos componentes en la versión 2.0.0.M1 de gvNIX, se han reorganizado los 
+aquetes internos de cada uno de los add-ons, diferenciando entre "add-on" y "annotations". 
+
+==== Compatibilidad con versiones anteriores
+
+gvNIX 2.0.0.M1 ha sufrido grandes cambios de arquitectura debido a las novedades comentadas anteriormente. Por 
+este motivo, gvNIX 2.0.0.M1 no es compatible con aplicaciones generadas con versiones anteriores de la herramienta
+de desarrollo.
+
+
 :numbered:
 = I. Introducción
 
