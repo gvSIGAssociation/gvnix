@@ -3,7 +3,7 @@ gvNIX - Spring Roo Addon Suite ![alt text](https://travis-ci.org/gvSIGAssociatio
 
 Welcome to gvNIX, an Spring Roo Addon Suite.
 
-gvNIX is an Spring Roo Addon Suite that focuses both enterprise knowledge and
+gvNIX is an http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#roo-addon-suites[Spring Roo Addon Suite] that focuses both enterprise knowledge and
 enterprise standards to build Java applications.
 
 gvNIX is sponsored by the <a href="http://www.dgti.gva.es/" target="_blank">General
