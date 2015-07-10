@@ -1298,7 +1298,14 @@ en la herramienta de desarrollo gvNIX.
 include::apendice-comandos.adoc[]
 
 [appendix]
-== Desarrollo con eclipse
+== Desarrollo con Eclipse
+
+A continuación, se muestran una serie de consejos/guías para trabajar con gvNIX desde
+un IDE.
+
+En este caso, se mostrará como instalar y utilizar https://spring.io/tools/sts/all[STS 3.7+] incorporando las
+funcionalidades de la herramienta de desarrollo gvNIX.
+
 include::guia-desarrollo_eclipse.adoc[]
 
 [appendix]

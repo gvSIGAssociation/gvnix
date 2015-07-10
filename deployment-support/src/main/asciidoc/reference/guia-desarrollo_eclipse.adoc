@@ -1,202 +1,74 @@
-//Push down level title
-:leveloffset: 2
+=== Instalación de STS
 
-Instalación
------------
+Descarga e instala STS 3.7.0 desde la URL https://spring.io/tools/sts/all
 
-Spring ha desarrollado una extensión para Eclipse llamada SpringSource
-Tool Suite o STS, que ofrece soporte para trabajar en Eclipse con
-aplicaciones de Spring, entre ellas Spring Roo y por tanto gvNIX. Entre
-otras funcionalidades incorpora un intérprete de comandos de Roo que
-permite ejecutar órdenes sin necesidad de salir de Eclipse.
+=== Instalación del Soporte para Roo en STS
 
-Hay dos formas de instalar STS, la primera es como una distribución
-propia y la segunda es como un plugin de un Eclipse ya existente. Se
-recomienda encarecidamente utilizar la primera de ellas por su facilidad
-de instalación y mejor rendimiento.
+Para instalar el soporte de ROO para STS, dirígete a la URL http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#install-roo-support
+y sigue las instrucciones que se indican. 
 
-STS como distribución
-~~~~~~~~~~~~~~~~~~~~~
+=== Instalación de gvNIX
 
-__Para instalar el IDE como una distribución propia realizar los
-siguientes pasos:__
+Abre la consola de ROO desde el STS: "Window > Show View > Other... > Spring > Roo Shell"
 
-* Descargar la última versión de Springsource Tool Suite desde
-link:#[http://spring.io/tools]
-* Descomprimir el archivo descargado y moverlo a una carpeta, por
-ejemplo $HOME/software.
-* Ejecutar STS
-($HOME/software/springsource-X.X.X/sts-X.X.X.RELEASE/STS). Tener en
-cuenta que STS es una aplicación Java por lo que requiere tener una
-máquina virtual Java instalada en el sistema.
+Instala la URL del repositorio que contiene el Roo Addon Suite de gvNIX:
 
-STS como plugin
-~~~~~~~~~~~~~~~
+------------------------------------------------------------------------------
+    roo> addon repository add --url http://repository.gvnix.org/index.xml
+------------------------------------------------------------------------------
+	
+Para conocer cuantos Roo Addon Suites contiene el repositorio de gvNIX, ejecuta el siguiente comando:
 
-__Para instalar el IDE en un Eclipse existente seguir los siguientes
-pasos:__
+------------------------------------------------------------------------------
+    roo> addon suite list --repository http://repository.gvnix.org/index.xml
+------------------------------------------------------------------------------
 
-* Si no se dispone todavía de él, descargar Eclipse IDE for Java EE
-Developers de link:#[http://www.eclipse.org/downloads/]
-* Crear la variable de classpath de Eclipse M2_REPO, para ello:
-1.  *_Window > Preferences > Java > Build Path
-                  > Classpath Variables_*, botón __`New...`__.
-2.  Definir los siguientes valores:
-** __`Name`__ = __`M2_REPO`__.
-** __`Path`__ = directorio correspondiente al repositorio de Maven
-(normalmente en Unix: $HOME/.m2/repository)
-3.  _Ok_ para crear la variable, y _Ok_ de nuevo para cerrar la ventana
-de preferencias y guardar cambios.
-* Instalar plugin M2Eclipse para Eclipse
-(http://m2eclipse.sonatype.org/installing-m2eclipse.html)
-+
-En el menú Help > Install New Software, en el campo de texto "Work
-with:" indicar que se usará el site:
-link:#[http://m2eclipse.sonatype.org/sites/m2e]. A continución
-eleccionar "Maven Integration for Eclipse". Pulsar en siguiente y tras
-aceptar la licencia del plugin instalar.
-* Activa la opción __`Enable Window > Preferences > General >
-              Workspace > Refresh Automatically`__.
-* Opcionalmente, instalar el plugin Subeclipse para trabajar sobre el
-sistema de control de versiones Subversion (SVN).
-+
-Para ello en Eclipse, en el menú _Help > Install New Software_. En la
-ventana que se abre hacer click sobre el botón _Add_ que hay a la
-derecha de _Work with_. Se abre un diálogo en el que se indicará como
-nombre Subeclipse por ejemplo y en la URL indicar
-_http://subclipse.tigris.org/update_1.6.x_ guardar con _OK_ y la ventana
-anterior empezará la carga de los plugins que hay disponibles.
-Seleccionarlos y seguir haciendo click en _Next_. La URL indicada es de
-la versión actual, revisar el sitio oficial de http://subclipse.tigris.org/[Subeclipse] para
-más información y futuras versiones.
-* Para instalar el plugin STS seguir las instrucciones del punto "UPDATE
-SITE INSTALLATION" del documento _Spring Source Tool Suite Installation
-Instructions_.
+A continuación aparecerán por consola los nombres de los Roo Addon Suites disponibles en el repositorio:
+
+------------------------------------------------------------------------------
+    Getting all 'Roo Addon Suites' located on
+    'http://repository.gvnix.org/index.xml' repository...
+
+        org.gvnix.roo.addon.suite
+
+    1 Roo Addon Suites were found on 'http://repository.gvnix.org/index.xml'
+    repository
+------------------------------------------------------------------------------
+
+Instala el Roo Addon Suite de gvNIX:
+
+------------------------------------------------------------------------------
+    roo> addon suite install name --symbolicName org.gvnix.roo.addon.suite
+------------------------------------------------------------------------------
+
+Al finalizar la instalación, aparecerá por consola:
+
+------------------------------------------------------------------------------
+    Subsystem dependency manager started.
+    Getting 'Roo Addon Suite' dependencies...
+
+        0 dependencies were found on selected 'Roo Addon Suite'
+    Subsystem dependency manager finished.
+    Installing subsystem...
+    Subsystem successfully installed: org.gvnix.roo.addon.suite; id: 1
+
+    Starting subsystem: 1
+    Subsystem successfully started: org.gvnix.roo.addon.suite; id: 1
+------------------------------------------------------------------------------
+
+En este momento dispones de todas las funcionalidades de gvNIX desde la propia consola del STS. 
 
 
-Integrar soporte ROO en STS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Utilizar Eclipse como IDE
 
-Spring Roo ya no está incluido en la distribución de STS a partir de su
-versión _3.6.0_, por ello necesitaremos instalar este soporte para poder
-trabajar con gvNIX.
-
-Para incluir este soporte, sigue los siguientes pasos:
-
-1.  Abre tu STS
-2.  Abre el dashboard del STS y busca Spring ROO
-3.  Instala _Spring Roo (current production release)_ y _Spring IDE -
-Roo Extension_
-4.  Reinicia tu STS
-
-image::sts_install.jpeg[Integrando soporte ROO en STS,align=center]
-
-
-Consola gvNIX / Roo integrada en Eclipse
-----------------------------------------
-
-El plugin o distribución de STS instalado ofrece la posibilidad de
-incluir la consola de ROO en el propio entorno de desarrollo. Para
-ello antes hay que indicarle a Eclipse donde está instalada la nueva
-versión de ROO.
-
-En el menú _Window > Preferences > Spring > Roo Support_. Pulsar sobre
-el botón Add y buscar en el navegador de archivos el lugar donde está
-instalado ROO. Aparecerá una pantalla similar a la siguiente:
-
-image::preferences_roo.png[Configuración del soporte gvNIX en Eclipse, align=center]
-
-Presionando en OK sobre las dos pantallas que abiertas ya estará
-configurado el soporte para la linea de comandos de ROO. Para poder
-usarlo abrir la perspectiva de Spring con _Window > Open Perspective >
-Other > Spring_. En la parte inferior de la pantalla aparecerá una
-pestaña llamada Roo Shell. Si no apareciese la pestaña, puede abrirse
-seleccionando _Window > Show View > Roo Shell._
-
-Para abrir la consola pulsar en el botón que aparece en la parte
-superior derecha de la pestaña con el título _Open Roo Shell._ Entonces
-seleccionar el proyecto en el que se va a trabajar y ya se puede empezar
-a ejecutar comandos. Si no se dispone todavía de ningún proyecto, en el
-punto siguiente se verá como crear un nuevo proyecto.
-
-La ejecución de comandos también se puede hacer de forma gráfica
-pulsando en el botón que aparece en la parte superior derecha de la
-pestaña con el título Open Roo Command Wizard.
-
-image::eclipse_gvNIX_shell.png[Consola gvNIX en Eclipse, align=center]
-
-[NOTE]
-====
-Hay que tener en cuenta una pequeña diferencia a la hora de usar la
-línea de comandos desde Eclipse con respecto a la linea de comandos de
-gvNIX en la consola del sistema. Mientras en una consola del sistema se
-utiliza la tecla TAB para completar los comandos, en el IDE se utilizará
-Ctrl+Space que es el atajo por defecto usado en Eclipse.
-====
-
-
-Utilizar Eclipse como IDE
--------------------------
-
-Crear proyecto gvNIX en Eclipse IDE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==== Crear proyecto gvNIX en Eclipse IDE
 
 Crear un proyecto gvNIX desde Eclipse a través del menú: __File > New >
 Spring Roo Project__:
 
 image::eclipse_new_roo_project.png[Nuevo proyecto Spring Roo con soporte gvNIX, align=center]
 
-Esta primera pantalla habrá ejecutado de forma automática el comando de
-creación de un nuevo proyecto:
-
-----------------------------------------------
-project setup --topLevelPackage com.gvnix.tenminutes
-----------------------------------------------
-
-En este punto ya se dispone de un proyecto Maven preparado.
-
-A continuación, añadir el soporte para el manejo de la persistencia de
-datos a través de JPA. El siguiente ejemplo muestra los comandos que se
-deben usar para configurar el soporte JPA. Recordar que se puede usar
-Ctrl+Space como ayuda a la escritura en los comandos:
-
--------------------------------------------------------------------------
-roo> jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
-Created ...
-roo> entity jpa --class ~.domain.Timer --testAutomatically
-Created ...
-~.domain.Timer roo> field string --fieldName message --notNull
-Managed ...
--------------------------------------------------------------------------
-
-El comando *jpa setup* permite configurar la capa de acceso a datos de
-manera sencilla. El comando *entitiy jpa* sirve para crear una nueva
-entidad y *field* crea atributos en la entidad. Estos comandos se verán
-con más detalle en la sección
-link:#_persistencia_de_objetos[Persistencia de
-objetos] y
-link:#guia-desarrollo_gestion-entidades_definicion_crear-con-comando[Crear
-una entidad con el intérprete de comandos], también se verá como generar
-todas las entidades de una aplicación mediante el proceso de ingeniería
-inversa contra un esquema de BBDD existente.
-
------------------------------------------------------
-~.domain.Timer roo> web mvc setup
-~.domain.Timer roo> web mvc all --package ~.web
-Created ...
------------------------------------------------------
-
-Los comandos *web mvc* crean la capa capa web que gestionaran la
-interacción del usuario con la aplicación. Se verán con más detalle en
-link:#_web_mvc_controller[Crear la capa web con el
-intérprete de comandos].
-
-------------------------------------------------------
-~.web roo> selenium test --controller ~.web.Time
-------------------------------------------------------
-
-Importar proyecto gvNIX en Eclipse
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==== Importar proyecto gvNIX en Eclipse
 
 gvNIX/Roo permite crear proyectos desde la linea de comandos, aunque
 puede suceder que se necesite importar un proyecto ya existente en el
@@ -205,7 +77,7 @@ ejecutar el comando `perform eclipse` para crear una estructura de
 proyecto Eclipse:
 
 -------------------------------
-~.domain.PizzaOrder roo> perform eclipse
+roo> perform eclipse
 -------------------------------
 
 Este comando termina ejecutando el comando del
@@ -234,22 +106,7 @@ en el caso de no estar correctamente configurado nos aparecerán falsos
 errores en el proyecto.
 
 
-Generación de pruebas de integración
-------------------------------------
-
-El comando _entity jpa_ dispone de la opción testAutomatically que al
-ser especificada generará los test de integración para dicha entidad
-usando JUnit.
-
-Si los tests no fueron creados en el momento de la ejecución del comando
-_entity_, pueden ser generados con posterioridad mediante otro comando:
-
---------------------------------------------
-roo> test integration --entity ~.domain.Timer
---------------------------------------------
-
-Arrancar la aplicación con Eclipse
-----------------------------------
+==== Arrancar la aplicación con Eclipse
 
 Es posible arrancar la aplicación desde el propio Eclipse y, además de
 permitir depurarla, permite hacer cambios en caliente sobre la
@@ -262,8 +119,7 @@ y ficheros de configuración.
 
 Para prepara un servidor seguir los siguiente pasos:
 
-Mostrar la Vista de Servidores en Eclipse
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===== Mostrar la Vista de Servidores en Eclipse
 
 Eclipse tiene una vista que permite ver los distintos servidores
 configurados y gestionarlos desde ahí. Estos son los pasos para mostrar
@@ -273,8 +129,7 @@ la vista
           Other..`..
 2.  Busque la vista llamada `Servers` y pulse el botón `Ok`.
 
-Crear un nuevo Servidor
-~~~~~~~~~~~~~~~~~~~~~~~
+===== Crear un nuevo Servidor
 
 Se pueden definir múltiples entornos de ejecución para los servidores.
 Esta configuración incluye el tipo de servidor (Tomcat, Jetty, JBoss,
@@ -322,8 +177,7 @@ continuar.
 7.  Añadir las aplicaciones a ejecutar en este servidor de entre las
 disponibles.
 
-Ajustar la configuración del Servidor
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===== Ajustar la configuración del Servidor
 
 Puede ser necesario ajustar algunas opciones de la configuración del
 servidor. Para poder acceder a dichas opciones hay que seleccionar el
@@ -359,8 +213,7 @@ texo que aparece en el apartado _VM Arguments_ lo siguiente:
 ====
 
 
-Ejecución de la aplicación en el Servidor
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===== Ejecución de la aplicación en el Servidor
 
 Una vez configurado el servidor, se podrá añadir a este la aplicación
 que se desea ejecutar en él. Se puede ejecutar más de una a la vez. En
@@ -401,8 +254,7 @@ comandos de gvNIX, ya que automáticamente se verán reflejados los
 cambios en el navegador.
 
 
-Trabajando con el código de la aplicación en Eclipse
-----------------------------------------------------
+==== Trabajando con el código de la aplicación en Eclipse
 
 Al generar un proyecto con gvNIX/Roo habrá que trabajar sobre el código
 de la aplicación para añadir más funcionalidades y/o modificar alguna de
@@ -445,8 +297,7 @@ asociado a una clase Java mediante aspectos java, la clase debe estar
 libre de errores de compilación.
 ====
 
-Modificación del código generado
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==== Modificación del código generado
 
 Como se ha comentado, seguramente será necesario añadir nuevas
 funcionalidades o modificar algunas de las que se han generado
@@ -486,6 +337,3 @@ Es interesante tener abierta la consola gvNIX para que los cambios
 realizados sobre los ficheros del proyecto disparen los cambios
 automáticos que realiza gvNIX/Roo.
 ====
-
-//Return level title
-:leveloffset: 0
