@@ -41,8 +41,8 @@ function showDetailTabs(mainDatatablesId) {
 		}
 	});
 	tabs.click(function(e) {
-		var curTab = jQuery('.ui-tabs-active');
-        curTabIndex = curTab.index();
-    	jQuery.cookie(mainDatatablesId + "_active_panel", curTabIndex);		
+		var curTab = jQuery('#' + mainDatatablesId + ' .ui-tabs-active');
+		curTabIndex = curTab.index();
+		jQuery.cookie(mainDatatablesId + "_active_panel", curTabIndex);
 	});
 }
