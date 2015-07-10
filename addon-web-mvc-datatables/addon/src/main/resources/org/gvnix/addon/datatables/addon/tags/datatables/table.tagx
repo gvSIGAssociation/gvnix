@@ -574,7 +574,7 @@
           </spring:escapeBody>
         </c:set>
         <spring:url value="/resources/images/delete.png" var="delete_image_url" />
-        <c:if test="${selection and datatablesHasBatchSupport}">
+        <c:if test="${selectionMultiRow and datatablesHasBatchSupport}">
 	        <c:set var="delete_multirow_confirm_msg">
 	          <spring:escapeBody javaScriptEscape="true" htmlEscape="false">
 	             <spring:message htmlEscape="false" code="entity_delete_multirow_confirm"/>
