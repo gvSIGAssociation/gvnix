@@ -267,7 +267,7 @@ estando disponible para toda la comunidad.
 ==== Reestructuración de paquetes
 
 Para facilitar el desarrollo de nuevos componentes en la versión 2.0.0.M1 de gvNIX, se han reorganizado los 
-aquetes internos de cada uno de los add-ons, diferenciando entre "add-on" y "annotations". 
+paquetes internos de cada uno de los add-ons, diferenciando entre "add-on" y "annotations". 
 
 ==== Compatibilidad con versiones anteriores
 
