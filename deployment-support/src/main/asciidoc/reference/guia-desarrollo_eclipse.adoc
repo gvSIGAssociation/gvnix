@@ -68,42 +68,36 @@ Spring Roo Project__:
 
 image::eclipse_new_roo_project.png[Nuevo proyecto Spring Roo con soporte gvNIX, align=center]
 
+A continuación, configuramos el nuevo proyecto indicando el nombre del proyecto y el topLevelPackage:
+
+image::eclipse_new_roo_project_tenminutes.jpg[Configurando el proyecto, align=center]
+
+Al presionar el botón "Next" aparecerá la siguiente consola de Spring Roo preparada para crear
+nuestro proyecto:
+
+image::eclipse_new_roo_project_shell_1.jpg[Consola de creación del proyecto, align=center]
+
+Para finalizar, presionamos "Finish" y la consola de Spring Roo se iniciará, ejecutando
+los comandos necesarios para generar nuestro proyecto:
+
+image::eclipse_new_roo_project_shell_2.jpg[Consola de creación del proyecto arrancada, align=center]
+
 ==== Importar proyecto gvNIX en Eclipse
 
 gvNIX/Roo permite crear proyectos desde la linea de comandos, aunque
-puede suceder que se necesite importar un proyecto ya existente en el
-IDE. Si se está ejecutando gvNIX en la línea de comandos, bastaría con
-ejecutar el comando `perform eclipse` para crear una estructura de
-proyecto Eclipse:
-
--------------------------------
-roo> perform eclipse
--------------------------------
-
-Este comando termina ejecutando el comando del
-sistema`mvn eclipse:eclipse` en el proyecto, por lo que es indiferente
-el uso de cualquiera de los dos métodos. Tener en cuenta que este último
-comando necesita tener configurado Maven.
-
-Ahora se puede importar en el entorno de trabajo mediante
-`File > Import > General > Existing Projects
-      into workSpace`. Si aparece el mensaje _Turn Weaving Service on?_,
-marcar la casilla _Don't ask again until next upgrade_ y clic en _Yes_
-(será necesario reiniciar Eclipse).
-
-También es posible borrar la configuración de eclipse ejecutando el
-comando `mvn eclipse:clean` en una consola del sistema que tenga
-configurada Maven. Para regenerar la configuración de eclipse en un solo
-comando usar `mvn eclipse:clean eclipse:eclipse`.
+puede suceder que se necesite importar un proyecto a Eclipse para facilitar
+su desarrollo. Para importar un proyecto generado desde la linea de comandos
+a su entorno de trabajo eclipse, utilizaría el menú del IDE 
+"File > Import > Maven > Existing Maven Projects"
 
 Al importar un proyecto en Eclipse es importante comprobar que dicho
 proyecto tiene configuradas las características de proyecto Maven y
 proyecto de aspectos java. Esto aparece de forma visual en el proyecto
 mediante unas pequeñas letras M y AJ. Si no apareciesen se pueden añadir
 estas características seleccionando el proyecto y con el segundo botón
-del ratón eligiendo la opción _Configure_. Esto es muy importante ya que
-en el caso de no estar correctamente configurado nos aparecerán falsos
-errores en el proyecto.
+del ratón eligiendo la opción _Configure > Convert To AspectJ Project_. 
+Esto es muy importante ya que en el caso de no estar correctamente configurado 
+nos aparecerán falsos errores en el proyecto.
 
 
 ==== Arrancar la aplicación con Eclipse
@@ -216,36 +210,18 @@ texo que aparece en el apartado _VM Arguments_ lo siguiente:
 ===== Ejecución de la aplicación en el Servidor
 
 Una vez configurado el servidor, se podrá añadir a este la aplicación
-que se desea ejecutar en él. Se puede ejecutar más de una a la vez. En
-la vista Servers, pulsar con el botón derecho sobre el servidor deseado
-y seleccionar la opción _Add and Remove ..._. En el diálogo que se abre
-seleccionar de la lista de la izquierda la aplicación y pulsar el botón
-_Add_. Por último, cerrar el diálogo con _Finish_.
+que se desea ejecutar en él. 
 
-image::eclipse_servers-addremoveapp.png[Añadir / Eliminar aplicaciones al Servidor, align=center]
+Para ello haz click derecho sobre el proyecto que deseas ejecutar, y selecciona
+la opción "Run as > Run on Server". Aparecerá la siguiente ventana:
 
-Ya es posible arrancar el servidor y probar la aplicación.
+image::eclipse_run_on_server.jpg[Ejecutar aplicación en servidor eclipse, align=center]
 
-image::eclipse_servers.png[Vista de servidores disponibles en el workspace de Eclipse, align=center]
+Seleccionamos nuestro servidor Tomcat configurado en el punto anterior y hacemos click en "Finish".
+Se ejecutará la aplicación en nuestro navegador dentro de Eclipse:
 
-En la imagen anterior se observa un servidor Tomcat 6 con la aplicación
-_tenminutes_ disponible para ejecutar. Con los botones disponibles se
-puede arrancar la aplicación en modo debug, arrancar la aplicación de
-manera normal (botón verde con triángulo blanco en el centro), arrancar
-en modo profile, pararlo o re-publicar los cambios del proyecto en el
-servidor.
+image::eclipse_web_browser.jpg[Navegador web eclipse, align=center]
 
-image::eclipse_servers-buttons.png[Botones de la vista servidores de Eclipse, align=center]
-
-Una vez arrancado el servidor se podrá navegar por la aplicación bien
-desde un navegador externo (Firefox) o bien desde un navegador propio
-que incorpora Eclipse accediendo a la dirección
-link:#[http://localhost:8080/tenminutes]. Observar que el final de la
-dirección se corresponde con el nombre de la aplicación proporcionado al
-crear el proyecto. Para abrir el navegador interno de Eclipse utilizar
-_Window > Show view > Internal Web Browser_.
-
-image::eclipse_browser.png[Navegador interno de Eclipse , align=center]
 
 Ejecutar la apliación desde Eclipse puede ser muy útil a la hora de
 hacer cambios en el proyecto, modificaciones en las vistas, en los
@@ -316,9 +292,25 @@ se encuentre en un aspecto java, se puede mover el método o el campo a
 la clase Java, del que depende el aspecto java. En el ejemplo, se
 movería a la clase _Timer.java_. Puede realizarse cortando y pegando,
 pero Eclipse con el plugin STS ofrece una opción mucho más adecuada para
-esto.
+esto:
 
-Seleccionando el nombre del método a mover y a través del menú
+1. Abre el fichero Java que contiene el método que quieres modificar. En este caso, abriremos
+el fichero _BaseServiceImpl.java_.
+
+2. Abre la vista de link:http://www.eclipse.org/ajdt/xref/[Cross References] en tu eclipse.
+
+[NOTE]
+====
+Si la vista de "Cross References" aparece vacía, debes limpiar el proyecto a través de la entrada
+de menú "Project > Clean..."
+====
+
+image::eclipse_cross_references.png[Cross References BaseServiceImpl.java, align=center]
+
+3. Haciendo doble click sobre el método que deseamos actualizar en la vista de "Cross References", se abrirá
+el fichero .aj.
+
+4. Seleccionando el nombre del método a mover y a través del menú
 contextual _AspectJ Refactoring > Push In ..._ Eclipse se ocupará de
 eliminar el código del .aj y moverlo al .java.
 
