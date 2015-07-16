@@ -329,21 +329,3 @@ Es interesante tener abierta la consola gvNIX para que los cambios
 realizados sobre los ficheros del proyecto disparen los cambios
 automáticos que realiza gvNIX/Roo.
 ====
-
-=== Mejorar el rendimiento de STS
-
-Después de trabajar con el IDE STS, se han detectado varias funcionalidades y plugins que ralentizan
-la propia herramienta e impiden trabajar de forma óptima. 
-
-Se proponen una serie de acciones a realizar sobre la instalación del STS para mejorar su rendimiento:
-
-1. Ir al directorio de instalación de STS/Eclipse 3.7 desde la consola del sistema.
-
-2. Ejecutar los siguientes comandos:
-
-    mkdir -p disabled/features disabled/plugins
-    mv plugins/org.eclipse.jpt.* disabled/plugins
-    mv features/org.eclipse.jpt.* disabled/features
-
-Después de aplicar estos cambios, se mejorará el rendimiento del STS 3.7, permitiendo al desarrollador trabajar
-de forma más eficiente.
