@@ -134,8 +134,9 @@ public class WSConfigServiceImplTest {
         for (Element element : dependencyList) {
 
             dependency = new Dependency(element);
-            expect(projectMetadata.getPom().isDependencyRegistered(dependency))
-                    .andReturn(true);
+            expect(
+                    projectMetadata.getPom().isDependencyRegistered(dependency,
+                            false)).andReturn(true);
         }
 
         replay(metadataService, projectMetadata);
@@ -169,10 +170,11 @@ public class WSConfigServiceImplTest {
             if (dependency.getArtifactId().compareTo(dependencyNotDefined) == 0) {
                 expect(
                         projectMetadata.getPom().isDependencyRegistered(
-                                dependency)).andReturn(false);
+                                dependency, false)).andReturn(false);
             }
-            expect(projectMetadata.getPom().isDependencyRegistered(dependency))
-                    .andReturn(true);
+            expect(
+                    projectMetadata.getPom().isDependencyRegistered(dependency,
+                            false)).andReturn(true);
         }
 
         replay(metadataService, projectMetadata);

@@ -270,7 +270,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
             // Some dependency not registered: all dependencies not installed
             Pom pom = project.getPom();
-            if (!pom.isDependencyRegistered(new Dependency(dependency))) {
+            if (!pom.isDependencyRegistered(new Dependency(dependency), false)) {
                 return false;
             }
         }
