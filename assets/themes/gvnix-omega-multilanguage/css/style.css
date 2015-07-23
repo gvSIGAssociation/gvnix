@@ -3003,9 +3003,26 @@ ul.ds-btn { display: table; }
   margin-top: -72px;
   margin-bottom: 50px;
   background-size: 1500px;
-  background-position-y: -190px;
-  height: 210px;
+  background-position-y: -90px;
+  height: 310px;
 }
+
+#counter h1{
+  background-color: black;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  font-weight: lighter;
+  letter-spacing: 2em;
+
+}
+
+#counter h1 small{
+   color: white;
+   letter-spacing: 0;
+   font-size: 1em;
+}
+
 .counter-box{
   padding: 40px 0 40px;
   color: #fff;
@@ -3023,10 +3040,20 @@ ul.ds-btn { display: table; }
   line-height: 1.6em;
   text-align: center;
 }
+
 @media (min-width: 1024px) {
   .counter-box p {
     font-size: 1.5em;
     line-height: 1.6em;
+  }
+  #counter h1{
+  font-size: 2em;
+  }
+}
+
+@media (min-width: 1100px) {
+  #counter h1{
+  font-size: 2.6em;
   }
 }
 
@@ -3034,6 +3061,9 @@ ul.ds-btn { display: table; }
   .counter-box p {
   font-size: 1.1em;
   line-height: 1.2em;
+  }
+  #counter h1{
+  font-size: 1.6em;
   }
 }
 
@@ -3043,21 +3073,28 @@ ul.ds-btn { display: table; }
   }
   #counter{
     margin-bottom: 30px;
-    background-position-y: -90px;
+    background-position-y: 0px;
     height: auto;
     background-position-x: -700px;
   }
   .counter-box{
     padding: 0;
   }
-}
-
-@media (max-width: 480px) {
-    #counter{
-    margin-bottom: 30px;
-    background-position-y: -90px;
-    height: auto;
-    background-position-x: -950px;
+  #counter h1{
+  font-size: 1.2em;
   }
 
 }
+
+@media (max-width: 590px) {
+    #counter{
+    margin-bottom: 30px;
+    background-position-y: 0px;
+    height: auto;
+    background-position-x: -950px;
+  }
+  #counter h1{
+  font-size: 0.7em;
+  }
+
+  }
