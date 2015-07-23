@@ -41,7 +41,7 @@ ROO_VERSION=`grep "[<]roo.version[>]\K([^<]*)" $GVNIX_HOME/pom.xml -oPm1`
 function usage () {
 cat << EOF
 
-Usage: $0 spring-roo.zip [test|deploy|release] {--skipCleanRepo} {--skipSign} {--lowVerbose} {-d | --debug}
+Usage: $0 spring-roo.zip [test|deploy|release] {--skipCleanRepo} {--skipSign} {--lowVerbose} {--tomcatPort} {-d | --debug}
 
 Parameter:
 
@@ -81,6 +81,9 @@ Options:
 
               Reduces log info showed by CI tests
 
+    --tomcatPort
+            
+            Tomcat port to use when execute CI tests. Default 8080
 
     -d,--debug
 
@@ -128,6 +131,7 @@ RUN_CI=no
 DEPLOY_JARS=no
 DEPLOY_RELEASE=no
 DEBUG=no
+TOMCAT_PORT=8080
 
 ## identify action and options
 ACTION="$1"
@@ -145,6 +149,11 @@ do
             ;;
         --lowVerbose)
             LOW_VERBOSE=yes
+            ;;
+        --tomcatPort)
+            ## getting tomcat port
+            shift
+            TOMCAT_PORT=$1            
             ;;
         -d|--debug)
             DEBUG=yes
@@ -312,7 +321,7 @@ if [ "$RUN_CI" = "yes" ]; then
       mkdir /tmp/gvnix_int_test;
       CI_LOG_FILE=/tmp/gvnix_int_test/ci.log.txt
       show_message_info "Redirect CI log to $CI_LOG_FILE"
-      bash $GVNIX_DEPLOYMENT_SUPPORT_DIR/gvNIX-CI.sh /tmp/gvnix_int_test $ROO_COMMAND $GVNIX_HOME > $CI_LOG_FILE
+      bash $GVNIX_DEPLOYMENT_SUPPORT_DIR/gvNIX-CI.sh /tmp/gvnix_int_test $ROO_COMMAND $GVNIX_HOME $TOMCAT_PORT > $CI_LOG_FILE
       CI_RESULT=$?  
       if [ $CI_RESULT -ne 0 ]; then
         show_message_problem "ERROR: CI test fail" "See $CI_LOG_FILE for full log" "Last 20 lines: "
@@ -320,7 +329,7 @@ if [ "$RUN_CI" = "yes" ]; then
         exit 1
       fi
     else
-      bash $GVNIX_DEPLOYMENT_SUPPORT_DIR/gvNIX-CI.sh /tmp/gvnix_int_test $ROO_COMMAND $GVNIX_HOME
+      bash $GVNIX_DEPLOYMENT_SUPPORT_DIR/gvNIX-CI.sh /tmp/gvnix_int_test $ROO_COMMAND $GVNIX_HOME $TOMCAT_PORT
     fi
 else
     show_message_info "Run Integration test: Skip"

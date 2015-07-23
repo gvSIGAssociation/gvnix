@@ -1,10 +1,11 @@
 ## Run all integration tests from console and form jenkins integration system daily.
 ## Run example:
-##  ${WORKSPACE}/src/test/resources/integration.sh ${TEST_ROOT} ${ROO_COMMAND} ${GVNIX_HOME}
+##  ${WORKSPACE}/src/test/resources/integration.sh ${TEST_ROOT} ${ROO_COMMAND} ${GVNIX_HOME} ${TOMCAT_PORT}
 ## Where input parameters are:
 ##  * ${TEST_ROOT}: Output execution tests folder
 ##  * ${ROO_COMMAND}: Roo shell executable path
 ##  * ${GVNIX_HOME}: Path to gvNIX root source folder for access the test scripts
+##  * ${$TOMCAT_PORT}: Tomcat port to use
 ## 
 
 function usage {
@@ -12,12 +13,13 @@ cat << EOF
 Run all integration tests from console and form jenkins integration system daily.
 
 Usage:
-    $0 TEST_ROOT ROO_COMMAND GVNIX_HOME
+    $0 TEST_ROOT ROO_COMMAND GVNIX_HOME TOMCAT_PORT
 
 Where input parameters are:
   * TEST_ROOT: Output execution tests folder
   * ROO_COMMAND: Roo shell executable path. Should be "gvnix.sh"
   * GVNIX_HOME: Path to gvNIX root source folder for access the test scripts
+  * TOMCAT_PORT: Tomcat port to use
 EOF
 }
 
@@ -34,6 +36,7 @@ export DISPLAY=:1
 export TEST_ROOT=$1
 export ROO_COMMAND=$2
 export GVNIX_HOME=$3
+export TOMCAT_PORT=$4
 
 
 ## Get current file abs_path
@@ -107,23 +110,23 @@ show_message_info "Starting Roo scripts"
   ## XXX use gvNIX version of roo script as this files need to be fixed (project --> project setup)
 	
 	## clinic
-  test_simple clinic $GVNIX_HOME/deployment-support/src/test/resources/clinic.roo
+  test_simple clinic $GVNIX_HOME/deployment-support/src/test/resources/clinic.roo $TOMCAT_PORT
 
 	## embedding
-  test_simple embedding $GVNIX_HOME/deployment-support/src/test/resources/embedding.roo
+  test_simple embedding $GVNIX_HOME/deployment-support/src/test/resources/embedding.roo $TOMCAT_PORT
 
 	## multimodule
   ## TODO Check
-  #test_simple multimodule $GVNIX_HOME/deployment-support/src/test/resources/multimodule.roo
+  #test_simple multimodule $GVNIX_HOME/deployment-support/src/test/resources/multimodule.roo $TOMCAT_PORT
 
 	## pizzashop
-  test_simple pizzashop $GVNIX_HOME/deployment-support/src/test/resources/pizzashop.roo
+  test_simple pizzashop $GVNIX_HOME/deployment-support/src/test/resources/pizzashop.roo $TOMCAT_PORT
 
 	## vote
-  test_simple vote $GVNIX_HOME/deployment-support/src/test/resources/vote.roo
+  test_simple vote $GVNIX_HOME/deployment-support/src/test/resources/vote.roo $TOMCAT_PORT
 
 	## wedding
-  test_simple wedding $GVNIX_HOME/deployment-support/src/test/resources/wedding.roo
+  test_simple wedding $GVNIX_HOME/deployment-support/src/test/resources/wedding.roo $TOMCAT_PORT
 
 ##
 ## gvNIX binding add-on
@@ -147,17 +150,17 @@ show_message_info "Starting addon-dynamic-configuration scripts"
 show_message_info "Starting addon-web-mvc scripts"
 
 	## batch
-  test_page_available batch $GVNIX_HOME/addon-web-mvc/addon/src/test/batch.roo petclinic
+  test_page_available batch $GVNIX_HOME/addon-web-mvc/addon/src/test/batch.roo petclinic $TOMCAT_PORT
 
 	## jquery
-  test_page_available jquery $GVNIX_HOME/addon-web-mvc/addon/src/test/jquery.roo petclinic/owners
+  test_page_available jquery $GVNIX_HOME/addon-web-mvc/addon/src/test/jquery.roo petclinic/owners $TOMCAT_PORT
 
 ##
 ## gvNIX bootstrap add-on
 ##
 show_message_info "Starting addon-web-mvc-bootstrap scripts"
 
-  test_page_available bootstrap $GVNIX_HOME/addon-web-mvc-bootstrap/src/test/resources/bootstrap.roo petclinic
+  test_page_available bootstrap $GVNIX_HOME/addon-web-mvc-bootstrap/src/test/resources/bootstrap.roo petclinic $TOMCAT_PORT
 
 ##
 ## gvNIX datatables add-on
@@ -165,18 +168,18 @@ show_message_info "Starting addon-web-mvc-bootstrap scripts"
 show_message_info "Starting addon-web-mvc-datatables scripts"
 	
 	## datatables
-  #test_page_available datatables $GVNIX_HOME/addon-web-mvc-datatables/addon/src/main/resources/datatables.roo petclinic/owners
-  test_simple datatables $GVNIX_HOME/addon-web-mvc-datatables/addon/src/main/resources/datatables.roo
+  #test_page_available datatables $GVNIX_HOME/addon-web-mvc-datatables/addon/src/main/resources/datatables.roo petclinic/owners $TOMCAT_PORT
+  test_simple datatables $GVNIX_HOME/addon-web-mvc-datatables/addon/src/main/resources/datatables.roo $TOMCAT_PORT
 
 	## datatables-multimodule
   ## TODO requires fix of roo multimodule script!!!
-  #test_simple datatables-multimodule $GVNIX_HOME/addon-web-mvc-datatables/addon/src/test/resources/datatables-multimodule.roo
+  #test_simple datatables-multimodule $GVNIX_HOME/addon-web-mvc-datatables/addon/src/test/resources/datatables-multimodule.roo $TOMCAT_PORT
 
 	## datatables-test
-  test_simple "datatables-test" $GVNIX_HOME/addon-web-mvc-datatables/addon/src/test/resources/datatables-test.roo
+  test_simple "datatables-test" $GVNIX_HOME/addon-web-mvc-datatables/addon/src/test/resources/datatables-test.roo $TOMCAT_PORT
 
 	## datatables-pkc
-  test_simple "datatables-pkc" $GVNIX_HOME/addon-web-mvc-datatables/addon/src/test/resources/datatables-pkc.roo
+  test_simple "datatables-pkc" $GVNIX_HOME/addon-web-mvc-datatables/addon/src/test/resources/datatables-pkc.roo $TOMCAT_PORT
 
 ##
 ## gvNIX loupe add-on
@@ -184,7 +187,7 @@ show_message_info "Starting addon-web-mvc-datatables scripts"
 show_message_info "Starting addon-web-mvc-loupefield scripts"
 	
 	## loupefield
-  test_simple loupefield $GVNIX_HOME/addon-web-mvc-loupefield/addon/src/main/resources/loupe.roo
+  test_simple loupefield $GVNIX_HOME/addon-web-mvc-loupefield/addon/src/main/resources/loupe.roo $TOMCAT_PORT
 
 ##
 ## gvNIX dialog add-on
@@ -193,7 +196,7 @@ show_message_info "Starting addon-web-mvc-loupefield scripts"
 	
 	## dialog
   ## TODO To Check this
-  # test_simple dialog $GVNIX_HOME/addon-web-mvc-dialog/addon/src/main/resources/dialog.roo
+  # test_simple dialog $GVNIX_HOME/addon-web-mvc-dialog/addon/src/main/resources/dialog.roo $TOMCAT_PORT
 
 ##
 ## gvNIX geo add-on
@@ -201,7 +204,7 @@ show_message_info "Starting addon-web-mvc-loupefield scripts"
 show_message_info "Starting addon-web-mvc-geo scripts"
 
   ## Requires Geo DB it can't run test nor app
-  test_compile geo $GVNIX_HOME/addon-web-mvc-geo/addon/src/test/resources/geo.roo
+  test_compile geo $GVNIX_HOME/addon-web-mvc-geo/addon/src/test/resources/geo.roo 
 
 ##
 ## gvNIX i18n add-on
@@ -209,7 +212,7 @@ show_message_info "Starting addon-web-mvc-geo scripts"
 show_message_info "Starting addon-web-mvc-i18n scripts"
 	
 	## es-i18n
-  test_simple "es-18n" $GVNIX_HOME/addon-web-mvc-i18n/src/main/resources/es-i18n.roo
+  test_simple "es-18n" $GVNIX_HOME/addon-web-mvc-i18n/src/main/resources/es-i18n.roo $TOMCAT_PORT
 
 ##
 ## gvNIX menu add-on
@@ -217,10 +220,10 @@ show_message_info "Starting addon-web-mvc-i18n scripts"
 show_message_info "Starting addon-web-mvc-menu scripts"
 	
 	## menu
-  test_simple menu $GVNIX_HOME/addon-web-mvc-menu/src/main/resources/menu.roo
-	
+  test_simple menu $GVNIX_HOME/addon-web-mvc-menu/src/main/resources/menu.roo $TOMCAT_PORT
+	 
 	## base
-  test_simple menu_base  $GVNIX_HOME/addon-web-mvc-menu/src/test/resources/base.roo
+  test_simple menu_base  $GVNIX_HOME/addon-web-mvc-menu/src/test/resources/base.roo $TOMCAT_PORT
 
 ##
 ## gvNIX occ add-on
@@ -228,7 +231,7 @@ show_message_info "Starting addon-web-mvc-menu scripts"
 show_message_info "Starting addon-occ scripts"
 	
 	## occ
-  test_simple menu_base $GVNIX_HOME/addon-occ/addon/src/main/resources/occ.roo
+  test_simple menu_base $GVNIX_HOME/addon-occ/addon/src/main/resources/occ.roo $TOMCAT_PORT
 
 ##
 ## gvNIX jpa add-on
@@ -236,17 +239,17 @@ show_message_info "Starting addon-occ scripts"
 show_message_info "Starting addon-jpa scripts"
 	
 	## jpa-audit-test
-  test_simple "jpa-audit" $GVNIX_HOME/addon-jpa/addon/src/test/resources/jpa-audit-test.roo
+  test_simple "jpa-audit" $GVNIX_HOME/addon-jpa/addon/src/test/resources/jpa-audit-test.roo $TOMCAT_PORT
 
 	## jpa-audit-envers
-  test_simple "jpa-audit-envers" $GVNIX_HOME/addon-jpa/addon/src/test/resources/jpa-audit-envers.roo
+  test_simple "jpa-audit-envers" $GVNIX_HOME/addon-jpa/addon/src/test/resources/jpa-audit-envers.roo $TOMCAT_PORT
 
 	## jpa-audit-multimodule
   ## TODO check
-  #test_simple "jpa-audit-multimodule" $GVNIX_HOME/addon-jpa/addon/src/test/resources/jpa-audit-multimodule.roo
+  #test_simple "jpa-audit-multimodule" $GVNIX_HOME/addon-jpa/addon/src/test/resources/jpa-audit-multimodule.roo $TOMCAT_PORT
 
 	## jpa-audit-pkc 
-  test_simple "jpa-audit-pkc" $GVNIX_HOME/addon-jpa/addon/src/test/resources/jpa-audit-pkc.roo
+  test_simple "jpa-audit-pkc" $GVNIX_HOME/addon-jpa/addon/src/test/resources/jpa-audit-pkc.roo $TOMCAT_PORT
 
 ##
 ## gvNIX report add-on
@@ -254,10 +257,10 @@ show_message_info "Starting addon-jpa scripts"
 show_message_info "Starting addon-web-mvc-report scripts"
 	
 	## report
-  test_simple report $GVNIX_HOME/addon-web-mvc-report/addon/src/main/resources/report.roo
+  test_simple report $GVNIX_HOME/addon-web-mvc-report/addon/src/main/resources/report.roo $TOMCAT_PORT
 	
 	## gvnix-test-report
-  test_simple "gvnix-test-report" $GVNIX_HOME/addon-web-mvc-report/addon/src/test/resources/gvnix-test-report.roo
+  test_simple "gvnix-test-report" $GVNIX_HOME/addon-web-mvc-report/addon/src/test/resources/gvnix-test-report.roo $TOMCAT_PORT
 
 ##
 ## gvNIX service add-on
@@ -265,10 +268,10 @@ show_message_info "Starting addon-web-mvc-report scripts"
 show_message_info "Starting addon-service scripts"
 	
 	## bing
-  test_simple "service_bing" $GVNIX_HOME/addon-service/addon/src/main/resources/bing.roo
+  test_simple "service_bing" $GVNIX_HOME/addon-service/addon/src/main/resources/bing.roo $TOMCAT_PORT
 
 	## service
-  test_simple "service_service" $GVNIX_HOME/addon-service/addon/src/main/resources/service.roo
+  test_simple "service_service" $GVNIX_HOME/addon-service/addon/src/main/resources/service.roo $TOMCAT_PORT
 
 	## gvnix-test-no-jpa-no-web
   test_compile "service_gvnix-test-no-jpa-no-web" $GVNIX_HOME/addon-service/addon/src/test/resources/gvnix-test-no-jpa-no-web.roo
@@ -292,7 +295,7 @@ show_message_info "Starting addon-service scripts"
 show_message_info "Starting addon-web-mvc-typicalsecurity scripts"
 	
 	## typicalsecurity
-  test_simple "typicalsecurity" $GVNIX_HOME/addon-web-mvc-typicalsecurity/src/main/resources/typicalsecurity.roo
+  test_simple "typicalsecurity" $GVNIX_HOME/addon-web-mvc-typicalsecurity/src/main/resources/typicalsecurity.roo $TOMCAT_PORT
 
 ##
 ## gvNIX monitoring add-on
@@ -300,7 +303,7 @@ show_message_info "Starting addon-web-mvc-typicalsecurity scripts"
 show_message_info "Starting addon-monitoring scripts"
 	
 	## monitoring
-  test_simple "monitoring" $GVNIX_HOME/addon-monitoring/src/main/resources/monitoring.roo
+  test_simple "monitoring" $GVNIX_HOME/addon-monitoring/src/main/resources/monitoring.roo $TOMCAT_PORT
 
 ##
 ## gvNIX add-ons
@@ -308,7 +311,7 @@ show_message_info "Starting addon-monitoring scripts"
 show_message_info "Starting general scripts"
 	
 	## gvnix-sample
-  test_simple "gvnix-sample" $GVNIX_HOME/src/main/resources/gvnix-sample.roo
+  test_simple "gvnix-sample" $GVNIX_HOME/src/main/resources/gvnix-sample.roo $TOMCAT_PORT
 
 
 show_message_info "All integration script executed: DONE!!!"

@@ -118,23 +118,25 @@ function run_compile() {
 
 ## Runs mvn clean, compile, test, and tomcat command on current folder
 ##  (tomcat is runing with "fork" option)
+##	 * tomcat port to use (default: 8080)
 function run_test_and_tomcat_folk() {
-    mvn clean compile test tomcat:run -Dmaven.tomcat.fork=true
+    mvn clean compile test tomcat:run -Dmaven.tomcat.port=$1 -Dmaven.tomcat.fork=true
 }
 
 ## Runs mvn clean, compile, test, and tomcat command on current folder in "background"
 ##    Then tries to get a page from running server. After 40 retries kills "background" process
 ## Params:
-##   * page to get (relative to localhost:8080)
+##   * page to get (relative to localhost:$2)
+##	 * tomcat port to use (default: 8080)
 function run_test_and_tomcat_background_wget_page() {
-    mvn clean compile test tomcat:run & 
+    mvn clean compile test tomcat:run -Dmaven.tomcat.port=$2 & 
     sleep 20
     if [-z "`jobs`"]; then
       ## Tomcat not runing
       echo "====   Maven task is not running... Canceling script!!!!! ======"
       exit 1
     fi
-    wget --retry-connrefused -t 20 -T 5 -O target/main.html http://localhost:8080/$1
+    wget --retry-connrefused -t 20 -T 5 -O target/main.html http://localhost:$2/$1
     kill -9 %1
 }
 
@@ -186,12 +188,13 @@ function end_test_msg() {
 ## Requieres:
 ##   * "$TEST_ROO": root folder for test
 ##   * "$ROO_COMMAND": Path to roo.sh
+##	 * "$TOMCAT_PORT": Tomcat port to use
 function test_simple() {
     cd $TEST_ROOT
     start_test_msg $1
     init_test_folder $1
     run_roo_script $2
-    run_test_and_tomcat_folk
+    run_test_and_tomcat_folk $3 
     clean_test_folder
     cd $TEST_ROOT
     end_test_msg $1
@@ -228,16 +231,17 @@ function test_compile() {
 ## Params:
 ##   * test name
 ##   * path to roo script file
-##   * page to check (relative to http://localhost:8080)
+##   * page to check (relative to http://localhost:$port)
 ## Requieres:
 ##   * "$TEST_ROO": root folder for test
 ##   * "$ROO_COMMAND": Path to roo.sh
+##	 * "$TOMCAT_PORT": Tomcat port to use
 function test_page_available() {
     cd $TEST_ROOT
     start_test_msg $1
     init_test_folder $1
     run_roo_script $2
-    run_test_and_tomcat_background_wget_page $3
+    run_test_and_tomcat_background_wget_page $3 $4
     clean_test_folder
     cd $TEST_ROOT
     end_test_msg $1
