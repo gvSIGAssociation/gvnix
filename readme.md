@@ -1,4 +1,4 @@
-gvNIX - Spring Roo Addon Suite ![alt text](https://travis-ci.org/gvSIGAssociation/gvnix.svg?branch=master "Build status")
+gvNIX - Spring Roo Addon Suite ![alt text](https://jenkins.gvsig.net/buildStatus/icon?job=gvNIX-CI "Build status")
 ======================================
 
 Welcome to gvNIX, an Spring Roo Addon Suite.
