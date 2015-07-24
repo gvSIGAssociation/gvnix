@@ -29,12 +29,9 @@
     <c:set var="sec_field">
       <spring:escapeBody javaScriptEscape="true" >${field}</spring:escapeBody>
     </c:set>
-    <!--
-    <script type="text/javascript">dojo.require("dijit.form.SimpleTextarea");</script>
-    -->
     <div id="_${fn:escapeXml(id)}_id" class="control-group form-group">
       <label for="_${sec_field}_id" class="control-label">
-        <c:out value="${fn:escapeXml(label)}" />
+        <c:out value="${label}" />
         :
       </label>
       <div class="controls">
@@ -42,9 +39,6 @@
         data-required="${required}" data-regex="${validationRegex}" />
       <form:errors cssClass="errors alert alert-danger" id="_${sec_field}_error_id" path="${sec_field}" />
       </div>
-      <!--
-      <script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '_${sec_field}_id', widgetType : 'dijit.form.SimpleTextarea', widgetAttrs : {disabled : ${disabled}}})); </script>
-      -->
     </div>
     <br />
 

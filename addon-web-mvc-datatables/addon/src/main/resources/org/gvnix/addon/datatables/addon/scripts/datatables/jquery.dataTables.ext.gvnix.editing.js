@@ -979,7 +979,7 @@ var GvNIX_Editing;
 				for(var i = 0; i < controls.length; i++){
 					if(jQuery(jQuery(controls[i]).find('[name][type!=hidden]')).length !== 0){
 						columns.push(jQuery(jQuery(controls[i]).find('[name][type!=hidden]')).attr('name'));
-						var label = jQuery(labels[i]).text();
+						var label = jQuery(labels[i]).html();
 						if(label.lastIndexOf(":") > 0){
 							columnNames.push(label.substring(0,label.lastIndexOf(":")).trim());
 						} else {
@@ -988,7 +988,7 @@ var GvNIX_Editing;
 					}
 					else if(jQuery(jQuery(controls[i]).find('[data-name]')).length !== 0){
 						columns.push(jQuery(jQuery(controls[i]).find('[data-name]')).attr('data-name'));
-						var label = jQuery(labels[i]).text();
+						var label = jQuery(labels[i]).html();
 						if(label.lastIndexOf(":") > 0){
 							columnNames.push(label.substring(0,label.lastIndexOf(":")).trim());
 						} else {

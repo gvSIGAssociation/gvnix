@@ -17,7 +17,7 @@
 
     <div id="_${fn:escapeXml(id)}_id" class="control-group form-group">
       <label for="_${fn:escapeXml(field)}_id" class="control-label">
-        <c:out value="${fn:escapeXml(label)}" />
+        <c:out value="${label}" />
         :
       </label>
       <div class="controls">
@@ -32,11 +32,11 @@
       </a>
 
       <c:out value=" " />
-      <spring:message arguments="${label}" code="entity_not_found" />
+      <spring:message arguments="${label}" code="entity_not_found" javaScriptEscape="true"/>
       </div>
       <c:if test="${not empty required and required eq 'true'}">
         (
-        <div class="errors alert alert-danger"><spring:message code="field_required" /></div>
+        <div class="errors alert alert-danger"><spring:message code="field_required" javaScriptEscape="true" /></div>
         )
       </c:if>
       </div>

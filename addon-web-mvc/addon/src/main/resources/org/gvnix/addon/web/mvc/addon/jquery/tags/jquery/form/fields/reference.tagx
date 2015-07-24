@@ -17,7 +17,7 @@
 
     <div id="_${fn:escapeXml(id)}_id" class="control-group">
       <label for="_${fn:escapeXml(field)}_id" class="control-label">
-        <c:out value="${fn:escapeXml(label)}" />
+        <c:out value="${label}" />
         :
       </label>
       <div class="controls">
@@ -30,10 +30,10 @@
         <img alt="${fn:escapeXml(add_message)}" src="${create_img_url}" title="${fn:escapeXml(add_message)}" />
       </a>
       <c:out value=" " />
-      <spring:message arguments="${label}" code="entity_not_found" />
+      <spring:message arguments="${label}" code="entity_not_found" javaScriptEscape="true"/>
       <c:if test="${not empty required and required eq 'true'}">
         (
-        <spring:message code="field_required" />
+        <spring:message code="field_required" javaScriptEscape="true" />
         )
       </c:if>
       </div>

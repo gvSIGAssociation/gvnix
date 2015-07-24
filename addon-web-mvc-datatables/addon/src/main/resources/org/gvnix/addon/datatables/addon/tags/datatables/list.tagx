@@ -24,7 +24,7 @@
     <c:if test="${empty labelPlural}">
       <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}_plural" var="labelPlural" htmlEscape="false" />
     </c:if>
-    <spring:message arguments="${labelPlural}" code="entity_list_all" var="title_msg" htmlEscape="false" />
+    <spring:message arguments="${labelPlural}" code="entity_list_all" var="title_msg" />
     <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
         <jsp:doBody />
     </util:panel>

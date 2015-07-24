@@ -27,7 +27,7 @@
         <spring:message code="${labelCode}" var="label" htmlEscape="false" />
       </c:when>
     </c:choose>
-    <spring:message arguments="${fn:escapeXml(label)}" code="entity_find" var="title_msg" htmlEscape="false" />
+    <spring:message arguments="${label}" code="entity_find" var="title_msg" />
     <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
       <spring:url value="${path}" var="form_url" />
       <form:form action="${form_url}" method="GET">
@@ -35,9 +35,6 @@
         <jsp:doBody />
         <div class="submit" id="${fn:escapeXml(id)}_${fn:escapeXml(finderName)}_submit">
           <spring:message code="button_find" var="find_button" htmlEscape="false" />
-          <!-- 
-          <script type="text/javascript">Spring.addDecoration(new Spring.ValidateAllDecoration({elementId:'proceed', event:'onclick'}));</script>
-           -->
           <input id="proceed" type="submit" value="${fn:escapeXml(find_button)}"/>
         </div>
       </form:form>

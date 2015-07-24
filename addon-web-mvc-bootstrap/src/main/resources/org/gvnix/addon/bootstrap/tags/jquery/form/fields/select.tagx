@@ -45,7 +45,7 @@
       <c:choose>
         <c:when test="${not empty items}">
           <label for="_${sec_field}_id" class="control-label">
-            <c:out value="${fn:escapeXml(label)}" />
+            <c:out value="${label}" />
             :
           </label>
           <div class="controls">
@@ -184,14 +184,6 @@
             </c:otherwise>
           </c:choose>
           </div>
-          <!--
-          <c:choose>
-            <c:when test="${multiple == false}">
-              <script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '_${sec_field}_id', widgetType: 'dijit.form.FilteringSelect', widgetAttrs : {hasDownArrow : true}})); </script>
-            </c:when>
-            <!-#- disabled due to http://jira.springframework.org/browse/ROO-909 <c:otherwise> <script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '_${field}_id', widgetType: 'dijit.form.MultiSelect', widgetAttrs : {}})); </script> </c:otherwise> -#->
-          </c:choose>
-          -->
         </c:when>
         <c:otherwise>
           <field:reference field="${label}" id="${id}" path="${path}" required="${required}" />

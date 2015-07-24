@@ -39,10 +39,10 @@
     <c:if test="${empty validationMessage}">
       <c:choose>
         <c:when test="${empty validationMessageCode}">
-          <spring:message arguments="${fn:escapeXml(label)}" code="field_invalid" var="field_invalid" htmlEscape="false" />
+          <spring:message arguments="${label}" code="field_invalid" var="field_invalid" htmlEscape="false" />
         </c:when>
         <c:otherwise>
-          <spring:message arguments="${fn:escapeXml(label)}" code="${validationMessageCode}" var="field_invalid" htmlEscape="false" />
+          <spring:message arguments="${label}" code="${validationMessageCode}" var="field_invalid" htmlEscape="false" />
         </c:otherwise>
       </c:choose>
     </c:if>
@@ -57,7 +57,7 @@
 
     <div id="_${fn:escapeXml(id)}_id" class="control-group form-group">
       <label for="_${sec_field}_id" class="control-label">
-        <c:out value="${fn:escapeXml(label)}" />
+        <c:out value="${label}" />
         :
       </label>
 
@@ -71,12 +71,6 @@
         </c:otherwise>
       </c:choose>
 
-      <c:set var="sec_field_validation">
-        <spring:escapeBody javaScriptEscape="true">${field_validation}</spring:escapeBody>
-      </c:set>
-      <c:set var="sec_field_invalid">
-        <spring:escapeBody javaScriptEscape="true" htmlEscape="true">${field_invalid}</spring:escapeBody>
-      </c:set>
       <c:set var="sec_field_required">
         <spring:escapeBody javaScriptEscape="true">${field_required}</spring:escapeBody>
       </c:set>
@@ -90,8 +84,8 @@
       <c:choose>
         <c:when test="${disableFormBinding}">
           <input class="form-control input-sm" id="_${sec_field}_id" name="${sec_field}" type="${fn:escapeXml(type)}"
-            title="${sec_field_validation}" data-required="${required}"
-            data-invalid="${sec_field_invalid}" data-missing="${sec_field_required}"
+            title="${fn:escapeXml(field_validation)}" data-required="${required}"
+            data-invalid="${fn:escapeXml(field_invalid)}" data-missing="${fn:escapeXml(sec_field_required)}"
             data-regex="${validationRegex}" data-minlength="${min}" data-maxlength="${max}"
             data-mindecimal="${decimalMin}" data-maxdecimal="${decimalMax}" />
         </c:when>
@@ -102,8 +96,8 @@
             </c:when>
             <c:otherwise>
               <form:input class="form-control input-sm" id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}"
-                title="${sec_field_validation}" data-required="${required}"
-                data-invalid="${sec_field_invalid}" data-missing="${sec_field_required}"
+                title="${field_validation}" data-required="${required}"
+                data-invalid="${field_invalid}" data-missing="${sec_field_required}"
                 data-regex="${validationRegex}" data-minlength="${min}" data-maxlength="${max}"
                 data-mindecimal="${decimalMin}" data-maxdecimal="${decimalMax}" />
             </c:otherwise>
@@ -112,12 +106,6 @@
         </c:otherwise>
       </c:choose>
       </div>
-
-      <!--
-      <script type="text/javascript">
-        Spring.addDecoration(new Spring.ElementDecoration({elementId : '_${sec_field}_id', widgetType : 'dijit.form.ValidationTextBox', widgetAttrs : {promptMessage: '${sec_field_validation}', invalidMessage: '${sec_field_invalid}', required : ${required}, ${sec_validation_regex} missingMessage : '${sec_field_required}' }}));
-      </script>
-      -->
     </div>
     <br />
   </c:if>
