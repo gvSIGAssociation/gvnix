@@ -1,28 +1,28 @@
-## Run all integration tests from console and form jenkins integration system daily.
-## Run example:
-##  ${WORKSPACE}/src/test/resources/integration.sh ${TEST_ROOT} ${ROO_COMMAND} ${GVNIX_HOME} ${TOMCAT_PORT}
-## Where input parameters are:
-##  * ${TEST_ROOT}: Output execution tests folder
-##  * ${ROO_COMMAND}: Roo shell executable path
-##  * ${GVNIX_HOME}: Path to gvNIX root source folder for access the test scripts
-##  * ${$TOMCAT_PORT}: Tomcat port to use
+## Run integration tests.
 ## 
+## Example:
+##  ${WORKSPACE}/src/test/resources/integration.sh ${TEST_ROOT} ${ROO_COMMAND} ${GVNIX_HOME} ${TOMCAT_PORT}
+## 
+## Options:
+##  * ${TEST_ROOT}:    execution tests output folder.
+##  * ${ROO_COMMAND}:  Roo command to execute the Roo Shell.
+##  * ${GVNIX_HOME}:   path to the gvNIX source code directory to locate the test scripts.
+##  * ${$TOMCAT_PORT}: Tomcat port to use
 
 function usage {
 cat << EOF
-Run all integration tests from console and form jenkins integration system daily.
+Run integration tests.
 
 Usage:
     $0 TEST_ROOT ROO_COMMAND GVNIX_HOME TOMCAT_PORT
 
-Where input parameters are:
-  * TEST_ROOT: Output execution tests folder
-  * ROO_COMMAND: Roo shell executable path. Should be "gvnix.sh"
-  * GVNIX_HOME: Path to gvNIX root source folder for access the test scripts
-  * TOMCAT_PORT: Tomcat port to use
+Options:
+  * TEST_ROOT,   execution tests output folder.
+  * ROO_COMMAND, Roo command to execute the Roo Shell.
+  * GVNIX_HOME,  path to the gvNIX source code directory to locate the test scripts.
+  * TOMCAT_PORT, Tomcat port to use
 EOF
 }
-
 
 ## Exit script on any error (when a commad exits with non 0 status)
 set -e 
@@ -66,32 +66,32 @@ source "$THIS_FOLDER/build-util.functions"
 if [ -z "$TEST_ROOT" ]; then
   usage
   echo ""
-  echo "*** Missing Test root path"
+  echo "*** Missing output folder"
   echo ""
   exit 1
 fi
 
 if [ ! -x "$ROO_COMMAND" ]; then
   usage
-  show_message_problem "ERROR" "Missing gvnix executable"
+  show_message_problem "ERROR" "Missing Roo command"
   exit 1
 fi
 
 if [ ! -d "$GVNIX_HOME" ]; then
   usage
-  show_message_problem "ERROR" "Missing gvNIX home"
+  show_message_problem "ERROR" "Missing gvNIX source code directory"
   exit 1
 fi
 
 if [ ! -d "$GVNIX_HOME/addon-jpa" ]; then
   usage
-  show_message_problem "ERROR" "Invalid gvNIX home" "Missing folder: $GVNIX_HOME/addon-jpa"
+  show_message_problem "ERROR" "Invalid gvNIX HOME" "Missing folder: $GVNIX_HOME/addon-jpa"
   exit 1
 fi
 
 if [ ! -f "$GVNIX_HOME/pom.xml" ]; then
   usage
-  show_message_problem "ERROR" "Invalid gvNIX home" "Missing folder: $GVNIX_HOME/pom.xml"
+  show_message_problem "ERROR" "Invalid gvNIX HOME" "Missing folder: $GVNIX_HOME/pom.xml"
   exit 1
 fi
 
