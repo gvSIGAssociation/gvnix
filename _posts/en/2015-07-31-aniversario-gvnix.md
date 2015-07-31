@@ -2,7 +2,7 @@
 layout: post
 anniversary: true
 timeline: true
-title: gvNIX Anniversary
+title: gvNIX 5th Anniversary
 description: gvNIX is celebrating its 5th anniversary!
 tags: [GVA, gvNIX, Opensource, Proyectos]
 comments: true
