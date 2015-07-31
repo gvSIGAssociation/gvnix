@@ -7,6 +7,8 @@ description: gvNIX is celebrating its 5th anniversary!
 tags: [GVA, gvNIX, Opensource, Proyectos]
 comments: true
 featured: true
+type: photo
+imagefeature: post/anniversary-photo_en.png
 share: true
 category:
     - en
