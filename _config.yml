@@ -15,7 +15,7 @@ search:            true
 share:             true
 
 # Assign a banner image for your site's at 5th anniversary
-anniversary:      false
+anniversary:      true
 
 # Read Time is a calculator tp provide post read-time based on word count. Usage is recommended.
 readtime:         true

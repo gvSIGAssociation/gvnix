@@ -3,7 +3,7 @@ layout: post
 anniversary: true
 timeline: true
 title: Aniversario gvNIX
-description: Cumplimos 5 años
+description: Estamos de aniversario, ¡gvNIX cumple 5 años!
 tags: [GVA, gvNIX, Opensource, Proyectos]
 comments: true
 featured: true
@@ -14,7 +14,7 @@ lang: es
 ---
 
 
-Este mes de julio estamos de aniversario, ¡cumplimos 5 años!
+Estamos de aniversario, ¡cumplimos 5 años!
 
 Hace 5 años desde que la Generalitat Valenciana apostó por el desarrollo de esta
 herramienta de desarrollo Java de código abierto para el desarrollo rápido de
