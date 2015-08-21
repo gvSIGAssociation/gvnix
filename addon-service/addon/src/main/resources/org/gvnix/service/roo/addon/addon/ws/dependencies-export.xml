@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dependencies>
-	<dependency org="org.apache.cxf" name="cxf-rt-core" rev="${cxf.version}">
+	<dependency org="org.apache.cxf" name="cxf-core" rev="${cxf.version}">
 	<exclusions>
 		<exclusion org="org.springframework" name="spring-beans" />
 		<exclusion org="org.springframework" name="spring-core" />
@@ -18,5 +18,5 @@
 	<dependency org="javax.xml.bind" name="jaxb-api" rev="2.2.7" />
 	<dependency org="javax.xml.ws" name="jaxws-api" rev="2.2.8" />
 	<!-- Avoid ROO-3163 -->
-	<dependency org="org.springframework" name="spring-tx" rev="${spring.version}" />
+	<dependency org="org.springframework" name="spring-tx" rev="" />
 </dependencies>

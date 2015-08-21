@@ -169,7 +169,7 @@
   <properties>
     <google.code.project.name>gvnix</google.code.project.name>
     <gvnix.version>${project.parent.version}</gvnix.version>
-    <querydsl.version>3.6.3</querydsl.version>
+    <querydsl.version>3.6.6</querydsl.version>
     <spring.version>3.2.0.RELEASE</spring.version>
     <devel.resources.path>../../devel-resources</devel.resources.path>
   </properties>

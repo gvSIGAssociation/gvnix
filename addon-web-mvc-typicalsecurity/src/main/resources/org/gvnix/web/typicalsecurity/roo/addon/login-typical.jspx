@@ -27,7 +27,7 @@
 
 		<spring:message code="security_login_form_name" var="name" />
 		<spring:message code="security_login_form_name_message" htmlEscape="false" var="name_msg"/>
-		<input class="form-control" type="text" placeholder="${name}" autofocus="autofocus" id="j_username" name="j_username" data-required="true" data-minlength="3" data-maxlength="30" data-original-title="${name_msg}" />
+		<input class="form-control" type="text" placeholder="${name}" autofocus="autofocus" id="j_username" name="username" data-required="true" data-minlength="3" data-maxlength="30" data-original-title="${name_msg}" />
 	        <!-- <script type="text/javascript">
 	          <c:set var="sec_name_msg">
 	            <spring:escapeBody javaScriptEscape="true">${name_msg}</spring:escapeBody>
@@ -37,7 +37,7 @@
 
 		<spring:message code="security_login_form_password" var="pass"/>
        	<spring:message code="security_login_form_password_message" htmlEscape="false" var="pwd_msg"/>
-        <input type="password" class="form-control" placeholder="${pass}" id="j_password" name="j_password" data-required="true" data-minlength="3" data-maxlength="30" data-original-title="${pwd_msg}" />
+        <input type="password" class="form-control" placeholder="${pass}" id="j_password" name="password" data-required="true" data-minlength="3" data-maxlength="30" data-original-title="${pwd_msg}" />
 	    	<!-- <script type="text/javascript">
 	          <c:set var="sec_pwd_msg">
 	            <spring:escapeBody javaScriptEscape="true">${pwd_msg}</spring:escapeBody>
