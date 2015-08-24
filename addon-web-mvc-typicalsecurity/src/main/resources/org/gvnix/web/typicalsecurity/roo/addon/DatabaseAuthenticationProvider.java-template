@@ -37,7 +37,7 @@ import org.springframework.security.authentication.dao.AbstractUserDetailsAuthen
 import org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -124,7 +124,7 @@ public class DatabaseAuthenticationProvider extends
 	        throw new BadCredentialsException("Invalid password");
 	      }
 	      // authorize admin
-	      authorities.add(new GrantedAuthorityImpl("ROLE_ADMIN"));
+	      authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 	    } else {
 	      try {
 	    	TypedQuery<User> query= User.findUsersByEmailAddress(username);
@@ -143,7 +143,7 @@ public class DatabaseAuthenticationProvider extends
 	        TypedQuery<UserRole> roleQuery=UserRole.findUserRolesByUserEntry(targetUser);
 	        List<UserRole> userRoles = roleQuery.getResultList();
 	        for(UserRole userRole:userRoles){
-	        	authorities.add(new GrantedAuthorityImpl(userRole.getRoleEntry().getRoleName()));
+	        	authorities.add(new SimpleGrantedAuthority(userRole.getRoleEntry().getRoleName()));
 	        }
 	      } catch (EmptyResultDataAccessException e) {
 		        throw new BadCredentialsException("Invalid user");

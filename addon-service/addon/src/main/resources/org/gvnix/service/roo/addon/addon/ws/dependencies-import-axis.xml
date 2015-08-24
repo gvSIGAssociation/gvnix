@@ -2,7 +2,7 @@
 <dependencies>
 	<dependency org="axis" name="axis" rev="${axis.version}" />
 	<!-- Generated Axis classes uses javax.persistence.Entity -->
-	<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" />
+	<dependency org="org.eclipse.persistence" name="javax.persistence" rev="" />
 	<!-- Avoid ROO-3163 -->
 	<dependency org="org.springframework" name="spring-tx" rev="" />
 </dependencies>
