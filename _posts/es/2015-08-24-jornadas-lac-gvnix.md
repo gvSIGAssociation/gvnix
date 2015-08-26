@@ -24,9 +24,11 @@ gvNIX se dará a conocer como nuevo producto de la [Asociación gvSIG](http://ww
 Varios miembros del equipo de la Asocación gvSIG y del equipo de desarrollo de [DISID Corporation](http://www.disid.com)
 presentaran la herramienta gvNIX en las jornadas participando activamente con talleres y ponencias.
 
-En el taller nos centraremos en esta componente GEO.
+La presentación gvNIX: Desarrollo rápido de geoportales para visualización y gestión de datos será el viernes 28 de agosto
+a las 11:30 hora local;  el taller sobre gvNIX: Desarrollo con gvNIX, herramienta para el desarrollo rápido de geoportales en Java
+se impartirá los días 26 y 28 de agosto de 16h a 20h hora local.
 
-Llegados a este punto podemos ya comentar que este taller está especialmente orientado a desarrolladores.
+En el taller nos centraremos en esta componente GEO, especialmente orientado a desarrolladores.
 
 Para los que quieran asistir al taller y además quieran ir siguiendo los distintos ejercicios del mismo, los requisitos previos son:
 
