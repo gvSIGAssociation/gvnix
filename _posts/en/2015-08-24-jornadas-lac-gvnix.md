@@ -2,7 +2,7 @@
 layout: post
 anniversary: false
 timeline: false
-title: gvNIX en las 7as Jornadas de Latinoamérica y Caribe de gvSIG.
+title: gvNIX en las 7as Jornadas de Latinoamérica y Caribe de gvSIG
 description: Presentación y taller de gvNIX en México
 tags: [GVA, gvNIX, Opensource, Proyectos]
 comments: true
