@@ -11,8 +11,8 @@ type: photo
 imagefeature: post/geo/map_entities_1.png
 share: true
 category:
-    - es
-lang: es
+    - en
+lang: en
 ---
 
 
