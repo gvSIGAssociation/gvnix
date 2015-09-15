@@ -21,15 +21,8 @@ conference to take place in Toluca, Mexico, from 26 to 28 August.
 
 gvNIX will be announced as a new product of the [Association gvSIG](http://www.gvsig.com).
 
-Varios miembros del equipo de la Asocación gvSIG y del equipo de desarrollo de [DISID Corporation](http://www.disid.com)
-presentaran la herramienta gvNIX en las jornadas participando activamente con talleres y ponencias.
-
 Several members of the Association gvSIG team and the [DISID Corporation](http://www.disid.com) development team
 will be presented the gvNIX tool to participate actively in the conference with workshops and presentations.
-
-La presentación gvNIX: Desarrollo rápido de geoportales para visualización y gestión de datos será el viernes 28 de agosto
-a las 11:30 hora local;  el taller sobre gvNIX: Desarrollo con gvNIX, herramienta para el desarrollo rápido de geoportales en Java
-se impartirá los días 26 y 28 de agosto de 16h a 20h hora local.
 
 The presentation gvNIX: Rapid development of geoportals for visualization and data management will be Friday August 28
 at 11:30 local time; gvNIX workshop: Development gvNIX tool for rapid development of Java geoportals
@@ -48,7 +41,6 @@ For those who want to participate in the workshop and also want to go along the 
 * Installed PostgreSQL and PostGIS spatial extension
  * PostgreSQL 9.3: <a href="http://www.postgresql.org/download/">http://www.postgresql.org/download/</a>
  * PostGIS 2: <a href="http://postgis.net/install" rel="nofollow">http://postgis.net/install</a>
-
 
 In the practical part, the workshop will see how:
 
@@ -73,10 +65,11 @@ At the end of the workshop, attendees will have a Geoportal that looks like this
 </figure>
 </div>
 
-The [Registration] (http://www.gvsig.com/es/eventos/jornadas-lac/2015/inscripcion) remains open,
+
+The [Registration](http://www.gvsig.com/es/eventos/jornadas-lac/2015/inscripcion) remains open,
 and as in all gvSIG event is free, with places are limited.
 
-On the website of the conference can consult the [program] http://www.gvsig.com/es/eventos/jornadas-lac/2015/programa)
+On the website of the conference can consult the [program](http://www.gvsig.com/es/eventos/jornadas-lac/2015/programa)
 full of activities with the papers to be presented at the conference 7a Latin American and Caribbean gvSIG.
 
 We wait for you!
