@@ -2,9 +2,9 @@
 layout: post
 anniversary: false
 timeline: false
-title: gvNIX en las 7as Jornadas de Latinoamérica y Caribe de gvSIG
-description: Presentación y taller de gvNIX en México
-tags: [GVA, gvNIX, Opensource, Proyectos]
+title: gvNIX in 7th Latin America an Caribbean Conference gvSIG
+description: Presentation and workshop of gvNIX in Mexico
+tags: [gvNIX, gvSIG, Opensource, Training]
 comments: true
 featured: true
 type: photo
@@ -16,50 +16,56 @@ lang: en
 ---
 
 
-Este año estaremos en las 7as Jornadas Latinoamérica y Caribe de gvSIG.
-jornadas que se celebrarán en Toluca, México, del 26 al 28 de agosto.
+This year we will be in the 7th Latin American and Caribbean Conference gvSIG,
+conference to take place in Toluca, Mexico, from 26 to 28 August.
 
-gvNIX se dará a conocer como nuevo producto de la [Asociación gvSIG](http://www.gvsig.com).
+gvNIX will be announced as a new product of the [Association gvSIG](http://www.gvsig.com).
 
 Varios miembros del equipo de la Asocación gvSIG y del equipo de desarrollo de [DISID Corporation](http://www.disid.com)
 presentaran la herramienta gvNIX en las jornadas participando activamente con talleres y ponencias.
+
+Several members of the Association gvSIG team and the [DISID Corporation](http://www.disid.com) development team
+will be presented the gvNIX tool to participate actively in the conference with workshops and presentations.
 
 La presentación gvNIX: Desarrollo rápido de geoportales para visualización y gestión de datos será el viernes 28 de agosto
 a las 11:30 hora local;  el taller sobre gvNIX: Desarrollo con gvNIX, herramienta para el desarrollo rápido de geoportales en Java
 se impartirá los días 26 y 28 de agosto de 16h a 20h hora local.
 
-En el taller nos centraremos en esta componente GEO, especialmente orientado a desarrolladores.
+The presentation gvNIX: Rapid development of geoportals for visualization and data management will be Friday August 28
+at 11:30 local time; gvNIX workshop: Development gvNIX tool for rapid development of Java geoportals
+will be held on 26 and 28 August from 16h to 20h local time.
 
-Para los que quieran asistir al taller y además quieran ir siguiendo los distintos ejercicios del mismo, los requisitos previos son:
+In this workshop we will focus on GEO component, especially oriented to developers.
 
-* Tener instalado STS y el entorno de desarrollo (Maven, distribución de gvNIX)
+For those who want to participate in the workshop and also want to go along the various exercises, the prerequisites are:
+
+* Installed STS and the development environment (Maven, gvNIX distribution)
 * JDK 7: <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html">http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html</a>
-* Maven 3.0.5 o superior: <a href="http://maven.apache.org/download.cgi">http://maven.apache.org/download.cgi</a>
+* Maven 3.0.5 or higher: <a href="http://maven.apache.org/download.cgi">http://maven.apache.org/download.cgi</a>
 * STS 3.6: <a href="https://spring.io/tools/sts/all">https://spring.io/tools/sts/all</a>
 * gvNIX 1.4.0: <a href="http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download">http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.0.RELEASE.zip/download</a>
-* Guía instalación gvNIX: <a href="https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc" target="_blank"> https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc</a>
-* Tener instalado POSTGRESQL y la extensión espacial POSTGIS
+* Installation guide gvNIX: <a href="https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc" target="_blank"> https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc</a>
+* Installed PostgreSQL and PostGIS spatial extension
  * PostgreSQL 9.3: <a href="http://www.postgresql.org/download/">http://www.postgresql.org/download/</a>
  * PostGIS 2: <a href="http://postgis.net/install" rel="nofollow">http://postgis.net/install</a>
 
 
-En cuanto a la parte práctica, en el taller veremos como:
+In the practical part, the workshop will see how:
 
-* Crear base de datos POSTGRESQL con extensión POSTGIS (para agilizar el taller se aconseja que los asistentes ya lo tengan configurado)
-* Configurar un proyecto para trabajar con componentes GEO
-* Crear un proyecto gvNIX basado en modelo de entidades con campos GEO
-* Generar capa web (Datatables, Bootstrap, jQuery, etc…)
-* Transformar capa web de campos GEO para guardar datos
-* Demostración de creación, actualización y visualización de entidades con campos GEO
-* Generar mapa vacío
-* Añadir entidades al mapa
-* Añadir nuevas capas al mapa (Tiles y WMS)
-* Añadir nuevas herramientas al mapa (Personalizadas e incluídas en gvNIX)
-* Configuración de capas (filtrable, seleccionable, icono, colores, etc…)
-* Demostración de filtrado y selección utilizando componente Datatables
+* Create PostgreSQL database with PostGIS extension (to streamline the workshop recommended that the attendees have already configured)
+* Set up a project to work with GEO components
+* Create a project based on gvNIX entity model with GEO fields
+* Generate web layer (datatables, Bootstrap, jQuery, etc ...)
+* Transform web layer GEO fields to store data
+* Demonstration of creating, updating and visualization of entities with GEO fields
+* Generate empty map
+* Add entities to map
+* Add new layers to the map (Tiles and WMS)
+* Add new tools to map (Custom and included in gvNIX)
+* Setting layers (filterable, selectable icon colors, etc ...)
+* Demonstration using filtering and selection Datatables component
 
-
-Al acabar el taller, los asistentes tendrán un Geoportal con el siguiente aspecto:
+At the end of the workshop, attendees will have a Geoportal that looks like this:
 
 <div class="col-md-12">
 <figure>
@@ -67,11 +73,10 @@ Al acabar el taller, los asistentes tendrán un Geoportal con el siguiente aspec
 </figure>
 </div>
 
-La [inscripción](http://www.gvsig.com/es/eventos/jornadas-lac/2015/inscripcion) continua abierta,
-y como en todo evento gvSIG es gratuita, siendo el aforo limitado.
+The [Registration] (http://www.gvsig.com/es/eventos/jornadas-lac/2015/inscripcion) remains open,
+and as in all gvSIG event is free, with places are limited.
 
-En la página web de las Jornadas podéis consultar el [programa](http://www.gvsig.com/es/eventos/jornadas-lac/2015/programa)
-completo de actividades con las ponencias que se van a presentar en las 7as Jornadas de Latinoamérica y Caribe de gvSIG.
+On the website of the conference can consult the [program] http://www.gvsig.com/es/eventos/jornadas-lac/2015/programa)
+full of activities with the papers to be presented at the conference 7a Latin American and Caribbean gvSIG.
 
-
-¡Os esperamos!
+We wait for you!

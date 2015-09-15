@@ -4,7 +4,7 @@ anniversary: false
 timeline: false
 title: gvNIX en las 7as Jornadas de Latinoamérica y Caribe de gvSIG
 description: Presentación y taller de gvNIX en México
-tags: [GVA, gvNIX, Opensource, Proyectos]
+tags: [gvNIX, gvSIG, Opensource, Formación]
 comments: true
 featured: true
 type: photo
@@ -16,7 +16,7 @@ lang: es
 ---
 
 
-Este año estaremos en las 7as Jornadas Latinoamérica y Caribe de gvSIG.
+Este año estaremos en las 7as Jornadas Latinoamérica y Caribe de gvSIG,
 jornadas que se celebrarán en Toluca, México, del 26 al 28 de agosto.
 
 gvNIX se dará a conocer como nuevo producto de la [Asociación gvSIG](http://www.gvsig.com).
