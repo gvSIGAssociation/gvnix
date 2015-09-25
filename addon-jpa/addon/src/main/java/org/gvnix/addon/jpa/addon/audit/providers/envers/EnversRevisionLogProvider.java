@@ -72,10 +72,10 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
             .getLogger(EnversRevisionLogProvider.class);
 
     private static final Dependency HIBERNATE_DEPENDENCY = new Dependency(
-            "org.hibernate", "hibernate-entitymanager", "4.3.6.Final");
+            "org.hibernate", "hibernate-entitymanager", null);
 
     private static final Dependency HIBERNATE_ENVERS_DEPENDENCY = new Dependency(
-            "org.hibernate", "hibernate-envers", "4.3.6.Final");
+            "org.hibernate", "hibernate-envers", null);
 
     private static final String HBER_PERS_PROV_CLS = "org.hibernate.jpa.HibernatePersistenceProvider";
 
@@ -302,15 +302,10 @@ public class EnversRevisionLogProvider implements RevisionLogProvider {
                             .concat(HIBERNATE_DEPENDENCY.getSimpleDescription()));
         }
 
-        // Gets hibernate-entityManager version
-        String hibernateVersion = hibernateDependencies.iterator().next()
-                .getVersion();
-
-        // Install hibernate envers dependency using hibernate-entityManager
-        // version
+        // Install hibernate envers dependency
         Dependency enversDependency = new Dependency(
                 HIBERNATE_ENVERS_DEPENDENCY.getGroupId(),
-                HIBERNATE_ENVERS_DEPENDENCY.getArtifactId(), hibernateVersion);
+                HIBERNATE_ENVERS_DEPENDENCY.getArtifactId(), null);
         projectOperations.addDependency(
                 projectOperations.getFocusedModuleName(), enversDependency);
     }

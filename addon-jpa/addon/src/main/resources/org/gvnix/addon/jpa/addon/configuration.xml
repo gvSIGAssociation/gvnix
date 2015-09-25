@@ -9,20 +9,17 @@
 			</repository>
 		</repositories>
 		<properties>
-			<querydsl.version>3.6.3</querydsl.version>
 			<gvnix.version>2.0.0.BUILD-SNAPSHOT</gvnix.version>
 		</properties>
 	    <dependencies>
         <dependency>
           <groupId>com.mysema.querydsl</groupId>
           <artifactId>querydsl-apt</artifactId>
-          <version>${querydsl.version}</version>
           <scope>provided</scope>
         </dependency>
         <dependency>
           <groupId>com.mysema.querydsl</groupId>
           <artifactId>querydsl-jpa</artifactId>
-          <version>${querydsl.version}</version>
         </dependency>
     		<dependency>
         		<groupId>org.gvnix</groupId>

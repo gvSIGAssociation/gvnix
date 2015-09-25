@@ -3,9 +3,7 @@
   <gvnix>
     <web-report>
        <properties>
-         <jasperreports.version>5.0.1</jasperreports.version>
          <jasperreportsfonts.version>4.0.0</jasperreportsfonts.version>
-         <apachepoi.version>3.9</apachepoi.version>
          <gvnix.version>2.0.0.BUILD-SNAPSHOT</gvnix.version>
      </properties>
     </web-report>
@@ -14,7 +12,6 @@
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
-            <version>${jasperreports.version}</version>
             <exclusions>
               <exclusion>
                   <groupId>commons-collections</groupId>
@@ -25,12 +22,10 @@
         <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-context-support</artifactId>
-          <version>${spring.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.poi</groupId>
           <artifactId>poi</artifactId>
-          <version>${apachepoi.version}</version>
         </dependency>
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
