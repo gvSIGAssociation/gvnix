@@ -19,22 +19,21 @@ package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.ReferenceCardinality;
-import org.apache.felix.scr.annotations.ReferencePolicy;
-import org.apache.felix.scr.annotations.ReferenceStrategy;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.config.DefaultDynamicConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.support.logging.HandlerUtils;
 
@@ -52,52 +51,16 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 @Component
 @Service
-@Reference(name = "components",
-        strategy = ReferenceStrategy.LOOKUP,
-        policy = ReferencePolicy.DYNAMIC,
-        referenceInterface = DefaultDynamicConfiguration.class,
-        cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class ServicesImpl implements Services {
 
     private static final Logger logger = HandlerUtils
             .getLogger(ServicesImpl.class);
 
-    private ComponentContext context;
+    // ------------ OSGi component attributes ----------------
+    private BundleContext context;
 
     protected void activate(ComponentContext context) {
-        this.context = context;
-    }
-
-    /**
-     * Get all the dynamic configuration components.
-     * 
-     * @return Dynamic configuration components
-     */
-    private Set<Object> getComponents() {
-
-        return getSet("components");
-    }
-
-    /**
-     * Get named configuration components.
-     * 
-     * @param <T> Components type
-     * @param name Components name
-     * @return Components
-     */
-    @SuppressWarnings("unchecked")
-    private <T> Set<T> getSet(String name) {
-
-        Set<T> result = new HashSet<T>();
-        Object[] objs = context.locateServices(name);
-        if (objs != null) {
-            for (Object o : objs) {
-
-                result.add((T) o);
-            }
-        }
-
-        return result;
+        this.context = context.getBundleContext();
     }
 
     /**
@@ -110,7 +73,7 @@ public class ServicesImpl implements Services {
         dynConf.setActive(Boolean.TRUE);
 
         // Iterate all dynamic configurations components registered
-        for (Object o : getComponents()) {
+        for (Object o : getDefaultDynamicConfiguration()) {
             try {
 
                 // Invoke the read method of all components to get properties
@@ -160,7 +123,7 @@ public class ServicesImpl implements Services {
         String path = "";
 
         // Find required dynamic configuration component
-        for (Object o : getComponents()) {
+        for (Object o : getDefaultDynamicConfiguration()) {
             if (o.getClass().getName().equals(dynComp.getId())) {
 
                 try {
@@ -250,7 +213,7 @@ public class ServicesImpl implements Services {
     public void setCurrentConfiguration(DynConfiguration dynConf) {
 
         // Iterate all dynamic configurations components registered
-        for (Object o : getComponents()) {
+        for (Object o : getDefaultDynamicConfiguration()) {
             try {
 
                 // Invoke the read method of all components to get its
@@ -292,4 +255,23 @@ public class ServicesImpl implements Services {
         }
     }
 
+    public List<Object> getDefaultDynamicConfiguration() {
+        List<Object> dynConfigurations = new ArrayList<Object>();
+        // Get all Services implement DefaultDynamicConfiguration interface
+        try {
+            ServiceReference[] references = context.getAllServiceReferences(
+                    DefaultDynamicConfiguration.class.getName(), null);
+
+            for (ServiceReference ref : references) {
+                dynConfigurations.add(context.getService(ref));
+            }
+
+            return dynConfigurations;
+
+        }
+        catch (InvalidSyntaxException e) {
+            logger.warning("Cannot load DefaultDynamicConfiguration on ServicesImpl.");
+            return null;
+        }
+    }
 }
