@@ -35,6 +35,7 @@ To start to develop gvNIX and extend its features you need:
 * JDK 7 or above ( http://www.oracle.com/technetwork/es/java/javase/downloads/index.html)
 * Maven 3.0.5 or above ( http://maven.apache.org/download.html )
 * Internet access so that Maven can download required dependencies
+* Spring Roo development requeriments. Follow the instructions to setup Spring Roo ( https://github.com/spring-projects/spring-roo#developer-instructions)
 
 Run gvNIX Roo Addon Suite
 ===========================
