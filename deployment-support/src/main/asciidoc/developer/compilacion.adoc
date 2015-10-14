@@ -7,8 +7,8 @@ Compilación e instalación de add-ons
 TBC Pequeña introducción hablando de OSGi e instalación/desinstalación
 en caliente
 
-Compilación y empaquetado de un add-on.
----------------------------------------
+Compilación y empaquetado de un add-on. (cambiar entero)
+--------------------------------------------------------
 
 Los add-ons se empaquetan en un archivo _jar_. Al generar el proyecto
 con la plantilla de add-ons Roo ya nos prepara el fichero `pom.xml` para
@@ -22,8 +22,8 @@ Esto genera un `.jar` en el directorio `target` y guarda una copia en el
 repositorio de maven local con el add-on listo para instalar en el
 entrono OSGi de framework.
 
-Instalación
------------
+Instalación  (cambiar entero)
+-----------------------------
 
 Al finalizar el comando `mvn clean
     install` del empaquetado la consola muestra algo parecido por
@@ -63,7 +63,7 @@ La consola del framework ofrece una serie de comando para instalar los
 _bundles_ _en caliente_. Las instrucciones son las siguientes:
 
 1.  Utilizando la ruta que nos muestra maven de la instalación del jar
-del bundle usamos el comando `osgi install` para instalarlo en el
+del bundle usamos el comando `addon install` para instalarlo en el
 framework:
 +
 -------------
@@ -80,31 +80,18 @@ _no se habrá instalado_.
 ====
 +
 Como salida el framework nos informa de `ID` del bundle instalado.
++
+El addon se activa automaticamente cuando se instala.
 
-2.  Usamos el comando `osgi list` para comprobar que el bundle está
-instalado:
+2.  Usamos el comando `addon list` para comprobar que el bundle está
+instalado y se ha activado:
 +
 -----------------------------------------------------------------------
-roo>
-[ 1] [...
-[55] [Installed   ] [    1] org.organization.roo.addon (0.1.0.SNAPSHOT)
-roo>
------------------------------------------------------------------------
-3.  Ahora activamos el bundle con el comando `felix shell
-          start` con el `ID` del bundle que acabamos de instalar.
-+
--------------------------
-roo> felix shell start 55
-roo>
--------------------------
-4.  Comprobamos que el bundle se ha activado.
-+
-----------------------------------------------------------------------
 roo>
 [ 1] [...
 [55] [Active     ] [    1] org.organization.roo.addon (0.1.0.SNAPSHOT)
 roo>
-----------------------------------------------------------------------
+-----------------------------------------------------------------------
 +
 [NOTE]
 ====
@@ -113,6 +100,7 @@ el `classpath` de framework alguna de las dependencias del add-on. Ver
 la sección link:#_instalar_dependencias_de_terceros[Instalar
 dependencias de terceros].
 ====
+
 
 Otro comando que nos puede ser útil es `osgi
       update`. Permite reinstalar el jar usando la versión actual del
@@ -126,6 +114,11 @@ roo>
 Para poder ver mensajes sobre las instalación y activación del los
 _bundles_ podemos usar el comando `osgi
       log`.
+
+Instalar una suite de add-ons
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TBC Comentar addon suite
 
 Desinstalar un add-on
 ~~~~~~~~~~~~~~~~~~~~~
@@ -164,20 +157,13 @@ Depuración de add-on
 ~~~~~~~~~~~~~~~~~~~~
 
 En este momento la depuración de un add-on sólo es posible mediante el
-sistema de _depuración de java remota_. El entrono de desarrollo de
-gvNIX ofrece una versión de `gvnix-dev` llamada `gvnix-dev-debug` que ya
-tiene configurada los parámetros necesario para ello.
+sistema de _depuración de java remota_. El entorno de desarrollo de
+gvNIX ofrece `roo_dev` que ya tiene configurada los parámetros necesario para ello.
 
 La recomendación es depurar con eclipse. Para tener el proyecto y el
 eclipse preparado se deben seguir los siguientes pasos:
 
-.Importar el proyecto de add-on en el eclipse
-
-Para importar un proyecto en el eclipse hay que seguir dos pasos:
-
-1.  Ejecutar el comando `mvn eclipse:eclipse` desde la consola del
-sistema, estando situados en el directorio del add-on.
-2.  Importar el proyecto en el eclipse usando la opción
+.Importar el proyecto de add-on en el eclipse usando la opción
 _Import../Existing Project into Workspace_
 
 .Preparar el Debug en eclipse
@@ -187,20 +173,19 @@ eclipse. Para ello seguir los siguientes pasos:
 
 1.  Acceder a la ventana de configuración de depuración en _Run/Debug
 configuration..._
-2.  Seleccionar el tipo `Remote Java
-            Application` y pulsar el botón `New`
+2.  Seleccionar el tipo `Remote Java Application` y pulsar el botón `New`
 3.  Seleccionar el proyecto del add-on usando el botón `Browse...`
 4.  Añadimos en la pestaña `sources` los proyectos que queremos depurar
 (Add-ons, bootstrap de ROO...).
 5.  El campo `port` en la sección `Connection properties` establecemos
-el valor `4000`
+el valor `8000`
 6.  La propiedad `host` debe de ser en este caso `localhost`.
 7.  Guardar la configuración con el botón `Apply`
 
 .Arrancar el Debug
 
 Antes de arrancar el Debug de eclipse es necesario que el framework esté
-arrancado con `gvnix-dev-debug`. Luego ya podremos arrancar la
+arrancado con `roo-dev`. Luego ya podremos arrancar la
 depuración con la configuración que se ha creado en el punto anterior.
 
 Recordar instalar el add-on en el entorno de desarrollo.
@@ -211,7 +196,7 @@ Añadir en una instalación de gvNIX
 TBC (Describir como añadir en una instalación de binarios de gvnix:
 igual que en desarrollo o copiando al directorio 'plugins')
 
-Añadir un add-on al la distribución de gvNIX
+Añadir un add-on a la distribución de gvNIX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 TBC (Describir añadir al pom.xml padre como modulo, limpiar pom.xml del

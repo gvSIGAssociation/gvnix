@@ -90,7 +90,7 @@ Sus características son:
 * Cada uno tiene un identificador de tipo cadena único cuya generación
 es totalmente predecible. El primer requisito es que comience por los
 caracteres `MID:`.
-* Se construyen bajo demanda, no se almacenan en el proyecto.
+* Se construyen bajo demanda, no se almacenan en el proyecto (se generan en memoria).
 * Un metadato puede depender de otro. Si el metadato varia sus
 _dependientes_ recibirán una notificación.
 * Es posible monitorizar las notificaciones de los metadatos
@@ -104,7 +104,8 @@ Shell
 
 Componente que implementa una consola interactiva que soporta
 autocompletado y ayuda en linea. A través de este componente el
-framework interactúa con el usuario.
+framework interactúa con el usuario. Se encarga de transformar 
+los parametros de los comenados en sus tipos correspondientes.
 
 Process Manager
 ---------------

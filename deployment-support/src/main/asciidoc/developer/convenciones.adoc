@@ -49,8 +49,8 @@ _org.gvnix.test.funcionalidad_
 Paquete raíz para probar funcionalidades específicas CIT:
 _org.gvnix.test.cit.funcionalidad_
 
-Add-ons
-~~~~~~~
+Add-ons (revisar nombres de los add-ons)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Para add-ons genéricos que aportará gvNIX añadir al paquete raíz la
 funcionalidad y finalizar con `roo.addon` (esto último es requerimiento
@@ -89,7 +89,7 @@ es.gv.cit.pizzashop.security.authentication.wscit
 -------------------------------------------------
 
 Del mismo modo que se debe seguir un convenio para el código Java
-generado, debemos también tenerolo para los distintos *artefactos que se
+generado, debemos también tenerlo para los distintos *artefactos que se
 generan*.
 
 El motivo para adoptar este convenio es principalmente la mantenibilidad
@@ -125,8 +125,8 @@ El idioma de desarrollo será el inglés, tanto para el código fuente
 generado como para el código fuente de los add-ons: métodos,
 propiedades, variables y javadoc.
 
-Cabecera Javadoc para la clase java
------------------------------------
+Cabecera Javadoc para la clase java (revisar)
+---------------------------------------------
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  /**
@@ -147,59 +147,9 @@ O simplemente:
    */
 ---------------------------------------------------
 
-Documentación del proyecto
---------------------------
 
-Ya está accesible y actualizado a media noche el javadoc de todos los
-módulos de gvNIX:
-
-http://projects.disid.com/projects/fwjava/wiki/Javadoc
-
-En el proyecto gvNIX ha llegado un momento que la documentación de cada
-módulo en su directorio "docs" se queda anticuada rápidamente debido a
-que es fácil olvidarse de actualizarla al hacer algún cambio en el
-código, a parte de ser un "coñazo" cambiar código en un sitio y
-documentación en otro.
-
-Es por ello, que hemos llegado a la conclusión de mantener toda la
-documentación en javadoc.
-
-Para cada módulo, a parte de la documentación javadoc que se incluye en
-cada clase java, existen ficheros especiales del proyecto que se
-incluyen en el javadoc:
-
-* _package.html_: se puede añadir en cada paquete java y se incluirá como
-documentación adicional en la página javadoc de cada paquete
-
-* _overview.html_: se puede añadir en _src/main/javadoc_ y se incluirá como
-documentación adicional en la página principal del javadoc.
-
-Con esto, creo que podemos dejar de mantener la documentación por
-separado (javadoc y rst en docs). Además, tenemos la posibilidad de
-consultar la última versión de la documentación de todos los módulos vía
-web.
-
-Poco a poco, iremos migrando la documentación de docs a javadoc y
-mejorando el javadoc que existe actualmente.
-
-La doc estará en inglés. Hay que definir una guía para el documentador
-que evite que cada uno documente como mejor le parezca, es decir, qué
-doc se pone en la clase, qué doc en el package, qué doc se pone en cada
-tipo de clase (por ejemplo la lista de comandos debe estar en la doc de
-la clase Command), etc. Lo que comentas aplica a documentación muy
-dinámica, habrá documentación que no cambia a lo largo del tiempo y que
-quizás no vale la pena llevar a Javadoc. Habrá que ver cada caso.
-
-El javadoc de Springframework está lleno de ejemplos de buena doc:
-
-http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/web/servlet/mvc/AbstractController.html
-(workflow y propiedades en cabecera de clase)
-
-http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/orm/hibernate3/HibernateInterceptor.html
-(ejemplo de código)
-
-Nombre de add-ons
------------------
+Nombre de add-ons (revisar nombres de los add-ons)
+--------------------------------------------------
 
 Dentro del fichero pom.xml habría que añadir la etiqueta `description`
 dentro de `project` con una breve descripción del add-on.
@@ -235,8 +185,8 @@ sobre la tecnología en la que debe aplicarse (por ejemplo, _for Spring
 MVC based web layer_). Este último punto ayudará a los desarrolladores a
 saber si pueden utilizarlo en determinados add-ons.
 
-Licencia de add-ons
--------------------
+Licencia de add-ons (revisar que licencia hay ahora)
+----------------------------------------------------
 
 Se utilizará GPLv3.
 

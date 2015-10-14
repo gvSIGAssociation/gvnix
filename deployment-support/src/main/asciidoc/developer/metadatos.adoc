@@ -13,14 +13,15 @@ momento, siempre que se conozca el tipo, usando el servicio
 Al desarrollar un add-on podemos tener que realizar operaciones sobre
 artefactos o dependientes de ellos pero esto puede requerir _marcar_ o
 _añadir información_ al artefacto. Esto comúnmente se consigue usando
-_anotaciones_ en los artefacto afectados que, a su vez, terminan siendo
+_anotaciones_ en los artefactos afectados que, a su vez, terminan siendo
 _metadatos_ del artefacto.
 
 El requisito de un metadato es implementar el interface MetadataItem.
 Luego, cada metadato ofrece su información con su implementación
 específica. Además de él, es necesario implementar un MetadataProvider
 que gestione el registro, comportamiento y creación de ese tipo de
-metadato.
+metadato. Notar que el MetadateProvider es unico, mientras que éste puede generar 
+varias instancias de su MetadataItem. Un MetadataProvider gestiona solo una anotacion.
 
 El manejo de los metadatos se realiza a través del servicio
 MetadataService que expone los metadatos a través del método `get`.
@@ -60,9 +61,9 @@ información del metadato y el ITD.
 
 Ejemplos de esto son:
 
-EntityMetadata::
-  Metadatos de la anotación de @RooEntity (junto con
-  EntityMetadataProvider).
+JavaBeanMetadata::
+  Metadatos de la anotación de @RooJavaBean (junto con
+  JavaBeanMetadataProvider).
 ToStringMetadata::
   Metadatos de la anotación de @RooToString (junto con
   ToStringMetadataProvider).
@@ -126,7 +127,7 @@ dependencias... pero, entre ellos, tampoco es posible especificar un
 orden*. De hecho, las estructuras de datos que almacenan esta
 dependencias están basadas en HashSet y HashMap. Es más, se ha podido
 observar que a partir de una primera notificación de un `metadato`, se
-pueden producir varias notificaciones al mismos MetadataProvider en
+pueden producir varias notificaciones al mismo MetadataProvider en
 distintos puntos de las dependencias registradas.
 
 Debido a esto, la conclusión que podemos sacar es que, si nuestro add-on

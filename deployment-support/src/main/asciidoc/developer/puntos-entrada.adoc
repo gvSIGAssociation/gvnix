@@ -30,10 +30,15 @@ su disponibilidad.
 
 Estas clases suelen ser declarativas o con poca lógica (adaptar
 parámetros y opciones por defecto, etc...), delegando la ejecución de
-los comando a servicios OSGi definidos por un interface (normalmente con
-nombre terminado en el sufijo `Operations`). Normalmente, la clase
+los comando a servicios OSGi definidos por un interface 'Operations`. Normalmente, la clase
 `Commands`, el Interface `Operations` y la implementación de esta última
 (`OperationsImpl`) se encuentran en el mismo paquete.
+
+Como analogia, los 'Commands' y 'Operations' se pueden ver como controladores y servicios. 
+La clase 'Commands' define la interfaz de entrada y recibe sus parametros, al igual que un 
+controlador, y delega en la interface 'Operations' para realizar operaciones o calculos, al 
+igual que los controladores delegan en servicios.
+
 
 Listeners
 ---------
@@ -52,8 +57,6 @@ cambios. Algunos de los tipos de listeners disponibles son:
 
 MetadataNotificationListener::
   Recibe notificaciones de los *metadatos* de los artefactos.
-DependencyListener::
-  Recibe los cambios en las dependencias del proyecto.
 FileEventListener::
   Recibe los cambios en fichero y directorios.
 ProcessManagerStatusListener::

@@ -8,8 +8,8 @@ Los add-ons, como cualquier componente OSGi, disponen de un API para
 interactuar con el contenedor OSGi. Permitiendo a nuestro código recibir
 eventos OSGi, reemplazar componentes OSGi, etc.
 
-Reemplazar componentes-servicios de Roo
----------------------------------------
+Reemplazar componentes-servicios de Roo (revisar)
+-------------------------------------------------
 
 En algunos casos podemos necesitar cambiar los componentes-servicios que
 por defecto instala Roo por otros específicos de gvNIX, por ejemplo, el

@@ -16,8 +16,8 @@ Test Funcionales
 
 TBC FALTA Info del proceso
 
-Integración contínua
---------------------
+Integración contínua  (cambiar entero)
+--------------------------------------
 
 Servidor Jenkins: http://dailybuild.disid.com:8081/
 
@@ -77,8 +77,8 @@ saliente a mail.disid.com y el sufijo de email por defecto a @disid.com.
 Es necesario tener instalados los plugins _Run Condition Plugin_ y
 _Text-finder Plugin_.
 
-Desplegado nocturno de snapshots
---------------------------------
+Desplegado nocturno de snapshots  (cambiar entero)
+--------------------------------------------------
 
 Servidor Jenkins: http://dailybuild.disid.com:8081/
 
@@ -142,8 +142,8 @@ saliente a mail.disid.com y el sufijo de email por defecto a @disid.com.
 Es necesario tener instalados los plugins _Run Condition Plugin_ y
 _Text-finder Plugin_.
 
-Actualización del mirror de código fuente en github
----------------------------------------------------
+Actualización del mirror de código fuente en github  (cambiar entero)
+---------------------------------------------------------------------
 
 Servidor Jenkins: http://dailybuild.disid.com:8081/
 
@@ -213,8 +213,8 @@ saliente a mail.disid.com y el sufijo de email por defecto a @disid.com.
 Es necesario tener instalados los plugins _Run Condition Plugin_ y
 _Text-finder Plugin_.
 
-Calidad de código con SONAR
----------------------------
+Calidad de código con SONAR  (cambiar entero)
+---------------------------------------------
 
 Servidor Jenkins: http://dailybuild.disid.com:8081/
 

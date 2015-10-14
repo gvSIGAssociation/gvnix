@@ -17,7 +17,7 @@ TBC Comandos de tipo 'xxx setup'
 Comandos de información
 -----------------------
 
-TBC [omandos de tipo 'paga list'
+TBC Comandos de tipo 'paga list'
 
 Comandos de acción
 ------------------

@@ -1,10 +1,10 @@
-Creación de proyecto de add-on
-------------------------------
+Creación de proyecto de add-on (revisarlo)
+------------------------------------------
 
 //Push down title level
 :leveloffset: 2
 
-Estos son los a seguir para prepara un proyecto de add-on:
+Estos son los pasos a seguir para prepara un proyecto de add-on:
 
 1.  Crear el directorio que contendrá el proyecto del add-on.
 2.  Ejecutar la consola del framework desde el directorio que acabamos
@@ -39,21 +39,9 @@ propiedades de tipo enumerados disponibles para la línea de comando con
 autocompletados. Para mostrar las opciones inicializadas en la clase de
 un parámetro asociado al comando.
 
-Si vamos a trabajar con Eclipse podemos ejecutar:
 
-* Desde la consola del framework:
-+
----------------
-perform eclipse
----------------
-* Desde el shell del sistema:
-+
--------------------
-mvn eclipse:eclipse
--------------------
-
-Declaración y uso de componente-servicios OSGi
-----------------------------------------------
+Declaración y uso de componente-servicios OSGi (revisarlo)
+----------------------------------------------------------
 
 El framework funciona sobre la implementación OSGi
 http://felix.apache.org/[Apache Felix]. Todos los servicios (excepto
@@ -294,7 +282,7 @@ Existen algunos ya registrados en el sistema que pueden ser útiles:
 * StaticFieldConverter: Nos permite registrar enumerados Java.
 
 Estas clases pueden ser muy útiles si nuestro add-on trabaja con tipos
-(por ejemplo un datos de un elementos de menú). En el add-on se ha
+(por ejemplo un dato de un elemento de menú). En el add-on se ha
 definido una clase para el tipo en cuestión y crea un converter que
 permita la conversión de lo que introduzca el usuario en el Shell al
 tipo. Es recomendable que estos tipos se creen como _tipos inmutables_
@@ -309,6 +297,8 @@ La interface Operations
 Es la Interfaz dónde se definen los métodos necesarios para el
 funcionamiento del Add-on. Para ser invocados desde la clase Commands o
 desde otro Add-on que pueda utilizarlos.
+
+Son los encargados de generar los ficheros java, asi como de añadir las anotaciones en caso de ser necesarias.
 
 La clase OperationsImpl
 -----------------------
@@ -328,8 +318,8 @@ componentes-servicios OSGi.
 
 Para estas clases podemos dar la siguientes recomendaciones:
 
-* Intentar que los estados usado para tomar las decisiones de si está
-activado o no algún comando sean lo más simples posible o que estén
+* Intentar que los estados usados para tomar las decisiones de si está
+activado o no algún comando sean lo más simple posible o que estén
 _cacheados_ (aunque suponga implementar algún listener para identificar
 cambios de estado).
 +

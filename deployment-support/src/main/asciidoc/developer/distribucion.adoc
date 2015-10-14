@@ -1,5 +1,5 @@
-Distribución de Add-ons
------------------------
+Distribución de Add-ons (cambiar todo)
+--------------------------------------
 
 //Push down title level
 :leveloffset: 2
@@ -24,8 +24,8 @@ sistema RooBoot de Roo.
 2.  Para que los proyecto puedan acceder a sus anotaciones cuando
 compilan un proyecto que utiliza un add-on.
 
-Añadir en el proyecto la dependencia al add-on
-----------------------------------------------
+Añadir en el proyecto la dependencia al add-on  (cambiar entero)
+----------------------------------------------------------------
 
 * Para que un proyecto en el que se está utilizando un add-on pueda
 acceder a las anotaciones del add-on deben añadirse dos elementos en el
@@ -111,8 +111,8 @@ for (Element depen : depens) {
 Este código suele incluirse en el comando setup del addon o en la
 primera acción que realice cualquier comando del addon.
 
-Configurar repositorio de google code
--------------------------------------
+Configurar repositorio de google code (cambiar entero)
+------------------------------------------------------
 
 Ahora el proyecto gestionado con gvNIX intentará obtener la dependencia
 del add-on desde el repositorio local de maven y en caso de no
@@ -189,8 +189,8 @@ por el valor de la versión del add-on:
 </resources>
 ----------------------------------------------------
 
-Subir dependencia a google code
--------------------------------
+Subir dependencia a google code (cambiar entero)
+------------------------------------------------
 
 * En el fichero de configuración de maven ($M2_HOME/conf/settings.xml)
 deberemos configurar el usuario y la clave que da acceso al proyecto en
@@ -210,8 +210,8 @@ siguiente orden maven:
 mvn clean deploy
 ----------------
 
-Actualizar un addon en una instalación de gvNIX
------------------------------------------------
+Actualizar un addon en una instalación de gvNIX (cambiar entero)
+----------------------------------------------------------------
 
 Puedes actualizar ejecutando el siguiente comando en la consola de
 gvNIX:

@@ -10,8 +10,8 @@ en M1. Ver si extraer alguna de los add-ons implementados)
 En este capitulo se incluyen una serie de recetas que pueden ser útiles
 en el desarrollo de framework para realizar algunas funciones comunes.
 
-Clases de utilidad
-------------------
+Clases de utilidad (revisar)
+----------------------------
 
 El framework provee de una serie de clases para la ayuda al add-on.
 Estas clases son abstractas con sus métodos declarados como estáticos.
@@ -24,7 +24,7 @@ org.springframework.roo.support.util.FileUtils::
 org.springframework.roo.support.util.DomUtils::
   Utilidades para el manejo del API Dom (búsquedas de elementos,
   etc...).
-org.springframework.roo.support.util.Assert::
+org.springframework.util.Assert::
   Utilidades para hacer comprobaciones de parámetros y variables.
 org.springframework.roo.support.util.XmlUtils::
   Utilidases para editar o crear ficheros xml.
@@ -45,7 +45,7 @@ org.springframework.roo.process.manager.FileManager::
   habilitar el soporte de _deshacer cambios ante un fallo_.
 org.springframework.roo.project.PathResolver::
   Ayudas para el manejo de rutas de fichero dentro de proyecto (obtener
-  rutas absolutas a partir de relativas al proyecto).
+  rutas absolutas a partir de relativas al proyecto). Obsoleto.
 org.springframework.roo.metadata.MetadataService::
   Permite consultar metadatos de nuestra aplicación.
 org.springframework.roo.metadata.MetadataDependencyRegistry::
@@ -1036,13 +1036,6 @@ Generar tests funcionales de Selenium
 http://projects.disid.com/issues/5823
 
 org.springframework.roo.addon.web.selenium.SeleniumOperationsImpl
-
-No se añade un elemento en Java o AJ
-------------------------------------
-
-Si no se añade alguna propiedad, método, etc. a un fichero Java o AJ
-puede ser debido a que dicho elemento no está asociado al metadataId
-adecuado.
 
 No se añade un elemento en Java o AJ
 ------------------------------------
