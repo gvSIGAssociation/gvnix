@@ -185,8 +185,8 @@ sobre la tecnología en la que debe aplicarse (por ejemplo, _for Spring
 MVC based web layer_). Este último punto ayudará a los desarrolladores a
 saber si pueden utilizarlo en determinados add-ons.
 
-Licencia de add-ons (revisar que licencia hay ahora)
-----------------------------------------------------
+Licencia de add-ons
+-------------------
 
 Se utilizará GPLv3.
 
