@@ -128,7 +128,6 @@ public class JpaBatchMetadata extends
     }
 
     private final JpaBatchAnnotationValues annotationValues;
-    private final JpaActiveRecordMetadata activeRecordMetadata;
     private final JavaType entity;
     private final FieldMetadata entityIdentifier;
     private final JavaType listOfIdentifiersType;
@@ -155,9 +154,7 @@ public class JpaBatchMetadata extends
     public JpaBatchMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             JpaBatchAnnotationValues annotationValues,
-            List<FieldMetadata> identifiers,
-            JpaActiveRecordMetadata entityActiveRecordMetadata,
-            JpaCrudAnnotationValues crudAnnotationValues,
+            List<FieldMetadata> identifiers, String entityPlural,
             JpaAuditMetadata auditMetada, boolean hasEntityListeners) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Validate.isTrue(isValid(identifier), "Metadata identification string '"
@@ -175,9 +172,6 @@ public class JpaBatchMetadata extends
         // Roo only use one field for pk
         this.entityIdentifier = identifiers.iterator().next();
 
-        // Store jpa ActiveRecord info
-        this.activeRecordMetadata = entityActiveRecordMetadata;
-
         // Store auditMetadata
         this.auditMetadata = auditMetada;
 
@@ -190,10 +184,10 @@ public class JpaBatchMetadata extends
                 && !this.hasEntityListeners;
 
         // Get entity name
-        this.entityName = StringUtils.isBlank(this.activeRecordMetadata
-                .getEntityName()) ? entity.getSimpleTypeName()
-                : this.activeRecordMetadata.getEntityName();
-        this.entityPlural = entityActiveRecordMetadata.getPlural();
+        this.entityName = entity.getSimpleTypeName();
+
+        // Get entity plural name
+        this.entityPlural = entityPlural;
 
         this.listOfIdentifiersType = new JavaType(
                 LIST.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,

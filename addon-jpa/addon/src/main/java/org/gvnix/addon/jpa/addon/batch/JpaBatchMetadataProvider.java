@@ -34,6 +34,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.jpa.addon.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.jpa.addon.activerecord.JpaCrudAnnotationValues;
+import org.springframework.roo.addon.plural.addon.PluralMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -145,19 +146,9 @@ public final class JpaBatchMetadataProvider extends
         List<FieldMetadata> identifiers = getPersistenceMemberLocator()
                 .getIdentifierFields(targetEntity);
 
-        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) getMetadataService()
-                .get(entityMetadataKey);
-
-        if (entityMetadata == null) {
-            return null;
-        }
-
         // register downstream dependency (entityActiveRecord --> jpaBatch)
         getMetadataDependencyRegistry().registerDependency(entityMetadataKey,
                 metadataIdentificationString);
-
-        JpaCrudAnnotationValues crudAnnotationValues = new JpaCrudAnnotationValues(
-                entityMetadata);
 
         // check if entity use audit
         String auditMetatadaKey = JpaAuditMetadata.createIdentifier(
@@ -172,11 +163,20 @@ public final class JpaBatchMetadataProvider extends
         boolean hasEntityListeners = getEntityListenerOperations()
                 .hasAnyListener(targetEntity);
 
+        // Getting plural
+        final String pluralId = PluralMetadata.createIdentifier(targetEntity,
+                path);
+        final PluralMetadata pluralMetadata = (PluralMetadata) getMetadataService()
+                .get(pluralId);
+        if (pluralMetadata == null) {
+            // Can't acquire the plural
+            return null;
+        }
+
         // TODO get more data
         return new JpaBatchMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, identifiers,
-                entityMetadata, crudAnnotationValues, auditMetada,
-                hasEntityListeners);
+                pluralMetadata.getPlural(), auditMetada, hasEntityListeners);
     }
 
     /**
