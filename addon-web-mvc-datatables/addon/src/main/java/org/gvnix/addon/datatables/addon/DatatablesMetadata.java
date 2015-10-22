@@ -3382,6 +3382,7 @@ public class DatatablesMetadata extends
         bodyBuilder.appendFormalLine("// Building JSON response");
         bodyBuilder
                 .appendFormalLine("StringBuilder json = new StringBuilder();");
+        bodyBuilder.appendFormalLine("json.append(\"{\")");
         bodyBuilder
                 .appendFormalLine("json.append(\"\\\"all_isnull\\\": \\\"\" + messageSource_dtt.getMessage(\"global.filters.operations.all.isnull\", null, defaultLocale) + \"\\\"\");");
         bodyBuilder.appendFormalLine(JSON_APPEND);

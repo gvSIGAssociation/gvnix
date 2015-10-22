@@ -135,7 +135,7 @@ function fnDatatablesExtInit(oSettings, tableId, options, count) {
 	});
 	
 	// Calling at first time Footer Callback
-	updateDatatablesFilters($table.fnSettings());
+	window.setTimeout(updateDatatablesFilters, 100, $table.fnSettings());
 	
 	// Calling at first time RowCreatedCallback
 	var $tds = $table.find("td");
@@ -218,15 +218,8 @@ function fnVal($control) {
 	var nControl = $control[0];
 
 	if (nControl.nodeName.toLowerCase() == "input") {
-		var patternDate = nControl.attributes["data-dateformat"];
-		if(patternDate != undefined && nControl["value"] != ""){
-			return jQuery.datepicker.formatDate(jQueryDateFormat(patternDate.value),
-						new Date(nControl["value"]));
-		}else{
-			return $control.val();
-		}
+		return $control.val();
 	}
-
 
 	// Note: At present, using .val() on textarea elements strips carriage
 	// return characters from the browser-reported value. When this value is
@@ -381,6 +374,10 @@ function updateDatatablesFilters(oSettings) {
 	var filters = oSettings.aoPreSearchCols;
 	var footer = jQuery(oSettings.aoFooter)[0];
 	
+	// Getting ajax source
+	 var ajaxSource = oSettings.sAjaxSource;
+	 
+	 if(ajaxSource !== null && ajaxSource != undefined){
 	// If footer is defined
 	if(footer !== undefined){
 		
@@ -395,16 +392,13 @@ function updateDatatablesFilters(oSettings) {
 				var filterInput = $cell.find('input');
 				
 				 // Adding data to current filter input
-                if(filterInput !== null && filterInput !== undefined){
+	                if(filterInput !== null && filterInput !== undefined && filterInput.length > 0){
+	                	
                 	// Saving Parent Id
                     filterInput.data("dataTableId", oSettings.sTableId);
                     // Saving Parent Path
-                    var ajaxSource = oSettings.sAjaxSource;
-                    if(ajaxSource !== null && ajaxSource !== undefined){
                         ajaxSource = ajaxSource.replace("/datatables/ajax","");
                         filterInput.data("dataTablePath", ajaxSource);
-                    }
-                }
 
 				filterInput.css("width", "80%");
 
@@ -427,10 +421,19 @@ function updateDatatablesFilters(oSettings) {
 							  }
 						  },
 						  error:function (xhr, ajaxOptions, thrownError) {
+	    							  console.log("Error getting filters ");
 						  }
 					});
 				}else{
 					filterInput.css("background-color","#ffffff");
+				}
+	    				
+	    				// Checking that not exists another advanced search
+	    		        if(jQuery(filterInput).parent().find('a').length == 0){
+	    				    new GvNIX_Advanced_Filter(jQuery(filterInput));
+	    		        }
+	    				
+	                }
 				}
 			}
 	    }

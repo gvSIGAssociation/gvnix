@@ -574,7 +574,7 @@ var GvNIX_Advanced_Filter;
 					// Draw UI inside dialog
 					var dialogDiv = jQuery(parent.find("div"));
 					if(dialogDiv !== undefined){
-						if(that._data.type != undefined){
+						if(that._data.type != "undefined"){
                             that._fnCreateDialogTypifiedUI(dialogDiv, that._data.type);
                         } else {
                             that._fnCreateDialogBaseUI(dialogDiv);
@@ -1099,9 +1099,8 @@ var GvNIX_Advanced_Filter;
 
 				// If there's no cookie check browser for locale
 				if(locale === undefined)
-					locale = window.navigator.language.substring(0,2) || window.navigator.userLanguage.substring(0,2);
-
-				var params = {
+							locale = window.navigator.userLanguage || window.navigator.language;
+			var params = {
 						"_locale_": locale
 					};
 
@@ -1357,19 +1356,3 @@ var GvNIX_Advanced_Filter;
 
 
 })(jQuery, window, document);
-
-/*
- * STATIC METHODS
- */
-
-//Registering events
-fnRegisterFunctionsToCallBack(function(context){
-    setTimeout(function(){
-        jQuery(".search_init , .dandelion_text_filter", context).each(function(index) {
-	        // Checking that not exists another advanced search
-	        if(jQuery(this).parent().find('a').length == 0){
-			    new GvNIX_Advanced_Filter(jQuery(this));
-	        }
-		});
-    }, 500);
-});
