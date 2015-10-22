@@ -63,7 +63,7 @@
       <div class="controls datetime">
       <c:choose>
         <c:when test="${disableFormBinding}">
-          <input id="_${sec_field}_id" name="${sec_field}" cssClass="datepicker form-control input-sm"
+          <input id="_${sec_field}_id" name="${sec_field}" class="datepicker form-control input-sm"
             title="${fn:escapeXml(field_validation)}" data-required="${required}"
             data-invalid="${fn:escapeXml(field_invalid)}" data-missing="${fn:escapeXml(sec_field_required)}"
             data-regex="${validationRegex}" data-dateformat="${dateTimePattern}" />
