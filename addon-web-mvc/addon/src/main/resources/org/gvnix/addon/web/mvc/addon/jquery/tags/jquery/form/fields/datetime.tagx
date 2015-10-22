@@ -28,7 +28,7 @@
     <c:set var="sec_field">
       <spring:escapeBody javaScriptEscape="true" >${field}</spring:escapeBody>
     </c:set>
-    
+
     <c:if test="${empty required}">
       <c:set value="false" var="required" />
     </c:if>
@@ -63,15 +63,15 @@
       <div class="controls">
       <c:choose>
         <c:when test="${disableFormBinding}">
-          <input id="_${sec_field}_id" name="${sec_field}" class="datepicker" 
-            cssClass="datepicker" title="${fn:escapeXml(field_validation)}" data-required="${required}"  
-            data-invalid="${fn:escapeXml(field_invalid)}" data-missing="${fn:escapeXml(sec_field_required)}" 
+          <input id="_${sec_field}_id" name="${sec_field}" class="datepicker"
+            title="${fn:escapeXml(field_validation)}" data-required="${required}"
+            data-invalid="${fn:escapeXml(field_invalid)}" data-missing="${fn:escapeXml(sec_field_required)}"
             data-regex="${validationRegex}" data-dateformat="${dateTimePattern}" />
         </c:when>
         <c:otherwise>
-          <form:input id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}"  
-            cssClass="datepicker" title="${field_validation}" data-required="${required}"  
-            data-invalid="${field_invalid}" data-missing="${sec_field_required}" 
+          <form:input id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}"
+            cssClass="datepicker" title="${field_validation}" data-required="${required}"
+            data-invalid="${field_invalid}" data-missing="${sec_field_required}"
             data-regex="${validationRegex}" data-dateformat="${dateTimePattern}" />
           <form:errors cssClass="errors" id="_${sec_field}_error_id" path="${sec_field}" />
         </c:otherwise>
