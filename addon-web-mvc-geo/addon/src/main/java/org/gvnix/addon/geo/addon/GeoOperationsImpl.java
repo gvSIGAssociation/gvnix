@@ -1889,7 +1889,7 @@ public class GeoOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     * This method add necessary properties to messages.properties for
+     * This method add necessary properties to application.properties for
      * Controller
      */
     public void addI18nControllerProperties(String controllerPackage,
