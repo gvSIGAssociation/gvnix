@@ -33,7 +33,6 @@ var GvNIX_Loupe;
 		/**
 		 * Initial configuration
 		 */
-		debugger;
 		this.s = {
 
 			/**
