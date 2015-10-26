@@ -57,5 +57,38 @@ Para ver con mas detalle el comando que proporciona el add-on consultar
 la sección de link:#_comandos_del_add_on_web_mvc_lupa[comandos del
 add-on Lupa].
 
+Configuración del componente lupa
+---------------------------------
+
+Este addon permite mostrar el componente lupa en las diferentes *jspx* mediante el fichero _loupe.tagx_, el cual es añadido al proyecto al instalar el addon. Este fichero contiene una serie de propiedades para definir las opciones de configuración del componente, como por ejemplo *max*, que permite limitar el número de resultados a mostrar. Para obtener más información sobre estos parámetros consultar el fichero _WEB-INF/tags/loupefield/loupe.tagx_ donde estos parámetros incluyen una descripción en su definición.
+
+Ejemplo:
+[source,xml]
+----
+<form:create id="fu_com_springsource_petclinic_domain_Pet" modelAttribute="pet" path=" /pets" 
+    render="${empty dependencies}" z="E4jWxGSZUphUG7qjB1vBKbchssY=">
+  <field:input field="name" id="c_com_springsource_petclinic_domain_Pet_name" min="1" 
+    required="true" z="xqcX/Hnb52FNxMLXqv1yGlbMUM="/>
+  <loupefield:loupe returnFields="telephone" searchField="city" hiddeUtilbox="false" 
+    modalWidth="400" required="true" baseFilter="city=Valencia" additionalFields="lastName,city" 
+    max="4" caption="firstName" field="owner" controllerPath="pets" 
+    id="c_com_springsource_petclinic_domain_Pet_owner" listPath="owners/list" mode="update" 
+    pkField="id" z="user-managed"/>
+</form:create>
+----
+
+* *field* debe ser el campo del objeto expuesto en el formulario que se quiere representar en el campo lupa.
+* *required* indica si este campo es obligatorio (el valor por defecto es false).
+* *listPath* ruta a la lista del selector.
+* *controllerPath* ruta relativa al controller de la entidad a la que pertenece la vista.
+* *pkField* es el campo de la clave primaria de la entidad de referencia en el campo lupa. Se utiliza para realizar las búsquedas.
+* *caption* campos de la entidad se mostrarán en el campo lupa cuando se elige un resultado. Deben estar separados por comas.
+* *additionalFields* campos adicionales de la entidad por los que se buscarán coincidencias. Si no se especifica ninguno, se buscará por id.
+* *baseFilter* filtros por defecto por los que se mostrarán resultados. En el ejemplo sólo se mostrarán owners cuya ciudad es valencia.
+* *modalWidth* anchura del diálogo modal, en píxeles (el valor por defecto es 800).
+* *hiddeUtilbox* especifica si ocultar elementos con la clase utilbox (el valor por defecto es true).
+* *searchField* especifica el campo usado para buscar (en el filtro de diálogo) cuando el input pierde el foco (por defecto es el primer campo de caption).
+* *returnFields* campos adicionales que devolverá la búsqueda de Ajax, pero por los que no se buscará. Deben estar separados por comas.
+
 //Return level title
 :leveloffset: 0

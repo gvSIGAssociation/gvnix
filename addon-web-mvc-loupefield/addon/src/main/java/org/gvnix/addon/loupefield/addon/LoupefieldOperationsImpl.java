@@ -60,7 +60,7 @@ import org.w3c.dom.*;
 
 /**
  * Implementation of operations this add-on offers.
- * 
+ *
  * @author <a href="http://www.disid.com">DISID Corporation S.L.</a> made for <a
  *         href="http://www.dgti.gva.es">General Directorate for Information
  *         Technologies (DGTI)</a>
@@ -599,7 +599,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * Annotates given Controller with GvNIXLoupeController
-     * 
+     *
      * @param controller
      */
     private void doAddControllerAnnotation(JavaType controller) {
@@ -673,7 +673,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * This method updates create and update views adding loupefield uri
-     * 
+     *
      * @param controller
      */
     private void updateCreateAndUpdateViews(JavaType controller) {
@@ -712,7 +712,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * This method checks if a view exists in the project
-     * 
+     *
      * @param path
      * @return
      */
@@ -731,9 +731,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
-     * 
+     *
      * This method checks if controller is annotated with @GvNIXLoupeController
-     * 
+     *
      * @param controller
      * @return
      */
@@ -748,7 +748,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * This method checks if field exists in the Controller related entity
-     * 
+     *
      * @param controller
      * @return
      */
@@ -793,9 +793,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
-     * 
+     *
      * This method checks if all additionalField exists
-     * 
+     *
      * @param entity
      * @param relatedFields
      * @param additionalFields
@@ -835,7 +835,7 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
     /**
      * This method checks if caption exists as a related field
-     * 
+     *
      * @param entity
      * @param relatedFields
      * @param caption
@@ -868,9 +868,9 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
     }
 
     /**
-     * 
+     *
      * This method update field in view to use loupe element
-     * 
+     *
      * @param controller
      * @param path
      * @param field
@@ -964,6 +964,14 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
 
         // Adding mode
         loupe.setAttribute("mode", viewName);
+
+        // Remove deprecated attributes
+        if (loupe.getAttribute("itemValue") != ""){
+        	loupe.removeAttribute("itemValue");
+        }
+        if (loupe.getAttribute("items") != ""){
+        	loupe.removeAttribute("items");
+        }
 
         // Append new loupe element to view
         form.appendChild(loupe);
