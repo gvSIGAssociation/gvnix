@@ -157,8 +157,9 @@ Depuración de add-on
 ~~~~~~~~~~~~~~~~~~~~
 
 En este momento la depuración de un add-on sólo es posible mediante el
-sistema de _depuración de java remota_. El entorno de desarrollo de
-gvNIX ofrece `roo_dev` que ya tiene configurada los parámetros necesario para ello.
+sistema de _depuración de java remota_. El entrono de desarrollo de
+-gvNIX ofrece una versión de `gvnix-dev` llamada `gvnix-dev-debug` que ya
+-tiene configurada los parámetros necesario para ello.
 
 La recomendación es depurar con eclipse. Para tener el proyecto y el
 eclipse preparado se deben seguir los siguientes pasos:
@@ -185,7 +186,7 @@ el valor `8000`
 .Arrancar el Debug
 
 Antes de arrancar el Debug de eclipse es necesario que el framework esté
-arrancado con `roo-dev`. Luego ya podremos arrancar la
+arrancado con `gvnix-dev-debug`. Luego ya podremos arrancar la
 depuración con la configuración que se ha creado en el punto anterior.
 
 Recordar instalar el add-on en el entorno de desarrollo.
