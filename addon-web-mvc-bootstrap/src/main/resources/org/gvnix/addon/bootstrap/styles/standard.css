@@ -155,6 +155,16 @@ color: #acc47f;
 }
 
 /*
+* Errors
+*
+*/
+.errors {
+    color: #b94a48;
+    display: block;
+}
+
+
+/*
  * Forms
  *
  */

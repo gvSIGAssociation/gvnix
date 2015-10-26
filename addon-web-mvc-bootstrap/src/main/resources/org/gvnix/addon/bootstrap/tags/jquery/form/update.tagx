@@ -29,7 +29,7 @@
     <spring:message arguments="${label}" code="entity_update" var="title_msg" />
     <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
       <spring:url value="${path}" var="form_url" />
-      <form:form cssClass="form-horizontal" action="${form_url}" method="PUT" modelAttribute="${modelAttribute}" enctype="${enctype}"><!-- cssClass="validate" -->
+      <form:form cssClass="form-horizontal validate" action="${form_url}" method="PUT" modelAttribute="${modelAttribute}" enctype="${enctype}"><!-- cssClass="validate" -->
         <form:errors cssClass="errors alert alert-warning" delimiter="&lt;p/&gt;" />
         <jsp:doBody />
         <div class="submit" id="${fn:escapeXml(id)}_submit">

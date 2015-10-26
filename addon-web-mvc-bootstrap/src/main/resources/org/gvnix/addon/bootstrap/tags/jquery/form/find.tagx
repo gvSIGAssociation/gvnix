@@ -30,7 +30,7 @@
     <spring:message arguments="${label}" code="entity_find" var="title_msg" />
     <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
       <spring:url value="${path}" var="form_url" />
-      <form:form cssClass="form-horizontal" action="${form_url}" method="GET">
+      <form:form cssClass="form-horizontal validate" action="${form_url}" method="GET">
         <input type="hidden" name="${finderNameParam}" value="${fn:escapeXml(finderName)}" />
         <jsp:doBody />
         <div class="submit" id="${fn:escapeXml(id)}_${fn:escapeXml(finderName)}_submit">
