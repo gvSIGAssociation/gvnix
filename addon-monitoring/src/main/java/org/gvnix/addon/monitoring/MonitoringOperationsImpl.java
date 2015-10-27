@@ -92,9 +92,6 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
     private static final JavaType SPRING_MONITORING_ANNOTATION = new JavaType(
             "net.bull.javamelody.MonitoredWithSpring");
 
-    private static final JavaType ROO_JAVABEAN = new JavaType(
-            "org.springframework.roo.addon.javabean.RooJavaBean");
-
     private static final JavaType SPRING_CONTROLLER = new JavaType(
             "org.springframework.stereotype.Controller");
 
@@ -333,57 +330,11 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             filterClassElement
                     .setTextContent("net.bull.javamelody.MonitoringFilter");
             filterElement.appendChild(filterClassElement);
-            // init-param {
-            Element initParamElement = docXml.createElement("init-param");
-            // description
-            Element descriptionElement = docXml.createElement("description");
-            descriptionElement
-                    .setTextContent("Enables or disables the system actions garbage collector, http sessions,heap dump, memory histogram, process list, jndi tree, opened jdbcconnections, database (true by default).");
-            initParamElement.appendChild(descriptionElement);
-            // param-name
-            Element paramNameElement = docXml.createElement("param-name");
-            paramNameElement.setTextContent("system-actions-enabled");
-            initParamElement.appendChild(paramNameElement);
-            // param-value
-            Element paramValueElement = docXml.createElement("param-value");
-            paramValueElement.setTextContent("true");
-            initParamElement.appendChild(paramValueElement);
-            // } init-param
-            filterElement.appendChild(initParamElement);
-            // init-param 2{
-            Element initParam2Element = docXml.createElement("init-param");
-            // description 2
-            Element description2Element = docXml.createElement("description");
-            description2Element
-                    .setTextContent("A regular expression to exclude some urls from monitoring.");
-            initParam2Element.appendChild(description2Element);
-            // param-name 2
-            Element paramName2Element = docXml.createElement("param-name");
-            paramName2Element.setTextContent("url-exclude-pattern");
-            initParam2Element.appendChild(paramName2Element);
-            // param-value 2
-            Element paramValue2Element = docXml.createElement("param-value");
-            paramValue2Element.setTextContent("/resources/.*");
-            initParam2Element.appendChild(paramValue2Element);
-            // } init-param 2
-            filterElement.appendChild(initParam2Element);
-
-            // if there's path to add
-            if (pathString != null) {
-                // init-param 3 {
-                Element initParam3Element = docXml.createElement("init-param");
-                // param-name 3
-                Element paramName3Element = docXml.createElement("param-name");
-                paramName3Element.setTextContent("storage-directory");
-                initParam3Element.appendChild(paramName3Element);
-                // param-value 3
-                Element paramValue3Element = docXml
-                        .createElement("param-value");
-                paramValue3Element.setTextContent(pathString);
-                initParam3Element.appendChild(paramValue3Element);
-                // } init-param 3
-                filterElement.appendChild(initParam3Element);
-            }
+            // async-supported
+            Element asyncSupportedElement = docXml
+                    .createElement("async-supported");
+            asyncSupportedElement.setTextContent("true");
+            filterElement.appendChild(asyncSupportedElement);
 
             // Creating filter-mapping element
             Element filterMappingElement = docXml
@@ -396,6 +347,12 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             Element urlPatternElement = docXml.createElement("url-pattern");
             urlPatternElement.setTextContent("/*");
             filterMappingElement.appendChild(urlPatternElement);
+            Element dispatcherElement = docXml.createElement("dispatcher");
+            dispatcherElement.setTextContent("REQUEST");
+            filterMappingElement.appendChild(dispatcherElement);
+            Element dispatcher2Element = docXml.createElement("dispatcher");
+            dispatcher2Element.setTextContent("ASYNC");
+            filterMappingElement.appendChild(dispatcher2Element);
 
             // Creating listener
             Element listenerElement = docXml.createElement("listener");
@@ -410,6 +367,19 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
             docRoot.appendChild(filterElement);
             docRoot.appendChild(filterMappingElement);
             docRoot.appendChild(listenerElement);
+
+            // Add javamelody configuration file
+            NodeList paramValueNodes = docRoot
+                    .getElementsByTagName("param-value");
+
+            for (int i = 0; i < paramValueNodes.getLength(); i++) {
+                Node node = paramValueNodes.item(i);
+                if (("WEB-INF/spring/webmvc-config.xml").equals(node
+                        .getTextContent())) {
+                    node.setTextContent("classpath*:net/bull/javamelody/monitoring-spring-aspectj*.xml"
+                            .concat(" ").concat(node.getTextContent()));
+                }
+            }
 
             getFileManager().createOrUpdateTextFileIfRequired(webPath,
                     XmlUtils.nodeToString(docXml), true);
@@ -461,44 +431,15 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      */
     @Override
     public void addPackage(JavaPackage path) {
-        // Setting up monitoring annotations
-        createMonitoringConfig();
-
         // Creating annotation
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 SPRING_MONITORING_ANNOTATION);
-
-        // Getting all entity, controllers and services
-        Set<ClassOrInterfaceTypeDetails> entities = getTypeLocationService()
-                .findClassesOrInterfaceDetailsWithAnnotation(ROO_JAVABEAN);
 
         Set<ClassOrInterfaceTypeDetails> controllers = getTypeLocationService()
                 .findClassesOrInterfaceDetailsWithAnnotation(SPRING_CONTROLLER);
 
         Set<ClassOrInterfaceTypeDetails> services = getTypeLocationService()
                 .findClassesOrInterfaceDetailsWithAnnotation(SPRING_SERVICE);
-
-        // Annotating all entities if they exists
-        if (entities != null) {
-            Iterator<ClassOrInterfaceTypeDetails> it = entities.iterator();
-
-            while (it.hasNext()) {
-                ClassOrInterfaceTypeDetails entity = it.next();
-                if (entity.getType().getPackage().isWithin(path)) {
-
-                    // Generating new annotation
-                    ClassOrInterfaceTypeDetailsBuilder builder = new ClassOrInterfaceTypeDetailsBuilder(
-                            entity);
-
-                    // Add annotation to target type
-                    builder.updateTypeAnnotation(annotationBuilder.build());
-
-                    // Save changes to disk
-                    getTypeManagementService().createOrUpdateTypeOnDisk(
-                            builder.build());
-                }
-            }
-        }
 
         // Annotating all controllers if they exists
         if (controllers != null) {
@@ -546,210 +487,12 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
     }
 
     /**
-     * Adds config data for Spring monitoring
-     * 
-     * @param appContextPath
-     */
-    public void createMonitoringConfig() {
-
-        // Getting Application Context path
-        String appContextPath = getPathResolver().getFocusedIdentifier(
-                Path.SRC_MAIN_RESOURCES,
-                "META-INF/spring/applicationContext.xml");
-        // Getting Web Config Path
-        String webPath = getPathResolver().getFocusedIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml");
-
-        // Building configuration for annotation support in both context if
-        // needed
-        createMonitoringAutoProxy(appContextPath);
-        createMonitoringAdvisor(appContextPath);
-        if (getFileManager().exists(webPath)) { // If web mvc exists
-            createMonitoringAutoProxy(webPath);
-            createMonitoringAdvisor(webPath);
-        }
-
-    }
-
-    /**
-     * Adds an aop:config for Spring monitoring
-     * 
-     * @param appContextPath
-     */
-    public void createMonitoringAdvisor(String appContextPath) {
-        if (getFileManager().exists(appContextPath)) {
-            Document docXml = getWebProjectUtils().loadXmlDocument(
-                    appContextPath, getFileManager());
-
-            // Getting root element
-            Element docRoot = docXml.getDocumentElement();
-
-            // Checking if exist
-            NodeList beanElements = docRoot.getElementsByTagName(BEAN_TAG);
-
-            for (int i = 0; i < beanElements.getLength(); i++) {
-                Node bean = beanElements.item(i);
-                NamedNodeMap beanAttr = bean.getAttributes();
-                if (beanAttr != null) {
-                    Node idAttr = beanAttr.getNamedItem("id");
-                    // Checking if bean exists on current beans
-                    if (idAttr != null
-                            && "monitoringAdvisor"
-                                    .equals(idAttr.getNodeValue())) {
-
-                        // Checking if exist
-                        NodeList propertyList = bean.getChildNodes();
-
-                        for (int j = 0; j < propertyList.getLength(); j++) {
-                            Node property = propertyList.item(j);
-                            NamedNodeMap propertyAttr = property
-                                    .getAttributes();
-                            if (propertyAttr != null) {
-                                Node nameAttr = propertyAttr
-                                        .getNamedItem(NAME_TAG);
-                                // Checkin if property exists on current bean
-                                if (nameAttr != null
-                                        && "pointcut".equals(nameAttr
-                                                .getNodeValue())) {
-
-                                    // Checking if exist
-                                    NodeList bean2List = property
-                                            .getChildNodes();
-
-                                    for (int k = 0; k < bean2List.getLength(); k++) {
-                                        Node bean2 = bean2List.item(k);
-                                        NamedNodeMap bean2Attr = bean2
-                                                .getAttributes();
-                                        if (bean2Attr != null) {
-                                            Node classAttr = bean2Attr
-                                                    .getNamedItem(CLASS_TAG);
-                                            // Checkin if bean exists on current
-                                            // property
-                                            if (classAttr != null
-                                                    && JM_ANN_POINTCUT
-                                                            .equals(classAttr
-                                                                    .getNodeValue())) {
-                                                return;
-                                            }
-                                        }
-                                    }
-
-                                    // Creating new element (bean)
-                                    Element bean2Element = docXml
-                                            .createElement(BEAN_TAG);
-                                    bean2Element.setAttribute(CLASS_TAG,
-                                            JM_ANN_POINTCUT);
-
-                                    property.appendChild(bean2Element);
-
-                                    // Saving changes and exit
-                                    getFileManager()
-                                            .createOrUpdateTextFileIfRequired(
-                                                    appContextPath,
-                                                    XmlUtils.nodeToString(docXml),
-                                                    true);
-                                }
-                            }
-                        }
-
-                        // Creating new element (property)
-                        Element propertyElement = docXml
-                                .createElement("property");
-                        propertyElement.setAttribute(NAME_TAG, "pointcut");
-
-                        // Creating new element (bean)
-                        Element bean2Element = docXml.createElement(BEAN_TAG);
-                        bean2Element.setAttribute(CLASS_TAG, JM_ANN_POINTCUT);
-
-                        propertyElement.appendChild(bean2Element);
-                        bean.appendChild(propertyElement);
-
-                        // Saving changes and exit
-                        getFileManager().createOrUpdateTextFileIfRequired(
-                                appContextPath, XmlUtils.nodeToString(docXml),
-                                true);
-                    }
-                }
-            }
-
-            // Creating new element (bean)
-            Element beanElement = docXml.createElement(BEAN_TAG);
-            beanElement.setAttribute("id", "monitoringAdvisor");
-            beanElement.setAttribute(CLASS_TAG,
-                    "net.bull.javamelody.MonitoringSpringAdvisor");
-
-            // Creating new element (property)
-            Element propertyElement = docXml.createElement("property");
-            propertyElement.setAttribute(NAME_TAG, "pointcut");
-
-            // Creating new element (bean)
-            Element bean2Element = docXml.createElement(BEAN_TAG);
-            bean2Element.setAttribute(CLASS_TAG, JM_ANN_POINTCUT);
-
-            propertyElement.appendChild(bean2Element);
-            beanElement.appendChild(propertyElement);
-            docRoot.appendChild(beanElement);
-
-            // Saving changes
-            getFileManager().createOrUpdateTextFileIfRequired(appContextPath,
-                    XmlUtils.nodeToString(docXml), true);
-        }
-    }
-
-    /**
-     * Adds a bean for Spring monitoring
-     * 
-     * @param appContextPath
-     */
-    public void createMonitoringAutoProxy(String appContextPath) {
-        if (getFileManager().exists(appContextPath)) {
-            Document docXml = getWebProjectUtils().loadXmlDocument(
-                    appContextPath, getFileManager());
-
-            // Getting root element
-            Element docRoot = docXml.getDocumentElement();
-
-            // Checking if exist
-            NodeList beanElements = docRoot.getElementsByTagName(BEAN_TAG);
-
-            for (int i = 0; i < beanElements.getLength(); i++) {
-                Node bean = beanElements.item(i);
-                NamedNodeMap beanAttr = bean.getAttributes();
-                if (beanAttr != null) {
-                    Node classAttr = beanAttr.getNamedItem(CLASS_TAG);
-                    // Checking if bean exists on current beans
-                    if (classAttr != null
-                            && "org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
-                                    .equals(classAttr.getNodeValue())) {
-                        return;
-                    }
-                }
-            }
-
-            // Creating new element (bean)
-            Element beanElement = docXml.createElement(BEAN_TAG);
-            beanElement
-                    .setAttribute(CLASS_TAG,
-                            "org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator");
-
-            docRoot.appendChild(beanElement);
-
-            // Saving changes
-            getFileManager().createOrUpdateTextFileIfRequired(appContextPath,
-                    XmlUtils.nodeToString(docXml), true);
-        }
-    }
-
-    /**
      * Add a class to be monitored as a Spring service
      * 
      * @param name Set the class name to be monitored
      */
     @Override
     public void addClass(JavaType name) {
-        // Setting up monitoring annotations
-        createMonitoringConfig();
-
         // Get java type controller
         ClassOrInterfaceTypeDetails controller = getControllerDetails(name);
 
@@ -775,9 +518,6 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
      */
     @Override
     public void addMethod(JavaSymbolName methodName, JavaType className) {
-        // Setting up monitoring annotations
-        createMonitoringConfig();
-
         // Get java type controller
         ClassOrInterfaceTypeDetails controller = getControllerDetails(className);
 
@@ -809,15 +549,6 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
         LOGGER.log(
                 Level.INFO,
                 "[ERROR] This method doesn't exist for this class or maybe it's inside an .aj file. In this case you must to push-in that method and then execute this command again");
-    }
-
-    /**
-     * This method annotates a class or method
-     * 
-     * @param controller
-     */
-    private void annotateThing(ClassOrInterfaceTypeDetails controller) {
-
     }
 
     /**
