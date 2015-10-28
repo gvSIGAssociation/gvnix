@@ -1174,6 +1174,16 @@ var GvNIX_Loupe;
 						"</script>";
 				$("#" + inputData.name + "_dropdown_div" + sufix).html(htmlToAdd);
 
+				// Checks if a scroll container contains the loupe field.
+				// In that case, scrolls the loupe field to show its result list.
+				var container = jQuery(".dataTables_scrollBody");
+				var insideContainer = container.find("#"+inputId);
+				if(container.length && insideContainer.length){
+					container.animate({
+						scrollTop: jQuery("#"+inputId).offset().top - container.offset().top + container.scrollTop()
+					}, 200);
+				}
+
 			},
 
 			/**

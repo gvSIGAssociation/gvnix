@@ -236,6 +236,4 @@ input.filter_not_empty{
 /* view loupe results editing inline */
 
 .dataTables_scrollBody{
-  overflow: visible !important;
-  margin-bottom: 20px;
 }
