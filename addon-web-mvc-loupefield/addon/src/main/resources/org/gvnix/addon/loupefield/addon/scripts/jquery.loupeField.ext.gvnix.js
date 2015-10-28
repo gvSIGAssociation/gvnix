@@ -34,7 +34,6 @@ var GvNIX_Loupe;
 		 * Initial configuration
 		 */
 		this.s = {
-
 			/**
 			 * Input Id
 			 */
@@ -193,7 +192,7 @@ var GvNIX_Loupe;
 			/**
 			 * Value of searchfield
 			 */
-			"searchvalue": undefined,
+			"searchvalue": inputData.searchvalue,
 
 			/**
 			 * Indicates if the loupe has been initialized
@@ -375,7 +374,7 @@ var GvNIX_Loupe;
 				/**
 				 * Value of searchfield
 		         */
-				"searchvalue": undefined,
+				"searchvalue": inputData.searchvalue,
 
 				/**
 				 * Indicates if the loupe has been initialized
@@ -570,7 +569,7 @@ var GvNIX_Loupe;
 
 															// Filtering by current value or searchField
 															var currentValue;
-															if(data.searchvalue != undefined && data.searchvalue != ""){
+															if(data.searchvalue != undefined && data.searchvalue != "" && data.searchvalue != "undefined"){
 																currentValue = data.searchvalue;
 															}else{
 																currentValue = input.val();
@@ -649,7 +648,7 @@ var GvNIX_Loupe;
 						if(input.length > 0){
                             data = input.data();
 							var valueInput;
-							if(data.searchvalue != undefined && data.searchvalue != ""){
+							if(data.searchvalue != undefined && data.searchvalue != "" && data.searchvalue != "undefined"){
 								valueInput = data.searchvalue;
 							}else{
 								valueInput = input.val();
@@ -855,11 +854,11 @@ var GvNIX_Loupe;
 					}
 				}
 
+
 				var pkField = data.pkfield;
 				var additionalfieldsAux = data.additionalfields;
 				if(searchField != ""){
                     var searchFieldSplit = searchField.split(",");
-                    var firstSearchField = searchFieldSplit[0];
 					pkField = searchFieldSplit[0];
 					if(additionalfieldsAux!=""){
 						additionalfieldsAux = additionalfieldsAux + "," + data.pkfield;
@@ -933,7 +932,6 @@ var GvNIX_Loupe;
                         }else if(element.responseText != undefined || element.responseText != null){
                             error = element.responseText;
                         }
-
 
 						$("#" + data.name + "_dropdown_div").html("");
 
@@ -1173,16 +1171,6 @@ var GvNIX_Loupe;
 									"});" +
 						"</script>";
 				$("#" + inputData.name + "_dropdown_div" + sufix).html(htmlToAdd);
-
-				// Checks if a scroll container contains the loupe field.
-				// In that case, scrolls the loupe field to show its result list.
-				var container = jQuery(".dataTables_scrollBody");
-				var insideContainer = container.find("#"+inputId);
-				if(container.length && insideContainer.length){
-					container.animate({
-						scrollTop: jQuery("#"+inputId).offset().top - container.offset().top + container.scrollTop()
-					}, 200);
-				}
 
 			},
 
