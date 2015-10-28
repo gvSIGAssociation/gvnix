@@ -7,10 +7,11 @@ Implementación de campos lupa en el proyecto gvNIX.
 Descripción
 -----------
 
-Este add-on permite utilizar componentes de tipo lupa en aplicaciones
-gvNIX. Gracias a estos componentes, podemos buscar registros de forma
-sencilla de campos relacionados sin tener que visualizar todos los datos
-en un desplegable.
+Este add-on permite utilizar componentes de tipo lupa en aplicaciones gvNIX. Gracias a estos componentes, podemos buscar registros de forma sencilla de campos relacionados sin tener que visualizar todos los datos en un desplegable.
+
+Al aplicar este add-on sobre un proyecto, en los formularios es posible seleccionar registros de campos relacionados de una entidad. Estos registros son mostrados en una lista dinámica según las coincidencias de carácteres del texto introducido o en la lista completa de los registros de este campo.
+
+El addon permite configurar la representación de registros a mostrar , permitiendo limitar el número máximo de registros, los campos campo por los que se buscará coincidencias, los campos de la entidad relacionada que se mostrarán en cada resultado, filtros personalizados de búsqueda, etc.
 
 Instalación del componente lupa
 -------------------------------
@@ -19,7 +20,8 @@ Para instalarlo, hay que utilizar el comando
 link:#_web_mvc_loupe_setup[web mvc loupe setup],
 el cual solo estará disponible después de instalar el
 link:#_comandos_del_add_on_web_mvc[add-on
-JQuery] en nuestro proyecto.
+JQuery] y el link:#_add_on_web_mvc_datatables[add-on Web
+MVC Datatables] en nuestro proyecto.
 
 Permitiendo a una entidad utilizar el campo lupa
 ------------------------------------------------
@@ -42,6 +44,18 @@ métodos generados. Una vez ejecutado este comando, transformaremos el
 campo indicado a un campo de tipo lupa en la capa web de nuestra
 aplicación.
 
+
+[IMPORTANT] 
+El controlador de la entidad a la que referencia el campo también debe tener 
+instalado link:#_add_on_web_mvc_datatables[Datatables] con un modo de 
+visualización de listado estándar para la correcta visualización del 
+componente lupa. Si se desea instalar Datatables con un modo no estándar 
+(mode="show", por ejemplo), se puede crear un controlador adicional para la 
+misma entidad con el modo estándar de Datatables y asignar el atributo 
+"listPath" del campo lupa a la vista "list" de este segundo controlador. 
+El atributo "listPath" se explica en la sección 
+link:#_configuración_del_widget_lupa["Configuración del widget lupa"].
+
 Actualizando componentes lupa
 -----------------------------
 
@@ -57,8 +71,8 @@ Para ver con mas detalle el comando que proporciona el add-on consultar
 la sección de link:#_comandos_del_add_on_web_mvc_lupa[comandos del
 add-on Lupa].
 
-Configuración del componente lupa
----------------------------------
+Configuración del widget lupa
+-----------------------------
 
 Este addon permite mostrar el componente lupa en las diferentes *jspx* mediante el fichero _loupe.tagx_, el cual es añadido al proyecto al instalar el addon. Este fichero contiene una serie de propiedades para definir las opciones de configuración del componente, como por ejemplo *max*, que permite limitar el número de resultados a mostrar. Para obtener más información sobre estos parámetros consultar el fichero _WEB-INF/tags/loupefield/loupe.tagx_ donde estos parámetros incluyen una descripción en su definición.
 

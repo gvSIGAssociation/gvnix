@@ -237,3 +237,13 @@ input.filter_not_empty{
 
 .dataTables_scrollBody{
 }
+
+/* static progress bar */
+
+.dataTables_processing {
+  -webkit-animation: none !important;
+  -moz-animation: none !important;
+  -ms-animation: none !important;
+  -o-animation: none !important;
+  animation: none !important;
+}
