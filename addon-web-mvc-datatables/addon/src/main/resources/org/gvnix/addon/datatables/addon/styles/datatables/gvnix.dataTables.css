@@ -239,3 +239,13 @@ input.filter_not_empty{
   overflow: visible !important;
   margin-bottom: 20px;
 }
+
+/* static progress bar */
+
+.dataTables_processing {
+  -webkit-animation: none !important;
+  -moz-animation: none !important;
+  -ms-animation: none !important;
+  -o-animation: none !important;
+  animation: none !important;
+}
