@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import __ENTITY_LEVEL_PACKAGE__.User;
+
 /**
  * @author rohit
  *
@@ -34,14 +36,13 @@ import org.springframework.validation.Validator;
  */
 
 @Service("signupValidator")
-public class SignUpValidator implements Validator {
+public class SignUpValidator {
 
 	/*
 	 * (non-Javadoc)
 	 *
 	 * @see org.springframework.validation.Validator#supports(java.lang.Class)
 	 */
-	@Override
 	public boolean supports(Class<?> clazz) {
 		return UserRegistrationForm.class.equals(clazz);
 	}
@@ -52,7 +53,6 @@ public class SignUpValidator implements Validator {
 	 * @see org.springframework.validation.Validator#validate(java.lang.Object,
 	 * org.springframework.validation.Errors)
 	 */
-	@Override
 	public void validate(Object target, Errors errors) {
 		UserRegistrationForm form = (UserRegistrationForm) target;
 
@@ -61,6 +61,12 @@ public class SignUpValidator implements Validator {
 		if (!newPassword.equals(newPasswordAgain)) {
 			errors.reject("changepassword.passwordsnomatch");
 		}
+
+       int usersSameEmail = User
+                .findUsersByEmailAddress(form.getEmailAddress()).getResultList().size();
+        if(usersSameEmail > 0){
+            errors.reject("changepassword.duplicateemailaddress");
+       }
 
 		ReCaptchaImpl reCaptcha = new ReCaptchaImpl();
         reCaptcha.setPrivateKey("6LdfmL8SAAAAAHKPqUQV5SxrRX9Id6a8cQo-mgpE");
