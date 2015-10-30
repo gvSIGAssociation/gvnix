@@ -3000,6 +3000,7 @@ ul.ds-btn { display: table; }
 #counter{
   background-image: url(/assets/themes/gvnix-omega-multilanguage/images/banner-aniversario-gvNIX.png);
   background-repeat: no-repeat;
+  background-color: #000;
   margin-top: -72px;
   margin-bottom: 50px;
   background-size: 1500px;
