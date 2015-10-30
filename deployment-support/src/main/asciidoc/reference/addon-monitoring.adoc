@@ -2,7 +2,7 @@
 :leveloffset: 2
 
 
-Uso del componente https://code.google.com/p/javamelody/[Java Melody]
+Uso del componente https://github.com/javamelody/javamelody/wiki/[Java Melody]
 como sistema de monitorización para aplicaciones web.
 
 Descripción
