@@ -12,6 +12,8 @@ badges:
   releases:
     - name: 2.0.0.M1
       guide: gvnix-2.0.0.M1-reference-docs
+    - name: 1.5.1.RC1
+      guide: gvnix-1.5.1.RC1-reference-docs.pdf
     - name: 1.5.0
       guide: gvnix-1.5.0-reference-docs.pdf
     - name: 1.4.1
