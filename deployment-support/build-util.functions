@@ -131,7 +131,7 @@ function run_test_and_tomcat_folk() {
 function run_test_and_tomcat_background_wget_page() {
     mvn clean compile test tomcat:run -Dmaven.tomcat.port=$2 & 
     sleep 20
-    if [-z "`jobs`"]; then
+    if [ -z "`jobs`" ]; then
       ## Tomcat not runing
       echo "====   Maven task is not running... Canceling script!!!!! ======"
       exit 1
