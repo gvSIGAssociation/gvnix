@@ -60,7 +60,7 @@ badges:
       icon: arrow-circle-down
 
     - name: Source code
-      url:  https://github.com/DISID/gvnix
+      url:  https://github.com/gvSIGAssociation/gvnix
       icon: github
 
     - name: Support
