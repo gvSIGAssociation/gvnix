@@ -44,24 +44,33 @@ padding-top: 15px;
 color: #34302d;
 margin: 0;
 border-color: #d7d5d3;
-font-size: 12px;
+font-size: 0.9em;
 line-height: 22px;
 }
-
 .item--dropdown .item--left-column, .item--dropdown .item--right-column {
 width: 45%;
 display: inline-block;
 vertical-align: top;
 }
-
+.project-documentation--container.releases .item--dropdown .item--left-column {
+  width: 65%;
+  }
+.project-documentation--container.releases .item--dropdown .item--right-column {
+  width: 20%;
+}
 .item--dropdown .item--body .item--body--version {
 border-bottom: 1px solid #4a4540;
 padding: 7px 0;
 }
-
 .project-documentation--container .item--dropdown .item--body--version {
 margin: 0;
 border-color: #eee;
+}
+.project-documentation--container.releases .item--dropdown .item--body--version  {
+   font-size: 0.9em;
+}
+.project-documentation--container.releases .item--dropdown .item--body--version .fa {/*icon*/
+   font-size: 1.2em;
 }
 .project-documentation--container .item--dropdown .item--body--version:last-child {
 margin-bottom: 20px;
