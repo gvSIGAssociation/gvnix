@@ -1,7 +1,7 @@
 ---
 layout: post
-title: gvNIX is a finalist in PortalProgramas Awards to Best Free Software 2015.
-description: gvNIX featured as a _the greatest growth potential_ software
+title: gvNIX is a finalist in PortalProgramas Awards to Best Free Software 2015
+description: gvNIX featured as a the greatest growth potential software
 tags: [free software, awards]
 comments: true
 share: true
