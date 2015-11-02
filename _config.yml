@@ -5,8 +5,8 @@ mail-to:          mailto:gvnix@disid.com
 download:         http://repository.gvnix.org/
 quickstart:       http://github.com/DISID/gvnix-samples/tree/master/quickstart-app
 demo-geo:         http://geo-gvnix.rhcloud.com/login?lang=en
-downloads:        http://sourceforge.net/projects/gvnix/files/
-current-version:  2.0.0.M1
+sourceforge:      http://sourceforge.net/projects/gvnix/files/
+current-version:  1.5.1.RC1
 
 # Assign a default image for your site's header and footer
 default_bg_header: default_bg_header.png
@@ -226,6 +226,7 @@ t:
     download: "Download"
     release: "release"
     all-versions: "All versions"
+    at-sourceforge: on SourceForge
     view: "View"
     latest-news: "Latest news"
     all-news: "All news"
@@ -242,7 +243,7 @@ t:
     doc-guides: Getting Started Guides
     doc-tutorials: Tutorials
     doc-reference: Reference
-    doc: Documentation
+    doc: Doc
     additional-doc: Additional Documentation
     source-code: Source code
     less-1: Less than 1 minute read
@@ -277,6 +278,7 @@ t:
     download: "Descargar"
     release: "release"
     all-versions: "Todas las versiones"
+    at-sourceforge: en SourceForge
     view: "Ver"
     latest-news: "Últimas noticias"
     all-news: "Todas las noticias"
@@ -293,7 +295,7 @@ t:
     doc-guides: Guías de inicio
     doc-tutorials: Tutoriales
     doc-reference: Referencia
-    doc: Documentación
+    doc: Doc
     additional-doc: Documentación adicional
     source-code: Código fuente
     less-1: Leído hace menos de 1 minuto

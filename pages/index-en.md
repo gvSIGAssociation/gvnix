@@ -8,28 +8,18 @@ lang: en
 badges:
 
   # Customize the documentation links. Delete any entries that do not apply.
+  # Leave the 'url' property blank to link to gvNIX Suite repository (> 2.0.0).
 
   releases:
     - name: 2.0.0.M1
       guide: gvnix-2.0.0.M1-reference-docs
+      url:
     - name: 1.5.1.RC1
       guide: gvnix-1.5.1.RC1-reference-docs.pdf
-    - name: 1.5.0
-      guide: gvnix-1.5.0-reference-docs.pdf
+      url:  http://sourceforge.net/projects/gvnix/files/gvNIX-1.5.1.RC1.zip/download
     - name: 1.4.1
       guide: gvnix-1.4.1-reference-docs.pdf
-    - name: 1.4.0
-      guide: gvnix-1.4.0-reference-docs.pdf
-    - name: 1.3.1
-      guide: release-1.3.1-index.pdf
-    - name: 1.3.0
-      guide: release-1.3.0-index.pdf
-    - name: 1.2.0
-      guide: release-1.2.0-index.pdf
-    - name: 1.1.0
-      guide: release-1.1.0-index.pdf
-    - name: 1.0.0
-      guide: release-1.0.0-index.pdf
+      url:  http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.1.RELEASE.zip/download
 
   samples:
     - name: Petclinic
@@ -42,6 +32,8 @@ badges:
       icon: globe
 
   additional:
+    - name: All gvNIX versions
+      url: http://www.gvnix.org/en/documentation/
     - name: gvNIX install guide (version 1.x.)
       url: https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc
     - name: gvNIX install guide (version 2.x.)
