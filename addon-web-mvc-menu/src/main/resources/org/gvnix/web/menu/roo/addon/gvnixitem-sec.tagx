@@ -71,7 +71,7 @@
   -->
   <c:choose>
     <c:when test="${not empty roles}">
-      <sec:authorize ifAnyGranted="${roles}">
+      <sec:authorize access="hasAnyRole('${roles}')">
         <c:set var="authorizedRole" value="${true}" />
       </sec:authorize>
     </c:when>
