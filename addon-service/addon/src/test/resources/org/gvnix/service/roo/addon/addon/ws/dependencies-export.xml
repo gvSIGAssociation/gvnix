@@ -1,22 +1,63 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dependencies>
-	<dependency org="org.apache.cxf" name="cxf-rt-core" rev="${cxf.version}">
-	<exclusions>
-		<exclusion org="org.springframework" name="spring-beans" />
-		<exclusion org="org.springframework" name="spring-core" />
-		<exclusion org="org.springframework" name="spring-context" />
-	</exclusions>
-	</dependency>
-	<dependency org="org.apache.cxf" name="cxf-rt-bindings-soap" rev="${cxf.version}" />
-	<dependency org="org.apache.cxf" name="cxf-rt-databinding-jaxb" rev="${cxf.version}" />
-	<dependency org="org.apache.cxf" name="cxf-rt-frontend-jaxws" rev="${cxf.version}" />
-	<dependency org="org.apache.cxf" name="cxf-rt-transports-http" rev="${cxf.version}">
-	<exclusions>
-		<exclusion org="org.springframework" name="spring-web" />
-	</exclusions>
-	</dependency>
-	<dependency org="javax.xml.bind" name="jaxb-api" rev="2.2.7" />
-	<dependency org="javax.xml.ws" name="jaxws-api" rev="2.2.8" />
-	<!-- Avoid ROO-3163 -->
-	<dependency org="org.springframework" name="spring-tx" rev="" />
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-core</artifactId>
+        <version>${cxf.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-bindings-soap</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-databinding-jaxb</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxws</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-transports-http</artifactId>
+        <version>${cxf.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.2.7</version>
+    </dependency>
+    <dependency>
+        <groupId>javax.xml.ws</groupId>
+        <artifactId>jaxws-api</artifactId>
+        <version>2.2.8</version>
+    </dependency>
+    <!-- Avoid ROO-3163 -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-tx</artifactId>
+    </dependency>
 </dependencies>

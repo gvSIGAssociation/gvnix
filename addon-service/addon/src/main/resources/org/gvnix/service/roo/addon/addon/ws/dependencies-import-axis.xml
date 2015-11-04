@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dependencies>
-	<dependency org="axis" name="axis" rev="${axis.version}" />
+	<dependency>
+		<groupId>axis</groupId>
+		<artifactId>axis</artifactId>
+		<version>${axis.version}</version>
+	</dependency>
 	<!-- Generated Axis classes uses javax.persistence.Entity -->
-	<dependency org="org.eclipse.persistence" name="javax.persistence" rev="" />
+	<dependency>
+		<groupId>org.eclipse.persistence</groupId>
+		<artifactId>javax.persistence</artifactId>
+	</dependency>
 	<!-- Avoid ROO-3163 -->
-	<dependency org="org.springframework" name="spring-tx" rev="" />
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-tx</artifactId>
+	</dependency>
 </dependencies>

@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dependencies>
-	<dependency org="org.apache.cxf" name="cxf-rt-frontend-jaxws" rev="${cxf.version}" />
-	<dependency org="org.apache.cxf" name="cxf-rt-transports-http" rev="${cxf.version}">
-	<exclusions>
-		<exclusion org="org.springframework" name="spring-web" />
-	</exclusions>
+	<dependency>
+		<groupId>org.apache.cxf</groupId>
+		<artifactId>cxf-rt-frontend-jaxws</artifactId>
+		<version>${cxf.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.cxf</groupId>
+		<artifactId>cxf-rt-transports-http</artifactId>
+		<version>${cxf.version}</version>
+		<exclusions>
+			<exclusion>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+			</exclusion>
+		</exclusions>
 	</dependency>
 	<!-- Generated CXF classes uses javax.persistence.Entity -->
-	<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" />
+	<dependency>
+		<groupId>org.hibernate.javax.persistence</groupId>
+		<artifactId>hibernate-jpa-2.0-api</artifactId>
+		<version>1.0.1.Final</version>
+	</dependency>
 	<!-- Avoid ROO-3163 -->
-	<dependency org="org.springframework" name="spring-tx" rev="" />
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-tx</artifactId>
+	</dependency>
 </dependencies>
