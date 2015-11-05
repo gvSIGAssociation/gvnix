@@ -21,7 +21,7 @@
   <jsp:directive.attribute name="mode" type="java.lang.String" required="true" rtexprvalue="true" description="Mode of current LoupeField. Could be 'create' or 'update'" />
   <jsp:directive.attribute name="value" type="java.lang.Object" required="false" rtexprvalue="true" description="Value for input tag (don't use spring tags)" />
   <jsp:directive.attribute name="modalWidth" type="java.lang.String" required="false" description="Specify width for the window opened when push loupe button (default 800)" />
-  <jsp:directive.attribute name="hiddeUtilbox" type="java.lang.String" required="false" description="Specify if hidde elements with utilbox class (default true)" />
+  <jsp:directive.attribute name="hideUtilbox" type="java.lang.String" required="false" description="Specify if is necessary to hide elements with utilbox class on Datatables list (default true)" />
   <jsp:directive.attribute name="searchField" type="java.lang.String" required="false" description="Specify the field used to search when the input lost focus (default first element of caption)" />
   <jsp:directive.attribute name="returnFields" type="java.lang.String" required="false" description="Additional fields to return in ajax but don't search by them(Separated by commas)" />
   <jsp:directive.attribute name="labelTitleModal" type="java.lang.String" required="false" description="Specify the code of the label used for the title of modal, default 'Select' followed by label parameter" />
@@ -65,8 +65,8 @@
 	  	<c:set var="modalWidth" value="800" />
 	  </c:if>
 
-	  <c:if test="${empty hiddeUtilbox}">
-	  	<c:set var="hiddeUtilbox" value="true" />
+	  <c:if test="${empty hideUtilbox}">
+	  	<c:set var="hideUtilbox" value="true" />
 	  </c:if>
 
       <c:if test="${empty label}">
@@ -127,7 +127,7 @@
 		          		data-related="${related}"
 		          		data-relatedparam="${relatedParam}"
 		          		data-modalwidth="${modalWidth}"
-		          		data-hiddeutilbox="${hiddeUtilbox}"
+		          		data-hideutilbox="${hideUtilbox}"
 		          		data-searchfield="${searchField}"
 		          		data-returnfields="${returnFields}"
 		          		data-labeltitlemodal="${labelTitleModal}"
@@ -161,7 +161,7 @@
 		          		data-related="${related}"
 		          		data-relatedparam="${relatedParam}"
 		          		data-modalwidth="${modalWidth}"
-		          		data-hiddeutilbox="${hiddeUtilbox}"
+		          		data-hideutilbox="${hideUtilbox}"
 		          		data-searchfield="${searchField}"
 		          		data-returnfields="${returnFields}"
 		          		data-labeltitlemodal="${labelTitleModal}"
