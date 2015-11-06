@@ -74,9 +74,22 @@ public interface MenuEntryOperations {
     boolean isSpringSecurityInstalled();
 
     /**
+     * Checks if gvnixitem.tagx contains sec definition
+     * 
+     * @return true igvnixitem.tagx contains sec definition. Otherwise returns
+     *         false
+     */
+    boolean isSpringSecurityInstalledOnMenuTag();
+
+    /**
      * Setup all add-on artifacts (dependencies in this case)
      */
     void setup();
+
+    /**
+     * Update all add-on artifacts
+     */
+    void updateTags();
 
     /**
      * Setup all add-on artifacts with Bootstrap (dependencies in this case)
@@ -84,13 +97,22 @@ public interface MenuEntryOperations {
     void setupBootstrapMenu();
 
     /**
-     * Create or update menu web layer artefacts.
+     * Create or update menu web layer artifacts.
      * 
-     * @param classesPackage Web layer artefacts contains references to Java
+     * @param classesPackage Web layer artifacts contains references to Java
      *        classes in this package (used to create import declarations in
-     *        artefacts)
+     *        artifacts)
      */
-    void createWebArtefacts(String classesPackage);
+    void createWebArtifacts(String classesPackage);
+
+    /**
+     * Method that update installed all gvNIX menu elements
+     * 
+     * @param classesPackage Web layer artifacts contains references to Java
+     *        classes in this package (used to create import declarations in
+     *        artifacts)
+     */
+    void updateWebArtifacts(String classesPackage);
 
     /**
      * Allows for the addition of menu categories and menu items. If a category
@@ -291,7 +313,7 @@ public interface MenuEntryOperations {
 
     /**
      * Disable OSGI Roo menu component and then OSGI gvNIX menu component will
-     * be used automatically.</p>
+     * be used automatically. </p>
      */
     public void disableRooMenuOperations();
 }

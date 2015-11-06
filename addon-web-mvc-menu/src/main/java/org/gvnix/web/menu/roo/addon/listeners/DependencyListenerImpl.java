@@ -57,8 +57,6 @@ public class DependencyListenerImpl implements MenuDependencyListener {
     private MenuEntryOperations operations;
     private ProjectOperations projectOperations;
 
-    private Boolean hasSpringSecurity = null;
-
     protected void activate(final ComponentContext context) {
         this.context = context.getBundleContext();
         getMetadataDependencyRegistry().addNotificationListener(this);
@@ -77,14 +75,13 @@ public class DependencyListenerImpl implements MenuDependencyListener {
         if (ProjectMetadata.isValid(upstreamDependency)) {
             // Check if gvNIX menu is installed
             if (getMenuEntryOperations().isGvNixMenuAvailable()) {
-                // if dependency changes or its first call
-                if (!ObjectUtils.equals(getMenuEntryOperations()
-                        .isSpringSecurityInstalled(), hasSpringSecurity)) {
-                    LOGGER.finest("Spring Security changed or startup");
-                    // update hasSpringSecurity variable and update artifacts
-                    hasSpringSecurity = getMenuEntryOperations()
-                            .isSpringSecurityInstalled();
-                    getMenuEntryOperations().createWebArtefacts("~.web.menu");
+                // if spring security is installed and gvnixitem.tagx doesn't
+                // contains sec definition
+                // updates web artifacts
+                if (getMenuEntryOperations().isSpringSecurityInstalled()
+                        && !getMenuEntryOperations()
+                                .isSpringSecurityInstalledOnMenuTag()) {
+                    getMenuEntryOperations().updateWebArtifacts("~.web.menu");
                 }
 
                 // If Bootstrap is installed and gvNIX Bootstrap menu is not

@@ -87,9 +87,9 @@ public class MenuEntryCommands implements CommandMarker { // all command types
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
-    @CliAvailabilityIndicator({ "menu entry add", "menu entry visibility",
-            "menu entry move", "menu entry update", "menu entry info",
-            "menu entry roles", "menu tree" })
+    @CliAvailabilityIndicator({ "menu update tags", "menu entry add",
+            "menu entry visibility", "menu entry move", "menu entry update",
+            "menu entry info", "menu entry roles", "menu tree" })
     public boolean areMenuCommandsAvailable() {
         return operations.isProjectAvailable()
                 && operations.isGvNixMenuAvailable();
@@ -99,6 +99,12 @@ public class MenuEntryCommands implements CommandMarker { // all command types
             help = "Install gvNIX web menu: multilevel menu, advanced roo-shell menu commands and context menu support.")
     public void setup() {
         operations.setup();
+    }
+
+    @CliCommand(value = "menu update tags",
+            help = "Update gvNIX web menu tags including last changes.")
+    public void updateTags() {
+        operations.updateTags();
     }
 
     @CliCommand(value = "menu entry add",

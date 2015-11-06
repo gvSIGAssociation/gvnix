@@ -236,6 +236,30 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     }
 
     /** {@inheritDoc} */
+    public boolean isSpringSecurityInstalledOnMenuTag() {
+
+        if (!isGvNixMenuAvailable()) {
+            return false;
+        }
+
+        // Getting gvnixitem.tagx
+        String targetPath = getPathResolver().getIdentifier(
+                LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                "/WEB-INF/tags/menu/gvnixitem.tagx");
+        InputStream file = fileManager.getInputStream(targetPath);
+
+        final Document tagxFile = XmlUtils.readXml(file);
+        final Element root = tagxFile.getDocumentElement();
+
+        if (StringUtils.isNotBlank(root.getAttribute("xmlns:sec"))) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    /** {@inheritDoc} */
     public void setup() {
         // Parse the configuration.xml file
         Element configuration = XmlUtils.getConfiguration(getClass());
@@ -257,8 +281,14 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         // create project menu entity model
         createEntityModel("~.web.menu");
 
-        // create web layer artefacts
-        createWebArtefacts("~.web.menu");
+        // create web layer artifacts
+        createWebArtifacts("~.web.menu");
+    }
+
+    /** {@inheritDoc} */
+    public void updateTags() {
+        // Update web layer artfiacts
+        updateWebArtifacts("~.web.menu");
     }
 
     @Override
@@ -285,6 +315,38 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // Adding gvNIX Menu styles with Bootstrap
         installResourceIfNeeded("/styles/menu/dropdown-submenu.css",
+                "dropdown-submenu.css", null, null);
+
+        // Adding new css to load scripts
+        addStylesToLoadScriptBootstrap();
+    }
+
+    /**
+     * Method to update bootstrap menu
+     */
+    public void updateBootstrapMenu() {
+        if (isSpringSecurityInstalled()) {
+            updateResource("/WEB-INF/tags/menu/gvnixitem.tagx",
+                    "gvnixitem-bootstrap-sec.tagx", null,
+                    new String[] { "<menu:gvnixitem", " xmlns:spring=",
+                            " xmlns:sec=" });
+        }
+        else {
+            updateResource("/WEB-INF/tags/menu/gvnixitem.tagx",
+                    "gvnixitem-bootstrap.tagx", null,
+                    new String[] { "<menu:gvnixitem" });
+        }
+
+        // Adding gvnixsubcategory
+        updateResource("/WEB-INF/tags/menu/gvnixsubcategory.tagx",
+                "gvnixsubcategory.tagx", null, null);
+
+        // Adding subcategory.tagx
+        updateResource("/WEB-INF/tags/menu/subcategory.tagx",
+                "subcategory.tagx", null, null);
+
+        // Adding gvNIX Menu styles with Bootstrap
+        updateResource("/styles/menu/dropdown-submenu.css",
                 "dropdown-submenu.css", null, null);
 
         // Adding new css to load scripts
@@ -938,7 +1000,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     }
 
     /** {@inheritDoc} */
-    public void createWebArtefacts(String classesPackage) {
+    public void createWebArtifacts(String classesPackage) {
 
         // parameters Map to replace variables in file templates
         Map<String, String> params = new HashMap<String, String>();
@@ -985,6 +1047,54 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // change menu.jspx to use gvnix menu tag that will render menu.xml
         installResourceIfNeeded("/WEB-INF/views/menu.jspx", "menu.jspx", null,
+                new String[] { "menu:gvnixmenu" });
+    }
+
+    /** {@inheritDoc} */
+    public void updateWebArtifacts(String classesPackage) {
+
+        // parameters Map to replace variables in file templates
+        Map<String, String> params = new HashMap<String, String>();
+
+        // resolve given classes package
+        String javaPackage = getFullyQualifiedPackageName(classesPackage);
+
+        // Put variable values in parameters Map
+        params.put(
+                "__TOP_LEVEL_PACKAGE__",
+                getProjectOperations().getTopLevelPackage(
+                        getProjectOperations().getFocusedModuleName())
+                        .getFullyQualifiedPackageName());
+        params.put("__MENU_MODEL_CLASS__", javaPackage.concat(".Menu"));
+
+        // update tags
+        updateResource("/WEB-INF/tags/menu/gvnixmenu.tagx", "gvnixmenu.tagx",
+                params, new String[] { "<menu:gvnixitem" });
+
+        // Check if bootstrap is installed
+        if (getProjectOperations().isFeatureInstalledInFocusedModule(
+                "gvnix-bootstrap")) {
+            // Updating gvnixitem and gvnixitem-sec with Bootstrap
+            updateBootstrapMenu();
+        }
+        else {
+
+            // Installing gvnixitem and gvnixitem-sec without Bootstrap
+            if (isSpringSecurityInstalled()) {
+                updateResource("/WEB-INF/tags/menu/gvnixitem.tagx",
+                        "gvnixitem-sec.tagx", null, new String[] {
+                                "<menu:gvnixitem", " xmlns:spring=",
+                                " xmlns:sec=" });
+            }
+            else {
+                updateResource("/WEB-INF/tags/menu/gvnixitem.tagx",
+                        "gvnixitem.tagx", null,
+                        new String[] { "<menu:gvnixitem" });
+            }
+        }
+
+        // change menu.jspx to use gvnix menu tag that will render menu.xml
+        updateResource("/WEB-INF/views/menu.jspx", "menu.jspx", null,
                 new String[] { "menu:gvnixmenu" });
     }
 
@@ -1147,6 +1257,109 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                 }
             }
         }
+
+        if (target == null) {
+            return;
+        }
+
+        try {
+            InputStream inputStream = null;
+            OutputStreamWriter outputStream = null;
+            try {
+                inputStream = IOUtils.toInputStream(sourceContents);
+                outputStream = new OutputStreamWriter(target.getOutputStream());
+                IOUtils.copy(inputStream, outputStream);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
+        catch (IOException e) {
+            throw new IllegalStateException("Unable to create/update '".concat(
+                    targetPath).concat("'"), e);
+        }
+    }
+
+    /**
+     * Updates the contents for one resource represented by the given target
+     * file path and relative source path.
+     * 
+     * @param relativePath path relative to {@link Path.SRC_MAIN_WEBAPP} of
+     *        target file
+     * @param resourceName path relative to classpath of file to be copied
+     *        (cannot be null)
+     * @param toReplace
+     * @param containsStrings
+     */
+    private void updateResource(String relativePath, String resourceName,
+            Map<String, String> toReplace, String[] containsStrings) {
+        PathResolver pathResolver = getPathResolver();
+
+        String targetPath = pathResolver
+                .getIdentifier(
+                        LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
+                        relativePath);
+
+        InputStream resource = getClass().getResourceAsStream(resourceName);
+
+        String sourceContents;
+        String targetContents = null;
+
+        // load resource to copy
+        try {
+            sourceContents = IOUtils.toString(new InputStreamReader(resource));
+            // Replace params
+            if (toReplace != null) {
+                for (Entry<String, String> entry : toReplace.entrySet()) {
+                    sourceContents = StringUtils.replace(sourceContents,
+                            entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        catch (IOException e) {
+            throw new IllegalStateException(
+                    "Unable to load file to be copied '".concat(resourceName)
+                            .concat("'"), e);
+        }
+        finally {
+            try {
+                resource.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // load target contents if exists
+        if (fileManager.exists(targetPath)) {
+            FileReader reader = null;
+            try {
+                reader = new FileReader(targetPath);
+                targetContents = IOUtils.toString(reader);
+            }
+            catch (Exception e) {
+                throw new IllegalStateException("Error reading '".concat(
+                        targetPath).concat("'"), e);
+            }
+            finally {
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // prepare mutable file
+        // use MutableFile in combination with FileManager to take advantage of
+        // Roos transactional file handling which offers automatic rollback if
+        // an
+        // exception occurs
+        MutableFile target = fileManager.updateFile(targetPath);
 
         if (target == null) {
             return;
@@ -1466,10 +1679,17 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         if (element.hasChildNodes()) {
             builder.append(indent).append("Children     : ").append("\n");
             builder.append(getFormatedInfo(element.getChildNodes(), label,
-                    message, roles, lang, tabSize + 15)); // indent to the right
+                    message, roles, lang, tabSize + 15)); // indent
+                                                          // to
+                                                          // the
+                                                          // right
                                                           // of
-                                                          // "Children     : "
-                                                          // (length 15 chars)
+                                                          // "Children
+                                                          // :
+                                                          // "
+                                                          // (length
+                                                          // 15
+                                                          // chars)
         }
         else {
             builder.append("\n"); // empty line
