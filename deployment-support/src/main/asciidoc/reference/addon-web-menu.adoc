@@ -124,6 +124,16 @@ Para mas información sobre los comandos ver el
 link:#_comandos_del_add_on_web_menu[apéndice de comandos de este
 add-on].
 
+Actualización de componentes.
+-----------------------------
+
+Se facilita el comando 'menu update tags' para actualizar los componentes de menú 
+introducidos en el proyecto generado. 
+
+Para mas información sobre los comandos ver el
+link:#_comandos_del_add_on_web_menu[apéndice de comandos de este
+add-on].
+
 Futuras versiones
 -----------------
 

@@ -16,6 +16,9 @@ consultar la documentación del link:#_add_on_web_menu[add-on Web Menu].
 |Instala el sistema de gestión del menú web que permite organizar de
 forma sencilla su estructura de páginas y permisos
 
+|link:#_menu_update_tags[menu update tags]
+|Actualiza los componentes del menú a la última versión disponible.
+
 |link:#_menu_entry_add[menu entry add] |Añade
 un elemento al menú, sea una página o un grupo
 
@@ -54,6 +57,22 @@ fichero `src/main/webapp/WEB-INF/views/menu.xml`.
 Para una descripción detallada de las tareas que realiza este comando
 consultar la documentación de
 link:#_instalación_de_la_gestión_del_menú[instalación de la gestión del menú].
+
+menu update tags
+~~~~~~~~~~~~~~~~
+
+Actualiza los siguientes elementos a la versión original de los mismos.
+
+Updated SRC_MAIN_WEBAPP/WEB-INF/tags/menu/gvnixmenu.tagx
+Updated SRC_MAIN_WEBAPP/WEB-INF/tags/menu/gvnixitem.tagx
+Updated SRC_MAIN_WEBAPP/WEB-INF/tags/menu/gvnixsubcategory.tagx
+Updated SRC_MAIN_WEBAPP/WEB-INF/tags/menu/subcategory.tagx
+Updated SRC_MAIN_WEBAPP/styles/menu/dropdown-submenu.css
+Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
+
+Este comando es muy útil al migrar entre versiones de gvNIX, ya que nos facilita
+la actualización a las nuevas versiones de todos los componentes del menú.
+
 
 menu entry add
 ~~~~~~~~~~~~~~
