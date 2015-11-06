@@ -41,10 +41,10 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 @Component
 @Service
-public class DependencyListenerImpl implements MenuDependencyListener {
+public class MenuDependencyListenerImpl implements MenuDependencyListener {
 
     private static final Logger LOGGER = HandlerUtils
-            .getLogger(DependencyListenerImpl.class);
+            .getLogger(MenuDependencyListenerImpl.class);
 
     // ------------ OSGi component attributes ----------------
     private BundleContext context;
