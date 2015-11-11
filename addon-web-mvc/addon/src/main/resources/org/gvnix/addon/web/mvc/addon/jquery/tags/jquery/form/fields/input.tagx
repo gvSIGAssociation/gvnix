@@ -21,57 +21,56 @@
   <jsp:directive.attribute name="size" type="java.lang.String" required="false" rtexprvalue="true" description="Size attribute of the input element. (Not Length)" />
   <jsp:directive.attribute name="value" type="java.lang.String" required="false" rtexprvalue="true" description="Default input value" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
-  
+
   <c:if test="${empty render or render}">
-  
+
     <c:if test="${empty type}">
       <c:set value="text" var="type" />
     </c:if>
-    
+
     <c:if test="${empty disabled}">
       <c:set value="false" var="disabled" />
     </c:if>
-    
+
     <c:if test="${empty size}">
     	<c:set value="" var="size"/>
     </c:if>
-    
+
     <c:if test="${empty value}">
     	<c:set value="" var="value"/>
     </c:if>
-    
+
     <c:if test="${empty label}">
       <c:if test="${empty labelCode}">
         <c:set var="labelCode" value="${fn:substringAfter(id,'_')}" />
       </c:if>
       <spring:message code="label_${fn:toLowerCase(labelCode)}" var="label" htmlEscape="false" />
     </c:if>
-    
+
     <c:if test="${empty validationMessage}">
       <c:choose>
         <c:when test="${empty validationMessageCode}">
           <spring:message arguments="${label}" code="field_invalid" var="field_invalid" javaScriptEscape="true"/>
         </c:when>
         <c:otherwise>
-          <spring:message arguments="${label}" code="${validationMessageCode}" var="field_invalid" javaScriptEscape="true" />
+          <spring:message arguments="${label}" code="${validationMessageCode}" var="field_invalid" javaScriptEscape="true"/>
         </c:otherwise>
       </c:choose>
     </c:if>
-    
+
     <c:if test="${empty required}">
       <c:set value="false" var="required" />
     </c:if>
-    
+
     <c:set var="sec_field">
       <spring:escapeBody javaScriptEscape="true" >${field}</spring:escapeBody>
     </c:set>
-    
+
     <div id="_${fn:escapeXml(id)}_id" class="control-group">
       <label for="_${sec_field}_id" class="control-label">
        <c:choose>
           <c:when test="${empty renderLabel or renderLabel}">
-            <c:out value="${fn:escapeXml(label)}" />
-        :
+            <c:out value="${fn:escapeXml(label)}" />:
           </c:when>
           <c:otherwise>
             &amp;nbsp;
@@ -101,10 +100,10 @@
       <div class="controls">
       <c:choose>
         <c:when test="${disableFormBinding}">
-          <input id="_${sec_field}_id" name="${sec_field}" type="${fn:escapeXml(type)}" 
-            title="${fn:escapeXml(field_validation)}" data-required="${required}"  
-            data-invalid="${fn:escapeXml(field_invalid)}" data-missing="${fn:escapeXml(sec_field_required)}" 
-            data-regex="${validationRegex}" data-minlength="${min}" data-maxlength="${max}" 
+          <input id="_${sec_field}_id" name="${sec_field}" type="${fn:escapeXml(type)}"
+            title="${fn:escapeXml(field_validation)}" data-required="${required}"
+            data-invalid="${fn:escapeXml(field_invalid)}" data-missing="${fn:escapeXml(sec_field_required)}"
+            data-regex="${validationRegex}" data-minlength="${min}" data-maxlength="${max}"
             data-mindecimal="${decimalMin}" data-maxdecimal="${decimalMax}" size="${size}" value="${value}" />
         </c:when>
         <c:otherwise>
@@ -113,10 +112,10 @@
               <form:password id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}" size="${size}"/>
             </c:when>
             <c:otherwise>
-              <form:input id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}" 
-                title="${field_validation}" data-required="${required}"  
-                data-invalid="${field_invalid}" data-missing="${sec_field_required}" 
-                data-regex="${validationRegex}" data-minlength="${min}" data-maxlength="${max}" 
+              <form:input id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}"
+                title="${field_validation}" data-required="${required}"
+                data-invalid="${field_invalid}" data-missing="${sec_field_required}"
+                data-regex="${validationRegex}" data-minlength="${min}" data-maxlength="${max}"
                 data-mindecimal="${decimalMin}" data-maxdecimal="${decimalMax}" size="${size}" value="${value}"/>
             </c:otherwise>
           </c:choose>

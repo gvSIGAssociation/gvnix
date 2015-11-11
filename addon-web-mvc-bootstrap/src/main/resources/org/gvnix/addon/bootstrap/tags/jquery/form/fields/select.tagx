@@ -14,6 +14,8 @@
   <jsp:directive.attribute name="disableFormBinding" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Set to true to disable Spring form binding" />
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="renderLabel" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of the label should be rendered (default 'true')" />
+  <jsp:directive.attribute name="addEmptyValue" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if is necessary to include an empty value as first element of select input(default 'false')" />
+  <jsp:directive.attribute name="value" type="java.lang.String" required="false" rtexprvalue="true" description="Value of current select element. Only available if disableFormBinding is true." />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <c:if test="${empty render or render}">
@@ -33,6 +35,10 @@
     <c:if test="${empty multiple}">
       <c:set value="false" var="multiple" />
     </c:if>
+    
+    <c:if test="${empty addEmptyValue}">
+        <c:set value="false" var="addEmptyValue" />
+    </c:if>
 
     <c:set var="sec_field">
       <spring:escapeBody javaScriptEscape="true" >${field}</spring:escapeBody>
@@ -48,8 +54,7 @@
           <label for="_${sec_field}_id" class="control-label">
             <c:choose>
               <c:when test="${empty renderLabel or renderLabel}">
-                <c:out value="${fn:escapeXml(label)}" />
-                :
+                <c:out value="${fn:escapeXml(label)}" />:
               </c:when>
               <c:otherwise>
                 &amp;nbsp;
@@ -64,33 +69,71 @@
                   <c:choose>
                     <c:when test="${multiple}">
                       <select class="form-control" id="_${sec_field}_id" name="${sec_field}" multiple="${multiple}">
+                      <c:if test="${addEmptyValue}">
+                        <option value=""></option>
+                      </c:if>
                       <c:forEach items="${items}" var="item">
-                        <option value="${item}">
                         <c:choose>
-                          <c:when test="${empty itemLabel}">
-                            <spring:eval expression="item" />
+                          <c:when test="${value eq item}">
+                            <option value="${item}" selected="true">
+                             <c:choose>
+                              <c:when test="${empty itemLabel}">
+                                <spring:eval expression="item" />
+                              </c:when>
+                              <c:otherwise>
+                                <spring:eval expression="item[sec_itemLabel]"/>
+                              </c:otherwise>
+                            </c:choose>
+                            </option>
                           </c:when>
                           <c:otherwise>
-                            <spring:eval expression="item[sec_itemLabel]"/>
+                            <option value="${item}">
+                            <c:choose>
+                              <c:when test="${empty itemLabel}">
+                                <spring:eval expression="item" />
+                              </c:when>
+                              <c:otherwise>
+                                <spring:eval expression="item[sec_itemLabel]"/>
+                              </c:otherwise>
+                            </c:choose>
+                            </option>
                           </c:otherwise>
                         </c:choose>
-                        </option>
                       </c:forEach>
                       </select>
                     </c:when>
                     <c:otherwise>
                       <select class="form-control" id="_${sec_field}_id" name="${sec_field}">
+                      <c:if test="${addEmptyValue}">
+                        <option value=""></option>
+                      </c:if>
                       <c:forEach items="${items}" var="item">
-                        <option value="${item}">
                         <c:choose>
-                          <c:when test="${empty itemLabel}">
-                            <spring:eval expression="item" />
+                          <c:when test="${value eq item}">
+                            <option value="${item}" selected="true">
+                             <c:choose>
+                              <c:when test="${empty itemLabel}">
+                                <spring:eval expression="item" />
+                              </c:when>
+                              <c:otherwise>
+                                <spring:eval expression="item[sec_itemLabel]"/>
+                              </c:otherwise>
+                             </c:choose>
+                            </option>
                           </c:when>
                           <c:otherwise>
-                            <spring:eval expression="item[sec_itemLabel]"/>
+                            <option value="${item}">
+                            <c:choose>
+                              <c:when test="${empty itemLabel}">
+                                <spring:eval expression="item" />
+                              </c:when>
+                              <c:otherwise>
+                                <spring:eval expression="item[sec_itemLabel]"/>
+                              </c:otherwise>
+                            </c:choose>
+                            </option>
                           </c:otherwise>
                         </c:choose>
-                        </option>
                       </c:forEach>
                       </select>
                     </c:otherwise>
@@ -130,33 +173,71 @@
                   <c:choose>
                     <c:when test="${multiple}">
                       <select class="form-control" id="_${sec_field}_id" name="${sec_field}" multiple="${multiple}" data-required="${required}">
+                        <c:if test="${addEmptyValue}">
+                          <option value=""></option>
+                        </c:if>
                         <c:forEach items="${items}" var="item">
-                          <option value="${item[fn:escapeXml(itemValue)]}">
-                            <c:choose>
-                              <c:when test="${empty itemLabel}">
-                                <spring:eval expression="item" />
-                              </c:when>
-                              <c:otherwise>
-                                <spring:eval expression="item[sec_itemLabel]"/>
-                              </c:otherwise>
-                            </c:choose>
-                          </option>
+	                        <c:choose>
+	                           <c:when test="${value eq item[fn:escapeXml(itemValue)]}">
+	                               <option value="${item[fn:escapeXml(itemValue)]}" selected="true">
+	                                 <c:choose>
+	                                   <c:when test="${empty itemLabel}">
+	                                     <spring:eval expression="item" />
+	                                   </c:when>
+	                                   <c:otherwise>
+	                                     <spring:eval expression="item[sec_itemLabel]"/>
+	                                   </c:otherwise>
+	                                 </c:choose>
+	                               </option>
+	                           </c:when>
+	                           <c:otherwise>
+	                             <option value="${item[fn:escapeXml(itemValue)]}">
+	                             <c:choose>
+	                               <c:when test="${empty itemLabel}">
+	                                 <spring:eval expression="item" />
+	                               </c:when>
+	                               <c:otherwise>
+	                                 <spring:eval expression="item[sec_itemLabel]"/>
+	                               </c:otherwise>
+	                             </c:choose>
+	                           </option>
+	                           </c:otherwise>
+	                         </c:choose>
                         </c:forEach>
                       </select>
                     </c:when>
                     <c:otherwise>
-                      <select class="form-control" id="_${sec_field}_id" name="${sec_field}" multiple="${multiple}" data-required="${required}">
+                      <select class="form-control" id="_${sec_field}_id" name="${sec_field}" data-required="${required}">
+                      <c:if test="${addEmptyValue}">
+                          <option value=""></option>
+                      </c:if>
                         <c:forEach items="${items}" var="item">
-                          <option value="${item[fn:escapeXml(itemValue)]}">
-                            <c:choose>
-                              <c:when test="${empty itemLabel}">
-                                <spring:eval expression="item" />
+                          <c:choose>
+                              <c:when test="${value eq item[fn:escapeXml(itemValue)]}">
+                                  <option value="${item[fn:escapeXml(itemValue)]}" selected="true">
+                                    <c:choose>
+                                      <c:when test="${empty itemLabel}">
+                                        <spring:eval expression="item" />
+                                      </c:when>
+                                      <c:otherwise>
+                                        <spring:eval expression="item[sec_itemLabel]"/>
+                                      </c:otherwise>
+                                    </c:choose>
+                                  </option>
                               </c:when>
                               <c:otherwise>
-                                <spring:eval expression="item[sec_itemLabel]"/>
+                                   <option value="${item[fn:escapeXml(itemValue)]}">
+                                    <c:choose>
+                                      <c:when test="${empty itemLabel}">
+                                        <spring:eval expression="item" />
+                                      </c:when>
+                                      <c:otherwise>
+                                        <spring:eval expression="item[sec_itemLabel]"/>
+                                      </c:otherwise>
+                                    </c:choose>
+                                  </option>
                               </c:otherwise>
                             </c:choose>
-                          </option>
                         </c:forEach>
                       </select>
                     </c:otherwise>

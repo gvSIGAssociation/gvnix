@@ -24,8 +24,7 @@
 	      <dl class="row dl-horizontal" id="_${fn:escapeXml(id)}_id">
 			<dt><c:choose>
           <c:when test="${empty renderLabel or renderLabel}">
-            <c:out value="${fn:escapeXml(label)}" />
-            :
+            <c:out value="${fn:escapeXml(label)}" />:
           </c:when>
           <c:otherwise>
             &amp;nbsp;

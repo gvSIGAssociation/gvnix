@@ -15,6 +15,7 @@
   <jsp:directive.attribute name="disableFormBinding" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Set to true to disable Spring form binding" />
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="renderLabel" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of the label should be rendered (default 'true')" />
+  <jsp:directive.attribute name="value" type="java.lang.String" required="false" rtexprvalue="true" description="Value of current datetime element. Only available if disableFormBinding is true." />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <c:if test="${empty render or render}">
@@ -36,8 +37,7 @@
       <label for="_${sec_field}_id" class="control-label">
         <c:choose>
           <c:when test="${empty renderLabel or renderLabel}">
-            <c:out value="${fn:escapeXml(label)}" />
-            :
+            <c:out value="${fn:escapeXml(label)}" />:
           </c:when>
           <c:otherwise>
             &amp;nbsp;
@@ -64,9 +64,9 @@
       <c:choose>
         <c:when test="${disableFormBinding}">
           <input id="_${sec_field}_id" name="${sec_field}" class="datepicker"
-            title="${fn:escapeXml(field_validation)}" data-required="${required}"
+          	title="${fn:escapeXml(field_validation)}" data-required="${required}"
             data-invalid="${fn:escapeXml(field_invalid)}" data-missing="${fn:escapeXml(sec_field_required)}"
-            data-regex="${validationRegex}" data-dateformat="${dateTimePattern}" />
+            data-regex="${validationRegex}" data-dateformat="${dateTimePattern}" value="${value}" />
         </c:when>
         <c:otherwise>
           <form:input id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}"

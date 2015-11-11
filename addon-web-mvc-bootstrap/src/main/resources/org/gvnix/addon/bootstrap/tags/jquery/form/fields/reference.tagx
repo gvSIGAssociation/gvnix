@@ -20,8 +20,7 @@
       <label for="_${fn:escapeXml(field)}_id" class="control-label">
        <c:choose>
           <c:when test="${empty renderLabel or renderLabel}">
-            <c:out value="${fn:escapeXml(label)}" />
-            :
+            <c:out value="${fn:escapeXml(label)}" />:
           </c:when>
           <c:otherwise>
             &amp;nbsp;
