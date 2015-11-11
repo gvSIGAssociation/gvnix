@@ -6,7 +6,7 @@ download:         http://repository.gvnix.org/
 quickstart:       http://github.com/DISID/gvnix-samples/tree/master/quickstart-app
 demo-geo:         http://geo-gvnix.rhcloud.com/login?lang=en
 sourceforge:      http://sourceforge.net/projects/gvnix/files/
-current-version:  1.5.1.RC1
+current-version:  1.4.1
 
 # Assign a default image for your site's header and footer
 default_bg_header: default_bg_header.png
