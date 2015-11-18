@@ -7,7 +7,7 @@ comments: true
 share: true
 featured: true
 featured: true
-modified: 2015-10-27
+modified: 2015-11-18
 type: photo
 imagefeature: post/premiosPortalProgramas.png
 category:
@@ -15,14 +15,14 @@ category:
 lang: es
 ---
 
-gvNIX es finalista en la categoría _Mayor potencial de crecimiento_ de los
-Premios PortalProgramas al mejor Software Libre 2015.
+gvNIX segundo finalista en la categoría _Mayor potencial de crecimiento_ de los
+Premios [PortalProgramas](http://www.portalprogramas.com) al mejor Software Libre 2015.
 
 Se trata de la 7º edición de los premios que reconocen al software libre que más
 ha influido en los avances tecnológicos.
 
 Bajo la filosofía de que la colaboración hace el software libre más grande,
-[PortalProgramas](http://www.portalprogramas.com) organiza este concurso donde
+PortalProgramas organiza este concurso donde
 los usuarios nominan y votan a los proyectos de software libre que deseen, y
 una vez escogidos los finalistas, un jurado profesional determina los ganadores.
 
@@ -44,7 +44,6 @@ Desde aquí, gracias a [PortalProgramas](http://www.portalprogramas.com) por la 
 
 Puedes ver la participación del proyecto gvNIX [aquí](http://www.portalprogramas.com/software-libre/premios/proyecto/gvNIX)
 
-¡Gracias a todos por vuestros votos!
+¡Gracias a todos por vuestros votos! ¡Enhorabuena a los premiados!
 
-Estamos en la fase de votaciones del jurado. ¡El día 18 de noviembre conoceremos los ganadores!
 

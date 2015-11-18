@@ -7,7 +7,7 @@ comments: true
 share: true
 featured: true
 featured: true
-modified: 2015-10-27
+modified: 2015-11-18
 type: photo
 imagefeature: post/premiosPortalProgramas.png
 category:
@@ -17,7 +17,7 @@ lang: en
 
 
 
-gvNIX is a finalist in the category _the greatest growth potential_
+gvNIX is the second finalist in the category _the greatest growth potential_
 in PortalProgramas Awards to Best Free Software 2015.
 
 This is the 7th edition of the awards that recognize the free software that
@@ -42,8 +42,7 @@ From here, thanks to [PortalProgramas](http://www.portalprogramas.com) for the n
 
 You can see the participation of gvNIX project [here](http://www.portalprogramas.com/software-libre/premios/proyecto/gvNIX)
 
-Thank you all for your votes!
+Thank you all for your votes! Congrats to the winners!
 
-We are on stage of voting open. On November 18 we will know the winners!
 
 
