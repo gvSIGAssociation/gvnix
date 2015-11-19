@@ -60,17 +60,26 @@
         <spring:escapeBody javaScriptEscape="true">${field_required}</spring:escapeBody>
       </c:set>
 
+      <c:set value="datepicker" var="datePickerClass" />
+
+      <!-- Check for time pattern -->
+      <c:if test="${fn:containsIgnoreCase(dateTimePattern, 'h') or fn:containsIgnoreCase(dateTimePattern, 's') or fn:containsIgnoreCase(dateTimePattern, 'a') or fn:containsIgnoreCase(dateTimePattern, 'k') or fn:contains(dateTimePattern, 'm') }">
+        <!-- datePicket currenly doesn't support time -->
+        <c:set value="" var="datePickerClass" />
+      </c:if>
+
+
       <div class="controls">
       <c:choose>
         <c:when test="${disableFormBinding}">
-          <input id="_${sec_field}_id" name="${sec_field}" class="datepicker"
+          <input id="_${sec_field}_id" name="${sec_field}" class="${datePickerClass}"
           	title="${fn:escapeXml(field_validation)}" data-required="${required}"
             data-invalid="${fn:escapeXml(field_invalid)}" data-missing="${fn:escapeXml(sec_field_required)}"
             data-regex="${validationRegex}" data-dateformat="${dateTimePattern}" value="${value}" />
         </c:when>
         <c:otherwise>
           <form:input id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}"
-            cssClass="datepicker" title="${field_validation}" data-required="${required}"
+            cssClass="${datePickerClass}" title="${field_validation}" data-required="${required}"
             data-invalid="${field_invalid}" data-missing="${sec_field_required}"
             data-regex="${validationRegex}" data-dateformat="${dateTimePattern}" />
           <form:errors cssClass="errors" id="_${sec_field}_error_id" path="${sec_field}" />
