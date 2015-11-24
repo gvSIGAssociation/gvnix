@@ -218,19 +218,7 @@ function fnVal($control) {
 	var nControl = $control[0];
 
 	if (nControl.nodeName.toLowerCase() == "input") {
-		var patternDate = nControl.attributes["data-dateformat"];
-		if(patternDate != undefined && nControl["value"] != "" && $control.hasClass("datepicker")){
-			var sFormat = jQueryDateFormat(patternDate.value);
-			try {
-				var dDate = jQuery.datepicker.parseDate(sFormat,nControl["value"]);
-				return jQuery.datepicker.formatDate(sFormat,dDate);
-			} catch (e) {
-				// TODO Support for time formats
-				return jQuery.datepicker.formatDate(sFormat,new Date(nControl["value"]));
-			}
-		}else{
-			return $control.val();
-		}
+    return $control.val();
 	}
 
 	// Note: At present, using .val() on textarea elements strips carriage
