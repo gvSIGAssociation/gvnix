@@ -16,6 +16,7 @@
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="renderLabel" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of the label should be rendered (default 'true')" />
   <jsp:directive.attribute name="value" type="java.lang.String" required="false" rtexprvalue="true" description="Value of current datetime element. Only available if disableFormBinding is true." />
+  <jsp:directive.attribute name="timeStep" type="java.lang.Integer" required="false" rtexprvalue="true" description="Step in minutes for time selector. Only available if field has time format. Default value 5" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <c:if test="${empty render or render}">
@@ -29,6 +30,9 @@
     <c:set var="sec_field">
       <spring:escapeBody javaScriptEscape="true" >${field}</spring:escapeBody>
     </c:set>
+    <c:if test="${empty timeStep}">
+      <c:set value="5" var="timeStep" />
+    </c:if>
 
     <c:if test="${empty required}">
       <c:set value="false" var="required" />
@@ -60,26 +64,20 @@
         <spring:escapeBody javaScriptEscape="true">${field_required}</spring:escapeBody>
       </c:set>
 
-      <c:set value="datepicker" var="datePickerClass" />
+      <c:set value="datetimepicker" var="datePickerClass" />
 
-      <!-- Check for time pattern -->
-      <c:if test="${fn:containsIgnoreCase(dateTimePattern, 'h') or fn:containsIgnoreCase(dateTimePattern, 's') or fn:containsIgnoreCase(dateTimePattern, 'a') or fn:containsIgnoreCase(dateTimePattern, 'k') or fn:contains(dateTimePattern, 'm') }">
-        <!-- datePicket currenly doesn't support time -->
-        <c:set value="" var="datePickerClass" />
-      </c:if>
-      
       <div class="controls datetime">
       <c:choose>
         <c:when test="${disableFormBinding}">
           <input id="_${sec_field}_id" name="${sec_field}" class="${datePickerClass} form-control input-sm"
-            title="${fn:escapeXml(field_validation)}" data-required="${required}"
+            title="${fn:escapeXml(field_validation)}" data-required="${required}" data-timestep="${timeStep}"
             data-invalid="${fn:escapeXml(field_invalid)}" data-missing="${fn:escapeXml(sec_field_required)}"
             data-regex="${validationRegex}" data-dateformat="${dateTimePattern}" value="${value}" />
         </c:when>
         <c:otherwise>
           <form:input id="_${sec_field}_id" path="${sec_field}" disabled="${disabled}"
             cssClass="${datePickerClass} form-control input-sm" title="${field_validation}" data-required="${required}"
-            data-invalid="${field_invalid}" data-missing="${sec_field_required}"
+            data-invalid="${field_invalid}" data-missing="${sec_field_required}" data-timestep="${timeStep}"
             data-regex="${validationRegex}" data-dateformat="${dateTimePattern}" />
           <form:errors cssClass="errors alert alert-danger" id="_${sec_field}_error_id" path="${sec_field}" />
         </c:otherwise>

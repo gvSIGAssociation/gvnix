@@ -58,6 +58,30 @@ jquery-numberformatter
 * License: MIT Licencse (http://www.opensource.org/licenses/mit-license.php)
 * Downloaded from: https://code.google.com/p/jquery-numberformatter/
 
+
+Moment
+==============
+Date management library
+
+* Version: 2.10.6
+* Url: http://momentjs.com/
+* moment.js: uncompressed version
+* moment.min.js: compressed version
+* i18n/moment-xx.js: locale "xx" configuration
+* License: MIT Licencse (http://www.opensource.org/licenses/mit-license.php)
+* Downloaded from: https://cdnjs.com/libraries/moment.js
+
+
+jQuery DateTimePicker
+=======================
+Date/Time jQuery component
+
+* Version: https://github.com/xdan/datetimepicker/commit/ece0678bd2774fc5642ba78425f6e235429ea92c (17/11/2015)
+* Url: https://github.com/xdan/datetimepicker
+* jquery.datetimepicker.full.js: uncompressed version
+* jquery.datetimepicker.full.min.js: compressed version
+* License: MIT License
+* Download from: https://github.com/xdan/datetimepicker/archive/master.zip
 NOTE
 ====
 

@@ -27,6 +27,7 @@ var options = {
  ================================================= */
 
 var functionCallbacks = jQuery.Callbacks("unique");
+var callbackFunctionsNames = [];
 
 /* JS Utilities
 ================================================== */
@@ -177,64 +178,62 @@ function getLanguage() {
 
 /* jQuery Utilities
 ================================================== */
-
-/** 
- * Convert Java's SimpleDateFormat to jQuery UI datepicker formatDate.
- * Takes a Java pattern 
- * (http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html) 
- * and turns it into the expected jQueryUI formatDate 
- * (http://api.jqueryui.com/datepicker/).
- * 
- * Function authors: Laurent Picquet, Danny 
+/**
+ * Convert Java's SimpleDateFormat to momentJS formatDate.
+ * Takes a Java pattern
+ * (http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html)
+ * and turns it into the expected momentJS formatDate
+ * (http://momentjs.com/docs/#/parsing/string-format/).
+ *
+ * @param pattern SimpleDateFormat pattern
+ * @return moment pattern (if 'pattern' is ommited return defautl pattern)
  */
-function jQueryDateFormat(pattern){
+function momentDateFormat(pattern) {
 
-  debug("gvNIX :: Java DateFormat :: " + pattern);
+	debug("gvNIX :: Java DateFormat :: " + pattern);
 
-  // Year
-  if(pattern.search(/y{3,}/g) >= 0) {       // yyyy to yy
-    pattern = pattern.replace(/y{3,}/g, "yy");
-  }
-  else if(pattern.search(/y{2}/g) >=0) {    // yy to y
-    pattern = pattern.replace(/y{2}/g, "y");
-  }
+	if (pattern) {
+		// Year
+		if (pattern.search(/y{3,}/g) >= 0) {
+			pattern = pattern.replace(/y{3,}/g, "YYYY"); // yyyy to yy
+		} else if (pattern.search(/y{2}/g) >= 0) { // yy to YY
+			pattern = pattern.replace(/y{2}/g, "YY");
+		}
 
-  // Month
-  if(pattern.search(/M{4,}/g) >=0) {        // MMMM to MM
-    pattern = pattern.replace(/M{4,}/g, "MM");
-  }
-  else if(pattern.search(/M{3}/g) >=0) {    // MMM to M
-    pattern = pattern.replace(/M{3}/g, "M");
-  }
-  else if(pattern.search(/M{2}/g) >=0) {    // MM to mm
-    pattern = pattern.replace(/M{2}/g, "mm");
-  }
-  else if(pattern.search(/M{1}/g) >=0) {    // M to m
-    pattern = pattern.replace(/M{1}/g, "m");
-  }
+		// Day
+		if (pattern.search(/d{2,}/g) >= 0) { // dd to DD
+			pattern = pattern.replace(/d{2,}/g, "DD");
+		} else if (pattern.search(/d{1}/g) >= 0) { // d to D
+			pattern = pattern.replace(/d{1}/g, "D");
+		} else if (pattern.search(/D{1,}/g) >= 0) { // D,DD, DDD to DDD
+			pattern = pattern.replace(/D{1,}/g, "DDD");
+		}
 
-  // Day
-  if(pattern.search(/D{2,}/g) >=0) {        // DD to oo
-    pattern = pattern.replace(/D{2,}/g, "oo");
-  }
-  else if(pattern.search(/D{1}/g) >=0) {    // D to o
-    pattern = pattern.replace(/D{1}/g, "o");
-  }
+		// Day in week
+		if (pattern.search(/E{4,}/g) >= 0) { // EEEE to dddd
+			pattern = pattern.replace(/E{4,}/g, "dddd");
+		} else if (pattern.search(/E{2,3}/g) >= 0) { // EEE to ddd
+			pattern = pattern.replace(/E{2,3}/g, "ddd");
+		}
 
-  // Day in week
-  if(pattern.search(/E{4,}/g) >=0) {        // EEEE to DD
-    pattern = pattern.replace(/E{4,}/g, "DD");
-  }
-  else if(pattern.search(/E{2,3}/g) >=0) {  // EEE to D
-    pattern = pattern.replace(/E{2,3}/g, "D");
-  }
+		// Day in week (number)
+		if (pattern.search(/F{1}/g) >= 0) { // F to e
+			pattern = pattern.replace(/F{1}/g, "e");
+		}
 
-  // Note there is no need to convert "day in month" because jQuery
-  // format and Java DateFormat patterns are the same
+		// week of the year
+		if (pattern.search(/w{1,}/g) >= 0) { // ww to WW
+			pattern = pattern.replace(/w{1,}/g, "WW");
+		}
+	} else {
+		var pattern = "YYYY/MM/DD HH:mm";
+	}
 
-  debug("gvNIX :: jQueryDateFormat :: " + pattern);
+
+  debug("gvNIX :: momentDateFormat :: " + pattern);
   return pattern;
 }
+
 /**
  * Show a message to user
  * 
@@ -245,6 +244,52 @@ function jQueryDateFormat(pattern){
  */
 function showMessage(title, message,targetId) {
 	jQuery('<div title="'+title+'">'+message+'</div>').dialog();
+}
+
+/**
+ * Informs if date format (momentJS) includes date information
+ *
+ * @param format string
+ * @returns true if !format or format contains ('YQDMdw')
+ */
+function isDateFormatDate(format) {
+    if (!format) {
+       return true;
+	}
+    return format.search(/[YQDMdw]/) > -1;
+}
+
+/**
+ * Informs if date format (ISO 8601) includes time information
+ *
+ * @param format string
+ * @returns true if !format or format contains ('HmAasSZ')
+ */
+function isDateFormatTime(format) {
+    if (!format) {
+       return true;
+	}
+    return format.search(/[HhmAasSZ]/) > -1;
+    ;
+}
+
+/**
+ * Select the most switchable time format for time selectod
+ * related to requiered format
+ *
+ * @param format
+ * @returns time format
+ */
+function getSelectorTimeFormat(format) {
+	//
+	if (format.search(/h{1,2}/) > -1 && format.search(/[aA]/) > -1) {
+		if (format.search(/[A]/) > -1) {
+			return "hh:mm A";
+		} else {
+			return "hh:mm a";
+		}
+	}
+	return "HH:mm";
 }
 
 /* Application initialization
@@ -261,15 +306,31 @@ function jQueryInitializeComponents(context) {
     debug("gvNIX :: Navigator lang :: " + lang);
 
     // Date inputs init
-    jQuery(".datepicker",context).each(function( index ) {
+    jQuery(".datetimepicker",context).each(function( index ) {
       var $input = jQuery(this);
       var pattern = $input.attr("data-dateformat");
+      var timeStep = $input.attr("data-timestep");
+      try {
+        timeStep = parseInt(timeStep);
+      } catch (e) {
+        timeStep = 5;
+      }
 
       if(isNotEmpty(pattern)) {
-        $input.datepicker({ dateFormat: jQueryDateFormat( pattern ) });
+        var momentPattern = momentDateFormat(pattern);
+        $input.datetimepicker({format: momentPattern,
+            datepicker: isDateFormatDate(momentPattern),
+            timepicker: isDateFormatTime(momentPattern),
+            step: timeStep,
+            formatDate: "YYYY/MM/DD",
+            formatTime : getSelectorTimeFormat(momentPattern)});
       }
       else {
-        $input.datepicker();
+        var momentPattern = momentDateFormat();
+        $input.datetimepicker({step: timeStep,
+            format: momentPattern,
+            formatDate: "YYYY/MM/DD",
+            formatTime : "HH:mm" });
       }
     });
 
@@ -289,52 +350,7 @@ function jQueryInitializeComponents(context) {
       ignoreTitle: true 
     });
 
-     /**
-	 * Replaces the standar number validation to support number with comma.
-	 *
-	 * @name jQuery.validator.methods.number
-	 * @type Boolean
-	 */
-	jQuery.validator.addMethod("number", function(value, element) {
-		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage(), strict: true});
-		return this.optional(element) || !isNaN(localizedValue);
-	}, "Please enter a valid number");
-
-	/**
-	 * Replaces the standar min validation to support number with comma.
-	 *
-	 * @name jQuery.validator.methods.number
-	 * @type Boolean
-	 */
-	jQuery.validator.addMethod("min", function(value, element, params) {
-		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage()});
-		return this.optional(element) || localizedValue >= params;
-	}, jQuery.validator.format("Please enter a value greater than or equal to {0}."));
-
-	/**
-	 * Replaces the standar max validation to support number with comma.
-	 *
-	 * @name jQuery.validator.methods.number
-	 * @type Boolean
-	 */
-	jQuery.validator.addMethod("max", function(value, element, params) {
-		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage()});
-		return this.optional(element) || localizedValue >= params;
-	}, jQuery.validator.format("Please enter a value less than or equal to {0}."));
-
-	/**
-	 * Replaces the standar range validation to support number with comma.
-	 *
-	 * @name jQuery.validator.methods.number
-	 * @type Boolean
-	 */
-	jQuery.validator.addMethod("range", function(value, element, params) {
-		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage()});
-		return this.optional(element) ||( localizedValue >= param[0] && localizedValue <= param[1] );
-	}, jQuery.validator.format("Please enter a value between {0} and {1}."));
-
-
-    // Form validation init
+        // Form validation init
     jQuery("form.validate",context).each(function( index ) {
       var $form = $(this);
 
@@ -384,6 +400,18 @@ function jQueryInitializeComponents(context) {
           rules["max"] = data.maxdecimal;
         }
 
+        if ( isNotEmpty(data.dateformat)) {
+          rules["dateformat"] = momentDateFormat(data.dateformat);
+          rules["messages"] = {
+            'dateformat' : data.invalid
+          };
+        } else if ($input.hasClass("datetimepicker")){
+          rules["dateformat"] = "ANY";
+          rules["messages"] = {
+            'dateformat' : data.invalid
+          };
+        }
+        
         $input.rules("add", rules);
       });
     });
@@ -401,17 +429,85 @@ function jQueryInitializeComponents(context) {
 
 }
 
+/**
+ * Initialize jQuery Validator methods
+ */
+function initializeValidations() {
+	/**
+	 * Date/time validation with format
+	 *
+	 * @name jQuery.validator.methods.number
+	 * @type Boolean
+	 */
+	jQuery.validator.addMethod("dateformat", function(value, element, params) {
+		if (this.optional(element)) {
+			return true;
+		}
+		if (params == "ANY") {
+			return  moment(value).isValid();
+		} else {
+			return  moment(value,params, true).isValid();
+		}
+	}, "Please enter a correct date/time");
+
+     /**
+	 * Replaces the standar number validation to support number with comma.
+	 *
+	 * @name jQuery.validator.methods.number
+	 * @type Boolean
+	 */
+	jQuery.validator.addMethod("number", function(value, element) {
+		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage(), strict: true});
+		return this.optional(element) || !isNaN(localizedValue);
+	}, "Please enter a valid number");
+
+	/**
+	 * Replaces the standar min validation to support number with comma.
+	 *
+	 * @name jQuery.validator.methods.number
+	 * @type Boolean
+	 */
+	jQuery.validator.addMethod("min", function(value, element, params) {
+		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage()});
+		return this.optional(element) || localizedValue >= params;
+	}, jQuery.validator.format("Please enter a value greater than or equal to {0}."));
+
+	/**
+	 * Replaces the standar max validation to support number with comma.
+	 *
+	 * @name jQuery.validator.methods.number
+	 * @type Boolean
+	 */
+	jQuery.validator.addMethod("max", function(value, element, params) {
+		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage()});
+		return this.optional(element) || localizedValue >= params;
+	}, jQuery.validator.format("Please enter a value less than or equal to {0}."));
+
+	/**
+	 * Replaces the standar range validation to support number with comma.
+	 *
+	 * @name jQuery.validator.methods.number
+	 * @type Boolean
+	 */
+	jQuery.validator.addMethod("range", function(value, element, params) {
+		var localizedValue = jQuery.parseNumber(value, {locale: getLanguage()});
+		return this.optional(element) ||( localizedValue >= param[0] && localizedValue <= param[1] );
+	}, jQuery.validator.format("Please enter a value between {0} and {1}."));
+}
+
 
 /**
  * Function to add callbacks
  */
 function fnRegisterFunctionsToCallBack(callback){
 	functionCallbacks.add(callback);
+	callbackFunctionsNames.push(callback.name);
 }
 
 !function ($) {
 
   $(function(){
+	  initializeValidations();
 	  jQueryInitializeComponents();
   });
 

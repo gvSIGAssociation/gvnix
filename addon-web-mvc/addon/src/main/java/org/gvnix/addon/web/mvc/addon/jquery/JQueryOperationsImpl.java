@@ -497,6 +497,39 @@ public class JQueryOperationsImpl extends AbstractOperations implements
                 "/resources/scripts/jquery/jquery.numberformatter.min.js")
                 || modified;
 
+        // Add jQuery.print.js
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
+                "jquery_print_js_url",
+                "/resources/scripts/jquery/jquery.print.js")
+                || modified;
+
+        // Add jquery.dialogextend.min.js
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
+                "moment_js_url", "/resources/scripts/jquery/moment.min.js")
+                || modified;
+
+        // Add moment.min.js
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
+                "jquery_dialog_extend_js_url",
+                "/resources/scripts/jquery/jquery.dialogextend.min.js")
+                || modified;
+
+        // Add jquery-datetimepicker.css
+        modified = getWebProjectUtils().addCssToTag(docTagx, root,
+                "jquery_datetimepicker_css_url",
+                "/resources/styles/jquery/jquery.datetimepicker.css")
+                || modified;
+
+        // Add jquery-datetimepicker.min.js
+        modified = getWebProjectUtils().addJSToTag(docTagx, root,
+                "jquery_datetimepicker_js_url",
+                "/resources/scripts/jquery/jquery.datetimepicker.full.min.js")
+                || modified;
+
+        modified = addMomentAndDatepickerConfig(docTagx, root,
+                "moment_js_locale_url",
+                "/resources/scripts/jquery/i18n/moment-${jqueryLocale}.js");
+
         if (modified) {
             XmlUtils.writeXml(docTagxMutableFile.getOutputStream(), docTagx);
         }
@@ -788,5 +821,49 @@ public class JQueryOperationsImpl extends AbstractOperations implements
             return operationUtils;
         }
 
+    }
+
+    private boolean addMomentAndDatepickerConfig(Document docTagx,
+            Element root, String varName, String location) {
+
+        boolean modified = false;
+
+        // add url resolution
+        modified = getWebProjectUtils().addUrlToTag(docTagx, root, varName,
+                location);
+
+        // Add script
+        Element scriptElement = XmlUtils.findFirstElement(
+                String.format("script[@src='${%s}']", varName), root);
+        if (scriptElement == null) {
+            scriptElement = docTagx.createElement("script");
+            scriptElement.setAttribute("src", "${".concat(varName).concat("}"));
+            scriptElement.setAttribute("type", "text/javascript");
+            scriptElement.appendChild(docTagx
+                    .createComment("required for FF3 and Opera"));
+            root.appendChild(scriptElement);
+            modified = true;
+
+            // Add configuration script
+            Element scriptConfigElement = docTagx.createElement("script");
+            scriptConfigElement.setAttribute("type", "text/javascript");
+            StringBuilder strb = new StringBuilder();
+            strb.append("// set momentjs  and jQuery datetimepicker locale\n");
+            strb.append("moment.locale('${jqueryLocale}');\n");
+            strb.append("jQuery.datetimepicker.setLocale('${jqueryLocale}');\n");
+            strb.append("\n");
+            strb.append("// Define parse/format date using moment library\n");
+            strb.append("Date.parseDate = function( input, format ){\n");
+            strb.append("    return moment(input,format).toDate();\n");
+            strb.append("};\n");
+            strb.append("Date.prototype.dateFormat = function( format ){\n");
+            strb.append("    return moment(this).format(format);\n");
+            strb.append("};\n");
+            scriptConfigElement.appendChild(docTagx.createTextNode(strb
+                    .toString()));
+            root.appendChild(scriptConfigElement);
+        }
+
+        return modified;
     }
 }
