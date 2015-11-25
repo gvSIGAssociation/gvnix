@@ -26,15 +26,15 @@ el taller sobre **gvNIX: Desarrollo rápido de Geoportales para visualización y
 se impartirá el mismo día 3 de diciembre de 15.10h a 18h.
 
 <div class="row">
-<div class="col-md-offset-3 col-md-6 col-xs-12">
-<figure>
-  <img src="{{ site.url }}/images/post/11gvsig/gvnix-11gvsig-es.png">
-</figure>
-</div>
+  <div class="col-md-offset-3 col-md-6 col-xs-12">
+  <figure>
+    <img src="{{ site.url }}/images/post/11gvsig/gvnix-11gvsig-es.png" />
+  </figure>
+  </div>
 </div>
 
 
-## Taller gvNIX: Desarrollo rápido de Geoportales para visualización y gestión de datoS
+## Taller gvNIX: Desarrollo rápido de Geoportales para visualización y gestión de datos
 
 En el taller nos centraremos en esta componente GEO, especialmente orientado a desarrolladores.
 En el taller veremos como:
@@ -70,16 +70,18 @@ Para los que quieran asistir al taller **los requisitos previos** son:
 * Tener creada la base de datos espacial
   * Abrir aplicación pgAdmin.
   * Sobre PostgreSQL 9.x hacer click derecho y seleccionar Connect.
-<div class="col-md-12">
-<figure>
-  <img src="{{ site.url }}/images/post/prerequisites/01pgadmin-connect.png">
-</figure>
-</div>
+
+  <div class="col-md-12">
+  <figure>
+    <img src="{{ site.url }}/images/post/prerequisites/01pgadmin-connect.png">
+  </figure>
+  </div>
 
 * Crear usuario petclinic. En Login Role hacer click derecho, seleccionar New Login Role… y
 crear el usuario petclinic con la siguiente información:
   * Properties > Role Name: petclinic
   * Definition > Password: petclinic
+
 <div class="col-md-12">
 <figure>
   <img src="{{ site.url }}/images/post/prerequisites/02pgadmin-new-role.png">
@@ -89,6 +91,7 @@ crear el usuario petclinic con la siguiente información:
 * En Database > New Database crear una base de datos petclinic con la siguiente información:
   * Name: petclinic
   * Login role : petclinic
+
 <div class="col-md-12">
 <figure>
   <img src="{{ site.url }}/images/post/prerequisites/03pgadmin-new-database.png">
@@ -96,6 +99,7 @@ crear el usuario petclinic con la siguiente información:
 </div>
 
 * To add the spatial extent in the database, select the postgis option in petclinic > Extensions > new Extension.
+
 <div class="col-md-12">
 <figure>
   <img src="{{ site.url }}/images/post/prerequisites/04pgadmin-new-extension.png">
@@ -106,17 +110,18 @@ crear el usuario petclinic con la siguiente información:
   * Crear proyecto petclinic. Desde el STS, seleccionar “File > New > Other > Spring Roo Project“ y rellenar la siguiente información
     * Package : org.gvnix.petclinic
     * Project : petclinic
+
     <div class="col-md-12">
     <figure>
       <img src="{{ site.url }}/images/post/prerequisites/05create-new-project.png">
     </figure>
     </div>
+
   * Automáticamente se abrirá la consola de gvNIX
   * Descargar el script del proyecto desde [https://github.com/DISID/gvnix-samples/blob/master/quickstart-app/quickstart.roo]( https://github.com/DISID/gvnix-samples/blob/master/quickstart-app/quickstart.roo)
   * Ejecutar script en la consola de gvNIX script –file quickstart.roo
 
 * Tener descargado el archivo .m2.zip: [https://drive.google.com/file/d/0B6EMTWvnFZHfZUxQd1JBN25NTEU/view?usp=sharing](https://drive.google.com/file/d/0B6EMTWvnFZHfZUxQd1JBN25NTEU/view?usp=sharing)
-
 
 La [inscripción](http://www.gvsig.com/es/eventos/jornadas-gvsig/11as-jornadas-gvsig/inscripcion) continua abierta,
 y como en todo evento gvSIG es gratuita, siendo el aforo limitado.
