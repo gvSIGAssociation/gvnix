@@ -21,7 +21,7 @@ jornadas que se celebrarán en Toluca, México, del 26 al 28 de agosto.
 
 gvNIX se dará a conocer como nuevo producto de la [Asociación gvSIG](http://www.gvsig.com).
 
-Varios miembros del equipo de la Asocación gvSIG y del equipo de desarrollo de [DISID Corporation](http://www.disid.com)
+Varios miembros del equipo de la Asociación gvSIG y del equipo de desarrollo de [DISID Corporation](http://www.disid.com)
 presentaran la herramienta gvNIX en las jornadas participando activamente con talleres y ponencias.
 
 La presentación gvNIX: Desarrollo rápido de geoportales para visualización y gestión de datos será el viernes 28 de agosto
