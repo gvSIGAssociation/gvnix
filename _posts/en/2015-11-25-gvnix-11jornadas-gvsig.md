@@ -63,24 +63,23 @@ For those who want to participate in the workshop **the prerequisites** are:
   * Installation guide gvNIX: <a href="https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc" target="_blank"> https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc</a>
 
 * Installed PostgreSQL and PostGIS spatial extension
- * PostgreSQL 9.3: <a href="http://www.postgresql.org/download/">http://www.postgresql.org/download/</a>
- * PostGIS 2: <a href="http://postgis.net/install" rel="nofollow">http://postgis.net/install</a>
+  * PostgreSQL 9.3: [http://www.postgresql.org/download/](http://www.postgresql.org/download/)
+  * PostGIS 2: [http://postgis.net/install](http://postgis.net/install)
 
 * To have created the spatial database
   * Open Application pgAdmin.
   * On PostgreSQL 9.x right click and select Connect
+
 <div class="col-md-12">
 <figure>
   <img src="{{ site.url }}/images/post/prerequisites/01pgadmin-connect.png">
 </figure>
 </div>
 
-* Crear usuario petclinic. En Login Role hacer click derecho, seleccionar New Login Role… y
-crear el usuario petclinic la siguiente información:
-
 * Create Petclinic user. On Login Role, right click, select New Login Role... and create the user petclinic with the following information:
   * Properties > Role Name: petclinic
   * Definition > Password: petclinic
+
 <div class="col-md-12">
 <figure>
   <img src="{{ site.url }}/images/post/prerequisites/02pgadmin-new-role.png">
@@ -90,6 +89,7 @@ crear el usuario petclinic la siguiente información:
 * En Database > New Database create a petclinic database with the following information:
   * Name: petclinic
   * Login role : petclinic
+
 <div class="col-md-12">
 <figure>
   <img src="{{ site.url }}/images/post/prerequisites/03pgadmin-new-database.png">
@@ -97,6 +97,7 @@ crear el usuario petclinic la siguiente información:
 </div>
 
 * Para añadir la extensión espacial en la base de datos, seleccionar la opción postgis en petclinic > Extensions > new Extension.
+
 <div class="col-md-12">
 <figure>
   <img src="{{ site.url }}/images/post/prerequisites/04pgadmin-new-extension.png">
@@ -107,11 +108,13 @@ crear el usuario petclinic la siguiente información:
   * Create petclinic project. Since the STS, select "File > New > Other > Spring Roo Project" and fill in the following information
     * Package : org.gvnix.petclinic
     * Project : petclinic
+
     <div class="col-md-12">
     <figure>
       <img src="{{ site.url }}/images/post/prerequisites/05create-new-project.png">
     </figure>
     </div>
+
   * gvNIX console automatically opens.
   * Download the script of the project from [https://github.com/DISID/gvnix-samples/blob/master/quickstart-app/quickstart.roo]( https://github.com/DISID/gvnix-samples/blob/master/quickstart-app/quickstart.roo)
   * Run script in the console gvNIX -file script quickstart.roo
