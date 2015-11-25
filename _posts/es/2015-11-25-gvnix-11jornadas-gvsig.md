@@ -126,6 +126,6 @@ crear el usuario petclinic con la siguiente información:
 La [inscripción](http://www.gvsig.com/es/eventos/jornadas-gvsig/11as-jornadas-gvsig/inscripcion) continua abierta,
 y como en todo evento gvSIG es gratuita, siendo el aforo limitado.
 
-En la página web de las Jornadas podéis consultar todo el [programa](hhttp://www.gvsig.com/es/eventos/jornadas-gvsig/11as-jornadas-gvsig).
+En la página web de las Jornadas podéis consultar todo el [programa](http://www.gvsig.com/es/eventos/jornadas-gvsig/11as-jornadas-gvsig).
 
 ¡Os esperamos!
