@@ -171,12 +171,14 @@
           	</c:choose>
           	<c:choose>
           		<c:when test="${disableFormBinding}">
-          			<input type="hidden" id="${sec_field}_loupe_hidden_bind" name="${sec_field}" value="${value}" />
+          			<input type="hidden" id="${sec_field}_loupe_hidden_bind" class="loupe_hidden_bind" name="${sec_field}" value="${value}" />
        			</c:when>
        			<c:otherwise>
-    				<form:hidden id="${sec_field}_loupe_hidden_bind" name="${sec_field}" path="${field}" />
+    				<form:hidden id="${sec_field}_loupe_hidden_bind" name="${sec_field}" cssClass="loupe_hidden_bind" path="${field}" />
 					<c:if test="${mode eq 'update'}">
-                		<form:hidden id="${sec_field}_loupe_hidden_bind_id" name="${sec_field}_id" path="${field}.${pkField}" />
+                		<form:hidden id="${sec_field}_loupe_hidden_bind_id"
+                    cssClass="loupe_hidden_id"
+                    name="${sec_field}_id" path="${field}.${pkField}" />
                     </c:if>
        			</c:otherwise>
        		</c:choose>

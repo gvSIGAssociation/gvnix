@@ -662,19 +662,6 @@ var GvNIX_Editing;
 
 				this.fnUpdateEditingTools();
 
-				// Initializing Loupe components
-				setTimeout(function(){
-					oTable.find(".loupe_control").each(function(index) {
-						new GvNIX_Loupe(jQuery(this));
-					});
-					oTable.find(".row_editing").each(function(index){
-						// Bind events for update inputs, focus cursor and initialize components
-						this.editing_binded = false;
-						oTable.fnEditing()._fnBindRowEvents(this);
-					});
-
-				},100);
-
 			}, this) );
 
 			return true;

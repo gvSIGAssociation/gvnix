@@ -177,7 +177,7 @@ var GvNIX_Loupe;
 			/**
 			 * Hide elements with class utilbox on Datatables list
 			 */
-			"hideutilbox": inputData.hideutilbox,
+			"hideutilbox" : inputData.hideutilbox,
 
 			/**
 			 * OnAccept Function
@@ -200,8 +200,7 @@ var GvNIX_Loupe;
 			"initialized": false,
 
 			/**
-			 * Additional Fields to return by ajax but
-			 * don't search by them
+			 * Additional Fields to return by ajax but don't search by them
 			 */
 			"returnfields": inputData.returnfields,
 
@@ -221,6 +220,16 @@ var GvNIX_Loupe;
 				"id":  $aInput.attr('id'),
 
 				/**
+			 * jQuery input object
+			 */
+			"$input" : $aInput,
+
+			/**
+			 * jQuery container object
+			 */
+			"$container" : $aInput.parent(),
+
+			/**
 				 * Input Class
 				 */
 				"class": "form-control input-sm loupe_control",
@@ -356,9 +365,9 @@ var GvNIX_Loupe;
 				"modalwidth": inputData.modalwidth,
 
 				/**
-				 * Hide elements with class utilbox on Datatables list
+			 * Hide elements with class utilbox on Datatables list
 				 */
-				"hideutilbox": inputData.hideutilbox,
+			"hideutilbox" : inputData.hideutilbox,
 
 				/**
 				 * OnAccept Function
@@ -435,7 +444,7 @@ var GvNIX_Loupe;
 					data.initialized = false;
 					//Getting sufix
 					var sufix = data.id.substr(data.inputid.length);
-					var loupeButton = $("#" + data.searchbuttonid + sufix);
+			var loupeButton = data.$container.find(".loupe-button");
 					// If loupe button not exists add events
 					if (loupeButton.length == 0) {
 						// Creating loupe button and loupe label to show the result
@@ -457,8 +466,9 @@ var GvNIX_Loupe;
 			"_fnBindLoupeClickSearch" : function(sufix){
 				var instance = this;
 				var data = this._data;
-				var input = $("#" + data.id);
-				var loupeButton = $("#" + data.searchbuttonid + sufix);
+				var $input = data.$input;
+				var $container = data.$container;
+				var loupeButton = $container.find(".loupe-button");
 				loupeButton
 						.click(function() {
 							// Removing callbacks
@@ -466,18 +476,19 @@ var GvNIX_Loupe;
 
 							// Adding the div where the page is gonna be displayed if not
 							// exists
-							input.parent().append(
-									'<div id="' + data.listselectorid
-											+ '" style="display:none;"></div>');
+						$container.append('<div id="' + data.listselectorid
+								+ '" class="loupe-listselector" style="display:none;"></div>');
 							// Creating dialog, but not oppening
 							var buttonOpts = {};
 							buttonOpts[data.acceptlabel] = function() {
 								// Getting master table inside dialog
-								var table = $("#" + data.listselectorid
+							var table = jQuery("#"
+									+ data.listselectorid
 										+ " table[class*=dataTable][id]")[0];
 								var tableId = table.attributes.id.value;
 								// Getting datatableInstance
-								var datatableInstance = $("#" + tableId).dataTable();
+							var datatableInstance = jQuery("#" + tableId)
+									.dataTable();
 								// Getting rowClick properties
 								var datatableRowClick = datatableInstance.fnRowClick();
 								// Getting last Clicked element
@@ -510,13 +521,16 @@ var GvNIX_Loupe;
 								instance._data['searchvalue'] = "";
 
 								// Remove Dialog
-								input.parent().remove("#" + data.listselectorid);
+							//$container.remove("#" + data.listselectorid);
+							jQuery("#" + data.listselectorid).remove();
 								selectorDialog.dialog('destroy');
 
 								// FindById to show label
 								instance._fnFindRecordById(idLastClicked, instance, sufix);
 							};
-							var selectorDialog = $("#" + data.listselectorid).dialog({
+						var selectorDialog = jQuery("#" + data.listselectorid)
+								.dialog(
+										{
 								autoOpen : false,
 								modal : true,
 								resizable : false,
@@ -526,10 +540,15 @@ var GvNIX_Loupe;
 								buttons : buttonOpts,
 								close : function(event, ui) {
 									selectorDialog.dialog('close');
-									input.parent().remove("#" + data.listselectorid);
-									selectorDialog.dialog('destroy');
+												//$container.remove("#" + data.listselectorid);
+												jQuery("#" + data.listselectorid).remove();
+												selectorDialog
+														.dialog('destroy');
 									// Hidding dropdown div
-									$("#" + data.name + "_dropdown_div").html("");
+												$input
+														.parent().find(
+																".dropdown_div")
+														.html("");
 								}
 							});
 							// Using base filters to filter datatable when
@@ -541,8 +560,10 @@ var GvNIX_Loupe;
 								var relatedFields = data.related.split(",");
 								var relatedParams = data.relatedparam.split(",");
 								for(i in relatedFields){
-									var value = $("#_" + relatedFields[i] + "_id").val();
-									baseFilters = baseFilters + "&" + relatedParams[i] + "=" + value;
+								var value = jQuery(
+										"#_" + relatedFields[i] + "_id").val();
+								baseFilters = baseFilters + "&"
+										+ relatedParams[i] + "=" + value;
 								}
 							}
 
@@ -553,12 +574,12 @@ var GvNIX_Loupe;
 											function(a, e, i) {
 												setTimeout(
 														function() {
-															var table = $("#"
-																	+ data.listselectorid
+														var table = jQuery("#" + data.listselectorid
 																	+ " table[class*=dataTable][id]")[0];
 															var tableId = table.attributes.id.value;
-															// Getting datatableInstance
-															var datatableInstance = $(
+														// Getting
+														// datatableInstance
+														var datatableInstance = jQuery(
 																	"#" + tableId)
 																	.dataTable();
 															var editingInstance = datatableInstance
@@ -572,7 +593,8 @@ var GvNIX_Loupe;
 															if(data.searchvalue != undefined && data.searchvalue != "" && data.searchvalue != "undefined"){
 																currentValue = data.searchvalue;
 															}else{
-																currentValue = input.val();
+															currentValue = $input
+																	.val();
 															}
 
 															datatableInstance
@@ -581,9 +603,9 @@ var GvNIX_Loupe;
 															var isAjaxDatatable = datatableInstance
 																	.fnEditing()._data.oSettings.oFeatures.bServerSide;
 
-															// Setting Datatable as no
-															// editable
-															if(data.hideutilbox === undefined || data.hideutilbox === true){
+														// Setting Datatable as
+														// no editable
+														if(data.hideutilbox === undefined || data.hideutilbox === true){
 																editingInstance
 																	.fnSetNoEditableDatatable(isAjaxDatatable);
 															}
@@ -604,27 +626,32 @@ var GvNIX_Loupe;
 				// When the value changes, get the value and find by all fields
 				var instance = this;
 				var data = this._data;
-				var input = $("#" + data.id);
+			var $input = data.$input;
+			var $container = data.$container;
 				var timeOutClear = true;
-				input.keyup(function(a) {
+			$input.keyup(function(a) {
 					// Hidding dropdown when press Esc
 					if(a.key == "Esc"){
 						setTimeout(function(){
 							// Hidding dropdown div
-							$("#" +data.name + "_dropdown_div" + sufix).html("");
+						$container(".dropdown_div")
+								.html("");
 							timeOutClear = true;
 						},500);
 						timeOutClear = false;
 					}
 					if (timeOutClear) {
 						setTimeout(function() {
-							var text = input.val();
+							var text = $input.val();
 							if (text != "") {
 								GvNIX_Loupe.prototype._fnFindRecordByAll(text, instance, sufix);
 							} else {
-								$("#" + data.name + "_dropdown_div" + sufix).html('');
+							$container.find(
+									".dropdown_div")
+									.html('');
 								// White Background
-								$("#" + data.inputid + sufix).css("background","#ffffff");
+							$container.css(
+									"background", "#ffffff");
 							}
 							timeOutClear = true;
 						}, 500)
@@ -639,11 +666,12 @@ var GvNIX_Loupe;
 			"_fnOnLostFocusLoupeInput": function(sufix){
 				var instance = this;
 				var data = this._data;
-				var input = $("#" + data.id);
+			var input = data.$input;
+			var container = input.parent();
 				input.focusout(function(e){
 					setTimeout(function(){
 						// Hidding dropdown div
-						$("#" + data.name + "_dropdown_div" + sufix).html("");
+					container.find(".dropdown_div").html("");
 						//Get value and launch the find by field
 						if(input.length > 0){
                             data = input.data();
@@ -651,21 +679,21 @@ var GvNIX_Loupe;
 							if(data.searchvalue != undefined && data.searchvalue != "" && data.searchvalue != "undefined"){
 								valueInput = data.searchvalue;
 							}else{
-								// Getting selected Id from hidden input
-								var hiddenInputs = input.parent().find("input[type='hidden']");
-								if(hiddenInputs.length > 0){
-									for(x = 0; x < hiddenInputs.length; x++){
-										var hiddenInput = hiddenInputs[x];
-										// Check if hidden input has value and is not hidden input for binding
-										if(hiddenInput.value != "" && hiddenInput.id.indexOf("hidden_bind") == -1){
-											valueInput = hiddenInput.value;
-										}
+							// Getting selected Id from hidden input
+							var hiddenInputs = container.find("input[type='hidden']");
+							if(hiddenInputs.length > 0){
+								for(x = 0; x < hiddenInputs.length; x++){
+									var hiddenInput = hiddenInputs[x];
+									// Check if hidden input has value and is not hidden input for binding
+									if(hiddenInput.value != "" && hiddenInput.id.indexOf("hidden_bind") == -1){
+										valueInput = hiddenInput.value;
 									}
-								}else {
-									// Usually, hidden inputs will be present, but to prevent errors,
-									// we are going to set valueInput to undefined.
-									valueInput = undefined;
 								}
+							}else {
+								// Usually, hidden inputs will be present, but to prevent errors,
+								// we are going to set valueInput to undefined.
+								valueInput = undefined;
+							}
 							}
 							if (valueInput != "") {
 								instance._fnFindRecordByField(valueInput, instance, sufix, data.searchfield);
@@ -681,7 +709,7 @@ var GvNIX_Loupe;
 			"_fnOnKeyDownLoupeInput": function(sufix){
 				var instance = this;
 				var data = this._data;
-				var input = $("#" + data.id);
+			var input = data.$input;
 				input.keydown(function(e){
 					setTimeout(function(){
 							//Clean search value
@@ -695,7 +723,7 @@ var GvNIX_Loupe;
 			 * */
 			"_fnFindRecordByAll": function(search, instance, sufix) {
 				var data = instance._data;
-				var input = $("#" + data.id);
+			var input = data.$input;
 				var baseFilter = {};
 
 				//Adding filters from related elements
@@ -703,7 +731,7 @@ var GvNIX_Loupe;
 					var relatedFields = data.related.split(",");
 					var relatedParams = data.relatedparam.split(",");
 					for(i in relatedFields){
-						var value = $("#_" + relatedFields[i] + "_id").val();
+					var value = jQuery("#_" + relatedFields[i] + "_id").val();
 						baseFilter[relatedParams[i]] = value;
 					}
 				}
@@ -726,20 +754,22 @@ var GvNIX_Loupe;
 						_field_ : data.field
 					}, baseFilter);
 
-				$.ajax({
+			jQuery.ajax({
 					url : data.controllerurl + "?findUsingAjax",
 					data : params,
 					success : function(object) {
-						$("#" + data.inputid + sufix).css("background", "#ffffff");
+					input.css("background",
+							"#ffffff");
 
 						instance._fnCreateDropDownList(input, object, data.pkfield, instance, sufix);
 					},
 					error : function(object) {
 						var error = object.responseJSON[0].Error;
 
-						$("#" + data.name + "_dropdown_div" + sufix).html("");
+					data.$container.find(".dropdown_div").html("");
 
-						$("#" + data.inputid + sufix).css("background", "#FA6161");
+					input.css("background",
+							"#FA6161");
 					}
 				});
 			},
@@ -749,7 +779,8 @@ var GvNIX_Loupe;
 			 */
 			"_fnFindRecordById": function(id, instance, sufix) {
 				var data = this._data;
-				var input = $("#" + data.id);
+			var input = data.$input;
+			var container = data.$container;
 				var baseFilter = {};
 				if(data.basefilter != ""){
 					var baseFilterParams = data.basefilter.split("||");
@@ -803,12 +834,17 @@ var GvNIX_Loupe;
 
 						instance._data['searchvalue'] = inputValue;
 
-						$("#" + data.name + "_loupe_hidden" + sufix).val(object[data.pkfield]);
-						$("#" + data.name + "_loupe_hidden" + sufix).trigger('change');
+							var hiddeninput = data.$container.find(".loupe-hiddeninput");
+							hiddeninput
+									.val(object[data.pkfield]);
+							hiddeninput
+									.trigger('change');
 						// Hidding dropdown div
-						$("#" + data.name + "_dropdown_div" + sufix).html("");
+							container.find(".dropdown_div")
+									.html("");
 						// Background white
-						$("#" + data.inputid + sufix).css("background", "#ffffff");
+							input.css(
+									"background", "#ffffff");
 
 						// Fire Callback function
 						instance._fnSetItemCallback.fire(onSetNameFunction);
@@ -826,13 +862,14 @@ var GvNIX_Loupe;
 					error : function(element) {
 						var error = element.responseJSON[0].Error;
 
-						$("#" + data.name + "_dropdown_div").html("");
+							container.find(".dropdown_div").html("");
 
 						// Removing callbacks
 						instance._fnSetItemCallback.empty();
 
 						// Background red
-						$("#" + data.inputid + sufix).css("background", "#FA6161");
+							input.css(
+									"background", "#FA6161");
 
 					}
 				});
@@ -842,10 +879,11 @@ var GvNIX_Loupe;
 			/**
 			 * Find record by field but returning all object fields
 			 */
-			"_fnFindRecordByField": function(valueInput, instance, sufix, searchField) {
+		"_fnFindRecordByField" : function(valueInput, instance, sufix,
+				searchField) {
 				var data = this._data;
-				var input = $("#" + data.id);
-
+			var input = data.$input
+			var parent = data.$container;
 				var baseFilter = {};
 
 				//Adding filters from related elements
@@ -854,7 +892,7 @@ var GvNIX_Loupe;
 					var relatedFields = data.related.split(",");
 					var relatedParams = data.relatedparam.split(",");
 					for(i in relatedFields){
-						var value = $("#_" + relatedFields[i] + "_id").val();
+					var value = jQuery("#_" + relatedFields[i] + "_id").val();
 						baseFilter[relatedParams[i]] = value;
 					}
 				}
@@ -925,12 +963,16 @@ var GvNIX_Loupe;
 
 						instance._data['searchvalue'] = inputValue;
 
-						$("#" + data.name + "_loupe_hidden" + sufix).val(object[data.pkfield]);
-						$("#" + data.name + "_loupe_hidden" + sufix).trigger('change');
+							parent.find(".loupe-hiddeninput")
+									.val(object[data.pkfield]);
+							parent.find(".loupe-hiddeninput")
+									.trigger('change');
 						// Hidding dropdown div
-						$("#" + data.name + "_dropdown_div" + sufix).html("");
+							parent.find(".dropdown_div")
+									.html("");
 						// Background white
-						$("#" + data.inputid + sufix).css("background", "#ffffff");
+							input.css(
+									"background", "#ffffff");
 
 						// Fire Callback function
 						instance._fnSetItemCallback.fire(onSetNameFunction);
@@ -947,7 +989,7 @@ var GvNIX_Loupe;
                             error = element.responseText;
                         }
 
-						$("#" + data.name + "_dropdown_div").html("");
+							parent.find(".dropdown_div").html("");
 
 						// Creating callbacks
 						var onSetNameFunction = data.onset;
@@ -972,7 +1014,8 @@ var GvNIX_Loupe;
 						instance._fnSetItemCallback.empty();
 
 						// Background red
-						$("#" + data.inputid + sufix).css("background", "#FA6161");
+							input.css(
+									"background", "#FA6161");
 
 
 						//clean hidden value
@@ -987,42 +1030,50 @@ var GvNIX_Loupe;
 			 * */
 			"_fnCreateItems": function createItems(sufix) {
 				var data = this._data;
-				var input = $("#" + data.id);
+			var $input = data.$input;
+			var container = data.$container;
+
 				// Adding button search if not exists
-				var buttonSearch = $("#" + data.searchbuttonid + sufix);
+			var buttonSearch = container.find(".loupe-button");
 				if (buttonSearch.length == 0) {
-					$('<span style="cursor: pointer;" id="'+ data.searchbuttonid + sufix + '" class="input-group-addon glyphicon glyphicon-search loupe-button" />').insertAfter(input);
+					$('<span style="cursor: pointer;" id="'+ data.searchbuttonid + sufix + '" class="input-group-addon glyphicon glyphicon-search loupe-button" />').insertAfter($input);
 				}
 
 				// Hidding button if disabled
 				if(typeof data.disabled !== "undefined"){
-					$("#" + data.searchbuttonid + sufix).hide();
+				container.find(".loupe-button").hide();
 				}
 
 				// Adding DropDown list div
 
-				var dropDownDiv = $("#" + data.name + "_dropdown_div" + sufix);
+			var dropDownDiv = container.find(".dropdown_div");
 				if (dropDownDiv.length == 0) {
-					$("<div style='position:absolute;z-index:1;' id='"
-									+ data.name + "_dropdown_div"+ sufix +"'></div>").insertBefore($("#" + data.searchbuttonid + sufix));
+				jQuery(
+						"<div style='position:absolute;z-index:1;' class='dropdown_div' id='"
+								+ data.name + "_dropdown_div" + sufix
+								+ "'></div>").insertBefore(
+										data.$container.find(".loupe-button" ));
 				}
 
 				// Adding hidden input
-				var hiddenInput = $("#" + data.name + "_loupe_hidden" + sufix);
+			var hiddenInput = container.find(".loupe-hiddeninput");
 				if (hiddenInput.length == 0) {
 					var class_hidden = "";
 					if (data.required){
-						class_hidden = "include-to-validate";
+					class_hidden = "loupe-hiddeninput";
 					}
 
-					$('<input id="' + data.name
-									+ '_loupe_hidden'+ sufix +'" type="hidden" name="' + data.name
-									+ '" required="' + data.required + '" class="' + class_hidden + '">').insertAfter(input);
+				jQuery(
+						'<input id="' + data.name + '_loupe_hidden' + sufix
+								+ '" type="hidden" name="' + data.name
+								+ '" required="' + data.required + '" class="'
+								+ class_hidden + '">').insertAfter($input);
 
 				}
 
 				setTimeout(function(){
-					$("#" + data.name + "_dropdown_div"+ sufix).width(input.width() + 50);
+				container.find(".dropdown_div").width(
+						$input.width() + 50);
 				},500);
 			},
 
@@ -1034,11 +1085,9 @@ var GvNIX_Loupe;
 			"_fnUseBindingElementsIfNecessary": function(sufix) {
 				var instance = this;
 				var data = this._data;
-				var bindElement = $(":input[id='"+data.name+"_loupe_hidden_bind_id"+sufix+"']");
+			var $container = data.$container;
+			var bindElement = $container.find(".loupe_hidden_id");
                 // Getting again with other jQuery selector
-                if(bindElement.length == 0){
-                    bindElement = $(":input[id='_"+data.name+"_loupe_hidden_bind_id"+sufix.substring(1)+"']");
-                }
 				if(bindElement.length > 0){
 					var bindValue = bindElement.val();
 					// If not has value, remove element
@@ -1072,6 +1121,7 @@ var GvNIX_Loupe;
 				instance._fnDrawItemCallback.empty();
 
 				var inputData = input.data();
+			var $input = this._data.$input;
 				var inputId = input.attr('id');
 				var htmlToAdd = "";
 				var dataToAdd = "";
@@ -1137,24 +1187,24 @@ var GvNIX_Loupe;
 
 					htmlToAdd +=
 						"<script>" +
-							"$('#" + inputData.name + "_dropdown_div_itemid_" + item[pkField] + "').on"
+							"jQuery('#" + inputData.name + "_dropdown_div_itemid_" + item[pkField] + "').on"
 								+ "('click'," + "function(e){"
-									+ "$('#" + inputId + "').val('"+ item.__caption__ + "');"
+									+ "jQuery('#" + inputId + "').val('"+ item.__caption__ + "');"
 									+ "var loupeInstance = GvNIX_Loupe.fnGetInstance('"+ inputId + "','"+inputData.field+"');"
                                     + "loupeInstance._data['searchvalue'] = '"+ inputValue +"';"
                                     + "jQuery('#' + loupeInstance.s.id).data().searchvalue = '" + inputValue + "';"
-									+ "$('#" + inputData.name+ "_loupe_hidden"+ sufix +"').val(" + item[pkField] + ");"
-									+ "$('#" + inputData.name+ "_loupe_hidden"+ sufix +"').trigger('change');"
+									+ "jQuery('#" + inputData.name+ "_loupe_hidden"+ sufix +"').val(" + item[pkField] + ");"
+									+ "jQuery('#" + inputData.name+ "_loupe_hidden"+ sufix +"').trigger('change');"
 									+ "GvNIX_Loupe.prototype._fnSetItemCallback.fire('" + onSetNameFunction + "',['" + i +"']);"
 									+ "GvNIX_Loupe.prototype._fnSetItemCallback.empty();"
 									+ "});"
-							+ "$('#" + inputData.name + "_dropdown_div_itemid_"+ item[pkField] + "').mouseover" +
+							+ "jQuery('#" + inputData.name + "_dropdown_div_itemid_"+ item[pkField] + "').mouseover" +
 									"(" + "function(e){"
-										+ " $(this).css('border-left','4px solid #428BCA');" +
+										+ " jQuery(this).css('border-left','4px solid #428BCA');" +
 								"});"
-							+ "$('#" + inputData.name + "_dropdown_div_itemid_"+ item[pkField] + "').mouseout" +
+							+ "jQuery('#" + inputData.name + "_dropdown_div_itemid_"+ item[pkField] + "').mouseout" +
 									"(" + "function(e){"
-										+ "$(this).css('border-left','1px solid #CCCCCC');"
+										+ "jQuery(this).css('border-left','1px solid #CCCCCC');"
 								+ "});"
 						+ "</script>";
 				}
@@ -1171,17 +1221,17 @@ var GvNIX_Loupe;
 						"</div>";
 				htmlToAdd +=
 						"<script>" +
-							"$('#" + inputData.name+ "_dropdown_div_itemid_view_more').on" +
+							"jQuery('#" + inputData.name+ "_dropdown_div_itemid_view_more').on" +
 									"('click',function(e){"
-										+ "$('#" + inputData.searchbuttonid + sufix + "').trigger('click');"
+										+ "jQuery('#" + inputData.searchbuttonid + sufix + "').trigger('click');"
 									 + "});"
-							+ "$('#" + inputData.name + "_dropdown_div_itemid_view_more').mouseover" +
+							+ "jQuery('#" + inputData.name + "_dropdown_div_itemid_view_more').mouseover" +
 									"(function(e){"
-										+ " $(this).css('border-bottom','4px solid #428BCA');" +
+										+ " jQuery(this).css('border-bottom','4px solid #428BCA');" +
 									"});"
-							+ "$('#"+ inputData.name + "_dropdown_div_itemid_view_more').mouseout" +
+							+ "jQuery('#"+ inputData.name + "_dropdown_div_itemid_view_more').mouseout" +
 									"(function(e){"
-										+ "$(this).css('border-bottom','1px solid #CCCCCC');" +
+										+ "jQuery(this).css('border-bottom','1px solid #CCCCCC');" +
 									"});" +
 						"</script>";
 				$("#" + inputData.name + "_dropdown_div" + sufix).html(htmlToAdd);
@@ -1189,10 +1239,11 @@ var GvNIX_Loupe;
 				// Checks if a scroll container contains the loupe field.
 				// In that case, scrolls the loupe field to show its result list.
 				var container = jQuery(".dataTables_scrollBody");
-				var insideContainer = container.find("#"+inputId);
+			var insideContainer = container.find(input);
 				if(container.length && insideContainer.length){
 					container.animate({
-						scrollTop: jQuery("#"+inputId).offset().top - container.offset().top + container.scrollTop()
+					scrollTop : input.offset().top
+							- container.offset().top + container.scrollTop()
 					}, 200);
 				}
 
@@ -1228,12 +1279,12 @@ var GvNIX_Loupe;
 				var instance = this;
 				// Getting input
 				var inputId = instance.s.id;
-				var input = $("#" + inputId);
+			var input = data.$input;
 				// Enabling input
 				input.prop('disabled', !enable);
 				// Getting button
 				var buttonId = instance.s.searchbuttonid;
-				var button = $("#" + buttonId);
+			var button = this._data.$container.find(".loupe-button");
 				// Showing / Hidding input
 				if(enable){
 					button.show();
@@ -1250,9 +1301,8 @@ var GvNIX_Loupe;
 			"fnSetValue": function(id){
 				var instance = this;
 				// Getting hidden input
-				var hiddenId = instance.s.field + "_loupe_hidden";
 				// Setting id
-				$("#" + hiddenId).val(id);
+			this._data.$container.find("loupe-hiddeninput").val(id);
 				// Searching by id
 				instance._fnFindRecordById(id, instance, "");
 			},
@@ -1263,12 +1313,12 @@ var GvNIX_Loupe;
 			"fnCleanLoupe": function(){
 				var instance = this;
 				// Getting hidden input
-				var hiddenId = instance.s.field + "_loupe_hidden";
+			var input = instance._data.$input;
 				// Setting val to null
-				$("#" + hiddenId).val(null);
+			input.parent().find(".loupe-hiddeninput").val(null);
 				// Getting input
 				var inputId = instance.s.id;
-				var input = $("#" + inputId);
+			var input = this._data.$input;
 				input.val("");
 			},
 
@@ -1278,9 +1328,9 @@ var GvNIX_Loupe;
 			"fnCleanHiddenValueLoupe": function(){
 				var instance = this;
 				// Getting hidden input
-				var hiddenId = instance.s.field + "_loupe_hidden";
+			var input = instance._data.$input;
 				// Setting val to null
-				$("#" + hiddenId).val(null);
+			input.parent().find(".loupe-hiddeninput").val(null);
 			}
 
 
@@ -1311,7 +1361,7 @@ var GvNIX_Loupe;
 	 */
 	GvNIX_Loupe.fnGetInstance = function(currentFieldId, field){
 		//Getting current form
-		var form = $("#" + currentFieldId).closest("form");
+		var form = jQuery("#" + currentFieldId).closest("form");
 		if(form !== null){
 			// Getting related field in the current form
 			var relatedField = form.find("input[data-field='"+field+"']");
@@ -1357,14 +1407,14 @@ var GvNIX_Loupe;
 fnRegisterFunctionsToCallBack(function(context){
 	//GvNIX_Loupe.prototype._fnConstruct(context);
 	jQuery(".loupe_control", context).each(function(index) {
-		new GvNIX_Loupe($(this));
+		new GvNIX_Loupe(jQuery(this));
 	});
 });
 
 //Clean hide element of loupe
 function cleanHiddenInputLoupe(inputId, hiddenInputId){
-	var valueOfInput = $("#"+inputId).val();
+	var valueOfInput = jQuery("#"+inputId).val();
 	if(valueOfInput == ""){
-		$("#"+hiddenInputId).val("");
+		jQuery("#"+hiddenInputId).val("");
 	}
 }
