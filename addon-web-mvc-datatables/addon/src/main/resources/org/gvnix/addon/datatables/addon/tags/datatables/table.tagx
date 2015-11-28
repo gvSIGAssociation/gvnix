@@ -253,7 +253,10 @@
   <spring:url value="" var="urlParams">
     <spring:param name="form"/>
     <c:forEach var="paramAux" items="${param}" >
-      <spring:param name="${paramAux.key}" value="${paramAux.value}" />
+      <!-- if dtt_ignoreParms (Collection<String>) is defined ignore params registered on it  -->
+      <c:if test="${empty dtt_ignoreParams or !dtt_ignoreParams.contains(paramAux.key) }">
+        <spring:param name="${paramAux.key}" value="${paramAux.value}" />
+      </c:if>
     </c:forEach>
   </spring:url>
 
@@ -283,16 +286,16 @@
   <c:set var="authorizedDelete" value="true" />
   <c:if test="${datatablesSecurityApplied}">
 	  <c:if test="${not empty rolesAuthorizedShow}">
-	    <sec:authorize var="authorizedShow" access="hasAnyRole(${rolesAuthorizedShow})" />
+	    <sec:authorize var="authorizedShow" access="hasAnyRole('${rolesAuthorizedShow}')" />
 	  </c:if>
 	  <c:if test="${not empty rolesAuthorizedCreate}">
-	    <sec:authorize var="authorizedCreate" access="hasAnyRole(${rolesAuthorizedCreate})" />
+	    <sec:authorize var="authorizedCreate" access="hasAnyRole('${rolesAuthorizedCreate}')" />
 	  </c:if>
 	  <c:if test="${not empty rolesAuthorizedUpdate}">
-	    <sec:authorize var="authorizedUpdate" access="hasAnyRole(${rolesAuthorizedUpdate})" />
+	    <sec:authorize var="authorizedUpdate" access="hasAnyRole('${rolesAuthorizedUpdate}')" />
 	  </c:if>
 	  <c:if test="${not empty rolesAuthorizedDelete}">
-	    <sec:authorize var="authorizedDelete" access="hasAnyRole(${rolesAuthorizedDelete})" />
+	    <sec:authorize var="authorizedDelete" access="hasAnyRole('${rolesAuthorizedDelete}')" />
 	  </c:if>
   </c:if>
   <c:if test="${empty show and authorizedShow}">

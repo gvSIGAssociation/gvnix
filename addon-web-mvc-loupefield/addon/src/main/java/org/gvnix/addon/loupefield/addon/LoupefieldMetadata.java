@@ -441,6 +441,15 @@ public class LoupefieldMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
+        // uiModel.addAttribute("dtt_ignoreParams",
+        // Arrays.asList("selector","path"));
+        bodyBuilder
+                .appendFormalLine(String
+                        .format("uiModel.addAttribute(\"dtt_ignoreParams\", %s.asList(\"selector\",\"path\"));",
+                                helper.getFinalTypeName(new JavaType(
+                                        "java.util.Arrays"))));
+        bodyBuilder.appendFormalLine("");
+
         // Adding comments
         bodyBuilder
                 .appendFormalLine("// Show only the list fragment (without footer, header, menu, etc.)");
