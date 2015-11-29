@@ -298,6 +298,12 @@
 	    <sec:authorize var="authorizedDelete" access="hasAnyRole('${rolesAuthorizedDelete}')" />
 	  </c:if>
   </c:if>
+
+  <c:if test="${not empty dtt_disableEditing and dtt_disableEditing}">
+     <c:set var="create" value="false"/>
+     <c:set var="update" value="false"/>
+     <c:set var="delete" value="false"/>
+  </c:if>
   <c:if test="${empty show and authorizedShow}">
       <c:set var="show" value="true"/>
   </c:if>

@@ -163,7 +163,7 @@ public class LoupefieldMetadata extends
         builder.addField(entityManagerProviderField);
 
         // Adding showOnlyList method
-        builder.addMethod(getShowOnlyListMethod());
+        builder.addMethod(getShowOnlyListMethod(entity));
 
         // Adding findUsingAjax method
         builder.addMethod(getFindUsingAjaxMethod(entity));
@@ -177,7 +177,7 @@ public class LoupefieldMetadata extends
      * 
      * @return
      */
-    private MethodMetadata getShowOnlyListMethod() {
+    private MethodMetadata getShowOnlyListMethod(JavaType entity) {
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = AnnotatedJavaType
                 .convertFromJavaTypes(new JavaType(
@@ -224,7 +224,7 @@ public class LoupefieldMetadata extends
 
         // Create the method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        buildShowOnlyListMethodBody(bodyBuilder);
+        buildShowOnlyListMethodBody(bodyBuilder, entity);
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
@@ -367,7 +367,37 @@ public class LoupefieldMetadata extends
      * @param bodyBuilder
      */
     private void buildShowOnlyListMethodBody(
-            InvocableMemberBodyBuilder bodyBuilder) {
+            InvocableMemberBodyBuilder bodyBuilder, JavaType entity) {
+        // Adding comments
+        bodyBuilder
+                .appendFormalLine("// as we can't get target table configuration lets use standard _ajax_ configuration.");
+
+        // uiModel.asMap().put("datatablesHasBatchSupport", false);
+        bodyBuilder
+                .appendFormalLine("uiModel.asMap().put(\"datatablesHasBatchSupport\", false);");
+        // uiModel.asMap().put("datatablesUseAjax",true);
+        bodyBuilder
+                .appendFormalLine("uiModel.asMap().put(\"datatablesUseAjax\", true);");
+
+        // uiModel.asMap().put("datatablesInlineEditing",false);
+        bodyBuilder
+                .appendFormalLine("uiModel.asMap().put(\"datatablesInlineEditing\", false);");
+
+        // uiModel.asMap().put("datatablesInlineCreating",false);
+        bodyBuilder
+                .appendFormalLine("uiModel.asMap().put(\"datatablesInlineCreating\", false);");
+
+        // uiModel.asMap().put("datatablesSecurityApplied",false);
+        bodyBuilder
+                .appendFormalLine("uiModel.asMap().put(\"datatablesSecurityApplied\", false);");
+
+        // uiModel.asMap().put("datatablesStandardMode",true);
+        bodyBuilder
+                .appendFormalLine("uiModel.asMap().put(\"datatablesStandardMode\", true);");
+
+        // uiModel.asMap().put("finderNameParam","ajax_find");
+        bodyBuilder
+                .appendFormalLine("uiModel.asMap().put(\"finderNameParam\", \"ajax_find\");");
 
         // Adding comments
         bodyBuilder
@@ -398,6 +428,14 @@ public class LoupefieldMetadata extends
         // uiModel.addAttribute("parentId", parentId);
         bodyBuilder
                 .appendFormalLine("uiModel.addAttribute(\"parentId\", parentId);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} else {");
+
+        bodyBuilder.indent();
+        // uiModel.addAttribute("parentId", parentId);
+        bodyBuilder.appendFormalLine(String.format(
+                "uiModel.addAttribute(\"parentId\", \"%s_selector\");",
+                entity.getSimpleTypeName()));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
@@ -431,8 +469,13 @@ public class LoupefieldMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
+        // params.remove("selector");
+        bodyBuilder.appendFormalLine("params.remove(\"selector\");");
+        // params.remove("path");
+        bodyBuilder.appendFormalLine("params.remove(\"path\");");
+
         // if (!params.isEmpty()) {
-        bodyBuilder.appendFormalLine(" if (!params.isEmpty()) {");
+        bodyBuilder.appendFormalLine("if (!params.isEmpty()) {");
         bodyBuilder.indent();
 
         // uiModel.addAttribute("baseFilter", params);
@@ -448,6 +491,9 @@ public class LoupefieldMetadata extends
                         .format("uiModel.addAttribute(\"dtt_ignoreParams\", %s.asList(\"selector\",\"path\"));",
                                 helper.getFinalTypeName(new JavaType(
                                         "java.util.Arrays"))));
+        // uiModel.addAttribute("dtt_disableEditing", "true");
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"dtt_disableEditing\", \"true\");");
         bodyBuilder.appendFormalLine("");
 
         // Adding comments

@@ -404,7 +404,8 @@ var GvNIX_Loupe;
 				/**
 				 * Set loupe field as required or not
 				 */
-				"required": inputData.required === null ? 'false' : inputData.required
+			"required" : inputData.required === null ? 'false'
+					: inputData.required
 			}
 
 		this.fnSettings = function(){
@@ -474,16 +475,17 @@ var GvNIX_Loupe;
 							// Removing callbacks
 							instance._fnSetItemCallback.empty();
 
-							// Adding the div where the page is gonna be displayed if not
+						var finalListSelectorId = $input.id + '_' + data.listselectorid;
+						// Adding the div where the page is gonna be displayed
+						// if not
 							// exists
-						$container.append('<div id="' + data.listselectorid
+						$container.append('<div id="'+ finalListSelectorId
 								+ '" class="loupe-listselector" style="display:none;"></div>');
 							// Creating dialog, but not oppening
 							var buttonOpts = {};
 							buttonOpts[data.acceptlabel] = function() {
 								// Getting master table inside dialog
-							var table = jQuery("#"
-									+ data.listselectorid
+							var table = jQuery("#" + finalListSelectorId
 										+ " table[class*=dataTable][id]")[0];
 								var tableId = table.attributes.id.value;
 								// Getting datatableInstance
@@ -502,9 +504,15 @@ var GvNIX_Loupe;
 									callbackFunctions = {};
 									callbackFunctions[onAcceptNameFunction] = function(){
 										if(typeof window[onAcceptNameFunction] == "function"){
-											idLastClicked = window[onAcceptNameFunction](datatableRowClick._data.dt.aoData, idLastClicked, data.pkfield );
-										}else if ( window.console && console.log ){
-											console.log("[ERROR] : " + onAcceptNameFunction + " is not defined at 'loupe-callbacks.js'" );
+										idLastClicked = window[onAcceptNameFunction]
+												(
+														datatableRowClick._data.dt.aoData,
+														idLastClicked,
+														data.pkfield);
+									} else {
+										logMessage("[ERROR] : "
+														+ onAcceptNameFunction
+														+ " is not defined at 'loupe-callbacks.js'");
 										}
 
 									}
@@ -521,14 +529,12 @@ var GvNIX_Loupe;
 								instance._data['searchvalue'] = "";
 
 								// Remove Dialog
-							//$container.remove("#" + data.listselectorid);
-							jQuery("#" + data.listselectorid).remove();
-								selectorDialog.dialog('destroy');
+							jQuery("#" + finalListSelectorId).remove();
 
 								// FindById to show label
 								instance._fnFindRecordById(idLastClicked, instance, sufix);
 							};
-						var selectorDialog = jQuery("#" + data.listselectorid)
+						var selectorDialog = jQuery("#" + finalListSelectorId)
 								.dialog(
 										{
 								autoOpen : false,
@@ -540,10 +546,7 @@ var GvNIX_Loupe;
 								buttons : buttonOpts,
 								close : function(event, ui) {
 									selectorDialog.dialog('close');
-												//$container.remove("#" + data.listselectorid);
-												jQuery("#" + data.listselectorid).remove();
-												selectorDialog
-														.dialog('destroy');
+												jQuery("#" + finalListSelectorId).remove();
 									// Hidding dropdown div
 												$input
 														.parent().find(
@@ -574,8 +577,12 @@ var GvNIX_Loupe;
 											function(a, e, i) {
 												setTimeout(
 														function() {
-														var table = jQuery("#" + data.listselectorid
+														var table = jQuery("#" + finalListSelectorId
 																	+ " table[class*=dataTable][id]")[0];
+														if (!table) {
+															logMessage("[Error] datatables for selector ('" + finalListSelectorId + "') not found.");
+															return;
+														}
 															var tableId = table.attributes.id.value;
 														// Getting
 														// datatableInstance
@@ -600,15 +607,6 @@ var GvNIX_Loupe;
 															datatableInstance
 																	.fnFilter(currentValue);
 
-															var isAjaxDatatable = datatableInstance
-																	.fnEditing()._data.oSettings.oFeatures.bServerSide;
-
-														// Setting Datatable as
-														// no editable
-														if(data.hideutilbox === undefined || data.hideutilbox === true){
-																editingInstance
-																	.fnSetNoEditableDatatable(isAjaxDatatable);
-															}
 
 														}, 200);
 											}).dialog('open');
@@ -680,7 +678,7 @@ var GvNIX_Loupe;
 								valueInput = data.searchvalue;
 							}else{
 							// Getting selected Id from hidden input
-							var hiddenInputs = container.find("input[type='hidden']");
+							var hiddenInputs = container.find(".loupe-hiddeinput");
 							if(hiddenInputs.length > 0){
 								for(x = 0; x < hiddenInputs.length; x++){
 									var hiddenInput = hiddenInputs[x];
@@ -695,7 +693,7 @@ var GvNIX_Loupe;
 								valueInput = undefined;
 							}
 							}
-							if (valueInput != "") {
+						if (valueInput != "" && valueInput != undefined) {
 								instance._fnFindRecordByField(valueInput, instance, sufix, data.searchfield);
 							}
 						}
@@ -814,9 +812,12 @@ var GvNIX_Loupe;
 							callbackFunctions = {};
 							callbackFunctions[onSetNameFunction] = function(){
 								if(typeof window[onSetNameFunction] == "function"){
-									window[onSetNameFunction](input.attr('id'),instance,object);
-								}else if ( window.console && console.log ){
-									console.log("[ERROR] : " + onSetNameFunction + " is not defined at 'loupe-callbacks.js'" );
+										window[onSetNameFunction](input
+												.attr('id'), instance, object);
+									} else {
+										logMessage("[ERROR] : "
+														+ onSetNameFunction
+														+ " is not defined at 'loupe-callbacks.js'");
 								}
 
 							}
@@ -943,9 +944,12 @@ var GvNIX_Loupe;
 							callbackFunctions = {};
 							callbackFunctions[onSetNameFunction] = function(){
 								if(typeof window[onSetNameFunction] == "function"){
-									window[onSetNameFunction](input.attr('id'),instance,object);
-								}else if ( window.console && console.log ){
-									console.log("[ERROR] : " + onSetNameFunction + " is not defined at 'loupe-callbacks.js'" );
+										window[onSetNameFunction](input
+												.attr('id'), instance, object);
+									} else {
+										logMessage("[ERROR] : "
+														+ onSetNameFunction
+														+ " is not defined at 'loupe-callbacks.js'");
 								}
 
 							}
@@ -999,8 +1003,10 @@ var GvNIX_Loupe;
 							callbackFunctions[onSetNameFunction] = function(){
 								if(typeof window[onSetNameFunction] == "function"){
 							window[onSetNameFunction]();
-								}else if ( window.console && console.log ){
-									console.log("[ERROR] : " + onSetNameFunction + " is not defined at 'loupe-callbacks.js'" );
+									} else {
+										logMessage("[ERROR] : "
+														+ onSetNameFunction
+														+ " is not defined at 'loupe-callbacks.js'");
 								}
 
 							}
@@ -1036,7 +1042,12 @@ var GvNIX_Loupe;
 				// Adding button search if not exists
 			var buttonSearch = container.find(".loupe-button");
 				if (buttonSearch.length == 0) {
-					$('<span style="cursor: pointer;" id="'+ data.searchbuttonid + sufix + '" class="input-group-addon glyphicon glyphicon-search loupe-button" />').insertAfter($input);
+				buttonSearch = jQuery(
+						'<span style="cursor: pointer;" id="'
+								+ data.searchbuttonid
+								+ sufix
+								+ '" class="input-group-addon glyphicon glyphicon-search loupe-button" />')
+						.insertAfter($input);
 				}
 
 				// Hidding button if disabled
@@ -1058,9 +1069,9 @@ var GvNIX_Loupe;
 				// Adding hidden input
 			var hiddenInput = container.find(".loupe-hiddeninput");
 				if (hiddenInput.length == 0) {
-					var class_hidden = "";
+					var class_hidden = "loupe-hiddeninput";
 					if (data.required){
-					class_hidden = "loupe-hiddeninput";
+					class_hidden = class_hidden+ " include-to-validate";
 					}
 
 				jQuery(
@@ -1134,9 +1145,11 @@ var GvNIX_Loupe;
 				if(onSetNameFunction !== ""){
 					callbackFunctions[onSetNameFunction] = function(functionName, item){
 						if(typeof window[onSetNameFunction] == "function"){
-							window[onSetNameFunction](input.attr('id'),instance,data[item]);
-						}else if ( window.console && console.log ){
-							console.log("[ERROR] : " + onSetNameFunction + " is not defined at 'loupe-callbacks.js'" );
+						window[onSetNameFunction](input.attr('id'), instance,
+								data[item]);
+					} else {
+						logMessage("[ERROR] : " + onSetNameFunction
+								+ " is not defined at 'loupe-callbacks.js'");
 						}
 					}
 					instance._fnSetItemCallback.add(callbackFunctions[onSetNameFunction]);
@@ -1147,8 +1160,9 @@ var GvNIX_Loupe;
 					callbackFunctions[onDrawNameFunction] = function(functionName, item){
 						if(typeof window[onDrawNameFunction] == "function"){
 							itemToDraw = window[onDrawNameFunction](data[item]);
-						}else if ( window.console && console.log ){
-							console.log("[ERROR] : " + onDrawNameFunction + " is not defined at 'loupe-callbacks.js'" );
+					} else {
+						logMessage("[ERROR] : " + onDrawNameFunction
+								+ " is not defined at 'loupe-callbacks.js'");
 						}
 					}
 					instance._fnDrawItemCallback.add(callbackFunctions[onDrawNameFunction]);
@@ -1171,11 +1185,13 @@ var GvNIX_Loupe;
 						toDraw = itemToDraw;
 					}
 
-					htmlToAdd +=
-						"<div id='" + inputData.name + "_dropdown_div_itemid_" + item[pkField]+ "'"
+				htmlToAdd += "<div id='"
+						+ inputData.name
+						+ "_dropdown_div_itemid_"
+						+ item[pkField]
+						+ "'"
 						+ " style='background-color:#ffffff;cursor:pointer;padding:10px;border:1px solid #CCCCCC;border-top:0px;'>"
-							+ toDraw +
-						"</div>";
+						+ toDraw + "</div>";
 
                     var inputValue = undefined;
                     if(inputData.searchfield != undefined) {
@@ -1185,57 +1201,92 @@ var GvNIX_Loupe;
                         inputValue = item.__caption__;
                     }
 
-					htmlToAdd +=
-						"<script>" +
-							"jQuery('#" + inputData.name + "_dropdown_div_itemid_" + item[pkField] + "').on"
-								+ "('click'," + "function(e){"
-									+ "jQuery('#" + inputId + "').val('"+ item.__caption__ + "');"
-									+ "var loupeInstance = GvNIX_Loupe.fnGetInstance('"+ inputId + "','"+inputData.field+"');"
-                                    + "loupeInstance._data['searchvalue'] = '"+ inputValue +"';"
-                                    + "jQuery('#' + loupeInstance.s.id).data().searchvalue = '" + inputValue + "';"
-									+ "jQuery('#" + inputData.name+ "_loupe_hidden"+ sufix +"').val(" + item[pkField] + ");"
-									+ "jQuery('#" + inputData.name+ "_loupe_hidden"+ sufix +"').trigger('change');"
-									+ "GvNIX_Loupe.prototype._fnSetItemCallback.fire('" + onSetNameFunction + "',['" + i +"']);"
+				htmlToAdd += "<script>" + "jQuery('#"
+						+ inputData.name
+						+ "_dropdown_div_itemid_"
+						+ item[pkField]
+						+ "').on"
+						+ "('click',"
+						+ "function(e){"
+						+ "jQuery('#"
+						+ inputId
+						+ "').val('"
+						+ item.__caption__
+						+ "');"
+						+ "var loupeInstance = GvNIX_Loupe.fnGetInstance('"
+						+ inputId
+						+ "','"
+						+ inputData.field
+						+ "');"
+						+ "loupeInstance._data['searchvalue'] = '"
+						+ inputValue
+						+ "';"
+						+ "jQuery('#' + loupeInstance.s.id).data().searchvalue = '"
+						+ inputValue
+						+ "';"
+						+ "jQuery('#"
+						+ inputData.name
+						+ "_loupe_hidden"
+						+ sufix
+						+ "').val("
+						+ item[pkField]
+						+ ");"
+						+ "jQuery('#"
+						+ inputData.name
+						+ "_loupe_hidden"
+						+ sufix
+						+ "').trigger('change');"
+						+ "GvNIX_Loupe.prototype._fnSetItemCallback.fire('"
+						+ onSetNameFunction
+						+ "',['"
+						+ i
+						+ "']);"
 									+ "GvNIX_Loupe.prototype._fnSetItemCallback.empty();"
 									+ "});"
-							+ "jQuery('#" + inputData.name + "_dropdown_div_itemid_"+ item[pkField] + "').mouseover" +
-									"(" + "function(e){"
-										+ " jQuery(this).css('border-left','4px solid #428BCA');" +
-								"});"
-							+ "jQuery('#" + inputData.name + "_dropdown_div_itemid_"+ item[pkField] + "').mouseout" +
-									"(" + "function(e){"
-										+ "jQuery(this).css('border-left','1px solid #CCCCCC');"
+						+ "jQuery('#"
+						+ inputData.name
+						+ "_dropdown_div_itemid_"
+						+ item[pkField]
+						+ "').mouseover"
+						+ "("
+						+ "function(e){"
+						+ " jQuery(this).css('border-left','4px solid #428BCA');"
 								+ "});"
-						+ "</script>";
+						+ "jQuery('#"
+						+ inputData.name
+						+ "_dropdown_div_itemid_"
+						+ item[pkField]
+						+ "').mouseout"
+						+ "("
+						+ "function(e){"
+						+ "jQuery(this).css('border-left','1px solid #CCCCCC');"
+						+ "});" + "</script>";
 				}
 
 				// Deleting draw callbacks
 				instance._fnDrawItemCallback.empty();
 
-				htmlToAdd +=
-						"<div id='" + inputData.name + "_dropdown_div_itemid_view_more"
-						+ "' style='background-color:#ffffff;text-align:center;cursor:pointer;padding:10px;border:1px solid #CCCCCC;border-top:0px;-moz-border-radius:0 0 10px 10px;-webkit-border-radius:0 0 10px 10px;border-radius:0 0 10px 10px;'>" +
-								"<span style='font-weight:italic-bold;text-align:center;'>"
-									+ viewMoreCode + "" +
-								"</span>" +
-						"</div>";
-				htmlToAdd +=
-						"<script>" +
-							"jQuery('#" + inputData.name+ "_dropdown_div_itemid_view_more').on" +
-									"('click',function(e){"
-										+ "jQuery('#" + inputData.searchbuttonid + sufix + "').trigger('click');"
-									 + "});"
-							+ "jQuery('#" + inputData.name + "_dropdown_div_itemid_view_more').mouseover" +
-									"(function(e){"
-										+ " jQuery(this).css('border-bottom','4px solid #428BCA');" +
-									"});"
-							+ "jQuery('#"+ inputData.name + "_dropdown_div_itemid_view_more').mouseout" +
-									"(function(e){"
-										+ "jQuery(this).css('border-bottom','1px solid #CCCCCC');" +
-									"});" +
-						"</script>";
-				$("#" + inputData.name + "_dropdown_div" + sufix).html(htmlToAdd);
-
+			htmlToAdd += "<div id='"
+					+ inputData.name
+					+ "_dropdown_div_itemid_view_more"
+					+ "' style='background-color:#ffffff;text-align:center;cursor:pointer;padding:10px;border:1px solid #CCCCCC;border-top:0px;-moz-border-radius:0 0 10px 10px;-webkit-border-radius:0 0 10px 10px;border-radius:0 0 10px 10px;'>"
+					+ "<span style='font-weight:italic-bold;text-align:center;'>"
+					+ viewMoreCode + "" + "</span>" + "</div>";
+			htmlToAdd += "<script>" + "jQuery('#" + inputData.name
+					+ "_dropdown_div_itemid_view_more').on"
+					+ "('click',function(e){" + "jQuery('#"
+					+ inputData.searchbuttonid + sufix + "').trigger('click');"
+					+ "});" + "jQuery('#" + inputData.name
+					+ "_dropdown_div_itemid_view_more').mouseover"
+					+ "(function(e){"
+					+ " jQuery(this).css('border-bottom','4px solid #428BCA');"
+					+ "});" + "jQuery('#" + inputData.name
+					+ "_dropdown_div_itemid_view_more').mouseout"
+					+ "(function(e){"
+					+ "jQuery(this).css('border-bottom','1px solid #CCCCCC');"
+					+ "});" + "</script>";
+			$input.parent().find(".dropdown_div").html(
+					htmlToAdd);
 				// Checks if a scroll container contains the loupe field.
 				// In that case, scrolls the loupe field to show its result list.
 				var container = jQuery(".dataTables_scrollBody");
@@ -1302,7 +1353,7 @@ var GvNIX_Loupe;
 				var instance = this;
 				// Getting hidden input
 				// Setting id
-			this._data.$container.find("loupe-hiddeninput").val(id);
+				this._data.$container.find(".loupe-hiddeninput").val(id);
 				// Searching by id
 				instance._fnFindRecordById(id, instance, "");
 			},
@@ -1361,47 +1412,69 @@ var GvNIX_Loupe;
 	 */
 	GvNIX_Loupe.fnGetInstance = function(currentFieldId, field){
 		//Getting current form
-		var form = jQuery("#" + currentFieldId).closest("form");
+		var curField = jQuery("#" + currentFieldId);
+		if (curField == null || curField.length == 0) {
+				logMessage("[ERROR] element '" + currentFieldId
+						+ "' not found.");
+		}
+		var form = curField.closest("form");
+		if (form == null || form.length == 0) {
+			if (curField[0].form) {
+				form = jQuery(curField[0].form);
+			} else {
+				return GvNIX_Loupe._fnGetInstance(curField);
+			}
+		}
 		if(form !== null){
 			// Getting related field in the current form
 			var relatedField = form.find("input[data-field='"+field+"']");
 			if(relatedField !== null && relatedField.data() !== null){
-				// Getting related field data
-				var relatedFieldData = relatedField.data();
-				// Getting related field id
-				var relatedFieldId = relatedFieldData.inputid;
-
-				// Adding sufix
-				if(currentFieldId.search("_create") !== -1){
-					relatedFieldId += currentFieldId.substr(currentFieldId.search("_create"));
-				}else if(currentFieldId.search("_edit") !== -1){
-					relatedFieldId += currentFieldId.substr(currentFieldId.search("_edit"));
-				}
-
-				//Getting all instances
-				var instances = GvNIX_Loupe._aInstances;
-
-				// Iterating instances and returning the correct one
-                var currentInstance = null;
-				for(i in instances){
-					var instance = instances[i];
-					var settings = instance.s;
-					if(settings.id.indexOf(relatedFieldId) != -1){
-                        currentInstance = instances[i];
-                        break;
-					}
-				}
-                return currentInstance;
-			}else if ( window.console && console.log ){
-				console.log("[ERROR] Cannot locate loupe field '"+field+"' in current form.");
+				return GvNIX_Loupe._fnGetInstance(relatedField);
+			} else {
+				logMessage("[ERROR] Cannot locate loupe field '" + field
+						+ "' in current form.");
 			}
-		}else if ( window.console && console.log ){
-			console.log("[ERROR] Can not locate current form.");
+		} else {
+			logMessage("[ERROR] Can not locate current form.");
+	}
+	},
+
+	/**
+	 * Gets the loupe object instance for a jQuery-input object
+	 *
+	 * @param $input
+	 * @returns
+	 */
+	GvNIX_Loupe._fnGetInstance = function($input) {
+		// Getting related field id
+		var relatedFieldId = $input.data().inputid;
+
+		// Getting all instances
+		var instances = GvNIX_Loupe._aInstances;
+
+		// Iterating instances and returning the correct one
+		var currentInstance = null;
+		for (i in instances) {
+			var instance = instances[i];
+			var settings = instance.s;
+			if (settings.id.indexOf(relatedFieldId) != -1) {
+				currentInstance = instances[i];
+				break;
+			}
 		}
+		return currentInstance;
 	}
 
-
 })(jQuery, window, document);
+
+/**
+ * Shows message in log console (if any)
+ */
+function logMessage(message){
+	if (window.console && console.log) {
+			console.log(message);
+	}
+}
 
 // Registering events
 fnRegisterFunctionsToCallBack(function(context){
