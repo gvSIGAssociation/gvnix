@@ -59,7 +59,7 @@ For those who want to participate in the workshop **the prerequisites** are:
   * Maven 3.0.5 or higher: <a href="http://maven.apache.org/download.cgi">http://maven.apache.org/download.cgi</a>
   * STS 3.6: <a href="https://spring.io/tools/sts/all">https://spring.io/tools/sts/all</a>
   * Tomcat 7.0.65: [http://ftp.cixug.es/apache/tomcat/tomcat-7/v7.0.65/bin/apache-tomcat-7.0.65.zip](http://ftp.cixug.es/apache/tomcat/tomcat-7/v7.0.65/bin/apache-tomcat-7.0.65.zip)
-  * gvNIX 1.5.1: [http://sourceforge.net/projects/gvnix/files/gvNIX-1.5.1.RC1.zip/download](http://sourceforge.net/projects/gvnix/files/gvNIX-1.5.1.RC1.zip/download)
+  * gvNIX 1.5.1: [http://sourceforge.net/projects/gvnix/files/gvNIX-1.5.1.RC4.zip/download](http://sourceforge.net/projects/gvnix/files/gvNIX-1.5.1.RC4.zip/download)
   * Installation guide gvNIX: <a href="https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc" target="_blank"> https://github.com/DISID/gvnix-samples/blob/master/INSTALL-gvNIX-1.x.adoc</a>
 
 * Installed PostgreSQL and PostGIS spatial extension
