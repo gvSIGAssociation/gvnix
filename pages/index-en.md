@@ -14,9 +14,9 @@ badges:
     - name: 2.0.0.M1
       guide: gvnix-2.0.0.M1-reference-docs
       url:
-    - name: 1.5.1.RC3
-      guide: gvnix-1.5.1.RC3-reference-docs.pdf
-      url:  http://sourceforge.net/projects/gvnix/files/gvNIX-1.5.1.RC3.zip/download
+    - name: 1.5.1.RC4
+      guide: gvnix-1.5.1.RC4-reference-docs.pdf
+      url:  http://sourceforge.net/projects/gvnix/files/gvNIX-1.5.1.RC4.zip/download
     - name: 1.4.1
       guide: gvnix-1.4.1-reference-docs.pdf
       url:  http://sourceforge.net/projects/gvnix/files/gvNIX-1.4.1.RELEASE.zip/download
