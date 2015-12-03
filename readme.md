@@ -5,10 +5,9 @@ Welcome to gvNIX, an Spring Roo Addon Suite.
 
 gvNIX is an <a href="http://docs.spring.io/spring-roo/docs/2.0.0.M1/reference/html/#roo-addon-suites" target="_blank">Spring Roo Addon Suite</a> that focuses both enterprise knowledge and enterprise standards to build Java applications.
 
-gvNIX is sponsored by the <a href="http://www.dgti.gva.es/" target="_blank">General
-Directorate for Information Technologies</a> (DGTI) at Regional Ministry of Finance
-and Public Administration of the Generalitat Valenciana (Valencian Community, Spain),
-and led by <a href="http://www.disid.com" target="_blank">DISID</a>.
+gvNIX is sponsored by the <a href="http://www.dgtic.gva.es/" target="_blank">General
+Directorate for Information and Communication Technologies</a> (DGTIC) at Regional Ministry of Finance
+and Economic Model of the Generalitat Valenciana (Valencian Community, Spain), managed by <a href="http://www.gvsig.com" target="_blank">gvSIG Association</a> and led by <a href="http://www.disid.com" target="_blank">DISID</a>.
 
 About this doc
 ==============
@@ -168,6 +167,7 @@ Contact us ?
 ------------
 
 * http://www.gvnix.org
+* http://www.gvsig.com
 * http://www.disid.com
 * https://github.com/gvSIGAssociation/gvnix
 * If you use Twitter, you are encouraged to follow @gvNIX and we appreciate your mentions.
