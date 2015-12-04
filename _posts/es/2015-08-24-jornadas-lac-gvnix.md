@@ -6,7 +6,7 @@ title: gvNIX en las 7as Jornadas de Latinoamérica y Caribe de gvSIG
 description: Presentación y taller de gvNIX en México
 tags: [gvNIX, gvSIG, Opensource, Formación]
 comments: true
-featured: true
+training: true
 type: photo
 imagefeature: post/geo/map_entities_1.png
 share: true

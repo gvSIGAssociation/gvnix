@@ -7,6 +7,7 @@ description: Presentation and workshop of gvNIX at 11gvSIG
 tags: [gvNIX, gvSIG, Opensource, Training]
 comments: true
 featured: true
+training: true
 type: photo
 imagefeature: post/11gvsig/gvnix-11gvsig-en.png
 share: true

@@ -6,7 +6,7 @@ title: gvNIX in 7th Latin America an Caribbean Conference gvSIG
 description: Presentation and workshop of gvNIX in Mexico
 tags: [gvNIX, gvSIG, Opensource, Training]
 comments: true
-featured: true
+training: true
 type: photo
 imagefeature: post/geo/map_entities_1.png
 share: true
