@@ -2,7 +2,7 @@
   <resource>
     <capability name='roo-addon'>
       <p n='command-mvc-loupe-setup' v='web mvc loupe setup'/>
-      <p n='command-mvc-loupe-update' v='web mvc loupe update'/>
+      <p n='command-mvc-loupe-update' v='web mvc loupe update tags'/>
       <p n='command-mvc-loupe-set' v='web mvc loupe set'/>
       <p n='command-mvc-loupe-field' v='web mvc loupe field'/>
     </capability>

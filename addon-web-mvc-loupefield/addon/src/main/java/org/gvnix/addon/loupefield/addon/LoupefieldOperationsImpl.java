@@ -591,8 +591,14 @@ public class LoupefieldOperationsImpl implements LoupefieldOperations {
         try {
             inputStream = FileUtils.getInputStream(getClass(),
                     "styles/loupeField.css");
-            outputStream = getFileManager().createFile(filePath)
-                    .getOutputStream();
+            if (!getFileManager().exists(filePath)) {
+                outputStream = getFileManager().createFile(filePath)
+                        .getOutputStream();
+            }
+            else {
+                outputStream = getFileManager().updateFile(filePath)
+                        .getOutputStream();
+            }
             IOUtils.copy(inputStream, outputStream);
         }
         catch (final IOException ioe) {

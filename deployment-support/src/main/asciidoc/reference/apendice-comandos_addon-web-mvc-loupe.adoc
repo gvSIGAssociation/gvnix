@@ -99,8 +99,8 @@ Sus parámetros son:
   el desplegable del componente lupa. Por defecto se muestran los 3
   primeros resultados obtenidos.
 
-web mvc loupe update
-~~~~~~~~~~~~~~~~~~~~
+web mvc loupe update tags
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Este comando mantiene actualizados todos los componentes que se importan
 al proyecto gvNIX al realizar la instalación del add-on.

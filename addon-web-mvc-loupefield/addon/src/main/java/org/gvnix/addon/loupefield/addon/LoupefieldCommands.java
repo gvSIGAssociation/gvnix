@@ -70,7 +70,7 @@ public class LoupefieldCommands implements CommandMarker { // All command types
      * @return true (default) if the command should be visible at this stage,
      *         false otherwise
      */
-    @CliAvailabilityIndicator({ "web mvc loupe update" })
+    @CliAvailabilityIndicator({ "web mvc loupe update tags" })
     public boolean isUpdatetAvailable() {
         return operations.isUpdateCommandAvailable();
     }
@@ -102,7 +102,7 @@ public class LoupefieldCommands implements CommandMarker { // All command types
      * 
      * @param type
      */
-    @CliCommand(value = "web mvc loupe update", help = "Update Loupe tags")
+    @CliCommand(value = "web mvc loupe update tags", help = "Update Loupe tags")
     public void update() {
         operations.update();
     }
