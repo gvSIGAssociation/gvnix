@@ -31,7 +31,7 @@
           </c:otherwise>
         </c:choose></dt>
 			<dd>
-				<p>
+				<p id="_${fn:escapeXml(id)}_${fn:escapeXml(field)}_id">
 		        <c:choose>
 		          <c:when test="${date}">
 		            <spring:escapeBody>
