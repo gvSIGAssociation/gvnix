@@ -12,16 +12,14 @@ import java.lang.reflect.Modifier;
 import javax.persistence.EntityManager;
 
 import org.gvnix.web.datatables.util.EntityManagerProvider;
-import org.springframework.stereotype.Service;
 
 /**
  * Service which provides EntityManager instance for a JPA Entity class from a
  * ActiveRecord Spring-Roo entity
- * 
+ *
  * @author gvNIX Team
  * @since 1.4.1
  */
-@Service
 public class EntityManagerProviderImpl implements EntityManagerProvider {
 
     /**
@@ -29,7 +27,7 @@ public class EntityManagerProviderImpl implements EntityManagerProvider {
      * Use Introspect API to locate and invoke
      * <code>EntityManager klass.entityManager()</code> static method to get
      * EntityManager instance.
-     * 
+     *
      * @param klass ActiveRecord JPA Entity class
      * @return applicable JPA EntityManager for <code>klass</code>
      * @throws IllegalStateException if <code>klass</code> has no matching
