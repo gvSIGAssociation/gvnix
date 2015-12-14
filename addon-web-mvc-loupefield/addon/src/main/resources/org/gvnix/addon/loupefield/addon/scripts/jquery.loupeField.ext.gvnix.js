@@ -664,40 +664,54 @@ var GvNIX_Loupe;
 			"_fnOnLostFocusLoupeInput": function(sufix){
 				var instance = this;
 				var data = this._data;
-			var input = data.$input;
-			var container = input.parent();
+				var input = data.$input;
+				var container = input.parent();
 				input.focusout(function(e){
 					setTimeout(function(){
-						// Hidding dropdown div
+					// Hidding dropdown div
 					container.find(".dropdown_div").html("");
-						//Get value and launch the find by field
-						if(input.length > 0){
-                            data = input.data();
-							var valueInput;
-							if(data.searchvalue != undefined && data.searchvalue != "" && data.searchvalue != "undefined"){
-								valueInput = data.searchvalue;
+					var searchValue;
+					var inputValue = input.val();
+					// Check for any input value
+					if(inputValue.length > 0){
+						// Check if search field is defined
+						if(data.searchfield  && data.searchfield != ""){
+							if(data.searchvalue && data.searchvalue != "" && data.searchvalue != "undefined"){
+								// Get stored search value
+								searchValue = data.searchvalue;
 							}else{
+								// Get current input value
+								searchValue = inputValue;
+							}
+							if (searchValue && searchValue != "") {
+								// Launch find by field
+								instance._fnFindRecordByField(searchValue, instance, sufix, data.searchfield);
+							}
+						}else{
 							// Getting selected Id from hidden input
-							var hiddenInputs = container.find(".loupe-hiddeinput");
+							var hiddenInputs = container.find(".loupe-hiddeninput");
 							if(hiddenInputs.length > 0){
 								for(x = 0; x < hiddenInputs.length; x++){
 									var hiddenInput = hiddenInputs[x];
 									// Check if hidden input has value and is not hidden input for binding
 									if(hiddenInput.value != "" && hiddenInput.id.indexOf("hidden_bind") == -1){
-										valueInput = hiddenInput.value;
+										// Launch find by id
+										instance._fnFindRecordById(hiddenInput.value, instance, sufix);
 									}
 								}
-							}else {
-								// Usually, hidden inputs will be present, but to prevent errors,
-								// we are going to set valueInput to undefined.
-								valueInput = undefined;
-							}
-							}
-						if (valueInput != "" && valueInput != undefined) {
-								instance._fnFindRecordByField(valueInput, instance, sufix, data.searchfield);
 							}
 						}
-					},500);
+					}else { // Input is clear
+						// Clean hidden input.
+						container.find(".loupe-hiddeninput").val("");
+						// Reset background to white color
+						input.css("background", "#ffffff");
+						// Usually, hidden inputs will be present, but to prevent errors,
+						// we are going to set valueInput to undefined.
+						searchValue = undefined;
+					}
+				},500);
+
 				})
 			},
 
@@ -1194,7 +1208,7 @@ var GvNIX_Loupe;
 						+ toDraw + "</div>";
 
                     var inputValue = undefined;
-                    if(inputData.searchfield != undefined) {
+				if (inputData.searchfield != undefined && inputData.searchfield != "") {
                         var searchFieldSplit = inputData.searchfield.split(",");
                         inputValue = item[searchFieldSplit[0]];
                     }else{
