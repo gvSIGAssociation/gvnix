@@ -777,9 +777,9 @@ var GvNIX_Loupe;
 					},
 					error : function(object) {
 						var error = object.responseJSON[0].Error;
-
-					data.$container.find(".dropdown_div").html("");
-
+					var container = data.$container;
+					container.find(".dropdown_div").html("");
+					container.find(".loupe-hiddeninput").val("");
 					input.css("background",
 							"#FA6161");
 					}
@@ -878,6 +878,7 @@ var GvNIX_Loupe;
 						var error = element.responseJSON[0].Error;
 
 							container.find(".dropdown_div").html("");
+							container.find(".loupe-hiddeninput").val("");
 
 						// Removing callbacks
 						instance._fnSetItemCallback.empty();
@@ -1007,6 +1008,7 @@ var GvNIX_Loupe;
                             error = element.responseText;
                         }
 
+							parent.find(".loupe-hiddeninput").val("");
 							parent.find(".dropdown_div").html("");
 
 						// Creating callbacks
