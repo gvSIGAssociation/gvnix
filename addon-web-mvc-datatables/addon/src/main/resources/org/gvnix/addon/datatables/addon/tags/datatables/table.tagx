@@ -370,7 +370,7 @@
   <c:if test="${serverSide and datatablesInlineCreating}">
     <c:set var="inlineCreating" value="true" />
   </c:if>
-  <c:if test="${inlineCreating}">
+  <c:if test="${inlineCreating and create}">
     <spring:message code="global_menu_new" var="label" arguments="${entity_title}" />
     <div class="tab-content create-div table-responsive" id="${id}CreateForm" style="display: none;">
       <h4>${label}</h4>
