@@ -451,6 +451,18 @@ function initializeValidations() {
 	}, "Please enter a correct date/time");
 
      /**
+	 * Validator for loupefield input
+	 *
+	 * @name jQuery.validator.methods.loupefield
+	 * @type Boolean
+	 */
+	jQuery.validator.addMethod("loupefield", function(value, element){
+		var data = jQuery(element).data();
+		var loupeInstance = GvNIX_Loupe.fnGetInstance(element.id, data.field);
+		return !loupeInstance.fnHasError();
+	}, "Please select a valid register");
+
+     /**
 	 * Replaces the standar number validation to support number with comma.
 	 *
 	 * @name jQuery.validator.methods.number

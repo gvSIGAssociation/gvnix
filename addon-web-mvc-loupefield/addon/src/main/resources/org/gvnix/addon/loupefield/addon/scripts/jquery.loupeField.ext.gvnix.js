@@ -405,7 +405,12 @@ var GvNIX_Loupe;
 				 * Set loupe field as required or not
 				 */
 			"required" : inputData.required === null ? 'false'
-					: inputData.required
+					: inputData.required,
+
+			/**
+			 * Set loupefield on error status
+			 */
+			"hasError" : false
 			}
 
 		this.fnSettings = function(){
@@ -440,12 +445,12 @@ var GvNIX_Loupe;
 			/**
 			 * Method to initialize Loupe Fields and create callbacks
 			 */
-			"_fnConstruct" : function(instance){
+			"_fnConstruct" : function(){
 					var data = this._data;
 					data.initialized = false;
 					//Getting sufix
 					var sufix = data.id.substr(data.inputid.length);
-			var loupeButton = data.$container.find(".loupe-button");
+					var loupeButton = data.$container.find(".loupe-button");
 					// If loupe button not exists add events
 					if (loupeButton.length == 0) {
 						// Creating loupe button and loupe label to show the result
@@ -457,6 +462,10 @@ var GvNIX_Loupe;
 						this._fnBindLoupeInputKeyUp(sufix);
 						this._fnOnLostFocusLoupeInput(sufix);
 						this._fnOnKeyDownLoupeInput(sufix);
+						// Set form validation
+						if(this.fnGetForm()){
+							this._fnInitializeValidation();
+						}
 					}
 			},
 
@@ -706,6 +715,7 @@ var GvNIX_Loupe;
 						container.find(".loupe-hiddeninput").val("");
 						// Reset background to white color
 						input.css("background", "#ffffff");
+						data.hasError = false;
 						// Usually, hidden inputs will be present, but to prevent errors,
 						// we are going to set valueInput to undefined.
 						searchValue = undefined;
@@ -770,6 +780,7 @@ var GvNIX_Loupe;
 					url : data.controllerurl + "?findUsingAjax",
 					data : params,
 					success : function(object) {
+					data.hasError = false;
 					input.css("background",
 							"#ffffff");
 
@@ -777,6 +788,7 @@ var GvNIX_Loupe;
 					},
 					error : function(object) {
 						var error = object.responseJSON[0].Error;
+						data.hasError = true;
 					var container = data.$container;
 					container.find(".dropdown_div").html("");
 					container.find(".loupe-hiddeninput").val("");
@@ -816,6 +828,7 @@ var GvNIX_Loupe;
 					url : data.controllerurl + "?findUsingAjax",
 					data : params,
 					success : function(element) {
+						data.hasError = false;
 						// Getting object
 						var object = element[0];
 
@@ -876,6 +889,7 @@ var GvNIX_Loupe;
 
 					error : function(element) {
 						var error = element.responseJSON[0].Error;
+						data.hasError = true;
 
 							container.find(".dropdown_div").html("");
 							container.find(".loupe-hiddeninput").val("");
@@ -949,6 +963,7 @@ var GvNIX_Loupe;
 					url : data.controllerurl + "?findUsingAjax",
 					data : params,
 					success : function(element) {
+						data.hasError = false;
 						// Getting object
 						var object = element[0];
 
@@ -1007,7 +1022,9 @@ var GvNIX_Loupe;
                         }else if(element.responseText != undefined || element.responseText != null){
                             error = element.responseText;
                         }
-
+                        
+                        data.hasError = true;
+			
 							parent.find(".loupe-hiddeninput").val("");
 							parent.find(".dropdown_div").html("");
 
@@ -1136,6 +1153,15 @@ var GvNIX_Loupe;
 					// is used on _fnSetItemCallback
 					data.initialized = true;
 				}
+			},
+			
+			/**
+		 	* Initializes function on application.js to validate loupe fields input
+			 */
+			"_fnInitializeValidation" : function(){
+				var data = this._data;
+				var rules = {loupefield : ""};
+				data.$input.rules("add", rules);
 			},
 
 			/**
@@ -1398,9 +1424,29 @@ var GvNIX_Loupe;
 			var input = instance._data.$input;
 				// Setting val to null
 			input.parent().find(".loupe-hiddeninput").val(null);
+			},
+			
+					/**
+		 * Method to get form of current loupe input if exists
+		 *
+		 * @return HTML form element which contains current input.
+		 */
+		"fnGetForm" : function(){
+			var form = this._data.$container.closest("form");
+			if (form && form.length > 0) {
+				return form;
 			}
+			return null;
+		},
 
-
+		/**
+		 * Method to check if loupe field has error
+		 *
+		 * @return true if loupe field input has error.
+		 */
+		"fnHasError" : function(){
+			return this._data.hasError;
+		},
 	};
 
 	// Static variables * * * * * * * * * * * * * * * * * * * * * * * * * * *
