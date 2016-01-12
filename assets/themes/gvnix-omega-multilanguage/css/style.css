@@ -2989,9 +2989,6 @@ ul.ds-btn { display: table; }
 #masthead + #counter{
   border-top: 5px solid #252525;
 }
-.home-template section>div#counter{
-  border: 1px solid red;
-}
 
 .home-template #counter {
    margin: 0;
@@ -3005,7 +3002,7 @@ ul.ds-btn { display: table; }
   margin-bottom: 50px;
   background-size: 1500px;
   background-position-y: -90px;
-  height: 310px;
+  height: 250px;
 }
 
 #counter h1{
