@@ -8,6 +8,7 @@ featured: true
 category: en
 tags: [geoportal, tutorial, video, gvSIG]
 video: https://www.youtube.com/watch?v=6BE4EqF2PYQ
+imagefeature: post/11gvsig/gvnix-11gvsig-en.png
 comments: true
 share: true
 ---

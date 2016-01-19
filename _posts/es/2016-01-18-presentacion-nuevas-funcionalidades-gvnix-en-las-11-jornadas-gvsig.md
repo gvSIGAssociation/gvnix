@@ -10,6 +10,7 @@ type: video
 featured: true
 share: true
 video: https://www.youtube.com/watch?v=rMHE3CizTv8
+imagefeature: post/11gvsig/gvnix-11gvsig-es.png
 category:
     - es
 lang: es

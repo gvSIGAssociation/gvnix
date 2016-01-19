@@ -8,6 +8,7 @@ tags: [gvNIX, gvSIG, Opensource, Training, geoportal, tutorial, video]
 comments: true
 type: video
 video: https://www.youtube.com/watch?v=KEDaUIVoHFA
+imagefeature: post/11gvsig/gvnix-11gvsig-en.png
 featured: true
 share: true
 category:
