@@ -1240,7 +1240,7 @@ var GvNIX_Loupe;
                         var searchFieldSplit = inputData.searchfield.split(",");
                         inputValue = item[searchFieldSplit[0]];
                     }else{
-                        inputValue = item.__caption__;
+                        inputValue = item.__caption__.replace(/'/g, "\\'");
                     }
 
 				htmlToAdd += "<script>" + "jQuery('#"
@@ -1253,7 +1253,7 @@ var GvNIX_Loupe;
 						+ "jQuery('#"
 						+ inputId
 						+ "').val('"
-						+ item.__caption__
+						+ item.__caption__.replace(/'/g, "\\'")
 						+ "');"
 						+ "var loupeInstance = GvNIX_Loupe.fnGetInstance('"
 						+ inputId
