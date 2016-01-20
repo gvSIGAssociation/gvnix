@@ -1327,8 +1327,12 @@ var GvNIX_Loupe;
 					+ "(function(e){"
 					+ "jQuery(this).css('border-bottom','1px solid #CCCCCC');"
 					+ "});" + "</script>";
-			$input.parent().find(".dropdown_div").html(
-					htmlToAdd);
+				var inputContainer = $input.parent();
+				// Remove previous error message from validator (if any)
+				// And append generated HTML to dropdown div
+				inputContainer.find(".errors").html("");
+				inputContainer.find(".dropdown_div").html(
+						htmlToAdd);
 				// Checks if a scroll container contains the loupe field.
 				// In that case, scrolls the loupe field to show its result list.
 				var container = jQuery(".dataTables_scrollBody");
