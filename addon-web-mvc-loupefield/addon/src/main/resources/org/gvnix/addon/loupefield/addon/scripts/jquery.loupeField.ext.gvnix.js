@@ -679,46 +679,32 @@ var GvNIX_Loupe;
 					setTimeout(function(){
 					// Hidding dropdown div
 					container.find(".dropdown_div").html("");
-					var searchValue;
 					var inputValue = input.val();
 					// Check for any input value
 					if(inputValue.length > 0){
-						// Check if search field is defined
-						if(data.searchfield  && data.searchfield != ""){
-							if(data.searchvalue && data.searchvalue != "" && data.searchvalue != "undefined"){
-								// Get stored search value
-								searchValue = data.searchvalue;
-							}else{
-								// Get current input value
-								searchValue = inputValue;
-							}
-							if (searchValue && searchValue != "") {
-								// Launch find by field
-								instance._fnFindRecordByField(searchValue, instance, sufix, data.searchfield);
-							}
-						}else{
-							// Getting selected Id from hidden input
-							var hiddenInputs = container.find(".loupe-hiddeninput");
-							if(hiddenInputs.length > 0){
-								for(x = 0; x < hiddenInputs.length; x++){
-									var hiddenInput = hiddenInputs[x];
-									// Check if hidden input has value and is not hidden input for binding
-									if(hiddenInput.value != "" && hiddenInput.id.indexOf("hidden_bind") == -1){
-										// Launch find by id
-										instance._fnFindRecordById(hiddenInput.value, instance, sufix);
-									}
+						// Getting selected Id from hidden input
+						var hiddenInputs = container.find(".loupe-hiddeninput");
+						if(hiddenInputs.length > 0){
+							for(x = 0; x < hiddenInputs.length; x++){
+								var hiddenInput = hiddenInputs[x];
+								// Check if hidden input has value and is not hidden input for binding
+								if(hiddenInput.value == "" && hiddenInput.id.indexOf("hidden_bind") == -1){
+									// Input has value but any selected register, can't save
+									data.hasError = true;
 								}
 							}
 						}
 					}else { // Input is clear
 						// Clean hidden input.
 						container.find(".loupe-hiddeninput").val("");
+						// Restore error flag
+						data.hasError = false;
 						// Reset background to white color
 						input.css("background", "#ffffff");
-						data.hasError = false;
-						// Usually, hidden inputs will be present, but to prevent errors,
-						// we are going to set valueInput to undefined.
-						searchValue = undefined;
+					}
+					// Recall loupefield validation method
+					if(instance.fnGetForm()){
+						input.valid();
 					}
 				},500);
 
@@ -745,7 +731,8 @@ var GvNIX_Loupe;
 			 * */
 			"_fnFindRecordByAll": function(search, instance, sufix) {
 				var data = instance._data;
-			var input = data.$input;
+				var input = data.$input;
+				var container = data.$container;
 				var baseFilter = {};
 
 				//Adding filters from related elements
@@ -789,11 +776,12 @@ var GvNIX_Loupe;
 					error : function(object) {
 						var error = object.responseJSON[0].Error;
 						data.hasError = true;
-					var container = data.$container;
 					container.find(".dropdown_div").html("");
-					container.find(".loupe-hiddeninput").val("");
 					input.css("background",
 							"#FA6161");
+				},
+				complete : function(){
+					container.find(".loupe-hiddeninput").val("");
 					}
 				});
 			},
@@ -873,6 +861,12 @@ var GvNIX_Loupe;
 						// Background white
 							input.css(
 									"background", "#ffffff");
+
+
+							// Recall input validator function to remove error messages
+							if(instance.fnGetForm()){
+								input.valid();
+							}
 
 						// Fire Callback function
 						instance._fnSetItemCallback.fire(onSetNameFunction);
@@ -1103,15 +1097,18 @@ var GvNIX_Loupe;
 			var hiddenInput = container.find(".loupe-hiddeninput");
 				if (hiddenInput.length == 0) {
 					var class_hidden = "loupe-hiddeninput";
+					var requiredProperty = ""
 					if (data.required){
+					requiredProperty = "required='" + data.required + "'";
 					class_hidden = class_hidden+ " include-to-validate";
 					}
 
-				jQuery(
-						'<input id="' + data.name + '_loupe_hidden' + sufix
+				hiddenInputHtml = '<input id="' + data.name + '_loupe_hidden' + sufix
 								+ '" type="hidden" name="' + data.name
-								+ '" required="' + data.required + '" class="'
-								+ class_hidden + '">').insertAfter($input);
+				+ '" ' + requiredProperty + 'class="'
+				+ class_hidden + '">';
+
+				jQuery(hiddenInputHtml).insertAfter($input);
 
 				}
 

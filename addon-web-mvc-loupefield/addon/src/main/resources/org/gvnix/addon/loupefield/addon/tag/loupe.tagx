@@ -22,7 +22,7 @@
   <jsp:directive.attribute name="value" type="java.lang.Object" required="false" rtexprvalue="true" description="Value for input tag (don't use spring tags)" />
   <jsp:directive.attribute name="modalWidth" type="java.lang.String" required="false" description="Specify width for the window opened when push loupe button (default 800)" />
   <jsp:directive.attribute name="hideUtilbox" type="java.lang.String" required="false" description="Specify if is necessary to hide elements with utilbox class on Datatables list (default true)" />
-  <jsp:directive.attribute name="searchField" type="java.lang.String" required="false" description="Specify the field used to search when the input lost focus (default first element of caption)" />
+  <jsp:directive.attribute name="searchField" type="java.lang.String" required="false" description="Specify the field used to filter records (default first element of caption)" />
   <jsp:directive.attribute name="returnFields" type="java.lang.String" required="false" description="Additional fields to return in ajax but don't search by them(Separated by commas)" />
   <jsp:directive.attribute name="labelTitleModal" type="java.lang.String" required="false" description="Specify the code of the label used for the title of modal, default 'Select' followed by label parameter" />
 
@@ -103,9 +103,10 @@
           	<c:choose>
           		<c:when test="${disabled eq false}">
 	          		<input autocomplete="off"
-		          		class="form-control loupe_control"
+		          		class="form-control loupe_control validate"
 		          		id="_${fn:escapeXml(id)}_loupe_input_id"
 		          		type="text"
+            	        name="_${sec_field}_loupe_input"
 		          		data-field= "${field}"
 		          		data-name="${sec_field}"
 		          		data-pkfield = "${pkField}"
@@ -136,9 +137,10 @@
 	          	</c:when>
 	          	<c:otherwise>
        				<input autocomplete="off"
-		          		class="form-control loupe_control"
+		          		class="form-control loupe_control validate"
 		          		id="_${fn:escapeXml(id)}_loupe_input_id"
 		          		type="text"
+           		        name="_${sec_field}_loupe_input"
 		          		disabled="${disabled}"
 		          		data-field= "${field}"
 		          		data-name="${sec_field}"

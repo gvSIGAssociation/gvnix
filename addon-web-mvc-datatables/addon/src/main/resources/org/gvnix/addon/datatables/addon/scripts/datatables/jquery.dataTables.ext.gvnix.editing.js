@@ -1000,6 +1000,13 @@ var GvNIX_Editing;
 
 						// Roo property id has the pattern "... _Entity_propertyName_id"
 						var $ctrlGroup = $createForm.find("div[id $= '_" + property.replace(".","_") + "_id'].control-group");
+						if($ctrlGroup.length == 0){
+							// Control name is empty or doesn't match with field. Try data-name attribute.
+							property = controls.find("[name="+property+"]").attr("data-name");
+							if(property && property != ""){
+								$ctrlGroup = $createForm.find("div[id $= '_" + property.replace(".","_") + "_id'].control-group");
+							}
+						}
 						var $createCtrls = $ctrlGroup.find("div.controls");
 						var $input = $createCtrls.find(":input");
 						if ($input.length == 0) {
