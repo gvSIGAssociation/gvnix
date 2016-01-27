@@ -105,6 +105,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -2432,6 +2433,16 @@ public class DatatablesMetadata extends
                 // optional (by default will get false)
                 parameterTypes.add(helper.createRequestParam(paramType,
                         finderParamNames.get(i).getSymbolName(), false, null));
+            }
+            else if (paramType.getFullyQualifiedTypeName().equals(
+                    new JavaType(Date.class).getFullyQualifiedTypeName())) {
+                AnnotationMetadata dateTimeFormatAnnotation = finderMethod
+                        .getFinderMethodParamFields().get(i)
+                        .getAnnotation(SpringJavaType.DATE_TIME_FORMAT);
+                parameterTypes.add(helper.createDateTimeRequestParam(paramType,
+                        finderParamNames.get(i).getSymbolName(), null, null,
+                        dateTimeFormatAnnotation));
+
             }
             else {
                 parameterTypes.add(helper.createRequestParam(paramType,

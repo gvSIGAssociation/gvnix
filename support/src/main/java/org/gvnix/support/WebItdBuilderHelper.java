@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
@@ -82,6 +83,42 @@ public class WebItdBuilderHelper extends ItdBuilderHelper {
         AnnotationMetadataBuilder paramAnnotationBuilder = new AnnotationMetadataBuilder(
                 SpringJavaType.REQUEST_PARAM, annotationAttributes);
         return new AnnotatedJavaType(paramType, paramAnnotationBuilder.build());
+    }
+
+    /**
+     * Creates a "RequestParam" annotated type including DateTimeFormat
+     * annotation for Date fields.
+     * 
+     * @param paramType
+     * @param value (optional) "value" attribute value
+     * @param required (optional) attribute value
+     * @param defaultValue (optional) attribute value
+     * @param dateTimeFormatAnnotation DateTimeFormat annotation metadata from
+     *        referred Date field
+     * @return
+     */
+    public AnnotatedJavaType createDateTimeRequestParam(JavaType paramType,
+            String value, Boolean required, String defaultValue,
+            AnnotationMetadata dateTimeFormatAnnotation) {
+        // create annotation values
+        final List<AnnotationAttributeValue<?>> annotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        if (StringUtils.isNotBlank(value)) {
+            annotationAttributes.add(new StringAttributeValue(
+                    new JavaSymbolName("value"), value));
+        }
+        if (required != null) {
+            annotationAttributes.add(new BooleanAttributeValue(
+                    new JavaSymbolName("required"), required.booleanValue()));
+        }
+        if (defaultValue != null) {
+            annotationAttributes.add(new StringAttributeValue(
+                    new JavaSymbolName("defaultValue"), defaultValue));
+        }
+        AnnotationMetadataBuilder paramAnnotationBuilder = new AnnotationMetadataBuilder(
+                SpringJavaType.REQUEST_PARAM, annotationAttributes);
+
+        return new AnnotatedJavaType(paramType, paramAnnotationBuilder.build(),
+                dateTimeFormatAnnotation);
     }
 
     /**
