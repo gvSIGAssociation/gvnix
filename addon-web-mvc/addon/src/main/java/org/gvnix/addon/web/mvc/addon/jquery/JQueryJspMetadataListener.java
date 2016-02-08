@@ -26,6 +26,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.web.mvc.controller.addon.finder.WebFinderMetadata;
+import org.springframework.roo.addon.web.mvc.controller.addon.scaffold.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.jsp.JspMetadataListener;
 import org.springframework.roo.metadata.DefaultMetadataService;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
@@ -34,6 +36,7 @@ import org.springframework.roo.metadata.MetadataNotificationListener;
 import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.logging.HandlerUtils;
 
@@ -77,6 +80,10 @@ public class JQueryJspMetadataListener implements MetadataProvider,
 
     private JQueryOperations operations;
 
+    private JspMetadataListener jspMetadataListener;
+
+    private FileManager fileManager;
+
     /**
      * Registers the dependency between upstream {@link JQueryMetadata},
      * upstream {@link WebFinderMetadata} and this meta-data as downstream.
@@ -97,6 +104,9 @@ public class JQueryJspMetadataListener implements MetadataProvider,
         getMetadataDependencyRegistry().registerDependency(
                 WebFinderMetadata.getMetadataIdentiferType(),
                 JQueryJspMetadata.getMetadataIdentiferType());
+        getMetadataDependencyRegistry().registerDependency(
+                WebScaffoldMetadata.getMetadataIdentiferType(),
+                JQueryJspMetadata.getMetadataIdentiferType());
         getMetadataDependencyRegistry().addNotificationListener(this);
     }
 
@@ -114,6 +124,9 @@ public class JQueryJspMetadataListener implements MetadataProvider,
                 JQueryJspMetadata.getMetadataIdentiferType());
         getMetadataDependencyRegistry().deregisterDependency(
                 WebFinderMetadata.getMetadataIdentiferType(),
+                JQueryJspMetadata.getMetadataIdentiferType());
+        getMetadataDependencyRegistry().deregisterDependency(
+                WebScaffoldMetadata.getMetadataIdentiferType(),
                 JQueryJspMetadata.getMetadataIdentiferType());
         getMetadataDependencyRegistry().removeNotificationListener(this);
     }
@@ -172,6 +185,8 @@ public class JQueryJspMetadataListener implements MetadataProvider,
         // ID refers to WebFinderMetadata and we must update the finders
         if (finderMetadata != null) {
             if (finderMetadata.isValid()) {
+                // Write pending changes to ensure that jsp file actually exists
+                getFileManager().commit();
                 // Call to operations for update pages
                 getOperations().updateFindJsp(controller, finderMetadata);
             }
@@ -190,6 +205,10 @@ public class JQueryJspMetadataListener implements MetadataProvider,
 
     public void notify(final String upstreamDependency,
             String downstreamDependency) {
+
+        // Force JspMetadataListener
+        getJspMetadataListener().notify(upstreamDependency,
+                downstreamDependency);
 
         if (MetadataIdentificationUtils
                 .isIdentifyingClass(downstreamDependency)) {
@@ -214,6 +233,16 @@ public class JQueryJspMetadataListener implements MetadataProvider,
                 final JavaType controller = WebFinderMetadata
                         .getJavaType(upstreamDependency);
                 final LogicalPath path = WebFinderMetadata
+                        .getPath(upstreamDependency);
+                downstreamDependency = JQueryJspMetadata.createIdentifier(
+                        controller, path);
+            }
+            // If source meta-data identification (requester/notifier) is
+            // WebScaffoldMetadata
+            else if (WebScaffoldMetadata.isValid(upstreamDependency)) {
+                final JavaType controller = WebScaffoldMetadata
+                        .getJavaType(upstreamDependency);
+                final LogicalPath path = WebScaffoldMetadata
                         .getPath(upstreamDependency);
                 downstreamDependency = JQueryJspMetadata.createIdentifier(
                         controller, path);
@@ -317,6 +346,63 @@ public class JQueryJspMetadataListener implements MetadataProvider,
         }
         else {
             return operations;
+        }
+    }
+
+    public JspMetadataListener getJspMetadataListener() {
+        if (jspMetadataListener == null) {
+            // Get all Services implement MetadataNotificationListener interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(
+                                MetadataNotificationListener.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    MetadataNotificationListener listener = (MetadataNotificationListener) this.context
+                            .getService(ref);
+                    if (listener.getClass().equals(JspMetadataListener.class)) {
+                        jspMetadataListener = (JspMetadataListener) listener;
+                        return jspMetadataListener;
+                    }
+
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load JspMetadataListener on JQueryJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return jspMetadataListener;
+        }
+    }
+
+    public FileManager getFileManager() {
+        if (fileManager == null) {
+            // Get all Services implement JQueryOperations interface
+            try {
+                ServiceReference<?>[] references = this.context
+                        .getAllServiceReferences(FileManager.class.getName(),
+                                null);
+
+                for (ServiceReference<?> ref : references) {
+                    return (FileManager) this.context.getService(ref);
+                }
+
+                return null;
+
+            }
+            catch (InvalidSyntaxException e) {
+                LOGGER.warning("Cannot load FileManager on JQueryJspMetadataListener.");
+                return null;
+            }
+        }
+        else {
+            return fileManager;
         }
     }
 
