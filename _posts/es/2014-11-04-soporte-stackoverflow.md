@@ -30,7 +30,7 @@ Soporte en inglés con la etiqueta ["gvnix"](http://stackoverflow.com/questions/
 
 
 
-y soporte en castellano con ["gvnix-es"](http://stackoverflow.com/questions/tagged/gvnix-es)
+y soporte en castellano con la etiqueta ["gvnix" en el portal en español](http://es.stackoverflow.com/questions/tagged/gvnix)
 
 Queremos darte las gracias por adelantado y esperamos tus preguntas, respuestas y discusiones.
 

@@ -258,7 +258,9 @@ Known, modify and redistribute the source code of gvNIX.
 
 Feel free to help us to evolve, develop and improve gvNIX.
 
-You can send your support requests related to gvNIX, as well as the suggestions that you consider appropiate for its improvement to [Stackoverflow](http://stackoverflow.com/questions/tagged/gvnix). Remember to use the tag #gvnix or #gvnix-es.
+You can send your support requests related to gvNIX, as well as the suggestions that you consider appropiate for its improvement to [StackOverflow](http://stackoverflow.com/questions/tagged/gvnix).
+Remember to use the tag _gvNIX_.
 
-Of course you will find us on the social networks either according to '@gvNIX' or including the `#gvnix` tag in your tweets.
+Of course you will find us on the social networks either according to
+[@gvNIX](http://www.twitter.com/gvnix) or including the _#gvnix_ tag in your tweets.
 
