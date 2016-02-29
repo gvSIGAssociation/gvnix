@@ -34,7 +34,7 @@ completa para tus proyectos Java.
 pública y por supuesto a estudiantes en diferentes centros educativos;
 5 años dónde gvNIX se ha consolidado convirtiéndose en
 estándar para desarrollo Java de la Dirección General de Tecnologías de la
-Información (DGTI) de la Generalitat Valenciana.
+Información y la Comunicación (DGTIC) de la Generalitat Valenciana.
 
 La proyección de crecimiento de gvNIX es ilusionante y garantiza una firme
 propuesta de mejora y de participación de la comunidad de

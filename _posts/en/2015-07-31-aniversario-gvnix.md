@@ -32,7 +32,7 @@ Over the course of the past 5 years, during which user community has grown and e
 5 years during which it makes a firm commitment to training,
 at both companies and public administration and, of course, students at different education centers.
 5 years during which gvNIX is consolidated as standard for Java development of
-the General Directorate for Information Technologies (DGTI) of the Generalitat Valenciana.
+the General Directorate for Information Technologies (GDIT) of the Generalitat Valenciana.
 
 The growth forecast of gvNIX is exciting and
 ensures steady improvement proposal

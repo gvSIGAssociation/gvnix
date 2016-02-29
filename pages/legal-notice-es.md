@@ -17,8 +17,8 @@ El uso de la información contenida en este portal implica la aceptación de las
  las buenas costumbres. El usuario no podrá usar el presente sitio web con
  ninguna finalidad o propósito que sea ilegal o esté prohibido por las presentes
  condiciones de uso, quedando prohibida cualquier actuación en perjuicio de la
- Dirección General de Tecnologías de la Información (DGTI) de la Conselleria de
- Hacienda y Administración Pública de la Generalitat Valenciana o de terceros.
+ Dirección General de Tecnologías de la Información y la Comunicación (DGTIC)
+ de la Conselleria de Hacienda y Modelo Económico de la Generalitat Valenciana o de terceros.
 
 * El contenido se emite a efectos meramente informativos, incluyéndose sólo
 información de carácter general; no ofrece necesariamente información exhaustiva,
@@ -31,12 +31,12 @@ Conselleria no tiene control alguno y respecto de las cuales declina toda respon
 
 * No puede garantizarse que un documento disponible en la WEB reproduzca
 exactamente un texto adoptado oficialmente, únicamente se consideran auténticos
-los textos legales de la Dirección General de Tecnologías de la Información (DGTI)
-de la Conselleria de Hacienda y Administración Pública de la Generalitat Valenciana
+los textos legales de la Dirección General de Tecnologías de la Información y la Comunicación (DGTIC)
+de la Conselleria de Hacienda y Modelo Económico de la Generalitat Valenciana
 publicados en las ediciones impresas de los correspondientes diarios y boletines oficiales.
 
-* La Dirección General de Tecnologías de la Información (DGTI) de la Conselleria
- de Hacienda y Administración Pública de la Generalitat Valenciana
+* La Dirección General de Tecnologías de la Información y la Comunicación (DGTIC) de la
+de la Conselleria de Hacienda y Modelo Económico de la Generalitat Valenciana
 se reserva el derecho a suspender temporalmente el acceso al portal,
 sin previo aviso, de forma discrecional y temporal.
 

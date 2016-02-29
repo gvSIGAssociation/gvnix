@@ -2,7 +2,7 @@
 layout: post
 title: Formación gratuita en gvNIX para estudiantes
 description: Generalitat Valenciana, Asociación gvSIG y DISID apuestan por los futuros ingenieros valencianos
-tags: [formación, gvNIX, DGTI, galería de fotos]
+tags: [formación, gvNIX, DGTIC, galería de fotos]
 type: photo
 imagefeature: /post/institutos-semana-1/7.png
 training: true

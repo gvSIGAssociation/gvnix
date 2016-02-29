@@ -17,8 +17,8 @@ following terms of use:
 in force at all times and the rules of good faith, morality and decency. You may
 not use this web site any goal or purpose that is unlawful or prohibited by these
 terms of use, forbids any action to the detriment of the General Directorate for
-Information Technologies (DGTI) of the Regional Ministry of Finance and Public
-Administration of the Generalitat Valenciana or third parties.
+Information and Communication Technologies (DGTIC) at Regional Ministry of Finance and Economic Model
+of the Generalitat Valenciana or third parties.
 
 * The content is issued for information purposes, including general information
 only; not necessarily comprehensive, complete, accurate or updated information,
@@ -30,12 +30,12 @@ has no control and for which declines all responsibility.
 
 * There is no guarantee that a document available on the web exactly reproduces
 an officially adopted text, only the legal texts of the General Directorate for
-Information Technologies (DGTI) of the Regional Ministry of Finance and Public
-Administration published in the printed editions of the relevant official
+Information and Communication Technologies (DGTIC) at Regional Ministry of Finance and Economic Model
+ published in the printed editions of the relevant official
 journals and newsletters are authentic.
 
-* The General Directorate for Information Technologies (DGTI) of the Regional
-Ministry of Finance and Public Administration of the Generalitat Valenciana
+* The General Directorate for Information  and Communication Technologies (DGTIC)
+at Regional Ministry of Finance and Economic Model of the Generalitat Valenciana
 reserves the right to temporarily suspend access to the website, without notice,
 at its discretion and temporary.
 

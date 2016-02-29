@@ -38,7 +38,7 @@ Objetivo
 
 gvNIX es el entorno de desarrollo rápido de aplicaciones Java que
 recientemente se ha consolidado como el estándar para desarrollo Java de
-la Dirección General de Tecnologías de la Información (DGTI) de la
+la Dirección General de Tecnologías de la Información y la Comunicación (DGTIC) de la
 Generalitat, siendo la propuesta de la DGTI a los nuevos retos,
 condicionantes y expectativas que existen en el ámbito del desarrollo y
 mantenimiento de aplicaciones.
