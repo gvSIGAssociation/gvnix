@@ -72,7 +72,7 @@ timezone:    Europe/Madrid
 # Jekyll Configuration
 #
 future:      true
-highlighter: pygments
+highlighter: rouge
 markdown:    kramdown
 paginate:    2
 paginate_path: "blog/page:num"
